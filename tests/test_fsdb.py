@@ -3,39 +3,14 @@ import tempfile
 import os
 
 from romidata import FSDB
+from romidata.testing import DBTestCase
 
-from dirsync import sync
 import numpy as np
 import imageio
 
 DATABASE_LOCATION = "testdata"
 
-class TemporaryCloneDB(object):
-    """
-    Class for doing tests on a copy of a local DB.
-
-    Parameters
-    __________
-        db_location : str
-            location of the source database
-
-    Attributes
-    __________
-        tmpdir : tempfile.TemporaryDirectory
-    """
-    def __init__(self, db_location):
-        self.tmpdir = tempfile.TemporaryDirectory()
-        sync(db_location, self.tmpdir.name, action="sync")
-
-    def __del__(self):
-        self.tmpdir.cleanup()
-
-class TestFSDB(unittest.TestCase):
-    def get_test_db(self):
-        self.tmpclone = TemporaryCloneDB(DATABASE_LOCATION)
-        db = FSDB(self.tmpclone.tmpdir.name)
-        return db
-
+class TestFSDB(DBTestCase):
     def get_test_scan(self):
         db = self.get_test_db()
         scan = db.get_scan("testscan")

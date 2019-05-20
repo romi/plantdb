@@ -67,11 +67,14 @@ import glob
 import os
 import sys
 import json
-import copy 
+import copy
 import imageio 
 from shutil import copyfile
 
 from romidata import db
+
+MARKER_FILE_NAME = "romidb" # This file must exist in the root of a folder for it to be considered a valid DB
+LOCK_FILE_NAME = "lock" # This file prevents opening the DB if it is present in the root folder of a DB
 
 class FSDB(db.DB):
     """Class defining the database object `DB`.
@@ -86,6 +89,8 @@ class FSDB(db.DB):
         path to the base directory containing the database
     scans : list
         list of `Scan` objects found in the database
+    is_connected : bool
+        True iff the DB is connected (locked the directory)
 
     Methods
     -------
@@ -119,17 +124,39 @@ class FSDB(db.DB):
 
         """
         if not os.path.isdir(basedir):
-            raise error.Error("Not a directory: %s" % basedir)
+            raise IOError("Not a directory: %s" % basedir)
+        if not _is_db(basedir):
+            raise IOError("Not a DB. Check that there is a marker named %s in %s" % (MARKER_FILE_NAME, basedir))
         self.basedir = basedir
-        self.scans = _load_scans(self)
+        self.lock_path = os.path.abspath(os.path.join(basedir, LOCK_FILE_NAME))
+        self.scans = []
+        self.is_connected = False
 
     def connect(self, login_data=None):
-        """No need to connect to HDD."""
-        pass
+        """Connects to DB by creating a lock file.
+        """
+        if not self.is_connected:
+            try:
+                with open(self.lock_path, "x") as _:
+                    self.scans = _load_scans(self)
+                    self.is_connected = True
+            except FileExistsError:
+                raise IOError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
 
     def disconnect(self):
-        """No need to disconnect from HDD."""
-        pass
+        """Disconnects by removing lock.
+        """
+        if self.is_connected:
+            if _is_safe_to_delete(self.lock_path):
+                os.remove(self.lock_path)
+            else:
+                raise IOError("Could not remove lock, maybe you messed with the lock_path attribute?")
+            self.scans = []
+            self.is_connected = False
+
+    def __del__(self):
+        self.disconnect()
+
 
     def get_scans(self):
         """Get the list of scans saved in the database.
@@ -173,9 +200,9 @@ class FSDB(db.DB):
             a new scan object from the database
         """
         if not _is_valid_id(id):
-            raise error.Error("Invalid id")
+            raise IOError("Invalid id")
         if self.get_scan(id) != None:
-            raise error.Error("Duplicate scan name: %s" % id)
+            raise IOError("Duplicate scan name: %s" % id)
         scan = Scan(self, id)
         _make_scan(scan)
         self.scans.append(scan)
@@ -189,18 +216,11 @@ class FSDB(db.DB):
         ----------
             scan_id (str): id of the scan to remove.
         """
-        for x in self.scans:
-            if scan_id == x.id:
-                for f in x.filesets:
-                    x.delete_fileset(f.id)
-                fullpath = os.path.join(self.basedir, scan_id)
-                for f in glob.glob(os.path.join(fullpath, "*")):
-                    os.remove(f)
-                if os.path.exists(fullpath):
-                    os.rmdir(fullpath)
-                self.scans.remove(x)
-                return
-        raise error.Error("Invalid id")
+        scan = self.get_scan(scan_id)
+        if scan is None:
+            raise IOError("Invalid id")
+        _delete_scan(scan)
+        self.scans.remove(scan)
 
 
 class Scan(db.Scan):
@@ -249,9 +269,9 @@ class Scan(db.Scan):
 
     def create_fileset(self, id):
         if not _is_valid_id(id):
-            raise error.Error("Invalid id")
+            raise IOError("Invalid id")
         if self.get_fileset(id) != None:
-            raise error.Error("Duplicate fileset name: %s" % id)
+            raise IOError("Duplicate fileset name: %s" % id)
         fileset = Fileset(self.db, self, id)
         _make_fileset(fileset)
         self.filesets.append(fileset)
@@ -262,19 +282,12 @@ class Scan(db.Scan):
         _store_scan(self)
 
     def delete_fileset(self, fileset_id):
-        for x in self.filesets:
-            if fileset_id == x.id:
-                for f in x.files:
-                    x.delete_file(f.id)
-                fullpath = os.path.join(self.db.basedir, self.id, fileset_id)
-                for f in glob.glob(os.path.join(fullpath, "*")):
-                    os.remove(f)
-                if os.path.exists(fullpath):
-                    os.rmdir(fullpath)
-                self.filesets.remove(x)
-                self.store()
-                return
-        raise error.Error("Invalid id")
+        fs = self.get_fileset(fileset_id)
+        if fs is None:
+            raise IOError("Invalid ID: %s"%fileset_id)
+        _delete_fileset(fs)
+        self.filesets.remove(fs)
+        self.store()
 
         
 class Fileset(db.Fileset):
@@ -311,16 +324,12 @@ class Fileset(db.Fileset):
         return file
 
     def delete_file(self, file_id):
-        for x in self.files:
-            if file_id == x.id:
-                fullpath = os.path.join(self.scan.db.basedir, self.scan.id, self.id, x.filename)
-                if os.path.exists(fullpath):
-                    os.remove(fullpath)
-                self.files.remove(x)
-                self.store()
-                return
-        raise error.Error("Invalid id")
-
+        x = self.get_file(file_id)
+        if x is None:
+            raise IOError("Invalid file ID: %s"%file_id)
+        _delete_file(x)
+        self.files.remove(x)
+        self.store()
     
     def store(self):
         self.scan.store()
@@ -431,7 +440,7 @@ def _load_scan_filesets(scan):
                 print("Warning: unable to load fileset %s, deleting..."%id)
                 # scan.delete_fileset(id)
     else:
-        raise error.Error("%s: filesets is not a list" % files_json)
+        raise IOError("%s: filesets is not a list" % files_json)
     return filesets
 
 
@@ -445,11 +454,11 @@ def _load_fileset(scan, fileset_info):
 def _parse_fileset(db, scan, fileset_info):
     id = fileset_info.get("id")
     if id == None:
-        raise error.Error("Fileset: No ID")
+        raise IOError("Fileset: No ID")
     fileset = Fileset(db, scan, id)
     path = _fileset_path(fileset)
     if not os.path.isdir(path):
-        raise error.Error(
+        raise IOError(
             "Fileset: Fileset directory doesn't exists: %s" % path)
     return fileset
 
@@ -467,7 +476,7 @@ def _load_fileset_files(fileset, fileset_info):
                 print("Warning: unable to load file %s, deleting..."%id)
                 # fileset.delete_file(id)
     else:
-        raise error.Error("files.json: expected a list for files")
+        raise IOError("files.json: expected a list for files")
     return files
 
 
@@ -480,14 +489,14 @@ def _load_file(fileset, file_info):
 def _parse_file(fileset, file_info):
     id = file_info.get("id")
     if id == None:
-        raise error.Error("File: No ID")
+        raise IOError("File: No ID")
     filename = file_info.get("file")
     if filename == None:
-        raise error.Error("File: No filename")
+        raise IOError("File: No filename")
     file = File(fileset.db, fileset, id, filename)
     path = _file_path(file, filename)
     if not os.path.isfile(path):
-        raise error.Error("File: File doesn't exists: %s" % path)
+        raise IOError("File: File doesn't exists: %s" % path)
     return file
 
 
@@ -498,7 +507,7 @@ def _load_metadata(path):
         with open(path, "r") as f:
             r = json.load(f)
         if not isinstance(r, dict):
-            raise error.Error("Not a JSON object: %s" % path)
+            raise IOError("Not a JSON object: %s" % path)
         return r
     else:
         return {}
@@ -560,7 +569,7 @@ def _get_metadata(metadata, key):
 def _set_metadata(metadata, data, value):
     if isinstance(data, str):
         if value == None:
-            raise error.Error("No value given for key %s" % data)
+            raise IOError("No value given for key %s" % data)
         # Do a deepcopy of the value because we don't want to caller
         # the inadvertedly change the values.
         metadata[data] = copy.deepcopy(value)
@@ -568,7 +577,7 @@ def _set_metadata(metadata, data, value):
         for key, value in data.items():
             _set_metadata(metadata, key, value)
     else:
-        raise error.Error("Invalid key: ", data)
+        raise IOError("Invalid key: ", data)
 
 
 #
@@ -665,7 +674,50 @@ def _store_scan(scan):
                   indent=4, separators=(',', ': '))
 
 
-#
-
 def _is_valid_id(id):
     return True # haha  (FIXME!)
+
+def _is_db(path):
+    return os.path.exists(os.path.join(path, MARKER_FILE_NAME))
+
+def _is_safe_to_delete(path):
+    """ A path is safe to delete only if it's a subfolder of a db.
+    """
+    path = os.path.abspath(path)
+    while True:
+        if _is_db(path):
+            return True
+        newpath = os.path.abspath(os.path.join(path, os.path.pardir))
+        if newpath == path:
+            return False
+        path = newpath
+
+def _delete_file(file):
+    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename)
+    if not _is_safe_to_delete(fullpath):
+        raise IOError("Cannot delete files outside of a DB.")
+    if os.path.exists(fullpath):
+        os.remove(fullpath)
+
+
+def _delete_fileset(fileset):
+    for f in fileset.files:
+        fileset.delete_file(f.id)
+    fullpath = os.path.join(fileset.scan.db.basedir, fileset.scan.id, fileset.id)
+    if not _is_safe_to_delete(fullpath):
+        raise IOError("Cannot delete files outside of a DB.")
+    for f in glob.glob(os.path.join(fullpath, "*")):
+        os.remove(f)
+    if os.path.exists(fullpath):
+        os.rmdir(fullpath)
+
+def _delete_scan(scan):
+    for f in scan.filesets:
+        scan.delete_fileset(f.id)
+    fullpath = os.path.join(scan.db.basedir, scan.id)
+    if not _is_safe_to_delete(fullpath):
+        raise IOError("Cannot delete files outside of a DB.")
+    for f in glob.glob(os.path.join(fullpath, "*")):
+        os.remove(f)
+    if os.path.exists(fullpath):
+        os.rmdir(fullpath)

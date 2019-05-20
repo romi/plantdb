@@ -45,7 +45,7 @@ class FilesetTarget(luigi.Target):
             exists : bool
         """
         fs = self.scan.get_fileset(self.fileset_id)
-        return fs is not None and len(fs.get_files()) > 0
+        return fs is not None
 
     def get(self, create=True):
         """Returns the corresponding fileset object.
