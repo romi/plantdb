@@ -1,0 +1,163 @@
+import unittest
+import tempfile
+import os
+
+from romidata import FSDB
+
+from dirsync import sync
+import numpy as np
+import imageio
+
+DATABASE_LOCATION = "testdata"
+
+class TemporaryCloneDB(object):
+    """
+    Class for doing tests on a copy of a local DB.
+
+    Parameters
+    __________
+        db_location : str
+            location of the source database
+
+    Attributes
+    __________
+        tmpdir : tempfile.TemporaryDirectory
+    """
+    def __init__(self, db_location):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        sync(db_location, self.tmpdir.name, action="sync")
+
+    def __del__(self):
+        self.tmpdir.cleanup()
+
+class TestFSDB(unittest.TestCase):
+    def get_test_db(self):
+        self.tmpclone = TemporaryCloneDB(DATABASE_LOCATION)
+        db = FSDB(self.tmpclone.tmpdir.name)
+        return db
+
+    def get_test_scan(self):
+        db = self.get_test_db()
+        scan = db.get_scan("testscan")
+        return scan
+
+    def get_test_fileset(self):
+        scan = self.get_test_scan()
+        fileset = scan.get_fileset("testfileset")
+        return fileset
+
+    def test_connect(self):
+        fileset = self.get_test_fileset()
+        fileset.get_file("image")
+        fileset.get_file("text")
+
+    def test_read_image(self):
+        fileset = self.get_test_fileset()
+        file = fileset.get_file("image")
+        img = file.read_image()
+
+        assert(img[0,0] == 255)
+        assert(img[0,1] == 0)
+        assert(img[1,0] == 0)
+        assert(img[1,1] == 255)
+
+    def test_read_text(self):
+        fileset = self.get_test_fileset()
+        file = fileset.get_file("text")
+        txt = file.read_text()
+
+        assert(txt == "hello")
+
+    def test_read_bytes(self):
+        fileset = self.get_test_fileset()
+        file = fileset.get_file("text")
+        txt = file.read_bytes()
+
+        assert(txt == bytearray(b"hello"))
+
+    def test_create_scan(self):
+        db = self.get_test_db()
+        scan = db.create_scan("testscan_2")
+
+        assert(os.path.isdir(os.path.join(db.basedir, "testscan_2")))
+
+    def test_create_fileset(self):
+        scan = self.get_test_scan()
+        fs = scan.create_fileset("testfileset_2")
+
+        assert(os.path.isdir(os.path.join(scan.db.basedir, scan.id, "testfileset_2")))
+
+    def test_write_image(self):
+        fs = self.get_test_fileset()
+        img = np.zeros((1,1), dtype=np.uint8)
+
+        f = fs.create_file("test_image_png")
+        img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_png.png")
+        f.write_image("png", img)
+        assert(os.path.exists(img_path))
+        img_read = imageio.imread(img_path)
+        assert(img_read[0,0] == 0)
+
+        f = fs.create_file("test_image_jpg")
+        img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_jpg.jpg")
+        f.write_image("jpg", img)
+        assert(os.path.exists(img_path))
+        img_read = imageio.imread(img_path)
+        assert(img_read[0,0] == 0)
+
+    def test_write_text(self):
+        fs = self.get_test_fileset()
+        text = "hello"
+
+        f = fs.create_file("test_text")
+        f_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_text.txt")
+        f.write_text("txt", text)
+
+        assert(os.path.exists(f_path))
+        with open(f_path, 'r') as f_read:
+            assert(f_read.read() == "hello")
+
+    def test_write_bytes(self):
+        fs = self.get_test_fileset()
+        text_bytes = bytearray(b"hello")
+
+        f = fs.create_file("test_text")
+        f_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_text.txt")
+        f.write_bytes("txt", text_bytes)
+
+        assert(os.path.exists(f_path))
+        with open(f_path, 'r') as f_read:
+            assert(f_read.read() == "hello")
+
+    def test_delete_file(self):
+        fs = self.get_test_fileset()
+        fs.delete_file("text")
+
+        fspath = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id)
+
+        assert(os.path.exists(fspath))
+        assert(fs.get_file("text") is None)
+        assert(not os.path.exists(os.path.join(fspath, "text.txt")))
+
+    def test_delete_fileset(self):
+        scan = self.get_test_scan()
+        scan.delete_fileset("testfileset")
+
+        scanpath = os.path.join(scan.db.basedir, scan.id)
+
+        assert(os.path.exists(scanpath))
+        assert(scan.get_fileset("testfileset") is None)
+        assert(not os.path.exists(os.path.join(scanpath, "testfileset")))
+
+    def test_delete_scan(self):
+        db = self.get_test_db()
+        db.delete_scan("testscan")
+
+        assert(os.path.exists(db.basedir))
+        assert(not os.path.exists(os.path.join(db.basedir, "testscan")))
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+

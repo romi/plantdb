@@ -1,0 +1,17 @@
+{
+    "filesets": [
+        {
+            "files": [
+                {
+                    "file": "text.txt",
+                    "id": "text"
+                },
+                {
+                    "file": "image.png",
+                    "id": "image"
+                }
+            ],
+            "id": "testfileset"
+        }
+    ]
+}
