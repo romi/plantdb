@@ -181,6 +181,27 @@ class FSDB(db.DB):
         self.scans.append(scan)
         return scan
 
+    def delete_scan(self, scan_id):
+        """
+        Deletes a scan
+
+        Parameters
+        ----------
+            scan_id (str): id of the scan to remove.
+        """
+        for x in self.scans:
+            if scan_id == x.id:
+                for f in x.filesets:
+                    x.delete_fileset(f.id)
+                fullpath = os.path.join(self.basedir, scan_id)
+                for f in glob.glob(os.path.join(fullpath, "*")):
+                    os.remove(f)
+                if os.path.exists(fullpath):
+                    os.rmdir(fullpath)
+                self.scans.remove(x)
+                return
+        raise error.Error("Invalid id")
+
 
 class Scan(db.Scan):
     """Class defining the scan object `Scan`.

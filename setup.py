@@ -4,16 +4,14 @@ from setuptools import setup, find_packages
 NAME = "romidata"
 DESCRIPTION = "Data handling tools for the ROMI project"
 LICENSE = "Gnu LGPL"
+VERSION = "0.5dev0"
 
 opts = dict(name=NAME,
             description=DESCRIPTION,
             license=LICENSE,
-            classifiers=CLASSIFIERS,
-            platforms=PLATFORMS,
             version=VERSION,
             packages=find_packages(),
             install_requires=[
-                "json",
                 "toml"
             ],
             )

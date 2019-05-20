@@ -23,5 +23,5 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-
-from romiscan.fsdb import FSDB
+from romidata.fsdb import FSDB
+from romidata.task import RomiTask, FilesetTarget, DatabaseConfig
