@@ -73,9 +73,11 @@ import imageio
 from shutil import copyfile
 
 from romidata import db
+from romidata.db import DBBusyError
 
 MARKER_FILE_NAME = "romidb" # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock" # This file prevents opening the DB if it is present in the root folder of a DB
+
 
 class FSDB(db.DB):
     """Class defining the database object `DB`.
@@ -143,7 +145,7 @@ class FSDB(db.DB):
                     self.is_connected = True
                 atexit.register(self.disconnect)
             except FileExistsError:
-                raise IOError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
+                raise DBBusyError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
 
     def disconnect(self):
         """Disconnects by removing lock.

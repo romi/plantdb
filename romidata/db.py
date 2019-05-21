@@ -35,6 +35,10 @@ A ``File`` can be an image, text of bytes.
 TODO: add ``store`` method ?
 """
 
+class DBBusyError(OSError):
+    def __init__(self, message):
+        self.message = message
+
 
 class DB(object):
     """Class defining the database object `DB`.
