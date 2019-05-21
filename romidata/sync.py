@@ -13,12 +13,6 @@ class FSDBSync():
         * That the DB is not busy by checking for the lock file in the DB path root.
     It locks the two databases during the sync. The sync is done using rsync as a subprocess
 
-    Parameters
-    __________
-    source : str
-        source database path (remote or local)
-    target : str
-        target database path (remote or local)
 
     Attributes
     __________
@@ -38,6 +32,14 @@ class FSDBSync():
             return
 
     def __init__(self, source, target):
+        """
+        Parameters
+        __________
+        source : str
+            source database path (remote or local)
+        target : str
+            target database path (remote or local)
+        """
         self.source_str = source
         self.target_str = target
         self.source = _fmt_path(source)
