@@ -19,6 +19,7 @@ class FilesetTarget(luigi.Target):
             id of the target fileset
     """
     def __init__(self, db, scan_id, fileset_id):
+        self.db = db
         db.connect()
         scan = db.get_scan(scan_id)
         if scan is None:

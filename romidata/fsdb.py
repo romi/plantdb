@@ -63,6 +63,7 @@ json objects in a separate directory:
 2018/metadata/images/rgb0002.json
 """
 
+import atexit
 import glob
 import os
 import sys
@@ -140,6 +141,7 @@ class FSDB(db.DB):
                 with open(self.lock_path, "x") as _:
                     self.scans = _load_scans(self)
                     self.is_connected = True
+                atexit.register(self.disconnect)
             except FileExistsError:
                 raise IOError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
 
@@ -147,16 +149,15 @@ class FSDB(db.DB):
         """Disconnects by removing lock.
         """
         if self.is_connected:
+            for s in self.scans:
+                s._erase()
             if _is_safe_to_delete(self.lock_path):
                 os.remove(self.lock_path)
+                atexit.unregister(self.disconnect)
             else:
                 raise IOError("Could not remove lock, maybe you messed with the lock_path attribute?")
             self.scans = []
             self.is_connected = False
-
-    def __del__(self):
-        self.disconnect()
-
 
     def get_scans(self):
         """Get the list of scans saved in the database.
@@ -246,6 +247,12 @@ class Scan(db.Scan):
         self.metadata = None
         self.filesets = []
 
+    def _erase(self):
+        for f in self.filesets:
+            f._erase()
+        del self.metadata
+        del self.filesets
+
     def get_filesets(self):
         return self.filesets  # Copy?
 
@@ -297,6 +304,12 @@ class Fileset(db.Fileset):
         self.metadata = None
         self.files = []
 
+    def _erase(self):
+        for f in self.files:
+            f._erase()
+        self.metadata = None
+        self.files = None
+
     def get_files(self):
         return self.files
 
@@ -340,6 +353,10 @@ class File(db.File):
     def __init__(self, db, fileset, id, filename):
         super().__init__(db, fileset, id)
         self.filename = filename
+        self.metadata = None
+
+    def _erase(self):
+        self.filename = None
         self.metadata = None
 
     def get_metadata(self, key=None):
