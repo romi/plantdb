@@ -8,17 +8,28 @@ class DatabaseConfig(luigi.Config):
 class FilesetTarget(luigi.Target):
     """Implementation of a luigi Target for the romidata DB API.
 
-    Parameters
+    Attributes
     __________
+    db : DB
+        database object
+    scan : Scan
+        scan in which the target is
+    fileset_id : str
+        id if the target fileset
 
-        db : romiscan.db.DB
-            database object
-        scan_id : str
-            id of the scan where the fileset is located
-        fileset_id : str
-            id of the target fileset
     """
     def __init__(self, db, scan_id, fileset_id):
+        """
+        Parameters
+        __________
+
+            db : romiscan.db.DB
+                database object
+            scan_id : str
+                id of the scan where the fileset is located
+            fileset_id : str
+                id of the target fileset
+        """
         self.db = db
         db.connect()
         scan = db.get_scan(scan_id)

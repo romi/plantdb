@@ -20,12 +20,26 @@ class DBRunner(object):
         config : dict
             luigi configuration for tasks
         """
-        if not isinstance(lst, (list, tuple))
+        if not isinstance(tasks, (list, tuple)):
             tasks = [tasks]
         self.db = db
         self.tasks = tasks
         luigi_config = luigi.configuration.get_config()
         luigi_config.read_dict(config)
+
+    def _run_scan_connected(self, scan):
+        db_config = {}
+        db_config['worker'] = {
+            "no_install_shutdown_handler" : True
+        }
+        db_config['DatabaseConfig'] = {
+            'db' : self.db,
+            'scan_id' : scan
+        }
+        luigi_config = luigi.configuration.get_config()
+        luigi_config.read_dict(db_config)
+        luigi.build(tasks=self.tasks,
+                    local_scheduler=True, )
 
     def run_scan(self, scan_id):
         """Run the tasks on a single scan.
@@ -37,15 +51,7 @@ class DBRunner(object):
         """
         self.db.connect()
         scan = self.db.get_scan(scan_id)
-        db_config = {}
-        db_config['DatabaseConfig'] = {
-            'db' : db,
-            'scan_id' : scan
-        }
-        luigi_config = luigi.configuration.get_config()
-        luigi_config.read_dict(db_config)
-        luigi.build(tasks=self.tasks,
-                    local_scheduler=True)
+        self._run_scan_connected(scan)
         self.db.disconnect()
 
     def run(self):
@@ -53,5 +59,7 @@ class DBRunner(object):
         """
         self.db.connect()
         for scan in self.db.get_scans():
-            self.run_scan(scan.id)
+            print("scan = %s"%scan.id)
+            self._run_scan_connected(scan)
+        print("done")
         self.db.disconnect()

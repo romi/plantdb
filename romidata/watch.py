@@ -1,9 +1,15 @@
+import logging
 import time
 
 from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler, LoggingEventHandler, DirCreatedEvent
 
 from romidata.db import DBBusyError
 from romidata.runner import DBRunner
+
+# logging.basicConfig(level=logging.INFO,
+#     format='%(asctime)s - %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S')
 
 class FSDBWatcher():
     """Class for watching changes on a FSDB database and launching a task when it has changed.
@@ -11,12 +17,6 @@ class FSDBWatcher():
 
     Attributes
     __________
-    db : FSDB
-        the target database
-    tasks : list of RomiTask
-        the list of tasks to do on change
-    config : dict
-        configuration for the task
     observer : Observer
         watchdog observer for the filesystem
     """
@@ -30,38 +30,46 @@ class FSDBWatcher():
         config : dict
             configuration for the task
         """
-        self.db = db
-        self.tasks = tasks
-        self.config = config
-        self.runner = DBRunner(db, tasks, config)
         self.observer = Observer()
-        self.observer.schedule(self.run, path, recursive=True)
-
+        handler = FSDBEventHandler(db, tasks, config)
+        self.observer.schedule(handler, db.basedir, recursive=False)
 
     def start(self):
-        """Start watching the database.
-        """
         self.observer.start()
 
     def stop(self):
-        """Stop watching the database.
-        """
-        self.observer.join()
         self.observer.stop()
 
-    def run(self):
-        """Run tasks on the database when it becomes available.
+    def join(self):
+        self.observer.join()
+
+
+class FSDBEventHandler(FileSystemEventHandler):
+    def __init__(self, db, tasks, config):
+        """Parameters
+        __________
+        db : FSDB
+            the target database
+        tasks : list of RomiTask
+            the list of tasks to do on change
+        config : dict
+            configuration for the task
         """
-        if self.running:
+        self.runner = DBRunner(db, tasks, config)
+        self.running = False
+
+    def on_created(self, event):
+        """Run tasks on the database when it becomes available, if a new
+        folder has been created (new scan)
+        """
+        if not isinstance(event, DirCreatedEvent):
             return
-        self.running = True
         while True:
             try:
                 self.runner.run()
-                break
+                self.running = False
+                return
             except DBBusyError:
                 print("DB Busy, waiting for it to be available...")
                 time.sleep(1)
                 continue
-        self.running = False
-
