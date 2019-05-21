@@ -12,7 +12,11 @@ opts = dict(name=NAME,
             version=VERSION,
             packages=find_packages(),
             install_requires=[
-                "toml"
+                "toml",
+                "luigi",
+                "numpy",
+                "imageio",
+                "dirsync"
             ],
             )
 
