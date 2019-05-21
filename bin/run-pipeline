@@ -5,9 +5,11 @@ import sys
 import os
 from shutil import copyfile
 from optparse import OptionParser
+import importlib
 import json
 
 from romidata import FSDB
+from romidata.runner import DBRunner
 
 def parse_path(path):
     path = path.strip('/')
@@ -22,6 +24,10 @@ def parse_path(path):
 def main():
     usage = "usage: %prog [options] db/scan"
     parser = OptionParser(usage=usage)
+
+    parser.add_option("-m", "--module",
+                      dest="module",
+                      default=None)
 
     parser.add_option("-t", "--task",
                       dest="task",
@@ -56,20 +62,11 @@ def main():
     else:
         raise Exception('Unknown pipeline config type')
 
-    db_config = {}
-    db_config['DatabaseConfig'] = {
-        'db' : db,
-        'scan_id' : scan
-    }
+    module = importlib.import(option.module)
+    task = getattr(module, option.task)
 
-    luigi_config = luigi.configuration.get_config()
-    luigi_config.read_dict(config)
-    luigi_config.read_dict(db_config)
-    toml.dump(config, open(scan_pipeline, 'w'))
-
-
-    luigi.build(tasks=[eval("%s()" % options.task)],
-                local_scheduler=True)
+    runner = DBRunner(db, task, config)
+    runner.run()
 
 if __name__ == "__main__":
     main()
