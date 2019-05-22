@@ -31,8 +31,161 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="romi-luigi-tasks">
-<h1>Romi Luigi Tasks<a class="headerlink" href="#romi-luigi-tasks" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-romidata.task">
+<span id="romi-luigi-tasks"></span><h1>Romi Luigi Tasks<a class="headerlink" href="#module-romidata.task" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="romidata.task.DatabaseConfig">
+<em class="property">class </em><code class="descclassname">romidata.task.</code><code class="descname">DatabaseConfig</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.DatabaseConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configuration for the database.</p>
+<dl class="attribute">
+<dt id="romidata.task.DatabaseConfig.db">
+<code class="descname">db</code><em class="property"> = &lt;luigi.parameter.Parameter object&gt;</em><a class="headerlink" href="#romidata.task.DatabaseConfig.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="romidata.task.DatabaseConfig.scan_id">
+<code class="descname">scan_id</code><em class="property"> = &lt;luigi.parameter.Parameter object&gt;</em><a class="headerlink" href="#romidata.task.DatabaseConfig.scan_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.task.DummyTask">
+<em class="property">class </em><code class="descclassname">romidata.task.</code><code class="descname">DummyTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.DummyTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>A RomiTask which does nothing and requires nothing.</p>
+<dl class="method">
+<dt id="romidata.task.DummyTask.requires">
+<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.DummyTask.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.task.DummyTask.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.DummyTask.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.task.FilesetTarget">
+<em class="property">class </em><code class="descclassname">romidata.task.</code><code class="descname">FilesetTarget</code><span class="sig-paren">(</span><em>db</em>, <em>scan_id</em>, <em>fileset_id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.FilesetTarget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of a luigi Target for the romidata DB API.</p>
+<dl class="attribute">
+<dt id="romidata.task.FilesetTarget.db">
+<code class="descname">db</code><a class="headerlink" href="#romidata.task.FilesetTarget.db" title="Permalink to this definition">¶</a></dt>
+<dd><p>database object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.DB" title="romidata.db.DB">DB</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="romidata.task.FilesetTarget.scan">
+<code class="descname">scan</code><a class="headerlink" href="#romidata.task.FilesetTarget.scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>scan in which the target is</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.Scan" title="romidata.db.Scan">Scan</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="romidata.task.FilesetTarget.fileset_id">
+<code class="descname">fileset_id</code><a class="headerlink" href="#romidata.task.FilesetTarget.fileset_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>id if the target fileset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.task.FilesetTarget.create">
+<code class="descname">create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.FilesetTarget.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a target by creating the filset using the romidata DB API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>fileset (romiscan.db.Fileset)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.task.FilesetTarget.exists">
+<code class="descname">exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.FilesetTarget.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>A target exists if the associated fileset exists and is not empty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>exists</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.task.FilesetTarget.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>create=True</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.FilesetTarget.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the corresponding fileset object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>create</strong> (<em>bool</em>) – create the fileset if it does not exist in the database. (default is <cite>True</cite>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>fileset</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>romiscan.db.Fileset</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.task.RomiTask">
+<em class="property">class </em><code class="descclassname">romidata.task.</code><code class="descname">RomiTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.RomiTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of a luigi Task for the romidata DB API.</p>
+<dl class="method">
+<dt id="romidata.task.RomiTask.complete">
+<code class="descname">complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.RomiTask.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a task is complete by checking if Filesets corresponding
+to te task id exist.</p>
+<p>Contrary to original luigi Tasks, this check for completion
+of all required tasks to decide wether it is complete.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.task.RomiTask.output">
+<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.RomiTask.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output for a RomiTask is a FileSetTarget, the fileset ID being
+the task ID.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="romidata.task.mourn_failure">
+<code class="descclassname">romidata.task.</code><code class="descname">mourn_failure</code><span class="sig-paren">(</span><em>task</em>, <em>exception</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.task.mourn_failure" title="Permalink to this definition">¶</a></dt>
+<dd><p>In the case of failure of a task, remove the corresponding fileset from
+the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task</strong> (<a class="reference internal" href="#romidata.task.RomiTask" title="romidata.task.RomiTask"><em>RomiTask</em></a>) – The task which has failed</p></li>
+<li><p><strong>exception</strong> – The exception raised by the failure</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
