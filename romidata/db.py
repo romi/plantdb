@@ -89,6 +89,18 @@ class DB(object):
         """
         raise NotImplementedError
 
+    def delete_scan(self, scan_id):
+        """Delete a scan from the DB.
+
+        Parameters
+        __________
+        id : str
+            id of the scan to delete
+        """
+        raise NotImplementedError
+
+
+
 
 class Scan(object):
     """Class defining the scan object `Scan`.
@@ -194,6 +206,17 @@ class Scan(object):
             id of the new fileset
         """
         raise NotImplementedError
+
+    def delete_fileset(self, fileset_id):
+        """Delete a fileset from the DB.
+
+        Parameters
+        __________
+        id : str
+            id of the fileset to delete
+        """
+        raise NotImplementedError
+
 
 
 class Fileset(object):
@@ -306,6 +329,16 @@ class Fileset(object):
         __________
         id : str
             id of the new file
+        """
+        raise NotImplementedError
+
+    def delete_file(self, file_id):
+        """Delete a file from the DB.
+
+        Parameters
+        __________
+        id : str
+            id of the file to delete
         """
         raise NotImplementedError
 

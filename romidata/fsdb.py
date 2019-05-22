@@ -131,8 +131,6 @@ class FSDB(db.DB):
         self.is_connected = False
 
     def connect(self, login_data=None):
-        """Connects to DB by creating a lock file.
-        """
         if not self.is_connected:
             try:
                 with open(self.lock_path, "x") as _:
@@ -143,8 +141,6 @@ class FSDB(db.DB):
                 raise DBBusyError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
 
     def disconnect(self):
-        """Disconnects by removing lock.
-        """
         if self.is_connected:
             for s in self.scans:
                 s._erase()
@@ -157,46 +153,15 @@ class FSDB(db.DB):
             self.is_connected = False
 
     def get_scans(self):
-        """Get the list of scans saved in the database.
-
-        Returns
-        -------
-        scans : list
-            list of `Scan` objects found in the database
-        """
         return self.scans
 
     def get_scan(self, id):
-        """Get a scan saved in the database under given `id`.
-
-        Parameters
-        ----------
-        id : int
-            identifier of the scan to get
-
-        Returns
-        -------
-        scan : Scan
-            `Scan` object associated to given `id`
-        """
         for scan in self.scans:
             if scan.get_id() == id:
                 return scan
         return None
 
     def create_scan(self, id):
-        """Create a new scan object in the database.
-
-        Parameters
-        ----------
-        id : int
-            identifier of the scan to create
-
-        Returns
-        -------
-        scan: Scan
-            a new scan object from the database
-        """
         if not _is_valid_id(id):
             raise IOError("Invalid id")
         if self.get_scan(id) != None:
@@ -207,13 +172,6 @@ class FSDB(db.DB):
         return scan
 
     def delete_scan(self, scan_id):
-        """
-        Deletes a scan
-
-        Parameters
-        ----------
-            scan_id (str): id of the scan to remove.
-        """
         scan = self.get_scan(scan_id)
         if scan is None:
             raise IOError("Invalid id")
@@ -222,23 +180,6 @@ class FSDB(db.DB):
 
 
 class Scan(db.Scan):
-    """Class defining the scan object `Scan`.
-
-    Implementation of a scan as a list of files with attached metadata.
-
-    Attributes
-    ----------
-    db : FSDB
-        database where to find the scan
-    id : int
-        id of the scan in the database `db`
-    metadata : dict
-        dictionary of metadata attached to `Scan` object
-    filesets : list
-        list of `Fileset` attached to `Scan` object
-
-    """
-
     def __init__(self, db, id):
         super().__init__(db, id)
         self.metadata = None
