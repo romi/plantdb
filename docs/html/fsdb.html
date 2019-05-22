@@ -199,32 +199,88 @@ json objects in a separate directory:</p>
 <dd><dl class="method">
 <dt id="romidata.fsdb.File.get_metadata">
 <code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – metadata key to retrieve (defaults to None)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict or value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.import_file">
 <code class="descname">import_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.import_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Import an existing file to the File object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.read_bytes">
 <code class="descname">read_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_bytes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads bytes from a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>buffer</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytearray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.read_image">
 <code class="descname">read_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_image" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads image data from a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>image</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.read_text">
 <code class="descname">read_text</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads string from a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>string</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.set_metadata">
 <code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.set_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<p>if value is None, scan metadata is set to data. If value is not None
+data is a key and is set to value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>str</em><em> or </em><em>dict</em>) – key or value</p></li>
+<li><p><strong>value</strong> – value to set (default is None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.store">
@@ -234,17 +290,44 @@ json objects in a separate directory:</p>
 <dl class="method">
 <dt id="romidata.fsdb.File.write_bytes">
 <code class="descname">write_bytes</code><span class="sig-paren">(</span><em>type</em>, <em>buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_bytes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Writes bytes to a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>str</em>) – File extension of the file</p></li>
+<li><p><strong>buffer</strong> (<em>bytearray</em>) – data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.write_image">
 <code class="descname">write_image</code><span class="sig-paren">(</span><em>type</em>, <em>image</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_image" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Writes an image to the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>str</em>) – File extension of the image (e.g. “jpg” or “png”)</p></li>
+<li><p><strong>image</strong> (<em>numpy.array</em>) – Image data (NxM or NxMx3)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.File.write_text">
 <code class="descname">write_text</code><span class="sig-paren">(</span><em>type</em>, <em>string</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Writes a string to a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>str</em>) – File extension of the file</p></li>
+<li><p><strong>string</strong> (<em>str</em>) – data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -254,7 +337,13 @@ json objects in a separate directory:</p>
 <dd><dl class="method">
 <dt id="romidata.fsdb.Fileset.create_file">
 <code class="descname">create_file</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.create_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>create a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – id of the new file</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.delete_file">
@@ -264,22 +353,66 @@ json objects in a separate directory:</p>
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.get_file">
 <code class="descname">get_file</code><span class="sig-paren">(</span><em>id</em>, <em>create=False</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get file with given id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.File" title="romidata.db.File">File</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.get_files">
 <code class="descname">get_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_files" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get all files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.get_metadata">
 <code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – metadata key to retrieve (defaults to None)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict or value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.set_metadata">
 <code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.set_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<p>if value is None, scan metadata is set to data. If value is not None
+data is a key and is set to value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>str</em><em> or </em><em>dict</em>) – key or value</p></li>
+<li><p><strong>value</strong> – value to set (default is None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Fileset.store">
@@ -356,7 +489,7 @@ json objects in a separate directory:</p>
 <dl class="method">
 <dt id="romidata.fsdb.Scan.get_fileset">
 <code class="descname">get_fileset</code><span class="sig-paren">(</span><em>id</em>, <em>create=False</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_fileset" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the set of files associated to scan id</p>
+<dd><p>get a fileset with a given id</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – </p>
