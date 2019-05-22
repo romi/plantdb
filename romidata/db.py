@@ -26,7 +26,7 @@
 
 """
 API for the database module in the ROMI project.
-===
+------------------------------------------------
 
 A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.
 A ``Scan`` can be made of several list of files ``Fileset``.

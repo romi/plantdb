@@ -24,43 +24,48 @@
 # ------------------------------------------------------------------------------
 
 
-"""Implementation of a database as a local file structure.
+"""
+FSDB: Implementation of a database as a local file structure.
+------------------------------------------------------------
 
 Assuming the following file structure:
 
-2018/
-2018/images/
-2018/images/rgb0001.jpg
-2018/images/rgb0002.jpg
+::
+    2018/
+    2018/images/
+    2018/images/rgb0001.jpg
+    2018/images/rgb0002.jpg
 
 The 2018/files.json file then contains the following structure:
 
-{
-    "filesets": [
-        {
-            "id": "images",
-            "files": [
-                {
-                    "id": "rgb00001",
-                    "file": "rgb00001.jpg"
-                },
-                {
-                    "id": "rgb00002",
-                    "file": "rgb00002.jpg"
-                }
-            ]
-        }
-    ]
-}
+.. code-block:: json
+    {
+        "filesets": [
+            {
+                "id": "images",
+                "files": [
+                    {
+                        "id": "rgb00001",
+                        "file": "rgb00001.jpg"
+                    },
+                    {
+                        "id": "rgb00002",
+                        "file": "rgb00002.jpg"
+                    }
+                ]
+            }
+        ]
+    }
 
 The metadata of the scan, filesets, and images are stored all as
 json objects in a separate directory:
 
-2018/metadata/
-2018/metadata/metadata.json
-2018/metadata/images.json
-2018/metadata/images/rgb0001.json
-2018/metadata/images/rgb0002.json
+::
+    2018/metadata/
+    2018/metadata/metadata.json
+    2018/metadata/images.json
+    2018/metadata/images/rgb0001.json
+    2018/metadata/images/rgb0002.json
 """
 
 import atexit
