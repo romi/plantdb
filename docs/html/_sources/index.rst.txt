@@ -11,6 +11,7 @@ Welcome to ROMI Data's documentation!
     :caption: Contents:
     
     db
+    tasks
 
 
 Indices and tables
