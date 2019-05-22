@@ -38,7 +38,7 @@ Assuming the following file structure:
 
 The 2018/files.json file then contains the following structure:
 
-.. codeblock:: json
+.. codeblock:: javascript
     {
         "filesets": [
             {
