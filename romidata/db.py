@@ -26,18 +26,14 @@
 
 """
 API for the database module in the ROMI project.
+===
 
 A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.
 A ``Scan`` can be made of several list of files ``Fileset``.
 A ``Fileset`` is made of a list of files ``Files``.
 A ``File`` can be an image, text of bytes.
-
-TODO: add ``store`` method ?
 """
 
-class DBBusyError(OSError):
-    def __init__(self, message):
-        self.message = message
 
 
 class DB(object):
@@ -129,6 +125,15 @@ class Scan(object):
         """
         return self.id
 
+    def get_db(self):
+        """ get parent db
+
+        Returns
+        _______
+        DB
+        """
+        return self.db
+
     def get_filesets(self):
         """ get all sets of files
 
@@ -139,7 +144,7 @@ class Scan(object):
         raise NotImplementedError
 
     def get_fileset(self, id):
-        """get the set of files associated to scan id
+        """get a fileset with a given id
 
         Parameters
         __________
@@ -209,24 +214,6 @@ class Fileset(object):
         id of the scan in the database `DB`
     scan : Scan
         scan containing the set of files
-
-    Methods
-    -------
-    get_id
-        get scan id
-    get_db
-        get database object
-    get_scan
-        get scan object
-    get_files
-        get the list of files associated to scan
-    get_metadata
-        get metadata associated to ``Fileset``
-    set_metadata
-        set metadata associated to ``Fileset``
-    create_file
-        create a file in the given ``Fileset``
-
     """
 
     def __init__(self, db, scan, id):
@@ -235,27 +222,91 @@ class Fileset(object):
         self.id = id
 
     def get_id(self):
+        """get scan id
+
+        Returns
+        _______
+        str
+        """
         return self.id
 
     def get_db(self):
+        """ get parent db
+
+        Returns
+        _______
+        DB
+        """
         return self.db
 
     def get_scan(self):
+        """ get parent scan
+
+        Returns
+        _______
+        Scan
+        """
         return self.scan
 
     def get_files(self):
+        """ get all files
+
+        Returns
+        _______
+        list
+        """
         raise NotImplementedError
 
     def get_file(self, id):
+        """get file with given id
+
+        Parameters
+        __________
+        id : str
+
+        Returns
+        _______
+        File
+        """
         raise NotImplementedError
 
     def get_metadata(self, key=None):
+        """ get metadata associated to scan
+
+        Parameters
+        __________
+        key : str
+            metadata key to retrieve (defaults to None)
+
+        Returns
+        _______
+        dict or value
+        """
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
+        """ get metadata associated to scan
+
+        if value is None, scan metadata is set to data. If value is not None
+        data is a key and is set to value.
+
+        Parameters
+        __________
+        data : str or dict
+            key or value
+        value
+            value to set (default is None)
+        """
         raise NotImplementedError
 
     def create_file(self, id):
+        """ create a file
+
+        Parameters
+        __________
+        id : str
+            id of the new file
+        """
         raise NotImplementedError
 
 
@@ -272,32 +323,6 @@ class File(object):
         set of file containing the file
     id : int
         id of the scan in the database `DB`
-
-    Methods
-    -------
-    get_id
-        get scan id
-    get_db
-        get database object
-    get_fileset
-        get list of files
-    get_metadata
-        get metadata associated to ``File``
-    set_metadata
-        set metadata associated to ``File``
-    write_image
-        method writing an image
-    write_text
-        method writing text
-    import_file
-        prepare file import from given path and add it to Fileset, use ``read_images``, ``read_text`` or ``read_bytes`` to actually import it!
-    read_images
-        read the file, given as ``path`` in ``import_file``, as an image
-    read_text
-        read the file, given as ``path`` in ``import_file``, as text
-    read_bytes
-        read the file, given as ``path`` in ``import_file``, as bytes
-
     """
 
     def __init__(self, db, fileset, id):
@@ -306,37 +331,145 @@ class File(object):
         self.id = id
 
     def get_id(self):
+        """get file id
+
+        Returns
+        _______
+        str
+        """
         return self.id
 
     def get_db(self):
-        return self.db
+        """ get parent db
+
+        Returns
+        _______
+        DB
+        """
+        return self.fileset.scan.db
+
+    def get_scan(self):
+        """ get parent scan
+
+        Returns
+        _______
+        DB
+        """
+        return self.fileset.scan
 
     def get_fileset(self):
+        """ get parent fileset
+
+        Returns
+        _______
+        DB
+        """
         return self.fileset
 
+
     def get_metadata(self, key=None):
+        """ get metadata associated to scan
+
+        Parameters
+        __________
+        key : str
+            metadata key to retrieve (defaults to None)
+
+        Returns
+        _______
+        dict or value
+        """
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
+        """ get metadata associated to scan
+
+        if value is None, scan metadata is set to data. If value is not None
+        data is a key and is set to value.
+
+        Parameters
+        __________
+        data : str or dict
+            key or value
+        value
+            value to set (default is None)
+        """
         raise NotImplementedError
 
     def write_image(self, type, image):
+        """Writes an image to the file
+
+        Parameters
+        __________
+        type : str
+            File extension of the image (e.g. "jpg" or "png")
+        image : numpy.array
+            Image data (NxM or NxMx3)
+        """
         raise NotImplementedError
 
     def write_text(self, type, string):
+        """Writes a string to a file
+
+        Parameters
+        __________
+        type : str
+            File extension of the file
+        string : str
+            data
+        """
         raise NotImplementedError
 
     def write_bytes(self, type, buffer):
+        """Writes bytes to a file
+
+        Parameters
+        __________
+        type : str
+            File extension of the file
+        buffer : bytearray
+            data
+        """
         raise NotImplementedError
 
     def import_file(self, path):
+        """Import an existing file to the File object.
+
+        Parameters
+        __________
+        path : str
+        """
         raise NotImplementedError
 
     def read_image(self):
+        """Reads image data from a file
+
+        Returns
+        _______
+        image : numpy.array
+        """
         raise NotImplementedError
 
     def read_text(self):
+        """Reads string from a file
+
+        Returns
+        _______
+        string : str
+        """
         raise NotImplementedError
 
     def read_bytes(self):
+        """Reads bytes from a file
+
+        Returns
+        _______
+        buffer : bytearray
+        """
         raise NotImplementedError
+
+class DBBusyError(OSError):
+    """This  error is raised when the Database is busy and an operation cannot be done on it.
+    """
+    def __init__(self, message):
+        self.message = message
