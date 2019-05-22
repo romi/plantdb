@@ -178,5 +178,3 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
-# -- Extension configuration -------------------------------------------------
-html_theme = 'alabaster'
