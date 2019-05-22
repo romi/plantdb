@@ -97,7 +97,7 @@ class Scan(object):
 
     Attributes
     ----------
-    db : DB
+    db : db.DB
         database where to find the scan
     id : int
         id of the scan in the database `DB`
@@ -208,11 +208,11 @@ class Fileset(object):
 
     Attributes
     ----------
-    db : DB
+    db : db.DB
         database where to find the scan
     id : int
         id of the scan in the database `DB`
-    scan : Scan
+    scan : db.Scan
         scan containing the set of files
     """
 
@@ -319,7 +319,7 @@ class File(object):
     ----------
     db : DB
         database where to find the scan
-    fileset : Fileset
+    fileset : db.Fileset
         set of file containing the file
     id : int
         id of the scan in the database `DB`
