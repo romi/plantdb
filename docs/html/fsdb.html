@@ -14,7 +14,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to ROMI Data’s documentation!" href="index.html" />
+    <link rel="prev" title="DB API" href="db.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -138,7 +138,7 @@ json objects in a separate directory:</p>
 <dd class="field-even"><p><strong>scan</strong> – a new scan object from the database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#romidata.fsdb.Scan" title="romidata.fsdb.Scan">Scan</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.Scan" title="romidata.db.Scan">Scan</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -172,7 +172,7 @@ json objects in a separate directory:</p>
 <dd class="field-even"><p><strong>scan</strong> – <cite>Scan</cite> object associated to given <cite>id</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#romidata.fsdb.Scan" title="romidata.fsdb.Scan">Scan</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.Scan" title="romidata.db.Scan">Scan</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -340,7 +340,13 @@ json objects in a separate directory:</p>
 <dl class="method">
 <dt id="romidata.fsdb.Scan.create_fileset">
 <code class="descname">create_fileset</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.create_fileset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>create a set of files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – id of the new fileset</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Scan.delete_fileset">
@@ -350,22 +356,66 @@ json objects in a separate directory:</p>
 <dl class="method">
 <dt id="romidata.fsdb.Scan.get_fileset">
 <code class="descname">get_fileset</code><span class="sig-paren">(</span><em>id</em>, <em>create=False</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_fileset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get the set of files associated to scan id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="db.html#romidata.db.Fileset" title="romidata.db.Fileset">Fileset</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Scan.get_filesets">
 <code class="descname">get_filesets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_filesets" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get all sets of files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Scan.get_metadata">
 <code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – metadata key to retrieve (defaults to None)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict or value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Scan.set_metadata">
 <code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.set_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get metadata associated to scan</p>
+<p>if value is None, scan metadata is set to data. If value is not None
+data is a key and is set to value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>str</em><em> or </em><em>dict</em>) – key or value</p></li>
+<li><p><strong>value</strong> – value to set (default is None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="romidata.fsdb.Scan.store">
@@ -395,6 +445,7 @@ json objects in a separate directory:</p>
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="db.html">DB API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">FSDB</a></li>
 </ul>
 
@@ -402,7 +453,7 @@ json objects in a separate directory:</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to ROMI Data’s documentation!</a></li>
+      <li>Previous: <a href="db.html" title="previous chapter">DB API</a></li>
   </ul></li>
 </ul>
 </div>
