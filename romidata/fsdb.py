@@ -94,19 +94,6 @@ class FSDB(db.DB):
         list of `Scan` objects found in the database
     is_connected : bool
         True iff the DB is connected (locked the directory)
-
-    Methods
-    -------
-    connect:
-        no connection required here
-    disconnect:
-        no connection required here
-    get_scans:
-        get the list of scans saved in the database
-    get_scan:
-        get a scan save in the database
-    create_scan:
-        create a new scan object in the database
     """
 
     def __init__(self, basedir):
