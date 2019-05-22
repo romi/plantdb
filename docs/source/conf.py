@@ -179,3 +179,10 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+#---sphinx-themes-----
+html_theme = 'p-main_theme'
+import os
+from PSphinxTheme import utils
+
+p, html_theme, needs_sphinx = utils.set_psphinxtheme(html_theme)
+html_theme_path = p
