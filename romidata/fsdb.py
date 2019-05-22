@@ -30,7 +30,7 @@ FSDB: Implementation of a database as a local file structure.
 
 Assuming the following file structure:
 
-.. codeblock:: none
+.. code-block::
     2018/
     2018/images/
     2018/images/rgb0001.jpg
@@ -38,7 +38,7 @@ Assuming the following file structure:
 
 The 2018/files.json file then contains the following structure:
 
-.. codeblock:: javascript
+.. code-block:: JSON
     {
         "filesets": [
             {
@@ -60,7 +60,7 @@ The 2018/files.json file then contains the following structure:
 The metadata of the scan, filesets, and images are stored all as
 json objects in a separate directory:
 
-.. code-block:: none
+.. code-block::
     2018/metadata/
     2018/metadata/metadata.json
     2018/metadata/images.json
