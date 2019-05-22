@@ -45,38 +45,52 @@ class DB(object):
 
     Abstract class defining the API used to communicate with a database in the
     ROMI project.
-
-    Methods
-    -------
-    connect:
-        connect to the database
-    disconnect:
-        disconnect from the database
-    get_scans:
-        get the list of scans saved in the database
-    get_scan:
-        get a scan save in the database
-    create_scan:
-        create a new scan object in the database
-
     """
 
     def __init__(self):
         pass
 
     def connect(self, login_data=None):
+        """Connect to the database
+        """
         raise NotImplementedError
 
     def disconnect(self):
+        """disconnect from the database
+        """
         raise NotImplementedError
 
     def get_scans(self):
+        """get the list of scans saved in the database
+        """
         raise NotImplementedError
 
     def get_scan(self, id):
+        """get a scan saved in the database
+
+        Parameters
+        __________
+        id : str
+            id of the scan to retrieve
+
+        Returns
+        _______
+        Scan
+        """
         raise NotImplementedError
 
     def create_scan(self, id):
+        """ create a new scan object in the database
+
+        Parameters
+        __________
+        id : str
+            id of the scan to retrieve
+
+        Returns
+        _______
+            Scan
+        """
         raise NotImplementedError
 
 
@@ -91,44 +105,89 @@ class Scan(object):
         database where to find the scan
     id : int
         id of the scan in the database `DB`
-
-    Methods
-    -------
-    get_id
-        get scan id
-    get_filesets
-        get all sets of files
-    get_fileset
-        get the set of files associated to scan id
-    get_metadata
-        get metadata associated to scan
-    set_metadata
-        set metadata associated to scan
-    create_fileset
-        create a set of files
-
     """
 
     def __init__(self, db, id):
+        """
+        Parameters
+        __________
+
+        db : DB
+            db to create the scan in
+        id : str
+            scan id
+        """
         self.db = db
         self.id = id
 
     def get_id(self):
+        """get scan id
+
+        Returns
+        _______
+        str
+        """
         return self.id
 
     def get_filesets(self):
+        """ get all sets of files
+
+        Returns
+        _______
+        list
+        """
         raise NotImplementedError
 
     def get_fileset(self, id):
+        """get the set of files associated to scan id
+
+        Parameters
+        __________
+        id : str
+
+        Returns
+        _______
+        Fileset
+        """
         raise NotImplementedError
 
     def get_metadata(self, key=None):
+        """ get metadata associated to scan
+
+        Parameters
+        __________
+        key : str
+            metadata key to retrieve (defaults to None)
+
+        Returns
+        _______
+        dict or value
+        """
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
+        """ get metadata associated to scan
+
+        if value is None, scan metadata is set to data. If value is not None
+        data is a key and is set to value.
+
+        Parameters
+        __________
+        data : str or dict
+            key or value
+        value
+            value to set (default is None)
+        """
         raise NotImplementedError
 
     def create_fileset(self, id):
+        """ create a set of files
+
+        Parameters
+        __________
+        id : str
+            id of the new fileset
+        """
         raise NotImplementedError
 
 
