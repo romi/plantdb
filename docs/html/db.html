@@ -625,9 +625,41 @@ data is a key and is set to value.</p>
 <span class="target" id="module-romidata.fsdb"></span><div class="section" id="fsdb-implementation-of-a-database-as-a-local-file-structure">
 <h2>FSDB: Implementation of a database as a local file structure.<a class="headerlink" href="#fsdb-implementation-of-a-database-as-a-local-file-structure" title="Permalink to this headline">¶</a></h2>
 <p>Assuming the following file structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2018</span><span class="o">/</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">images</span><span class="o">/</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">rgb0001</span><span class="o">.</span><span class="n">jpg</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">rgb0002</span><span class="o">.</span><span class="n">jpg</span>
+</pre></div>
+</div>
 <p>The 2018/files.json file then contains the following structure:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;filesets&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;files&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb00001&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb00001.jpg&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb00002&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;rgb00002.jpg&quot;</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>The metadata of the scan, filesets, and images are stored all as
 json objects in a separate directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2018</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span><span class="n">metadata</span><span class="o">.</span><span class="n">json</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span><span class="n">images</span><span class="o">.</span><span class="n">json</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">rgb0001</span><span class="o">.</span><span class="n">json</span>
+<span class="mi">2018</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">rgb0002</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
 <dl class="class">
 <dt id="romidata.fsdb.FSDB">
 <em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">FSDB</code><span class="sig-paren">(</span><em>basedir</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB" title="Permalink to this definition">¶</a></dt>
