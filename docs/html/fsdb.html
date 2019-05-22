@@ -36,24 +36,9 @@
 <div class="section" id="fsdb-implementation-of-a-database-as-a-local-file-structure">
 <h2>FSDB: Implementation of a database as a local file structure.<a class="headerlink" href="#fsdb-implementation-of-a-database-as-a-local-file-structure" title="Permalink to this headline">¶</a></h2>
 <p>Assuming the following file structure:</p>
-<dl class="simple">
-<dt>::</dt><dd><p>2018/
-2018/images/
-2018/images/rgb0001.jpg
-2018/images/rgb0002.jpg</p>
-</dd>
-</dl>
 <p>The 2018/files.json file then contains the following structure:</p>
 <p>The metadata of the scan, filesets, and images are stored all as
 json objects in a separate directory:</p>
-<dl class="simple">
-<dt>::</dt><dd><p>2018/metadata/
-2018/metadata/metadata.json
-2018/metadata/images.json
-2018/metadata/images/rgb0001.json
-2018/metadata/images/rgb0002.json</p>
-</dd>
-</dl>
 <dl class="class">
 <dt id="romidata.fsdb.FSDB">
 <em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">FSDB</code><span class="sig-paren">(</span><em>basedir</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB" title="Permalink to this definition">¶</a></dt>
