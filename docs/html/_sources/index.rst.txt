@@ -10,6 +10,7 @@ Welcome to ROMI Data's documentation!
     :maxdepth: 2
     :caption: Contents:
     
+    db
     fsdb
 
 
