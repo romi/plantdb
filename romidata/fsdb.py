@@ -26,7 +26,7 @@
 
 """
 FSDB: Implementation of a database as a local file structure.
-------------------------------------------------------------
+-------------------------------------------------------------
 
 Assuming the following file structure:
 

@@ -71,7 +71,7 @@ class DB(object):
 
         Returns
         _______
-        Scan
+        db.Scan
         """
         raise NotImplementedError
 
@@ -85,7 +85,7 @@ class DB(object):
 
         Returns
         _______
-            Scan
+        db.Scan
         """
         raise NotImplementedError
 
@@ -130,7 +130,7 @@ class Scan(object):
 
         Returns
         _______
-        DB
+        db.DB
         """
         return self.db
 
@@ -152,7 +152,7 @@ class Scan(object):
 
         Returns
         _______
-        Fileset
+        db.Fileset
         """
         raise NotImplementedError
 
@@ -235,7 +235,7 @@ class Fileset(object):
 
         Returns
         _______
-        DB
+        db.DB
         """
         return self.db
 
@@ -244,7 +244,7 @@ class Fileset(object):
 
         Returns
         _______
-        Scan
+        db.Scan
         """
         return self.scan
 
@@ -266,7 +266,7 @@ class Fileset(object):
 
         Returns
         _______
-        File
+        db.File
         """
         raise NotImplementedError
 
@@ -344,7 +344,7 @@ class File(object):
 
         Returns
         _______
-        DB
+        db.DB
         """
         return self.fileset.scan.db
 
@@ -353,7 +353,7 @@ class File(object):
 
         Returns
         _______
-        DB
+        db.Scan
         """
         return self.fileset.scan
 
@@ -362,7 +362,7 @@ class File(object):
 
         Returns
         _______
-        DB
+        db.FileSet
         """
         return self.fileset
 
