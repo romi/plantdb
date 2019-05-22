@@ -34,6 +34,276 @@
 <h1>Welcome to ROMI Data’s documentation!<a class="headerlink" href="#welcome-to-romi-data-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<span class="target" id="module-romidata.fsdb"></span><p>Implementation of a database as a local file structure.</p>
+<p>Assuming the following file structure:</p>
+<p>2018/
+2018/images/
+2018/images/rgb0001.jpg
+2018/images/rgb0002.jpg</p>
+<p>The 2018/files.json file then contains the following structure:</p>
+<dl>
+<dt>{</dt><dd><dl>
+<dt>“filesets”: [</dt><dd><dl>
+<dt>{</dt><dd><p>“id”: “images”,
+“files”: [</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{</dt><dd><p>“id”: “rgb00001”,
+“file”: “rgb00001.jpg”</p>
+</dd>
+</dl>
+<p>},
+{</p>
+<blockquote>
+<div><p>“id”: “rgb00002”,
+“file”: “rgb00002.jpg”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>]</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>]</p>
+</dd>
+</dl>
+<p>}</p>
+<p>The metadata of the scan, filesets, and images are stored all as
+json objects in a separate directory:</p>
+<p>2018/metadata/
+2018/metadata/metadata.json
+2018/metadata/images.json
+2018/metadata/images/rgb0001.json
+2018/metadata/images/rgb0002.json</p>
+<dl class="class">
+<dt id="romidata.fsdb.FSDB">
+<em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">FSDB</code><span class="sig-paren">(</span><em>basedir</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class defining the database object <cite>DB</cite>.</p>
+<dl class="simple">
+<dt>Implementation of a database as a simple file structure with:</dt><dd><ul class="simple">
+<li><p><cite>images</cite> folder containing image files</p></li>
+<li><p><cite>metadata</cite> folder containing JSON metadata associated to image files</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>basedir<span class="classifier">str</span></dt><dd><p>path to the base directory containing the database</p>
+</dd>
+<dt>scans<span class="classifier">list</span></dt><dd><p>list of <cite>Scan</cite> objects found in the database</p>
+</dd>
+<dt>is_connected<span class="classifier">bool</span></dt><dd><p>True iff the DB is connected (locked the directory)</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>login_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to DB by creating a lock file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.create_scan">
+<code class="descname">create_scan</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.create_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new scan object in the database.</p>
+<dl class="simple">
+<dt>id<span class="classifier">int</span></dt><dd><p>identifier of the scan to create</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>scan: Scan</dt><dd><p>a new scan object from the database</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.delete_scan">
+<code class="descname">delete_scan</code><span class="sig-paren">(</span><em>scan_id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.delete_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a scan</p>
+<blockquote>
+<div><p>scan_id (str): id of the scan to remove.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects by removing lock.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.get_scan">
+<code class="descname">get_scan</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.get_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a scan saved in the database under given <cite>id</cite>.</p>
+<dl class="simple">
+<dt>id<span class="classifier">int</span></dt><dd><p>identifier of the scan to get</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>scan<span class="classifier">Scan</span></dt><dd><p><cite>Scan</cite> object associated to given <cite>id</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.FSDB.get_scans">
+<code class="descname">get_scans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.FSDB.get_scans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of scans saved in the database.</p>
+<dl class="simple">
+<dt>scans<span class="classifier">list</span></dt><dd><p>list of <cite>Scan</cite> objects found in the database</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.fsdb.File">
+<em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">File</code><span class="sig-paren">(</span><em>db</em>, <em>fileset</em>, <em>id</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="romidata.fsdb.File.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.import_file">
+<code class="descname">import_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.import_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.read_bytes">
+<code class="descname">read_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.read_image">
+<code class="descname">read_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.read_text">
+<code class="descname">read_text</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.read_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.set_metadata">
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.store">
+<code class="descname">store</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.write_bytes">
+<code class="descname">write_bytes</code><span class="sig-paren">(</span><em>type</em>, <em>buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.write_image">
+<code class="descname">write_image</code><span class="sig-paren">(</span><em>type</em>, <em>image</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.File.write_text">
+<code class="descname">write_text</code><span class="sig-paren">(</span><em>type</em>, <em>string</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.File.write_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.fsdb.Fileset">
+<em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">Fileset</code><span class="sig-paren">(</span><em>db</em>, <em>scan</em>, <em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="romidata.fsdb.Fileset.create_file">
+<code class="descname">create_file</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.create_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.delete_file">
+<code class="descname">delete_file</code><span class="sig-paren">(</span><em>file_id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.delete_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.get_file">
+<code class="descname">get_file</code><span class="sig-paren">(</span><em>id</em>, <em>create=False</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.get_files">
+<code class="descname">get_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.set_metadata">
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Fileset.store">
+<code class="descname">store</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Fileset.store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="romidata.fsdb.Scan">
+<em class="property">class </em><code class="descclassname">romidata.fsdb.</code><code class="descname">Scan</code><span class="sig-paren">(</span><em>db</em>, <em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class defining the scan object <cite>Scan</cite>.</p>
+<p>Implementation of a scan as a list of files with attached metadata.</p>
+<dl class="simple">
+<dt>db<span class="classifier">FSDB</span></dt><dd><p>database where to find the scan</p>
+</dd>
+<dt>id<span class="classifier">int</span></dt><dd><p>id of the scan in the database <cite>db</cite></p>
+</dd>
+<dt>metadata<span class="classifier">dict</span></dt><dd><p>dictionary of metadata attached to <cite>Scan</cite> object</p>
+</dd>
+<dt>filesets<span class="classifier">list</span></dt><dd><p>list of <cite>Fileset</cite> attached to <cite>Scan</cite> object</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="romidata.fsdb.Scan.create_fileset">
+<code class="descname">create_fileset</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.create_fileset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.delete_fileset">
+<code class="descname">delete_fileset</code><span class="sig-paren">(</span><em>fileset_id</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.delete_fileset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.get_fileset">
+<code class="descname">get_fileset</code><span class="sig-paren">(</span><em>id</em>, <em>create=False</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_fileset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.get_filesets">
+<code class="descname">get_filesets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_filesets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.set_metadata">
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>data</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="romidata.fsdb.Scan.store">
+<code class="descname">store</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#romidata.fsdb.Scan.store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
