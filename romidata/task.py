@@ -153,7 +153,7 @@ class RomiTask(luigi.Task):
                 return False
         return True
 
-    def read_text(self, file_id):
+    def read(self, file_id):
         """Helper function to read text from a file
         in the input fileset
 
@@ -162,74 +162,7 @@ class RomiTask(luigi.Task):
         file_id : str
             id of the input file
         """
-        return self.input().get().get_file(file_id).read_text()
-
-    def write_text(self, file_id, ext, data):
-        """Helper function to write text to a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        ext : str
-            file extension
-        data : str
-            data to write
-        """
-        return self.output().get().get_file(file_id, create=True).write_text(ext, data)
-
-    def read_image(self, file_id):
-        """Helper function to read image from a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        """
-        return self.input().get().get_file(file_id).read_image()
-
-    def write_image(self, file_id, ext, data):
-        """Helper function to write image to a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        ext : str
-            file extension
-        data : numpy.array
-            data to write
-        """
-        return self.output().get().get_file(file_id, create=True).write_image(ext, data)
-
-    def read_bytes(self, file_id):
-        """Helper function to read bytes from a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        """
-        return self.input().get().get_file(file_id).read_bytes()
-
-    def write_bytes(self, file_id, ext, data):
-        """Helper function to write bytes to a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        ext : str
-            file extension
-        data : bytearray
-            data to write
-        """
-        return self.output().get().get_file(file_id, create=True).write_bytes(ext, data)
+        return self.input().get().get_file(file_id).read()
 
 class FilesetExists(luigi.Task):
     """A Task which requires a fileset with a given
@@ -263,39 +196,6 @@ class FileByFileTask(RomiTask):
         """
         raise NotImplementedError
 
-    def read_file(self, fi):
-        """Reads a file depending on type
-        Parameters
-        ----------
-        fi : db.File
-        """
-        if self.type == "image":
-            return fi.read_image()
-        elif self.type == "text":
-            return fi.read_text()
-        elif self.type == "bytes":
-            return  fi.read_bytes()
-        else:
-            raise ValueError("Unknown data type %sé"%self.type)
-
-    def write_file(self, fi, ext, data):
-        """Writes to a file depending on type
-        Parameters
-        ----------
-        fi : db.File
-        ext : str
-        data
-        """
-        if self.type == "image":
-            fi.write_image(ext, data)
-        elif self.type == "text":
-            fi.write_text(ext, data)
-        elif self.type == "bytes":
-            fi.write_bytes(ext, data)
-        else:
-            raise ValueError("Unknown data type %sé"%self.type)
-
-
     def run(self):
         """Run the task on every file in the fileset.
         """
@@ -303,7 +203,7 @@ class FileByFileTask(RomiTask):
         output_fileset = self.output().get()
         for fi in input_fileset.get_files():
             print(fi)
-            x = self.read_file(fi)
+            x = self.read(fi)
             ext = os.path.splitext(fi.filename)[-1][1:]
             y = self.f(x)
             newfi = output_fileset.create_file(fi.id)
