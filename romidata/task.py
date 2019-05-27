@@ -154,7 +154,7 @@ class RomiTask(luigi.Task):
         return True
 
     def read(self, file_id):
-        """Helper function to read text from a file
+        """Helper function to read from a file
         in the input fileset
 
         Parameters
