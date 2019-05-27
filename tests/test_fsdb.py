@@ -29,7 +29,7 @@ class TestFSDB(DBTestCase):
     def test_read_image(self):
         fileset = self.get_test_fileset()
         file = fileset.get_file("image")
-        img = file.read_image()
+        img = file.read()
 
         assert(img[0,0] == 255)
         assert(img[0,1] == 0)
@@ -39,16 +39,9 @@ class TestFSDB(DBTestCase):
     def test_read_text(self):
         fileset = self.get_test_fileset()
         file = fileset.get_file("text")
-        txt = file.read_text()
+        txt = file.read()
 
         assert(txt == "hello")
-
-    def test_read_bytes(self):
-        fileset = self.get_test_fileset()
-        file = fileset.get_file("text")
-        txt = file.read_bytes()
-
-        assert(txt == bytearray(b"hello"))
 
     def test_create_scan(self):
         db = self.get_test_db()
@@ -66,16 +59,16 @@ class TestFSDB(DBTestCase):
         fs = self.get_test_fileset()
         img = np.zeros((1,1), dtype=np.uint8)
 
-        f = fs.create_file("test_image_png")
+        f = fs.create_file("test_image_png", "png")
         img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_png.png")
-        f.write_image("png", img)
+        f.write(img)
         assert(os.path.exists(img_path))
         img_read = imageio.imread(img_path)
         assert(img_read[0,0] == 0)
 
-        f = fs.create_file("test_image_jpg")
+        f = fs.create_file("test_image_jpg", "jpg")
         img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_jpg.jpg")
-        f.write_image("jpg", img)
+        f.write(img)
         assert(os.path.exists(img_path))
         img_read = imageio.imread(img_path)
         assert(img_read[0,0] == 0)
@@ -84,21 +77,9 @@ class TestFSDB(DBTestCase):
         fs = self.get_test_fileset()
         text = "hello"
 
-        f = fs.create_file("test_text")
+        f = fs.create_file("test_text", "txt")
         f_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_text.txt")
-        f.write_text("txt", text)
-
-        assert(os.path.exists(f_path))
-        with open(f_path, 'r') as f_read:
-            assert(f_read.read() == "hello")
-
-    def test_write_bytes(self):
-        fs = self.get_test_fileset()
-        text_bytes = bytearray(b"hello")
-
-        f = fs.create_file("test_text")
-        f_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_text.txt")
-        f.write_bytes("txt", text_bytes)
+        f.write(text)
 
         assert(os.path.exists(f_path))
         with open(f_path, 'r') as f_read:

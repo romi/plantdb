@@ -1,3 +1,43 @@
+# -*- python -*-
+# -*- coding: utf-8 -*-
+# 
+# romidata - Data handling tools for the ROMI project
+# 
+# Copyright (C) 2018-2019 Sony Computer Science Laboratories
+# Authors: D. Colliaux, T. Wintz, P. Hanappe
+# 
+# This file is part of romidata.
+# 
+# romidata is free software: you can redistribute it
+# and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# 
+# romidata is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with romidata.  If not, see
+# <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+"""
+romidata.task
+=============
+
+ROMI Luigi Tasks
+
+This module implements subclasses of ``luigi.Config``, ``luigi.Target`` and ``luigi.Tasks``. The goal is to
+have luigi tasks work seemlessly with the database API implemented in ``romidata.db``.
+
+A ``FilesetTarget`` is a luigi target corresponding to a ``Fileset`` object.
+
+A ``RomiTask`` must implement two methods : ``run`` and ``requires``.
+To check for a task completeness, the fileset existence is checked as well as all it's dependencies.
+"""
+
 import luigi
 
 class DatabaseConfig(luigi.Config):
@@ -112,6 +152,163 @@ class RomiTask(luigi.Task):
             if not task.complete():
                 return False
         return True
+
+    def read_text(self, file_id):
+        """Helper function to read text from a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        """
+        return self.input().get().get_file(file_id).read_text()
+
+    def write_text(self, file_id, ext, data):
+        """Helper function to write text to a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        ext : str
+            file extension
+        data : str
+            data to write
+        """
+        return self.output().get().get_file(file_id, create=True).write_text(ext, data)
+
+    def read_image(self, file_id):
+        """Helper function to read image from a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        """
+        return self.input().get().get_file(file_id).read_image()
+
+    def write_image(self, file_id, ext, data):
+        """Helper function to write image to a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        ext : str
+            file extension
+        data : numpy.array
+            data to write
+        """
+        return self.output().get().get_file(file_id, create=True).write_image(ext, data)
+
+    def read_bytes(self, file_id):
+        """Helper function to read bytes from a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        """
+        return self.input().get().get_file(file_id).read_bytes()
+
+    def write_bytes(self, file_id, ext, data):
+        """Helper function to write bytes to a file
+        in the input fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+        ext : str
+            file extension
+        data : bytearray
+            data to write
+        """
+        return self.output().get().get_file(file_id, create=True).write_bytes(ext, data)
+
+class FilesetExists(luigi.Task):
+    """A Task which requires a fileset with a given
+    id to exist. 
+    """
+    fileset_id = None
+
+    def requires(self):
+        return []
+
+    def run(self):
+        if self.output().get() is None:
+            raise OSError("Fileset %s does not exist"%self.fileset_id)
+
+    def output(self):
+        return FilesetTarget(DatabaseConfig().db, DatabaseConfig().scan_id, self.fileset_id)
+
+class ImagesFilesetExists(FilesetExists):
+    """A Task which requires the presence of a fileset with id ``images``
+    """
+    fileset_id = "images"
+
+class FileByFileTask(RomiTask):
+    """This abstract class is a Task which take every file from a fileset
+    and applies some function to it and saves it back
+    to the target.
+    """
+    type = None
+    def f(self, x):
+        """Function applied to every data item.
+        """
+        raise NotImplementedError
+
+    def read_file(self, fi):
+        """Reads a file depending on type
+        Parameters
+        ----------
+        fi : db.File
+        """
+        if self.type == "image":
+            return fi.read_image()
+        elif self.type == "text":
+            return fi.read_text()
+        elif self.type == "bytes":
+            return  fi.read_bytes()
+        else:
+            raise ValueError("Unknown data type %sé"%self.type)
+
+    def write_file(self, fi, ext, data):
+        """Writes to a file depending on type
+        Parameters
+        ----------
+        fi : db.File
+        ext : str
+        data
+        """
+        if self.type == "image":
+            fi.write_image(ext, data)
+        elif self.type == "text":
+            fi.write_text(ext, data)
+        elif self.type == "bytes":
+            fi.write_bytes(ext, data)
+        else:
+            raise ValueError("Unknown data type %sé"%self.type)
+
+
+    def run(self):
+        """Run the task on every file in the fileset.
+        """
+        input_fileset = self.input().get()
+        output_fileset = self.output().get()
+        for fi in input_fileset.get_files():
+            print(fi)
+            x = self.read_file(fi)
+            ext = os.path.splitext(fi.filename)[-1][1:]
+            y = self.f(x)
+            newfi = output_fileset.create_file(fi.id)
+            self.write_file(newfi, ext, y)
+            x = input()
 
 @RomiTask.event_handler(luigi.Event.FAILURE)
 def mourn_failure(task, exception):

@@ -25,8 +25,10 @@
 
 
 """
+romidata.fsdb
+=============
+
 FSDB: Implementation of a database as a local file structure.
--------------------------------------------------------------
 
 Assuming the following file structure:
 
@@ -80,7 +82,7 @@ import copy
 import imageio 
 from shutil import copyfile
 
-from romidata import db
+from romidata import db, io
 from romidata.db import DBBusyError
 
 MARKER_FILE_NAME = "romidb" # This file must exist in the root of a folder for it to be considered a valid DB
@@ -155,11 +157,13 @@ class FSDB(db.DB):
     def get_scans(self):
         return self.scans
 
-    def get_scan(self, id):
-        for scan in self.scans:
-            if scan.get_id() == id:
-                return scan
-        return None
+    def get_scan(self, id, create=False):
+        ids = [f.id for f in self.scans]
+        if id not in ids:
+            if create:
+                return self.create_scan(id)
+            return None
+        return self.scans[ids.index(id)]
 
     def create_scan(self, id):
         if not _is_valid_id(id):
@@ -196,12 +200,12 @@ class Scan(db.Scan):
 
     
     def get_fileset(self, id, create=False):
-        for fileset in self.filesets:
-            if fileset.get_id() == id:
-                return fileset
-        if create:
-            return self.create_fileset(id)
-        return None
+        ids = [f.id for f in self.filesets]
+        if id not in ids:
+            if create:
+                return self.create_fileset(id)
+            return None
+        return self.filesets[ids.index(id)]
 
     def get_metadata(self, key=None):
         return _get_metadata(self.metadata, key)
@@ -253,10 +257,10 @@ class Fileset(db.Fileset):
 
     def get_file(self, id, create=False):
         ids = [f.id for f in self.files]
-        if id not in ids and not create:
+        if id not in ids:
+            if create:
+                return self.create_file(id)
             return None
-        if id not in ids and create:
-            return self.create_file(id)
         return self.files[ids.index(id)]
 
     def get_metadata(self, key=None):
@@ -268,8 +272,8 @@ class Fileset(db.Fileset):
         _set_metadata(self.metadata, data, value)
         _store_fileset_metadata(self)
 
-    def create_file(self, id):
-        file = File(self.db, self, id, None)
+    def create_file(self, id, ext=''):
+        file = File(self.db, self, id, ext)
         self.files.append(file)
         self.store()
         return file
@@ -287,15 +291,19 @@ class Fileset(db.Fileset):
 
 
 class File(db.File):
-
-    def __init__(self, db, fileset, id, filename):
-        super().__init__(db, fileset, id)
-        self.filename = filename
+    def __init__(self, db, fileset, id, ext=''):
+        super().__init__(db, fileset, id, ext)
         self.metadata = None
 
     def _erase(self):
-        self.filename = None
+        self.id = None
         self.metadata = None
+
+    def filename(self):
+        if self.ext != "":
+            return "%s.%s"%(self.id, self.ext)
+        else:
+            return self.id
 
     def get_metadata(self, key=None):
         return _get_metadata(self.metadata, key)
@@ -306,54 +314,25 @@ class File(db.File):
         _set_metadata(self.metadata, data, value)
         _store_file_metadata(self)
 
-    def write_image(self, type, image):
-        filename = _get_filename(self, type)
-        path = _file_path(self, filename)
-        imageio.imwrite(path, image)
-        self.filename = filename
-        self.store()
-
-    def write_text(self, type, string):
-        filename = _get_filename(self, type)
-        path = _file_path(self, filename)
-        with open(path, "w") as f:
-            f.write(string)
-        self.filename = filename
-        self.store()
-
-    def write_bytes(self, type, buffer):
-        filename = _get_filename(self, type)
-        path = _file_path(self, filename)
-        with open(path, "wb") as f:
-            f.write(buffer)
-        self.filename = filename
-        self.store()
 
     def import_file(self, path):
         filename = os.path.basename(path)
-        newpath = _file_path(self, filename)
+        self.ext = os.path.splitext(filename)[-1][1:]
+        newpath = _file_path(self)
         copyfile(path, newpath)
-        self.filename = filename
         self.store()
 
-    def read_image(self):
-        path = _file_path(self, self.filename)
-        return imageio.imread(path)
+    def read(self):
+        return io.read(_file_path(self))
 
-    def read_text(self):
-        path = _file_path(self, self.filename)
-        with open(path, "r") as f:
-            return f.read()
-
-    def read_bytes(self):
-        path = _file_path(self, self.filename)
-        with open(path, "rb") as f:
-            return f.read()
+    def write(self, data):
+        io.write(_file_path(self), data)
+        self.store()
 
     def store(self):
         self.fileset.store()
 
-
+       
 ##################################################################
 #
 # the ugly stuff...
@@ -393,7 +372,7 @@ def _load_scan_filesets(scan):
             except:
                 id = fileset_info.get("id")
                 print("Warning: unable to load fileset %s, deleting..."%id)
-                # scan.delete_fileset(id)
+                scan.delete_fileset(id)
     else:
         raise IOError("%s: filesets is not a list" % files_json)
     return filesets
@@ -429,7 +408,7 @@ def _load_fileset_files(fileset, fileset_info):
             except:
                 id = file_info.get("id")
                 print("Warning: unable to load file %s, deleting..."%id)
-                # fileset.delete_file(id)
+                fileset.delete_file(id)
     else:
         raise IOError("files.json: expected a list for files")
     return files
@@ -448,8 +427,9 @@ def _parse_file(fileset, file_info):
     filename = file_info.get("file")
     if filename == None:
         raise IOError("File: No filename")
-    file = File(fileset.db, fileset, id, filename)
-    path = _file_path(file, filename)
+    ext = os.path.splitext(filename)[-1][1:]
+    file = File(fileset.db, fileset, id, ext)
+    path = _file_path(file)
     if not os.path.isfile(path):
         raise IOError("File: File doesn't exists: %s" % path)
     return file
@@ -566,11 +546,11 @@ def _fileset_path(fileset):
                         fileset.id)
 
 
-def _file_path(file, filename):
+def _file_path(file):
     return os.path.join(file.db.basedir,
                         file.fileset.scan.id,
                         file.fileset.id,
-                        filename)
+                        file.filename())
 
 
 def _scan_files_json(scan):
@@ -604,7 +584,7 @@ def _file_metadata_path(file):
 # store a scan to disk
 
 def _file_to_dict(file):
-    return {"id": file.get_id(), "file": file.filename}
+    return {"id": file.get_id(), "file": file.filename()}
 
 
 def _fileset_to_dict(fileset):
@@ -648,7 +628,8 @@ def _is_safe_to_delete(path):
         path = newpath
 
 def _delete_file(file):
-    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename)
+    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename())
+    print("delete %s"%fullpath)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
     if os.path.exists(fullpath):

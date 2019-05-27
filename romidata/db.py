@@ -25,13 +25,16 @@
 
 
 """
+romidata.db
+===========
+
 API for the database module in the ROMI project.
-------------------------------------------------
 
 A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.
 A ``Scan`` can be made of several list of files ``Fileset``.
 A ``Fileset`` is made of a list of files ``Files``.
 A ``File`` can be an image, text of bytes.
+
 """
 
 
@@ -61,13 +64,16 @@ class DB(object):
         """
         raise NotImplementedError
 
-    def get_scan(self, id):
+    def get_scan(self, id, create=False):
         """get a scan saved in the database
 
         Parameters
         __________
         id : str
             id of the scan to retrieve
+
+        create :  bool
+            create the scan if it does not exist (default : False)
 
         Returns
         _______
@@ -155,13 +161,15 @@ class Scan(object):
         """
         raise NotImplementedError
 
-    def get_fileset(self, id):
+    def get_fileset(self, id, create=False):
         """get a fileset with a given id
 
         Parameters
         __________
         id : str
 
+        create :  bool
+            create the fileset if it does not exist (default : False)
         Returns
         _______
         db.Fileset
@@ -280,12 +288,15 @@ class Fileset(object):
         """
         raise NotImplementedError
 
-    def get_file(self, id):
+    def get_file(self, id, create=False):
         """get file with given id
 
         Parameters
         __________
         id : str
+
+        create :  bool
+            create the file if it does not exist (default : False)
 
         Returns
         _______
@@ -354,14 +365,17 @@ class File(object):
         database where to find the scan
     fileset : db.Fileset
         set of file containing the file
-    id : int
+    id : str
         id of the scan in the database `DB`
+    ext : str
+        file format (default = None, can be deduced when importing file)
     """
 
-    def __init__(self, db, fileset, id):
+    def __init__(self, db, fileset, id, ext=""):
         self.db = db
         self.fileset = fileset
         self.id = id
+        self.ext = ext
 
     def get_id(self):
         """get file id
@@ -429,42 +443,6 @@ class File(object):
         """
         raise NotImplementedError
 
-    def write_image(self, type, image):
-        """Writes an image to the file
-
-        Parameters
-        __________
-        type : str
-            File extension of the image (e.g. "jpg" or "png")
-        image : numpy.array
-            Image data (NxM or NxMx3)
-        """
-        raise NotImplementedError
-
-    def write_text(self, type, string):
-        """Writes a string to a file
-
-        Parameters
-        __________
-        type : str
-            File extension of the file
-        string : str
-            data
-        """
-        raise NotImplementedError
-
-    def write_bytes(self, type, buffer):
-        """Writes bytes to a file
-
-        Parameters
-        __________
-        type : str
-            File extension of the file
-        buffer : bytearray
-            data
-        """
-        raise NotImplementedError
-
     def import_file(self, path):
         """Import an existing file to the File object.
 
@@ -474,25 +452,17 @@ class File(object):
         """
         raise NotImplementedError
 
-    def read_image(self):
-        """Reads image data from a file
+    def write_raw(self, buffer):
+        """Writes bytes to a file
 
-        Returns
-        _______
-        image : numpy.array
+        Parameters
+        __________
+        buffer : bytearray
+            data
         """
         raise NotImplementedError
 
-    def read_text(self):
-        """Reads string from a file
-
-        Returns
-        _______
-        string : str
-        """
-        raise NotImplementedError
-
-    def read_bytes(self):
+    def read_raw(self):
         """Reads bytes from a file
 
         Returns
@@ -500,6 +470,7 @@ class File(object):
         buffer : bytearray
         """
         raise NotImplementedError
+
 
 class DBBusyError(OSError):
     """This  error is raised when the Database is busy and an operation cannot be done on it.
