@@ -367,15 +367,15 @@ class File(object):
         set of file containing the file
     id : str
         id of the scan in the database `DB`
-    ext : str
+    filename : str
         file format (default = None, can be deduced when importing file)
     """
 
-    def __init__(self, db, fileset, id, ext=""):
+    def __init__(self, db, fileset, id):
         self.db = db
         self.fileset = fileset
         self.id = id
-        self.ext = ext
+        self.filename = None
 
     def get_id(self):
         """get file id
@@ -452,7 +452,45 @@ class File(object):
         """
         raise NotImplementedError
 
-    def write_raw(self, buffer):
+    def write_raw(self, buffer, ext=""):
+        """Writes bytes to a file
+
+        Parameters
+        __________
+        buffer : bytearray
+            data
+        """
+        raise NotImplementedError
+
+    def read_raw(self):
+        """Reads bytes from a file
+
+        Returns
+        _______
+        buffer : bytearray
+        """
+        raise NotImplementedError
+
+    def write(self, str, ext=""):
+        """Writes text to a file
+
+        Parameters
+        __________
+        data : str
+            data
+        """
+        raise NotImplementedError
+
+    def read(self):
+        """Reads text from a file
+
+        Returns
+        _______
+        str
+        """
+        raise NotImplementedError
+
+    def write_raw(self, buffer, ext=""):
         """Writes bytes to a file
 
         Parameters

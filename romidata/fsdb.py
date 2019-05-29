@@ -272,8 +272,8 @@ class Fileset(db.Fileset):
         _set_metadata(self.metadata, data, value)
         _store_fileset_metadata(self)
 
-    def create_file(self, id, ext=''):
-        file = File(self.db, self, id, ext)
+    def create_file(self, id):
+        file = File(self.db, self, id)
         self.files.append(file)
         self.store()
         return file
@@ -291,19 +291,13 @@ class Fileset(db.Fileset):
 
 
 class File(db.File):
-    def __init__(self, db, fileset, id, ext=''):
-        super().__init__(db, fileset, id, ext)
+    def __init__(self, db, fileset, id):
+        super().__init__(db, fileset, id)
         self.metadata = None
 
     def _erase(self):
         self.id = None
         self.metadata = None
-
-    def filename(self):
-        if self.ext != "":
-            return "%s.%s"%(self.id, self.ext)
-        else:
-            return self.id
 
     def get_metadata(self, key=None):
         return _get_metadata(self.metadata, key)
@@ -314,23 +308,40 @@ class File(db.File):
         _set_metadata(self.metadata, data, value)
         _store_file_metadata(self)
 
-
     def import_file(self, path):
         filename = os.path.basename(path)
-        self.ext = os.path.splitext(filename)[-1][1:]
+        ext = os.path.splitext(filename)[-1][1:]
+        self.filename = '%s.%s'%(self.id, ext)
         newpath = _file_path(self)
         copyfile(path, newpath)
         self.store()
 
-    def read(self):
-        return io.read(_file_path(self))
-
-    def write(self, data):
-        io.write(_file_path(self), data)
-        self.store()
-
     def store(self):
         self.fileset.store()
+
+    def read_raw(self):
+        path  = _file_path(self)
+        with open(path, "rb") as f:
+            return f.read()
+
+    def write_raw(self, data, ext=""):
+        self.filename = '%s.%s'%(self.id, ext)
+        path  = _file_path(self)
+        with open(path, "wb") as f:
+            f.write(data)
+        self.store()
+
+    def read(self):
+        path  = _file_path(self)
+        with open(path, "r") as f:
+            return f.read()
+
+    def write(self, data, ext=""):
+        self.filename = '%s.%s'%(self.id, ext)
+        path  = _file_path(self)
+        with open(path, "w") as f:
+            f.write(data)
+        self.store()
 
        
 ##################################################################
@@ -427,8 +438,8 @@ def _parse_file(fileset, file_info):
     filename = file_info.get("file")
     if filename == None:
         raise IOError("File: No filename")
-    ext = os.path.splitext(filename)[-1][1:]
-    file = File(fileset.db, fileset, id, ext)
+    file = File(fileset.db, fileset, id)
+    file.filename = filename
     path = _file_path(file)
     if not os.path.isfile(path):
         raise IOError("File: File doesn't exists: %s" % path)
@@ -550,7 +561,7 @@ def _file_path(file):
     return os.path.join(file.db.basedir,
                         file.fileset.scan.id,
                         file.fileset.id,
-                        file.filename())
+                        file.filename)
 
 
 def _scan_files_json(scan):
@@ -584,7 +595,7 @@ def _file_metadata_path(file):
 # store a scan to disk
 
 def _file_to_dict(file):
-    return {"id": file.get_id(), "file": file.filename()}
+    return {"id": file.get_id(), "file": file.filename}
 
 
 def _fileset_to_dict(fileset):
@@ -628,7 +639,7 @@ def _is_safe_to_delete(path):
         path = newpath
 
 def _delete_file(file):
-    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename())
+    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename)
     print("delete %s"%fullpath)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")

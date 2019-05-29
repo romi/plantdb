@@ -164,6 +164,24 @@ class RomiTask(luigi.Task):
         """
         return self.input().get().get_file(file_id).read()
 
+    def write(self, file_id, ext, data):
+        """Helper function to write to a file
+        in the output fileset
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+
+        ext :  str
+            file extension
+
+        data : object
+            data  to write
+        """
+        fi = self.output().get().create_file(file_id, ext=ext)
+        fi.write(data)
+
 class FilesetExists(luigi.Task):
     """A Task which requires a fileset with a given
     id to exist. 

@@ -4,6 +4,7 @@ import os
 
 from romidata import FSDB
 from romidata.testing import DBTestCase
+from romidata import io
 
 import numpy as np
 import imageio
@@ -26,22 +27,7 @@ class TestFSDB(DBTestCase):
         fileset.get_file("image")
         fileset.get_file("text")
 
-    def test_read_image(self):
-        fileset = self.get_test_fileset()
-        file = fileset.get_file("image")
-        img = file.read()
 
-        assert(img[0,0] == 255)
-        assert(img[0,1] == 0)
-        assert(img[1,0] == 0)
-        assert(img[1,1] == 255)
-
-    def test_read_text(self):
-        fileset = self.get_test_fileset()
-        file = fileset.get_file("text")
-        txt = file.read()
-
-        assert(txt == "hello")
 
     def test_create_scan(self):
         db = self.get_test_db()
@@ -55,31 +41,20 @@ class TestFSDB(DBTestCase):
 
         assert(os.path.isdir(os.path.join(scan.db.basedir, scan.id, "testfileset_2")))
 
-    def test_write_image(self):
-        fs = self.get_test_fileset()
-        img = np.zeros((1,1), dtype=np.uint8)
+    def test_read_text(self):
+        fileset = self.get_test_fileset()
+        file = fileset.get_file("text")
+        txt = file.read()
 
-        f = fs.create_file("test_image_png", "png")
-        img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_png.png")
-        f.write(img)
-        assert(os.path.exists(img_path))
-        img_read = imageio.imread(img_path)
-        assert(img_read[0,0] == 0)
-
-        f = fs.create_file("test_image_jpg", "jpg")
-        img_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_image_jpg.jpg")
-        f.write(img)
-        assert(os.path.exists(img_path))
-        img_read = imageio.imread(img_path)
-        assert(img_read[0,0] == 0)
+        assert(txt == "hello")
 
     def test_write_text(self):
         fs = self.get_test_fileset()
         text = "hello"
 
-        f = fs.create_file("test_text", "txt")
+        f = fs.create_file("test_text")
         f_path = os.path.join(fs.scan.db.basedir, fs.scan.id, fs.id, "test_text.txt")
-        f.write(text)
+        f.write(text, "txt")
 
         assert(os.path.exists(f_path))
         with open(f_path, 'r') as f_read:

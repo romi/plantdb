@@ -39,3 +39,13 @@ class DBTestCase(unittest.TestCase):
         self.db.connect()
         return self.db
 
+    def get_test_scan(self):
+        db = self.get_test_db()
+        scan = db.get_scan("testscan")
+        return scan
+
+    def get_test_fileset(self):
+        scan = self.get_test_scan()
+        fileset = scan.get_fileset("testfileset")
+        return fileset
+
