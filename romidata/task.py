@@ -211,6 +211,10 @@ class FileByFileTask(RomiTask):
     to the target.
     """
     type = None
+
+    reader = None
+    writer = None
+
     def f(self, x):
         """Function applied to every data item.
         """
@@ -222,13 +226,13 @@ class FileByFileTask(RomiTask):
         input_fileset = self.input().get()
         output_fileset = self.output().get()
         for fi in input_fileset.get_files():
-            print(fi)
-            x = self.read(fi)
+            x = self.reader(fi)
+
             ext = os.path.splitext(fi.filename)[-1][1:]
             y = self.f(x)
             newfi = output_fileset.create_file(fi.id)
-            self.write_file(newfi, ext, y)
-            x = input()
+
+            self.writer(newfi, y)
 
 @RomiTask.event_handler(luigi.Event.FAILURE)
 def mourn_failure(task, exception):

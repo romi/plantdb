@@ -3,6 +3,7 @@ import tempfile
 import os
 
 from romidata import RomiTask, DatabaseConfig, FilesetTarget, FSDB
+from romidata import io
 from romidata.task import FileByFileTask, FilesetExists, ImagesFilesetExists
 from romidata.testing import TemporaryCloneDB, DBTestCase
 
@@ -28,7 +29,8 @@ class DoNothingTask(RomiTask):
         pass
 
 class ImageIdentityTask(FileByFileTask):
-    type = "image"
+    reader = io.read_image
+    writer = io.write_image
     def f(self, x):
         return x
 
