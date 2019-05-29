@@ -153,34 +153,36 @@ class RomiTask(luigi.Task):
                 return False
         return True
 
-    def read(self, file_id):
-        """Helper function to read from a file
-        in the input fileset
-
-        Parameters
-        ----------
-        file_id : str
-            id of the input file
-        """
-        return self.input().get().get_file(file_id).read()
-
-    def write(self, file_id, ext, data):
-        """Helper function to write to a file
-        in the output fileset
+    def input_file(self, file_id):
+        """Helper to get a file from the
+        input fileset.
 
         Parameters
         ----------
         file_id : str
             id of the input file
 
-        ext :  str
-            file extension
-
-        data : object
-            data  to write
+        Returns
+        _______
+        db.File
         """
-        fi = self.output().get().create_file(file_id, ext=ext)
-        fi.write(data)
+        return self.input().get().get_file(file_id)
+
+    def output_file(self, file_id):
+        """Helper function to get a file from
+        the output  fileset.
+
+        Parameters
+        ----------
+        file_id : str
+            id of the input file
+
+        Returns
+        _______
+        db.File
+
+        """
+        return self.output().get().get_file(file_id, create=True)
 
 class FilesetExists(luigi.Task):
     """A Task which requires a fileset with a given

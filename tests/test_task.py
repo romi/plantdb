@@ -15,8 +15,8 @@ class TouchFileTask(RomiTask):
         return[]
     def run(self):
         x = self.output().get()
-        y = x.create_file("hello", "txt")
-        y.write("hello")
+        y = x.create_file("hello")
+        y.write("hello", "txt")
 
 class TestFilesetExists(FilesetExists):
     fileset_id = "testfileset"
