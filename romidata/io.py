@@ -56,7 +56,6 @@ import imageio
 import json
 import toml
 import numpy as np
-import treex
 import networkx as nx
 import tempfile
 
