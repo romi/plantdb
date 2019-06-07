@@ -56,6 +56,9 @@ import imageio
 import json
 import toml
 import numpy as np
+import treex
+import networkx as nx
+import tempfile
 
 def read_json(dbfile):
     """Reads json from a DB file.
@@ -125,6 +128,8 @@ def write_image(dbfile, data, ext="jpg"):
     ext : str
         file extension (defaults to "jpg")
     """
+    if ext == "jpg" and len(data.shape) == 3:
+        data = data[:,:,:3]
     b = imageio.imwrite(imageio.RETURN_BYTES, data, format=ext)
     dbfile.write_raw(b, ext)
 
@@ -138,9 +143,9 @@ def read_volume(dbfile):
     _______
     np.ndarray
     """
-    return imageio.volread(dbfile.read_raw())
+    return imageio.volread(dbfile.read_raw(), format="npz")
 
-def write_volume(dbfile, data, ext="tiff"):
+def write_volume(dbfile, data):
     """Writes volume to a DB file.
     Parameters
     __________
@@ -149,10 +154,10 @@ def write_volume(dbfile, data, ext="tiff"):
     ext : str
         file extension (defaults to "tiff").
     """
-    b = imageio.volwrite(imageio.RETURN_BYTES, data, format=ext)
-    dbfile.write_raw(b, ext)
+    b = imageio.volwrite(imageio.RETURN_BYTES, data, format="npz")
+    dbfile.write_raw(b, "npz")
 
-def read_point_cloud(dbfile):
+def read_point_cloud(dbfile, ext="ply"):
     """Reads point cloud from a DB file.
     Parameters
     __________
@@ -163,10 +168,11 @@ def read_point_cloud(dbfile):
     PointCloud
     """
     b = dbfile.read_raw()
-    with tempfile.NamedTemporaryFile() as fh:
-        fh.write(b)
-        fh.close()
-        return open3d.io.read_point_cloud(fh.name)
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return open3d.io.read_point_cloud(fname)
 
 def write_point_cloud(dbfile, data, ext="ply"):
     """Writes point cloud to a DB file.
@@ -177,13 +183,45 @@ def write_point_cloud(dbfile, data, ext="ply"):
     ext : str
         file extension (defaults to "ply").
     """
-    with tempfile.NamedTemporaryFile() as fh:
-        fh.close()
-        open3d.write_point_cloud("temp.%s"%ext, data)
-        dbfile.import_file(fh.name)
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        open3d.io.write_point_cloud(fname, data)
+        dbfile.import_file(fname)
 
-def read_triangle_mesh(dbfile):
-    """Reads point cloud from a DB file.
+def read_triangle_mesh(dbfile, ext="ply"):
+    """Reads triangle mesh from a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+
+    Returns
+    _______
+    PointCloud
+    """
+    b = dbfile.read_raw()
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return open3d.io.read_triangle_mesh(fname)
+
+def write_triangle_mesh(dbfile, data, ext="ply"):
+    """Writes triangle mesh to a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+    data : PointCloud
+    ext : str
+        file extension (defaults to "ply").
+    """
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        open3d.io.write_triangle_mesh(fname, data)
+        dbfile.import_file(fname)
+
+
+def read_graph(dbfile):
+    """Reads treex tree from a DB file.
     Parameters
     __________
     dbfile : db.File
@@ -193,22 +231,24 @@ def read_triangle_mesh(dbfile):
     TriangleMesh
     """
     b = dbfile.read_raw()
-    with tempfile.NamedTemporaryFile() as fh:
-        fh.write(b)
-        fh.close()
-        return open3d.io.read_triangle_mesh(fh.name)
+    ext = "p"
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return nx.read_gpickle(fname)
 
-def write_triangle_mesh(dbfile, data, ext="ply"):
-    """Writes point cloud to a DB file.
+def write_graph(dbfile, data):
+    """Writes treex tree to a DB file.
     Parameters
     __________
     dbfile : db.File
-    data : PointCloud
+    data : treex.tree.Tree
     ext : str
-        file extension (defaults to "ply").
+        file extension (defaults to "treex").
     """
-    with tempfile.NamedTemporaryFile() as fh:
-        fh.close()
-        open3d.io.write_triangle_mesh("temp.%s"%ext, data)
-        dbfile.import_file(fh.name)
-
+    ext = "p"
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        nx.write_gpickle(data, fname)
+        dbfile.import_file(fname)

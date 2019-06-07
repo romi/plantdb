@@ -10,15 +10,17 @@ import json
 
 from romidata import FSDB
 from romidata.runner import DBRunner
+from romidata.task import DatabaseConfig
 
 def parse_path(path):
-    path = path.strip('/')
+    path = path.rstrip('/')
+    print("path = %s"%path)
     if not os.path.isdir(path):
         raise IOError("Scan path not found.")
 
     path = path.split('/')
     db_path = '/'.join(path[:-1])
-    scan_id = path[-1])
+    scan_id = path[-1]
     return db_path, scan_id
 
 def main():
@@ -27,7 +29,7 @@ def main():
 
     parser.add_option("-m", "--module",
                       dest="module",
-                      default=None)
+                      default="romiscan.tasks")
 
     parser.add_option("-t", "--task",
                       dest="task",
@@ -50,10 +52,13 @@ def main():
     db_path, scan_id = parse_path(args[0])
     db = FSDB(db_path)
 
+    DatabaseConfig.db = db
+    DatabaseConfig.scan_id = scan_id
+
     # Read pipeline configuration
-    scan_pipeline = os.path.join(db, scan, "pipeline.toml")
-    if options.config is None: # By default, take pipeline.toml in the scan directory
-        options.config = scan_pipeline
+    # scan_pipeline = os.path.join(db, scan, "pipeline.toml")
+    # if options.config is None: # By default, take pipeline.toml in the scan directory
+        # options.config = scan_pipeline
     if os.path.splitext(options.config)[-1] == ".toml":
         import toml
         config = toml.load(open(options.config))
@@ -62,11 +67,13 @@ def main():
     else:
         raise Exception('Unknown pipeline config type')
 
-    module = importlib.import(option.module)
-    task = getattr(module, option.task)
+    module = importlib.import_module(options.module)
+    task = getattr(module, options.task)
+
+    print("config = \n%s"%json.dumps(config, indent=4))
 
     runner = DBRunner(db, task, config)
-    runner.run()
+    runner.run_scan(scan_id)
 
 if __name__ == "__main__":
     main()

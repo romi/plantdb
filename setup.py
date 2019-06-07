@@ -11,6 +11,7 @@ opts = dict(name=NAME,
             license=LICENSE,
             version=VERSION,
             packages=find_packages(),
+            scripts=['bin/run-pipeline'],
             install_requires=[
                 "toml",
                 "luigi",

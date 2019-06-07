@@ -38,8 +38,9 @@ class DBRunner(object):
         }
         luigi_config = luigi.configuration.get_config()
         luigi_config.read_dict(db_config)
-        luigi.build(tasks=self.tasks,
-                    local_scheduler=True, )
+        tasks = [t() for t in self.tasks]
+        luigi.build(tasks=tasks,
+                    local_scheduler=True)
 
     def run_scan(self, scan_id):
         """Run the tasks on a single scan.

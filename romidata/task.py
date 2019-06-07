@@ -39,6 +39,7 @@ To check for a task completeness, the fileset existence is checked as well as al
 """
 
 import luigi
+import os
 
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
@@ -226,13 +227,13 @@ class FileByFileTask(RomiTask):
         input_fileset = self.input().get()
         output_fileset = self.output().get()
         for fi in input_fileset.get_files():
-            x = self.reader(fi)
+            x = type(self).reader(fi)
 
             ext = os.path.splitext(fi.filename)[-1][1:]
             y = self.f(x)
             newfi = output_fileset.create_file(fi.id)
 
-            self.writer(newfi, y)
+            type(self).writer(newfi, y)
 
 @RomiTask.event_handler(luigi.Event.FAILURE)
 def mourn_failure(task, exception):

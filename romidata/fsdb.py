@@ -233,7 +233,7 @@ class Scan(db.Scan):
     def delete_fileset(self, fileset_id):
         fs = self.get_fileset(fileset_id)
         if fs is None:
-            raise IOError("Invalid ID: %s"%fileset_id)
+            return
         _delete_fileset(fs)
         self.filesets.remove(fs)
         self.store()
@@ -514,7 +514,7 @@ def _get_metadata(metadata, key):
 
 def _set_metadata(metadata, data, value):
     if isinstance(data, str):
-        if value == None:
+        if value is None:
             raise IOError("No value given for key %s" % data)
         # Do a deepcopy of the value because we don't want to caller
         # the inadvertedly change the values.
@@ -639,6 +639,8 @@ def _is_safe_to_delete(path):
         path = newpath
 
 def _delete_file(file):
+    if file.filename is None:
+        return
     fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id, file.fileset.id, file.filename)
     print("delete %s"%fullpath)
     if not _is_safe_to_delete(fullpath):
