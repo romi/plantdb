@@ -41,6 +41,32 @@ To check for a task completeness, the fileset existence is checked as well as al
 import luigi
 import os
 
+class TaskParameter(Parameter):
+    """ A parameter for a custom task.
+    """
+
+    def serialize(self, x):
+        if x is None:
+            return ''
+        else:
+            return str(x.__name__)
+
+    def parse(self, x):
+        y = x.split(".")
+        if not y[-1].isidentifier():
+            raise ValueError("Invalid task name: %s"%x)
+        if len(y) == 1:
+            c = eval(y[0])
+        else:
+            mod = ".".join(y[:-1])
+            mod = importlib.import_module(mod)
+            c = mod.getattr(y[-1])
+
+        if not issubclass(c, RomiTask):
+            raise ValueError("Invalid task, not a subclass of RomiTask")
+
+        return c
+
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
     db = luigi.Parameter()
@@ -117,6 +143,12 @@ class FilesetTarget(luigi.Target):
 
 class RomiTask(luigi.Task):
     """Implementation of a luigi Task for the romidata DB API."""
+    upstream_task = TaskParameter()
+
+    def requires(self):
+        return self.upstream_task
+
+
     def output(self):
         """Output for a RomiTask is a FileSetTarget, the fileset ID being
         the task ID.
@@ -154,19 +186,23 @@ class RomiTask(luigi.Task):
                 return False
         return True
 
-    def input_file(self, file_id):
+    def input_file(self, file_id=None):
         """Helper to get a file from the
-        input fileset.
+        input fileset. If file_id is None,
+        returns some file of the input fileset.
 
         Parameters
         ----------
         file_id : str
-            id of the input file
+            id of the input file. Defaults to None.
 
         Returns
         _______
         db.File
         """
+        if file_id is None:
+            return self.input().get().get_files()[0]
+
         return self.input().get().get_file(file_id)
 
     def output_file(self, file_id):
