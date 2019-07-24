@@ -41,36 +41,37 @@ To check for a task completeness, the fileset existence is checked as well as al
 import luigi
 import os
 
-class TaskParameter(Parameter):
-    """ A parameter for a custom task.
-    """
+from romidata import FSDB
 
-    def serialize(self, x):
-        if x is None:
-            return ''
-        else:
-            return str(x.__name__)
+db = None
+
+class ScanParameter(luigi.Parameter):
+    def serialize(self, scan):
+        db_path = scan.db.basedir
+        scan_id = scan.id
+        return '/'.join([db_path, scan_id])
 
     def parse(self, x):
-        y = x.split(".")
-        if not y[-1].isidentifier():
-            raise ValueError("Invalid task name: %s"%x)
-        if len(y) == 1:
-            c = eval(y[0])
-        else:
-            mod = ".".join(y[:-1])
-            mod = importlib.import_module(mod)
-            c = mod.getattr(y[-1])
+        global db
+        path = x.rstrip('/')
+        print("path = %s"%path)
+        if not os.path.isdir(path):
+            raise IOError("Scan path not found.")
 
-        if not issubclass(c, RomiTask):
-            raise ValueError("Invalid task, not a subclass of RomiTask")
+        path = path.split('/')
+        db_path = '/'.join(path[:-1])
+        scan_id = path[-1]
+        if db is not None:
+            db.disconnect()
 
-        return c
+        db = FSDB(db_path)
+        db.connect()
+        scan = db.get_scan(scan_id)
+        return scan
 
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
-    db = luigi.Parameter()
-    scan_id = luigi.Parameter()
+    scan = ScanParameter()
 
 class FilesetTarget(luigi.Target):
     """Implementation of a luigi Target for the romidata DB API.
@@ -85,7 +86,7 @@ class FilesetTarget(luigi.Target):
         id if the target fileset
 
     """
-    def __init__(self, db, scan_id, fileset_id):
+    def __init__(self, scan, fileset_id):
         """
         Parameters
         __________
@@ -97,11 +98,7 @@ class FilesetTarget(luigi.Target):
             fileset_id : str
                 id of the target fileset
         """
-        self.db = db
-        db.connect()
-        scan = db.get_scan(scan_id)
-        if scan is None:
-            raise Exception("Scan does not exist")
+        self.db = scan.db
         self.scan = scan
         self.fileset_id = fileset_id
 
@@ -143,10 +140,12 @@ class FilesetTarget(luigi.Target):
 
 class RomiTask(luigi.Task):
     """Implementation of a luigi Task for the romidata DB API."""
-    upstream_task = TaskParameter()
+
+    upstream_task = luigi.TaskParameter()
+    output_file_id = luigi.Parameter(default="out")
 
     def requires(self):
-        return self.upstream_task
+        return self.upstream_task()
 
 
     def output(self):
@@ -154,7 +153,10 @@ class RomiTask(luigi.Task):
         the task ID.
         """
         fileset_id = self.task_id
-        return FilesetTarget(DatabaseConfig().db, DatabaseConfig().scan_id, fileset_id)
+        return FilesetTarget(DatabaseConfig().scan, fileset_id)
+
+    def output_file(self):
+        fs = self.output
 
     def complete(self):
         """Checks if a task is complete by checking if Filesets corresponding
@@ -187,25 +189,23 @@ class RomiTask(luigi.Task):
         return True
 
     def input_file(self, file_id=None):
-        """Helper to get a file from the
-        input fileset. If file_id is None,
-        returns some file of the input fileset.
+        """Helper function to get a file from
+        the input fileset.
 
         Parameters
         ----------
         file_id : str
-            id of the input file. Defaults to None.
+            id of the input file
 
         Returns
         _______
         db.File
+
         """
-        if file_id is None:
-            return self.input().get().get_files()[0]
+        return self.upstream_task.output_file(file_id)
 
-        return self.input().get().get_file(file_id)
 
-    def output_file(self, file_id):
+    def output_file(self, file_id=None):
         """Helper function to get a file from
         the output  fileset.
 
@@ -219,7 +219,9 @@ class RomiTask(luigi.Task):
         db.File
 
         """
-        return self.output().get().get_file(file_id, create=True)
+        if file_id is None:
+            file_id = self.get_task_family().split('.')[-1]
+        return self.output().get().get_file(file_id)
 
 class FilesetExists(luigi.Task):
     """A Task which requires a fileset with a given
@@ -235,7 +237,7 @@ class FilesetExists(luigi.Task):
             raise OSError("Fileset %s does not exist"%self.fileset_id)
 
     def output(self):
-        return FilesetTarget(DatabaseConfig().db, DatabaseConfig().scan_id, self.fileset_id)
+        return FilesetTarget(DatabaseConfig().scan, self.fileset_id)
 
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``

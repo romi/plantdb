@@ -23,57 +23,12 @@ def parse_path(path):
     scan_id = path[-1]
     return db_path, scan_id
 
-def main():
-    usage = "usage: %prog [options] db/scan"
-    parser = OptionParser(usage=usage)
 
-    parser.add_option("-m", "--module",
-                      dest="module",
-                      default="romiscan.tasks")
-
-    parser.add_option("-t", "--task",
-                      dest="task",
-                      default=None)
-
-    parser.add_option("-c", "--config",
-                      dest="config",
-                      default=None)
-
-    (options, args) = parser.parse_args()
-
-    if '-n' in sys.argv:
-        i = find('-n')
-
-    if len(args) != 1:
-        raise Exception(
-            'Wrong number of arguments. Type %prog --help for more.')
-
-    # Connect to database
-    db_path, scan_id = parse_path(args[0])
-    db = FSDB(db_path)
+if __name__ == "__main__":
+    db = FSDB("/data/twintz/scanner/calib")
+    scan_id = "calib_test1"
 
     DatabaseConfig.db = db
     DatabaseConfig.scan_id = scan_id
 
-    # Read pipeline configuration
-    # scan_pipeline = os.path.join(db, scan, "pipeline.toml")
-    # if options.config is None: # By default, take pipeline.toml in the scan directory
-        # options.config = scan_pipeline
-    if os.path.splitext(options.config)[-1] == ".toml":
-        import toml
-        config = toml.load(open(options.config))
-    elif os.path.splitext(options.config)[-1] == ".json":
-        config = json.load(open(options.config))
-    else:
-        raise Exception('Unknown pipeline config type')
-
-    module = importlib.import_module(options.module)
-    task = getattr(module, options.task)
-
-    print("config = \n%s"%json.dumps(config, indent=4))
-
-    runner = DBRunner(db, task, config)
-    runner.run_scan(scan_id)
-
-if __name__ == "__main__":
-    main()
+    luigi.run()
