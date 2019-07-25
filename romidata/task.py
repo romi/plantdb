@@ -54,18 +54,15 @@ class ScanParameter(luigi.Parameter):
     def parse(self, x):
         global db
         path = x.rstrip('/')
-        print("path = %s"%path)
         if not os.path.isdir(path):
             raise IOError("Scan path not found.")
 
         path = path.split('/')
         db_path = '/'.join(path[:-1])
         scan_id = path[-1]
-        if db is not None:
-            db.disconnect()
-
-        db = FSDB(db_path)
-        db.connect()
+        if db is None: # TODO: cannot change DB during run..
+            db = FSDB(db_path)
+            db.connect()
         scan = db.get_scan(scan_id)
         return scan
 
@@ -155,9 +152,6 @@ class RomiTask(luigi.Task):
         fileset_id = self.task_id
         return FilesetTarget(DatabaseConfig().scan, fileset_id)
 
-    def output_file(self):
-        fs = self.output
-
     def complete(self):
         """Checks if a task is complete by checking if Filesets corresponding
         to te task id exist.
@@ -202,7 +196,7 @@ class RomiTask(luigi.Task):
         db.File
 
         """
-        return self.upstream_task.output_file(file_id)
+        return self.upstream_task().output_file(file_id)
 
 
     def output_file(self, file_id=None):
@@ -221,7 +215,7 @@ class RomiTask(luigi.Task):
         """
         if file_id is None:
             file_id = self.get_task_family().split('.')[-1]
-        return self.output().get().get_file(file_id)
+        return self.output().get().get_file(file_id, create=True)
 
 class FilesetExists(luigi.Task):
     """A Task which requires a fileset with a given
