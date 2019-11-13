@@ -64,6 +64,8 @@ class ScanParameter(luigi.Parameter):
             db = FSDB(db_path)
             db.connect()
         scan = db.get_scan(scan_id)
+        if scan is None:
+            scan = db.create_scan(scan_id)
         return scan
 
 class DatabaseConfig(luigi.Config):
