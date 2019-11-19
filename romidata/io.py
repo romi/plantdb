@@ -50,6 +50,24 @@ Triangle  Meshes
 
 """
 
+try:
+    from open3d import open3d
+    from open3d.open3d.geometry import PointCloud, TriangleMesh
+except:
+    import open3d
+    from open3d.geometry import PointCloud, TriangleMesh
+
+try: # 0.7 -> 0.8 breaking
+    o3d_read_point_cloud = open3d.geometry.read_point_cloud
+    o3d_write_point_cloud = open3d.geometry.write_point_cloud
+    o3d_read_triangle_mesh = open3d.geometry.read_triangle_mesh
+    o3d_write_triangle_mesh = open3d.geometry.write_triangle_mesh
+except:
+    o3d_read_point_cloud = open3d.io.read_point_cloud
+    o3d_write_point_cloud = open3d.io.write_point_cloud
+    o3d_read_triangle_mesh = open3d.io.read_triangle_mesh
+    o3d_write_triangle_mesh = open3d.io.write_triangle_mesh
+
 import open3d
 import os
 import imageio
@@ -171,7 +189,7 @@ def read_point_cloud(dbfile, ext="ply"):
         fname = os.path.join(d, "temp.%s"%ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return open3d.io.read_point_cloud(fname)
+        return o3d_read_point_cloud(fname)
 
 def write_point_cloud(dbfile, data, ext="ply"):
     """Writes point cloud to a DB file.
@@ -184,7 +202,7 @@ def write_point_cloud(dbfile, data, ext="ply"):
     """
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
-        open3d.io.write_point_cloud(fname, data)
+        o3d_write_point_cloud(fname, data)
         dbfile.import_file(fname)
 
 def read_triangle_mesh(dbfile, ext="ply"):
@@ -202,7 +220,7 @@ def read_triangle_mesh(dbfile, ext="ply"):
         fname = os.path.join(d, "temp.%s"%ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return open3d.io.read_triangle_mesh(fname)
+        return o3d_read_triangle_mesh(fname)
 
 def write_triangle_mesh(dbfile, data, ext="ply"):
     """Writes triangle mesh to a DB file.
@@ -215,7 +233,7 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     """
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
-        open3d.io.write_triangle_mesh(fname, data)
+        o3d_write_triangle_mesh(fname, data)
         dbfile.import_file(fname)
 
 
@@ -250,4 +268,38 @@ def write_graph(dbfile, data):
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
         nx.write_gpickle(data, fname)
+        dbfile.import_file(fname)
+
+def read_torch(dbfile, ext="pt"):
+    """Reads torch tensor from a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+
+    Returns
+    _______
+    Torch.Tensor
+    """
+    import torch
+    b = dbfile.read_raw()
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return torch.load(fname)
+
+def write_torch(dbfile, data, ext="pt"):
+    """Writes point cloud to a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+    data : TorchTensor
+    ext : str
+        file extension (defaults to "pt").
+    """
+    import torch
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        torch.save(data, fname)
+
         dbfile.import_file(fname)
