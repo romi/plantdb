@@ -261,11 +261,13 @@ class FileByFileTask(RomiTask):
         input_fileset = self.input().get()
         output_fileset = self.output().get()
         for fi in input_fileset.get_files():
+            m = fi.get_metadata()
             x = type(self).reader(fi)
 
             ext = os.path.splitext(fi.filename)[-1][1:]
             y = self.f(x)
             newfi = output_fileset.create_file(fi.id)
+            newfi.set_metadata(m)
 
             type(self).writer(newfi, y)
 
