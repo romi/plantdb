@@ -174,6 +174,41 @@ def write_volume(dbfile, data):
     b = imageio.volwrite(imageio.RETURN_BYTES, data, format="npz")
     dbfile.write_raw(b, "npz")
 
+def read_npz(dbfile):
+    """Reads npz from a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+
+    Returns
+    _______
+    np.ndarray
+    """
+    import numpy as np
+    b = dbfile.read_raw()
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.npz")
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return np.load(fname)
+
+def write_npz(dbfile, data):
+    """Writes npz to a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+    data : 3D numpy array
+    ext : str
+        file extension (defaults to "tiff").
+    """
+    import numpy as np
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.npz")
+        np.savez(fname, **data)
+        dbfile.import_file(fname)
+
+
+
 def read_point_cloud(dbfile, ext="ply"):
     """Reads point cloud from a DB file.
     Parameters
