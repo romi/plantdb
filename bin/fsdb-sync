@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import argparse
+from romidata.sync import FSDBSync
+
+parser = argparse.ArgumentParser(description='Sync two FSDB databases')
+
+parser.add_argument('orig', metavar='orig', type=str,
+                    help='Source database (path, local or remote)')
+
+parser.add_argument('target', metavar='target', type=str,
+                    help='Target database (path, local or remote)')
+
+args = parser.parse_args()
+fsdb_sync = FSDBSync(args.orig, args.target)
+fsdb_sync.sync()
