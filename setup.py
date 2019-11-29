@@ -17,8 +17,6 @@ opts = dict(name=NAME,
                 "luigi",
                 "numpy",
                 "imageio",
-                "dirsync",
-                "watchdog"
             ],
             )
 
