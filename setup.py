@@ -12,12 +12,7 @@ opts = dict(name=NAME,
             version=VERSION,
             packages=find_packages(),
             scripts=['bin/fsdb-sync'],
-            install_requires=[
-                "toml",
-                "luigi",
-                "numpy",
-                "imageio",
-            ],
+            install_requires=[],
             )
 
 if __name__ == '__main__':
