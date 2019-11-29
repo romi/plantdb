@@ -54,8 +54,6 @@ class ScanParameter(luigi.Parameter):
     def parse(self, x):
         global db
         path = x.rstrip('/')
-        if not os.path.isdir(path):
-            raise IOError("Scan path not found.")
 
         path = path.split('/')
         db_path = '/'.join(path[:-1])
