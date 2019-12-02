@@ -79,7 +79,6 @@ import os
 import sys
 import json
 import copy
-import imageio 
 from shutil import copyfile
 
 from romidata import db, io
