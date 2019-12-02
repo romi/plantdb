@@ -50,31 +50,8 @@ Triangle  Meshes
 
 """
 
-try:
-    from open3d import open3d
-    from open3d.open3d.geometry import PointCloud, TriangleMesh
-except:
-    import open3d
-    from open3d.geometry import PointCloud, TriangleMesh
 
-try: # 0.7 -> 0.8 breaking
-    o3d_read_point_cloud = open3d.geometry.read_point_cloud
-    o3d_write_point_cloud = open3d.geometry.write_point_cloud
-    o3d_read_triangle_mesh = open3d.geometry.read_triangle_mesh
-    o3d_write_triangle_mesh = open3d.geometry.write_triangle_mesh
-except:
-    o3d_read_point_cloud = open3d.io.read_point_cloud
-    o3d_write_point_cloud = open3d.io.write_point_cloud
-    o3d_read_triangle_mesh = open3d.io.read_triangle_mesh
-    o3d_write_triangle_mesh = open3d.io.write_triangle_mesh
-
-import open3d
 import os
-import imageio
-import json
-import toml
-import numpy as np
-import networkx as nx
 import tempfile
 
 def read_json(dbfile):
@@ -87,7 +64,7 @@ def read_json(dbfile):
     _______
     jsonifyable object
     """
-
+    import json
     return json.loads(dbfile.read())
 
 def write_json(dbfile, data, ext="json"):
@@ -99,6 +76,7 @@ def write_json(dbfile, data, ext="json"):
     ext : str
         file extension (defaults to "json")
     """
+    import json
     dbfile.write(json.dumps(data), ext)
 
 def read_toml(dbfile):
@@ -111,6 +89,7 @@ def read_toml(dbfile):
     _______
     jsonifyable object
     """
+    import toml
     return toml.loads(dbfile.read())
 
 def write_toml(dbfile, data, ext="toml"):
@@ -122,6 +101,7 @@ def write_toml(dbfile, data, ext="toml"):
     ext : str
         file extension (defaults to "toml")
     """
+    import toml
     dbfile.write(toml.dumps(data), ext)
 
 def read_image(dbfile):
@@ -134,6 +114,7 @@ def read_image(dbfile):
     _______
     np.ndarray
     """
+    import imageio
     return imageio.imread(dbfile.read_raw())
 
 def write_image(dbfile, data, ext="jpg"):
@@ -145,6 +126,7 @@ def write_image(dbfile, data, ext="jpg"):
     ext : str
         file extension (defaults to "jpg")
     """
+    import imageio
     if ext == "jpg" and len(data.shape) == 3:
         data = data[:,:,:3]
     b = imageio.imwrite(imageio.RETURN_BYTES, data, format=ext)
@@ -160,6 +142,7 @@ def read_volume(dbfile):
     _______
     np.ndarray
     """
+    import imageio
     return imageio.volread(dbfile.read_raw(), format="npz")
 
 def write_volume(dbfile, data):
@@ -171,6 +154,7 @@ def write_volume(dbfile, data):
     ext : str
         file extension (defaults to "tiff").
     """
+    import imageio
     b = imageio.volwrite(imageio.RETURN_BYTES, data, format="npz")
     dbfile.write_raw(b, "npz")
 
@@ -219,6 +203,15 @@ def read_point_cloud(dbfile, ext="ply"):
     _______
     PointCloud
     """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_read_point_cloud = open3d.geometry.read_point_cloud
+    except:
+        o3d_read_point_cloud = open3d.io.read_point_cloud
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
@@ -235,6 +228,15 @@ def write_point_cloud(dbfile, data, ext="ply"):
     ext : str
         file extension (defaults to "ply").
     """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_write_point_cloud = open3d.geometry.write_point_cloud
+    except:
+        o3d_write_point_cloud = open3d.io.write_point_cloud
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
         o3d_write_point_cloud(fname, data)
@@ -250,6 +252,15 @@ def read_triangle_mesh(dbfile, ext="ply"):
     _______
     PointCloud
     """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_read_triangle_mesh = open3d.geometry.read_triangle_mesh
+    except:
+        o3d_read_triangle_mesh = open3d.io.read_triangle_mesh
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
@@ -266,6 +277,16 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     ext : str
         file extension (defaults to "ply").
     """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_write_triangle_mesh = open3d.geometry.write_triangle_mesh
+    except:
+        o3d_write_triangle_mesh = open3d.io.write_triangle_mesh
+
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
         o3d_write_triangle_mesh(fname, data)
@@ -282,6 +303,7 @@ def read_graph(dbfile):
     _______
     TriangleMesh
     """
+    import networkx as nx
     b = dbfile.read_raw()
     ext = "p"
     with tempfile.TemporaryDirectory() as d:
@@ -299,6 +321,7 @@ def write_graph(dbfile, data):
     ext : str
         file extension (defaults to "treex").
     """
+    import networkx as nx
     ext = "p"
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
