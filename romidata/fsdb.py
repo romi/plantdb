@@ -153,8 +153,10 @@ class FSDB(db.DB):
             self.scans = []
             self.is_connected = False
 
-    def get_scans(self):
-        return self.scans
+    def get_scans(self, query=None):
+        if query is None:
+            return self.scans
+        return _filter_query(self.scans, query)
 
     def get_scan(self, id, create=False):
         ids = [f.id for f in self.scans]
@@ -194,8 +196,10 @@ class Scan(db.Scan):
         del self.metadata
         del self.filesets
 
-    def get_filesets(self):
-        return self.filesets  # Copy?
+    def get_filesets(self, query=None):
+        if query is None:
+            return self.filesets  # Copy?
+        return _filter_query(self.filesets, query)
 
     
     def get_fileset(self, id, create=False):
@@ -251,8 +255,10 @@ class Fileset(db.Fileset):
         self.metadata = None
         self.files = None
 
-    def get_files(self):
-        return self.files
+    def get_files(self, query=None):
+        if query is None:
+            return self.files
+        return _filter_query(self.files, query)
 
     def get_file(self, id, create=False):
         ids = [f.id for f in self.files]
@@ -669,3 +675,15 @@ def _delete_scan(scan):
         os.remove(f)
     if os.path.exists(fullpath):
         os.rmdir(fullpath)
+        
+def _filter_query(l, query):
+    query_result = []
+    for f in l:
+        flag_add = True
+        for q in query.keys():
+            if f.get_metadata(q) != query[q]:
+                flag_add = False
+                break
+        if flag_add:
+            query_result.append(f)
+    return query_result
