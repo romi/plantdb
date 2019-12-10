@@ -243,7 +243,7 @@ class FileByFileTask(RomiTask):
     and applies some function to it and saves it back
     to the target.
     """
-    channel = luigi.Parameter(default=rgb)
+    channel = luigi.Parameter(default='rgb')
     type = None
 
     reader = None
