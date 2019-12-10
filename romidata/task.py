@@ -243,6 +243,7 @@ class FileByFileTask(RomiTask):
     and applies some function to it and saves it back
     to the target.
     """
+    channel = luigi.Parameter(default=rgb)
     type = None
 
     reader = None
@@ -258,7 +259,7 @@ class FileByFileTask(RomiTask):
         """
         input_fileset = self.input().get()
         output_fileset = self.output().get()
-        for fi in input_fileset.get_files():
+        for fi in input_fileset.get_files(query={"channel" : self.channel}):
             m = fi.get_metadata()
             x = type(self).reader(fi)
 
