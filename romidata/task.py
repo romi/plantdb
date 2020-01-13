@@ -243,13 +243,13 @@ class FileByFileTask(RomiTask):
     and applies some function to it and saves it back
     to the target.
     """
-    channel = luigi.Parameter(default='rgb')
+    query = luigi.Parameter(default=None)
     type = None
 
     reader = None
     writer = None
 
-    def f(self, f):
+    def f(self, f, outfs):
         """Function applied to every file in the fileset
         must return a file object
         """
@@ -260,8 +260,8 @@ class FileByFileTask(RomiTask):
         """
         input_fileset = self.input().get()
         output_fileset = self.output().get()
-        for fi in input_fileset.get_files(query={"channel" : self.channel}):
-            outfi = self.f(fi)
+        for fi in input_fileset.get_files(query=self.query):
+            outfi = self.f(fi, output_fileset)
             m = fi.get_metadata()
             outm = outfi.get_metadata()
             outfi.set_metadata({**m, **outm})
