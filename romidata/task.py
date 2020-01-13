@@ -243,7 +243,7 @@ class FileByFileTask(RomiTask):
     and applies some function to it and saves it back
     to the target.
     """
-    query = luigi.Parameter(default=None)
+    query = luigi.DictParameter(default={})
     type = None
 
     reader = None
