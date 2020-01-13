@@ -1,18 +1,15 @@
 import os
 from setuptools import setup, find_packages
+import subprocess
 
-NAME = "romidata"
-DESCRIPTION = "Data handling tools for the ROMI project"
-LICENSE = "Gnu LGPL"
-VERSION = "0.5dev0"
 
-opts = dict(name=NAME,
-            description=DESCRIPTION,
-            license=LICENSE,
-            version=VERSION,
+label = subprocess.check_output(["git", "describe"]).decode().strip()
+
+opts = dict(name="romidata",
             packages=find_packages(),
             scripts=['bin/fsdb-sync'],
-            install_requires=[],
+            setup_requires=['setuptools_scm'],
+            use_scm_version=True
             )
 
 if __name__ == '__main__':
