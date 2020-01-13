@@ -249,8 +249,9 @@ class FileByFileTask(RomiTask):
     reader = None
     writer = None
 
-    def f(self, x):
-        """Function applied to every data item.
+    def f(self, f):
+        """Function applied to every file in the fileset
+        must return a file object
         """
         raise NotImplementedError
 
@@ -260,15 +261,11 @@ class FileByFileTask(RomiTask):
         input_fileset = self.input().get()
         output_fileset = self.output().get()
         for fi in input_fileset.get_files(query={"channel" : self.channel}):
+            outfi = self.f(fi)
             m = fi.get_metadata()
-            x = type(self).reader(fi)
+            outm = outfi.get_metadata()
+            outfi.set_metadata({**m, **outm})
 
-            ext = os.path.splitext(fi.filename)[-1][1:]
-            y = self.f(x)
-            newfi = output_fileset.create_file(fi.id)
-            newfi.set_metadata(m)
-
-            type(self).writer(newfi, y)
 
 @RomiTask.event_handler(luigi.Event.FAILURE)
 def mourn_failure(task, exception):
