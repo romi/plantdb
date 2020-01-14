@@ -681,7 +681,7 @@ def _filter_query(l, query):
     for f in l:
         flag_add = True
         for q in query.keys():
-            if f.get_metadata(q) != query[q]:
+            if f.get_metadata(q) is not None and f.get_metadata(q) != query[q]:
                 flag_add = False
                 break
         if flag_add:
