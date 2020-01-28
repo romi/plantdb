@@ -251,7 +251,18 @@ class FileByFileTask(RomiTask):
 
     def f(self, f, outfs):
         """Function applied to every file in the fileset
-        must return a file object
+        must return a file object.
+
+        Parameters
+        ----------
+        f: FSDB.File
+            input file
+        outfs: FSDB.FileSet
+            output fileset
+
+        Returns
+        _______
+        FSDB.File: this file must be created in outfs
         """
         raise NotImplementedError
 
