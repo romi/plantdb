@@ -142,7 +142,7 @@ class RomiTask(luigi.Task):
 
     upstream_task = luigi.TaskParameter()
     output_file_id = luigi.Parameter(default="out")
-    # scan = DatabaseConfig().scan
+    scan_id = luigi.Parameter(default="")
 
     def requires(self):
         return self.upstream_task()
@@ -153,37 +153,11 @@ class RomiTask(luigi.Task):
         the task ID.
         """
         fileset_id = self.task_id
-        return FilesetTarget(DatabaseConfig().scan, fileset_id)
-
-    def complete(self):
-        """Checks if a task is complete by checking if Filesets corresponding
-        to te task id exist.
-        
-        Contrary to original luigi Tasks, this check for completion
-        of all required tasks to decide wether it is complete.
-        """
-        outs = self.output()
-        if isinstance(outs, dict):
-            outs = [outs[k] for k in outs.keys()]
-        elif isinstance(outs, list):
-            pass
+        if self.scan_id == "":
+            return FilesetTarget(DatabaseConfig().scan, fileset_id)
         else:
-            outs = [outs]
+            return FilesetTarget(db.get_scan(self.scan_id), fileset_id)
 
-        if not all(map(lambda output: output.exists(), outs)):
-            return False
-
-        req = self.requires()
-        if isinstance(req, dict):
-            req = [req[k] for k in req.keys()]
-        elif isinstance(req, list):
-            pass
-        else:
-            req = [req]
-        for task in req:
-            if not task.complete():
-                return False
-        return True
 
     def input_file(self, file_id=None):
         """Helper function to get a file from
@@ -220,21 +194,23 @@ class RomiTask(luigi.Task):
             file_id = self.get_task_family().split('.')[-1]
         return self.output().get().get_file(file_id, create=True)
 
-class FilesetExists(luigi.Task):
+class FilesetExists(RomiTask):
     """A Task which requires a fileset with a given
     id to exist. 
     """
     fileset_id = None
+    upstream_task = None
 
     def requires(self):
         return []
 
+    def output(self):
+        self.task_id = self.fileset_id
+        return super().output()
+
     def run(self):
         if self.output().get() is None:
             raise OSError("Fileset %s does not exist"%self.fileset_id)
-
-    def output(self):
-        return FilesetTarget(DatabaseConfig().scan, self.fileset_id)
 
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``
