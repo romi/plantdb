@@ -53,6 +53,7 @@ Triangle  Meshes
 
 import os
 import tempfile
+from .db import File, Fileset
 
 def read_json(dbfile):
     """Reads json from a DB file.
@@ -361,3 +362,29 @@ def write_torch(dbfile, data, ext="pt"):
         torch.save(data, fname)
 
         dbfile.import_file(fname)
+
+def to_file(dbfile: File, path: str):
+    """
+    Helper to write a dbfile to a file in the filesystem
+    """
+    b = dbfile.read_raw()
+    with open(path, "wb") as fh:
+        fh.write(b)
+
+def dbfile_from_local_file(path: str):
+    """
+    Creates a temporary (not in a DB) File object from a local file
+    """
+    dirname, fname = os.path.split(path)
+    id = os.path.splitext(fname)[0]
+
+    db = DB()
+    db.basedir = ""
+    scan = Scan(db, "")
+    fileset = Fileset(db, scan, dirname)
+
+    f = fsdb.File(db=db, fileset=fileset, id=id)
+    f.filename = fname
+    f.metadata = None
+
+    return f
