@@ -39,6 +39,7 @@ To check for a task completeness, the fileset existence is checked as well as al
 """
 
 import luigi
+from luigi import task_register
 import os
 
 from romidata import FSDB
@@ -65,6 +66,7 @@ class ScanParameter(luigi.Parameter):
         if scan is None:
             scan = db.create_scan(scan_id)
         return scan
+
 
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
@@ -140,6 +142,7 @@ class RomiTask(luigi.Task):
 
     upstream_task = luigi.TaskParameter()
     output_file_id = luigi.Parameter(default="out")
+    # scan = DatabaseConfig().scan
 
     def requires(self):
         return self.upstream_task()
