@@ -28,7 +28,8 @@ default_modules = {
     "TreeGraph": "romiscan.tasks.arabidopsis",
     "AnglesAndInternodes": "romiscan.tasks.arabidopsis",
     "Visualization": "romidata.visualization",
-    "Clean": "romidata.task"
+    "Clean": "romidata.task",
+    "VirtualPlant" : "romiscanner.lpy"
 }
 
 parser = argparse.ArgumentParser(description='Run a romiscan task.')
