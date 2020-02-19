@@ -389,3 +389,10 @@ def dbfile_from_local_file(path: str):
     f.metadata = None
 
     return f
+
+def tmpdir_from_fileset(fileset: Fileset):
+    tmpdir = tempfile.TemporaryDirectory()
+    for f in fileset.get_files():
+        filepath = os.path.join(tmpdir.name, f.filename)
+        to_file(f, filepath)
+    return tmpdir
