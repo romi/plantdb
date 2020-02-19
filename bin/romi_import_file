@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+from romidata import FSDB
+import argparse
+import toml
+import json
+import os
+from pathlib import Path
+
+parser = argparse.ArgumentParser(description='Import a folder as a fileset in a scan')
+
+parser.add_argument('--metadata', metavar='metadata', type=str, default=None,
+                    help='JSON or TOML file with metadata')
+
+parser.add_argument('file', metavar='file', type=str,
+                    help='File to add to fileset (folder name will be fileset id)')
+
+parser.add_argument('fileset', metavar='fileset', type=str,
+                    help='Scan folder (/path/to/db/scan_id)')
+
+args = parser.parse_args()
+if args.metadata is not None:
+    metadata = json.loads(args.metadata)
+else:
+    metadata = None
+
+fileset_dir = Path(args.fileset)
+
+fileset_id = os.path.basename(args.fileset)
+file_id = os.path.basename(os.path.splitext(args.file)[0])
+scan_id = os.path.basename(fileset_dir.parent)
+db_path= fileset_dir.parent.parent
+
+db = FSDB(db_path)
+db.connect()
+
+scan = db.get_scan(scan_id, create=True)
+fileset = scan.get_fileset(fileset_id, create=True)
+file = fileset.create_file(file_id)
+file.import_file(args.file)
+
+if metadata is not None:
+    file.set_metadata(metadata)
