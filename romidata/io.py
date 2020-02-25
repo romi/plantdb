@@ -190,7 +190,7 @@ def write_npz(dbfile, data):
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.npz")
-        np.savez(fname, **data)
+        np.savez_compressed(fname, **data)
         dbfile.import_file(fname)
 
 
@@ -292,6 +292,56 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s"%ext)
         o3d_write_triangle_mesh(fname, data)
+        dbfile.import_file(fname)
+
+def read_voxel_grid(dbfile, ext="ply"):
+    """Reads voxel grid from a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+
+    Returns
+    _______
+    PointCloud
+    """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_read_voxel_grid = open3d.geometry.read_voxel_grid
+    except:
+        o3d_read_voxel_grid = open3d.io.read_voxel_grid
+    b = dbfile.read_raw()
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        with open(fname, "wb") as fh:
+            fh.write(b)
+        return o3d_read_voxel_grid(fname)
+
+def write_voxel_grid(dbfile, data, ext="ply"):
+    """Writes voxel grid to a DB file.
+    Parameters
+    __________
+    dbfile : db.File
+    data : PointCloud
+    ext : str
+        file extension (defaults to "ply").
+    """
+    try:
+        from open3d import open3d
+    except:
+        import open3d
+
+    try: # 0.7 -> 0.8 breaking
+        o3d_write_voxel_grid = open3d.geometry.write_voxel_grid
+    except:
+        o3d_write_voxel_grid = open3d.io.write_voxel_grid
+
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.%s"%ext)
+        o3d_write_voxel_grid(fname, data)
         dbfile.import_file(fname)
 
 
