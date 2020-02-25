@@ -41,8 +41,10 @@ To check for a task completeness, the fileset existence is checked as well as al
 import luigi
 from luigi import task_register
 import os
+import json
 
 from romidata import FSDB
+from .log import logger
 
 db = None
 
@@ -120,7 +122,7 @@ class FilesetTarget(luigi.Target):
             exists : bool
         """
         fs = self.scan.get_fileset(self.fileset_id)
-        return fs is not None
+        return fs is not None and len(fs.get_files()) > 0
 
     def get(self, create=True):
         """Returns the corresponding fileset object.
@@ -154,9 +156,18 @@ class RomiTask(luigi.Task):
         """
         fileset_id = self.task_id
         if self.scan_id == "":
-            return FilesetTarget(DatabaseConfig().scan, fileset_id)
+            t = FilesetTarget(DatabaseConfig().scan, fileset_id)
         else:
-            return FilesetTarget(db.get_scan(self.scan_id), fileset_id)
+            t = FilesetTarget(db.get_scan(self.scan_id), fileset_id)
+        fs = t.get()
+        params =  dict(self.to_str_params(only_significant=False, only_public=False))
+        for k in params.keys():
+            try:
+                params[k] = json.loads(params[k])
+            except:
+                continue
+        fs.set_metadata("task_params", params)
+        return t
 
 
     def input_file(self, file_id=None):
