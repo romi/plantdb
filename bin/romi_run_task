@@ -60,11 +60,12 @@ parser.add_argument('--local-scheduler', dest='ls', action="store_true", default
 args = parser.parse_args()
 config = {}
 
-if args.config is None:
-    if args.task == "Scan":
-        args.config = os.path.join(args.scan, "scan.toml")
-    else:
-        args.config = os.path.join(args.scan, "pipeline.toml")
+scan_last_cfg = os.path.join(args.scan, "scan.toml")
+pipeline_last_cfg = os.path.join(args.scan, "pipeline.toml")
+if os.path.isfile(scan_last_cfg):
+    config = {**config, **toml.load(scan_last_cfg)}
+if os.path.isfile(pipeline_last_cfg):
+    config = {**config, **toml.load(pipeline_last_cfg)}
 
 if os.path.isdir(args.config):
 
@@ -90,9 +91,7 @@ elif os.path.isfile(args.config):
             c = toml.load(open(args.config))
         except:
             raise IOError("Could not load config file")
-    config = c
-else:
-    raise IOError("Config file do not exit")
+    config = {**config, **c}
 
 pp = pprint.PrettyPrinter(indent=4)
 
