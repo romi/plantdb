@@ -413,7 +413,6 @@ def write_torch(dbfile, data, ext="pt"):
         torch.save(data, fname)
 
         dbfile.import_file(fname)
-
 def to_file(dbfile: File, path: str):
     """
     Helper to write a dbfile to a file in the filesystem
