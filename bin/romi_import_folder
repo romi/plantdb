@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+from romidata import FSDB
+import argparse
+import toml
+import json
+import os
+from pathlib import Path
+
+parser = argparse.ArgumentParser(description='Import a folder as a fileset in a scan')
+
+parser.add_argument('--metadata', metavar='metadata', type=str, default=None,
+                    help='JSON or TOML file with metadata')
+
+parser.add_argument('folder', metavar='folder', type=str,
+                    help='Folder to folder (folder name will be fileset id)')
+
+parser.add_argument('scan', metavar='scan', type=str,
+                    help='Scan folder (/path/to/db/scan_id)')
+
+args = parser.parse_args()
+if args.metadata is not None:
+    metadata = json.loads(args.metadata)
+else:
+    metadata = None
+
+scan_path = Path(args.scan)
+scan_id = os.path.basename(scan_path)
+db_path = scan_path.parent
+
+db = FSDB(db_path)
+db.connect()
+
+scan = db.get_scan(scan_id, create=True)
+
+folder_path = args.folder.rstrip('/')
+path = folder_path.split('/')
+fileset_id = path[-1]
+
+fileset = scan.create_fileset(fileset_id)
+try:
+    for f in os.listdir(folder_path):
+        if os.path.isfile(os.path.join(folder_path, f)):
+            fi = fileset.create_file(os.path.splitext(f)[0])
+            fi.import_file(os.path.join(folder_path, f))
+except:
+    scan.delete_fileset(fileset_id)
+
+if metadata is not None:
+    fileset.set_metadata(metadata)

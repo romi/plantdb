@@ -39,9 +39,12 @@ To check for a task completeness, the fileset existence is checked as well as al
 """
 
 import luigi
+from luigi import task_register
 import os
+import json
 
 from romidata import FSDB
+from .log import logger
 
 db = None
 
@@ -65,6 +68,7 @@ class ScanParameter(luigi.Parameter):
         if scan is None:
             scan = db.create_scan(scan_id)
         return scan
+
 
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
@@ -118,7 +122,7 @@ class FilesetTarget(luigi.Target):
             exists : bool
         """
         fs = self.scan.get_fileset(self.fileset_id)
-        return fs is not None
+        return fs is not None and len(fs.get_files()) > 0
 
     def get(self, create=True):
         """Returns the corresponding fileset object.
@@ -140,6 +144,7 @@ class RomiTask(luigi.Task):
 
     upstream_task = luigi.TaskParameter()
     output_file_id = luigi.Parameter(default="out")
+    scan_id = luigi.Parameter(default="")
 
     def requires(self):
         return self.upstream_task()
@@ -150,37 +155,20 @@ class RomiTask(luigi.Task):
         the task ID.
         """
         fileset_id = self.task_id
-        return FilesetTarget(DatabaseConfig().scan, fileset_id)
-
-    def complete(self):
-        """Checks if a task is complete by checking if Filesets corresponding
-        to te task id exist.
-        
-        Contrary to original luigi Tasks, this check for completion
-        of all required tasks to decide wether it is complete.
-        """
-        outs = self.output()
-        if isinstance(outs, dict):
-            outs = [outs[k] for k in outs.keys()]
-        elif isinstance(outs, list):
-            pass
+        if self.scan_id == "":
+            t = FilesetTarget(DatabaseConfig().scan, fileset_id)
         else:
-            outs = [outs]
+            t = FilesetTarget(db.get_scan(self.scan_id), fileset_id)
+        fs = t.get()
+        params =  dict(self.to_str_params(only_significant=False, only_public=False))
+        for k in params.keys():
+            try:
+                params[k] = json.loads(params[k])
+            except:
+                continue
+        fs.set_metadata("task_params", params)
+        return t
 
-        if not all(map(lambda output: output.exists(), outs)):
-            return False
-
-        req = self.requires()
-        if isinstance(req, dict):
-            req = [req[k] for k in req.keys()]
-        elif isinstance(req, list):
-            pass
-        else:
-            req = [req]
-        for task in req:
-            if not task.complete():
-                return False
-        return True
 
     def input_file(self, file_id=None):
         """Helper function to get a file from
@@ -217,21 +205,23 @@ class RomiTask(luigi.Task):
             file_id = self.get_task_family().split('.')[-1]
         return self.output().get().get_file(file_id, create=True)
 
-class FilesetExists(luigi.Task):
+class FilesetExists(RomiTask):
     """A Task which requires a fileset with a given
     id to exist. 
     """
     fileset_id = None
+    upstream_task = None
 
     def requires(self):
         return []
 
+    def output(self):
+        self.task_id = self.fileset_id
+        return super().output()
+
     def run(self):
         if self.output().get() is None:
             raise OSError("Fileset %s does not exist"%self.fileset_id)
-
-    def output(self):
-        return FilesetTarget(DatabaseConfig().scan, self.fileset_id)
 
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``
@@ -303,3 +293,33 @@ class DummyTask(RomiTask):
     def run(self):
         """ """
         return
+
+class Clean(RomiTask):
+    no_confirm = luigi.BoolParameter(default=False)
+    upstream_task = None
+
+    def requires(self):
+        return []
+
+    def complete(self):
+        return False
+
+    def confirm(self, c, default='n'):
+        valid = {"yes": True, "y": True, "ye": True,
+        "no": False, "n": False}
+        if c == '':
+            return valid[default]
+        else:
+            return valid[c]
+
+    def run(self):
+        logger.critical("This is going to delete all filesets except the scan fileset (images). Confirm? [y/N]")
+        choice = self.confirm(input().lower())
+        if not choice:
+            raise IOError("Did not validate deletion.")
+
+        scan = DatabaseConfig().scan
+        fs_ids = [fs.id for fs in scan.get_filesets()]
+        for fs in fs_ids:
+            if fs != "images":
+                scan.delete_fileset(fs)
