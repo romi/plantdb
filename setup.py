@@ -9,7 +9,8 @@ opts = dict(name="romidata",
             use_scm_version=True,
             install_requires=[
                 'luigi',
-                'toml'
+                'toml',
+                'appdirs'
             ]
             )
 
