@@ -79,7 +79,7 @@ def write_json(dbfile, data, ext="json"):
         file extension (defaults to "json")
     """
     import json
-    dbfile.write(json.dumps(data), ext)
+    dbfile.write(json.dumps(data, indent=4), ext)
 
 def read_toml(dbfile):
     """Reads toml from a DB file.
