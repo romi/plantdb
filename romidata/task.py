@@ -209,7 +209,7 @@ class FilesetExists(RomiTask):
     """A Task which requires a fileset with a given
     id to exist. 
     """
-    fileset_id = None
+    fileset_id = luigi.Parameter()
     upstream_task = None
 
     def requires(self):
@@ -226,7 +226,7 @@ class FilesetExists(RomiTask):
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``
     """
-    fileset_id = "images"
+    fileset_id = luigi.Parameter(default="images")
 
 class FileByFileTask(RomiTask):
     """This abstract class is a Task which take every file from a fileset
@@ -263,9 +263,10 @@ class FileByFileTask(RomiTask):
         output_fileset = self.output().get()
         for fi in input_fileset.get_files(query=self.query):
             outfi = self.f(fi, output_fileset)
-            m = fi.get_metadata()
-            outm = outfi.get_metadata()
-            outfi.set_metadata({**m, **outm})
+            if outfi is not None:
+                m = fi.get_metadata()
+                outm = outfi.get_metadata()
+                outfi.set_metadata({**m, **outm})
 
 
 @RomiTask.event_handler(luigi.Event.FAILURE)
