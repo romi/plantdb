@@ -48,6 +48,7 @@ from .log import logger
 
 db = None
 
+
 class ScanParameter(luigi.Parameter):
     def serialize(self, scan):
         db_path = scan.db.basedir
@@ -61,7 +62,7 @@ class ScanParameter(luigi.Parameter):
         path = path.split('/')
         db_path = '/'.join(path[:-1])
         scan_id = path[-1]
-        if db is None: # TODO: cannot change DB during run..
+        if db is None:  # TODO: cannot change DB during run..
             db = FSDB(db_path)
             db.connect()
         scan = db.get_scan(scan_id)
@@ -73,6 +74,7 @@ class ScanParameter(luigi.Parameter):
 class DatabaseConfig(luigi.Config):
     """Configuration for the database."""
     scan = ScanParameter()
+
 
 class FilesetTarget(luigi.Target):
     """Implementation of a luigi Target for the romidata DB API.
@@ -87,6 +89,7 @@ class FilesetTarget(luigi.Target):
         id if the target fileset
 
     """
+
     def __init__(self, scan, fileset_id):
         """
         Parameters
@@ -139,6 +142,7 @@ class FilesetTarget(luigi.Target):
         """
         return self.scan.get_fileset(self.fileset_id, create=create)
 
+
 class RomiTask(luigi.Task):
     """Implementation of a luigi Task for the romidata DB API."""
 
@@ -148,7 +152,6 @@ class RomiTask(luigi.Task):
 
     def requires(self):
         return self.upstream_task()
-
 
     def output(self):
         """Output for a RomiTask is a FileSetTarget, the fileset ID being
@@ -160,7 +163,8 @@ class RomiTask(luigi.Task):
         else:
             t = FilesetTarget(db.get_scan(self.scan_id), fileset_id)
         fs = t.get()
-        params =  dict(self.to_str_params(only_significant=False, only_public=False))
+        params = dict(
+            self.to_str_params(only_significant=False, only_public=False))
         for k in params.keys():
             try:
                 params[k] = json.loads(params[k])
@@ -168,7 +172,6 @@ class RomiTask(luigi.Task):
                 continue
         fs.set_metadata("task_params", params)
         return t
-
 
     def input_file(self, file_id=None):
         """Helper function to get a file from
@@ -185,7 +188,6 @@ class RomiTask(luigi.Task):
 
         """
         return self.upstream_task().output_file(file_id)
-
 
     def output_file(self, file_id=None):
         """Helper function to get a file from
@@ -205,6 +207,7 @@ class RomiTask(luigi.Task):
             file_id = self.get_task_family().split('.')[-1]
         return self.output().get().get_file(file_id, create=True)
 
+
 class FilesetExists(RomiTask):
     """A Task which requires a fileset with a given
     id to exist. 
@@ -221,12 +224,14 @@ class FilesetExists(RomiTask):
 
     def run(self):
         if self.output().get() is None:
-            raise OSError("Fileset %s does not exist"%self.fileset_id)
+            raise OSError("Fileset %s does not exist" % self.fileset_id)
+
 
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``
     """
     fileset_id = luigi.Parameter(default="images")
+
 
 class FileByFileTask(RomiTask):
     """This abstract class is a Task which take every file from a fileset
@@ -285,8 +290,10 @@ def mourn_failure(task, exception):
     scan = task.output().get().scan
     scan.delete_fileset(output_fileset.id)
 
+
 class DummyTask(RomiTask):
     """A RomiTask which does nothing and requires nothing."""
+
     def requires(self):
         """ """
         return []
@@ -295,7 +302,19 @@ class DummyTask(RomiTask):
         """ """
         return
 
+
 class Clean(RomiTask):
+    """ Cleanup a scan, keeping only the "images" fileset and removing all computed pipelines.
+
+    Module: romiscan.tasks.scan
+    Default upstream tasks: None
+
+    Parameters
+    ----------
+    no_confirm : BoolParameter, default=False
+        Do not ask for confirmation in the command prompt.
+
+    """
     no_confirm = luigi.BoolParameter(default=False)
     upstream_task = None
 
@@ -307,14 +326,15 @@ class Clean(RomiTask):
 
     def confirm(self, c, default='n'):
         valid = {"yes": True, "y": True, "ye": True,
-        "no": False, "n": False}
+                 "no": False, "n": False}
         if c == '':
             return valid[default]
         else:
             return valid[c]
 
     def run(self):
-        logger.critical("This is going to delete all filesets except the scan fileset (images). Confirm? [y/N]")
+        logger.critical(
+            "This is going to delete all filesets except the scan fileset (images). Confirm? [y/N]")
         choice = self.confirm(input().lower())
         if not choice:
             raise IOError("Did not validate deletion.")

@@ -36,7 +36,9 @@ parser = argparse.ArgumentParser(description='Run a romiscan task.')
 
 
 parser.add_argument('--config', dest='config', default=None,
-                    help='config location. If a file, reads config from it, if a folder, concatenates all config files in the folder. By default, reads from the scan directory')
+                    help="""config location. If a file, reads config from it,
+                         if a folder, concatenates all config files in the
+                         folder. By default, reads from the scan directory""")
 
 parser.add_argument('--luigicmd', dest='luigicmd', default=default_luigicmd,
                     help='luigi command, default: %s'%default_luigicmd)
