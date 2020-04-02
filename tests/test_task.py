@@ -4,7 +4,7 @@ import os
 
 from romidata import RomiTask, DatabaseConfig, FilesetTarget, FSDB
 from romidata import io
-from romidata.task import FileByFileTask, FilesetExists, ImagesFilesetExists
+from romidata.tasks.db import FilesetExists, ImagesFilesetExists, FileByFileTask
 from romidata.testing import TemporaryCloneDB, DBTestCase
 
 import luigi
