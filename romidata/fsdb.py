@@ -19,8 +19,7 @@
 # See the GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
-# <https://www.gnu.org/licenses/>.
+# License along with romidata.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 
@@ -110,14 +109,14 @@ class FSDB(db.DB):
         dbroot/                            # base directory of the database
         ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
         │   ├── files.json                 # JSON file referencing the files of the datataset
-        │   ├── images/                    # gather the 'images' FileSet
-        │   │   ├── scan_img_01.jpg        # 'image' File 01
-        │   │   ├── scan_img_02.jpg        # 'image' File 02
+        │   ├── images/                    # gather the 'images' `FileSet`
+        │   │   ├── scan_img_01.jpg        # 'image' `File` 01
+        │   │   ├── scan_img_02.jpg        # 'image' `File` 02
         │   │   ├── [...]
-        │   │   └── scan_img_99.jpg        # 'image' File 99
+        │   │   └── scan_img_99.jpg        # 'image' `File` 99
         │   ├── metadata/                  # metadata directory
         │   │   ├── images                 # 'images' metadata directory
-        │   │   │   ├── scan_img_01.json   # JSON file with 'image' File metadata
+        │   │   │   ├── scan_img_01.json   # JSON file with 'image' file metadata
         │   │   │   ├── scan_img_02.json   #
         │   │   ├── [...]
         │   │   │   └── scan_img_99.json   #
@@ -133,7 +132,8 @@ class FSDB(db.DB):
     scans : list
         list of `Scan` objects found in the database
     is_connected : bool
-        True if the DB is connected (locked the directory)
+        ``True`` if the DB is connected (locked the directory), else ``False
+
     """
 
     def __init__(self, basedir):
