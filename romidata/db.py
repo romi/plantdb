@@ -405,7 +405,7 @@ class File(object):
 
         Returns
         -------
-        db.FileSet
+        db.Fileset
         """
         return self.fileset
 

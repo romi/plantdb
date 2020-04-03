@@ -114,7 +114,7 @@ class FileByFileTask(RomiTask):
         ----------
         f: FSDB.File
             input file
-        outfs: FSDB.FileSet
+        outfs: FSDB.Fileset
             output fileset
 
         Returns
