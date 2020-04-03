@@ -38,7 +38,7 @@ A ``RomiTask`` must implement two methods : ``run`` and ``requires``.
 
 To check for a task completeness, the fileset existence is checked as well as all it's dependencies.
 """
-
+from os import path
 import luigi
 
 from romidata import FSDB
@@ -47,15 +47,30 @@ db = None
 
 
 class ScanParameter(luigi.Parameter):
-    def serialize(self, scan):
-        db_path = scan.db.basedir
-        scan_id = scan.id
-        return '/'.join([db_path, scan_id])
+    """ Register a luigi `Parameter` object to access `fsdb.Scan` class.
+    Override the default implementation methods `parse` & `serialize`
 
+    Notes
+    -----
+    The `parse` method connect to the given path to an `FSDB` database.
+
+    """
     def parse(self, x):
+        """Parse an individual value from the input.
+        Override the default implementation method for specialized parsing.
+
+        Parameters
+        ----------
+        x : str
+            the value to parse, here the path to an `FSDB` database.
+
+        Returns
+        -------
+        the parsed value.
+
+        """
         global db
         path = x.rstrip('/')
-
         path = path.split('/')
         db_path = '/'.join(path[:-1])
         scan_id = path[-1]
@@ -67,16 +82,35 @@ class ScanParameter(luigi.Parameter):
             scan = db.create_scan(scan_id)
         return scan
 
+    def serialize(self, scan):
+        """Opposite of `parse()`.
+        Converts the value `scan` to a string.
+
+        Parameters
+        ----------
+        scan : str
+            the value to serialize, here an `FSDB` database.
+
+        """
+        db_path = scan.db.basedir
+        scan_id = scan.id
+        return '/'.join([db_path, scan_id])
+
+
+class DatabaseConfig(luigi.Config):
+    """Configuration for the database."""
+    scan = ScanParameter()
+
 
 class FilesetTarget(luigi.Target):
-    """Implementation of a luigi Target for the romidata DB API.
+    """Implementation of a luigi ``Target`` for the romidata DB API.
 
     Attributes
     ----------
-    db : DB
+    db : romidata.fsdb.FSDB
         database object
-    scan : Scan
-        scan in which the target is
+    scan : romidata.fsdb.Scan
+        scan dataset in which the target is
     fileset_id : str
         id if the target fileset
 
@@ -86,8 +120,8 @@ class FilesetTarget(luigi.Target):
         """
         Parameters
         ----------
-        scan : str
-            id of the scan where the fileset is located
+        scan : romidata.fsdb.Scan
+            scan where the fileset is located
         fileset_id : str
             id of the target fileset
         """
@@ -100,7 +134,8 @@ class FilesetTarget(luigi.Target):
 
         Returns
         -------
-        fileset (romiscan.db.Fileset)
+        romidata.fsdb.Fileset
+            The created `Fileset` with given `fileset_id` to contructor.
 
         """
         return self.scan.create_fileset(self.fileset_id)
@@ -126,12 +161,9 @@ class FilesetTarget(luigi.Target):
 
         Returns
         -------
-            fileset : romiscan.db.Fileset
+        romidata.fsdb.Fileset
+            Get the `Fileset` corresponding to the given `fileset_id` to
+            contructor.
 
         """
         return self.scan.get_fileset(self.fileset_id, create=create)
-
-
-class DatabaseConfig(luigi.Config):
-    """Configuration for the database."""
-    scan = ScanParameter()

@@ -16,13 +16,13 @@ class FSDBWatcher():
 
 
     Attributes
-    __________
+    ----------
     observer : Observer
         watchdog observer for the filesystem
     """
     def __init__(self, db, tasks, config):
         """Parameters
-        __________
+        ----------
         db : FSDB
             the target database
         tasks : list of RomiTask
@@ -47,7 +47,7 @@ class FSDBWatcher():
 class FSDBEventHandler(FileSystemEventHandler):
     def __init__(self, db, tasks, config):
         """Parameters
-        __________
+        ----------
         db : FSDB
             the target database
         tasks : list of RomiTask

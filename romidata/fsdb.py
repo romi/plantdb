@@ -87,13 +87,44 @@ from romidata.db import DBBusyError
 MARKER_FILE_NAME = "romidb" # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock" # This file prevents opening the DB if it is present in the root folder of a DB
 
+def dummy_db():
+    """ Create a dummy temporary database.
+
+    Returns
+    -------
+    str
+        The path to the root directory of the dummy database.
+    """
+    from os.path import join
+    from tempfile import mkdtemp
+    mydb = mkdtemp(prefix='romidb_')
+    open(join(mydb, MARKER_FILE_NAME), 'w').close()
+    return mydb
+
 
 class FSDB(db.DB):
-    """Class defining the database object `DB`.
+    """Class defining the database object from abstract class `DB`.
 
-    Implementation of a database as a simple file structure with:
-      * `images` folder containing image files
-      * `metadata` folder containing JSON metadata associated to image files
+    Implementation of a database as a simple local file structure:
+        ```
+        dbroot/                            # base directory of the database
+        ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
+        │   ├── files.json                 # JSON file referencing the files of the datataset
+        │   ├── images/                    # gather the 'images' FileSet
+        │   │   ├── scan_img_01.jpg        # 'image' File 01
+        │   │   ├── scan_img_02.jpg        # 'image' File 02
+        │   │   ├── [...]
+        │   │   └── scan_img_99.jpg        # 'image' File 99
+        │   ├── metadata/                  # metadata directory
+        │   │   ├── images                 # 'images' metadata directory
+        │   │   │   ├── scan_img_01.json   # JSON file with 'image' File metadata
+        │   │   │   ├── scan_img_02.json   #
+        │   │   ├── [...]
+        │   │   │   └── scan_img_99.json   #
+        │   │   └── metadata.json          # scan dataset metadata
+        ├── (LOCK_FILE_NAME)               # "lock file", present if DB is connected
+        └── MARKER_FILE_NAME               # ROMI DB marker file
+        ```
 
     Attributes
     ----------
@@ -102,7 +133,7 @@ class FSDB(db.DB):
     scans : list
         list of `Scan` objects found in the database
     is_connected : bool
-        True iff the DB is connected (locked the directory)
+        True if the DB is connected (locked the directory)
     """
 
     def __init__(self, basedir):
@@ -114,24 +145,62 @@ class FSDB(db.DB):
         Parameters
         ----------
         basedir : str
-            root directory of the database
+            path to root directory of the database
 
         Examples
         --------
+        >>> # EXAMPLE 1: Use a temporary dummy database:
         >>> from romidata import FSDB
-        >>> db = FSDB('$HOME/example_path/')
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> print(type(db))
+        <class 'romidata.fsdb.FSDB'>
+        >>> print(db.basedir)
+        /tmp/romidb_***
+        >>> # Now connecting to this dummy DB...
+        >>> db.connect()
+        >>> # ...allows to create new `Scan` in it:
+        >>> new_scan = db.create_scan("007")
+        >>> print(type(new_scan))
+        <class 'romidata.fsdb.Scan'>
+        >>> db.disconnect()
 
         """
+        super().__init__()
+        # Check the given path to root directory of the database is a directory:
         if not os.path.isdir(basedir):
             raise IOError("Not a directory: %s" % basedir)
+        # Check the given path to root directory of the database is a "romi db", ie. have the `MARKER_FILE_NAME`:
         if not _is_db(basedir):
             raise IOError("Not a DB. Check that there is a marker named %s in %s" % (MARKER_FILE_NAME, basedir))
+        # Defines attributes:
         self.basedir = basedir
         self.lock_path = os.path.abspath(os.path.join(basedir, LOCK_FILE_NAME))
         self.scans = []
         self.is_connected = False
 
     def connect(self, login_data=None):
+        """ Connect to the local database.
+
+        Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
+
+        Parameters
+        ----------
+        login_data : bool
+            UNUSED
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> print(db.is_connected)
+        False
+        >>> db.connect()
+        >>> print(db.is_connected)
+        True
+
+        """
         if not self.is_connected:
             try:
                 with open(self.lock_path, "x") as _:
@@ -140,8 +209,29 @@ class FSDB(db.DB):
                 atexit.register(self.disconnect)
             except FileExistsError:
                 raise DBBusyError("File %s exists in DB root: DB is busy, cannot connect."%LOCK_FILE_NAME)
+        else:
+            print(f"Already connected to the database '{self.basedir}'")
 
     def disconnect(self):
+        """ Disconnect from the local database.
+
+        Handle DB "locking" system by removing the `LOCK_FILE_NAME` file from the DB.
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> print(db.is_connected)
+        False
+        >>> db.connect()
+        >>> print(db.is_connected)
+        True
+        >>> db.disconnect()
+        >>> print(db.is_connected)
+        False
+
+        """
         if self.is_connected:
             for s in self.scans:
                 s._erase()
@@ -152,13 +242,60 @@ class FSDB(db.DB):
                 raise IOError("Could not remove lock, maybe you messed with the lock_path attribute?")
             self.scans = []
             self.is_connected = False
+        else:
+            print(f"Already disconnected from the database '{self.basedir}'")
 
     def get_scans(self, query=None):
+        """ Get a list of `Scan` using a `query`.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of scans.
+
+        Returns
+        -------
+        list of romidata.fsdb.Scan
+            The list of `Scan` resulting form the query.
+
+        See Also
+        --------
+        _filter_query: the query method used to returns a list of `Scan`
+
+        """
         if query is None:
             return self.scans
         return _filter_query(self.scans, query)
 
     def get_scan(self, id, create=False):
+        """ Get a `Scan` from the local database.
+
+        Parameters
+        ----------
+        id : str
+            The `Scan.id`, should exists if `create` is `False`.
+        create : bool, optional
+            If `False` (default), the `Scan.id` should exists, else create it.
+
+        Notes
+        -----
+        If the `id` do not exists in the local database and `create` is `False`,
+        `None` is returned.
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> db.connect()
+        >>> new_scan = db.get_scan('007', create=True)
+        >>> print(new_scan)
+        <romidata.fsdb.Scan object at **************>
+        >>> scan = db.get_scan('unknown')
+        >>> print(scan)
+        None
+
+        """
         ids = [f.id for f in self.scans]
         if id not in ids:
             if create:
@@ -167,6 +304,40 @@ class FSDB(db.DB):
         return self.scans[ids.index(id)]
 
     def create_scan(self, id):
+        """ Create a `Scan` in the local database.
+
+        Parameters
+        ----------
+        id : str
+            The `Scan.id`, should not exists in the local database.
+
+        Returns
+        -------
+        romidata.fsdb.Scan
+            The new `Scan` object created in the local database.
+
+        Raises
+        ------
+        OSError
+            If the `id` already exists in the local database.
+            If the `id` is not valid.
+
+        See Also
+        --------
+        _is_valid_id: test if the given `id` is valid.
+        _make_scan: the "scan directory" creation method.
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> db.connect()
+        >>> new_scan = db.create_scan('007')
+        >>> scan = db.create_scan('007')
+        OSError: Duplicate scan name: 007
+
+        """
         if not _is_valid_id(id):
             raise IOError("Invalid id")
         if self.get_scan(id) != None:
@@ -176,8 +347,37 @@ class FSDB(db.DB):
         self.scans.append(scan)
         return scan
 
-    def delete_scan(self, scan_id):
-        scan = self.get_scan(scan_id)
+    def delete_scan(self, id):
+        """ Delete an existing `Scan` from the local database.
+
+        Parameters
+        ----------
+        id : str
+            The `Scan.id`, should exists in the local database.
+
+        Raises
+        ------
+        OSError
+            If the `id` do not exists in the local database.
+
+        See Also
+        --------
+        _delete_scan: the "scan directory" deletion method.
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> db.connect()
+        >>> new_scan = db.create_scan('007')
+        >>> db.delete_scan('007')
+        >>> scan = db.get_scan('007')
+        >>> print(scan)
+        None
+
+        """
+        scan = self.get_scan(id)
         if scan is None:
             raise IOError("Invalid id")
         _delete_scan(scan)
@@ -185,8 +385,46 @@ class FSDB(db.DB):
 
 
 class Scan(db.Scan):
+    """Class defining the scan object from abstract class `Scan`.
+
+    Implementation of a scan as a simple file structure with:
+      * `images` folder containing image files
+      * `metadata` folder containing JSON metadata associated to image files
+
+    Attributes
+    ----------
+    metadata : dict
+        dictionary of metadata attached to the scan.
+    filesets : list of Fileset
+        list of `Fileset` object.
+    """
+
     def __init__(self, db, id):
+        """ Scan dataset constructor.
+
+        Parameters
+        ----------
+        db : FSDB
+            The database to which the scan dataset belongs to.
+        id : str
+            The scan dataet id, should be unique in the `db`.
+
+        Examples
+        --------
+        >>> from romidata import FSDB
+        >>> from romidata.fsdb import Scan
+        >>> from romidata.fsdb import dummy_db
+        >>> db = FSDB(dummy_db())
+        >>> scan = Scan(db, '007')
+        >>> print(type(scan))
+        <class 'romidata.fsdb.Scan'>
+        >>> scan.set_metadata({'Name': "Bond... James Bond!"})
+        >>> print(scan.metadata)
+        {'Name': 'Bond... James Bond!'}
+
+        """
         super().__init__(db, id)
+        # Defines attributes:
         self.metadata = None
         self.filesets = []
 
@@ -201,7 +439,6 @@ class Scan(db.Scan):
             return self.filesets  # Copy?
         return _filter_query(self.filesets, query)
 
-    
     def get_fileset(self, id, create=False):
         ids = [f.id for f in self.filesets]
         if id not in ids:

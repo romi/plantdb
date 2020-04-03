@@ -4,7 +4,7 @@ class DBRunner(object):
     """Class for running a given task on a database using luigi.
 
     Attributes
-    __________
+    ----------
     db : DB
         target database
     """
@@ -12,7 +12,7 @@ class DBRunner(object):
     def __init__(self, db, tasks, config):
         """
         Parameters
-        __________
+        ----------
         db : DB
             target database
         tasks : list or RomiTask
@@ -46,7 +46,7 @@ class DBRunner(object):
         """Run the tasks on a single scan.
 
         Parameters
-        __________
+        ----------
         scan_id : str
             id of the scan to process
         """

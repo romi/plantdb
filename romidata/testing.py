@@ -11,12 +11,12 @@ class TemporaryCloneDB(object):
     Class for doing tests on a copy of a local DB.
 
     Parameters
-    __________
+    ----------
         db_location : str
             location of the source database
 
     Attributes
-    __________
+    ----------
         tmpdir : tempfile.TemporaryDirectory
     """
     def __init__(self, db_location):

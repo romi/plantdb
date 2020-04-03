@@ -15,7 +15,7 @@ class FSDBSync():
 
 
     Attributes
-    __________
+    ----------
     source_str : str
         source path 
     target_str : str
@@ -34,7 +34,7 @@ class FSDBSync():
     def __init__(self, source, target):
         """
         Parameters
-        __________
+        ----------
         source : str
             source database path (remote or local)
         target : str
@@ -76,12 +76,12 @@ def _fmt_path(path):
     """ Parses path by checking for a ':' sign.
 
     Parameters
-    __________
+    ----------
     path : str
         the path to format
 
     Returns
-    _______
+    -------
     dict
         a dictionary describing the parsed path.
     """

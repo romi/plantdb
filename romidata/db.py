@@ -37,8 +37,6 @@ A ``File`` can be an image, text of bytes.
 
 """
 
-
-
 class DB(object):
     """Class defining the database object `DB`.
 
@@ -68,15 +66,14 @@ class DB(object):
         """get a scan saved in the database
 
         Parameters
-        __________
+        ----------
         id : str
             id of the scan to retrieve
-
         create :  bool
             create the scan if it does not exist (default : False)
 
         Returns
-        _______
+        -------
         db.Scan
         """
         raise NotImplementedError
@@ -85,21 +82,21 @@ class DB(object):
         """ create a new scan object in the database
 
         Parameters
-        __________
+        ----------
         id : str
             id of the scan to retrieve
 
         Returns
-        _______
+        -------
         db.Scan
         """
         raise NotImplementedError
 
-    def delete_scan(self, scan_id):
+    def delete_scan(self, id):
         """Delete a scan from the DB.
 
         Parameters
-        __________
+        ----------
         id : str
             id of the scan to delete
         """
@@ -124,7 +121,7 @@ class Scan(object):
     def __init__(self, db, id):
         """
         Parameters
-        __________
+        ----------
 
         db : DB
             db to create the scan in
@@ -138,7 +135,7 @@ class Scan(object):
         """get scan id
 
         Returns
-        _______
+        -------
         str
         """
         return self.id
@@ -147,7 +144,7 @@ class Scan(object):
         """ get parent db
 
         Returns
-        _______
+        -------
         db.DB
         """
         return self.db
@@ -156,7 +153,7 @@ class Scan(object):
         """ get all sets of files
 
         Returns
-        _______
+        -------
         list
         """
         raise NotImplementedError
@@ -165,13 +162,13 @@ class Scan(object):
         """get a fileset with a given id
 
         Parameters
-        __________
+        ----------
         id : str
 
         create :  bool
             create the fileset if it does not exist (default : False)
         Returns
-        _______
+        -------
         db.Fileset
         """
         raise NotImplementedError
@@ -180,12 +177,12 @@ class Scan(object):
         """ get metadata associated to scan
 
         Parameters
-        __________
+        ----------
         key : str
             metadata key to retrieve (defaults to None)
 
         Returns
-        _______
+        -------
         dict or value
         """
         raise NotImplementedError
@@ -197,7 +194,7 @@ class Scan(object):
         data is a key and is set to value.
 
         Parameters
-        __________
+        ----------
         data : str or dict
             key or value
         value
@@ -209,7 +206,7 @@ class Scan(object):
         """ create a set of files
 
         Parameters
-        __________
+        ----------
         id : str
             id of the new fileset
         """
@@ -219,7 +216,7 @@ class Scan(object):
         """Delete a fileset from the DB.
 
         Parameters
-        __________
+        ----------
         id : str
             id of the fileset to delete
         """
@@ -256,7 +253,7 @@ class Fileset(object):
         """get scan id
 
         Returns
-        _______
+        -------
         str
         """
         return self.id
@@ -265,7 +262,7 @@ class Fileset(object):
         """ get parent db
 
         Returns
-        _______
+        -------
         db.DB
         """
         return self.db
@@ -274,7 +271,7 @@ class Fileset(object):
         """ get parent scan
 
         Returns
-        _______
+        -------
         db.Scan
         """
         return self.scan
@@ -283,7 +280,7 @@ class Fileset(object):
         """ get all files
 
         Returns
-        _______
+        -------
         list
         """
         raise NotImplementedError
@@ -292,14 +289,14 @@ class Fileset(object):
         """get file with given id
 
         Parameters
-        __________
+        ----------
         id : str
 
         create :  bool
             create the file if it does not exist (default : False)
 
         Returns
-        _______
+        -------
         db.File
         """
         raise NotImplementedError
@@ -308,12 +305,12 @@ class Fileset(object):
         """ get metadata associated to scan
 
         Parameters
-        __________
+        ----------
         key : str
             metadata key to retrieve (defaults to None)
 
         Returns
-        _______
+        -------
         dict or value
         """
         raise NotImplementedError
@@ -325,7 +322,7 @@ class Fileset(object):
         data is a key and is set to value.
 
         Parameters
-        __________
+        ----------
         data : str or dict
             key or value
         value
@@ -337,7 +334,7 @@ class Fileset(object):
         """ create a file
 
         Parameters
-        __________
+        ----------
         id : str
             id of the new file
         """
@@ -347,7 +344,7 @@ class Fileset(object):
         """Delete a file from the DB.
 
         Parameters
-        __________
+        ----------
         id : str
             id of the file to delete
         """
@@ -381,7 +378,7 @@ class File(object):
         """get file id
 
         Returns
-        _______
+        -------
         str
         """
         return self.id
@@ -390,7 +387,7 @@ class File(object):
         """ get parent db
 
         Returns
-        _______
+        -------
         db.DB
         """
         return self.fileset.scan.db
@@ -399,7 +396,7 @@ class File(object):
         """ get parent scan
 
         Returns
-        _______
+        -------
         db.Scan
         """
         return self.fileset.scan
@@ -408,7 +405,7 @@ class File(object):
         """ get parent fileset
 
         Returns
-        _______
+        -------
         db.FileSet
         """
         return self.fileset
@@ -418,12 +415,12 @@ class File(object):
         """ get metadata associated to scan
 
         Parameters
-        __________
+        ----------
         key : str
             metadata key to retrieve (defaults to None)
 
         Returns
-        _______
+        -------
         dict or value
         """
         raise NotImplementedError
@@ -435,7 +432,7 @@ class File(object):
         data is a key and is set to value.
 
         Parameters
-        __________
+        ----------
         data : str or dict
             key or value
         value
@@ -447,7 +444,7 @@ class File(object):
         """Import an existing file to the File object.
 
         Parameters
-        __________
+        ----------
         path : str
         """
         raise NotImplementedError
@@ -456,7 +453,7 @@ class File(object):
         """Writes bytes to a file
 
         Parameters
-        __________
+        ----------
         buffer : bytearray
             data
         """
@@ -466,7 +463,7 @@ class File(object):
         """Reads bytes from a file
 
         Returns
-        _______
+        -------
         buffer : bytearray
         """
         raise NotImplementedError
@@ -475,7 +472,7 @@ class File(object):
         """Writes text to a file
 
         Parameters
-        __________
+        ----------
         data : str
             data
         """
@@ -485,7 +482,7 @@ class File(object):
         """Reads text from a file
 
         Returns
-        _______
+        -------
         str
         """
         raise NotImplementedError
@@ -494,7 +491,7 @@ class File(object):
         """Writes bytes to a file
 
         Parameters
-        __________
+        ----------
         buffer : bytearray
             data
         """
@@ -504,7 +501,7 @@ class File(object):
         """Reads bytes from a file
 
         Returns
-        _______
+        -------
         buffer : bytearray
         """
         raise NotImplementedError
