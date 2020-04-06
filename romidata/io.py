@@ -79,7 +79,7 @@ def write_json(dbfile, data, ext="json"):
     dbfile : db.File
     data : jsonifyable object
     ext : str
-        file extension (defaults to "json")
+        File extension (defaults to "json")
     """
     import json
     dbfile.write(json.dumps(data, indent=4), ext)
@@ -108,7 +108,7 @@ def write_toml(dbfile, data, ext="toml"):
     dbfile : db.File
     data : jsonifyable object
     ext : str
-        file extension (defaults to "toml")
+        File extension (defaults to "toml")
     """
     import toml
     dbfile.write(toml.dumps(data), ext)
@@ -138,7 +138,7 @@ def write_image(dbfile, data, ext="jpg"):
     dbfile : db.File
     data : imageifyable object
     ext : str
-        file extension (defaults to "jpg")
+        File extension (defaults to "jpg")
     """
     import imageio
     if ext == "jpg" and len(data.shape) == 3:
@@ -171,7 +171,7 @@ def write_volume(dbfile, data):
     dbfile : db.File
     data : 3D numpy array
     ext : str
-        file extension (defaults to "tiff").
+        File extension (defaults to "tiff").
     """
     import imageio
     b = imageio.volwrite(imageio.RETURN_BYTES, data, format="npz")
@@ -206,7 +206,7 @@ def write_npz(dbfile, data):
     dbfile : db.File
     data : 3D numpy array
     ext : str
-        file extension (defaults to "tiff").
+        File extension (defaults to "tiff").
     """
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
@@ -251,7 +251,7 @@ def write_point_cloud(dbfile, data, ext="ply"):
     dbfile : db.File
     data : PointCloud
     ext : str
-        file extension (defaults to "ply").
+        File extension (defaults to "ply").
     """
     try:
         from open3d import open3d
@@ -303,7 +303,7 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     dbfile : db.File
     data : PointCloud
     ext : str
-        file extension (defaults to "ply").
+        File extension (defaults to "ply").
     """
     try:
         from open3d import open3d
@@ -357,7 +357,7 @@ def write_voxel_grid(dbfile, data, ext="ply"):
     dbfile : db.File
     data : PointCloud
     ext : str
-        file extension (defaults to "ply").
+        File extension (defaults to "ply").
     """
     try:
         from open3d import open3d
@@ -404,7 +404,7 @@ def write_graph(dbfile, data):
     dbfile : db.File
     data : treex.tree.Tree
     ext : str
-        file extension (defaults to "treex").
+        File extension (defaults to "treex").
     """
     import networkx as nx
     ext = "p"

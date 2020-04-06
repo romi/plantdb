@@ -7,17 +7,17 @@ from romidata import FSDB
 DATABASE_LOCATION = "testdata"
 
 class TemporaryCloneDB(object):
-    """
-    Class for doing tests on a copy of a local DB.
+    """Class for doing tests on a copy of a local DB.
 
     Parameters
     ----------
-        db_location : str
-            location of the source database
+    db_location : str
+        Location of the source database
 
     Attributes
     ----------
-        tmpdir : tempfile.TemporaryDirectory
+    tmpdir : tempfile.TemporaryDirectory
+        The temporary directory.
     """
     def __init__(self, db_location):
         self.tmpdir = tempfile.TemporaryDirectory()

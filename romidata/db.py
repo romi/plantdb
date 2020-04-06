@@ -47,47 +47,57 @@ class DB(object):
         pass
 
     def connect(self, login_data=None):
-        """Connect to the database
+        """Connect to the database.
+
+        Parameters
+        ----------
+        login_data : list or dict, optional
+            Use this to access to a `DB` with credentials.
+
         """
         raise NotImplementedError
 
     def disconnect(self):
-        """disconnect from the database
+        """Disconnect from the database.
+
         """
         raise NotImplementedError
 
     def get_scans(self):
-        """get the list of scans saved in the database
+        """Get the list of scans saved in the database.
+
         """
         raise NotImplementedError
 
     def get_scan(self, id, create=False):
-        """get a scan saved in the database
+        """Get a scan saved in the database.
 
         Parameters
         ----------
         id : str
-            id of the scan to retrieve
+            Id of the scan to retrieve
         create :  bool
-            create the scan if it does not exist (default : False)
+            Create the scan if it does not exist (default : False)
 
         Returns
         -------
         db.Scan
+
         """
         raise NotImplementedError
 
     def create_scan(self, id):
-        """ create a new scan object in the database
+        """Create a new scan object in the database.
 
         Parameters
         ----------
         id : str
-            id of the scan to retrieve
+            Id of the scan to retrieve
 
         Returns
         -------
         db.Scan
+
         """
         raise NotImplementedError
 
@@ -97,7 +107,8 @@ class DB(object):
         Parameters
         ----------
         id : str
-            id of the scan to delete
+            Id of the scan to delete
+
         """
         raise NotImplementedError
 
@@ -112,26 +123,25 @@ class Scan(object):
     Attributes
     ----------
     db : db.DB
-        database where to find the scan
+        Database where to find the scan
     id : int
-        id of the scan in the database `DB`
+        Id of the scan in the database `DB`
     """
 
     def __init__(self, db, id):
         """
         Parameters
         ----------
-
         db : DB
-            db to create the scan in
+            Db to create the scan in
         id : str
-            scan id
+            Scan id
         """
         self.db = db
         self.id = id
 
     def get_id(self):
-        """get scan id
+        """Get scan id
 
         Returns
         -------
@@ -140,7 +150,7 @@ class Scan(object):
         return self.id
 
     def get_db(self):
-        """ get parent db
+        """Get parent db
 
         Returns
         -------
@@ -149,7 +159,7 @@ class Scan(object):
         return self.db
 
     def get_filesets(self):
-        """ get all sets of files
+        """Get all sets of files
 
         Returns
         -------
@@ -158,14 +168,14 @@ class Scan(object):
         raise NotImplementedError
 
     def get_fileset(self, id, create=False):
-        """get a fileset with a given id
+        """Get a fileset with a given id
 
         Parameters
         ----------
         id : str
-
         create :  bool
-            create the fileset if it does not exist (default : False)
+            Create the fileset if it does not exist (default : False)
+
         Returns
         -------
         db.Fileset
@@ -173,12 +183,12 @@ class Scan(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
         Parameters
         ----------
         key : str
-            metadata key to retrieve (defaults to None)
+            Metadata key to retrieve (defaults to None)
 
         Returns
         -------
@@ -187,17 +197,17 @@ class Scan(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
-        if value is None, scan metadata is set to data. If value is not None
-        data is a key and is set to value.
+        If value is None, scan metadata is set to data.
+        If value is not None data is a key and is set to value.
 
         Parameters
         ----------
         data : str or dict
-            key or value
+            Key or value
         value
-            value to set (default is None)
+            Value to set (default is None)
         """
         raise NotImplementedError
 
@@ -207,7 +217,7 @@ class Scan(object):
         Parameters
         ----------
         id : str
-            id of the new fileset
+            Id of the new fileset
         """
         raise NotImplementedError
 
@@ -217,7 +227,7 @@ class Scan(object):
         Parameters
         ----------
         id : str
-            id of the fileset to delete
+            Id of the fileset to delete
         """
         raise NotImplementedError
 
@@ -249,7 +259,7 @@ class Fileset(object):
         self.id = id
 
     def get_id(self):
-        """get scan id
+        """Get scan id
 
         Returns
         -------
@@ -258,7 +268,7 @@ class Fileset(object):
         return self.id
 
     def get_db(self):
-        """ get parent db
+        """Get parent db
 
         Returns
         -------
@@ -267,7 +277,7 @@ class Fileset(object):
         return self.db
 
     def get_scan(self):
-        """ get parent scan
+        """Get parent scan
 
         Returns
         -------
@@ -276,7 +286,7 @@ class Fileset(object):
         return self.scan
 
     def get_files(self):
-        """ get all files
+        """Get all files
 
         Returns
         -------
@@ -285,14 +295,14 @@ class Fileset(object):
         raise NotImplementedError
 
     def get_file(self, id, create=False):
-        """get file with given id
+        """Get file with given id
 
         Parameters
         ----------
         id : str
-
+            File id
         create :  bool
-            create the file if it does not exist (default : False)
+            Create the file if it does not exist (default : False)
 
         Returns
         -------
@@ -301,12 +311,12 @@ class Fileset(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
         Parameters
         ----------
         key : str
-            metadata key to retrieve (defaults to None)
+            Metadata key to retrieve (defaults to None)
 
         Returns
         -------
@@ -315,17 +325,17 @@ class Fileset(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
-        if value is None, scan metadata is set to data. If value is not None
-        data is a key and is set to value.
+        If value is None, scan metadata is set to data.
+        If value is not None data is a key and is set to value.
 
         Parameters
         ----------
         data : str or dict
-            key or value
+            Key or value
         value
-            value to set (default is None)
+            Value to set (default is None)
         """
         raise NotImplementedError
 
@@ -335,7 +345,7 @@ class Fileset(object):
         Parameters
         ----------
         id : str
-            id of the new file
+            Id of the new file
         """
         raise NotImplementedError
 
@@ -345,7 +355,7 @@ class Fileset(object):
         Parameters
         ----------
         id : str
-            id of the file to delete
+            Id of the file to delete
         """
         raise NotImplementedError
 
@@ -374,7 +384,7 @@ class File(object):
         self.filename = None
 
     def get_id(self):
-        """get file id
+        """Get file id
 
         Returns
         -------
@@ -383,7 +393,7 @@ class File(object):
         return self.id
 
     def get_db(self):
-        """ get parent db
+        """Get parent db
 
         Returns
         -------
@@ -392,7 +402,7 @@ class File(object):
         return self.fileset.scan.db
 
     def get_scan(self):
-        """ get parent scan
+        """Get parent scan
 
         Returns
         -------
@@ -401,7 +411,7 @@ class File(object):
         return self.fileset.scan
 
     def get_fileset(self):
-        """ get parent fileset
+        """Get parent fileset
 
         Returns
         -------
@@ -411,12 +421,12 @@ class File(object):
 
 
     def get_metadata(self, key=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
         Parameters
         ----------
         key : str
-            metadata key to retrieve (defaults to None)
+            Metadata key to retrieve (defaults to None)
 
         Returns
         -------
@@ -425,17 +435,17 @@ class File(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """ get metadata associated to scan
+        """Get metadata associated to scan
 
-        if value is None, scan metadata is set to data. If value is not None
-        data is a key and is set to value.
+        If value is None, scan metadata is set to data.
+        If value is not None data is a key and is set to value.
 
         Parameters
         ----------
         data : str or dict
-            key or value
+            Key or value
         value
-            value to set (default is None)
+            Value to set (default is None)
         """
         raise NotImplementedError
 
@@ -454,7 +464,7 @@ class File(object):
         Parameters
         ----------
         buffer : bytearray
-            data
+            Data
         """
         raise NotImplementedError
 
@@ -473,7 +483,7 @@ class File(object):
         Parameters
         ----------
         data : str
-            data
+            Data
         """
         raise NotImplementedError
 
@@ -492,7 +502,7 @@ class File(object):
         Parameters
         ----------
         buffer : bytearray
-            data
+            Data
         """
         raise NotImplementedError
 
@@ -507,7 +517,10 @@ class File(object):
 
 
 class DBBusyError(OSError):
-    """This  error is raised when the Database is busy and an operation cannot be done on it.
+    """ Raises an error if the database is busy.
+
+    This error is raised when the database is busy and an operation cannot be
+     done on it.
     """
     def __init__(self, message):
         self.message = message

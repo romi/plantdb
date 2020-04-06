@@ -6,7 +6,7 @@ class DBRunner(object):
     Attributes
     ----------
     db : DB
-        target database
+        Target database
     """
 
     def __init__(self, db, tasks, config):
@@ -14,11 +14,11 @@ class DBRunner(object):
         Parameters
         ----------
         db : DB
-            target database
+            Target database
         tasks : list or RomiTask
-            tasks
+            Tasks
         config : dict
-            luigi configuration for tasks
+            Luigi configuration for tasks
         """
         if not isinstance(tasks, (list, tuple)):
             tasks = [tasks]
@@ -48,7 +48,7 @@ class DBRunner(object):
         Parameters
         ----------
         scan_id : str
-            id of the scan to process
+            Id of the scan to process
         """
         self.db.connect()
         scan = self.db.get_scan(scan_id)

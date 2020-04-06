@@ -17,13 +17,13 @@ class FSDBSync():
     Attributes
     ----------
     source_str : str
-        source path 
+        Source path
     target_str : str
-        target path 
+        Target path
     source : dict
-        source path description
+        Source path description
     target : dict
-        target path description
+        Target path description
     """
     def __del__(self):
         try:
@@ -36,9 +36,9 @@ class FSDBSync():
         Parameters
         ----------
         source : str
-            source database path (remote or local)
+            Source database path (remote or local)
         target : str
-            target database path (remote or local)
+            Target database path (remote or local)
         """
         self.source_str = source
         self.target_str = target
@@ -47,7 +47,7 @@ class FSDBSync():
 
 
     def unlock(self):
-        """ Unlock the source and target DB after sync.
+        """Unlock the source and target DB after sync.
         """
         for x in [self.source, self.target]:
             if x["type"] == "local":
@@ -56,7 +56,7 @@ class FSDBSync():
                 _unlock_remote(x)
 
     def lock(self):
-        """ Lock the source and target DB before sync.
+        """Lock the source and target DB before sync.
         """
         for x in [self.source, self.target]:
             if x["type"] == "local":
@@ -65,7 +65,7 @@ class FSDBSync():
                 _lock_remote(x)
 
     def sync(self):
-        """ Sync the two DBs.
+        """Sync the two DBs.
         """
         self.lock()
         subprocess.run(["rsync", "-av", self.source_str, self.target_str])
@@ -73,17 +73,17 @@ class FSDBSync():
 
 
 def _fmt_path(path):
-    """ Parses path by checking for a ':' sign.
+    """Parses path by checking for a ':' sign.
 
     Parameters
     ----------
     path : str
-        the path to format
+        The path to format
 
     Returns
     -------
     dict
-        a dictionary describing the parsed path.
+        A dictionary describing the parsed path.
     """
     if ':' in path: # This is a remote path
         path_split = path.split(':')

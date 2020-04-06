@@ -7,8 +7,18 @@ from romidata.task import db
 
 
 class RomiTask(luigi.Task):
-    """Implementation of a luigi Task for the romidata DB API."""
+    """Implementation of a luigi Task for the romidata DB API.
 
+    Attributes
+    ----------
+    upstream_task : luigi.TaskParameter
+        The upstream task.
+    output_file_id : luigi.Parameter, optional
+        The output fileset name, default is 'out'.
+    scan_id : luigi.Parameter, optional
+        The scan id to use to get or create the FilesetTarget.
+
+    """
     upstream_task = luigi.TaskParameter()
     output_file_id = luigi.Parameter(default="out")
     scan_id = luigi.Parameter(default="")
@@ -18,7 +28,7 @@ class RomiTask(luigi.Task):
 
     def output(self):
         """Output for a RomiTask is a FileSetTarget, the fileset ID being
-        the task ID.
+        The task ID.
         """
         fileset_id = self.task_id
         if self.scan_id == "":
@@ -42,7 +52,7 @@ class RomiTask(luigi.Task):
         Parameters
         ----------
         file_id : str
-            id of the input file
+            Id of the input file
 
         Returns
         -------
@@ -52,13 +62,12 @@ class RomiTask(luigi.Task):
         return self.upstream_task().output_file(file_id)
 
     def output_file(self, file_id=None):
-        """Helper function to get a file from
-        the output  fileset.
+        """Helper function to get a file from the output  fileset.
 
         Parameters
         ----------
         file_id : str
-            id of the input file
+            Id of the input file
 
         Returns
         -------
@@ -107,15 +116,14 @@ class FileByFileTask(RomiTask):
     writer = None
 
     def f(self, f, outfs):
-        """Function applied to every file in the fileset
-        must return a file object.
+        """Function applied to every file in the fileset must return a file object.
 
         Parameters
         ----------
         f: FSDB.File
-            input file
+            Input file
         outfs: FSDB.Fileset
-            output fileset
+            Output fileset
 
         Returns
         -------
@@ -166,7 +174,7 @@ class DummyTask(RomiTask):
 
 
 class Clean(RomiTask):
-    """ Cleanup a scan, keeping only the "images" fileset and removing all computed pipelines.
+    """Cleanup a scan, keeping only the "images" fileset and removing all computed pipelines.
 
     Module: romiscan.tasks.scan
     Default upstream tasks: None

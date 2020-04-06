@@ -112,7 +112,7 @@ LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in
 
 
 def dummy_db():
-    """ Create a dummy temporary database.
+    """Create a dummy temporary database.
 
     Returns
     -------
@@ -146,9 +146,9 @@ class FSDB(db.DB):
     Attributes
     ----------
     basedir : str
-        path to the base directory containing the database
+        Path to the base directory containing the database
     scans : list
-        list of `Scan` objects found in the database
+        List of `Scan` objects found in the database
     is_connected : bool
         ``True`` if the DB is connected (locked the directory), else ``False
 
@@ -163,7 +163,7 @@ class FSDB(db.DB):
         Parameters
         ----------
         basedir : str
-            path to root directory of the database
+            Path to root directory of the database
 
         Examples
         --------
@@ -200,7 +200,7 @@ class FSDB(db.DB):
         self.is_connected = False
 
     def connect(self, login_data=None):
-        """ Connect to the local database.
+        """Connect to the local database.
 
         Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
 
@@ -234,7 +234,7 @@ class FSDB(db.DB):
             print(f"Already connected to the database '{self.basedir}'")
 
     def disconnect(self):
-        """ Disconnect from the local database.
+        """Disconnect from the local database.
 
         Handle DB "locking" system by removing the `LOCK_FILE_NAME` file from the DB.
 
@@ -268,7 +268,7 @@ class FSDB(db.DB):
             print(f"Already disconnected from the database '{self.basedir}'")
 
     def get_scans(self, query=None):
-        """ Get a list of `Scan` using a `query`.
+        """Get a list of `Scan` using a `query`.
 
         Parameters
         ----------
@@ -290,7 +290,7 @@ class FSDB(db.DB):
         return _filter_query(self.scans, query)
 
     def get_scan(self, id, create=False):
-        """ Get a `Scan` from the local database.
+        """Get a `Scan` from the local database.
 
         Parameters
         ----------
@@ -326,7 +326,7 @@ class FSDB(db.DB):
         return self.scans[ids.index(id)]
 
     def create_scan(self, id):
-        """ Create a `Scan` in the local database.
+        """Create a `Scan` in the local database.
 
         Parameters
         ----------
@@ -370,7 +370,7 @@ class FSDB(db.DB):
         return scan
 
     def delete_scan(self, id):
-        """ Delete an existing `Scan` from the local database.
+        """Delete an existing `Scan` from the local database.
 
         Parameters
         ----------
@@ -422,7 +422,7 @@ class Scan(db.Scan):
     """
 
     def __init__(self, db, id):
-        """ Scan dataset constructor.
+        """Scan dataset constructor.
 
         Parameters
         ----------
@@ -828,7 +828,7 @@ def _set_metadata(metadata, data, value):
 ################################################################################
 
 def _make_fileset(fileset):
-    """ Create the fileset directory.
+    """Create the fileset directory.
 
     Parameters
     ----------
@@ -853,7 +853,7 @@ def _make_fileset(fileset):
 
 
 def _make_scan(scan):
-    """ Create the scan directory.
+    """Create the scan directory.
 
     Parameters
     ----------
@@ -882,7 +882,7 @@ def _make_scan(scan):
 ################################################################################
 
 def _get_filename(file, ext):
-    """ Returns a file's name.
+    """Returns a file's name.
 
     Parameters
     ----------
@@ -901,7 +901,7 @@ def _get_filename(file, ext):
 
 
 def _scan_path(scan):
-    """ Get the path to given scan.
+    """Get the path to given scan.
 
     Parameters
     ----------
@@ -918,7 +918,7 @@ def _scan_path(scan):
 
 
 def _fileset_path(fileset):
-    """ Get the path to given fileset.
+    """Get the path to given fileset.
 
     Parameters
     ----------
@@ -936,7 +936,7 @@ def _fileset_path(fileset):
 
 
 def _file_path(file):
-    """ Get the path to given file.
+    """Get the path to given file.
 
     Parameters
     ----------
@@ -955,7 +955,7 @@ def _file_path(file):
 
 
 def _scan_files_json(scan):
-    """ Get the path to scan's "files.json" file.
+    """Get the path to scan's "files.json" file.
 
     Parameters
     ----------
@@ -973,7 +973,7 @@ def _scan_files_json(scan):
 
 
 def _scan_metadata_path(scan):
-    """ Get the path to scan's "metadata.json" file.
+    """Get the path to scan's "metadata.json" file.
 
     Parameters
     ----------
@@ -992,7 +992,7 @@ def _scan_metadata_path(scan):
 
 
 def _fileset_metadata_path(fileset):
-    """ Get the path to `fileset.id` metadata JSON file.
+    """Get the path to `fileset.id` metadata JSON file.
 
     Parameters
     ----------
@@ -1036,7 +1036,7 @@ def _file_metadata_path(file):
 ################################################################################
 
 def _file_to_dict(file):
-    """ Returns a dict with the file "id" and "filename".
+    """Returns a dict with the file "id" and "filename".
 
     Parameters
     ----------
@@ -1053,7 +1053,7 @@ def _file_to_dict(file):
 
 
 def _fileset_to_dict(fileset):
-    """ Returns a dict with the fileset "id" and the list of "files" dict.
+    """Returns a dict with the fileset "id" and the list of "files" dict.
 
     Parameters
     ----------
@@ -1077,7 +1077,7 @@ def _fileset_to_dict(fileset):
 
 
 def _scan_to_dict(scan):
-    """ Returns a dict with the scan's dictionary of `Fileset`s.
+    """Returns a dict with the scan's dictionary of `Fileset`s.
 
     Parameters
     ----------
@@ -1102,7 +1102,7 @@ def _scan_to_dict(scan):
 
 
 def _store_scan(scan):
-    """ Dump the scan's JSON on drive.
+    """Dump the scan's JSON on drive.
 
     Parameters
     ----------
@@ -1127,7 +1127,7 @@ def _is_valid_id(id):
 
 
 def _is_db(path):
-    """ Test if the given path is indeed an FSDB database.
+    """Test if the given path is indeed an FSDB database.
     Do it by checking the presence of the `MARKER_FILE_NAME`.
 
     Parameters
@@ -1145,7 +1145,7 @@ def _is_db(path):
 
 
 def _is_safe_to_delete(path):
-    """ Tests if given path is safe to delete.
+    """Tests if given path is safe to delete.
 
     Parameters
     ----------
@@ -1172,7 +1172,7 @@ def _is_safe_to_delete(path):
 
 
 def _delete_file(file):
-    """ Delete the given file.
+    """Delete the given file.
 
     Parameters
     ----------
@@ -1201,7 +1201,7 @@ def _delete_file(file):
 
 
 def _delete_fileset(fileset):
-    """ Delete the given fileset, starting by its `File`(s).
+    """Delete the given fileset, starting by its `File`(s).
 
     Parameters
     ----------
@@ -1231,7 +1231,7 @@ def _delete_fileset(fileset):
 
 
 def _delete_scan(scan):
-    """ Delete the given scan, starting by its `Fileset`s.
+    """Delete the given scan, starting by its `Fileset`s.
 
     Parameters
     ----------
