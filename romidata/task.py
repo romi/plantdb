@@ -235,11 +235,11 @@ class RomiTask(luigi.Task):
         Returns
         -------
         FilesetTarget
-            A set of file(s) in the
+            A set of file(s) in the ???
 
         """
         fileset_id = self.task_id
-        if self.scan_id == "" or self.scan_id is None:
+        if self.scan_id == "":
             t = FilesetTarget(DatabaseConfig().scan, fileset_id)
         else:
             t = FilesetTarget(db.get_scan(self.scan_id), fileset_id)

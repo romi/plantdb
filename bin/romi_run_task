@@ -34,7 +34,7 @@ MODULES = {
     "CurveSkeleton": "romiscan.tasks.proc3d",
     "TreeGraph": "romiscan.tasks.arabidopsis",
     "AnglesAndInternodes": "romiscan.tasks.arabidopsis",
-    "Visualization": "romidata.visualization",
+    "Visualization": "romiscan.tasks.visualization",
     "Clean": "romidata.task",
     "VirtualPlant": "romiscanner.lpy"
 }

@@ -15,7 +15,7 @@ api = Api(app)
 try:
     db_location = os.environ["DB_LOCATION"]
 except:
-    raise Error("DB_LOCATION environment variable is not set")
+    raise ValueError("DB_LOCATION environment variable is not set")
 
 try:
     db_prefix = os.environ["DB_PREFIX"]
