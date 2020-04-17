@@ -8,7 +8,7 @@ opts = dict(name="romidata",
                 'bin/romi_fsdb_sync',
                 'bin/romi_import_folder',
                 'bin/romi_run_task',
-                'bin/romi_import_folder',
+                'bin/romi_scanner_rest_api',
                 'bin/romi_import_file'
             ],
             setup_requires=['setuptools_scm'],
