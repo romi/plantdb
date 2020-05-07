@@ -191,4 +191,4 @@ api.add_resource(File, '/files/<path:path>')
 api.add_resource(Refresh, '/refresh')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
