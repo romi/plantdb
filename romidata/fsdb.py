@@ -185,14 +185,6 @@ class FSDB(db.DB):
 
         """
         super().__init__()
-        # Check the given path to root directory of the database is a directory:
-        if not os.path.isdir(basedir):
-            raise IOError("Not a directory: %s" % basedir)
-        # Check the given path to root directory of the database is a "romi db", ie. have the `MARKER_FILE_NAME`:
-        if not _is_db(basedir):
-            raise IOError(
-                "Not a DB. Check that there is a marker named %s in %s" % (
-                    MARKER_FILE_NAME, basedir))
         # Defines attributes:
         self.basedir = basedir
         self.lock_path = os.path.abspath(os.path.join(basedir, LOCK_FILE_NAME))
@@ -221,6 +213,14 @@ class FSDB(db.DB):
         True
 
         """
+        # Check the given path to root directory of the database is a directory:
+        if not os.path.isdir(self.basedir):
+            raise IOError("Not a directory: %s" % self.basedir)
+        # Check the given path to root directory of the database is a "romi db", ie. have the `MARKER_FILE_NAME`:
+        if not _is_db(self.basedir):
+            raise IOError(
+                "Not a DB. Check that there is a marker named %s in %s" % (
+                    MARKER_FILE_NAME, self.basedir))
         if not self.is_connected:
             try:
                 with open(self.lock_path, "x") as _:
