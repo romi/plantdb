@@ -8,12 +8,12 @@
 * Returns: ScanList JSON 
 
 
-### /scans/<scanid>
+### /scans/\[scanid\]
 
 * Arguments: none
 * Returns: Detailed scan JSON  
 
-### /files/<path>
+### /files/\[path\]
 
 * Arguments: none
 * Returns: The content of the file  
@@ -35,7 +35,7 @@ Obtact with fields:
 * hasMesh: Boolean
 * hasSkeleton: Boolean
 * hasAngleData: Boolean
-* thumbnailUri: String, URL, example "/files/<scanid>/Visualization/thumbnail_pict20190201_134037_0.jpg"
+* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 
 
 ### Scan (detailed)
@@ -46,7 +46,7 @@ Obtact with fields:
 * hasMesh: Boolean
 * hasSkeleton: Boolean
 * hasAngleData: Boolean
-* thumbnailUri: String, URL, example "/files/<scanid>/Visualization/thumbnail_pict20190201_134037_0.jpg"
+* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 * camera: Camera object
 * data: Data object
 
@@ -59,8 +59,8 @@ Object with fields:
 * nbPhotos: Number
 * environment: String
 * files: Object
-    * files.metadatas: String, URL, example "/files/<scanid>/metadata/metadata.json"
-    * files.archive: String, URL, example "/files/<scanid>/Visualization/scan.zip"
+    * files.metadatas: String, URL, example "/files/\[scanid\]/metadata/metadata.json"
+    * files.archive: String, URL, example "/files/\[scanid\]/Visualization/scan.zip"
 
 
 ### Camera
@@ -84,8 +84,8 @@ Object with fields:
 * id: String, ID of the picture
 * rotmat: Rotation matrix, Array 3x3
 * tvec: Translation vector, Array 3x1
-* thumbnailUri: String, URL, example "/files/<scanid>/Visualization/thumbnail_<id>.jpg"
-* photoUri: String, URL, example "/files/<scanid>/Visualization/image_<id>.jpg"
+* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_\[id\].jpg"
+* photoUri: String, URL, example "/files/\[scanid\]/Visualization/image_\[id\].jpg"
 
 
 ### Data object
