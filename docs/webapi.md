@@ -16,34 +16,6 @@ NOTE: Only scans that have a Visualisation fileset are included
 * Arguments: none
 * Returns: The content of the file  
 
-
-### TODO
-
-#### /scans
-* Include ALL scans
-
-
-#### /image/\[scanid\]/\[filesetid\]/\[fileid\]
-* Arguments:
-    * size: values \{orig, large, thumb\}
-* Returns: The image file. 
-    * large: WxH
-    * thumbnail: WxH
-
-
-#### /pointcloud/\[scanid\]/\[filesetid\]/\[fileid\]
-* Arguments:
-    * size: values \{orig, preview\}
-* Returns: The pointcloud file (ply). 
-
-
-#### /mesh/\[scanid\]/\[filesetid\]/\[fileid\]
-* Arguments:
-    * size: values \{orig, preview\}
-* Returns: The mesh. 
-
-
-
 ## Object descriptions
 
 ### ScanList
