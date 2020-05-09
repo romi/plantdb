@@ -9,7 +9,7 @@ from romidata import FSDB as DB
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 api = Api(app)
 
 try:
@@ -20,7 +20,7 @@ except:
 try:
     db_prefix = os.environ["DB_PREFIX"]
 except:
-    db_prefix = "/files/"
+    raise ValueError("DB_LOCATION environment variable is not set")
 
 db = DB(db_location)
 db.connect()
@@ -135,6 +135,11 @@ def fmt_scan(scan):
 
         try:
             res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
+        except:
+            pass
+        
+        try:
+            res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
         except:
             pass
 
