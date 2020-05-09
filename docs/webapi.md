@@ -87,7 +87,7 @@ Object with fields:
 
 ### Data object
 Object with fields:
-* angles: 
+* angles: Array of Angle objects
 * skeleton: Skeleton object
 
 
