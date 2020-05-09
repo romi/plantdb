@@ -1,17 +1,15 @@
-
-
 ## REST URLs
 
 ### /scans
 
 * Arguments: none
-* Returns: ScanList JSON 
+* Returns: JSON with a ScanList array 
 
 
 ### /scans/\[scanid\]
 
 * Arguments: none
-* Returns: Detailed scan JSON  
+* Returns: JSON with a scan details object   
 
 ### /files/\[path\]
 
@@ -22,11 +20,10 @@
 ## Object descriptions
 
 ### ScanList
+* Array of scan summary objects
 
-* Array of scan summaries
 
-
-### Scan (summary)
+### Scan summary object
 
 Obtact with fields:
 * id: String
@@ -38,10 +35,10 @@ Obtact with fields:
 * thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 
 
-### Scan (detailed)
+### Scan details object
 Obtact with fields:
 * id: String
-* metadata: Scan metadata (see below)
+* metadata: Metadata object
 * hasPointCloud: Boolean
 * hasMesh: Boolean
 * hasSkeleton: Boolean
@@ -51,7 +48,7 @@ Obtact with fields:
 * data: Data object
 
 
-### Scan metadata
+### Metadata object
 Object with fields:
 * date: String, example "2019-02-01_13-35-42"
 * plant: String
@@ -63,13 +60,13 @@ Object with fields:
     * files.archive: String, URL, example "/files/\[scanid\]/Visualization/scan.zip"
 
 
-### Camera
+### Camera object
 Object with fields:
-* model: Camera model
+* model: Model object
 * poses: Array of Pose objects
 
 
-### Camera model
+### Model object
 Object with fields:
 * id: Number
 * width: Number
