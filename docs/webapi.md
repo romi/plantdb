@@ -42,8 +42,8 @@ Fields:
 * nbPhotos: Number
 * environment: String
 * files: Object
-** files.metadatas: String, URL, example "/files/<scanid>/metadata/metadata.json"
-** files.archive: String, URL, example "/files/<scanid>/Visualization/scan.zip"
+    * files.metadatas: String, URL, example "/files/<scanid>/metadata/metadata.json"
+    * files.archive: String, URL, example "/files/<scanid>/Visualization/scan.zip"
 
 
 ### Skeleton
