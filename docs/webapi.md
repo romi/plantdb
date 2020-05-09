@@ -1,20 +1,47 @@
 ## REST URLs
 
 ### /scans
-
 * Arguments: none
-* Returns: JSON with a ScanList array 
+* Returns: JSON with a ScanList array.
+
+NOTE: Only scans that have a Visualisation fileset are included 
 
 
 ### /scans/\[scanid\]
-
 * Arguments: none
 * Returns: JSON with a scan details object   
 
-### /files/\[path\]
 
+### /files/\[path\]
 * Arguments: none
 * Returns: The content of the file  
+
+
+### TODO
+
+#### /scans
+* Include ALL scans
+
+
+#### /image/\[scanid\]/\[filesetid\]/\[fileid\]
+* Arguments:
+    * size: values \{orig, large, thumb\}
+* Returns: The image file. 
+    * large: WxH
+    * thumbnail: WxH
+
+
+#### /pointcloud/\[scanid\]/\[filesetid\]/\[fileid\]
+* Arguments:
+    * size: values \{orig, preview\}
+* Returns: The pointcloud file (ply). 
+
+
+#### /mesh/\[scanid\]/\[filesetid\]/\[fileid\]
+* Arguments:
+    * size: values \{orig, preview\}
+* Returns: The mesh. 
+
 
 
 ## Object descriptions
@@ -24,8 +51,7 @@
 
 
 ### Scan summary object
-
-Obtact with fields:
+Object with fields:
 * id: String
 * metadata: Scan metadata (see below)
 * hasPointCloud: Boolean
@@ -36,7 +62,7 @@ Obtact with fields:
 
 
 ### Scan details object
-Obtact with fields:
+Object with fields:
 * id: String
 * metadata: Metadata object
 * hasPointCloud: Boolean
