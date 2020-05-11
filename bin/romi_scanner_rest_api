@@ -20,7 +20,7 @@ except:
 try:
     db_prefix = os.environ["DB_PREFIX"]
 except:
-    db_prefix = "/files"
+    db_prefix = "/files/"
 
 db = DB(db_location)
 db.connect()
