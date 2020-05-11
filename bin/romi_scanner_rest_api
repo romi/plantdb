@@ -9,7 +9,7 @@ from romidata import FSDB as DB
 from flask_cors import CORS
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 api = Api(app)
 
 try:
@@ -20,7 +20,7 @@ except:
 try:
     db_prefix = os.environ["DB_PREFIX"]
 except:
-    raise ValueError("DB_LOCATION environment variable is not set")
+    db_prefix = "/files"
 
 db = DB(db_location)
 db.connect()
