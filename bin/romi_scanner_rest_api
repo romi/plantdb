@@ -137,6 +137,11 @@ def fmt_scan(scan):
             res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
         except:
             pass
+        
+        try:
+            res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
+        except:
+            pass
 
 
     res["workspace"] = metadata["scanner"]["workspace"]
