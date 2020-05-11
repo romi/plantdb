@@ -48,7 +48,7 @@ Object with fields:
 
 ### Metadata object
 Object with fields:
-* date: String, example "2019-02-01_13-35-42"
+* date: String, example "2019-02-01 13:35:42"
 * plant: String
 * species: String
 * nbPhotos: Number
