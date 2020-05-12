@@ -25,25 +25,29 @@ NOTE: Only scans that have a Visualisation fileset are included
 ### Scan summary object
 Object with fields:
 * id: String
+* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 * metadata: Scan metadata (see below)
 * hasPointCloud: Boolean
 * hasMesh: Boolean
 * hasSkeleton: Boolean
 * hasAngleData: Boolean
-* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 
 
 ### Scan details object
 Object with fields:
 * id: String
+* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 * metadata: Metadata object
 * hasPointCloud: Boolean
 * hasMesh: Boolean
 * hasSkeleton: Boolean
 * hasAngleData: Boolean
-* thumbnailUri: String, URL, example "/files/\[scanid\]/Visualization/thumbnail_pict20190201_134037_0.jpg"
 * camera: Camera object
 * data: Data object
+* workspace: Workspace object
+* filesUri:
+    * mesh: String URL, if hasMesh is true
+    * pointCloud: String URL, if hasPointCloud is true
 
 
 ### Metadata object
@@ -85,8 +89,9 @@ Object with fields:
 
 ### Data object
 Object with fields:
-* angles: Array of Angle objects
-* skeleton: Skeleton object
+* angles: Array of Angle objects, required if hasAngleData is true
+* skeleton: Skeleton object, required if hasSkeleton is true
+
 
 
 ### Angles object
@@ -96,6 +101,13 @@ Object with fields:
 * internodes: Array of numbers
 * measured_internodes: Array of numbers
 * fruit_points: Array of ???
+
+
+### Workspace object
+Object with fields:
+* x: [min, max]
+* y: [min, max]
+* z: [min, max]
 
 
 ### Skeleton object
