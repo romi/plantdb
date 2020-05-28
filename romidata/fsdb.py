@@ -835,21 +835,15 @@ def _make_fileset(fileset):
     fileset : fsdb.Fileset
         The fileset to use for directory creation.
 
-    Raises
-    ------
-    OSError
-        If the fileset's path is not a directory.
-
     See Also
     --------
-    _fileset_path: returns the path foe a given fileset.
+    _fileset_path
 
     """
     path = _fileset_path(fileset)
+    # Create the fileset directory if it does not exists:
     if not os.path.isdir(path):
         os.makedirs(path)
-    else:
-        raise IOError(f"Given `fileset` has no valid directory: {path}")
 
 
 def _make_scan(scan):
@@ -860,21 +854,15 @@ def _make_scan(scan):
     scan : fsdb.Scan
         The scan to use for directory creation.
 
-    Raises
-    ------
-    OSError
-        If the scan's path is not a directory.
-
     See Also
     --------
-    _scan_path: returns the path for a given scan.
+    _scan_path
 
     """
     path = _scan_path(scan)
+    # Create the scan directory if it does not exists:
     if not os.path.isdir(path):
         os.makedirs(path)
-    else:
-        raise IOError(f"Given `scan` has no valid directory: {path}")
 
 
 ################################################################################
