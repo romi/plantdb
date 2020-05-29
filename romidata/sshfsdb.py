@@ -83,7 +83,7 @@ class SSHFSDB(fsdb.FSDB):
         --------
         >>> # EXAMPLE 1: Use a temporary dummy database:
         >>> from romidata import SSHFSDB
-        >>> db = sshfsdb.SSHFSDB("db", "someone@example.com:/data")
+        >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.basedir)
         db
         >>> print(db.remotedir)
