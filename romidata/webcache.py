@@ -21,96 +21,111 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with romidata.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-import json
 import os
 import hashlib
-from romidata import io
-from romidata import FSDB as DB
-from skimage.transform import resize
-import imageio
+from PIL import Image
 import numpy as np
 
-def file_path(db, scanid, filesetid, fileid):
+def __file_path(db, scanid, filesetid, fileid):
     scan = db.get_scan(scanid)
     fs = scan.get_fileset(filesetid)
     f = fs.get_file(fileid)
     return os.path.join(db.basedir, scan.id, fs.id, f.filename)
 
-def _hash(type, scanid, filesetid, fileid, size):
+def __hash(resource_type, scanid, filesetid, fileid, size):
     m = hashlib.sha1()
-    key = "%s|%s|%s|%s|%s" % (type, scanid, filesetid, fileid, size)
+    key = "%s|%s|%s|%s|%s" % (resource_type, scanid, filesetid, fileid, size)
     m.update(key.encode('utf-8'))
     return m.hexdigest()
 
+
 # Image
 
-def image_hash(scanid, filesetid, fileid, size):
-    return _hash("image", scanid, filesetid, fileid, size)
-
-def image_resize(img, max_size):
-    i = np.argmax(img.shape[0:2])
-    if img.shape[i] <= max_size:
-        return img
-    if i == 0:
-        new_shape = [max_size, int(max_size * img.shape[1]/img.shape[0])]
-    else:
-        new_shape = [int(max_size * img.shape[0]/img.shape[1]), max_size]
-    return resize(img, new_shape)
+def __image_hash(scanid, filesetid, fileid, size):
+    return __hash("image", scanid, filesetid, fileid, size)
 
 
-def image_cache(db, scanid, filesetid, fileid, size):
-    src = file_path(db, scanid, filesetid, fileid)
-    dir = os.path.join(db.basedir, scanid, "webcache")
-    os.makedirs(dir, exist_ok=True)
-    dst = os.path.join(dir, image_hash(scanid, filesetid, fileid, size))
+def __image_resize(img, max_size):
+    img.thumbnail((max_size, max_size))
+    return img
+
+
+def __image_cache(db, scanid, filesetid, fileid, size):
+    src = __file_path(db, scanid, filesetid, fileid)
+    directory = os.path.join(db.basedir, scanid, "webcache")
+    os.makedirs(directory, exist_ok=True)
+    dst = os.path.join(directory, __image_hash(scanid, filesetid, fileid, size))
     
-    resolutions = {
-        "large": 1500,
-        "thumb": 150
-    }
+    resolutions = { "large": 1500, "thumb": 150 }
     maxsize = resolutions.get(size) 
 
-    image = imageio.imread(src)
-    # remove alpha channel
-    if image.shape[2] == 4:
-        image = image[:,:,:3]
-    cached_image = image_resize(image, maxsize)
-    imageio.imwrite(dst, cached_image, format="jpg")
+    image = Image.open(src)
+    image.load()
+    image = __image_resize(image, maxsize)
+    image.save(dst, "JPEG", quality=84)
 
     print("Converted %s to %s, size %d" % (src, dst, maxsize))
 
-    return dst;
+    return dst
 
 
-def image_cached_path(db, scanid, filesetid, fileid, size):
+def __image_cached_path(db, scanid, filesetid, fileid, size):
     path = os.path.join(db.basedir, scanid, "webcache",
-                        image_hash(scanid, filesetid, fileid, size))
+                        __image_hash(scanid, filesetid, fileid, size))
     if not os.path.isfile(path):
-        image_cache(db, scanid, filesetid, fileid, size)
+        __image_cache(db, scanid, filesetid, fileid, size)
     return path
 
 
 def image_path(db, scanid, filesetid, fileid, size):
+    """Point cloud path in the webcache.
+        
+       Returns the path in the webcache of a given point cloud file in the database.
+    
+       Parameters
+       ----------
+       db: DB
+            The database object
+       scanid: str
+            The ID of the scan in the database
+       filesetid: str
+            The ID of the fileset in the scan
+       fileid: str
+            The ID of the file in the fileset
+       size: str
+            The requested size ('orig', 'large', or 'thumb')
+
+    """
     if size == "orig":
         print("Using original file")
-        return file_path(db, scanid, filesetid, fileid)
-    else:
+        return __file_path(db, scanid, filesetid, fileid)
+    elif size == "large" or size == "thumb":
         print("Using cached file")
-        return image_cached_path(db, scanid, filesetid, fileid, size)
+        return __image_cached_path(db, scanid, filesetid, fileid, size)
+    else:
+        raise ValueError("Unknow size specification: %s" % size)
+
 
 # PointCloud
 
-def pointcloud_hash(scanid, filesetid, fileid, size):
-    return _hash("pointcloud", scanid, filesetid, fileid, size)
-
-
-def pointcloud_resize(pointcloud, max_size):
+def __load_open3d():
     try:
         from open3d import open3d
-    except:
+    except ModuleNotFoundError:
+        msg = "Please install Open3D with the followng command: pip install open3d"
+        raise ModuleNotFoundError(msg)
+    except ImportError:
         import open3d
+
         
-    if len(pointcloud.points) < max_pointcloud_size:
+def __pointcloud_hash(scanid, filesetid, fileid, size):
+    return __hash("pointcloud", scanid, filesetid, fileid, size)
+
+
+def __pointcloud_resize(pointcloud, max_size):
+    __load_open3d()
+        
+    if len(pointcloud.points) < max_size:
         return pointcloud
 
     downsample = len(pointcloud.points) // max_size + 1
@@ -120,53 +135,87 @@ def pointcloud_resize(pointcloud, max_size):
         return pointcloud.voxel_down_sample(downsample)
 
 
-def pointcloud_cache(db, scanid, filesetid, fileid, size):
-    try:
-        from open3d import open3d
-    except:
-        import open3d
+def __pointcloud_cache(db, scanid, filesetid, fileid, size):
+    __load_open3d()
         
     try:  # 0.7 -> 0.8 breaking
         read_pointcloud = open3d.geometry.read_point_cloud
         write_pointcloud = open3d.geometry.write_point_cloud
-    except:
+    except AttributeError:
         read_pointcloud = open3d.io.read_point_cloud
         write_pointcloud = open3d.io.write_point_cloud
         
-    src = file_path(db, scanid, filesetid, fileid)
-    dir = os.path.join(db.basedir, scanid, "webcache")
-    os.makedirs(dir, exist_ok=True)
-    dst = os.path.join(dir, pointcloud_hash(scanid, filesetid, fileid, size))
+    src = __file_path(db, scanid, filesetid, fileid)
+    directory = os.path.join(db.basedir, scanid, "webcache")
+    os.makedirs(directory, exist_ok=True)
+    dst = os.path.join(directory, __pointcloud_hash(scanid, filesetid, fileid, size))
 
     max_pointcloud_size = 10000
     pointcloud = read_pointcloud(src)
-    pointcloud_lowres = pointcloud_resize(pointcloud, max_pointcloud_size)
+    pointcloud_lowres = __pointcloud_resize(pointcloud, max_pointcloud_size)
     write_pointcloud(dst, pointcloud_lowres)
     
-    return dst;
+    return dst
 
 
-def pointcloud_cached_path(db, scanid, filesetid, fileid, size):
+def __pointcloud_cached_path(db, scanid, filesetid, fileid, size):
     path = os.path.join(db.basedir, scanid, "webcache",
-                        pointcloud_hash(scanid, filesetid, fileid, size))
+                        __pointcloud_hash(scanid, filesetid, fileid, size))
     if not os.path.isfile(path):
-        pointcloud_cache(db, scanid, filesetid, fileid, size)
+        __pointcloud_cache(db, scanid, filesetid, fileid, size)
     return path
 
 
 def pointcloud_path(db, scanid, filesetid, fileid, size):
+    """Point cloud path in the webcache.
+        
+       Returns the path in the webcache of a given point cloud file in the database.
+    
+       Parameters
+       ----------
+       db: DB
+            The database object
+       scanid: str
+            The ID of the scan in the database
+       filesetid: str
+            The ID of the fileset in the scan
+       fileid: str
+            The ID of the file in the fileset
+       size: str
+            The requested size ('orig' or 'preview')
+
+    """
     if size == "orig":
         print("Using original file")
-        return file_path(db, scanid, filesetid, fileid)
-    else:
+        return __file_path(db, scanid, filesetid, fileid)
+    elif size == "preview":
         print("Using cached file")
-        return pointcloud_cached_path(db, scanid, filesetid, fileid, size)
-
+        return __pointcloud_cached_path(db, scanid, filesetid, fileid, size)
+    else:
+        raise ValueError("Unknow size specification: %s" % size)
 
 # Mesh
 
 def mesh_path(db, scanid, filesetid, fileid, size):
+    """Mesh path in the webcache.
+        
+       Returns the path in the webcache of a given mesh file in the database.
+    
+       Parameters
+       ----------
+       db: DB
+            The database object
+       scanid: str
+            The ID of the scan in the database
+       filesetid: str
+            The ID of the fileset in the scan
+       fileid: str
+            The ID of the file in the fileset
+       size: str
+            The requested size (orig)
+
+    """
     print("Using original file")
-    return file_path(db, scanid, filesetid, fileid)
+    return __file_path(db, scanid, filesetid, fileid)
 
     

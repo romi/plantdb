@@ -192,7 +192,13 @@ class Refresh(Resource):
         return 200
 
 class Image(Resource):
+    """Class representing a image HTTP request, subclass of
+    flask_restful's Resource class.
+    """
     def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the image data. Resize the image if
+        necessary.
+        """
         global db
         size = request.args.get('size', default='thumb', type=str)
         if not size in ['orig', 'thumb', 'large']:
@@ -201,7 +207,13 @@ class Image(Resource):
         return send_file(path, mimetype='image/jpeg')
 
 class PointCloud(Resource):
+    """Class representing a point cloud HTTP request, subclass of
+    flask_restful's Resource class.
+    """
     def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the point cloud data. Downsample the
+        point cloud if necessary.
+        """
         global db
         size = request.args.get('size', default='preview', type=str)
         if not size in ['orig', 'preview']:
@@ -210,7 +222,13 @@ class PointCloud(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 class Mesh(Resource):
+    """Class representing a mesh HTTP request, subclass of
+    flask_restful's Resource class.
+    """
     def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the mesh data. Downsample the
+        mesh if necessary.
+        """
         global db
         size = request.args.get('size', default='orig', type=str)
         if not size in ['orig']:
