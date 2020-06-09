@@ -21,6 +21,31 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with romidata.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+"""romidata.webcache
+=============
+
+Provides three utility functions that are used in combination with the
+DB interface to create downsized versions of images, point clouds, and
+mesh resources. The resources are identified using the scan, fileset,
+and file IDs.  The downsized versions are cached in the 'webcache'
+directory in the scan directory.
+
+The following size specifications are available:
+
+* Images: 'thumb' (max. 150x150), 'large' (max. 1500x1500), and 'orig' (original size).
+* Point clouds: 'preview' (max. 10k points), and 'orig' (original size).
+* Mesh: 'orig' (original size). [TODO]
+
+Examples
+--------
+>>> from romidata import FSDB
+>>> import romidata.webcache as webcache
+>>> db = FSDB("path/to/db"))
+>>> db.connect()
+>>> path = webcache.image_path(db, 'scan000', 'images', 'image000', 'thumb')
+>>> db.disconnect()
+
+"""
 import os
 import hashlib
 from PIL import Image
