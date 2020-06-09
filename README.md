@@ -1,5 +1,4 @@
-# data-storage
-
+# romidata
 ## Install `romidata` conda package:
 ```bash
 conda create -n romidata romidata -c romi-eu -c open3d-admin --force
@@ -15,7 +14,7 @@ python -c 'import romidata'
 1. Clone the sources:
     ```bash
     git clone https://github.com/romi/conda_recipes.git
-    git clone https://github.com/romi/data-storage.git
+    git clone https://github.com/romi/romidata.git
     ```
 2. Create a conda environment:
     ```bash
@@ -24,7 +23,7 @@ python -c 'import romidata'
 3. Install sources:
    ```bash
    conda activate romidata_dev
-   cd data-storage
+   cd romidata
    python setup.py develop
    ```
 4. Test `romidata` library:
