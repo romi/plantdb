@@ -24,6 +24,7 @@
 # ------------------------------------------------------------------------------
 
 from romidata.fsdb import FSDB
+from romidata.sshfsdb import SSHFSDB
 from romidata.task import RomiTask
 from romidata.task import FilesetTarget
 from romidata.task import DatabaseConfig
