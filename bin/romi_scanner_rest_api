@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
+import os
+import json
 from flask import Flask, send_file
 from flask import request, send_from_directory
-import json
+from flask_cors import CORS
 from flask_restful import Resource, Api
-import os
 from romidata import io
 from romidata import FSDB as DB
-from flask_cors import CORS
+from romidata import webcache
 
 app = Flask(__name__)
 CORS(app)
@@ -190,10 +191,58 @@ class Refresh(Resource):
         db.connect()
         return 200
 
+class Image(Resource):
+    """Class representing a image HTTP request, subclass of
+    flask_restful's Resource class.
+    """
+    def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the image data. Resize the image if
+        necessary.
+        """
+        global db
+        size = request.args.get('size', default='thumb', type=str)
+        if not size in ['orig', 'thumb', 'large']:
+            size = 'thumb'
+        path = webcache.image_path(db, scanid, filesetid, fileid, size)
+        return send_file(path, mimetype='image/jpeg')
+
+class PointCloud(Resource):
+    """Class representing a point cloud HTTP request, subclass of
+    flask_restful's Resource class.
+    """
+    def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the point cloud data. Downsample the
+        point cloud if necessary.
+        """
+        global db
+        size = request.args.get('size', default='preview', type=str)
+        if not size in ['orig', 'preview']:
+            size = 'preview'
+        path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
+        return send_file(path, mimetype='application/octet-stream')
+
+class Mesh(Resource):
+    """Class representing a mesh HTTP request, subclass of
+    flask_restful's Resource class.
+    """
+    def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the mesh data. Downsample the
+        mesh if necessary.
+        """
+        global db
+        size = request.args.get('size', default='orig', type=str)
+        if not size in ['orig']:
+            size = 'orig'
+        path = webcache.mesh_path(db, scanid, filesetid, fileid, size)
+        return send_file(path, mimetype='application/octet-stream')
+
 api.add_resource(ScanList, '/scans')
 api.add_resource(Scan, '/scans/<scan_id>')
 api.add_resource(File, '/files/<path:path>')
 api.add_resource(Refresh, '/refresh')
+api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
