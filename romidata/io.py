@@ -77,8 +77,9 @@ Triangle  Meshes
 
 import os
 import tempfile
-from .db import File, Fileset, DB, Scan
+
 from . import fsdb
+from .db import File, Fileset, DB, Scan
 
 
 def read_json(dbfile):

@@ -23,14 +23,13 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-import logging
 import time
-
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, LoggingEventHandler, DirCreatedEvent
 
 from romidata.db import DBBusyError
 from romidata.runner import DBRunner
+from watchdog.events import FileSystemEventHandler, DirCreatedEvent
+from watchdog.observers import Observer
+
 
 # logging.basicConfig(level=logging.INFO,
 #     format='%(asctime)s - %(message)s',

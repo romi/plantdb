@@ -49,10 +49,11 @@ Examples
 >>> db.disconnect()
 
 """
-import os
 import hashlib
+import os
+
 from PIL import Image
-import numpy as np
+
 
 def __file_path(db, scanid, filesetid, fileid):
     scan = db.get_scan(scanid)

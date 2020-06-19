@@ -26,9 +26,9 @@
 import os
 import subprocess
 
-from romidata import FSDB
 from romidata.fsdb import MARKER_FILE_NAME, LOCK_FILE_NAME
 from romidata.fsdb import _is_db
+
 
 class FSDBSync():
     """Class for sync between two FSDB databases.
