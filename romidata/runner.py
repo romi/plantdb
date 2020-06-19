@@ -25,6 +25,7 @@
 
 import luigi
 
+
 class DBRunner(object):
     """Class for running a given task on a database using luigi.
 
@@ -55,11 +56,11 @@ class DBRunner(object):
     def _run_scan_connected(self, scan):
         db_config = {}
         db_config['worker'] = {
-            "no_install_shutdown_handler" : True
+            "no_install_shutdown_handler": True
         }
         db_config['DatabaseConfig'] = {
-            'db' : self.db,
-            'scan_id' : scan
+            'db': self.db,
+            'scan_id': scan
         }
         luigi_config = luigi.configuration.get_config()
         luigi_config.read_dict(db_config)
@@ -85,7 +86,7 @@ class DBRunner(object):
         """
         self.db.connect()
         for scan in self.db.get_scans():
-            print("scan = %s"%scan.id)
+            print("scan = %s" % scan.id)
             self._run_scan_connected(scan)
         print("done")
         self.db.disconnect()
