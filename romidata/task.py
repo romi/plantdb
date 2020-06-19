@@ -1,6 +1,6 @@
-# -*- python -*-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# 
+#
 # romidata - Data handling tools for the ROMI project
 # 
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
@@ -41,7 +41,6 @@ To check for a task completeness, the fileset existence is checked as well as al
 import json
 
 import luigi
-
 from romidata import FSDB
 from romidata.log import logger
 
