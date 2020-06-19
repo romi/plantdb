@@ -96,7 +96,8 @@ def fmt_scan_minimal(scan):
         "hasPointCloud": has_point_cloud,
         "hasSkeleton": has_skeleton,
         "hasAngleData": has_angles,
-        "hasManualMeasures": has_manual_measures
+        "hasManualMeasures": has_manual_measures,
+        "hasAutomatedMeasures": has_angles
     }
 
 
