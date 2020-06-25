@@ -1,4 +1,4 @@
-# -*- python -*-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # romidata - Data handling tools for the ROMI project
@@ -19,9 +19,9 @@
 # See the GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see <https://www.gnu.org/licenses/>.
+# License along with romidata.  If not, see
+# <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-
 
 """
 romidata.fsdb
@@ -97,14 +97,13 @@ The metadata of the scan (`metadata.json`), of the set of 'images' files
 """
 
 import atexit
-import glob
-import os
-import sys
-import json
 import copy
+import glob
+import json
+import os
 from shutil import copyfile
 
-from romidata import db, io
+from romidata import db
 from romidata.db import DBBusyError
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB

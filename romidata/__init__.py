@@ -1,4 +1,4 @@
-# -*- python -*-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # romidata - Data handling tools for the ROMI project

@@ -1,24 +1,39 @@
-import os
 from setuptools import setup, find_packages
-import subprocess
 
-opts = dict(name="romidata",
-            packages=find_packages(),
-            scripts=[
-                'bin/romi_fsdb_sync',
-                'bin/romi_import_folder',
-                'bin/romi_run_task',
-                'bin/romi_scanner_rest_api',
-                'bin/romi_import_file'
-            ],
-            setup_requires=['setuptools_scm'],
-            use_scm_version=True,
-            install_requires=[
-                'luigi',
-                'toml',
-                'appdirs'
-            ]
-            )
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+opts = dict(
+    name="romidata",
+    packages=find_packages(),
+    scripts=[
+        'bin/romi_fsdb_sync',
+        'bin/romi_import_folder',
+        'bin/romi_import_file',
+        'bin/romi_scanner_rest_api'
+    ],
+    description='Database package for the ROMI project.',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://docs.romi-project.eu/Scanner/home/",
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
+    install_requires=[
+        'toml',
+        'appdirs',
+        'dirsync',
+        'watchdog'
+    ],
+    python_requires='>=3.6',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+    ],
+    # If True, include any files specified by your MANIFEST.in:
+    include_package_data=False
+)
 
 if __name__ == '__main__':
     setup(**opts)
