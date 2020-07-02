@@ -287,9 +287,7 @@ class RomiTask(luigi.Task):
 
 
 class FilesetExists(RomiTask):
-    """A Task which requires a fileset with a given
-    id to exist.
-    """
+    """A Task which requires a fileset with a given id to exist."""
     fileset_id = luigi.Parameter()
     upstream_task = None
 
@@ -306,8 +304,7 @@ class FilesetExists(RomiTask):
 
 
 class ImagesFilesetExists(FilesetExists):
-    """A Task which requires the presence of a fileset with id ``images``
-    """
+    """A Task which requires the presence of a fileset with id ``images``."""
     fileset_id = luigi.Parameter(default="images")
 
 
