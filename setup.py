@@ -19,9 +19,13 @@ opts = dict(
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     install_requires=[
-        'toml',
         'appdirs',
         'dirsync',
+        'imageio',
+        'luigi',
+        'numpy',
+        'pillow',
+        'toml',
         'watchdog'
     ],
     python_requires='>=3.6',
