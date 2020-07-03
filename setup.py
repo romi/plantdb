@@ -21,6 +21,9 @@ opts = dict(
     install_requires=[
         'appdirs',
         'dirsync',
+        'flask',
+        'flask-cors',
+        'flask-restful',
         'imageio',
         'luigi',
         'numpy',
