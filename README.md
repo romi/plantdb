@@ -99,7 +99,7 @@ wget https://media.romi-project.eu/data/test_db_small.tar.gz
 tar -xf test_db_small.tar.gz -C $DB_LOCATION
 ```
 
-### Serve
+### Serve the REST API
 Then you can start the REST API with `romi_scanner_rest_api`:
 ```bash
 romi_scanner_rest_api
@@ -113,4 +113,23 @@ n scans = 2
    Use a production WSGI server instead.
  * Debug mode: off
  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+```
+
+Open your favorite browser here:
+
+- scans: http://0.0.0.0:5000/scans
+- '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35scans
+
+### Python API
+Here is a minimal example how to access DB in Python:
+```python
+# Get the environment variable $DB_LOCATION
+import os
+db_path = os.environ['DB_LOCATION']
+# Use it to connect to DB:
+from romidata import FSDB
+db = FSDB(db_path)
+db.connect()
+dataset = db.get_scan("2018-12-17_17-05-35")
+img_fs = dataset.get_fileset('images')
 ```
