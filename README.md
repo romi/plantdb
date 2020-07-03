@@ -67,3 +67,50 @@ From the `base` conda environment, run:
 ```bash
 conda build conda_recipes/romidata/ -c romi-eu -c open3d-admin --user romi-eu
 ```
+
+## Usage
+This library is intended to run in the background as a REST API serving JSON informations from the DB.
+Typically these are used by the `3d-plantviewer` or `romiscan` libraries.
+
+### Setup
+You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`define it in an environment variable `DB_LOCATION`:
+```bash
+mkdir -p /data/ROMI/DB
+touch /data/ROMI/DB/romidb
+```
+Then define its location in an environment variable `DB_LOCATION`:
+```bash
+export DB_LOCATION=/data/ROMI/DB
+```
+**Notes**:
+> To permanently set this directory as the location of the DB, add it to your `~/.bashrc` file. 
+
+
+### Example datasets
+To populate your DB with example datasets, we provide some examples [here](https://media.romi-project.eu/data/test_db_small.tar.gz).
+
+Make sure you have `wget`:
+```bash
+sudo apt-get install wget
+```
+Then download the test archive and extract it to the location od the DB:
+```bash
+wget https://media.romi-project.eu/data/test_db_small.tar.gz
+tar -xf test_db_small.tar.gz -C $DB_LOCATION
+```
+
+### Serve
+Then you can start the REST API with `romi_scanner_rest_api`:
+```bash
+romi_scanner_rest_api
+```
+You should see something like:
+```
+n scans = 2
+ * Serving Flask app "romi_scanner_rest_api" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+```
