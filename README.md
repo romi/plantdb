@@ -118,7 +118,7 @@ n scans = 2
 Open your favorite browser here:
 
 - scans: http://0.0.0.0:5000/scans
-- '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35scans
+- '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35
 
 ### Python API
 Here is a minimal example how to access DB in Python:
