@@ -80,6 +80,7 @@ def fmt_scan_minimal(scan):
     has_skeleton = files_metadata["skeleton"] is not None
     has_angles = files_metadata["angles"] is not None
     has_manual_measures = "measures" in metadata
+    has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id])>0
 
     return {
         "id": scan.id,
@@ -100,7 +101,8 @@ def fmt_scan_minimal(scan):
         "hasSkeleton": has_skeleton,
         "hasAngleData": has_angles,
         "hasManualMeasures": has_manual_measures,
-        "hasAutomatedMeasures": has_angles
+        "hasAutomatedMeasures": has_angles,
+        "hasSegmentedPointCloud": has_segmented_point_cloud
     }
 
 
