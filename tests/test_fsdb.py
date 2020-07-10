@@ -1,15 +1,8 @@
-import unittest
-import tempfile
 import os
+import unittest
 
-from romidata import FSDB
 from romidata.testing import DBTestCase
-from romidata import io
 
-import numpy as np
-import imageio
-
-DATABASE_LOCATION = "testdata"
 
 class TestFSDB(DBTestCase):
     def get_test_scan(self):
@@ -26,8 +19,6 @@ class TestFSDB(DBTestCase):
         fileset = self.get_test_fileset()
         fileset.get_file("image")
         fileset.get_file("text")
-
-
 
     def test_create_scan(self):
         db = self.get_test_db()

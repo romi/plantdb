@@ -1,16 +1,11 @@
-import unittest
-import tempfile
 import os
+import tempfile
+import unittest
 
-from romidata import FSDB
-from romidata.sync import FSDBSync
 from romidata.fsdb import MARKER_FILE_NAME
+from romidata.sync import FSDBSync
 from romidata.testing import DBTestCase
 
-import numpy as np
-import imageio
-
-DATABASE_LOCATION = "testdata"
 
 class TestSync(DBTestCase):
     def test_sync_local_local(self):
@@ -26,4 +21,3 @@ class TestSync(DBTestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
