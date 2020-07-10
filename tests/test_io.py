@@ -1,13 +1,10 @@
 import os
 import unittest
-import tempfile
 
-import imageio
-import open3d
-import numpy as  np
-
+import numpy as np
 from romidata import io
 from romidata.testing import DBTestCase
+
 
 class TestIO(DBTestCase):
     """TODO : tests for all other IO...
