@@ -106,11 +106,13 @@ from shutil import copyfile
 from romidata import db
 from romidata.db import DBBusyError
 
-MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB
-LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in the root folder of a DB
+#: This file must exist in the root of a folder for it to be considered a valid DB
+MARKER_FILE_NAME = "romidb"
+#: This file prevents opening the DB if it is present in the root folder of a DB
+LOCK_FILE_NAME = "lock"
 
 
-def dummy_db():
+def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     """Create a dummy temporary database.
 
     Returns
@@ -120,36 +122,141 @@ def dummy_db():
 
     Examples
     --------
+    >>> import os
     >>> from romidata import FSDB
     >>> from romidata.fsdb import dummy_db
-    >>> db = FSDB(dummy_db())
+    >>> db = dummy_db()
     >>> db.connect()
     >>> print(db.is_connected)
     True
     >>> print(db.basedir)
     /tmp/romidb_*******
 
+    >>> db = dummy_db(with_scan=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> print(type(scan))
+    <class 'NoneType'>
+    >>> print(os.listdir(db.basedir))
+    ['lock', 'romidb', 'myscan_001']
+    >>> print(os.listdir(os.path.join(db.basedir, "myscan_001")))  # Same goes for the metadata
+    ['metadata']
+
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    ['metadata', 'files.json', 'fileset_001']
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> print(type(fs))
+    <class 'romidata.fsdb.Fileset'>
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
+    []
+
+    >>> db = dummy_db(with_file=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.get_file("test_image")
+    >>> print(type(f))
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
+    ['test_image.png', 'test_json.json']
+    >>> fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)
+
     """
     from os.path import join
     from tempfile import mkdtemp
+    from romidata import io
+
     mydb = mkdtemp(prefix='romidb_')
     open(join(mydb, MARKER_FILE_NAME), 'w').close()
-    return mydb
+    db = FSDB(mydb)
+
+    if with_file:
+        # To create a `File`, existing `Scan` & `Fileset` are required
+        with_scan, with_fileset = True, True
+    if with_fileset:
+        # To create a `Fileset`, an existing `Scan` is required
+        with_scan = True
+
+    # Initialize an `FSDB` to add required objects:
+    if with_scan or with_fileset or with_file:
+        db.connect()
+
+    # Create a `Scan` object if required:
+    if with_scan:
+        scan = db.create_scan("myscan_001")
+        scan.set_metadata("test", 1)
+
+    # Create a `Fileset` object if required:
+    if with_fileset:
+        fs = scan.create_fileset("fileset_001")
+        fs.set_metadata("test_fileset", 1)
+
+    # Create a `Fileset` object if required:
+    if with_file:
+        import numpy as np
+        f = fs.create_file("test_image")
+        img = np.array(255 * np.random.rand(50, 50, 3), dtype='uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("random image", True)
+        f = fs.create_file("test_json")
+        md = {"Who you gonna call?": "Ghostbuster"}
+        io.write_json(f, md, "json")
+        f.set_metadata("random json", True)
+
+    if with_scan or with_fileset or with_file:
+        db.disconnect()
+
+    return db
 
 
 class FSDB(db.DB):
     """Class defining the database object from abstract class `DB`.
 
     Implementation of a database as a simple local file structure:
+      * directory ``${FSDB.basedir}`` as database root directory;
+      * marker file ``MARKER_FILE_NAME`` at database root directory;
+      * (OPTIONAL) lock file ``LOCK_FILE_NAME`` at database root directory when connected;
 
     Attributes
     ----------
     basedir : str
         Path to the base directory containing the database
+    lock_path : str
+        Absolute path to the lock file.
     scans : list
-        List of `Scan` objects found in the database
+        List of `Scan` objects found in the database.
     is_connected : bool
-        ``True`` if the DB is connected (locked the directory), else ``False
+        ``True`` if the database is connected (locked directory), else ``False``.
+
+    Notes
+    -----
+    Requires the marker file ``MARKER_FILE_NAME`` at the given ``basedir``.
+    Lock file ``LOCK_FILE_NAME`` is found only when connecting an FSBD instance to the given ``basedir``.
+
+    See Also
+    --------
+    MARKER_FILE_NAME
+    LOCK_FILE_NAME
+
+    Examples
+    --------
+    >>> # EXAMPLE 1: Use a temporary dummy database:
+    >>> from romidata import FSDB
+    >>> from romidata.fsdb import dummy_db
+    >>> db = dummy_db()
+    >>> print(type(db))
+    <class 'romidata.fsdb.FSDB'>
+    >>> print(db.basedir)
+    /tmp/romidb_***
+    >>> # Now connecting to this dummy DB...
+    >>> db.connect()
+    >>> # ...allows to create new `Scan` in it:
+    >>> new_scan = db.create_scan("007")
+    >>> print(type(new_scan))
+    <class 'romidata.fsdb.Scan'>
+    >>> db.disconnect()
 
     """
 
@@ -163,24 +270,6 @@ class FSDB(db.DB):
         ----------
         basedir : str
             Path to root directory of the database
-
-        Examples
-        --------
-        >>> # EXAMPLE 1: Use a temporary dummy database:
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
-        >>> print(type(db))
-        <class 'romidata.fsdb.FSDB'>
-        >>> print(db.basedir)
-        /tmp/romidb_***
-        >>> # Now connecting to this dummy DB...
-        >>> db.connect()
-        >>> # ...allows to create new `Scan` in it:
-        >>> new_scan = db.create_scan("007")
-        >>> print(type(new_scan))
-        <class 'romidata.fsdb.Scan'>
-        >>> db.disconnect()
 
         """
         super().__init__()
@@ -200,11 +289,24 @@ class FSDB(db.DB):
         login_data : bool
             UNUSED
 
+        Raises
+        ------
+        IOError
+            If the given `basedir` is not an existing directory.
+            If the `MARKER_FILE_NAME` is missing from the `basedir`.
+        DBBusyError
+            If the `LOCK_FILE_NAME` lock fil is found in the `basedir`.
+
+        See Also
+        --------
+        MARKER_FILE_NAME
+        LOCK_FILE_NAME
+
         Examples
         --------
         >>> from romidata import FSDB
         >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
+        >>> db = dummy_db()
         >>> print(db.is_connected)
         False
         >>> db.connect()
@@ -237,11 +339,16 @@ class FSDB(db.DB):
 
         Handle DB "locking" system by removing the `LOCK_FILE_NAME` file from the DB.
 
+        Raises
+        ------
+        IOError
+            If the `LOCK_FILE_NAME` cannot be removed using the `lock_path` attribute.
+
         Examples
         --------
         >>> from romidata import FSDB
         >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
+        >>> db = dummy_db()
         >>> print(db.is_connected)
         False
         >>> db.connect()
@@ -307,7 +414,7 @@ class FSDB(db.DB):
         --------
         >>> from romidata import FSDB
         >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
+        >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.get_scan('007', create=True)
         >>> print(new_scan)
@@ -339,7 +446,7 @@ class FSDB(db.DB):
 
         Raises
         ------
-        OSError
+        IOError
             If the `id` already exists in the local database.
             If the `id` is not valid.
 
@@ -352,7 +459,7 @@ class FSDB(db.DB):
         --------
         >>> from romidata import FSDB
         >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
+        >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.create_scan('007')
         >>> scan = db.create_scan('007')
@@ -378,7 +485,7 @@ class FSDB(db.DB):
 
         Raises
         ------
-        OSError
+        IOError
             If the `id` do not exists in the local database.
 
         See Also
@@ -389,13 +496,17 @@ class FSDB(db.DB):
         --------
         >>> from romidata import FSDB
         >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
+        >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.create_scan('007')
+        >>> print(new_scan)
+        <romidata.fsdb.Scan object at 0x7f0730b1e390>
         >>> db.delete_scan('007')
         >>> scan = db.get_scan('007')
         >>> print(scan)
         None
+        >>> db.delete_scan('008')
+        OSError: Invalid id
 
         """
         scan = self.get_scan(id)
@@ -406,18 +517,73 @@ class FSDB(db.DB):
 
 
 class Scan(db.Scan):
-    """Class defining the scan object from abstract class `Scan`.
+    """Class defining the scan object from abstract class ``Scan``.
 
     Implementation of a scan as a simple file structure with:
-      * `images` folder containing image files
-      * `metadata` folder containing JSON metadata associated to image files
+      * directory ``${Scan.db.basedir}/${Scan.db.id}`` as scan root directory;
+      * (OPTIONAL) directory ``${Scan.db.basedir}/${Scan.db.id}/metadata`` containing JSON metadata file
+      * (OPTIONAL) JSON file ``metadata.json`` with Scan metadata
 
     Attributes
     ----------
+    db : FSDB
+        Database where to find the scan.
+    id : int
+        Id of the scan in the database ``FSDB``.
     metadata : dict
-        dictionary of metadata attached to the scan.
+        Dictionary of metadata attached to the scan.
     filesets : list of Fileset
-        list of `Fileset` object.
+        List of ``Fileset`` objects.
+
+    Notes
+    -----
+    Optional directory ``metadata`` & JSON file ``metadata.json`` are found when using method ``set_metadata()``.
+
+    Examples
+    --------
+    >>> import os
+    >>> from romidata import FSDB
+    >>> from romidata.fsdb import Scan
+    >>> from romidata.fsdb import dummy_db
+    >>> db = dummy_db()
+    >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
+    >>> scan = Scan(db, '007')
+    >>> print(type(scan))
+    <class 'romidata.fsdb.Scan'>
+    >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
+    None
+    >>> print(os.listdir(db.basedir))  # And it is NOT found under the `basedir` directory
+    ['romidb']
+    >>> # HOWEVER if you add metadata to the `Scan` object:
+    >>> scan.set_metadata({'Name': "Bond... James Bond!"})
+    >>> print(scan.metadata)
+    {'Name': 'Bond... James Bond!'}
+    >>> print(db.get_scan('007'))  # The `Scan` is still not found in the database!
+    None
+    >>> print(os.listdir(db.basedir))  # BUT it is now found under the `basedir` directory
+    ['007', 'romidb']
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    ['metadata']
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id, "metadata")))  # Same goes for the metadata
+    >>> db.disconnect()
+
+    >>> # Example #2: Get it from an `FSDB` object:
+    >>> db = dummy_db()
+    >>> scan = db.get_scan('007', create=True)
+    >>> print(type(scan))
+    <class 'romidata.fsdb.Scan'>
+    >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
+    <romidata.fsdb.Scan object at 0x7f34fc860fd0>
+    >>> print(os.listdir(db.basedir))  # And it is found under the `basedir` directory
+    ['007', 'romidb']
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    ['metadata']
+    >>> db.disconnect()
+    >>> # When reconnecting to db, if created scan is EMPTY (no Fileset & File) it is not found!
+    >>> db.connect()
+    >>> print(db.get_scan('007'))
+    None
+
     """
 
     def __init__(self, db, id):
@@ -428,20 +594,7 @@ class Scan(db.Scan):
         db : FSDB
             The database to which the scan dataset belongs to.
         id : str
-            The scan dataet id, should be unique in the `db`.
-
-        Examples
-        --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import Scan
-        >>> from romidata.fsdb import dummy_db
-        >>> db = FSDB(dummy_db())
-        >>> scan = Scan(db, '007')
-        >>> print(type(scan))
-        <class 'romidata.fsdb.Scan'>
-        >>> scan.set_metadata({'Name': "Bond... James Bond!"})
-        >>> print(scan.metadata)
-        {'Name': 'Bond... James Bond!'}
+            The scan dataset id, should be unique in the `db`.
 
         """
         super().__init__(db, id)
@@ -501,6 +654,27 @@ class Scan(db.Scan):
 
 
 class Fileset(db.Fileset):
+    """Class defining the fileset object from abstract class `Fileset`.
+
+    Implementation of a fileset as a simple file structure with:
+      * directory `${FSDB.basedir}/${FSDB.scan.id}/${Fileset.id}` containing set of files;
+      * directory `${FSDB.basedir}/${FSDB.scan.id}/metadata` containing JSON metadata associated to files;
+      * JSON file `files.json` containing the list of files from fileset;
+
+    Attributes
+    ----------
+    db : db.DB
+        Database where to find the scan.
+    id : int
+        Id of the scan in the database `FSDB`.
+    scan : db.Scan
+        Scan containing the set of files.
+    metadata : dict
+        Dictionary of metadata attached to the fileset.
+    files : list of File
+        list of `File` objects.
+
+    """
 
     def __init__(self, db, scan, id):
         super().__init__(db, scan, id)
@@ -519,6 +693,32 @@ class Fileset(db.Fileset):
         return _filter_query(self.files, query)
 
     def get_file(self, id, create=False):
+        """Get `File` of given id from a `Fileset`.
+
+        Parameters
+        ----------
+        id: str
+            Name or id of the file to get.
+        create: bool
+            If `True` create the `File` object, default is `False`.
+
+        Returns
+        -------
+        File
+            The retrieved or created file.
+
+        Examples
+        --------
+        >>> from romidata.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = db.get_fileset("fileset_001")
+        >>> f = fs.get_file("test_image")
+        >>> # To read the file you need to load the right reader from romidata.io
+        >>> from romidata.io import read_image
+        >>> img = read_image(f)
+
+        """
         ids = [f.id for f in self.files]
         if id not in ids:
             if create:
@@ -615,41 +815,43 @@ class File(db.File):
 # load the database
 
 def _load_scans(db):
-    """Load defined scans in given database object.
+    """Load list of ``Scan`` from given database.
 
     List sub-directories of ``db.basedir``
 
     Parameters
     ----------
     db : FSDB
-        The database to use to get the list of `fsdb.Scan`
+        The database object to use to get the list of ``fsdb.Scan``
 
     Returns
     -------
     list of romidata.fsdb.Scan
-         The list of `fsdb.Scan` found in the database.
+         The list of ``fsdb.Scan`` found in the database.
 
     See Also
     --------
-    _scan_path:
-    _scan_files_json:
-    _load_scan_filesets:
-    _load_scan_metadata:
-
-    Notes
-    -----
-
+    _scan_path
+    _scan_files_json
+    _load_scan_filesets
+    _load_scan_metadata
 
     Examples
     --------
     >>> from romidata import FSDB
     >>> from romidata.fsdb import dummy_db, _load_scans
-    >>> db = FSDB(dummy_db())
+    >>> db = dummy_db()
     >>> db.connect()
     >>> db.create_scan("007")
     >>> db.create_scan("111")
     >>> scans = _load_scans(db)
     >>> print(scans)
+    []
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scans = _load_scans(db)
+    >>> print(scans)
+    [<romidata.fsdb.Scan object at 0x7fa01220bd50>]
 
     """
     scans = []
@@ -666,6 +868,41 @@ def _load_scans(db):
 
 
 def _load_scan_filesets(scan):
+    """Load list of ``Fileset`` from given scan.
+
+    Load the list of filesets using "filesets" top-level entry from ``files.json``.
+
+    Parameters
+    ----------
+    scan : Scan
+        The scan object to use to get the list of ``fsdb.Fileset``
+
+    Returns
+    -------
+    list of romidata.fsdb.Fileset
+         The list of ``fsdb.Fileset`` found in the scan.
+
+    See Also
+    --------
+    _scan_files_json
+    _load_scan_filesets
+
+    Notes
+    -----
+    May delete a detected fileset if unable to load it!
+
+    Examples
+    --------
+    >>> from romidata import FSDB
+    >>> from romidata.fsdb import dummy_db, _load_scan_filesets
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = _load_scan_filesets(scan)
+    >>> print(fs)
+    [<romidata.fsdb.Fileset object at 0x7fa0122232d0>]
+
+    """
     filesets = []
     files_json = _scan_files_json(scan)
     with open(files_json, "r") as f:
@@ -686,6 +923,37 @@ def _load_scan_filesets(scan):
 
 
 def _load_fileset(scan, fileset_info):
+    """Load a fileset and set its attributes.
+
+    Parameters
+    ----------
+    scan : Scan
+        The scan object to use to get the list of ``fsdb.Fileset``
+    fileset_info: dict
+        Dictionary with the fileset id and listing its files, {'files': [], 'id': str}.
+
+    Returns
+    -------
+    fsdb.Fileset
+        A fileset with its ``files`` & ``metadata`` attributes restored.
+
+    Examples
+    --------
+    >>> import json
+    >>> from romidata.fsdb import dummy_db, _load_fileset, _scan_files_json
+    >>> db = dummy_db(with_file=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> json_path = _scan_files_json(scan)
+    >>> with open(json_path, "r") as f: structure = json.load(f)
+    >>> filesets_info = structure["filesets"]
+    >>> fs = _load_fileset(scan, filesets_info[0])
+    >>> print(fs)
+    <romidata.fsdb.Fileset object at 0x7f86bdf7a250>
+    >>> print(fs.files)
+    [<romidata.fsdb.File object at 0x7f8690459b50>, <romidata.fsdb.File object at 0x7f8690459750>]
+
+    """
     fileset = _parse_fileset(scan.db, scan, fileset_info)
     fileset.files = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
