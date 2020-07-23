@@ -150,11 +150,18 @@ def fmt_scan(scan):
         except:
             pass
 
-
     res["workspace"] = metadata["scanner"]["workspace"]
     res["camera"] = {}
 
-    res["camera"]["model"] = metadata["computed"]["camera_model"]
+    # backward compatibility
+    try:
+        # old version
+        res["camera"]["model"] = metadata["computed"]["camera_model"]
+    except KeyError:
+        # new version
+        camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
+        res["camera"]["model"] = camera_model["1"]
+
     res["camera"]["poses"] = []
 
     poses = io.read_json(fileset_visu.get_file(files_metadata["poses"]))
