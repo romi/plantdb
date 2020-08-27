@@ -20,7 +20,8 @@ parser.add_argument('scan', metavar='scan', type=str,
 
 args = parser.parse_args()
 if args.metadata is not None:
-    metadata = json.loads(args.metadata)
+    with open(args.metadata) as json_file:
+        metadata = json.load(json_file)
 else:
     metadata = None
 
