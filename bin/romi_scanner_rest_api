@@ -79,7 +79,7 @@ def fmt_scan_minimal(scan):
     has_point_cloud = files_metadata["point_cloud"] is not None
     has_skeleton = files_metadata["skeleton"] is not None
     has_angles = files_metadata["angles"] is not None
-    has_manual_measures = "measures" in metadata
+    has_manual_measures = "measures" in metadata or files_metadata["measures"] is not None
     has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id])>0
 
     return {
@@ -142,17 +142,29 @@ def fmt_scan(scan):
         x = io.read_json(fileset_visu.get_file(files_metadata["angles"]))
         res["data"]["angles"] = x
 
-        try:
-            res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
-        except:
-            pass
-        
-        try:
-            res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
-        except:
-            pass
+        if res["hasManualMeasures"]:
+            try:
+                res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
+            except KeyError:
+                measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
+                res["data"]["angles"]["measured_angles"] = measures["angles"]
 
-    res["workspace"] = metadata["scanner"]["workspace"]
+            try:
+                res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
+            except KeyError:
+                measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
+                res["data"]["angles"]["measured_internodes"] = measures["internodes"]
+
+    # backward compatibility
+    try:
+        # old version
+        res["workspace"] = metadata["scanner"]["workspace"]
+    except KeyError:
+        # new version
+        camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
+        res["workspace"] = camera_model["bounding_box"]
+
+
     res["camera"] = {}
 
     # backward compatibility
