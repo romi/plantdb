@@ -6,11 +6,11 @@ git_branch='dev'
 
 usage() {
   echo "USAGE:"
-  echo "  ./build.sh [[-t] [-u] [-b]] | [-h]]
+  echo "  ./build.sh [OPTIONS]
     "
 
   echo "DESCRIPTION:"
-  echo "  Build the docker image using Dockerfile in same location as 'roboticsmicrofarms/romidb'.
+  echo "  Build a docker image named 'roboticsmicrofarms/romidb' using Dockerfile in same location.
     "
 
   echo "OPTIONS:"

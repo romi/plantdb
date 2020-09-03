@@ -1,11 +1,12 @@
 #!/bin/bash
 
+user=$USER
 host_db="/data/ROMI/DB"
 vtag="latest"
 
 usage() {
   echo "USAGE:"
-  echo "  ./run.sh [[-t] [-p]] | [-h]]
+  echo "  ./run.sh [OPTIONS]
     "
 
   echo "DESCRIPTION:"
@@ -19,6 +20,9 @@ usage() {
   echo "  -p, --database_path
     Path to the host database to mount inside docker container, default to '$host_db'.
     "
+  echo "  -u, --user
+    User used during docker image build, default to '$user'.
+    "
   echo "  -h, --help
     Output a usage message and exit.
     "
@@ -29,6 +33,10 @@ while [ "$1" != "" ]; do
   -t | --tag)
     shift
     vtag=$1
+    ;;
+  -u | --user)
+    shift
+    user=$1
     ;;
   -p | --database_path)
     shift
@@ -47,5 +55,5 @@ while [ "$1" != "" ]; do
 done
 
 docker run -it -p 5000:5000 \
-  -v $host_db:/home/$USER/db \
+  -v $host_db:/home/$user/db \
   roboticsmicrofarms/romidb:$vtag
