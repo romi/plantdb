@@ -140,6 +140,8 @@ def fmt_scan(scan):
 
     if(res["hasAngleData"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["angles"]))
+        if "fruit_points" not in x:
+            x["fruit_points"] = []
         res["data"]["angles"] = x
 
         if res["hasManualMeasures"]:
