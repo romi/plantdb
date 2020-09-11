@@ -447,6 +447,7 @@ class Scan(db.Scan):
         super().__init__(db, id)
         # Defines attributes:
         self.metadata = None
+        self.measures = None
         self.filesets = []
 
     def _erase(self):
@@ -470,6 +471,9 @@ class Scan(db.Scan):
 
     def get_metadata(self, key=None):
         return _get_metadata(self.metadata, key)
+
+    def get_measures(self, key=None):
+        return _get_measures(self.measures, key)
 
     def set_metadata(self, data, value=None):
         if self.metadata == None:
@@ -660,6 +664,7 @@ def _load_scans(db):
                 and os.path.isfile(_scan_files_json(scan))):
             scan.filesets = _load_scan_filesets(scan)
             scan.metadata = _load_scan_metadata(scan)
+            scan.measures = _load_scan_measures(scan)
             scans.append(scan)
             # scan.store()
     return scans
@@ -755,8 +760,23 @@ def _load_metadata(path):
         return {}
 
 
+def _load_measures(path):
+    if os.path.isfile(path):
+        with open(path, "r") as f:
+            r = json.load(f)
+        if not isinstance(r, dict):
+            raise IOError("Not a JSON object: %s" % path)
+        return r
+    else:
+        return {}
+
+
 def _load_scan_metadata(scan):
     return _load_metadata(_scan_metadata_path(scan))
+
+
+def _load_scan_measures(scan):
+    return _load_measures(_scan_measures_path(scan))
 
 
 def _load_fileset_metadata(fileset):
@@ -806,6 +826,17 @@ def _get_metadata(metadata, key):
         return copy.deepcopy(metadata)
     else:
         return copy.deepcopy(metadata.get(str(key)))
+
+
+def _get_measures(measures, key):
+    # Do a deepcopy of the return value because we don't want to
+    # caller the inadvertedly change the values.
+    if measures == None:
+        return {}
+    elif key == None:
+        return copy.deepcopy(measures)
+    else:
+        return copy.deepcopy(measures.get(str(key)))
 
 
 def _set_metadata(metadata, data, value):
@@ -976,6 +1007,24 @@ def _scan_metadata_path(scan):
                         scan.id,
                         "metadata",
                         "metadata.json")
+
+
+def _scan_measures_path(scan):
+    """Get the path to scan's "measures.json" file.
+
+    Parameters
+    ----------
+    scan : fsdb.Scan
+        The scan to get the measures JSON file path from.
+
+    Returns
+    -------
+    str
+        Path to the scan's "measures.json" file.
+    """
+    return os.path.join(scan.db.basedir,
+                        scan.id,
+                        "measures.json")
 
 
 def _fileset_metadata_path(fileset):
