@@ -7,7 +7,6 @@ from flask import Flask, send_file
 from flask import request, send_from_directory
 from flask_cors import CORS
 from flask_restful import Resource, Api
-
 from romidata import FSDB as DB
 from romidata import io
 from romidata import webcache
@@ -29,7 +28,8 @@ except:
 db = DB(db_location)
 db.connect()
 
-print("n scans = %i"%len(db.get_scans()))
+print("n scans = %i" % len(db.get_scans()))
+
 
 def fmt_date(scan):
     try:
@@ -37,7 +37,7 @@ def fmt_date(scan):
         date, time = x.split('_')
         time = time.replace('-', ':')
     except:
-        date, time = "01-01-00","00:00:00"
+        date, time = "01-01-00", "00:00:00"
     return "%s %s" % (date, time)
 
 
@@ -48,10 +48,12 @@ def compute_fileset_matches(scan):
         filesets_matches[x] = fs.id
     return filesets_matches
 
+
 def get_path(f):
     fs = f.fileset
     scan = fs.scan
     return os.path.join(db_prefix, scan.id, fs.id, f.filename)
+
 
 def fmt_scan_minimal(scan):
     metadata = scan.get_metadata()
@@ -80,7 +82,7 @@ def fmt_scan_minimal(scan):
     has_skeleton = files_metadata["skeleton"] is not None
     has_angles = files_metadata["angles"] is not None
     has_manual_measures = "measures" in metadata or files_metadata["measures"] is not None
-    has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id])>0
+    has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
     return {
         "id": scan.id,
@@ -126,19 +128,19 @@ def fmt_scan(scan):
     metadata = scan.get_metadata()
 
     files_uri = {}
-    if(res["hasMesh"]):
+    if (res["hasMesh"]):
         files_uri["mesh"] = get_path(fileset_visu.get_file(files_metadata["mesh"]))
-    if(res["hasPointCloud"]):
+    if (res["hasPointCloud"]):
         files_uri["pointCloud"] = get_path(fileset_visu.get_file(files_metadata["point_cloud"]))
 
     res["filesUri"] = files_uri
     res["data"] = {}
 
-    if(res["hasSkeleton"]):
+    if (res["hasSkeleton"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
         res["data"]["skeleton"] = x
 
-    if(res["hasAngleData"]):
+    if (res["hasAngleData"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["angles"]))
         if "fruit_points" not in x:
             x["fruit_points"] = []
@@ -166,7 +168,6 @@ def fmt_scan(scan):
         camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
         res["workspace"] = camera_model["bounding_box"]
 
-
     res["camera"] = {}
 
     # backward compatibility
@@ -183,7 +184,7 @@ def fmt_scan(scan):
     poses = io.read_json(fileset_visu.get_file(files_metadata["poses"]))
 
     for i, im in enumerate(files_metadata["images"]):
-        f = fileset_visu.get_file(im) 
+        f = fileset_visu.get_file(im)
         id = f.get_metadata("image_id")
         for k in poses.keys():
             if os.path.splitext(poses[k]['name'])[0] == id:
@@ -199,19 +200,21 @@ def fmt_scan(scan):
 
 class ScanList(Resource):
     def get(self):
-        query=request.args.get('filterQuery')
-        scans=fmt_scans(db.get_scans(), query=query)
+        query = request.args.get('filterQuery')
+        scans = fmt_scans(db.get_scans(), query=query)
         return scans
 
 
 class Scan(Resource):
     def get(self, scan_id):
-        scan=db.get_scan(scan_id)
+        scan = db.get_scan(scan_id)
         return fmt_scan(scan)
+
 
 class File(Resource):
     def get(self, path):
         return send_from_directory(db_location, path)
+
 
 class Refresh(Resource):
     def get(self):
@@ -220,10 +223,12 @@ class Refresh(Resource):
         db.connect()
         return 200
 
+
 class Image(Resource):
     """Class representing a image HTTP request, subclass of
     flask_restful's Resource class.
     """
+
     def get(self, scanid, filesetid, fileid):
         """Return the HTTP response with the image data. Resize the image if
         necessary.
@@ -235,10 +240,12 @@ class Image(Resource):
         path = webcache.image_path(db, scanid, filesetid, fileid, size)
         return send_file(path, mimetype='image/jpeg')
 
+
 class PointCloud(Resource):
     """Class representing a point cloud HTTP request, subclass of
     flask_restful's Resource class.
     """
+
     def get(self, scanid, filesetid, fileid):
         """Return the HTTP response with the point cloud data. Downsample the
         point cloud if necessary.
@@ -250,10 +257,12 @@ class PointCloud(Resource):
         path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
         return send_file(path, mimetype='application/octet-stream')
 
+
 class Mesh(Resource):
     """Class representing a mesh HTTP request, subclass of
     flask_restful's Resource class.
     """
+
     def get(self, scanid, filesetid, fileid):
         """Return the HTTP response with the mesh data. Downsample the
         mesh if necessary.
@@ -264,6 +273,7 @@ class Mesh(Resource):
             size = 'orig'
         path = webcache.mesh_path(db, scanid, filesetid, fileid, size)
         return send_file(path, mimetype='application/octet-stream')
+
 
 api.add_resource(ScanList, '/scans')
 api.add_resource(Scan, '/scans/<scan_id>')
