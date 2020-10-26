@@ -32,7 +32,7 @@ from dirsync import sync
 from romidata import FSDB
 
 cwd = getcwd()
-DATABASE_LOCATION = abspath(join(cwd, "..", "tests", "testdata"))
+DATABASE_LOCATION = abspath(join(cwd, "tests", "testdata"))
 
 
 class TemporaryCloneDB(object):
@@ -65,6 +65,7 @@ class DBTestCase(unittest.TestCase):
             return
 
     def get_test_db(self):
+        # print(f"Example database location: {DATABASE_LOCATION}")
         self.tmpclone = TemporaryCloneDB(DATABASE_LOCATION)
         self.db = FSDB(self.tmpclone.tmpdir.name)
         self.db.connect()
