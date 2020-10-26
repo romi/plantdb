@@ -37,15 +37,23 @@ sudo apt-get update && apt-get install -y git python3-pip
     python3 -c 'import romidata'
     ```
 5. Test `romidata` library:
+
+   Install dependencies for testing and coverage:
    ```bash
    conda activate romidata_dev
-   conda install nose
-   nosetests tests -x -s -v -I test_watch.py -I test_io.py -I test_fsdb.py
+   conda install nose coverage
+   ```
+   Run all tests with highly verbose output (from the root directory):
+   ```bash
+   nosetests tests/ -x -s -v
+   ```
+   Run all tests with coverage report (from the root directory):
+   ```bash
+   nosetests tests/ --with-coverage --cover-package=romidata
+
    ```
 
 **Notes**:
-> Previous tests `test_watch.py`, `test_io.py` & `test_fsdb.py` appears to be broken!
->
 > You may change the name `romidata_dev` to something else, like an already existing conda environment (then skip step 2.).
 
 ## Conda packaging
