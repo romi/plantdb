@@ -65,33 +65,38 @@ Point Clouds
 ************
 
 * Python object: open3d.geometry.PointCloud
-* File extesions: 'ply'
+* File extensions: 'ply'
 
 Triangle  Meshes
 ****************
 
 * Python object: open3d.geometry.TriangleMesh
-* File extesions: 'ply'
+* File extensions: 'ply'
 
 """
 
 import os
 import tempfile
 
-from . import fsdb
-from .db import File, Fileset, DB, Scan
+from romidata import fsdb
+from romidata.db import DB
+from romidata.db import File
+from romidata.db import Fileset
+from romidata.db import Scan
 
 
 def read_json(dbfile):
-    """Reads json from a DB file.
+    """Reads json from a ROMI database file.
 
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
 
     Returns
     -------
-    jsonifyable object
+    dict
+        The deserialized JSON file.
     """
     import json
     return json.loads(dbfile.read())
@@ -103,9 +108,11 @@ def write_json(dbfile, data, ext="json"):
     Parameters
     ----------
     dbfile : db.File
-    data : jsonifyable object
-    ext : str
-        File extension (defaults to "json")
+        The `File` object used to write the associated file.
+    data : dict
+        The dictionary to save as a JSON file.
+    ext : str, optional
+        File extension, defaults to "json".
     """
     import json
     dbfile.write(json.dumps(data, indent=4), ext)
@@ -117,10 +124,12 @@ def read_toml(dbfile):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
 
     Returns
     -------
-    jsonifyable object
+    dict
+        The deserialized TOML file.
     """
     import toml
     return toml.loads(dbfile.read())
@@ -132,9 +141,11 @@ def write_toml(dbfile, data, ext="toml"):
     Parameters
     ----------
     dbfile : db.File
-    data : jsonifyable object
-    ext : str
-        File extension (defaults to "toml")
+        The `File` object used to write the associated file.
+    data : dict
+        The dictionary to save as a TOML file.
+    ext : str, optional
+        File extension, defaults to "toml".
     """
     import toml
     dbfile.write(toml.dumps(data), ext)
@@ -146,25 +157,28 @@ def read_image(dbfile):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The image array.
     """
     import imageio
     return imageio.imread(dbfile.read_raw())
 
 
-def write_image(dbfile, data, ext="jpg"):
+def write_image(dbfile, data, ext="png"):
     """Writes image to a DB file.
 
     Parameters
     ----------
     dbfile : db.File
-    data : imageifyable object
-    ext : str
-        File extension (defaults to "jpg")
+        The `File` object used to write the associated file.
+    data : array like
+        The array to save as an image.
+    ext : {'png', 'jpeg', 'tiff'}, optional
+        File extension, defaults to "png".
     """
     import imageio
     if ext == "jpg" and len(data.shape) == 3:
@@ -173,12 +187,15 @@ def write_image(dbfile, data, ext="jpg"):
     dbfile.write_raw(b, ext)
 
 
-def read_volume(dbfile):
+def read_volume(dbfile, ext="npz"):
     """Reads volume from a DB file.
 
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "npz".
 
     Returns
     -------
@@ -186,22 +203,24 @@ def read_volume(dbfile):
         The volume array.
     """
     import imageio
-    return imageio.volread(dbfile.read_raw(), format="npz")
+    return imageio.volread(dbfile.read_raw(), format=ext)
 
 
-def write_volume(dbfile, data):
+def write_volume(dbfile, data, ext="npz"):
     """Writes volume to a DB file.
 
     Parameters
     ----------
     dbfile : db.File
-    data : 3D numpy array
-    ext : str
-        File extension (defaults to "tiff").
+        The `File` object used to write the associated file.
+    data : array like
+        The 3D array to save as volume. 
+    ext : str, optional
+        File extension, defaults to "npz".
     """
     import imageio
-    b = imageio.volwrite(imageio.RETURN_BYTES, data, format="npz")
-    dbfile.write_raw(b, "npz")
+    b = imageio.volwrite(imageio.RETURN_BYTES, data, format=ext)
+    dbfile.write_raw(b, ext)
 
 
 def read_npz(dbfile):
@@ -210,10 +229,12 @@ def read_npz(dbfile):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
+        The uncompressed numpy array.
     """
     import numpy as np
     b = dbfile.read_raw()
@@ -230,9 +251,9 @@ def write_npz(dbfile, data):
     Parameters
     ----------
     dbfile : db.File
-    data : 3D numpy array
-    ext : str
-        File extension (defaults to "tiff").
+        The `File` object used to write the associated file.
+    data : array like
+        A 3D array to save as volume.
     """
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
@@ -247,26 +268,22 @@ def read_point_cloud(dbfile, ext="ply"):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "ply".
 
     Returns
     -------
-    PointCloud
+    open3d.geometry.PointCloud
+        The loaded point cloud object. 
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_read_point_cloud = open3d.geometry.read_point_cloud
-    except:
-        o3d_read_point_cloud = open3d.io.read_point_cloud
+    from open3d import io
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return o3d_read_point_cloud(fname)
+        return io.read_point_cloud(fname)
 
 
 def write_point_cloud(dbfile, data, ext="ply"):
@@ -275,75 +292,59 @@ def write_point_cloud(dbfile, data, ext="ply"):
     Parameters
     ----------
     dbfile : db.File
-    data : PointCloud
-    ext : str
-        File extension (defaults to "ply").
+        The `File` object used to write the associated file.
+    data : open3d.geometry.PointCloud
+        The point cloud object to save.
+    ext : str, optional
+        File extension, defaults to "ply".
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_write_point_cloud = open3d.geometry.write_point_cloud
-    except:
-        o3d_write_point_cloud = open3d.io.write_point_cloud
+    from open3d import io
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
-        o3d_write_point_cloud(fname, data)
+        io.write_point_cloud(fname, data)
         dbfile.import_file(fname)
 
 
 def read_triangle_mesh(dbfile, ext="ply"):
-    """Reads triangle mesh from a DB file.
+    """Reads triangular mesh from a DB file.
+
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "ply".
 
     Returns
     -------
-    PointCloud
+    open3d.geometry.PointCloud
+        The loaded point cloud object.
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_read_triangle_mesh = open3d.geometry.read_triangle_mesh
-    except:
-        o3d_read_triangle_mesh = open3d.io.read_triangle_mesh
+    from open3d import io
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return o3d_read_triangle_mesh(fname)
+        return io.read_triangle_mesh(fname)
 
 
 def write_triangle_mesh(dbfile, data, ext="ply"):
-    """Writes triangle mesh to a DB file.
+    """Writes triangular mesh to a DB file.
 
     Parameters
     ----------
     dbfile : db.File
-    data : PointCloud
-    ext : str
-        File extension (defaults to "ply").
+        The `File` object used to write the associated file.
+    data : open3d.geometry.TriangleMesh
+        The triangular mesh object to save.
+    ext : str, optional
+        File extension, defaults to "ply".
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_write_triangle_mesh = open3d.geometry.write_triangle_mesh
-    except:
-        o3d_write_triangle_mesh = open3d.io.write_triangle_mesh
-
+    from open3d import io
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
-        o3d_write_triangle_mesh(fname, data)
+        io.write_triangle_mesh(fname, data)
         dbfile.import_file(fname)
 
 
@@ -353,26 +354,22 @@ def read_voxel_grid(dbfile, ext="ply"):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "ply".
 
     Returns
     -------
-    PointCloud
+    open3d.geometry.PointCloud
+        The loaded point cloud object.
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_read_voxel_grid = open3d.geometry.read_voxel_grid
-    except:
-        o3d_read_voxel_grid = open3d.io.read_voxel_grid
+    from open3d import io
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return o3d_read_voxel_grid(fname)
+        return io.read_voxel_grid(fname)
 
 
 def write_voxel_grid(dbfile, data, ext="ply"):
@@ -381,40 +378,36 @@ def write_voxel_grid(dbfile, data, ext="ply"):
     Parameters
     ----------
     dbfile : db.File
-    data : PointCloud
-    ext : str
-        File extension (defaults to "ply").
+        The `File` object used to write the associated file.
+    data : open3d.geometry.PointCloud
+        The point cloud object to save.
+    ext : str, optional
+        File extension, defaults to "ply".
     """
-    try:
-        from open3d import open3d
-    except:
-        import open3d
-
-    try:  # 0.7 -> 0.8 breaking
-        o3d_write_voxel_grid = open3d.geometry.write_voxel_grid
-    except:
-        o3d_write_voxel_grid = open3d.io.write_voxel_grid
-
+    from open3d import io
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
-        o3d_write_voxel_grid(fname, data)
+        io.write_voxel_grid(fname, data)
         dbfile.import_file(fname)
 
 
-def read_graph(dbfile):
+def read_graph(dbfile, ext="p"):
     """Reads treex tree from a DB file.
 
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "ply".
 
     Returns
     -------
-    TriangleMesh
+    networkx.Graph
+        The loaded tree graph object.
     """
     import networkx as nx
     b = dbfile.read_raw()
-    ext = "p"
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         with open(fname, "wb") as fh:
@@ -422,18 +415,19 @@ def read_graph(dbfile):
         return nx.read_gpickle(fname)
 
 
-def write_graph(dbfile, data):
+def write_graph(dbfile, data, ext="p"):
     """Writes treex tree to a DB file.
 
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to write the associated file.
     data : treex.tree.Tree
-    ext : str
-        File extension (defaults to "treex").
+        The tree graph object to save.
+    ext : str, optional
+        File extension, defaults to "p".
     """
     import networkx as nx
-    ext = "p"
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         nx.write_gpickle(data, fname)
@@ -446,10 +440,14 @@ def read_torch(dbfile, ext="pt"):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
+    ext : str, optional
+        File extension, defaults to "pt".
 
     Returns
     -------
     Torch.Tensor
+        The loaded tensor object.
     """
     import torch
     b = dbfile.read_raw()
@@ -466,47 +464,46 @@ def write_torch(dbfile, data, ext="pt"):
     Parameters
     ----------
     dbfile : db.File
+        The `File` object used to load the associated file.
     data : TorchTensor
-    ext : str
-        file extension (defaults to "pt").
+        The torch tensor object to save.
+    ext : str, optional
+        File extension, defaults to "pt".
     """
     import torch
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         torch.save(data, fname)
-
         dbfile.import_file(fname)
 
 
 def to_file(dbfile: File, path: str):
-    """
-    Helper to write a dbfile to a file in the filesystem
-    """
+    """Helper to write a `dbfile` to a file in the filesystem. """
     b = dbfile.read_raw()
     with open(path, "wb") as fh:
         fh.write(b)
 
 
 def dbfile_from_local_file(path: str):
-    """
-    Creates a temporary (not in a DB) File object from a local file
-    """
+    """Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file. """
     dirname, fname = os.path.split(path)
     id = os.path.splitext(fname)[0]
-
+    # Initialise the `DB` abstract class:
     db = DB()
     db.basedir = ""
+    # Initialize a `Scan` instance:
     scan = Scan(db, "")
+    # Initialize a `Fileset` instance:
     fileset = Fileset(db, scan, dirname)
-
+    # Initialize a `File` instance & return it:
     f = fsdb.File(db=db, fileset=fileset, id=id)
     f.filename = fname
     f.metadata = None
-
     return f
 
 
 def tmpdir_from_fileset(fileset: Fileset):
+    """Creates a temporary directory (*i.e.* not in a DB) to host the ``Fileset`` object and write files. """
     tmpdir = tempfile.TemporaryDirectory()
     for f in fileset.get_files():
         filepath = os.path.join(tmpdir.name, f.filename)
