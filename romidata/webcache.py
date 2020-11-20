@@ -61,6 +61,7 @@ def __file_path(db, scanid, filesetid, fileid):
     f = fs.get_file(fileid)
     return os.path.join(db.basedir, scan.id, fs.id, f.filename)
 
+
 def __hash(resource_type, scanid, filesetid, fileid, size):
     m = hashlib.sha1()
     key = "%s|%s|%s|%s|%s" % (resource_type, scanid, filesetid, fileid, size)
@@ -84,9 +85,9 @@ def __image_cache(db, scanid, filesetid, fileid, size):
     directory = os.path.join(db.basedir, scanid, "webcache")
     os.makedirs(directory, exist_ok=True)
     dst = os.path.join(directory, __image_hash(scanid, filesetid, fileid, size))
-    
-    resolutions = { "large": 1500, "thumb": 150 }
-    maxsize = resolutions.get(size) 
+
+    resolutions = {"large": 1500, "thumb": 150}
+    maxsize = resolutions.get(size)
 
     image = Image.open(src)
     image.load()
@@ -139,41 +140,29 @@ def image_path(db, scanid, filesetid, fileid, size):
 
 def __load_open3d():
     try:
-        from open3d import open3d
+        import open3d as o3d
     except ModuleNotFoundError:
-        msg = "Please install Open3D with the followng command: pip install open3d"
+        msg = "Please install Open3D with the following command: `python -m pip install open3d`"
         raise ModuleNotFoundError(msg)
-    except ImportError:
-        import open3d
 
-        
+
 def __pointcloud_hash(scanid, filesetid, fileid, size):
     return __hash("pointcloud", scanid, filesetid, fileid, size)
 
 
 def __pointcloud_resize(pointcloud, max_size):
     __load_open3d()
-        
     if len(pointcloud.points) < max_size:
         return pointcloud
-
     downsample = len(pointcloud.points) // max_size + 1
-    try:
-        return open3d.geometry.uniform_down_sample(pointcloud, downsample)
-    except:
-        return pointcloud.voxel_down_sample(downsample)
+    return pointcloud.voxel_down_sample(downsample)
 
 
 def __pointcloud_cache(db, scanid, filesetid, fileid, size):
     __load_open3d()
-        
-    try:  # 0.7 -> 0.8 breaking
-        read_pointcloud = open3d.geometry.read_point_cloud
-        write_pointcloud = open3d.geometry.write_point_cloud
-    except AttributeError:
-        read_pointcloud = open3d.io.read_point_cloud
-        write_pointcloud = open3d.io.write_point_cloud
-        
+    read_pointcloud = o3d.io.read_point_cloud
+    write_pointcloud = o3d.io.write_point_cloud
+
     src = __file_path(db, scanid, filesetid, fileid)
     directory = os.path.join(db.basedir, scanid, "webcache")
     os.makedirs(directory, exist_ok=True)
@@ -183,7 +172,7 @@ def __pointcloud_cache(db, scanid, filesetid, fileid, size):
     pointcloud = read_pointcloud(src)
     pointcloud_lowres = __pointcloud_resize(pointcloud, max_pointcloud_size)
     write_pointcloud(dst, pointcloud_lowres)
-    
+
     return dst
 
 
@@ -223,6 +212,7 @@ def pointcloud_path(db, scanid, filesetid, fileid, size):
     else:
         raise ValueError("Unknow size specification: %s" % size)
 
+
 # Mesh
 
 def mesh_path(db, scanid, filesetid, fileid, size):
@@ -246,5 +236,3 @@ def mesh_path(db, scanid, filesetid, fileid, size):
     """
     print("Using original file")
     return __file_path(db, scanid, filesetid, fileid)
-
-    
