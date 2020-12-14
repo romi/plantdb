@@ -1,13 +1,7 @@
 import unittest
-import tempfile
-import time
-import os
 
-from romidata import FSDB
 from romidata.runner import DBRunner
 from romidata.testing import DBTestCase
-
-import luigi
 
 
 class TestFSDBRunner(DBTestCase):
@@ -21,8 +15,6 @@ class TestFSDBRunner(DBTestCase):
         runner = DBRunner(db, [], {})
         runner.run()
 
+
 if __name__ == "__main__":
     unittest.main()
-
-
-

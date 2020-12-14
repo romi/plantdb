@@ -1,13 +1,8 @@
-import unittest
-import tempfile
-import time
 import os
+import unittest
 
-from romidata import FSDB
-from romidata.watch import FSDBWatcher
 from romidata.testing import DBTestCase
-
-import luigi
+from romidata.watch import FSDBWatcher
 
 
 # class TouchFileTask(RomiTask):
@@ -28,8 +23,6 @@ class TestFSDBWatcher(DBTestCase):
         watcher.stop()
         watcher.join()
 
+
 if __name__ == "__main__":
     unittest.main()
-
-
-

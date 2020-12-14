@@ -73,10 +73,10 @@ class ScanParameter(luigi.Parameter):
 
         Notes
         -----
-        Uses given path, eg. `/db/root/path/scan_id, to defines:
+        Uses given path, eg. `/db/root/path/scan_id`, to defines:
           - the database root dir with `/db/root/path`
           - the scan dataset id with `scan_id`
-        If the given scan dataset id does not exists it is created.
+        If the given scan dataset id does not exists, it is created.
 
         """
         global db
@@ -148,7 +148,7 @@ class FilesetTarget(luigi.Target):
     >>> from romidata import FSDB
     >>> from romidata.fsdb import dummy_db
     >>> # - First, let's create a dummy FSDB database to play with:
-    >>> db = FSDB(dummy_db())
+    >>> db = dummy_db()
     >>> db.connect()
     >>> scan = db.create_scan("007")  # Add a `Scan` named `007` to the `FSDB` instance
     >>> fs = scan.create_fileset("required_fs")  # Add a `Fileset` named `required_fs` to the `Scan` instance
