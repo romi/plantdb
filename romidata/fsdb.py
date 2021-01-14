@@ -102,6 +102,7 @@ import glob
 import json
 import os
 from shutil import copyfile
+import logging
 
 from romidata import db
 from romidata.db import DBBusyError
@@ -173,27 +174,27 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     db = FSDB(mydb)
 
     if with_file:
-        # To create a `File`, existing `Scan` & `Fileset` are required
+        # To create a `File`, existing `Scan` & `Fileset` are required
         with_scan, with_fileset = True, True
     if with_fileset:
-        # To create a `Fileset`, an existing `Scan` is required
+        # To create a `Fileset`, an existing `Scan` is required
         with_scan = True
 
-    # Initialize an `FSDB` to add required objects:
+    # Initialize an `FSDB` to add required objects:
     if with_scan or with_fileset or with_file:
         db.connect()
 
-    # Create a `Scan` object if required:
+    # Create a `Scan` object if required:
     if with_scan:
         scan = db.create_scan("myscan_001")
         scan.set_metadata("test", 1)
 
-    # Create a `Fileset` object if required:
+    # Create a `Fileset` object if required:
     if with_fileset:
         fs = scan.create_fileset("fileset_001")
         fs.set_metadata("test_fileset", 1)
 
-    # Create a `Fileset` object if required:
+    # Create a `Fileset` object if required:
     if with_file:
         import numpy as np
         f = fs.create_file("test_image")
@@ -651,6 +652,7 @@ class Scan(db.Scan):
     def delete_fileset(self, fileset_id):
         fs = self.get_fileset(fileset_id)
         if fs is None:
+            logging.warning(f"Could not get the Fileset to delete: '{fileset_id}'!")
             return
         _delete_fileset(fs)
         self.filesets.remove(fs)
@@ -718,7 +720,7 @@ class Fileset(db.Fileset):
         >>> scan = db.get_scan("myscan_001")
         >>> fs = db.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
-        >>> # To read the file you need to load the right reader from romidata.io
+        >>> # To read the file you need to load the right reader from romidata.io
         >>> from romidata.io import read_image
         >>> img = read_image(f)
 
