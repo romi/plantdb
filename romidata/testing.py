@@ -64,9 +64,9 @@ class DBTestCase(unittest.TestCase):
         except:
             return
 
-    def get_test_db(self):
+    def get_test_db(self, db_path=DATABASE_LOCATION):
         # print(f"Example database location: {DATABASE_LOCATION}")
-        self.tmpclone = TemporaryCloneDB(DATABASE_LOCATION)
+        self.tmpclone = TemporaryCloneDB(db_path)
         self.db = FSDB(self.tmpclone.tmpdir.name)
         self.db.connect()
         return self.db
