@@ -44,18 +44,18 @@ LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in
 class SSHFSDB(fsdb.FSDB):
     """Subclass of FSDB that first mounts a remote directory using SSHFS.
 
-    Implementation of a database on a remote file system:
+    Implementation of a database on a remote file system.
 
     Attributes
     ----------
     basedir : str
         Path to the local directory where to mount the remote directory.
     remotedir : str
-        Path to the remote directory containing the database. Should be in the format user@server:path
+        Path to the remote directory containing the database. Should be in the format ``user@server:path``
     scans : list
-        List of `Scan` objects found in the database
+        List of ``Scan`` objects found in the database
     is_connected : bool
-        ``True`` if the DB is connected (locked the directory), else ``False
+        ``True`` if the DB is connected (locked the directory), else ``False``
 
     """
 
