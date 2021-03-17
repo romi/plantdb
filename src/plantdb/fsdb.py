@@ -29,8 +29,8 @@ plantdb.fsdb
 
 Implementation of a database as a local file structure.
 
-Assuming that the `FSDB` root databse directory is `dbroot/`, there is a
- `Scan` with `'myscan_001'` as `Scan.id` and there are some metadata (see
+Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a
+ ``Scan`` with ``'myscan_001'`` as ``Scan.id`` and there are some metadata (see
   below), you should have the following file structure:
 
 .. code-block::
@@ -53,7 +53,7 @@ Assuming that the `FSDB` root databse directory is `dbroot/`, there is a
     ├── (LOCK_FILE_NAME)               # "lock file", present if DB is connected
     └── MARKER_FILE_NAME               # ROMI DB marker file
 
-The `myscan_001/files.json` file then contains the following structure:
+The ``myscan_001/files.json`` file then contains the following structure:
 
 .. code-block:: JSON
 
