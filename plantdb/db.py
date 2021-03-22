@@ -36,7 +36,7 @@ A ``File`` can be an image, text of bytes.
 """
 
 class DB(object):
-    """Class defining the database object `DB`.
+    """Class defining the database object ``DB``.
 
     Abstract class defining the API used to communicate with a database in the
     ROMI project.
@@ -51,7 +51,7 @@ class DB(object):
         Parameters
         ----------
         login_data : list or dict, optional
-            Use this to access to a `DB` with credentials.
+            Use this to access to a ``DB`` with credentials.
 
         """
         raise NotImplementedError
@@ -75,8 +75,8 @@ class DB(object):
         ----------
         id : str
             Id of the scan to retrieve
-        create :  bool
-            Create the scan if it does not exist (default : False)
+        create : bool, optional
+            Create the scan if it does not exist (default : ``False``)
 
         Returns
         -------
@@ -115,7 +115,7 @@ class DB(object):
 
 
 class Scan(object):
-    """Class defining the scan object `Scan`.
+    """Class defining the scan object ``Scan``.
 
     Abstract class defining the API used to represent a scan in the ROMI project.
 
@@ -124,7 +124,7 @@ class Scan(object):
     db : db.DB
         Database where to find the scan
     id : int
-        Id of the scan in the database `DB`
+        Id of the scan in the database ``DB``
     """
 
     def __init__(self, db, id):
@@ -140,7 +140,7 @@ class Scan(object):
         self.id = id
 
     def get_id(self):
-        """Get scan id
+        """Get scan id.
 
         Returns
         -------
@@ -149,7 +149,7 @@ class Scan(object):
         return self.id
 
     def get_db(self):
-        """Get parent db
+        """Get parent db.
 
         Returns
         -------
@@ -158,7 +158,7 @@ class Scan(object):
         return self.db
 
     def get_filesets(self):
-        """Get all sets of files
+        """Get all sets of files.
 
         Returns
         -------
@@ -167,13 +167,13 @@ class Scan(object):
         raise NotImplementedError
 
     def get_fileset(self, id, create=False):
-        """Get a fileset with a given id
+        """Get a fileset with a given id.
 
         Parameters
         ----------
         id : str
-        create :  bool
-            Create the fileset if it does not exist (default : False)
+        create : bool, optional
+            Create the fileset if it does not exist (default : ``False``)
 
         Returns
         -------
@@ -182,12 +182,12 @@ class Scan(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
         Parameters
         ----------
         key : str
-            Metadata key to retrieve (defaults to None)
+            Metadata key to retrieve (defaults to ``None``)
 
         Returns
         -------
@@ -196,10 +196,10 @@ class Scan(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
-        If value is None, scan metadata is set to data.
-        If value is not None data is a key and is set to value.
+        If value is ``None``, scan metadata is set to data.
+        If value is not ``None`` data is a key and is set to value.
 
         Parameters
         ----------
@@ -211,7 +211,7 @@ class Scan(object):
         raise NotImplementedError
 
     def create_fileset(self, id):
-        """ create a set of files
+        """Create a set of files.
 
         Parameters
         ----------
@@ -233,7 +233,7 @@ class Scan(object):
 
 
 class Fileset(object):
-    """Class defining a set of files `Fileset` contained in a `Scan`.
+    """Class defining a set of files ``Fileset`` contained in a ``Scan``.
 
     Abstract class defining the API used to represent a set of files in the ROMI
     project.
@@ -247,7 +247,7 @@ class Fileset(object):
     db : db.DB
         database where to find the scan
     id : int
-        id of the scan in the database `DB`
+        id of the scan in the database ``DB``
     scan : db.Scan
         scan containing the set of files
     """
@@ -258,7 +258,7 @@ class Fileset(object):
         self.id = id
 
     def get_id(self):
-        """Get scan id
+        """Get scan id.
 
         Returns
         -------
@@ -267,7 +267,7 @@ class Fileset(object):
         return self.id
 
     def get_db(self):
-        """Get parent db
+        """Get parent db.
 
         Returns
         -------
@@ -276,7 +276,7 @@ class Fileset(object):
         return self.db
 
     def get_scan(self):
-        """Get parent scan
+        """Get parent scan.
 
         Returns
         -------
@@ -285,7 +285,7 @@ class Fileset(object):
         return self.scan
 
     def get_files(self):
-        """Get all files
+        """Get all files.
 
         Returns
         -------
@@ -294,14 +294,14 @@ class Fileset(object):
         raise NotImplementedError
 
     def get_file(self, id, create=False):
-        """Get file with given id
+        """Get file with given id.
 
         Parameters
         ----------
         id : str
             File id
-        create :  bool
-            Create the file if it does not exist (default : False)
+        create : bool, optional
+            Create the file if it does not exist (default : ``False``)
 
         Returns
         -------
@@ -310,12 +310,12 @@ class Fileset(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
         Parameters
         ----------
         key : str
-            Metadata key to retrieve (defaults to None)
+            Metadata key to retrieve (defaults to ``None``)
 
         Returns
         -------
@@ -324,22 +324,22 @@ class Fileset(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
-        If value is None, scan metadata is set to data.
-        If value is not None data is a key and is set to value.
+        If value is ``None``, scan metadata is set to data.
+        If value is not ``None`` data is a key and is set to value.
 
         Parameters
         ----------
         data : str or dict
-            Key or value
-        value
-            Value to set (default is None)
+            Key or value to set as metadata
+        value : any, optional
+            Value to set (default is ``None``)
         """
         raise NotImplementedError
 
     def create_file(self, id):
-        """ create a file
+        """Create a file.
 
         Parameters
         ----------
@@ -360,7 +360,7 @@ class Fileset(object):
 
 
 class File(object):
-    """Class defining a file `File` contained in a `Fileset`.
+    """Class defining a file ``File`` contained in a ``Fileset``.
 
     Abstract class defining the API used to represent a file in the ROMI project.
 
@@ -371,7 +371,7 @@ class File(object):
     fileset : db.Fileset
         set of file containing the file
     id : str
-        id of the scan in the database `DB`
+        id of the scan in the database ``DB``
     filename : str
         file format (default = None, can be deduced when importing file)
     """
@@ -383,7 +383,7 @@ class File(object):
         self.filename = None
 
     def get_id(self):
-        """Get file id
+        """Get file id.
 
         Returns
         -------
@@ -392,7 +392,7 @@ class File(object):
         return self.id
 
     def get_db(self):
-        """Get parent db
+        """Get parent db.
 
         Returns
         -------
@@ -401,7 +401,7 @@ class File(object):
         return self.fileset.scan.db
 
     def get_scan(self):
-        """Get parent scan
+        """Get parent scan.
 
         Returns
         -------
@@ -410,7 +410,7 @@ class File(object):
         return self.fileset.scan
 
     def get_fileset(self):
-        """Get parent fileset
+        """Get parent fileset.
 
         Returns
         -------
@@ -420,12 +420,12 @@ class File(object):
 
 
     def get_metadata(self, key=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
         Parameters
         ----------
-        key : str
-            Metadata key to retrieve (defaults to None)
+        key : str, optional
+            Metadata key to retrieve (defaults to ``None``)
 
         Returns
         -------
@@ -434,55 +434,61 @@ class File(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan
+        """Get metadata associated to scan.
 
-        If value is None, scan metadata is set to data.
-        If value is not None data is a key and is set to value.
+        If value is ``None``, scan metadata is set to data.
+        If value is not ``None`` data is a key and is set to value.
 
         Parameters
         ----------
         data : str or dict
-            Key or value
-        value
-            Value to set (default is None)
+            Key or value to set as metadata
+        value : any, optional
+            Value to set (default is ``None``)
         """
         raise NotImplementedError
 
     def import_file(self, path):
-        """Import an existing file to the File object.
+        """Import an existing file to the ``File`` object.
 
         Parameters
         ----------
         path : str
+            Path of the file to import
         """
         raise NotImplementedError
 
     def write_raw(self, buffer, ext=""):
-        """Writes bytes to a file
+        """Writes bytes to a file.
 
         Parameters
         ----------
         buffer : bytearray
-            Data
+            Data to write
+        ext : str, optional
+            File extension to use
         """
         raise NotImplementedError
 
     def read_raw(self):
-        """Reads bytes from a file
+        """Reads bytes from a file.
 
         Returns
         -------
-        buffer : bytearray
+        bytearray
+            File buffer
         """
         raise NotImplementedError
 
     def write(self, str, ext=""):
-        """Writes text to a file
+        """Writes text to a file.
 
         Parameters
         ----------
         data : str
-            Data
+            Data to write
+        ext : str, optional
+            File extension to use
         """
         raise NotImplementedError
 
@@ -492,25 +498,6 @@ class File(object):
         Returns
         -------
         str
-        """
-        raise NotImplementedError
-
-    def write_raw(self, buffer, ext=""):
-        """Writes bytes to a file
-
-        Parameters
-        ----------
-        buffer : bytearray
-            Data
-        """
-        raise NotImplementedError
-
-    def read_raw(self):
-        """Reads bytes from a file
-
-        Returns
-        -------
-        buffer : bytearray
         """
         raise NotImplementedError
 

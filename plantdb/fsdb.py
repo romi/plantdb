@@ -80,8 +80,8 @@ The ``myscan_001/files.json`` file then contains the following structure:
         ]
     }
 
-The metadata of the scan (`metadata.json`), of the set of 'images' files
- (`<Fileset.id>.json`) and of each 'image' files (`<File.id>.json`) are all
+The metadata of the scan (``metadata.json``), of the set of 'images' files
+ (``<Fileset.id>.json``) and of each 'image' files (``<File.id>.json``) are all
  stored as JSON files in a separate directory:
 
 .. code-block::
@@ -115,6 +115,15 @@ LOCK_FILE_NAME = "lock"
 
 def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     """Create a dummy temporary database.
+
+    Parameters
+    ----------
+    with_scan : bool, optional
+        Add a dummy ``Scan`` to the dummy database.
+    with_fileset : bool, optional
+        Add a dummy ``Fileset`` to the dummy database.
+    with_file : bool, optional
+        Add a dummy ``File`` to the dummy database.
 
     Returns
     -------
@@ -163,6 +172,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
     ['test_image.png', 'test_json.json']
     >>> fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)
+
 
     """
     from os.path import join
@@ -213,9 +223,10 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
 
 class FSDB(db.DB):
-    """Class defining the database object from abstract class `DB`.
+    """Class defining the database object from abstract class ``DB``.
 
     Implementation of a database as a simple local file structure:
+
       * directory ``${FSDB.basedir}`` as database root directory;
       * marker file ``MARKER_FILE_NAME`` at database root directory;
       * (OPTIONAL) lock file ``LOCK_FILE_NAME`` at database root directory when connected;
@@ -227,7 +238,7 @@ class FSDB(db.DB):
     lock_path : str
         Absolute path to the lock file.
     scans : list
-        List of `Scan` objects found in the database.
+        List of ``Scan`` objects found in the database.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
 
@@ -343,7 +354,7 @@ class FSDB(db.DB):
         Raises
         ------
         IOError
-            If the `LOCK_FILE_NAME` cannot be removed using the `lock_path` attribute.
+            If the `LOCK_FILE_NAME` cannot be removed using the ``lock_path`` attribute.
 
         Examples
         --------
@@ -389,7 +400,7 @@ class FSDB(db.DB):
 
         See Also
         --------
-        _filter_query: the query method used to returns a list of `Scan`
+        _filter_query
 
         """
         if query is None:
@@ -1138,7 +1149,6 @@ def _make_fileset(fileset):
     See Also
     --------
     _fileset_path
-
     """
     path = _fileset_path(fileset)
     # Create the fileset directory if it does not exists:
@@ -1157,7 +1167,6 @@ def _make_scan(scan):
     See Also
     --------
     _scan_path
-
     """
     path = _scan_path(scan)
     # Create the scan directory if it does not exists:
@@ -1183,7 +1192,6 @@ def _get_filename(file, ext):
     -------
     str
         The corresponding file's name.
-
     """
     return file.id + "." + ext
 
@@ -1310,7 +1318,6 @@ def _fileset_metadata_path(fileset):
     str
         Path to the "<Fileset.id>.json" file.
     """
-
     return os.path.join(fileset.db.basedir,
                         fileset.scan.id,
                         "metadata",
@@ -1353,7 +1360,6 @@ def _file_to_dict(file):
     -------
     dict
         {"id": file.get_id(), "file": file.filename}
-
     """
     return {"id": file.get_id(), "file": file.filename}
 
@@ -1373,8 +1379,7 @@ def _fileset_to_dict(fileset):
 
     See Also
     --------
-    _file_to_dict: returns a file's dictionary, ie. with its "id" and "filename".
-
+    _file_to_dict
     """
     files = []
     for f in fileset.get_files():
@@ -1397,9 +1402,8 @@ def _scan_to_dict(scan):
 
     See Also
     --------
-    _fileset_to_dict: returns a fileset's dictionary, ie. with its "id" and list of file's dictionary.
-    _file_to_dict: returns a file's dictionary, ie. with its "id" and "filename".
-
+    _fileset_to_dict
+    _file_to_dict
     """
     filesets = []
     for fileset in scan.get_filesets():
@@ -1417,9 +1421,8 @@ def _store_scan(scan):
 
     See Also
     --------
-    _scan_to_dict: returns a "filesets" dictionary.
-    _scan_files_json: returns the path to the scan's "files.json".
-
+    _scan_to_dict
+    _scan_files_json
     """
     structure = _scan_to_dict(scan)
     files_json = _scan_files_json(scan)
@@ -1434,7 +1437,8 @@ def _is_valid_id(id):
 
 def _is_db(path):
     """Test if the given path is indeed an FSDB database.
-    Do it by checking the presence of the `MARKER_FILE_NAME`.
+
+    Do it by checking the presence of the ``MARKER_FILE_NAME``.
 
     Parameters
     ----------
@@ -1445,7 +1449,6 @@ def _is_db(path):
     -------
     bool
         ``True`` if an FSDB database, else ``False``.
-
     """
     return os.path.exists(os.path.join(path, MARKER_FILE_NAME))
 
@@ -1465,7 +1468,7 @@ def _is_safe_to_delete(path):
 
     Notes
     -----
-    A path is safe to delete only if it's a subfolder of a db.
+    A path is safe to delete only if it's a sub-folder of a db.
     """
     path = os.path.abspath(path)
     while True:
@@ -1492,8 +1495,7 @@ def _delete_file(file):
 
     See Also
     --------
-    _is_safe_to_delete: methods used to check if its safe to delete the file.
-
+    _is_safe_to_delete
     """
     if file.filename is None:
         return
@@ -1521,8 +1523,7 @@ def _delete_fileset(fileset):
 
     See Also
     --------
-    _is_safe_to_delete: methods used to check if its safe to delete the fileset.
-
+    _is_safe_to_delete
     """
     for f in fileset.files:
         fileset.delete_file(f.id)
@@ -1551,8 +1552,7 @@ def _delete_scan(scan):
 
     See Also
     --------
-    _is_safe_to_delete: methods used to check if its safe to delete the scan.
-
+    _is_safe_to_delete
     """
     for f in scan.filesets:
         scan.delete_fileset(f.id)

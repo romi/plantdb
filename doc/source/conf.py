@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'plantdb'
-copyright = '2021, Robotics for Micro-farms'
-author = 'Robotics for Micro-farms'
+copyright = '2021, Robotics for Microfarms'
+author = 'Robotics for Microfarms'
 
 
 # -- General configuration ---------------------------------------------------
@@ -79,10 +79,40 @@ exclude_patterns = []
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = ["_static/css/extra.css"]
+
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'both',
+    'style_external_links': False,
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
+
+# A shorter title for the navigation bar.  Default is the same as html_title.
+html_short_title = project
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+html_logo = '_static/image/ROMI_ICON2_greenB.svg'
+
+# The name of an image file (within the static path) to use as favicon of the
+# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
+# pixels large.
+html_favicon = '_static/image/ROMI_green.svg'
+

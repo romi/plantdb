@@ -51,7 +51,8 @@ class SSHFSDB(fsdb.FSDB):
     basedir : str
         Path to the local directory where to mount the remote directory.
     remotedir : str
-        Path to the remote directory containing the database. Should be in the format ``user@server:path``
+        Path to the remote directory containing the database.
+        Should be in the format ``user@server:path``
     scans : list
         List of ``Scan`` objects found in the database
     is_connected : bool
@@ -70,7 +71,8 @@ class SSHFSDB(fsdb.FSDB):
         basedir : str
             Path to local directory of the database
         remotedir : str
-            Path to the remote directory containing the database. Should be in the format user@server:path
+            Path to the remote directory containing the database.
+            Should be in the format ``user@server:path``
 
         Examples
         --------
@@ -96,7 +98,7 @@ class SSHFSDB(fsdb.FSDB):
     def connect(self, login_data=None):
         """Connect to the remote database.
 
-        Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
+        Handle DB "locking" system by adding a ``LOCK_FILE_NAME`` file in the DB.
 
         Parameters
         ----------
@@ -127,7 +129,7 @@ class SSHFSDB(fsdb.FSDB):
     def disconnect(self):
         """Disconnect from the database.
 
-        Handle DB "locking" system by removing the `LOCK_FILE_NAME` file from the DB.
+        Handle DB "locking" system by removing the ``LOCK_FILE_NAME`` file from the DB.
 
         Examples
         --------

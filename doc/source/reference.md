@@ -1,7 +1,5 @@
 # Reference API
 
-## Main classes
-
 ```{eval-rst}
 .. toctree::
    :maxdepth: 2
