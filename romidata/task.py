@@ -240,14 +240,11 @@ class RomiTask(luigi.Task):
     ----------
     upstream_task : luigi.TaskParameter
         The upstream task.
-    output_file_id : luigi.Parameter, optional
-        The output fileset name, default is 'out'.
     scan_id : luigi.Parameter, optional
         The scan id to use to get or create the FilesetTarget.
 
     """
     upstream_task = luigi.TaskParameter()
-    output_file_id = luigi.Parameter(default="out")
     scan_id = luigi.Parameter(default="")
 
     def requires(self):
@@ -306,9 +303,9 @@ class RomiTask(luigi.Task):
         db.File
 
         """
-        return self.upstream_task().output_file(file_id)
+        return self.upstream_task().output_file(file_id, False)
 
-    def output_file(self, file_id=None):
+    def output_file(self, file_id=None, create=True):
         """Helper function to get a file from the output  fileset.
 
         Parameters
@@ -322,9 +319,11 @@ class RomiTask(luigi.Task):
 
         """
         if file_id is None:
-            file_id = self.get_task_family().split('.')[-1]
-        return self.output().get().get_file(file_id, create=True)
+            file_id = self.get_task_name()
+        return self.output().get().get_file(file_id, create)
 
+    def get_task_name(self):
+        return self.get_task_family().split('.')[-1]
 
 class FilesetExists(RomiTask):
     """A Task which requires a fileset with a given id to exist."""
@@ -341,7 +340,6 @@ class FilesetExists(RomiTask):
     def run(self):
         if self.output().get() is None:
             raise OSError("Fileset %s does not exist" % self.fileset_id)
-
 
 class ImagesFilesetExists(FilesetExists):
     """A Task which requires the presence of a fileset with id ``images``."""
