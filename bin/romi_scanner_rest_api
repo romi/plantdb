@@ -7,9 +7,9 @@ from flask import Flask, send_file
 from flask import request, send_from_directory
 from flask_cors import CORS
 from flask_restful import Resource, Api
-from romidata import FSDB as DB
-from romidata import io
-from romidata import webcache
+from plantdb import FSDB as DB
+from plantdb import io
+from plantdb import webcache
 
 app = Flask(__name__)
 CORS(app)

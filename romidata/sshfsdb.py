@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# romidata - Data handling tools for the ROMI project
+# plantdb - Data handling tools for the ROMI project
 #
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
 #
-# This file is part of romidata.
+# This file is part of plantdb.
 #
-# romidata is free software: you can redistribute it
+# plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 #
-# romidata is distributed in the hope that it will be
+# plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
+# License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 """
-romidata.sshfsdb
+plantdb.sshfsdb
 =============
 
 Implementation of a database as a file structure on a remote server
@@ -35,7 +35,7 @@ using SSHFS.
 import os
 import subprocess
 
-from romidata import db, fsdb
+from plantdb import db, fsdb
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in the root folder of a DB
@@ -75,7 +75,7 @@ class SSHFSDB(fsdb.FSDB):
         Examples
         --------
         >>> # EXAMPLE 1: Use a temporary dummy database:
-        >>> from romidata import SSHFSDB
+        >>> from plantdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.basedir)
         db
@@ -86,7 +86,7 @@ class SSHFSDB(fsdb.FSDB):
         >>> # ...allows to create new `Scan` in it:
         >>> new_scan = db.create_scan("007")
         >>> print(type(new_scan))
-        <class 'romidata.fsdb.Scan'>
+        <class 'plantdb.fsdb.Scan'>
         >>> db.disconnect()
 
         """
@@ -105,7 +105,7 @@ class SSHFSDB(fsdb.FSDB):
 
         Examples
         --------
-        >>> from romidata import SSHFSDB
+        >>> from plantdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.is_connected)
         False
@@ -131,7 +131,7 @@ class SSHFSDB(fsdb.FSDB):
 
         Examples
         --------
-        >>> from romidata import SSHFSDB
+        >>> from plantdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.is_connected)
         False

@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from romidata.testing import DBTestCase
+from plantdb.testing import DBTestCase
 
 
 class TestFSDB(DBTestCase):

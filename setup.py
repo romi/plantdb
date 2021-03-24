@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 opts = dict(
-    name="romidata",
+    name="plantdb",
     packages=find_packages(),
     scripts=[
         'bin/romi_fsdb_sync',
@@ -15,7 +15,7 @@ opts = dict(
     description='Database package for the ROMI project.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://docs.romi-project.eu/Scanner/home/",
+    url="https://docs.romi-project.eu/Scanner/",
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     install_requires=[

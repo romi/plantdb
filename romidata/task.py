@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# romidata - Data handling tools for the ROMI project
+# plantdb - Data handling tools for the ROMI project
 # 
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
 # 
-# This file is part of romidata.
+# This file is part of plantdb.
 # 
-# romidata is free software: you can redistribute it
+# plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # 
-# romidata is distributed in the hope that it will be
+# plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
+# License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 """
-romidata.task
+plantdb.task
 =============
 
 ROMI Luigi Tasks
 
 This module implements subclasses of ``luigi.Config``, ``luigi.Target`` and ``luigi.Tasks``.
-The goal is to have luigi tasks work seamlessly with the database API implemented in ``romidata.db``.
+The goal is to have luigi tasks work seamlessly with the database API implemented in ``plantdb.db``.
 
 A ``FilesetTarget`` is a luigi target corresponding to a ``Fileset`` object.
 
@@ -41,8 +41,8 @@ To check for a task completeness, the fileset existence is checked as well as al
 import json
 
 import luigi
-from romidata import FSDB
-from romidata.log import logger
+from plantdb import FSDB
+from plantdb.log import logger
 
 db = None
 
@@ -123,7 +123,7 @@ class DatabaseConfig(luigi.Config):
 
 
 class FilesetTarget(luigi.Target):
-    """Subclass luigi `Target` for `Fileset` as defined in romidata `FSDB` API.
+    """Subclass luigi `Target` for `Fileset` as defined in plantdb `FSDB` API.
 
     A `FilesetTarget` is used by `luigi.Task` (or subclass) methods:
      * `requires` to assert the existence of the `Fileset` prior to starting the task;
@@ -131,9 +131,9 @@ class FilesetTarget(luigi.Target):
 
     Attributes
     ----------
-    db : romidata.fsdb.FSDB
+    db : plantdb.fsdb.FSDB
         An `FSDB` database instance.
-    scan : romidata.fsdb.Scan
+    scan : plantdb.fsdb.Scan
         A `Scan` dataset instance within `db`.
     fileset_id : str
         Id of the target `Fileset` instance within `scan`.
@@ -144,9 +144,9 @@ class FilesetTarget(luigi.Target):
 
     Examples
     --------
-    >>> from romidata.task import FilesetTarget
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import dummy_db
+    >>> from plantdb.task import FilesetTarget
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import dummy_db
     >>> # - First, let's create a dummy FSDB database to play with:
     >>> db = dummy_db()
     >>> db.connect()
@@ -167,7 +167,7 @@ class FilesetTarget(luigi.Target):
     >>> out_fst = FilesetTarget(scan, "output_fs")
     >>> out_fs = out_fst.create()
     >>> type(out_fs)
-    romidata.fsdb.Fileset
+    plantdb.fsdb.Fileset
     >>> print(out_fs.id)
     'output_fs'
 
@@ -178,7 +178,7 @@ class FilesetTarget(luigi.Target):
 
         Parameters
         ----------
-        scan : romidata.fsdb.Scan
+        scan : plantdb.fsdb.Scan
             The `Scan` dataset instance where to find/create the `Fileset`.
         fileset_id : str
             Id of the target `Fileset`.
@@ -189,13 +189,13 @@ class FilesetTarget(luigi.Target):
         self.fileset_id = fileset_id
 
     def create(self):
-        """Creates a `Fileset` using the `romidata` FSDB API.
+        """Creates a `Fileset` using the `plantdb` FSDB API.
 
         The name of the created `Fileset` is given by `self.fileset_id`.
 
         Returns
         -------
-        romidata.fsdb.Fileset
+        plantdb.fsdb.Fileset
             The created `Fileset` instance.
 
         """
@@ -226,7 +226,7 @@ class FilesetTarget(luigi.Target):
 
         Returns
         -------
-        romidata.fsdb.Fileset
+        plantdb.fsdb.Fileset
             The fetched/created `Fileset` instance.
 
         """
@@ -234,7 +234,7 @@ class FilesetTarget(luigi.Target):
 
 
 class RomiTask(luigi.Task):
-    """Implementation of a luigi Task for the romidata DB API.
+    """Implementation of a luigi Task for the plantdb DB API.
 
     Attributes
     ----------

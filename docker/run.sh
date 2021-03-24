@@ -10,7 +10,7 @@ usage() {
     "
 
   echo "DESCRIPTION:"
-  echo "  Run 'roboticsmicrofarms/romidb:<vtag>' container with a mounted local (host) database and expose it to port 5000.
+  echo "  Run 'roboticsmicrofarms/plantdb:<vtag>' container with a mounted local (host) database and expose it to port 5000.
     "
 
   echo "OPTIONS:"
@@ -56,4 +56,4 @@ done
 
 docker run -it -p 5000:5000 \
   -v $host_db:/home/$user/db \
-  roboticsmicrofarms/romidb:$vtag
+  roboticsmicrofarms/plantdb:$vtag

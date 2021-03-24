@@ -2,9 +2,9 @@ import os
 import tempfile
 import unittest
 
-from romidata.fsdb import MARKER_FILE_NAME
-from romidata.sync import FSDBSync
-from romidata.testing import DBTestCase
+from plantdb.fsdb import MARKER_FILE_NAME
+from plantdb.sync import FSDBSync
+from plantdb.testing import DBTestCase
 
 
 class TestSync(DBTestCase):

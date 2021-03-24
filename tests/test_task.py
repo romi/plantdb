@@ -1,10 +1,10 @@
 import unittest
 
 import luigi
-from romidata import RomiTask, DatabaseConfig, FilesetTarget
-from romidata import io
-from romidata.task import FilesetExists, ImagesFilesetExists, FileByFileTask
-from romidata.testing import DBTestCase
+from plantdb import RomiTask, DatabaseConfig, FilesetTarget
+from plantdb import io
+from plantdb.task import FilesetExists, ImagesFilesetExists, FileByFileTask
+from plantdb.testing import DBTestCase
 from os import rmdir, path
 
 class TouchFileTask(RomiTask):
