@@ -5,7 +5,7 @@ LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ARG USER_NAME=scanner
-ARG ROMIDATA_BRANCH=dev
+ARG PLANTDB_BRANCH=dev
 
 USER root
 # Change shell to 'bash', default is 'sh'
@@ -31,8 +31,8 @@ USER ${USER_NAME}
 # Change working directory:
 WORKDIR /home/${USER_NAME}/ROMI
 
-RUN git clone --branch $ROMIDATA_BRANCH https://github.com/romi/romidata.git && \
-    cd romidata && \
+RUN git clone --branch $PLANTDB_BRANCH https://github.com/romi/plantdb.git && \
+    cd plantdb && \
     python3.7 -m pip install setuptools setuptools-scm --no-cache-dir && \
     python3.7 -m pip install . --no-cache-dir && \
     mkdir ~/db

@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# romidata - Data handling tools for the ROMI project
+# plantdb - Data handling tools for the ROMI project
 #
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
 #
-# This file is part of romidata.
+# This file is part of plantdb.
 #
-# romidata is free software: you can redistribute it
+# plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 #
-# romidata is distributed in the hope that it will be
+# plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
+# License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 """
-romidata.webcache
+plantdb.webcache
 =============
 
 Provides three utility functions that are used in combination with the
@@ -41,8 +41,8 @@ The following size specifications are available:
 
 Examples
 --------
->>> from romidata import FSDB
->>> import romidata.webcache as webcache
+>>> from plantdb import FSDB
+>>> import plantdb.webcache as webcache
 >>> db = FSDB("path/to/db"))
 >>> db.connect()
 >>> path = webcache.image_path(db, 'scan000', 'images', 'image000', 'thumb')

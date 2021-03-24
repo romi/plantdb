@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from romidata.testing import DBTestCase
-from romidata.watch import FSDBWatcher
+from plantdb.testing import DBTestCase
+from plantdb.watch import FSDBWatcher
 
 
 # class TouchFileTask(RomiTask):

@@ -10,7 +10,7 @@ usage() {
     "
 
   echo "DESCRIPTION:"
-  echo "  Build a docker image named 'roboticsmicrofarms/romidb' using Dockerfile in same location.
+  echo "  Build a docker image named 'roboticsmicrofarms/plantdb' using Dockerfile in same location.
     "
 
   echo "OPTIONS:"
@@ -21,7 +21,7 @@ usage() {
     User name to create inside docker image, default to '$user'.
     "
   echo "  -b, --branch
-    Git branch to use for cloning 'romidata' inside docker image, default to '$git_branch'.
+    Git branch to use for cloning 'plantdb' inside docker image, default to '$git_branch'.
     "
   echo "  -h, --help
     Output a usage message and exit.
@@ -54,7 +54,7 @@ while [ "$1" != "" ]; do
   shift
 done
 
-docker build -t roboticsmicrofarms/romidb:$vtag \
+docker build -t roboticsmicrofarms/plantdb:$vtag \
   --build-arg USER_NAME=$user \
-  --build-arg ROMIDATA_BRANCH=$git_branch \
+  --build-arg PLANTDB_BRANCH=$git_branch \
   .

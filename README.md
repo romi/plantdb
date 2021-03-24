@@ -1,4 +1,4 @@
-# romidata
+# PlantDB
 
 Documentation about the "Plant Scanner" project can be found [here](https://docs.romi-project.eu/Scanner/home/).
 
@@ -19,28 +19,28 @@ sudo apt-get update && apt-get install -y git python3-pip
 
 1. Clone the sources:
     ```bash
-    git clone https://github.com/romi/romidata.git
+    git clone https://github.com/romi/plantdb.git
     ```
 2. Create a conda environment:
     ```bash
-    conda create --name romidata_dev python=3.7
+    conda create --name plantdb_dev python=3.7
     ```
 3. Install sources:
    ```bash
-   conda activate romidata_dev
-   cd romidata
+   conda activate plantdb_dev
+   cd plantdb
    python3 -m pip install -e .
    ```
-4. Test import of `romidata` library:
+4. Test import of `plantdb` library:
     ```bash
-    conda activate romidata_dev
-    python3 -c 'import romidata'
+    conda activate plantdb_dev
+    python3 -c 'import plantdb'
     ```
-5. Test `romidata` library:
+5. Test `plantdb` library:
 
    Install dependencies for testing and coverage:
    ```bash
-   conda activate romidata_dev
+   conda activate plantdb_dev
    conda install nose coverage
    ```
    Run all tests with highly verbose output (from the root directory):
@@ -49,31 +49,31 @@ sudo apt-get update && apt-get install -y git python3-pip
    ```
    Run all tests with coverage report (from the root directory):
    ```bash
-   nosetests tests/ --with-coverage --cover-package=romidata
+   nosetests tests/ --with-coverage --cover-package=plantdb
 
    ```
 
 **Notes**:
-> You may change the name `romidata_dev` to something else, like an already existing conda environment (then skip step 2.).
+> You may change the name `plantdb_dev` to something else, like an already existing conda environment (then skip step 2.).
 
 ## Conda packaging
 **Notes**:
 > This is not working YET!
 
-### Install `romidata` conda package:
+### Install `plantdb` conda package:
 ```bash
-conda create -n romidata romidata -c romi-eu -c open3d-admin --force
+conda create -n plantdb plantdb -c romi-eu -c open3d-admin --force
 ```
-To test package install, in the activated environment import `romidata` in python:
+To test package install, in the activated environment import `plantdb` in python:
 ```bash
-conda activate romidata
-python -c 'import romidata'
+conda activate plantdb
+python -c 'import plantdb'
 ```
 
-### Build `romidata` conda package:
+### Build `plantdb` conda package:
 From the `base` conda environment, run:
 ```bash
-conda build conda_recipes/romidata/ -c romi-eu -c open3d-admin --user romi-eu
+conda build conda_recipes/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
 ```
 
 ## Usage
@@ -135,7 +135,7 @@ Here is a minimal example how to access DB in Python:
 import os
 db_path = os.environ['DB_LOCATION']
 # Use it to connect to DB:
-from romidata import FSDB
+from plantdb import FSDB
 db = FSDB(db_path)
 db.connect()
 dataset = db.get_scan("2018-12-17_17-05-35")

@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
-# romidata - Data handling tools for the ROMI project
+# plantdb - Data handling tools for the ROMI project
 # 
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
 # 
-# This file is part of romidata.
+# This file is part of plantdb.
 # 
-# romidata is free software: you can redistribute it
+# plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # 
-# romidata is distributed in the hope that it will be
+# plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
+# License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 """
-romidata.fsdb
+plantdb.fsdb
 =============
 
 Implementation of a database as a local file structure.
@@ -104,8 +104,8 @@ import os
 from shutil import copyfile
 import logging
 
-from romidata import db
-from romidata.db import DBBusyError
+from plantdb import db
+from plantdb.db import DBBusyError
 
 #: This file must exist in the root of a folder for it to be considered a valid DB
 MARKER_FILE_NAME = "romidb"
@@ -124,8 +124,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     Examples
     --------
     >>> import os
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import dummy_db
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> db.connect()
     >>> print(db.is_connected)
@@ -150,7 +150,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     ['metadata', 'files.json', 'fileset_001']
     >>> fs = scan.get_fileset("fileset_001")
     >>> print(type(fs))
-    <class 'romidata.fsdb.Fileset'>
+    <class 'plantdb.fsdb.Fileset'>
     >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
     []
 
@@ -167,7 +167,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     """
     from os.path import join
     from tempfile import mkdtemp
-    from romidata import io
+    from plantdb import io
 
     mydb = mkdtemp(prefix='romidb_')
     open(join(mydb, MARKER_FILE_NAME), 'w').close()
@@ -244,11 +244,11 @@ class FSDB(db.DB):
     Examples
     --------
     >>> # EXAMPLE 1: Use a temporary dummy database:
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import dummy_db
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> print(type(db))
-    <class 'romidata.fsdb.FSDB'>
+    <class 'plantdb.fsdb.FSDB'>
     >>> print(db.basedir)
     /tmp/romidb_***
     >>> # Now connecting to this dummy DB...
@@ -256,7 +256,7 @@ class FSDB(db.DB):
     >>> # ...allows to create new `Scan` in it:
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
-    <class 'romidata.fsdb.Scan'>
+    <class 'plantdb.fsdb.Scan'>
     >>> db.disconnect()
 
     """
@@ -305,8 +305,8 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
         False
@@ -347,8 +347,8 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
         False
@@ -384,7 +384,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        list of romidata.fsdb.Scan
+        list of plantdb.fsdb.Scan
             The list of `Scan` resulting form the query.
 
         See Also
@@ -413,13 +413,13 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.get_scan('007', create=True)
         >>> print(new_scan)
-        <romidata.fsdb.Scan object at **************>
+        <plantdb.fsdb.Scan object at **************>
         >>> scan = db.get_scan('unknown')
         >>> print(scan)
         None
@@ -442,7 +442,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        romidata.fsdb.Scan
+        plantdb.fsdb.Scan
             The new `Scan` object created in the local database.
 
         Raises
@@ -458,8 +458,8 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.create_scan('007')
@@ -495,13 +495,13 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from romidata import FSDB
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
         >>> new_scan = db.create_scan('007')
         >>> print(new_scan)
-        <romidata.fsdb.Scan object at 0x7f0730b1e390>
+        <plantdb.fsdb.Scan object at 0x7f0730b1e390>
         >>> db.delete_scan('007')
         >>> scan = db.get_scan('007')
         >>> print(scan)
@@ -543,14 +543,14 @@ class Scan(db.Scan):
     Examples
     --------
     >>> import os
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import Scan
-    >>> from romidata.fsdb import dummy_db
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import Scan
+    >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
     >>> scan = Scan(db, '007')
     >>> print(type(scan))
-    <class 'romidata.fsdb.Scan'>
+    <class 'plantdb.fsdb.Scan'>
     >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
     None
     >>> print(os.listdir(db.basedir))  # And it is NOT found under the `basedir` directory
@@ -572,9 +572,9 @@ class Scan(db.Scan):
     >>> db = dummy_db()
     >>> scan = db.get_scan('007', create=True)
     >>> print(type(scan))
-    <class 'romidata.fsdb.Scan'>
+    <class 'plantdb.fsdb.Scan'>
     >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
-    <romidata.fsdb.Scan object at 0x7f34fc860fd0>
+    <plantdb.fsdb.Scan object at 0x7f34fc860fd0>
     >>> print(os.listdir(db.basedir))  # And it is found under the `basedir` directory
     ['007', 'romidb']
     >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
@@ -715,13 +715,13 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from romidata.fsdb import dummy_db
+        >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = db.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
-        >>> # To read the file you need to load the right reader from romidata.io
-        >>> from romidata.io import read_image
+        >>> # To read the file you need to load the right reader from plantdb.io
+        >>> from plantdb.io import read_image
         >>> img = read_image(f)
 
         """
@@ -832,7 +832,7 @@ def _load_scans(db):
 
     Returns
     -------
-    list of romidata.fsdb.Scan
+    list of plantdb.fsdb.Scan
          The list of ``fsdb.Scan`` found in the database.
 
     See Also
@@ -844,8 +844,8 @@ def _load_scans(db):
 
     Examples
     --------
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import dummy_db, _load_scans
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import dummy_db, _load_scans
     >>> db = dummy_db()
     >>> db.connect()
     >>> db.create_scan("007")
@@ -857,7 +857,7 @@ def _load_scans(db):
     >>> db.connect()
     >>> scans = _load_scans(db)
     >>> print(scans)
-    [<romidata.fsdb.Scan object at 0x7fa01220bd50>]
+    [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
 
     """
     scans = []
@@ -886,7 +886,7 @@ def _load_scan_filesets(scan):
 
     Returns
     -------
-    list of romidata.fsdb.Fileset
+    list of plantdb.fsdb.Fileset
          The list of ``fsdb.Fileset`` found in the scan.
 
     See Also
@@ -900,14 +900,14 @@ def _load_scan_filesets(scan):
 
     Examples
     --------
-    >>> from romidata import FSDB
-    >>> from romidata.fsdb import dummy_db, _load_scan_filesets
+    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import dummy_db, _load_scan_filesets
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> fs = _load_scan_filesets(scan)
     >>> print(fs)
-    [<romidata.fsdb.Fileset object at 0x7fa0122232d0>]
+    [<plantdb.fsdb.Fileset object at 0x7fa0122232d0>]
 
     """
     filesets = []
@@ -947,7 +947,7 @@ def _load_fileset(scan, fileset_info):
     Examples
     --------
     >>> import json
-    >>> from romidata.fsdb import dummy_db, _load_fileset, _scan_files_json
+    >>> from plantdb.fsdb import dummy_db, _load_fileset, _scan_files_json
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -956,9 +956,9 @@ def _load_fileset(scan, fileset_info):
     >>> filesets_info = structure["filesets"]
     >>> fs = _load_fileset(scan, filesets_info[0])
     >>> print(fs)
-    <romidata.fsdb.Fileset object at 0x7f86bdf7a250>
+    <plantdb.fsdb.Fileset object at 0x7f86bdf7a250>
     >>> print(fs.files)
-    [<romidata.fsdb.File object at 0x7f8690459b50>, <romidata.fsdb.File object at 0x7f8690459750>]
+    [<plantdb.fsdb.File object at 0x7f8690459b50>, <plantdb.fsdb.File object at 0x7f8690459750>]
 
     """
     fileset = _parse_fileset(scan.db, scan, fileset_info)

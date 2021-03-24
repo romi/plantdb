@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# romidata - Data handling tools for the ROMI project
+# plantdb - Data handling tools for the ROMI project
 #
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
 #
-# This file is part of romidata.
+# This file is part of plantdb.
 #
-# romidata is free software: you can redistribute it
+# plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 #
-# romidata is distributed in the hope that it will be
+# plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with romidata.  If not, see
+# License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
 """
-romidata.io
+plantdb.io
 ===========
 
 ROMI Data IO
@@ -78,11 +78,11 @@ Triangle  Meshes
 import os
 import tempfile
 
-from romidata import fsdb
-from romidata.db import DB
-from romidata.db import File
-from romidata.db import Fileset
-from romidata.db import Scan
+from plantdb import fsdb
+from plantdb.db import DB
+from plantdb.db import File
+from plantdb.db import Fileset
+from plantdb.db import Scan
 
 
 def read_json(dbfile):

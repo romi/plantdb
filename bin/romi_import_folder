@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from romidata import FSDB
+from plantdb import FSDB
 
 parser = argparse.ArgumentParser(description='Import a folder as a fileset in a scan')
 

@@ -1,7 +1,7 @@
 import unittest
 
-from romidata.runner import DBRunner
-from romidata.testing import DBTestCase
+from plantdb.runner import DBRunner
+from plantdb.testing import DBTestCase
 
 
 class TestFSDBRunner(DBTestCase):

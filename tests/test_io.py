@@ -2,8 +2,8 @@ import os
 import unittest
 
 import numpy as np
-from romidata import io
-from romidata.testing import DBTestCase
+from plantdb import io
+from plantdb.testing import DBTestCase
 
 
 class TestIO(DBTestCase):
