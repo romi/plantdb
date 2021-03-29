@@ -64,7 +64,7 @@ class TestRomiTask(DBTestCase):
     def test_romi_task(self):
         db = self.get_test_db()
         DatabaseConfig.db = db
-        DatabaseConfig.scan_id = "testscan"
+        DatabaseConfig.scan = db.get_scan("testscan")
         task = TouchFileTask()
         assert (not task.complete())
         luigi.build(tasks=[task], local_scheduler=True)
