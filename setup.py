@@ -25,11 +25,9 @@ opts = dict(
         'flask-cors',
         'flask-restful',
         'imageio',
-        'luigi',
         'numpy',
         'pillow',
-        'toml',
-        'watchdog'
+        'toml'
     ],
     python_requires='>=3.6',
     classifiers=[
