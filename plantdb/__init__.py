@@ -25,6 +25,3 @@
 
 from plantdb.fsdb import FSDB
 from plantdb.sshfsdb import SSHFSDB
-from plantdb.task import RomiTask
-from plantdb.task import FilesetTarget
-from plantdb.task import DatabaseConfig
