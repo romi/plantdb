@@ -2,7 +2,6 @@
 
 user=$USER
 vtag="latest"
-git_branch='dev'
 
 usage() {
   echo "USAGE:"
@@ -20,9 +19,6 @@ usage() {
   echo "  -u, --user
     User name to create inside docker image, default to '$user'.
     "
-  echo "  -b, --branch
-    Git branch to use for cloning 'plantdb' inside docker image, default to '$git_branch'.
-    "
   echo "  -h, --help
     Output a usage message and exit.
     "
@@ -38,10 +34,6 @@ while [ "$1" != "" ]; do
     shift
     user=$1
     ;;
-  -b | --branch)
-    shift
-    git_branch=$1
-    ;;
   -h | --help)
     usage
     exit
@@ -56,5 +48,4 @@ done
 
 docker build -t roboticsmicrofarms/plantdb:$vtag \
   --build-arg USER_NAME=$user \
-  --build-arg PLANTDB_BRANCH=$git_branch \
-  .
+  -f docker/Dockerfile .

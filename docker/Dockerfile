@@ -5,7 +5,6 @@ LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ARG USER_NAME=scanner
-ARG PLANTDB_BRANCH=dev
 
 USER root
 # Change shell to 'bash', default is 'sh'
@@ -14,6 +13,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
     git ca-certificates \
+    rsync \
     python3.7 python3-pip python3-wheel && \
     # Clean package manager:
     apt-get clean && \
@@ -31,8 +31,9 @@ USER ${USER_NAME}
 # Change working directory:
 WORKDIR /home/${USER_NAME}/ROMI
 
-RUN git clone --branch $PLANTDB_BRANCH https://github.com/romi/plantdb.git && \
-    cd plantdb && \
+COPY --chown=${USER_NAME} ./ plantdb/
+
+RUN cd plantdb && \
     python3.7 -m pip install setuptools setuptools-scm --no-cache-dir && \
     python3.7 -m pip install . --no-cache-dir && \
     mkdir ~/db
