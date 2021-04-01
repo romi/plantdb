@@ -26,13 +26,13 @@
 import tempfile
 import unittest
 
-from os import getcwd
 from os.path import join, abspath
+from pathlib import Path
 from dirsync import sync
 from plantdb import FSDB
 
-cwd = getcwd()
-DATABASE_LOCATION = abspath(join(cwd, "tests", "testdata"))
+parent_dir = Path(__file__).resolve().parents[1]
+DATABASE_LOCATION = abspath(join(parent_dir, "tests", "testdata"))
 
 
 class TemporaryCloneDB(object):
