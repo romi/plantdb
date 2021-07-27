@@ -79,8 +79,12 @@ def fmt_scan_minimal(scan):
 
     has_mesh = files_metadata["mesh"] is not None
     has_point_cloud = files_metadata["point_cloud"] is not None
+    has_pcd_groundTruth = files_metadata["pcd_ground_truth"] is not None
     has_skeleton = files_metadata["skeleton"] is not None
     has_angles = files_metadata["angles"] is not None
+    has_segmentation2D = files_metadata["segmentation2d_evaluation"] is not None
+    has_segmentedPcd_evaluation = files_metadata["segmented_pcd_evaluation"] is not None 
+    has_point_cloud_evaluation = files_metadata["point_cloud_evaluation"] is not None
     has_manual_measures = "measures" in metadata or files_metadata["measures"] is not None
     has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
@@ -100,8 +104,12 @@ def fmt_scan_minimal(scan):
         "thumbnailUri": first_thumbnail_path,
         "hasMesh": has_mesh,
         "hasPointCloud": has_point_cloud,
+        "hasPcdGroundTruth": has_pcd_groundTruth,
         "hasSkeleton": has_skeleton,
         "hasAngleData": has_angles,
+        "hasSegmentation2D": has_segmentation2D,
+        "hasSegmentedPcdEvaluation": has_segmentedPcd_evaluation,
+        "hasPointCloudEvaluation": has_point_cloud_evaluation,
         "hasManualMeasures": has_manual_measures,
         "hasAutomatedMeasures": has_angles,
         "hasSegmentedPointCloud": has_segmented_point_cloud
@@ -132,6 +140,8 @@ def fmt_scan(scan):
         files_uri["mesh"] = get_path(fileset_visu.get_file(files_metadata["mesh"]))
     if (res["hasPointCloud"]):
         files_uri["pointCloud"] = get_path(fileset_visu.get_file(files_metadata["point_cloud"]))
+    if (res["hasPcdGroundTruth"]):
+        files_uri["pcdGroundTruth"] = get_path(fileset_visu.get_file(files_metadata["pcd_ground_truth"]))
 
     res["filesUri"] = files_uri
     res["data"] = {}
@@ -139,6 +149,18 @@ def fmt_scan(scan):
     if (res["hasSkeleton"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
         res["data"]["skeleton"] = x
+
+    if (res["hasSegmentation2D"]):
+        x = io.read_json(fileset_visu.get_file(files_metadata["segmentation2d_evaluation"]))
+        res["data"]["segmentation2D"] = x
+
+    if (res["hasSegmentedPcdEvaluation"]):
+        x = io.read_json(fileset_visu.get_file(files_metadata["segmented_pcd_evaluation"]))
+        res["data"]["segmentedPcdEvaluation"] = x
+    
+    if (res["hasPointCloudEvaluation"]):
+        x = io.read_json(fileset_visu.get_file(files_metadata["point_cloud_evaluation"]))
+        res["data"]["pointCloudEvaluation"] = x
 
     if (res["hasAngleData"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["angles"]))
@@ -257,6 +279,22 @@ class PointCloud(Resource):
         path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
         return send_file(path, mimetype='application/octet-stream')
 
+class PointCloudGroundTruth(Resource):
+    """Class representing a point cloud HTTP request, subclass of
+    flask_restful's Resource class.
+    """
+
+    def get(self, scanid, filesetid, fileid):
+        """Return the HTTP response with the point cloud data. Downsample the
+        point cloud if necessary.
+        """
+        global db
+        size = request.args.get('size', default='preview', type=str)
+        if not size in ['orig', 'preview']:
+            size = 'preview'
+        path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
+        return send_file(path, mimetype='application/octet-stream')
+
 
 class Mesh(Resource):
     """Class representing a mesh HTTP request, subclass of
@@ -281,6 +319,7 @@ api.add_resource(File, '/files/<path:path>')
 api.add_resource(Refresh, '/refresh')
 api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
 api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
 api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
 
 if __name__ == "__main__":
