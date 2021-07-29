@@ -1,6 +1,9 @@
 #!/bin/bash
 
 user=$USER
+uid=$(id -u)
+group=$(id -g -n)
+gid=$(id -g)
 vtag="latest"
 
 usage() {
@@ -19,6 +22,15 @@ usage() {
   echo "  -u, --user
     User name to create inside docker image, default to '$user'.
     "
+  echo "  --uid
+    User id to use with 'user' inside docker image, default to '$uid'.
+    "
+  echo "  -g, --group
+    Group name to create inside docker image, default to 'group'.
+    "
+  echo "  --gid
+    Group id to use with 'user' inside docker image, default to '$gid'.
+    "
   echo "  -h, --help
     Output a usage message and exit.
     "
@@ -34,6 +46,18 @@ while [ "$1" != "" ]; do
     shift
     user=$1
     ;;
+  --uid)
+    shift
+    uid=$1
+    ;;
+  -g | --group)
+    shift
+    group=$1
+    ;;
+  --gid)
+    shift
+    gid=$1
+    ;;
   -h | --help)
     usage
     exit
@@ -48,4 +72,7 @@ done
 
 docker build -t roboticsmicrofarms/plantdb:$vtag \
   --build-arg USER_NAME=$user \
+  --build-arg USER_ID=$uid \
+  --build-arg GROUP_NAME=$group \
+  --build-arg GROUP_ID=$gid \
   -f docker/Dockerfile .
