@@ -5,6 +5,9 @@ LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ARG USER_NAME=scanner
+ARG USER_ID=1001
+ARG GROUP_NAME=scanner
+ARG GROUP_ID=1001
 
 USER root
 # Change shell to 'bash', default is 'sh'
@@ -19,17 +22,15 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* && \
-    # Add user USER_NAME:
-    useradd -m ${USER_NAME} && \
-    cd /home/${USER_NAME} && \
-    # Create 'ROMI' install directory
-    mkdir ROMI && \
+    # Create a non-root user and give it rights over its "home folder"
+    addgroup --gid $GROUP_ID $GROUP_NAME && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $USER_NAME && \
     chown -R ${USER_NAME}: /home/${USER_NAME}
 
 # Change user
 USER ${USER_NAME}
 # Change working directory:
-WORKDIR /home/${USER_NAME}/ROMI
+WORKDIR /home/${USER_NAME}
 
 COPY --chown=${USER_NAME} ./ plantdb/
 
