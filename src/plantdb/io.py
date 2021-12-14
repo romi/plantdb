@@ -199,7 +199,7 @@ def read_volume(dbfile, ext="npz"):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The volume array.
     """
     import imageio
@@ -217,6 +217,21 @@ def write_volume(dbfile, data, ext="npz"):
         The 3D array to save as volume. 
     ext : str, optional
         File extension, defaults to "npz".
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from plantdb import FSDB
+    >>> from plantdb.io import write_volume
+    >>> from plantdb.fsdb import Scan, Fileset, File
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db()
+    >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
+    >>> scan = db.get_scan('007', create=True)
+    >>> fs = scan.get_fileset('volume', create=True)
+    >>> f = fs.get_file('test_volume', create=True)
+    >>> write_volume(f, np.random.rand(50, 10, 10))
+
     """
     import imageio
     b = imageio.volwrite(imageio.RETURN_BYTES, data, format=ext)

@@ -23,60 +23,39 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-import tempfile
 import unittest
 
-from os.path import join, abspath
-from pathlib import Path
-from dirsync import sync
-from plantdb import FSDB
-
-parent_dir = Path(__file__).resolve().parents[1]
-DATABASE_LOCATION = abspath(join(parent_dir, "tests", "testdata"))
-
-
-class TemporaryCloneDB(object):
-    """Class for doing tests on a copy of a local DB.
-
-    Parameters
-    ----------
-    db_location : str
-        Location of the source database
-
-    Attributes
-    ----------
-    tmpdir : tempfile.TemporaryDirectory
-        The temporary directory.
-    """
-
-    def __init__(self, db_location):
-        self.tmpdir = tempfile.TemporaryDirectory()
-        sync(db_location, self.tmpdir.name, action="sync")
-
-    def __del__(self):
-        self.tmpdir.cleanup()
+from plantdb.fsdb import dummy_db
 
 
 class DBTestCase(unittest.TestCase):
-    def __del__(self):
+
+    def setUp(self):
+        self.db = dummy_db(with_scan=True, with_fileset=True, with_file=True)
+
+    def tearDown(self):
         try:
             self.db.disconnect()
         except:
             return
+        from shutil import rmtree
+        rmtree(self.db.basedir, ignore_errors=True)
 
-    def get_test_db(self, db_path=DATABASE_LOCATION):
-        # print(f"Example database location: {DATABASE_LOCATION}")
-        self.tmpclone = TemporaryCloneDB(db_path)
-        self.db = FSDB(self.tmpclone.tmpdir.name)
+    def get_test_db(self):
         self.db.connect()
         return self.db
 
     def get_test_scan(self):
         db = self.get_test_db()
-        scan = db.get_scan("testscan")
+        scan = db.get_scan("myscan_001")
         return scan
 
     def get_test_fileset(self):
         scan = self.get_test_scan()
-        fileset = scan.get_fileset("testfileset")
+        fileset = scan.get_fileset("fileset_001")
         return fileset
+
+    def get_test_file(self):
+        fileset = self.get_test_fileset()
+        file = fileset.get_file("test_image")
+        return file

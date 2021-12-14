@@ -118,8 +118,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    str
-        The path to the root directory of the dummy database.
+    FSDB
+        The dummy database.
 
     Examples
     --------
@@ -197,10 +197,17 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     # Create a `Fileset` object if required:
     if with_file:
         import numpy as np
+        # -- Create a fixed dummy image:
+        f = fs.create_file("dummy_image")
+        img = np.array([[255, 0], [0, 255]]).astype('uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("dummy image", True)
+        # -- Create a random RGB image:
         f = fs.create_file("test_image")
         img = np.array(255 * np.random.rand(50, 50, 3), dtype='uint8')
         io.write_image(f, img, "png")
         f.set_metadata("random image", True)
+        # -- Create a dummy JSON
         f = fs.create_file("test_json")
         md = {"Who you gonna call?": "Ghostbuster"}
         io.write_json(f, md, "json")
@@ -716,9 +723,9 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_file=True)
+        >>> db = dummy_db(with_scan=True, with_file=True)
         >>> scan = db.get_scan("myscan_001")
-        >>> fs = db.get_fileset("fileset_001")
+        >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
         >>> # To read the file you need to load the right reader from plantdb.io
         >>> from plantdb.io import read_image
@@ -1554,13 +1561,13 @@ def _delete_scan(scan):
     _is_safe_to_delete: methods used to check if its safe to delete the scan.
 
     """
+    from shutil import rmtree
     for f in scan.filesets:
         scan.delete_fileset(f.id)
     fullpath = os.path.join(scan.db.basedir, scan.id)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
-    for f in glob.glob(os.path.join(fullpath, "*")):
-        os.remove(f)
+    rmtree(fullpath, ignore_errors=True)
     if os.path.exists(fullpath):
         os.rmdir(fullpath)
 
