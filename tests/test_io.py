@@ -81,7 +81,7 @@ class TestIO(DBTestCase):
 
     def test_read_image(self):
         fileset = self.get_test_fileset()
-        file = fileset.get_file("image")
+        file = fileset.get_file("dummy_image")
         img = io.read_image(file)
 
         self.assertEqual(img[0, 0], 255)
