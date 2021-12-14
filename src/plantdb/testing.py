@@ -30,12 +30,15 @@ from dirsync import sync
 from plantdb import FSDB
 from plantdb.fsdb import dummy_db
 
+
 class TemporaryCloneDB(object):
     """Class for doing tests on a copy of a local DB.
+
     Parameters
     ----------
     db_location : str
-        Location of the source database
+        Location of the source database to clone in the temporary folder.
+
     Attributes
     ----------
     tmpdir : tempfile.TemporaryDirectory
@@ -47,15 +50,30 @@ class TemporaryCloneDB(object):
         sync(db_location, self.tmpdir.name, action="sync")
 
     def __del__(self):
-        self.tmpdir.cleanup()
+        try:
+            self.tmpdir.cleanup()
+        except:
+            return
 
 
 class DBTestCase(unittest.TestCase):
+    """A test database.
+
+    Attributes
+    ----------
+    db : plantdb.FSDB
+        The temporary directory.
+    tmpclone : TemporaryCloneDB
+        A local temporary copy of a test database.
+    """
 
     def setUp(self):
+        """Set up a dummy database with fake scan, fileset & files."""
         self.db = dummy_db(with_scan=True, with_fileset=True, with_file=True)
+        self.tmpclone = None
 
     def tearDown(self):
+        """Clean up after test."""
         try:
             self.db.disconnect()
         except:
@@ -64,6 +82,19 @@ class DBTestCase(unittest.TestCase):
         rmtree(self.db.basedir, ignore_errors=True)
 
     def get_test_db(self, db_path=None):
+        """Return the test ``FSDB`` database.
+
+        Parameters
+        ----------
+        db_path : str, optional
+            If `None` (default), return the dummy database.
+            Else, should be the location of the source database to clone in the temporary folder.
+
+        Returns
+        -------
+        plantdb.FSDB
+            The database to test.
+        """
         if db_path is not None:
             self.tmpclone = TemporaryCloneDB(db_path)
             self.db = FSDB(self.tmpclone.tmpdir.name)
@@ -72,16 +103,37 @@ class DBTestCase(unittest.TestCase):
         return self.db
 
     def get_test_scan(self):
+        """Return the default test ``Scan`` object named 'myscan_001'.
+
+        Returns
+        -------
+        plantdb.Scan
+            The default scan instance to test.
+        """
         db = self.get_test_db()
         scan = db.get_scan("myscan_001")
         return scan
 
     def get_test_fileset(self):
+        """Return the default test ``Fileset`` object named 'fileset_001'.
+
+        Returns
+        -------
+        plantdb.Scan
+            The default fileset instance to test.
+        """
         scan = self.get_test_scan()
         fileset = scan.get_fileset("fileset_001")
         return fileset
 
     def get_test_file(self):
+        """Return the default test ``File`` object named 'test_image'.
+
+        Returns
+        -------
+        plantdb.File
+            The default image file instance to test.
+        """
         fileset = self.get_test_fileset()
         file = fileset.get_file("test_image")
         return file
