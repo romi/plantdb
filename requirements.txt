@@ -3,7 +3,7 @@ dirsync
 flask
 flask-cors
 flask-restful
-imageio ==2.9.0
+imageio
 numpy
 pillow
 toml

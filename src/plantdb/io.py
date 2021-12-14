@@ -234,7 +234,7 @@ def write_volume(dbfile, data, ext="npz"):
 
     """
     import imageio
-    b = imageio.volwrite(imageio.RETURN_BYTES, data, format=ext)
+    b = imageio.volwrite(imageio.core.request.RETURN_BYTES, data, format=ext)
     dbfile.write_raw(b, ext)
 
 
