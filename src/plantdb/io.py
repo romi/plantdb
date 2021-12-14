@@ -234,8 +234,11 @@ def write_volume(dbfile, data, ext="npz"):
 
     """
     import imageio
-    b = imageio.volwrite(imageio.core.request.RETURN_BYTES, data, format=ext)
-    dbfile.write_raw(b, ext)
+    import numpy as np
+    with tempfile.TemporaryDirectory() as d:
+        fname = os.path.join(d, "temp.npz")
+        imageio.volwrite(fname, data, format=ext)
+        dbfile.import_file(fname)
 
 
 def read_npz(dbfile):
@@ -269,6 +272,7 @@ def write_npz(dbfile, data):
         The `File` object used to write the associated file.
     data : array like
         A 3D array to save as volume.
+
     """
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
