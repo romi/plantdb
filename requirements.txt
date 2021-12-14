@@ -1,0 +1,9 @@
+appdirs
+dirsync
+flask
+flask-cors
+flask-restful
+imageio ==2.9.0
+numpy
+pillow
+toml
