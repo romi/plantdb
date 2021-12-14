@@ -10,7 +10,7 @@ You will need:
 
 
 On Debian and Ubuntu, you can install them with:
-```bash
+```shell
 sudo apt-get update && apt-get install -y git python3-pip
 ```
 
@@ -18,61 +18,59 @@ sudo apt-get update && apt-get install -y git python3-pip
 ## Install from sources in conda environment:
 
 1. Clone the sources:
-    ```bash
+    ```shell
     git clone https://github.com/romi/plantdb.git
     ```
 2. Create a conda environment:
-    ```bash
-    conda create --name plantdb_dev python=3.7
+    ```shell
+    cd plantdb/
+    conda env create -f conda/env/plantdb.yaml
     ```
 3. Install sources:
-   ```bash
-   conda activate plantdb_dev
-   cd plantdb
-   python3 -m pip install -e .
-   ```
+    ```shell
+    conda activate plantdb
+    python3 -m pip install -e .
+    ```
 4. Test import of `plantdb` library:
-    ```bash
-    conda activate plantdb_dev
+    ```shell
+    conda activate plantdb
     python3 -c 'import plantdb'
     ```
 5. Test `plantdb` library:
-
-   Install dependencies for testing and coverage:
-   ```bash
-   conda activate plantdb_dev
-   conda install nose coverage
-   ```
-   Run all tests with highly verbose output (from the root directory):
-   ```bash
-   nosetests tests/ -x -s -v
-   ```
-   Run all tests with coverage report (from the root directory):
-   ```bash
-   nosetests tests/ --with-coverage --cover-package=plantdb
-
-   ```
+    Install dependencies for testing and coverage:
+    ```shell
+    conda activate plantdb
+    conda install nose coverage
+    ```
+    Run all tests with highly verbose output (from the root directory):
+    ```shell
+    nosetests tests/ -x -s -v
+    ```
+    Run all tests with coverage report (from the root directory):
+    ```shell
+    nosetests tests/ --with-coverage --cover-package=plantdb
+    ```
 
 **Notes**:
-> You may change the name `plantdb_dev` to something else, like an already existing conda environment (then skip step 2.).
+> You may change the name `plantdb` to something else, like an already existing conda environment (then skip step 2.).
 
 ## Conda packaging
 **Notes**:
 > This is not working YET!
 
 ### Install `plantdb` conda package:
-```bash
+```shell
 conda create -n plantdb plantdb -c romi-eu -c open3d-admin --force
 ```
 To test package install, in the activated environment import `plantdb` in python:
-```bash
+```shell
 conda activate plantdb
 python -c 'import plantdb'
 ```
 
 ### Build `plantdb` conda package:
 From the `base` conda environment, run:
-```bash
+```shell
 conda build conda_recipes/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
 ```
 
@@ -82,12 +80,12 @@ Typically these are used by the `3d-plantviewer` or `romiscan` libraries.
 
 ### Setup
 You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`define it in an environment variable `DB_LOCATION`:
-```bash
+```shell
 mkdir -p /data/ROMI/DB
 touch /data/ROMI/DB/romidb
 ```
 Then define its location in an environment variable `DB_LOCATION`:
-```bash
+```shell
 export DB_LOCATION=/data/ROMI/DB
 ```
 **Notes**:
@@ -98,18 +96,18 @@ export DB_LOCATION=/data/ROMI/DB
 To populate your DB with example datasets, we provide some examples [here](https://media.romi-project.eu/data/test_db_small.tar.gz).
 
 Make sure you have `wget`:
-```bash
+```shell
 sudo apt-get install wget
 ```
 Then download the test archive and extract it to the location od the DB:
-```bash
+```shell
 wget https://media.romi-project.eu/data/test_db_small.tar.gz
 tar -xf test_db_small.tar.gz -C $DB_LOCATION
 ```
 
 ### Serve the REST API
 Then you can start the REST API with `romi_scanner_rest_api`:
-```bash
+```shell
 romi_scanner_rest_api
 ```
 You should see something like:
