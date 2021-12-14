@@ -22,10 +22,32 @@
 # License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-
+import tempfile
 import unittest
 
+from dirsync import sync
+
+from plantdb import FSDB
 from plantdb.fsdb import dummy_db
+
+class TemporaryCloneDB(object):
+    """Class for doing tests on a copy of a local DB.
+    Parameters
+    ----------
+    db_location : str
+        Location of the source database
+    Attributes
+    ----------
+    tmpdir : tempfile.TemporaryDirectory
+        The temporary directory.
+    """
+
+    def __init__(self, db_location):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        sync(db_location, self.tmpdir.name, action="sync")
+
+    def __del__(self):
+        self.tmpdir.cleanup()
 
 
 class DBTestCase(unittest.TestCase):
@@ -41,7 +63,11 @@ class DBTestCase(unittest.TestCase):
         from shutil import rmtree
         rmtree(self.db.basedir, ignore_errors=True)
 
-    def get_test_db(self):
+    def get_test_db(self, db_path=None):
+        if db_path is not None:
+            self.tmpclone = TemporaryCloneDB(db_path)
+            self.db = FSDB(self.tmpclone.tmpdir.name)
+
         self.db.connect()
         return self.db
 
