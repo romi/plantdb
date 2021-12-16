@@ -9,6 +9,6 @@
 ```
 
 ```{eval-rst}
-.. automodule:: romidata.db
+.. automodule:: plantdb.db
    :members:
 ```
