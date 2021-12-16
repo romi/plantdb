@@ -14,10 +14,7 @@ USER root
 SHELL ["/bin/bash", "-c"]
 # Update package manager & install requirements:
 RUN apt-get update && \
-    apt-get install -yq --no-install-recommends \
-    git ca-certificates \
-    rsync \
-    python3.7 python3-pip python3-wheel && \
+    apt-get install -yq --no-install-recommends git ca-certificates rsync python3.7 python3-pip && \
     # Clean package manager:
     apt-get clean && \
     apt-get autoremove && \
@@ -34,9 +31,12 @@ WORKDIR /home/${USER_NAME}
 
 COPY --chown=${USER_NAME} ./ plantdb/
 
-RUN cd plantdb && \
-    python3.7 -m pip install setuptools setuptools-scm --no-cache-dir && \
-    python3.7 -m pip install . --no-cache-dir && \
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install setuptools wheel && \
+    python3 -m pip install -r plantdb/requirements.txt && \
+    python3 -m pip install nose coverage && \
+    python3 -m pip install -e plantdb/. && \
+    rm -rf .cache/pip && \
     mkdir ~/db
 
 ENV DB_LOCATION="/home/${USER_NAME}/db"

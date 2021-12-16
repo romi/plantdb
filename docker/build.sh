@@ -5,6 +5,7 @@ uid=$(id -u)
 group=$(id -g -n)
 gid=$(id -g)
 vtag="latest"
+docker_opts=""
 
 usage() {
   echo "USAGE:"
@@ -30,6 +31,13 @@ usage() {
     "
   echo "  --gid
     Group id to use with 'user' inside docker image, default to '$gid'.
+    "
+  # Docker options:
+  echo "  --no-cache
+    Do not use cache when building the image, (re)start from scratch.
+    "
+  echo "  --pull
+    Always attempt to pull a newer version of the parent image.
     "
   echo "  -h, --help
     Output a usage message and exit.
@@ -58,6 +66,14 @@ while [ "$1" != "" ]; do
     shift
     gid=$1
     ;;
+  --no-cache)
+    shift
+    docker_opts="$docker_opts --no-cache"
+    ;;
+  --pull)
+    shift
+    docker_opts="$docker_opts --pull"
+    ;;
   -h | --help)
     usage
     exit
@@ -70,9 +86,27 @@ while [ "$1" != "" ]; do
   shift
 done
 
-docker build -t roboticsmicrofarms/plantdb:$vtag \
+# Get the date to estimate docker image build time:
+start_time=`date +%s`
+
+# Start the docker image build:
+docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts \
   --build-arg USER_NAME=$user \
   --build-arg USER_ID=$uid \
   --build-arg GROUP_NAME=$group \
   --build-arg GROUP_ID=$gid \
   -f docker/Dockerfile .
+
+docker_build_status=$?
+
+# Important to CI/CD pipeline to track docker build failure
+if  [ $docker_build_status != 0 ]
+then
+  echo "docker build failed with $docker_build_status code"
+fi
+
+# Print docker image build time:
+echo
+echo Build time is $(expr `date +%s` - $start_time) s
+
+exit $docker_build_status
