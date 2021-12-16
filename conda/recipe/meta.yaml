@@ -1,0 +1,44 @@
+package:
+  name: plantdb
+  version: {{ environ.get('GIT_DESCRIBE_TAG', 'latest') }}
+
+source:
+  path: ../../
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  preserve_egg_dir: True
+
+requirements:
+  build:
+    - python  {{ python }}
+    - setuptools
+  run:
+    - python  {{ python }}
+    - appdirs
+    - flask
+    - flask-cors
+    - flask-restful
+    - imageio <=2.11.0
+    - numpy
+    - pillow
+    - toml
+
+test:
+  requires:
+    - nose
+    - coverage
+  imports:
+    - plantdb  # test the import of plantdb
+  commands:
+    - nosetests tests/ --with-coverage --cover-package=plantdb
+  source_files:
+    - tests/test_*.py
+
+about:
+  home: https://docs.romi-project.eu/Scanner/modules/plantdb/
+  license: LGPL-3.0-or-later
+  license_file: LICENSE
+  summary: Database package for the ROMI project.
+  dev_url: https://github.com/romi/plantdb
+  doc_source_url: https://docs.romi-project.eu/documentation/
