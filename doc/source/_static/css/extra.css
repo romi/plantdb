@@ -1,3 +1,21 @@
-.wy-side-nav-search {
-    background-color: #00A960;
+button[data-md-color-primary=green] {
+    background-color: #00A960
+}
+
+[data-md-color-primary=green] .md-typeset a {
+    color: #00A960
+}
+
+[data-md-color-primary=green] .md-header,
+[data-md-color-primary=green] .md-hero {
+    background-color: #00A960
+}
+
+[data-md-color-primary=green] .md-nav__link--active,
+[data-md-color-primary=green] .md-nav__link:active {
+    color: #00A960
+}
+
+[data-md-color-primary=green] .md-nav__item--nested>.md-nav__link {
+    color: inherit
 }

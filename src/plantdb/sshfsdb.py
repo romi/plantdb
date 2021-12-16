@@ -25,7 +25,7 @@
 
 """
 plantdb.sshfsdb
-=============
+===============
 
 Implementation of a database as a file structure on a remote server
 using SSHFS.

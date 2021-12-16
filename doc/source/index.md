@@ -5,6 +5,7 @@
    :maxdepth: 2
 
    reference.md
+   webapi.md
 ```
 
 This is the technical documentation for the `plantdb` python library.
@@ -24,6 +25,6 @@ It is not YET available as a conda package, but should be available soon on the 
 A docker image can be pulled from the Docker Hub...
 
 
-## Github repository
+## GitHub repository
 
 The source code associated to this library is accessible here: https://github.com/romi/romidata
