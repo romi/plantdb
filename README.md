@@ -55,28 +55,27 @@ sudo apt-get update && apt-get install -y git python3-pip
 > You may change the name `plantdb` to something else, like an already existing conda environment (then skip step 2.).
 
 ## Conda packaging
-**Notes**:
-> This is not working YET!
 
-### Install `plantdb` conda package:
+### USER - Install `plantdb` conda package
+In an active conda envirnoment of your choosing, here named `<my_env>` for clarity, you can install the `plantdb` conda package with:
 ```shell
-conda create -n plantdb plantdb -c romi-eu -c open3d-admin --force
+conda activate <my_env>
+conda install plantdb -c romi-eu
 ```
-To test package install, in the activated environment import `plantdb` in python:
+To test package install, in the activated `<my_env>` environment, import `plantdb` in python:
 ```shell
-conda activate plantdb
-python -c 'import plantdb'
+python -c 'from plantdb import FSDB'
 ```
 
-### Build `plantdb` conda package:
+### DEVELOPER - Build `plantdb` conda package
 From the `base` conda environment, run:
 ```shell
-conda build conda_recipes/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
+conda-build ./conda/recipe/ --channel conda-forge --user romi-eu  #  -c open3d-admin
 ```
 
 ## Usage
 This library is intended to run in the background as a REST API serving JSON informations from the DB.
-Typically these are used by the `3d-plantviewer` or `romiscan` libraries.
+Typically, these are used by the `3d-plantviewer` or `romiscan` libraries.
 
 ### Setup
 You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`define it in an environment variable `DB_LOCATION`:
@@ -126,8 +125,11 @@ Open your favorite browser here:
 - scans: http://0.0.0.0:5000/scans
 - '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35
 
-### Python API
-Here is a minimal example how to access DB in Python:
+
+## Minimal Python API
+
+Here is a minimal example how to access DB in Python.
+It assumes you got the example dataset, extracted it and that you defined its location under the environment variable `DB_LOCATION`:
 ```python
 # Get the environment variable $DB_LOCATION
 import os
@@ -136,6 +138,16 @@ db_path = os.environ['DB_LOCATION']
 from plantdb import FSDB
 db = FSDB(db_path)
 db.connect()
+
+# List the available scans:
+scan_names = [scan.id for scan in db.get_scans()]
+print(scan_names)
+# Access the example scan named '2018-12-17_17-05-35':
 dataset = db.get_scan("2018-12-17_17-05-35")
+
+# Access the 'images' fileset in this `Scan`:
 img_fs = dataset.get_fileset('images')
+# List the available files in this `Fileset`:
+file_names = [f.id for f in img_fs.get_files()]
+print(file_names)
 ```
