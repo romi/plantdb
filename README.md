@@ -37,7 +37,7 @@ tar -xf test_db_small.tar.gz -C $DB_LOCATION
 A docker image, named `roboticsmicrofarms/plantdb`, is distributed by the ROMI group.
 If you want to use it, simply do:
 ```shell
-docker run -v 
+docker run -p 5000:5000 -v $DB_LOCATION:/myapp/db -it roboticsmicrofarms/plantdb
 ```
 **Obviously you have to install docker first!**
 
