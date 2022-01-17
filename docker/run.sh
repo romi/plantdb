@@ -3,6 +3,7 @@
 host_db="/data/ROMI/DB"
 vtag="latest"
 unittest_cmd="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
+cmd="romi_scanner_rest_api"
 
 usage() {
   echo "USAGE:"
@@ -15,20 +16,16 @@ usage() {
 
   echo "OPTIONS:"
   echo "  -t, --tag
-    Docker image tag to use, default to '$vtag'.
-    "
+    Docker image tag to use, default to '$vtag'."
   echo "  -c, --cmd
-    Defines the command to run at docker startup, by default start an interactive container with a bash shell.
-    "
-  echo "  -p, --database_path
-    Path to the host database to mount inside docker container, default to '$host_db'.
-    "
+    Defines the command to run at container startup.
+    By default start an active container serving the database trough the REST API on port 5000."
+  echo "  -db
+    Path to the host database to mount inside docker container, default to '$host_db'."
   echo " --unittest_cmd
-    Runs unit tests defined in plantdb.
-    "
+    Runs unit tests defined in plantdb."
   echo "  -h, --help
-    Output a usage message and exit.
-    "
+    Output a usage message and exit."
 }
 
 while [ "$1" != "" ]; do
@@ -41,7 +38,7 @@ while [ "$1" != "" ]; do
     shift
     cmd=$1
     ;;
-  -p | --database_path)
+  -db)
     shift
     host_db=$1
     ;;
@@ -60,10 +57,8 @@ while [ "$1" != "" ]; do
   shift
 done
 
-if [ "$cmd" = "" ]
-then
-  docker run -it -p 5000:5000 -v $host_db:/myapp/db roboticsmicrofarms/plantdb:$vtag
-else
-  docker run -it -p 5000:5000 -v $host_db:/myapp/db roboticsmicrofarms/plantdb:$vtag \
-    bash -c "$cmd"
-fi
+docker run \
+  -p 5000:5000 \
+  -v $host_db:/myapp/db \
+  -it roboticsmicrofarms/plantdb:$vtag \
+  bash -c "$cmd"
