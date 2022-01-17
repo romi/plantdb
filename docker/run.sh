@@ -1,6 +1,5 @@
 #!/bin/bash
 
-user=$USER
 host_db="/data/ROMI/DB"
 vtag="latest"
 unittest_cmd="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
@@ -18,14 +17,14 @@ usage() {
   echo "  -t, --tag
     Docker image tag to use, default to '$vtag'.
     "
+  echo "  -c, --cmd
+    Defines the command to run at docker startup, by default start an interactive container with a bash shell.
+    "
   echo "  -p, --database_path
     Path to the host database to mount inside docker container, default to '$host_db'.
     "
   echo " --unittest_cmd
     Runs unit tests defined in plantdb.
-    "
-  echo "  -u, --user
-    User used during docker image build, default to '$user'.
     "
   echo "  -h, --help
     Output a usage message and exit.
@@ -38,9 +37,9 @@ while [ "$1" != "" ]; do
     shift
     vtag=$1
     ;;
-  -u | --user)
+  -c | --cmd)
     shift
-    user=$1
+    cmd=$1
     ;;
   -p | --database_path)
     shift
@@ -63,12 +62,8 @@ done
 
 if [ "$cmd" = "" ]
 then
-  docker run -it -p 5000:5000 \
-    -v $host_db:/home/$user/db \
-    roboticsmicrofarms/plantdb:$vtag
+  docker run -it -p 5000:5000 -v $host_db:/myapp/db roboticsmicrofarms/plantdb:$vtag
 else
-  docker run -it -p 5000:5000 \
-    -v $host_db:/home/$user/db \
-    roboticsmicrofarms/plantdb:$vtag \
+  docker run -it -p 5000:5000 -v $host_db:/myapp/db roboticsmicrofarms/plantdb:$vtag \
     bash -c "$cmd"
 fi
