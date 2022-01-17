@@ -20,10 +20,10 @@ usage() {
   echo "  -c, --cmd
     Defines the command to run at container startup.
     By default start an active container serving the database trough the REST API on port 5000."
-  echo "  -db
+  echo "  -db, --database
     Path to the host database to mount inside docker container, default to '$host_db'."
   echo " --unittest_cmd
-    Runs unit tests defined in plantdb."
+    Runs unit tests defined in plantdb/tests/."
   echo "  -h, --help
     Output a usage message and exit."
 }
@@ -38,7 +38,7 @@ while [ "$1" != "" ]; do
     shift
     cmd=$1
     ;;
-  -db)
+  -db | --database)
     shift
     host_db=$1
     ;;
