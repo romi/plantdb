@@ -4,10 +4,7 @@ LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
-ARG USER_NAME=scanner
-ARG USER_ID=1001
-ARG GROUP_NAME=scanner
-ARG GROUP_ID=1001
+ENV USER_NAME=myuser
 
 USER root
 # Change shell to 'bash', default is 'sh'
@@ -19,27 +16,25 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* && \
-    # Create a non-root user and give it rights over its "home folder"
-    addgroup --gid $GROUP_ID $GROUP_NAME && \
-    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID $USER_NAME && \
-    chown -R ${USER_NAME}: /home/${USER_NAME}
+    # Create a non-root user and give it rights over a "myapp" folder:
+    adduser --disabled-password ${USER_NAME} && \
+    mkdir /myapp && chown -R ${USER_NAME} /myapp
 
+ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
 # Change user
 USER ${USER_NAME}
 # Change working directory:
-WORKDIR /home/${USER_NAME}
-
+WORKDIR /myapp
+# Copy the
 COPY --chown=${USER_NAME} ./ plantdb/
-
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install setuptools wheel && \
     python3 -m pip install -r plantdb/requirements.txt && \
     python3 -m pip install nose coverage && \
     python3 -m pip install -e plantdb/. && \
     rm -rf .cache/pip && \
-    mkdir ~/db
+    mkdir db
 
-ENV DB_LOCATION="/home/${USER_NAME}/db"
-ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
+ENV DB_LOCATION="/myapp/db"
 
 CMD ["/bin/bash", "-c", "romi_scanner_rest_api"]

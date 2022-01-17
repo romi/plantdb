@@ -1,9 +1,5 @@
 #!/bin/bash
 
-user=$USER
-uid=$(id -u)
-group=$(id -g -n)
-gid=$(id -g)
 vtag="latest"
 docker_opts=""
 
@@ -19,18 +15,6 @@ usage() {
   echo "OPTIONS:"
   echo "  -t, --tag
     Docker image tag to use, default to '$vtag'.
-    "
-  echo "  -u, --user
-    User name to create inside docker image, default to '$user'.
-    "
-  echo "  --uid
-    User id to use with 'user' inside docker image, default to '$uid'.
-    "
-  echo "  -g, --group
-    Group name to create inside docker image, default to 'group'.
-    "
-  echo "  --gid
-    Group id to use with 'user' inside docker image, default to '$gid'.
     "
   # Docker options:
   echo "  --no-cache
@@ -49,22 +33,6 @@ while [ "$1" != "" ]; do
   -t | --tag)
     shift
     vtag=$1
-    ;;
-  -u | --user)
-    shift
-    user=$1
-    ;;
-  --uid)
-    shift
-    uid=$1
-    ;;
-  -g | --group)
-    shift
-    group=$1
-    ;;
-  --gid)
-    shift
-    gid=$1
     ;;
   --no-cache)
     shift
@@ -90,12 +58,7 @@ done
 start_time=`date +%s`
 
 # Start the docker image build:
-docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts \
-  --build-arg USER_NAME=$user \
-  --build-arg USER_ID=$uid \
-  --build-arg GROUP_NAME=$group \
-  --build-arg GROUP_ID=$gid \
-  -f docker/Dockerfile .
+docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts -f docker/Dockerfile .
 
 docker_build_status=$?
 
