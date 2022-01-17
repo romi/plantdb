@@ -16,7 +16,7 @@ RUN apt-get update && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* && \
     # Create a non-root user and give it rights over a "myapp" folder:
-    adduser --disabled-password ${USER_NAME} && \
+    adduser --disabled-password --gecos '' ${USER_NAME} && \
     mkdir /myapp && chown -R ${USER_NAME} /myapp
 
 ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
