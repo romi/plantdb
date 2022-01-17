@@ -152,7 +152,7 @@ img_fs = dataset.get_fileset('images')
 ### Conda packaging
 To build `plantdb` conda package, from the `base` conda environment, run:
 ```shell
-conda build conda_recipes/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
+conda build conda/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
 ```
 **NOT DONE YET!**
 
@@ -165,11 +165,9 @@ To build a new `roboticsmicrofarms/plantdb` image, from the root folder, simply 
 ./docker/build.sh
 ```
 
-To run a `roboticsmicrofarms/plantdb` image, from the root folder, simply do:
+To run the latest `roboticsmicrofarms/plantdb` image, from the root folder, simply do:
 ```shell
 ./docker/run.sh
 ```
 
-:::{info}
 Use the `-h` option to get help on using the scripts.
-:::
