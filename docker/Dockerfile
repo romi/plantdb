@@ -1,5 +1,4 @@
 FROM ubuntu:18.04
-
 LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 
 ENV LANG=C.UTF-8
@@ -25,8 +24,9 @@ ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
 USER ${USER_NAME}
 # Change working directory:
 WORKDIR /myapp
-# Copy the
+# Copy the package sources:
 COPY --chown=${USER_NAME} ./ plantdb/
+# Install the dependencies and package:
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install setuptools wheel && \
     python3 -m pip install -r plantdb/requirements.txt && \

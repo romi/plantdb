@@ -10,7 +10,7 @@ usage() {
     "
 
   echo "DESCRIPTION:"
-  echo "  Run 'roboticsmicrofarms/plantdb:<vtag>' container with a mounted local (host) database and expose it to port 5000.
+  echo "  Run 'roboticsmicrofarms/plantdb' container with a mounted local (host) database and expose it to port 5000.
     "
 
   echo "OPTIONS:"
