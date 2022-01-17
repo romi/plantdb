@@ -14,18 +14,14 @@ usage() {
 
   echo "OPTIONS:"
   echo "  -t, --tag
-    Docker image tag to use, default to '$vtag'.
-    "
-  # Docker options:
+    Docker image tag to use, default to '$vtag'."
+  # -- Docker options:
   echo "  --no-cache
-    Do not use cache when building the image, (re)start from scratch.
-    "
+    Do not use cache when building the image, (re)start from scratch."
   echo "  --pull
-    Always attempt to pull a newer version of the parent image.
-    "
+    Always attempt to pull a newer version of the parent image."
   echo "  -h, --help
-    Output a usage message and exit.
-    "
+    Output a usage message and exit."
 }
 
 while [ "$1" != "" ]; do
@@ -60,9 +56,8 @@ start_time=`date +%s`
 # Start the docker image build:
 docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts -f docker/Dockerfile .
 
-docker_build_status=$?
-
 # Important to CI/CD pipeline to track docker build failure
+docker_build_status=$?
 if  [ $docker_build_status != 0 ]
 then
   echo "docker build failed with $docker_build_status code"
