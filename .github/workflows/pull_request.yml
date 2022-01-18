@@ -5,32 +5,34 @@ name: CI
 on: pull_request
 
 jobs:
-    docker-build:
-        runs-on: self-hosted
+  docker-build:
+    runs-on: self-hosted
 
-        steps:
-         - uses: actions/checkout@v1
-           with:
-             submodules: true
-         - name: Build Dockerfile
-           run: |
-            ./docker/build.sh -t ${{ github.sha }} --no-cache
-    
-    unit-tests:
-        runs-on: self-hosted
-        needs: docker-build
-        
-        steps:
-         - name: Run Unit Tests
-           run: |
-            ./docker/run.sh -t ${{ github.sha }} --unittest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Build Dockerfile
+        run: |
+          docker container prune -f
+          ./docker/build.sh -t ${{ github.sha }} --no-cache
 
-    docker-clean:
-       runs-on: self-hosted
-       needs: unit-tests
-       if: always()
+  unit-tests:
+    runs-on: self-hosted
+    needs: docker-build
 
-       steps:
-        - name: Remove Docker Image
-          run: |
-            docker image rm plantdb:${{ github.sha }}
+    steps:
+      - name: Run Unit Tests
+        run: |
+          ./docker/run.sh -t ${{ github.sha }} --unittest
+
+  docker-clean:
+    runs-on: self-hosted
+    needs: unit-tests
+    if: always()
+
+    steps:
+      - name: Remove Docker Image
+        run: |
+          docker container prune -f
+          docker image rm roboticsmicrofarms/plantdb:${{ github.sha }}
