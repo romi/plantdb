@@ -2,7 +2,7 @@
 
 host_db="/data/ROMI/DB"
 vtag="latest"
-unittest_cmd="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
+unittest="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
 cmd="romi_scanner_rest_api"
 
 usage() {
@@ -22,7 +22,7 @@ usage() {
     By default start an active container serving the database trough the REST API on port 5000."
   echo "  -db, --database
     Path to the host database to mount inside docker container, default to '$host_db'."
-  echo " --unittest_cmd
+  echo " --unittest
     Runs unit tests defined in plantdb/tests/."
   echo "  -h, --help
     Output a usage message and exit."
@@ -42,8 +42,8 @@ while [ "$1" != "" ]; do
     shift
     host_db=$1
     ;;
-  --unittest_cmd)
-    cmd=$unittest_cmd
+  --unittest)
+    cmd=$unittest
     ;;
   -h | --help)
     usage

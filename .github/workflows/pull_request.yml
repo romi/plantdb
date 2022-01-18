@@ -23,7 +23,7 @@ jobs:
         steps:
          - name: Run Unit Tests
            run: |
-            ./docker/run.sh -t ${{ github.sha }} --unittest_cmd
+            ./docker/run.sh -t ${{ github.sha }} --unittest
 
     docker-clean:
        runs-on: self-hosted
