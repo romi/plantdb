@@ -57,8 +57,18 @@ while [ "$1" != "" ]; do
   shift
 done
 
-docker run \
-  -p 5000:5000 \
-  -v $host_db:/myapp/db \
-  -it roboticsmicrofarms/plantdb:$vtag \
-  bash -c "$cmd"
+if [ "$cmd" = "" ]; then
+  # Start in interactive mode:
+  docker run \
+    -p 5000:5000 \
+    -v $host_db:/myapp/db \
+    -it roboticsmicrofarms/plantdb:$vtag \
+    bash -c "$cmd"
+else
+  # Start in non-interactive mode (run the command):
+  docker run \
+    -p 5000:5000 \
+    -v $host_db:/myapp/db \
+    roboticsmicrofarms/plantdb:$vtag \
+    bash -c "$cmd"
+fi
