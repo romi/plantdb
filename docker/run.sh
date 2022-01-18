@@ -1,9 +1,9 @@
 #!/bin/bash
 
-host_db="/data/ROMI/DB"
 vtag="latest"
+host_db="/data/ROMI/DB"
 unittest="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
-cmd="romi_scanner_rest_api"
+cmd=""
 
 usage() {
   echo "USAGE:"
