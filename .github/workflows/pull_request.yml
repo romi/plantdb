@@ -35,4 +35,4 @@ jobs:
       - name: Remove Docker Image
         run: |
           docker container prune -f
-          docker image rm roboticsmicrofarms/plantdb:${{ github.sha }}
+          docker image rm roboticsmicrofarms/plantdb:${{ github.sha }} --force
