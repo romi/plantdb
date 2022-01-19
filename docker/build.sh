@@ -5,12 +5,13 @@ docker_opts=""
 
 usage() {
   echo "USAGE:"
-  echo "  ./build.sh [OPTIONS]
+  echo "  ./docker/build.sh [OPTIONS]
     "
 
   echo "DESCRIPTION:"
-  echo "  Build a docker image named 'roboticsmicrofarms/plantdb' using Dockerfile in same location.
-    "
+  echo "  Build a docker image named 'roboticsmicrofarms/plantdb' using 'Dockerfile' in the same location.
+  It must be run from the 'plantdb' repository root folder as it is the build context and it will be copied during at image build time!
+  "
 
   echo "OPTIONS:"
   echo "  -t, --tag
@@ -51,7 +52,7 @@ while [ "$1" != "" ]; do
 done
 
 # Get the date to estimate docker image build time:
-start_time=`date +%s`
+start_time=$(date +%s)
 
 # Start the docker image build:
 docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts -f docker/Dockerfile .
@@ -65,6 +66,6 @@ fi
 
 # Print docker image build time:
 echo
-echo Build time is $(expr `date +%s` - $start_time) s
+echo Build time is $(expr $(date +%s) - $start_time) s
 
 exit $docker_build_status
