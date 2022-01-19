@@ -7,12 +7,13 @@ cmd=""
 
 usage() {
   echo "USAGE:"
-  echo "  ./run.sh [OPTIONS]
+  echo "  ./docker/run.sh [OPTIONS]
     "
 
   echo "DESCRIPTION:"
   echo "  Run 'roboticsmicrofarms/plantdb' container with a mounted local (host) database and expose it to port 5000.
-    "
+  It must be run from the 'plantdb' repository root folder!
+  "
 
   echo "OPTIONS:"
   echo "  -t, --tag
