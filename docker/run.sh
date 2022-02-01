@@ -59,17 +59,24 @@ while [ "$1" != "" ]; do
   shift
 done
 
+# Check if we have a TTY or not
+if [ -t 1 ]; then
+  USE_TTY="-it"
+else
+  USE_TTY=""
+fi
+
 if [ "$cmd" = "" ]; then
   # Start in interactive mode:
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
-    -it roboticsmicrofarms/plantdb:$vtag  # keep the `-it` to be able to kill the container!
+    $USE_TTY roboticsmicrofarms/plantdb:$vtag # keep the `-it` to be able to kill the container!
 else
   # Start in non-interactive mode (run the command):
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
-    -it roboticsmicrofarms/plantdb:$vtag \
+    roboticsmicrofarms/plantdb:$vtag \
     bash -c "$cmd"
 fi
