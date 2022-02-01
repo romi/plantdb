@@ -2,8 +2,9 @@
 
 vtag="latest"
 host_db="/data/ROMI/DB"
-unittest="nose2 -s plantdb/tests/ --with-coverage"
+unittest="nose2 -s tests/ --with-coverage"
 cmd=""
+mount_option=""
 
 usage() {
   echo "USAGE:"
@@ -24,6 +25,9 @@ usage() {
     Use '-c /bin/bash' to access the shell inside the docker container."
   echo "  -db, --database
     Path to the host database to mount inside docker container, default to '$host_db'."
+  echo "  -v, --volume
+    Volume mapping for docker, e.g. '/abs/host/dir:/abs/container/dir'.
+    Multiple use is allowed."
   echo " --unittest
     Runs unit tests defined in plantdb/tests/."
   echo "  -h, --help
@@ -46,6 +50,20 @@ while [ "$1" != "" ]; do
     ;;
   --unittest)
     cmd=$unittest
+    mount_tests="$PWD/tests:/myapp/tests"
+    if [ "$mount_option" == "" ]; then
+      mount_option="-v $mount_tests"
+    else
+      mount_option="$mount_option -v $mount_tests" # append
+    fi
+    ;;
+  -v | --volume)
+    shift
+    if [ "$mount_option" == "" ]; then
+      mount_option="-v $1"
+    else
+      mount_option="$mount_option -v $1" # append
+    fi
     ;;
   -h | --help)
     usage
@@ -59,6 +77,11 @@ while [ "$1" != "" ]; do
   shift
 done
 
+# Use 'host database path' $host_db' to create a bind mount to '/myapp/db':
+if [ "$host_db" != "" ]; then
+  mount_option="$mount_option -v $host_db:/myapp/db"
+fi
+
 # Check if we have a TTY or not
 if [ -t 1 ]; then
   USE_TTY="-it"
@@ -70,13 +93,13 @@ if [ "$cmd" = "" ]; then
   # Start in interactive mode:
   docker run \
     -p 5000:5000 \
-    -v $host_db:/myapp/db \
-    $USE_TTY roboticsmicrofarms/plantdb:$vtag # keep the `-it` to be able to kill the precess/container!
+    $mount_option \
+    $USE_TTY roboticsmicrofarms/plantdb:$vtag # try to keep the `-it` to be able to kill the process/container!
 else
   # Start in non-interactive mode (run the command):
   docker run \
     -p 5000:5000 \
-    -v $host_db:/myapp/db \
-    roboticsmicrofarms/plantdb:$vtag \
-    $USE_TTY bash -c "$cmd"
+    $mount_option \
+    $USE_TTY roboticsmicrofarms/plantdb:$vtag \
+    bash -c ". /venv/bin/activate && $cmd" # try to keep the `-it` to be able to kill the process/container!
 fi
