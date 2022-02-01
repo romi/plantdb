@@ -221,7 +221,7 @@ def write_volume(dbfile, data, ext="npz"):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.io import write_volume
     >>> from plantdb.fsdb import Scan, Fileset, File
     >>> from plantdb.fsdb import dummy_db

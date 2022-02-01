@@ -1,34 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+"""
+Serve the plant database through a REST API.
+"""
+import argparse
 import json
 import os
 
-from flask import Flask, send_file
-from flask import request, send_from_directory
+from flask import Flask
+from flask import request
+from flask import send_file
+from flask import send_from_directory
 from flask_cors import CORS
-from flask_restful import Resource, Api
-from plantdb import FSDB as DB
+from flask_restful import Api
+from flask_restful import Resource
+
 from plantdb import io
 from plantdb import webcache
+from plantdb.fsdb import FSDB as DB
 
-app = Flask(__name__)
-CORS(app)
-api = Api(app)
 
-try:
-    db_location = os.environ["DB_LOCATION"]
-except:
-    raise ValueError("DB_LOCATION environment variable is not set")
-
-try:
-    db_prefix = os.environ["DB_PREFIX"]
-except:
-    db_prefix = "/files/"
-
-db = DB(db_location)
-db.connect()
-
-print("n scans = %i" % len(db.get_scans()))
+def parsing():
+    parser = argparse.ArgumentParser(description='Serve the plant database through a REST API.')
+    parser.add_argument('-db', '--db_location', type=str,
+                        help='Local database to serve.')
+    parser.add_argument('-prefix', '--db_prefix', type=str,
+                        help='Prefix to use with the database.')
+    return parser
 
 
 def fmt_date(scan):
@@ -83,7 +82,7 @@ def fmt_scan_minimal(scan):
     has_skeleton = files_metadata["skeleton"] is not None
     has_angles = files_metadata["angles"] is not None
     has_segmentation2D = files_metadata["segmentation2d_evaluation"] is not None
-    has_segmentedPcd_evaluation = files_metadata["segmented_pcd_evaluation"] is not None 
+    has_segmentedPcd_evaluation = files_metadata["segmented_pcd_evaluation"] is not None
     has_point_cloud_evaluation = files_metadata["point_cloud_evaluation"] is not None
     has_manual_measures = "measures" in metadata or files_metadata["measures"] is not None
     has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
@@ -157,7 +156,7 @@ def fmt_scan(scan):
     if (res["hasSegmentedPcdEvaluation"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["segmented_pcd_evaluation"]))
         res["data"]["segmentedPcdEvaluation"] = x
-    
+
     if (res["hasPointCloudEvaluation"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["point_cloud_evaluation"]))
         res["data"]["pointCloudEvaluation"] = x
@@ -279,6 +278,7 @@ class PointCloud(Resource):
         path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
         return send_file(path, mimetype='application/octet-stream')
 
+
 class PointCloudGroundTruth(Resource):
     """Class representing a point cloud HTTP request, subclass of
     flask_restful's Resource class.
@@ -313,14 +313,48 @@ class Mesh(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 
-api.add_resource(ScanList, '/scans')
-api.add_resource(Scan, '/scans/<scan_id>')
-api.add_resource(File, '/files/<path:path>')
-api.add_resource(Refresh, '/refresh')
-api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
+def run():
+    parser = parsing()
+    args = parser.parse_args()
 
-if __name__ == "__main__":
+    app = Flask(__name__)
+    CORS(app)
+    api = Api(app)
+
+    global db_location
+    global db_prefix
+
+    if args.db_location == "":
+        try:
+            db_location = os.environ["DB_LOCATION"]
+        except:
+            raise ValueError("DB_LOCATION environment variable is not set")
+    else:
+        db_location = args.db_location
+
+    if args.db_prefix == "":
+        try:
+            db_prefix = os.environ["DB_PREFIX"]
+        except:
+            db_prefix = "/files/"
+
+    global db
+    db = DB(db_location)
+    db.connect()
+
+    print("n scans = %i" % len(db.get_scans()))
+
+    api.add_resource(ScanList, '/scans')
+    api.add_resource(Scan, '/scans/<scan_id>')
+    api.add_resource(File, '/files/<path:path>')
+    api.add_resource(Refresh, '/refresh')
+    api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
+
     app.run(host='0.0.0.0')
+
+
+if __name__ == '__main__':
+    run()

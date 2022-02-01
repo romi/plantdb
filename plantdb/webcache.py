@@ -41,7 +41,7 @@ The following size specifications are available:
 
 Examples
 --------
->>> from plantdb import FSDB
+>>> from plantdb.fsdb import FSDB
 >>> import plantdb.webcache as webcache
 >>> db = FSDB("path/to/db"))
 >>> db.connect()

@@ -27,7 +27,7 @@ import unittest
 
 from dirsync import sync
 
-from plantdb import FSDB
+from plantdb.fsdb import FSDB
 from plantdb.fsdb import dummy_db
 
 

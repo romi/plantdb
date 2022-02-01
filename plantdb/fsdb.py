@@ -100,9 +100,9 @@ import atexit
 import copy
 import glob
 import json
+import logging
 import os
 from shutil import copyfile
-import logging
 
 from plantdb import db
 from plantdb.db import DBBusyError
@@ -133,7 +133,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     Examples
     --------
     >>> import os
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> db.connect()
@@ -262,7 +262,7 @@ class FSDB(db.DB):
     Examples
     --------
     >>> # EXAMPLE 1: Use a temporary dummy database:
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> print(type(db))
@@ -282,13 +282,12 @@ class FSDB(db.DB):
     def __init__(self, basedir):
         """Database constructor.
 
-        Check given ``basedir`` directory exists and load accessible ``Scan``
-        objects.
+        Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
 
         Parameters
         ----------
-        basedir : str
-            Path to root directory of the database
+        basedir : str or pathlib.Path
+            Path to the root directory of the database.
 
         """
         super().__init__()
@@ -323,7 +322,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
@@ -365,7 +364,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
@@ -431,7 +430,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
@@ -476,7 +475,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
@@ -513,7 +512,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb import FSDB
+        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
@@ -561,7 +560,7 @@ class Scan(db.Scan):
     Examples
     --------
     >>> import os
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import Scan
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
@@ -862,7 +861,7 @@ def _load_scans(db):
 
     Examples
     --------
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db, _load_scans
     >>> db = dummy_db()
     >>> db.connect()
@@ -918,7 +917,7 @@ def _load_scan_filesets(scan):
 
     Examples
     --------
-    >>> from plantdb import FSDB
+    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db, _load_scan_filesets
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()

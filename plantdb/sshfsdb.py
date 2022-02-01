@@ -35,7 +35,8 @@ using SSHFS.
 import os
 import subprocess
 
-from plantdb import db, fsdb
+from plantdb import db
+from plantdb import fsdb
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in the root folder of a DB
@@ -148,4 +149,3 @@ class SSHFSDB(fsdb.FSDB):
         super().disconnect()
         p = subprocess.run(["fusermount", "-u", self.basedir])
         print("The exit code was: %d" % p.returncode)
-        

@@ -1,9 +1,0 @@
-appdirs
-dirsync
-flask
-flask-cors
-flask-restful
-imageio
-numpy
-pillow
-toml

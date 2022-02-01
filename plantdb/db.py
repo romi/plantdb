@@ -35,6 +35,7 @@ A ``File`` can be an image, text of bytes.
 
 """
 
+
 class DB(object):
     """Class defining the database object ``DB``.
 
@@ -110,8 +111,6 @@ class DB(object):
 
         """
         raise NotImplementedError
-
-
 
 
 class Scan(object):
@@ -229,7 +228,6 @@ class Scan(object):
             Id of the fileset to delete
         """
         raise NotImplementedError
-
 
 
 class Fileset(object):
@@ -418,7 +416,6 @@ class File(object):
         """
         return self.fileset
 
-
     def get_metadata(self, key=None):
         """Get metadata associated to scan.
 
@@ -508,5 +505,6 @@ class DBBusyError(OSError):
     This error is raised when the database is busy and an operation cannot be
      done on it.
     """
+
     def __init__(self, message):
         self.message = message
