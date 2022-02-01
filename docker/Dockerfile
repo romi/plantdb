@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04 AS base
 LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 LABEL corresponding_author="Peter Hanappe <peter@romi-project.eu>"
 LABEL project="Robotics for microfarms"
@@ -13,36 +13,47 @@ ENV USER_NAME=myuser
 ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
 ENV DB_LOCATION="/myapp/db"
 
-USER root
-# Change shell to 'bash', default is 'sh'
+WORKDIR /myapp
 SHELL ["/bin/bash", "-c"]
+
+FROM base AS builder
+
 # Update package manager & install requirements:
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
-    git ca-certificates rsync python3.7 python3-pip && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.7 10 && \
+    git ca-certificates python3 python3-pip python3-venv && \
+    # Create a non-root user and give it rights over a "myapp" folder:
+    adduser --disabled-password --gecos '' ${USER_NAME} && \
+    chown -R ${USER_NAME} /myapp && \
+    mkdir -p /venv && chown -R ${USER_NAME} /venv
+
+USER ${USER_NAME}
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install poetry && \
+    python3 -m venv /venv
+
+COPY --chown=${USER_NAME} ./ ./
+RUN source /venv/bin/activate && \
+    poetry install -n --no-dev --no-root && \
+    poetry build && \
+    /venv/bin/pip install dist/*.whl
+
+FROM base AS final
+
+RUN adduser --disabled-password --gecos '' ${USER_NAME} && \
+    mkdir -p ${DB_LOCATION} && \
+    chown -R ${USER_NAME} /myapp && \
+    apt-get update && \
+    apt-get install -yq --no-install-recommends python3 rsync && \
     # Clean package manager:
     apt-get clean && \
     apt-get autoremove && \
-    rm -rf /var/lib/apt/lists/* && \
-    # Create a non-root user and give it rights over a "myapp" folder:
-    adduser --disabled-password --gecos '' ${USER_NAME} && \
-    mkdir -p ${DB_LOCATION} && chown -R ${USER_NAME} /myapp
+    rm -rf /var/lib/apt/lists/*
 
-# Change to non-root user:
 USER ${USER_NAME}
-# Change working directory:
-WORKDIR /myapp
-# Copy the sources:
-COPY --chown=${USER_NAME} ./ plantdb/
 
-# Install the required dependencies and plantdb:
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install poetry && \
-    cd plantdb && \
-    poetry env use 3.7 && \
-    poetry install -n --no-dev && \
-    poetry cache clear -n --all . && \
-    rm -rf .cache/pip
+COPY --from=builder --chown=${USER_NAME} /venv /venv
+COPY ./docker/docker-entrypoint.sh ./
 
-CMD ["./plantdb/docker/docker-entrypoint.sh"]
+CMD ["./docker-entrypoint.sh"]
