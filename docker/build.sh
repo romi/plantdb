@@ -10,7 +10,7 @@ usage() {
 
   echo "DESCRIPTION:"
   echo "  Build a docker image named 'roboticsmicrofarms/plantdb' using 'Dockerfile' in the same location.
-  It must be run from the 'plantdb' repository root folder as it is the build context and it will be copied during at image build time!
+  It must be run from the \`plantdb/\` repository root folder as it is the build context and it will be copied during at image build time!
   "
 
   echo "OPTIONS:"
@@ -59,8 +59,7 @@ docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts -f docker/Dockerfi
 
 # Important to CI/CD pipeline to track docker build failure
 docker_build_status=$?
-if  [ $docker_build_status != 0 ]
-then
+if [ $docker_build_status != 0 ]; then
   echo "docker build failed with $docker_build_status code"
 fi
 
