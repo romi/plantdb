@@ -2,7 +2,7 @@
 
 vtag="latest"
 host_db="/data/ROMI/DB"
-unittest="nosetests plantdb/tests/ --with-coverage --cover-package=plantdb"
+unittest="nose2 -s plantdb/tests/ --with-coverage"
 cmd=""
 
 usage() {
@@ -20,7 +20,8 @@ usage() {
     Docker image tag to use, default to '$vtag'."
   echo "  -c, --cmd
     Defines the command to run at container startup.
-    By default start an active container serving the database trough the REST API on port 5000."
+    By default start an active container serving the database trough the REST API on port 5000.
+    Use '-c /bin/bash' to access the shell inside the docker container."
   echo "  -db, --database
     Path to the host database to mount inside docker container, default to '$host_db'."
   echo " --unittest
@@ -63,13 +64,12 @@ if [ "$cmd" = "" ]; then
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
-    -it roboticsmicrofarms/plantdb:$vtag \
-    bash -c "$cmd"
+    -it roboticsmicrofarms/plantdb:$vtag  # keep the `-it` to be able to kill the container!
 else
   # Start in non-interactive mode (run the command):
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
-    roboticsmicrofarms/plantdb:$vtag \
+    -it roboticsmicrofarms/plantdb:$vtag \
     bash -c "$cmd"
 fi

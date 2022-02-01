@@ -26,7 +26,8 @@
 import os
 import subprocess
 
-from plantdb.fsdb import MARKER_FILE_NAME, LOCK_FILE_NAME
+from plantdb.fsdb import LOCK_FILE_NAME
+from plantdb.fsdb import MARKER_FILE_NAME
 from plantdb.fsdb import _is_db
 
 
@@ -50,6 +51,7 @@ class FSDBSync():
     target : dict
         Target path description
     """
+
     def __del__(self):
         try:
             self.unlock()
@@ -69,7 +71,6 @@ class FSDBSync():
         self.target_str = target
         self.source = _fmt_path(source)
         self.target = _fmt_path(target)
-
 
     def unlock(self):
         """Unlock the source and target DB after sync.
@@ -110,26 +111,26 @@ def _fmt_path(path):
     dict
         A dictionary describing the parsed path.
     """
-    if ':' in path: # This is a remote path
+    if ':' in path:  # This is a remote path
         path_split = path.split(':')
         host, path = path_split
         if len(path_split) != 2:
-            raise OSError("Invalid path format: %s"%path)
+            raise OSError("Invalid path format: %s" % path)
         return {
-            "type" : "remote",
-            "host" : host,
-            "path" : path,
-            "lock_path" : os.path.join(path, LOCK_FILE_NAME),
-            "marker_path" : os.path.join(path, MARKER_FILE_NAME)
+            "type": "remote",
+            "host": host,
+            "path": path,
+            "lock_path": os.path.join(path, LOCK_FILE_NAME),
+            "marker_path": os.path.join(path, MARKER_FILE_NAME)
         }
-    else: # This is a local path
+    else:  # This is a local path
         if not _is_db(path):
-            raise OSError("Source is not a valid FSDB path: %s"%os.path.abspath(path))
+            raise OSError("Source is not a valid FSDB path: %s" % os.path.abspath(path))
         return {
-            "type" : "local",
-            "path" : os.path.abspath(path),
-            "lock_path" : os.path.abspath(os.path.join(path, LOCK_FILE_NAME)),
-            "marker_path" : os.path.abspath(os.path.join(path, MARKER_FILE_NAME))
+            "type": "local",
+            "path": os.path.abspath(path),
+            "lock_path": os.path.abspath(os.path.join(path, LOCK_FILE_NAME)),
+            "marker_path": os.path.abspath(os.path.join(path, MARKER_FILE_NAME))
         }
 
 
@@ -140,7 +141,8 @@ def _lock_local(d):
         with open(lock_path, "x") as _:
             pass
     except FileExistsError:
-        raise IOError("Could not secure lock, %s is present in DB path."%LOCK_FILE_NAME)
+        raise IOError("Could not secure lock, %s is present in DB path." % LOCK_FILE_NAME)
+
 
 def _lock_remote(d):
     host = d["host"]
@@ -151,18 +153,19 @@ def _lock_remote(d):
     try:
         x = subprocess.run(['ssh', host, 'stat', marker_path], check=True)
     except:
-        raise OSError("Not a FSDB path, missing %s."%MARKER_FILE_NAME)
+        raise OSError("Not a FSDB path, missing %s." % MARKER_FILE_NAME)
     lock_path = os.path.join(path, LOCK_FILE_NAME)
     try:
-        x = subprocess.run(["ssh", host, 'set -o noclobber; echo "$$" > %s'%lock_path], check=True)
+        x = subprocess.run(["ssh", host, 'set -o noclobber; echo "$$" > %s' % lock_path], check=True)
     except:
-        raise OSError("Could not secure lock, %s is present in DB path."%LOCK_FILE_NAME)
+        raise OSError("Could not secure lock, %s is present in DB path." % LOCK_FILE_NAME)
+
 
 def _unlock_local(d):
     lock_path = d["lock_path"]
     os.remove(lock_path)
 
+
 def _unlock_remote(d):
     lock_path = d["lock_path"]
-    x = subprocess.run(["ssh", d["host"], 'rm %s'%lock_path])
-
+    x = subprocess.run(["ssh", d["host"], 'rm %s' % lock_path])
