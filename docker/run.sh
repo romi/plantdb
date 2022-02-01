@@ -71,12 +71,12 @@ if [ "$cmd" = "" ]; then
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
-    $USE_TTY roboticsmicrofarms/plantdb:$vtag # keep the `-it` to be able to kill the container!
+    $USE_TTY roboticsmicrofarms/plantdb:$vtag # keep the `-it` to be able to kill the precess/container!
 else
   # Start in non-interactive mode (run the command):
   docker run \
     -p 5000:5000 \
     -v $host_db:/myapp/db \
     roboticsmicrofarms/plantdb:$vtag \
-    bash -c "$cmd"
+    $USE_TTY bash -c "$cmd"
 fi
