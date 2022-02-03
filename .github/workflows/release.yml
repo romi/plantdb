@@ -1,3 +1,5 @@
+# This workflow will build the Docker image and publish it to Docker Hub in the 'roboticsmicrofarms' repo.
+
 # This action is inspired from official GitHub doc:
 #  https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-docker-hub
 # Metadata configuration here:
@@ -10,7 +12,7 @@ name: Publish Docker image
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   push_to_registry:
