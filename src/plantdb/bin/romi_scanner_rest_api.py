@@ -23,9 +23,9 @@ from plantdb.fsdb import FSDB as DB
 
 def parsing():
     parser = argparse.ArgumentParser(description='Serve the plant database through a REST API.')
-    parser.add_argument('-db', '--db_location', type=str,
+    parser.add_argument('-db', '--db_location', type=str, default="",
                         help='Local database to serve.')
-    parser.add_argument('-prefix', '--db_prefix', type=str,
+    parser.add_argument('-prefix', '--db_prefix', type=str, default="",
                         help='Prefix to use with the database.')
     return parser
 
