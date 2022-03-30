@@ -127,13 +127,12 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    FSDB
+    plantdb.fsdb.FSDB
         The dummy database.
 
     Examples
     --------
     >>> import os
-    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> db.connect()
@@ -172,7 +171,6 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
     ['test_image.png', 'test_json.json']
     >>> fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)
-
 
     """
     from os.path import join
@@ -262,7 +260,6 @@ class FSDB(db.DB):
     Examples
     --------
     >>> # EXAMPLE 1: Use a temporary dummy database:
-    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
     >>> print(type(db))
@@ -275,6 +272,16 @@ class FSDB(db.DB):
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
     <class 'plantdb.fsdb.Scan'>
+    >>> db.disconnect()
+
+    >>> # EXAMPLE 2: Use a local database:
+    >>> import os
+    >>> from plantdb.fsdb import FSDB
+    >>> db = FSDB(os.environ.get('DB_LOCATION', "/data/ROMI/DB/"))
+    >>> db.connect()
+    >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
+    >>> scan = db.get_scans()[1]
+    >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
     >>> db.disconnect()
 
     """
@@ -364,7 +371,6 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
@@ -392,7 +398,7 @@ class FSDB(db.DB):
             print(f"Already disconnected from the database '{self.basedir}'")
 
     def get_scans(self, query=None):
-        """Get a list of `Scan` using a `query`.
+        """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
         ----------
@@ -408,37 +414,49 @@ class FSDB(db.DB):
         --------
         _filter_query
 
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> db.get_scans()
+        [<plantdb.fsdb.Scan at *x************>]
+
         """
         if query is None:
             return self.scans
         return _filter_query(self.scans, query)
 
     def get_scan(self, id, create=False):
-        """Get a `Scan` from the local database.
+        """Get or create a `Scan` instance in the local database.
 
         Parameters
         ----------
         id : str
-            The `Scan.id`, should exists if `create` is `False`.
+            The name of the scan dataset to get/create.
+            It should exist if `create` is `False`.
         create : bool, optional
-            If `False` (default), the `Scan.id` should exists, else create it.
+            If ``False`` (default), the given `id` should exist in the local database.
+            Else the given `id` should NOT exist as they are unique.
 
         Notes
         -----
-        If the `id` do not exists in the local database and `create` is `False`,
-        `None` is returned.
+        If the `id` do not exist in the local database and `create` is `False`, `None` is returned.
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db()
+        >>> db = dummy_db(with_file=True)
         >>> db.connect()
+        >>> db.list_scans()
+        ['myscan_001']
         >>> new_scan = db.get_scan('007', create=True)
         >>> print(new_scan)
         <plantdb.fsdb.Scan object at **************>
-        >>> scan = db.get_scan('unknown')
-        >>> print(scan)
+        >>> db.list_scans()
+        ['myscan_001', '007']
+        >>> unknown_scan = db.get_scan('unknown')
+        >>> print(unknown_scan)
         None
 
         """
@@ -450,17 +468,17 @@ class FSDB(db.DB):
         return self.scans[ids.index(id)]
 
     def create_scan(self, id):
-        """Create a `Scan` in the local database.
+        """Create a new `Scan` instance in the local database.
 
         Parameters
         ----------
         id : str
-            The `Scan.id`, should not exists in the local database.
+            The name of the scan to create. It should not exist in the local database.
 
         Returns
         -------
         plantdb.fsdb.Scan
-            The new `Scan` object created in the local database.
+            The `Scan` instance created in the local database.
 
         Raises
         ------
@@ -470,12 +488,11 @@ class FSDB(db.DB):
 
         See Also
         --------
-        _is_valid_id: test if the given `id` is valid.
-        _make_scan: the "scan directory" creation method.
+        _is_valid_id
+        _make_scan
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
@@ -499,16 +516,16 @@ class FSDB(db.DB):
         Parameters
         ----------
         id : str
-            The `Scan.id`, should exists in the local database.
+            The name of the scan to create. It should exist in the local database.
 
         Raises
         ------
         IOError
-            If the `id` do not exists in the local database.
+            If the `id` do not exist in the local database.
 
         See Also
         --------
-        _delete_scan: the "scan directory" deletion method.
+        _delete_scan
 
         Examples
         --------
@@ -533,6 +550,33 @@ class FSDB(db.DB):
         _delete_scan(scan)
         self.scans.remove(scan)
 
+    def path(self) -> str:
+        """Get the path to the local database root directory.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db.connect()
+        >>> db.path()
+
+        """
+        return self.basedir
+
+    def list_scans(self, query=None) -> list:
+        """Get the list of scans in the local database.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db.connect()
+        >>> db.list_scans()
+        ['myscan_001']
+
+        """
+        return [f.id for f in self.get_scans(query)]
+
 
 class Scan(db.Scan):
     """Class defining the scan object from abstract class ``Scan``.
@@ -544,10 +588,10 @@ class Scan(db.Scan):
 
     Attributes
     ----------
-    db : FSDB
+    db : plantdb.fsdb.FSDB
         Database where to find the scan.
-    id : int
-        Id of the scan in the database ``FSDB``.
+    id : str
+        The scan unique name in the local database.
     metadata : dict
         Dictionary of metadata attached to the scan.
     filesets : list of Fileset
@@ -560,7 +604,6 @@ class Scan(db.Scan):
     Examples
     --------
     >>> import os
-    >>> from plantdb.fsdb import FSDB
     >>> from plantdb.fsdb import Scan
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db()
@@ -568,6 +611,8 @@ class Scan(db.Scan):
     >>> scan = Scan(db, '007')
     >>> print(type(scan))
     <class 'plantdb.fsdb.Scan'>
+    >>> print(scan.path())  # the obtained path should be different as the path to the created `dummy_db` change...
+    /tmp/romidb_j0pbkoo0/007
     >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
     None
     >>> print(os.listdir(db.basedir))  # And it is NOT found under the `basedir` directory
@@ -609,11 +654,10 @@ class Scan(db.Scan):
 
         Parameters
         ----------
-        db : FSDB
-            The database to which the scan dataset belongs to.
+        db : plantdb.fsdb.FSDB
+            The database to put/find the scan dataset.
         id : str
-            The scan dataset id, should be unique in the `db`.
-
+            The scan dataset name, should be unique in the `db`.
         """
         super().__init__(db, id)
         # Defines attributes:
@@ -628,11 +672,75 @@ class Scan(db.Scan):
         del self.filesets
 
     def get_filesets(self, query=None):
+        """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of filesets.
+
+        Returns
+        -------
+        list of plantdb.fsdb.Fileset
+            The list of `Fileset` resulting form the query.
+
+        See Also
+        --------
+        _filter_query
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.get_filesets()
+        [<plantdb.fsdb.Fileset at *x************>]
+
+        """
         if query is None:
             return self.filesets  # Copy?
         return _filter_query(self.filesets, query)
 
     def get_fileset(self, id, create=False):
+        """Get or create a `Fileset` instance, of given `id`, in the current scan dataset.
+
+        Parameters
+        ----------
+        id : str
+            The name of the fileset to get/create.
+            It should exist if `create` is `False`.
+        create : bool, optional
+            If ``False`` (default), the given `id` should exist in the local database.
+            Else the given `id` should NOT exist as they are unique.
+
+        Returns
+        -------
+        Fileset
+            The retrieved or created fileset.
+
+        Notes
+        -----
+        If the `id` do not exist in the local database and `create` is `False`, `None` is returned.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.list_filesets()
+        ['fileset_001']
+        >>> new_fileset = scan.get_fileset('007', create=True)
+        >>> print(new_fileset)
+        <plantdb.fsdb.Fileset object at **************>
+        >>> scan.list_filesets()
+        ['fileset_001', '007']
+        >>> unknown_fs = scan.get_fileset('unknown')
+        >>> print(unknown_fs)
+        None
+
+        """
         ids = [f.id for f in self.filesets]
         if id not in ids:
             if create:
@@ -641,18 +749,99 @@ class Scan(db.Scan):
         return self.filesets[ids.index(id)]
 
     def get_metadata(self, key=None):
+        """Get the metadata associated to a scan.
+
+        Parameters
+        ----------
+        key : str
+            A key that should exist in the scan's metadata.
+
+        Returns
+        -------
+        any
+            If `key` is ``None``, returns a dictionary.
+            Else, returns the value attached to this key.
+
+        """
         return _get_metadata(self.metadata, key)
 
     def get_measures(self, key=None):
+        """Get the manual measurements associated to a scan.
+
+        Parameters
+        ----------
+        key : str
+            A key that should exist in the scan's manual measurements.
+
+        Returns
+        -------
+        any
+            If `key` is ``None``, returns a dictionary.
+            Else, returns the value attached to this key.
+
+        Notes
+        -----
+        These manual measurements should be a JSON file named `measures.json`.
+        It is located at the root folder of the scan dataset.
+
+        """
         return _get_measures(self.measures, key)
 
     def set_metadata(self, data, value=None):
+        """Add a new metadata to the scan.
+
+        Parameters
+        ----------
+        data : str
+            Name of the metadata.
+        value : any
+            Value to attach to this metadata. Should be transformable to JSON.
+
+        """
         if self.metadata == None:
             self.metadata = {}
         _set_metadata(self.metadata, data, value)
         _store_scan_metadata(self)
 
     def create_fileset(self, id):
+        """Create a new `Fileset` instance in the local database attached to the current `Scan` instance.
+
+        Parameters
+        ----------
+        id : str
+            The name of the fileset to create. It should not exist in the current `Scan` instance.
+
+        Returns
+        -------
+        plantdb.fsdb.Fileset
+            The `Fileset` instance created in the current `Scan` instance.
+
+        Raises
+        ------
+        IOError
+            If the `id` already exists in the current `Scan` instance.
+            If the `id` is not valid.
+
+        See Also
+        --------
+        _is_valid_id
+        _make_scan
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.list_filesets()
+        ['fileset_001']
+        >>> new_fs = scan.create_fileset('fs_007')
+        >>> scan.list_filesets()
+        ['fileset_001', 'fs_007']
+        >>> wrong_fs = scan.create_fileset('fileset_001')
+        OSError: Duplicate scan name: fileset_001
+
+        """
         if not _is_valid_id(id):
             raise IOError("Invalid id")
         if self.get_fileset(id) != None:
@@ -664,9 +853,30 @@ class Scan(db.Scan):
         return fileset
 
     def store(self):
+        """Save changes to the scan's JSON."""
         _store_scan(self)
 
     def delete_fileset(self, fileset_id):
+        """Delete a given fileset from the scan dataset.
+
+        Parameters
+        ----------
+        fileset_id : str
+            Name of the fileset to delete.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.list_filesets()
+        ['fileset_001']
+        >>> scan.delete_fileset('fileset_001')
+        >>> scan.list_filesets()
+        []
+
+        """
         fs = self.get_fileset(fileset_id)
         if fs is None:
             logging.warning(f"Could not get the Fileset to delete: '{fileset_id}'!")
@@ -674,6 +884,36 @@ class Scan(db.Scan):
         _delete_fileset(fs)
         self.filesets.remove(fs)
         self.store()
+
+    def path(self) -> str:
+        """Get the path to the local scan dataset.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
+
+        """
+        return _scan_path(self)
+
+    def list_filesets(self, query=None) -> list:
+        """Get the list of filesets in the scan dataset.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> db.list_scans()
+        >>> scan = db.get_scan("myscan_001")
+        >>> scan.list_filesets()
+        ['fileset_001']
+
+        """
+        return [f.id for f in self.get_filesets(query)]
 
 
 class Fileset(db.Fileset):
@@ -686,11 +926,11 @@ class Fileset(db.Fileset):
 
     Attributes
     ----------
-    db : db.DB
+    db : fsdb.DB
         Database where to find the scan.
     id : int
         Id of the scan in the database `FSDB`.
-    scan : db.Scan
+    scan : fsdb.Scan
         Scan containing the set of files.
     metadata : dict
         Dictionary of metadata attached to the fileset.
@@ -711,19 +951,49 @@ class Fileset(db.Fileset):
         self.files = None
 
     def get_files(self, query=None):
+        """Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of files.
+
+        Returns
+        -------
+        list of plantdb.fsdb.File
+            The list of `File` resulting form the query.
+
+        See Also
+        --------
+        _filter_query
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> fs.get_files()
+        [<plantdb.fsdb.File at *x************>,
+         <plantdb.fsdb.File at *x************>,
+         <plantdb.fsdb.File at *x************>]
+
+        """
         if query is None:
             return self.files
         return _filter_query(self.files, query)
 
     def get_file(self, id, create=False):
-        """Get `File` of given id from a `Fileset`.
+        """Get or create a `File` instance, of given `id`, in the current fileset.
 
         Parameters
         ----------
-        id: str
-            Name or id of the file to get.
-        create: bool
-            If `True` create the `File` object, default is `False`.
+        id : str
+            Name of the file to get/create.
+        create : bool
+            If ``False`` (default), the given `id` should exist in the local database.
+            Else the given `id` should NOT exist as they are unique.
 
         Returns
         -------
@@ -733,7 +1003,7 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
@@ -775,6 +1045,41 @@ class Fileset(db.Fileset):
     def store(self):
         self.scan.store()
 
+    def path(self) -> str:
+        """Get the path to the local fileset.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db.connect()
+        >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
+        ['myscan_001']
+        >>> scan = db.get_scan("myscan_001")
+        >>> print(scan.path())  # should be '/tmp/romidb_********/myscan_001'
+        >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
+        ['fileset_001']
+        >>> fs = scan.get_fileset("fileset_001")
+        >>> print(fs.path())  # should be '/tmp/romidb_********/myscan_001/fileset_001'
+
+        """
+        return _fileset_path(self)
+
+    def list_files(self, query=None) -> list:
+        """Get the list of files in the fileset.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset("fileset_001")
+        >>> fs.list_files()
+        ['dummy_image', 'test_image', 'test_json']
+
+        """
+        return [f.id for f in self.get_files(query)]
 
 class File(db.File):
     def __init__(self, db, fileset, id):
@@ -828,6 +1133,24 @@ class File(db.File):
         with open(path, "w") as f:
             f.write(data)
         self.store()
+
+    def path(self) -> str:
+        """Get the path to the local file.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True, with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset("fileset_001")
+        >>> fs.list_files()
+        ['dummy_image', 'test_image', 'test_json']
+        >>> f = fs.get_file('dummy_image')
+        >>> f.path()  # should be '/tmp/romidb_********/myscan_001/fileset_001/dummy_image.png'
+
+        """
+        return _file_path(self)
 
 
 ##################################################################
