@@ -2182,6 +2182,20 @@ def _delete_scan(scan):
 
 
 def _filter_query(l, query):
+    """Filter a list of scans, filesets or files using a `query` on their metadata.
+
+    Parameters
+    ----------
+    l : list
+        List of scans, filesets or files to filter.
+    query : dict
+        Filtering query, metadata must have a matching `key` and `value`.
+
+    Returns
+    -------
+    list
+        Filtered list of scans, filesets or files.
+    """
     query_result = []
     for f in l:
         flag_add = True
