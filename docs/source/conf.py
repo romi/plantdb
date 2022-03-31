@@ -30,6 +30,8 @@ author = 'Robotics for Microfarms'
 extensions = [
     'myst_parser',  # Markdown parser
     'sphinx.ext.autodoc',  # Include documentation from docstrings
+    'sphinx.ext.autosummary',  # Include documentation from docstrings
+    'sphinx.ext.intersphinx',  # Link to other projects’ documentation
     'sphinx.ext.napoleon',  # Support for NumPy and Google style docstrings
     'sphinx.ext.viewcode'  # Add links to highlighted source code
 ]
@@ -102,10 +104,24 @@ html_short_title = project
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/images/ROMI_ICON2_greenB.png'
+html_logo = '_static/images/logo.svg'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = '_static/images/ROMI_green.png'
+html_favicon = '_static/images/ROMI_favicon_green.png'
 
+
+# -- Intersphinx -------------------------------------------------------------
+# Configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'scikit-learn': ('https://scikit-learn.org/stable/', None),
+                       'scikit-image': ('https://scikit-image.org/docs/stable/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/', None)
+                       }
+
+# List of `intersphinx_mapping`:
+# https://gist.github.com/bskinn/0e164963428d4b51017cebdb6cda5209

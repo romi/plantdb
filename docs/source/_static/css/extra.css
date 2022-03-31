@@ -1,5 +1,5 @@
-button[data-md-color-primary=green] {
-    background-color: #00A960
+[data-md-color-primary=green] {
+    background-color: #00A960;
 }
 
 [data-md-color-primary=green] .md-typeset a {

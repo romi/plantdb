@@ -352,7 +352,7 @@ class Fileset(object):
         Parameters
         ----------
         id : str
-            Id of the file to delete
+            Id of the file to delete.
         """
         raise NotImplementedError
 
@@ -365,11 +365,11 @@ class File(object):
     Attributes
     ----------
     db : DB
-        database where to find the scan
+        database where to find the file
     fileset : db.Fileset
-        set of file containing the file
+        set of files containing the file
     id : str
-        id of the scan in the database ``DB``
+        id of the file in the database ``DB``
     filename : str
         file format (default = None, can be deduced when importing file)
     """
