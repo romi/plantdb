@@ -172,13 +172,13 @@ def fmt_scan(scan):
                 res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
             except KeyError:
                 measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
-                res["data"]["angles"]["measured_angles"] = measures["angles"]
+                res["data"]["angles"]["measured_angles"] = measures["angles"] if "angles" in measures.keys() else []
 
             try:
                 res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
             except KeyError:
                 measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
-                res["data"]["angles"]["measured_internodes"] = measures["internodes"]
+                res["data"]["angles"]["measured_internodes"] = measures["internodes"] if "internodes" in measures.keys() else []
 
     # backward compatibility
     try:
