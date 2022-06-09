@@ -6,6 +6,7 @@ Serve the plant database through a REST API.
 """
 import argparse
 import json
+import logging
 import os
 
 from flask import Flask
@@ -84,7 +85,10 @@ def fmt_scan_minimal(scan):
     has_segmentation2D = files_metadata["segmentation2d_evaluation"] is not None
     has_segmentedPcd_evaluation = files_metadata["segmented_pcd_evaluation"] is not None
     has_point_cloud_evaluation = files_metadata["point_cloud_evaluation"] is not None
-    has_manual_measures = "measures" in metadata or files_metadata["measures"] is not None
+    has_manual_measures = "measures" in metadata or \
+        (files_metadata["measures"] is not None and \
+        len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
+
     has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
     return {
