@@ -150,12 +150,12 @@ def __pointcloud_hash(scanid, filesetid, fileid, size):
     return __hash("pointcloud", scanid, filesetid, fileid, size)
 
 
-def __pointcloud_resize(pointcloud, max_size):
-    __load_open3d()
-    if len(pointcloud.points) < max_size:
-        return pointcloud
-    downsample = len(pointcloud.points) // max_size + 1
-    return pointcloud.voxel_down_sample(downsample)
+# def __pointcloud_resize(pointcloud, max_size):
+#     __load_open3d()
+#     if len(pointcloud.points) < max_size:
+#         return pointcloud
+#     downsample = len(pointcloud.points) // max_size + 1
+#     return pointcloud.voxel_down_sample(downsample)
 
 
 def __pointcloud_cache(db, scanid, filesetid, fileid, size):
@@ -168,10 +168,10 @@ def __pointcloud_cache(db, scanid, filesetid, fileid, size):
     os.makedirs(directory, exist_ok=True)
     dst = os.path.join(directory, __pointcloud_hash(scanid, filesetid, fileid, size))
 
-    max_pointcloud_size = 10000
+    # max_pointcloud_size = 10000
     pointcloud = read_pointcloud(src)
-    pointcloud_lowres = __pointcloud_resize(pointcloud, max_pointcloud_size)
-    write_pointcloud(dst, pointcloud_lowres)
+    # pointcloud_lowres = __pointcloud_resize(pointcloud, max_pointcloud_size)
+    write_pointcloud(dst, pointcloud)
 
     return dst
 
