@@ -54,70 +54,83 @@ def get_path(f):
     scan = fs.scan
     return os.path.join(db_prefix, scan.id, fs.id, f.filename)
 
+def get_default_scan_response(id : str):
+    return {
+        "id": id,
+        "metadata": {
+            "date": "01-01-00 00:00:00",
+            "species": 'N/A',
+            "plant": "N/A",
+            "environment": "N/A",
+            "nbPhotos": 0,
+            "files": {
+                "metadatas": None,
+                "archive": None
+            }
+        },
+        "thumbnailUri": False,
+        "hasMesh": False,
+        "hasPointCloud": False,
+        "hasPcdGroundTruth": False,
+        "hasSkeleton": False,
+        "hasAngleData": False,
+        "hasSegmentation2D": False,
+        "hasSegmentedPcdEvaluation": False,
+        "hasPointCloudEvaluation": False,
+        "hasManualMeasures": False,
+        "hasAutomatedMeasures": False,
+        "hasSegmentedPointCloud": False,
+        "error": False      
+    }
+
 
 def fmt_scan_minimal(scan):
     metadata = scan.get_metadata()
-    try:
-        species = metadata['object']['species']
-    except:
-        species = "N/A"
-    try:
-        environment = metadata['object']['environment']
-    except:
-        environment = "N/A"
-    try:
-        plant = metadata['object']['plant_id']
-    except:
-        plant = "N/A"
+    response = get_default_scan_response(scan.id)
 
-    n_photos = len(scan.get_fileset('images').get_files())
+    # From here, we edit the metadatas of the dataset
+    response_meta = response["metadata"]
+
+    if 'object' in metadata:
+        obj = metadata['object']
+        if 'species' in obj:
+            response_meta['species'] = obj['species']
+
+        if 'species' in obj:
+            response_meta['environment'] = obj['environment']
+        
+        if 'plant_id' in obj:
+            response_meta['plant'] = obj['plant_id']
+
+    response_meta['nbPhotos'] = len(scan.get_fileset('images').get_files())
 
     fileset_visu = scan.get_fileset("Visualization")
     files_metadata = fileset_visu.get_metadata("files")
-    first_thumbnail_path = get_path(fileset_visu.get_file(files_metadata["thumbnails"][0]))
-    print(files_metadata["zip"])
 
-    has_mesh = files_metadata["mesh"] is not None
-    has_point_cloud = files_metadata["point_cloud"] is not None
-    has_pcd_groundTruth = files_metadata["pcd_ground_truth"] is not None
-    has_skeleton = files_metadata["skeleton"] is not None
-    has_angles = files_metadata["angles"] is not None
-    has_segmentation2D = files_metadata["segmentation2d_evaluation"] is not None
-    has_segmentedPcd_evaluation = files_metadata["segmented_pcd_evaluation"] is not None
-    has_point_cloud_evaluation = files_metadata["point_cloud_evaluation"] is not None
-    has_manual_measures = "measures" in metadata or \
+    fileset_visu_zip = get_path(fileset_visu.get_file(files_metadata["zip"]))
+    metadata_json_path = os.path.join(db_prefix, scan.id, "metadata", "metadata.json")
+
+    response_meta['files']['archive'] = fileset_visu_zip
+    response_meta['files']['metadatas'] = metadata_json_path
+
+    # Metadata part is complete
+    response['thumbnailUri'] = get_path(fileset_visu.get_file(files_metadata["thumbnails"][0]))
+
+    response['hasMesh'] = files_metadata["mesh"] is not None
+    response['hasPointCloud'] = files_metadata["point_cloud"] is not None
+    response['hasPcdGroundTruth'] = files_metadata["pcd_ground_truth"] is not None
+    response['hasSkeleton'] = files_metadata["skeleton"] is not None
+    response['hasAngleData'] = files_metadata["angles"] is not None
+    response['hasSegmentation2D'] = files_metadata["segmentation2d_evaluation"] is not None
+    response['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
+    response['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
+    response['hasManualMeasures'] = "measures" in metadata or \
         (files_metadata["measures"] is not None and \
         len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
 
-    has_segmented_point_cloud = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
+    response['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
-    return {
-        "id": scan.id,
-        "metadata": {
-            "date": fmt_date(scan),
-            "species": species,
-            "plant": plant,
-            "environment": environment,
-            "nbPhotos": n_photos,
-            "files": {
-                "metadatas": os.path.join(db_prefix, scan.id, "metadata/metadata.json"),
-                "archive": get_path(fileset_visu.get_file(files_metadata["zip"]))
-            }
-        },
-        "thumbnailUri": first_thumbnail_path,
-        "hasMesh": has_mesh,
-        "hasPointCloud": has_point_cloud,
-        "hasPcdGroundTruth": has_pcd_groundTruth,
-        "hasSkeleton": has_skeleton,
-        "hasAngleData": has_angles,
-        "hasSegmentation2D": has_segmentation2D,
-        "hasSegmentedPcdEvaluation": has_segmentedPcd_evaluation,
-        "hasPointCloudEvaluation": has_point_cloud_evaluation,
-        "hasManualMeasures": has_manual_measures,
-        "hasAutomatedMeasures": has_angles,
-        "hasSegmentedPointCloud": has_segmented_point_cloud,
-        "error": False      
-    }
+    return response
 
 
 def fmt_scans(scans, query):
@@ -131,33 +144,9 @@ def fmt_scans(scans, query):
                     continue
                 res.append(fmt_scan_minimal(scan))
         else:
-            res.append({
-                "id": scan.id,
-                "metadata": {
-                    "date": "01-01-00 00:00:00",
-                    "species": 'N/A',
-                    "plant": "N/A",
-                    "environment": "N/A",
-                    "nbPhotos": 0,
-                    "files": {
-                        "metadatas": None,
-                        "archive": None
-                    }
-                },
-                "thumbnailUri": False,
-                "hasMesh": False,
-                "hasPointCloud": False,
-                "hasPcdGroundTruth": False,
-                "hasSkeleton": False,
-                "hasAngleData": False,
-                "hasSegmentation2D": False,
-                "hasSegmentedPcdEvaluation": False,
-                "hasPointCloudEvaluation": False,
-                "hasManualMeasures": False,
-                "hasAutomatedMeasures": False,
-                "hasSegmentedPointCloud": False,
-                "error": False      
-            })
+            response = get_default_scan_response(scan.id)
+            response['error'] = True
+            res.append(response)
     return res
 
 
