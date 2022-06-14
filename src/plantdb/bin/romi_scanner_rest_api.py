@@ -115,19 +115,49 @@ def fmt_scan_minimal(scan):
         "hasPointCloudEvaluation": has_point_cloud_evaluation,
         "hasManualMeasures": has_manual_measures,
         "hasAutomatedMeasures": has_angles,
-        "hasSegmentedPointCloud": has_segmented_point_cloud
+        "hasSegmentedPointCloud": has_segmented_point_cloud,
+        "error": False      
     }
 
 
 def fmt_scans(scans, query):
     res = []
     for scan in scans:
-        filesets_matches = compute_fileset_matches(scan)
-        if 'Visualization' in filesets_matches:
-            metadata = scan.get_metadata()
-            if query is not None and not (query.lower() in json.dumps(metadata).lower()):
-                continue
-            res.append(fmt_scan_minimal(scan))
+        if not scan.error:
+            filesets_matches = compute_fileset_matches(scan)
+            if 'Visualization' in filesets_matches:
+                metadata = scan.get_metadata()
+                if query is not None and not (query.lower() in json.dumps(metadata).lower()):
+                    continue
+                res.append(fmt_scan_minimal(scan))
+        else:
+            res.append({
+                "id": scan.id,
+                "metadata": {
+                    "date": "01-01-00 00:00:00",
+                    "species": 'N/A',
+                    "plant": "N/A",
+                    "environment": "N/A",
+                    "nbPhotos": 0,
+                    "files": {
+                        "metadatas": None,
+                        "archive": None
+                    }
+                },
+                "thumbnailUri": False,
+                "hasMesh": False,
+                "hasPointCloud": False,
+                "hasPcdGroundTruth": False,
+                "hasSkeleton": False,
+                "hasAngleData": False,
+                "hasSegmentation2D": False,
+                "hasSegmentedPcdEvaluation": False,
+                "hasPointCloudEvaluation": False,
+                "hasManualMeasures": False,
+                "hasAutomatedMeasures": False,
+                "hasSegmentedPointCloud": False,
+                "error": False      
+            })
     return res
 
 
