@@ -68,7 +68,7 @@ def get_default_scan_response(id : str):
                 "archive": None
             }
         },
-        "thumbnailUri": False,
+        "thumbnailUri": "",
         "hasMesh": False,
         "hasPointCloud": False,
         "hasPcdGroundTruth": False,
