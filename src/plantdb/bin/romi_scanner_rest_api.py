@@ -191,34 +191,31 @@ def fmt_scan(scan):
         res["data"]["angles"] = x
 
         if res["hasManualMeasures"]:
-            try:
-                res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
-            except KeyError:
+            if 'measures' in metadata :
+                if 'angles' in metadata['measures']:
+                    res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
+                
+                if 'internodes' in metadata['measures']:
+                    res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
+            else :
                 measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
                 res["data"]["angles"]["measured_angles"] = measures["angles"] if "angles" in measures.keys() else []
-
-            try:
-                res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
-            except KeyError:
-                measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
                 res["data"]["angles"]["measured_internodes"] = measures["internodes"] if "internodes" in measures.keys() else []
 
     # backward compatibility
-    try:
-        # old version
+    if 'scanner' in metadata and 'workspace' in metadata['scanner']:
         res["workspace"] = metadata["scanner"]["workspace"]
-    except KeyError:
-        # new version
+    else:
         camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
         res["workspace"] = camera_model["bounding_box"]
 
     res["camera"] = {}
 
     # backward compatibility
-    try:
+    if 'computed' in metadata and 'camera_model' in metadata['computed']:
         # old version
         res["camera"]["model"] = metadata["computed"]["camera_model"]
-    except KeyError:
+    else :
         # new version
         camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
         res["camera"]["model"] = camera_model["1"]
@@ -348,17 +345,17 @@ def run():
     global db_prefix
 
     if args.db_location == "":
-        try:
+        if 'DB_LOCATION' in os.environ :
             db_location = os.environ["DB_LOCATION"]
-        except:
+        else :
             raise ValueError("DB_LOCATION environment variable is not set")
     else:
         db_location = args.db_location
 
     if args.db_prefix == "":
-        try:
+        if 'DB_PREFIX' in os.environ:
             db_prefix = os.environ["DB_PREFIX"]
-        except:
+        else:
             db_prefix = "/files/"
 
     global db
