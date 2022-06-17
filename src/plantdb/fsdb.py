@@ -671,18 +671,12 @@ class Scan(db.Scan):
         self.metadata = None
         self.measures = None
         self.filesets = []
-        self.error = False
 
     def _erase(self):
         for f in self.filesets:
             f._erase()
         del self.metadata
         del self.filesets
-
-    def mark_error(self):
-        """Mark the dataset as error (ig Visualization folder is absent)
-        """
-        self.error = True
 
     def get_filesets(self, query=None):
         """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
@@ -1506,8 +1500,6 @@ def _load_scans(db):
                 scan.metadata = _load_scan_metadata(scan)
                 scan.measures = _load_scan_measures(scan)
                 # scan.store()
-            else:
-                scan.mark_error()
             scans.append(scan)
     return scans
 

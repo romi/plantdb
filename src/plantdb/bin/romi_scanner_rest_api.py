@@ -9,6 +9,8 @@ import json
 import logging
 import os
 
+from pkg_resources import resource_exists
+
 from flask import Flask
 from flask import request
 from flask import send_file
@@ -136,13 +138,12 @@ def fmt_scan_minimal(scan):
 def fmt_scans(scans, query):
     res = []
     for scan in scans:
-        if not scan.error:
-            filesets_matches = compute_fileset_matches(scan)
-            if 'Visualization' in filesets_matches:
-                metadata = scan.get_metadata()
-                if query is not None and not (query.lower() in json.dumps(metadata).lower()):
-                    continue
-                res.append(fmt_scan_minimal(scan))
+        filesets_matches = compute_fileset_matches(scan)
+        if 'Visualization' in filesets_matches:
+            metadata = scan.get_metadata()
+            if query is not None and not (query.lower() in json.dumps(metadata).lower()):
+                continue
+            res.append(fmt_scan_minimal(scan))
         else:
             response = get_default_scan_response(scan.id)
             response['error'] = True
