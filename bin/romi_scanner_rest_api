@@ -5,11 +5,10 @@
 Serve the plant database through a REST API.
 """
 import argparse
+from cmath import log
 import json
 import logging
 import os
-
-from pkg_resources import resource_exists
 
 from flask import Flask
 from flask import request
@@ -155,7 +154,6 @@ def fmt_scans(scans, query):
 def fmt_scan(scan):
     fileset_visu = scan.get_fileset("Visualization")
     files_metadata = fileset_visu.get_metadata("files")
-
     res = fmt_scan_minimal(scan)
     metadata = scan.get_metadata()
 
@@ -169,6 +167,14 @@ def fmt_scan(scan):
 
     res["filesUri"] = files_uri
     res["data"] = {}
+
+    fileset_matches = compute_fileset_matches(scan)        
+    if "Colmap" in fileset_matches:
+        colmap_fileset = scan.get_fileset(fileset_matches["Colmap"])
+        images = [int(x) for x in io.read_json(colmap_fileset.get_file("images")).keys()]
+        res["data"]["matchedImages"] = images
+    else:
+        res["data"]["matchedImages"] = None
 
     if (res["hasSkeleton"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
@@ -368,6 +374,9 @@ db.connect()
 
 print("n scans = %i" % len(db.get_scans()))
 
+# This variable is left here for debug purpose
+global logger
+logger = logging.getLogger('werkzeug')
 api.add_resource(ScanList, '/scans')
 api.add_resource(Scan, '/scans/<scan_id>')
 api.add_resource(File, '/files/<path:path>')
