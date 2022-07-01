@@ -123,6 +123,7 @@ def fmt_scan_minimal(scan):
     response['hasPcdGroundTruth'] = files_metadata["pcd_ground_truth"] is not None
     response['hasSkeleton'] = files_metadata["skeleton"] is not None
     response['hasAngleData'] = files_metadata["angles"] is not None
+    response['hasAutomatedMeasures'] = files_metadata["angles"] is not None
     response['hasSegmentation2D'] = files_metadata["segmentation2d_evaluation"] is not None
     response['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
     response['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
