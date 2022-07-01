@@ -168,14 +168,6 @@ def fmt_scan(scan):
     res["filesUri"] = files_uri
     res["data"] = {}
 
-    fileset_matches = compute_fileset_matches(scan)        
-    if "Colmap" in fileset_matches:
-        colmap_fileset = scan.get_fileset(fileset_matches["Colmap"])
-        images = [int(x) for x in io.read_json(colmap_fileset.get_file("images")).keys()]
-        res["data"]["matchedImages"] = images
-    else:
-        res["data"]["matchedImages"] = None
-
     if (res["hasSkeleton"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
         res["data"]["skeleton"] = x
@@ -234,19 +226,35 @@ def fmt_scan(scan):
     res["camera"]["poses"] = []
 
     poses = io.read_json(fileset_visu.get_file(files_metadata["poses"]))
+    global logger
+    logger.info("-------------------------------------------------")
+    logger.info(files_metadata["images"])
 
+    keys = list(map(lambda e : os.path.splitext(poses[e]['name'])[0], poses.keys()))
     for i, im in enumerate(files_metadata["images"]):
         f = fileset_visu.get_file(im)
         id = f.get_metadata("image_id")
-        for k in poses.keys():
-            if os.path.splitext(poses[k]['name'])[0] == id:
-                res['camera']['poses'].append({
-                    'id': id,
-                    'tvec': poses[k]['tvec'],
-                    'rotmat': poses[k]['rotmat'],
-                    'photoUri': get_path(f),
-                    'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i]))})
-                break
+
+        if id in keys:
+            k = list(poses.keys())[keys.index(id)]
+            res['camera']['poses'].append({
+                'id': id,
+                'tvec': poses[k]['tvec'],
+                'rotmat': poses[k]['rotmat'],
+                'photoUri': get_path(f),
+                'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
+                'isMatched' : True
+            })
+        else:
+            res['camera']['poses'].append({
+                'id': id,
+                'tvec': [0,0,0],
+                'rotmat': [[0,0,0],[0,0,0],[0,0,0]],
+                'photoUri': get_path(f),
+                'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
+                'isMatched' : False
+            })
+
     return res
 
 
