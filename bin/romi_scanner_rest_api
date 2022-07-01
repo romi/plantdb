@@ -168,14 +168,6 @@ def fmt_scan(scan):
     res["filesUri"] = files_uri
     res["data"] = {}
 
-    fileset_matches = compute_fileset_matches(scan)        
-    if "Colmap" in fileset_matches:
-        colmap_fileset = scan.get_fileset(fileset_matches["Colmap"])
-        images = [int(x) for x in io.read_json(colmap_fileset.get_file("images")).keys()]
-        res["data"]["matchedImages"] = images
-    else:
-        res["data"]["matchedImages"] = None
-
     if (res["hasSkeleton"]):
         x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
         res["data"]["skeleton"] = x
