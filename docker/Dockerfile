@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS base
+FROM ubuntu:20.04
 LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 LABEL corresponding_author="Peter Hanappe <peter@romi-project.eu>"
 LABEL project="Robotics for microfarms"
@@ -10,50 +10,35 @@ LABEL description="A minimal REST API serving JSON information from the Plant DB
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ENV USER_NAME=myuser
+ENV USER_ID=1000
 ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
 ENV DB_LOCATION="/myapp/db"
 
-WORKDIR /myapp
 SHELL ["/bin/bash", "-c"]
-
-FROM base AS builder
 
 # Update package manager & install requirements:
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
-    git ca-certificates python3 python3-pip python3-venv && \
-    # Create a non-root user and give it rights over a "myapp" folder:
-    adduser --disabled-password --gecos '' ${USER_NAME} && \
-    chown -R ${USER_NAME} /myapp && \
-    mkdir -p /venv && chown -R ${USER_NAME} /venv
-
-USER ${USER_NAME}
-
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install poetry && \
-    python3 -m venv /venv
-
-COPY --chown=${USER_NAME} ./ ./
-RUN source /venv/bin/activate && \
-    poetry install -n --no-dev --no-root && \
-    poetry build && \
-    /venv/bin/pip install dist/*.whl
-
-FROM base AS final
-
-RUN adduser --disabled-password --gecos '' ${USER_NAME} && \
-    mkdir -p ${DB_LOCATION} && \
-    chown -R ${USER_NAME} /myapp && \
-    apt-get update && \
-    apt-get install -yq --no-install-recommends python3 rsync && \
+    git ca-certificates rsync python3 python3-pip && \
     # Clean package manager:
     apt-get clean && \
     apt-get autoremove && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    # Create a non-root user and give it rights over a "home" folder:
+    adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
+    chown -R ${USER_NAME}: /home/${USER_NAME} && \
+    mkdir -m 777 -p ${DB_LOCATION}
 
+# Set user
 USER ${USER_NAME}
+# Change working directory
+WORKDIR /home/${USER_NAME}
 
-COPY --from=builder --chown=${USER_NAME} /venv /venv
-COPY ./docker/docker-entrypoint.sh ./
+COPY --chown=${USER_NAME} ./ ./
 
-CMD ["./docker-entrypoint.sh"]
+RUN python3 -m pip install --upgrade pip
+
+RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install .
+
+CMD ["/bin/bash", "-c", "romi_scanner_rest_api"]

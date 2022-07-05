@@ -94,5 +94,5 @@ else
     -p 5000:5000 \
     $mount_option \
     $USE_TTY roboticsmicrofarms/plantdb:$vtag \
-    bash -c ". /venv/bin/activate && $cmd" # try to keep the `-it` to be able to kill the process/container!
+    bash -c "$cmd" # try to keep the `-it` to be able to kill the process/container!
 fi
