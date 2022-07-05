@@ -1,0 +1,13 @@
+setuptools
+wheel
+appdirs
+dirsync
+flask
+flask-cors
+flask-restful
+imageio
+numpy
+pillow
+toml
+nose2
+coverage
