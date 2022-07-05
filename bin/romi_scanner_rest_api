@@ -313,48 +313,43 @@ class Mesh(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 
-def run():
-    parser = parsing()
-    args = parser.parse_args()
+parser = parsing()
+args = parser.parse_args()
 
-    app = Flask(__name__)
-    CORS(app)
-    api = Api(app)
+app = Flask(__name__)
+CORS(app)
+api = Api(app)
 
-    global db_location
-    global db_prefix
+global db_location
+global db_prefix
 
-    if args.db_location == "":
-        try:
-            db_location = os.environ["DB_LOCATION"]
-        except:
-            raise ValueError("DB_LOCATION environment variable is not set")
-    else:
-        db_location = args.db_location
+if args.db_location == "":
+    try:
+        db_location = os.environ["DB_LOCATION"]
+    except:
+        raise ValueError("DB_LOCATION environment variable is not set")
+else:
+    db_location = args.db_location
 
-    if args.db_prefix == "":
-        try:
-            db_prefix = os.environ["DB_PREFIX"]
-        except:
-            db_prefix = "/files/"
+if args.db_prefix == "":
+    try:
+        db_prefix = os.environ["DB_PREFIX"]
+    except:
+        db_prefix = "/files/"
 
-    global db
-    db = DB(db_location)
-    db.connect()
+global db
+db = DB(db_location)
+db.connect()
 
-    print("n scans = %i" % len(db.get_scans()))
+print("n scans = %i" % len(db.get_scans()))
 
-    api.add_resource(ScanList, '/scans')
-    api.add_resource(Scan, '/scans/<scan_id>')
-    api.add_resource(File, '/files/<path:path>')
-    api.add_resource(Refresh, '/refresh')
-    api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(ScanList, '/scans')
+api.add_resource(Scan, '/scans/<scan_id>')
+api.add_resource(File, '/files/<path:path>')
+api.add_resource(Refresh, '/refresh')
+api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
+api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
 
-    app.run(host='0.0.0.0')
-
-
-if __name__ == '__main__':
-    run()
+app.run(host='0.0.0.0')
