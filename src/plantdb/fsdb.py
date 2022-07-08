@@ -706,6 +706,7 @@ class Scan(db.Scan):
         >>> db.disconnect()
 
         """
+
         if query is None:
             return self.filesets  # Copy?
         return _filter_query(self.filesets, query)
@@ -772,6 +773,7 @@ class Scan(db.Scan):
             Else, returns the value attached to this key.
 
         """
+
         return _get_metadata(self.metadata, key)
 
     def get_measures(self, key=None):
@@ -794,6 +796,7 @@ class Scan(db.Scan):
         It is located at the root folder of the scan dataset.
 
         """
+
         return _get_measures(self.measures, key)
 
     def set_metadata(self, data, value=None):
@@ -1491,13 +1494,13 @@ def _load_scans(db):
     names = os.listdir(db.basedir)
     for name in names:
         scan = Scan(db, name)
-        if (os.path.isdir(_scan_path(scan))
-                and os.path.isfile(_scan_files_json(scan))):
-            scan.filesets = _load_scan_filesets(scan)
-            scan.metadata = _load_scan_metadata(scan)
-            scan.measures = _load_scan_measures(scan)
+        if os.path.isdir(_scan_path(scan)):
+            if os.path.isfile(_scan_files_json(scan)):
+                scan.filesets = _load_scan_filesets(scan)
+                scan.metadata = _load_scan_metadata(scan)
+                scan.measures = _load_scan_measures(scan)
+                # scan.store()
             scans.append(scan)
-            # scan.store()
     return scans
 
 
