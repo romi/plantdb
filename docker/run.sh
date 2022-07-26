@@ -84,13 +84,13 @@ fi
 
 if [ "$cmd" = "" ]; then
   # Start in interactive mode:
-  docker run \
+  docker run --rm \
     -p 5000:5000 \
     $mount_option \
     $USE_TTY roboticsmicrofarms/plantdb:$vtag # try to keep the `-it` to be able to kill the process/container!
 else
   # Start in non-interactive mode (run the command):
-  docker run \
+  docker run --rm \
     -p 5000:5000 \
     $mount_option \
     $USE_TTY roboticsmicrofarms/plantdb:$vtag \
