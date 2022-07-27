@@ -1,6 +1,6 @@
 # PlantDB
 
-Documentation about the "Plant Scanner" project can be found [here](https://docs.romi-project.eu/Scanner/home/).
+Documentation about the "Plant Imager" project can be found [here](https://docs.romi-project.eu/plant_imager/home/).
 
 ## Getting started
 
