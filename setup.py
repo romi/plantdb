@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 opts = dict(
     name="plantdb",
-    version="0.11.99",
+    version="0.12",
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=False,
