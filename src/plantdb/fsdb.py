@@ -144,18 +144,18 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     <class 'NoneType'>
     >>> print(os.listdir(db.basedir))
     ['lock', 'romidb', 'myscan_001']
-    >>> print(os.listdir(os.path.join(db.basedir, "myscan_001")))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.basedir, "myscan_001")))
     ['metadata']
 
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))
     ['metadata', 'files.json', 'fileset_001']
     >>> fs = scan.get_fileset("fileset_001")
     >>> print(type(fs))
     <class 'plantdb.fsdb.Fileset'>
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))
     []
 
     >>> db = dummy_db(with_file=True)
@@ -164,7 +164,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.get_file("test_image")
     >>> print(type(f))
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))
     ['test_image.png', 'test_json.json']
     >>> fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)
 
