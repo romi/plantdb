@@ -1221,6 +1221,7 @@ class File(db.File):
     Contrary to other classes (``Scan`` & ``Fileset``) the uniqueness is not checked!
 
     """
+
     def __init__(self, db, fileset, id):
         super().__init__(db, fileset, id)
         self.metadata = None
@@ -2048,6 +2049,7 @@ def _store_scan(scan):
     with open(files_json, "w") as f:
         json.dump(structure, f, sort_keys=True,
                   indent=4, separators=(',', ': '))
+    return
 
 
 def _is_valid_id(id):
@@ -2109,7 +2111,7 @@ def _delete_file(file):
 
     Raises
     ------
-    OSError
+    IOError
         If the file's path is outside the file's database.
 
     See Also
@@ -2125,6 +2127,7 @@ def _delete_file(file):
         raise IOError("Cannot delete files outside of a DB.")
     if os.path.exists(fullpath):
         os.remove(fullpath)
+    return
 
 
 def _delete_fileset(fileset):
@@ -2137,23 +2140,24 @@ def _delete_fileset(fileset):
 
     Raises
     ------
-    OSError
+    IOError
         If the fileset's path is outside the fileset's database.
 
     See Also
     --------
     _is_safe_to_delete
     """
-    for f in fileset.files:
-        fileset.delete_file(f.id)
-    fullpath = os.path.join(fileset.scan.db.basedir, fileset.scan.id,
-                            fileset.id)
+    fullpath = os.path.join(fileset.scan.db.basedir, fileset.scan.id, fileset.id)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
+
+    for f in fileset.files:
+        fileset.delete_file(f.id)
     for f in glob.glob(os.path.join(fullpath, "*")):
         os.remove(f)
     if os.path.exists(fullpath):
         os.rmdir(fullpath)
+    return
 
 
 def _delete_scan(scan):
@@ -2166,7 +2170,7 @@ def _delete_scan(scan):
 
     Raises
     ------
-    OSError
+    IOError
         If the scan's path is outside the scan's database.
 
     See Also
@@ -2182,6 +2186,7 @@ def _delete_scan(scan):
     rmtree(fullpath, ignore_errors=True)
     if os.path.exists(fullpath):
         os.rmdir(fullpath)
+    return
 
 
 def _filter_query(l, query):
