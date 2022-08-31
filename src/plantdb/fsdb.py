@@ -94,14 +94,17 @@ The metadata of the scan (``metadata.json``), of the set of 'images' files (``<F
 
 import atexit
 import copy
-import glob
 import json
 import logging
 import os
 from shutil import copyfile
+from shutil import rmtree
 
 from plantdb import db
 from plantdb.db import DBBusyError
+from plantdb.log import configure_logger
+
+logger = configure_logger(__name__)
 
 #: This file must exist in the root of a folder for it to be considered a valid DB
 MARKER_FILE_NAME = "romidb"
@@ -354,7 +357,8 @@ class FSDB(db.DB):
                 raise DBBusyError(
                     "File %s exists in DB root: DB is busy, cannot connect." % LOCK_FILE_NAME)
         else:
-            print(f"Already connected to the database '{self.basedir}'")
+            logger.info(f"Already connected to the database '{self.basedir}'")
+        return
 
     def disconnect(self):
         """Disconnect from the local database.
@@ -392,7 +396,8 @@ class FSDB(db.DB):
             self.scans = []
             self.is_connected = False
         else:
-            print(f"Already disconnected from the database '{self.basedir}'")
+            logger.info(f"Already disconnected from the database '{self.basedir}'")
+        return
 
     def get_scans(self, query=None):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
@@ -550,6 +555,7 @@ class FSDB(db.DB):
             raise IOError("Invalid id")
         _delete_scan(scan)
         self.scans.remove(scan)
+        return
 
     def path(self) -> str:
         """Get the path to the local database root directory.
@@ -671,12 +677,14 @@ class Scan(db.Scan):
         self.metadata = None
         self.measures = None
         self.filesets = []
+        return
 
     def _erase(self):
         for f in self.filesets:
             f._erase()
         del self.metadata
         del self.filesets
+        return
 
     def get_filesets(self, query=None):
         """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
@@ -706,7 +714,6 @@ class Scan(db.Scan):
         >>> db.disconnect()
 
         """
-
         if query is None:
             return self.filesets  # Copy?
         return _filter_query(self.filesets, query)
@@ -773,7 +780,6 @@ class Scan(db.Scan):
             Else, returns the value attached to this key.
 
         """
-
         return _get_metadata(self.metadata, key)
 
     def get_measures(self, key=None):
@@ -796,7 +802,6 @@ class Scan(db.Scan):
         It is located at the root folder of the scan dataset.
 
         """
-
         return _get_measures(self.measures, key)
 
     def set_metadata(self, data, value=None):
@@ -814,6 +819,7 @@ class Scan(db.Scan):
             self.metadata = {}
         _set_metadata(self.metadata, data, value)
         _store_scan_metadata(self)
+        return
 
     def create_fileset(self, id):
         """Create a new `Fileset` instance in the local database attached to the current `Scan` instance.
@@ -868,6 +874,7 @@ class Scan(db.Scan):
     def store(self):
         """Save changes to the scan's JSON."""
         _store_scan(self)
+        return
 
     def delete_fileset(self, fileset_id):
         """Delete a given fileset from the scan dataset.
@@ -898,6 +905,7 @@ class Scan(db.Scan):
         _delete_fileset(fs)
         self.filesets.remove(fs)
         self.store()
+        return
 
     def path(self) -> str:
         """Get the path to the local scan dataset.
@@ -969,6 +977,7 @@ class Fileset(db.Fileset):
             f._erase()
         self.metadata = None
         self.files = None
+        return
 
     def get_files(self, query=None):
         """Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.
@@ -1074,6 +1083,7 @@ class Fileset(db.Fileset):
             self.metadata = {}
         _set_metadata(self.metadata, data, value)
         _store_fileset_metadata(self)
+        return
 
     def create_file(self, id):
         """Create a new `File` instance in the local database attached to the current `Fileset` instance.
@@ -1149,10 +1159,12 @@ class Fileset(db.Fileset):
         _delete_file(x)
         self.files.remove(x)
         self.store()
+        return
 
     def store(self):
         """Save changes to the scan's JSON."""
         self.scan.store()
+        return
 
     def path(self) -> str:
         """Get the path to the local fileset.
@@ -1229,6 +1241,7 @@ class File(db.File):
     def _erase(self):
         self.id = None
         self.metadata = None
+        return
 
     def get_metadata(self, key=None):
         """Get the metadata associated to a file.
@@ -1262,6 +1275,7 @@ class File(db.File):
             self.metadata = {}
         _set_metadata(self.metadata, data, value)
         _store_file_metadata(self)
+        return
 
     def import_file(self, path):
         """Import the file from its local path to the current fileset.
@@ -1278,10 +1292,12 @@ class File(db.File):
         newpath = _file_path(self)
         copyfile(path, newpath)
         self.store()
+        return
 
     def store(self):
         """Save changes to the scan's JSON."""
         self.fileset.store()
+        return
 
     def read_raw(self):
         """Read the file and return its contents.
@@ -1350,6 +1366,7 @@ class File(db.File):
         with open(path, "wb") as f:
             f.write(data)
         self.store()
+        return
 
     def read(self):
         """Read the file and return its contents.
@@ -1423,6 +1440,7 @@ class File(db.File):
         with open(path, "w") as f:
             f.write(data)
         self.store()
+        return
 
     def path(self) -> str:
         """Get the path to the local file.
@@ -1553,7 +1571,7 @@ def _load_scan_filesets(scan):
                 filesets.append(fileset)
             except:
                 id = fileset_info.get("id")
-                print("Warning: unable to load fileset %s, deleting..." % id)
+                logger.warning("Unable to load fileset %s, deleting..." % id)
                 scan.delete_fileset(id)
     else:
         raise IOError("%s: filesets is not a list" % files_json)
@@ -1605,8 +1623,7 @@ def _parse_fileset(db, scan, fileset_info):
     fileset = Fileset(db, scan, id)
     path = _fileset_path(fileset)
     if not os.path.isdir(path):
-        raise IOError(
-            "Fileset: Fileset directory doesn't exists: %s" % path)
+        logger.error(f"Fileset directory doesn't exists: %s" % path)
     return fileset
 
 
@@ -1620,7 +1637,7 @@ def _load_fileset_files(fileset, fileset_info):
                 files.append(file)
             except:
                 id = file_info.get("id")
-                print("Warning: unable to load file %s, deleting..." % id)
+                logger.warning("Unable to load file %s, deleting..." % id)
                 fileset.delete_file(id)
     else:
         raise IOError("files.json: expected a list for files")
@@ -1644,7 +1661,7 @@ def _parse_file(fileset, file_info):
     file.filename = filename
     path = _file_path(file)
     if not os.path.isfile(path):
-        raise IOError("File: File doesn't exists: %s" % path)
+        logger.error("File doesn't exists: %s" % path)
     return file
 
 
@@ -1692,6 +1709,7 @@ def _mkdir_metadata(path):
     dir = os.path.dirname(path)
     if not os.path.isdir(dir):
         os.makedirs(dir)
+    return
 
 
 def _store_metadata(path, metadata):
@@ -1699,28 +1717,28 @@ def _store_metadata(path, metadata):
     with open(path, "w") as f:
         json.dump(metadata, f, sort_keys=True,
                   indent=4, separators=(',', ': '))
+    return
 
 
 def _store_scan_metadata(scan):
-    _store_metadata(_scan_metadata_path(scan),
-                    scan.metadata)
+    _store_metadata(_scan_metadata_path(scan), scan.metadata)
+    return
 
 
 def _store_fileset_metadata(fileset):
-    _store_metadata(_fileset_metadata_path(fileset),
-                    fileset.metadata)
+    _store_metadata(_fileset_metadata_path(fileset), fileset.metadata)
+    return
 
 
 def _store_file_metadata(file):
-    _store_metadata(_file_metadata_path(file),
-                    file.metadata)
+    _store_metadata(_file_metadata_path(file), file.metadata)
+    return
 
 
 #
 
 def _get_metadata(metadata, key):
-    # Do a deepcopy of the return value because we don't want to
-    # caller the inadvertedly change the values.
+    # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
     if metadata == None:
         return {}
     elif key == None:
@@ -1730,8 +1748,7 @@ def _get_metadata(metadata, key):
 
 
 def _get_measures(measures, key):
-    # Do a deepcopy of the return value because we don't want to
-    # caller the inadvertedly change the values.
+    # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
     if measures == None:
         return {}
     elif key == None:
@@ -1744,14 +1761,14 @@ def _set_metadata(metadata, data, value):
     if isinstance(data, str):
         if value is None:
             raise IOError("No value given for key %s" % data)
-        # Do a deepcopy of the value because we don't want to caller
-        # the inadvertedly change the values.
+        # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
         metadata[data] = copy.deepcopy(value)
     elif isinstance(data, dict):
         for key, value in data.items():
             _set_metadata(metadata, key, value)
     else:
         raise IOError("Invalid key: ", data)
+    return
 
 
 ################################################################################
@@ -1771,9 +1788,10 @@ def _make_fileset(fileset):
     plantdb.fsdb._fileset_path
     """
     path = _fileset_path(fileset)
-    # Create the fileset directory if it does not exists:
+    # Create the fileset directory if it does not exist:
     if not os.path.isdir(path):
         os.makedirs(path)
+    return
 
 
 def _make_scan(scan):
@@ -1789,9 +1807,10 @@ def _make_scan(scan):
     plantdb.fsdb._scan_path
     """
     path = _scan_path(scan)
-    # Create the scan directory if it does not exists:
+    # Create the scan directory if it does not exist:
     if not os.path.isdir(path):
         os.makedirs(path)
+    return
 
 
 ################################################################################
@@ -2122,11 +2141,16 @@ def _delete_file(file):
         return
     fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id,
                             file.fileset.id, file.filename)
-    print("delete %s" % fullpath)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
+
     if os.path.exists(fullpath):
-        os.remove(fullpath)
+        try:
+            os.remove(fullpath)
+        except:
+            logger.error(f"Could not delete file '{fullpath}'!")
+        else:
+            logger.info(f"Deleted file '{fullpath}'!")
     return
 
 
@@ -2151,12 +2175,40 @@ def _delete_fileset(fileset):
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
 
+    # - Delete the `Files` belonging to the `Fileset`:
     for f in fileset.files:
         fileset.delete_file(f.id)
-    for f in glob.glob(os.path.join(fullpath, "*")):
-        os.remove(f)
-    if os.path.exists(fullpath):
-        os.rmdir(fullpath)
+    # - Delete metadata corresponding to the `Fileset`:
+    json_md = os.path.join(fileset.scan.path(), 'metadata', fileset.id + '.json')
+    dir_md = os.path.join(fileset.scan.path(), 'metadata', fileset.id)
+    try:
+        os.remove(json_md)
+    except:
+        if os.path.exists(json_md):
+            logger.error(f"Could not delete JSON metadata '{json_md}'!")
+        else:
+            logger.warning(f"Could not find JSON metadata file '{json_md}'!")
+    else:
+        logger.info(f"Deleted JSON metadata '{json_md}'!")
+    try:
+        rmtree(dir_md, ignore_errors=True)
+    except:
+        if os.path.exists(dir_md):
+            logger.error(f"Could not delete metadata directory '{dir_md}'!")
+        else:
+            logger.warning(f"Could not find metadata directory '{dir_md}'!")
+    else:
+        logger.info(f"Deleted metadata directory '{dir_md}'!")
+    # - Delete the directory corresponding to the `Fileset`:
+    try:
+        rmtree(fullpath, ignore_errors=True)
+    except:
+        if os.path.exists(fullpath):
+            logger.error(f"Could not delete Fileset directory '{fullpath}'!")
+        else:
+            logger.warning(f"Could not find Fileset directory '{fullpath}'!")
+    else:
+        logger.info(f"Deleted Fileset directory '{fullpath}'!")
     return
 
 
@@ -2177,15 +2229,21 @@ def _delete_scan(scan):
     --------
     _is_safe_to_delete
     """
-    from shutil import rmtree
-    for f in scan.filesets:
-        scan.delete_fileset(f.id)
     fullpath = os.path.join(scan.db.basedir, scan.id)
     if not _is_safe_to_delete(fullpath):
         raise IOError("Cannot delete files outside of a DB.")
-    rmtree(fullpath, ignore_errors=True)
-    if os.path.exists(fullpath):
-        os.rmdir(fullpath)
+
+    # - Delete the whole directory will get rid of everything (metadata, filesets, files):
+    try:
+        rmtree(fullpath, ignore_errors=True)
+    except:
+        if os.path.exists(fullpath):
+            logger.error(f"Could not delete `Scan` directory '{fullpath}'!")
+        else:
+            logger.warning(f"Could not find `Scan` directory '{fullpath}'!")
+    else:
+        logger.info(f"Deleted `Scan` directory '{fullpath}'!")
+
     return
 
 
