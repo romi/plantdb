@@ -23,6 +23,9 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-import logging
-
-logger = logging.getLogger('romiscanner')
+try:
+    from romitask.log import configure_logger
+except Exception:
+    import logging
+    def configure_logger(name):
+        return logging.getLogger('name')
