@@ -2261,14 +2261,32 @@ def _filter_query(l, query):
     -------
     list
         Filtered list of scans, filesets or files.
+
+    Examples
+    --------
+    >>> from plantdb.fsdb import dummy_db
+    >>> from plantdb.fsdb import _filter_query
+    >>> db = dummy_db(with_scan=True, with_file=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> {f.id: f.metadata for f in fs.get_files()}
+    >>> files = _filter_query(fs.get_files(), query={"channel": "rgb"})
+    >>> len(files)  # should be empty as no file has this metadata
+    0
+    >>> files = _filter_query(fs.get_files(), query={"random image": True})
+    >>> len(files)  # should be `1` as only one file has this metadata
+    1
+    >>> db.disconnect()
+
     """
     query_result = []
     for f in l:
-        flag_add = True
         for q in query.keys():
-            if f.get_metadata(q) is not None and f.get_metadata(q) != query[q]:
-                flag_add = False
-                break
-        if flag_add:
-            query_result.append(f)
+            try:
+                assert f.get_metadata(q) == query[q]
+            except AssertionError:
+                pass
+            except:
+                query_result.append(f)
     return query_result
