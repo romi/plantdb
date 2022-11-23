@@ -2255,7 +2255,7 @@ def _filter_query(l, query):
     l : list
         List of scans, filesets or files to filter.
     query : dict
-        Filtering query, metadata must have a matching `key` and `value`.
+        Filtering query, metadata must have a matching ``key`` and ``value``.
 
     Returns
     -------
@@ -2270,12 +2270,13 @@ def _filter_query(l, query):
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
-    >>> {f.id: f.metadata for f in fs.get_files()}
+    >>> print({f.id: f.metadata for f in fs.get_files()})
+    {'dummy_image': {'dummy image': True}, 'test_image': {'random image': True}, 'test_json': {'random json': True}}
     >>> files = _filter_query(fs.get_files(), query={"channel": "rgb"})
-    >>> len(files)  # should be empty as no file has this metadata
+    >>> print(len(files))  # should be empty as no file has this metadata
     0
     >>> files = _filter_query(fs.get_files(), query={"random image": True})
-    >>> len(files)  # should be `1` as only one file has this metadata
+    >>> print(len(files))  # should be `1` as only one file has this metadata
     1
     >>> db.disconnect()
 
@@ -2287,6 +2288,6 @@ def _filter_query(l, query):
                 assert f.get_metadata(q) == query[q]
             except AssertionError:
                 pass
-            except:
+            else:
                 query_result.append(f)
     return query_result
