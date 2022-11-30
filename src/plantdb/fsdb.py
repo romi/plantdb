@@ -410,7 +410,7 @@ class FSDB(db.DB):
         Returns
         -------
         list of plantdb.fsdb.Scan
-            The list of `Scan` resulting form the query.
+            List of `Scan`s, filtered by the `query` if any.
 
         See Also
         --------
@@ -426,8 +426,6 @@ class FSDB(db.DB):
         >>> db.disconnect()
 
         """
-        if query is None:
-            return self.scans
         return _filter_query(self.scans, query)
 
     def get_scan(self, id, create=False):
@@ -697,7 +695,7 @@ class Scan(db.Scan):
         Returns
         -------
         list of plantdb.fsdb.Fileset
-            The list of `Fileset` resulting form the query.
+            List of `Fileset`s, filtered by the `query` if any.
 
         See Also
         --------
@@ -714,8 +712,6 @@ class Scan(db.Scan):
         >>> db.disconnect()
 
         """
-        if query is None:
-            return self.filesets  # Copy?
         return _filter_query(self.filesets, query)
 
     def get_fileset(self, id, create=False):
@@ -952,7 +948,7 @@ class Fileset(db.Fileset):
     ----------
     db : plantdb.fsdb.FSDB
         Database where to find the `scan`.
-    id : int
+    id : str
         Name of the scan in the database `db`.
     scan : plantdb.fsdb.Scan
         Scan containing the set of files of interest.
@@ -990,7 +986,7 @@ class Fileset(db.Fileset):
         Returns
         -------
         list of plantdb.fsdb.File
-            The list of `File` resulting form the query.
+            List of `File`s, filtered by the query if any.
 
         See Also
         --------
@@ -1010,8 +1006,6 @@ class Fileset(db.Fileset):
         >>> db.disconnect()
 
         """
-        if query is None:
-            return self.files
         return _filter_query(self.files, query)
 
     def get_file(self, id, create=False):
@@ -2247,20 +2241,21 @@ def _delete_scan(scan):
     return
 
 
-def _filter_query(l, query):
-    """Filter a list of scans, filesets or files using a `query` on their metadata.
+def _filter_query(l, query=None):
+    """Filter a list of `Scan`s, `Fileset`s or `File`s using a `query` on their metadata.
 
     Parameters
     ----------
     l : list
-        List of scans, filesets or files to filter.
-    query : dict
-        Filtering query, metadata must have a matching ``key`` and ``value``.
+        List of `Scan`s, `Fileset`s or `File`s to filter.
+    query : dict, optional
+        Filtering query in the form of a dictionary.
+        The list of instances must have metadata matching ``key`` and ``value`` from the `query`.
 
     Returns
     -------
     list
-        Filtered list of scans, filesets or files.
+        List of `Scan`s, `Fileset`s or `File`s filtered by the query, if any.
 
     Examples
     --------
@@ -2272,6 +2267,9 @@ def _filter_query(l, query):
     >>> fs = scan.get_fileset("fileset_001")
     >>> print({f.id: f.metadata for f in fs.get_files()})
     {'dummy_image': {'dummy image': True}, 'test_image': {'random image': True}, 'test_json': {'random json': True}}
+    >>> files = _filter_query(fs.get_files(), query=None)
+    >>> print(len(files))  # no filtering so all three files are here!
+    3
     >>> files = _filter_query(fs.get_files(), query={"channel": "rgb"})
     >>> print(len(files))  # should be empty as no file has this metadata
     0
@@ -2281,13 +2279,18 @@ def _filter_query(l, query):
     >>> db.disconnect()
 
     """
-    query_result = []
-    for f in l:
-        for q in query.keys():
-            try:
-                assert f.get_metadata(q) == query[q]
-            except AssertionError:
-                pass
-            else:
-                query_result.append(f)
+    if query is None or query == {}:
+        # If there is no `query` return the unfiltered list of instances
+        query_result = [f for f in l]
+    else:
+        # Else apply the filter on metadata using key(s) and value(s) from `query`:
+        query_result = []
+        for f in l:
+            for q in query.keys():
+                try:
+                    assert f.get_metadata(q) == query[q]
+                except AssertionError:
+                    pass
+                else:
+                    query_result.append(f)
     return query_result
