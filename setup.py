@@ -21,8 +21,8 @@ opts = dict(
     description='Database package for the ROMI project.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://docs.romi-project.eu/Scanner/",
-    package_data ={"tests": ["test_fsdb.py", "test_io.py", "test_sync.py"]},
+    url="https://docs.romi-project.eu/plant_imager/",
+    package_data={"tests": ["test_fsdb.py", "test_io.py", "test_sync.py"]},
     zip_safe=False,
     python_requires='>=3.7',
     classifiers=[
