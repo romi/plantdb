@@ -1,0 +1,57 @@
+{% set data = load_setup_py_data() %}  # loads data from the `setup.py` file
+{% set version = data.get('version') %}  # get the 'version' from loaded data
+{% set summary = data.get('description') %}  # get the 'description' from loaded data
+# https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html#loading-data-from-other-files
+package:
+  name: plantdb
+  version: {{ version }}
+
+source:
+  path: ../../
+#  git_url: https://github.com/romi/romitask.git
+#  git_tag: dev
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+
+requirements:
+  build:
+    - setuptools
+    - python  {{ python }}
+  run:
+    - python  {{ python }}
+    - appdirs
+    - flask
+    - flask-cors
+    - flask-restful
+    - imageio
+    - numpy
+    - pillow
+    - toml
+
+test:
+  imports:
+    - plantdb  # test the import of plantdb
+  source_files:
+    - tests
+  requires:
+    - nose2
+    - coverage
+  commands:
+    - nose2 -v
+    - romi_fsdb_sync -h
+    - romi_import_folder -h
+    - romi_import_file -h
+    - romi_scanner_rest_api -h
+
+about:
+  home: https://docs.romi-project.eu/plant_imager/
+  license: LGPL-3.0-or-later
+  license_file: LICENSE
+  summary: {{ summary }}
+  description: |
+    The _3D plant phenotyping platform_ of the ROMI project allows to performs a full 3D analysis of plants.
+    It combines an imaging station with a powerful image processing pipeline, to build a 3D representation of plants.
+    This package is intended to act as the central database hosting the data required by the other ROMI libraries.
+  dev_url: https://github.com/romi/plantdb
+  doc_source_url: https://docs.romi-project.eu/plant_imager/

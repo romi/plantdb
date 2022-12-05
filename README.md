@@ -128,6 +128,7 @@ Let's assume you want to create a new `romi` conda environment (if not replace `
     ```
 
 To manually install tests tools:
+
 ```shell
 poetry add --dev nose2[coverage] coverage[toml]
 ```
@@ -199,14 +200,32 @@ Notes:
 To build `plantdb` conda package, from the `base` conda environment, run:
 
 ```shell
-conda build conda/plantdb/ -c romi-eu -c open3d-admin --user romi-eu
+conda build conda/recipe/ -c conda-forge --user romi-eu
 ```
 
-**NOT DONE YET!**
+This requires the `conda-build` package to be installed in the `base` environment!
+
+```shell
+conda install conda-build
+```
+
+To upload the built package, you need a valid account (here `romi-eu`) on [anaconda.org](www.anaconda.org) & to log ONCE
+with `anaconda login`, then:
+
+```shell
+anaconda upload ~/miniconda3/conda-bld/linux-64/plantdb*.tar.bz2 --user romi-eu
+```
+
+This requires the `anaconda-client` package to be installed in the `base` environment!
+
+```shell
+conda install anaconda-client
+```
 
 ### Docker `build.sh` & `run.sh` scripts
 
-To facilitate the use of docker, we created two scripts, `build.sh` & `run.sh`, located in the `docker` folder in the sources.
+To facilitate the use of docker, we created two scripts, `build.sh` & `run.sh`, located in the `docker` folder in the
+sources.
 
 To build a new `roboticsmicrofarms/plantdb` image, from the root folder, simply do:
 

@@ -1,0 +1,13 @@
+name: plantdb
+channels:
+  - defaults
+dependencies:
+  - python >=3.7,<3.10
+  - appdirs
+  - flask
+  - flask-cors
+  - flask-restful
+  - imageio
+  - numpy
+  - pillow
+  - toml
