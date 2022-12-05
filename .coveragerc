@@ -1,0 +1,9 @@
+[run]
+source = "plantdb"
+
+[report]
+omit =
+    *__init__.py
+    setup.py
+    src/plantdb/testing.py
+    tests/*

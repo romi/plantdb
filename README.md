@@ -179,6 +179,21 @@ img_fs = dataset.get_fileset('images')
 
 ## Developers & contributors
 
+### Unitary tests
+
+Some tests are defined in the `tests` directory.
+We use `nose2` to call them as follows:
+
+```shell
+nose2 -v -C
+```
+
+Notes:
+
+- the configuration file used by `nose2` is `unittests.cfg`
+- the `-C` option generate a coverage report, as defined by the `.coveragerc` file.
+- this requires the `nose2` & `coverage` packages listed in the `requirements.txt` file.
+
 ### Conda packaging
 
 To build `plantdb` conda package, from the `base` conda environment, run:
