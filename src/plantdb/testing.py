@@ -22,10 +22,9 @@
 # License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+import shutil
 import tempfile
 import unittest
-
-from dirsync import sync
 
 from plantdb.fsdb import FSDB
 from plantdb.fsdb import dummy_db
@@ -47,7 +46,7 @@ class TemporaryCloneDB(object):
 
     def __init__(self, db_location):
         self.tmpdir = tempfile.TemporaryDirectory()
-        sync(db_location, self.tmpdir.name, action="sync")
+        shutil.copytree(db_location, self.tmpdir.name)
 
     def __del__(self):
         try:
