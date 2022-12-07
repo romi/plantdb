@@ -13,7 +13,7 @@ jobs:
     - name: Build documentation with Sphinx
       uses: ammaraskar/sphinx-action@master
       with:
-        pre-build-command: python3 -m pip install sphinx, sphinx-argparse, sphinx-copybutton, sphinx-panels, sphinx-material, sphinx-prompt, myst-parser
+        pre-build-command: python3 -m pip install sphinx sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
         docs-folder: "docs/"
 
     - name: Deploy documentation
