@@ -33,7 +33,7 @@ extensions = [
     'sphinx.ext.autosummary',  # Include documentation from docstrings
     'sphinx.ext.intersphinx',  # Link to other projects’ documentation
     'sphinx.ext.napoleon',  # Support for NumPy and Google style docstrings
-    'sphinx.ext.viewcode'  # Add links to highlighted source code
+    'sphinx.ext.viewcode',  # Add links to highlighted source code
     'sphinx_panels',  # Enable panels, cards & tabs usage
     'sphinx_copybutton',  # Enable a copy button in each code-block
     'sphinx-prompt',  # Show a prompt on each line but making it un-selectable, so the reader can just copy and paste
