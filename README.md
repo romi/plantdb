@@ -197,7 +197,7 @@ Notes:
 
 ### Conda packaging
 
-To build `plantdb` conda package, from the `base` conda environment, run:
+To build the `plantdb` conda package, from the `base` conda environment, run:
 
 ```shell
 conda build conda/recipe/ -c conda-forge --user romi-eu
