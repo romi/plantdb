@@ -1,12 +1,23 @@
 name: "Deploy Sphinx API documentation"
-on: 
-- push
+
+on:
+  - push
 
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ammaraskar/sphinx-action@master
+    - name: Checkout repository
+      uses: actions/checkout@v1
+
+    - name: Build documentation with Sphinx
+      uses: ammaraskar/sphinx-action@master
       with:
+        pre-build-command: python3 -m pip install sphinx, sphinx-argparse, sphinx-copybutton, sphinx-panels, sphinx-material, sphinx-prompt, myst-parser
         docs-folder: "docs/"
+
+    - name: Deploy documentation
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
