@@ -1,0 +1,34 @@
+﻿plantdb.fsdb.Scan
+=================
+
+.. currentmodule:: plantdb.fsdb
+
+.. autoclass:: Scan
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Scan.__init__
+      ~Scan.create_fileset
+      ~Scan.delete_fileset
+      ~Scan.get_db
+      ~Scan.get_fileset
+      ~Scan.get_filesets
+      ~Scan.get_id
+      ~Scan.get_measures
+      ~Scan.get_metadata
+      ~Scan.list_filesets
+      ~Scan.path
+      ~Scan.set_metadata
+      ~Scan.store
+   
+   
+
+   
+   
+   

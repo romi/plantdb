@@ -1,0 +1,30 @@
+﻿plantdb.fsdb.FSDB
+=================
+
+.. currentmodule:: plantdb.fsdb
+
+.. autoclass:: FSDB
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FSDB.__init__
+      ~FSDB.connect
+      ~FSDB.create_scan
+      ~FSDB.delete_scan
+      ~FSDB.disconnect
+      ~FSDB.get_scan
+      ~FSDB.get_scans
+      ~FSDB.list_scans
+      ~FSDB.path
+   
+   
+
+   
+   
+   
