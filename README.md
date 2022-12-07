@@ -11,26 +11,26 @@ The API documentation of the `plantdb` library can be found here: https://romi.g
 
 ## Getting started
 
-This library is intended to run in the background as a REST API serving JSON information from the DB.
-Typically, these are used by the `plant-3d-explorer` or `plant-3d-vision` libraries.
+This library is intended to:
+
+1. provide a **Python API** to interact with the data, as for the `plant-3d-vision` library
+2. run in the background as a **REST API** serving JSON information from the DB, as for the `plant-3d-explorer` library
+
 
 ### Setup
 
-You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`define it in an environment variable `DB_LOCATION`:
-
-```shell
-mkdir -p /data/ROMI/DB
-touch /data/ROMI/DB/romidb
-```
-
-Then define its location in an environment variable `DB_LOCATION`:
-
-```shell
-export DB_LOCATION=/data/ROMI/DB
-```
+1. You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`:
+   ```shell
+   mkdir -p /data/ROMI/DB
+   touch /data/ROMI/DB/romidb
+   ```
+2. Then define its location in an environment variable `DB_LOCATION`:
+   ```shell
+   export DB_LOCATION=/data/ROMI/DB
+   ```
 
 **Notes**:
-> To permanently set this directory as the location of the DB, add it to your `~/.bashrc` file.
+> To permanently set this directory as the location of the DB, add it to your `~/.bashrc` or `~/.profile` file.
 
 ### Example datasets
 
@@ -64,16 +64,16 @@ docker run -p 5000:5000 -v $DB_LOCATION:/myapp/db -it roboticsmicrofarms/plantdb
 
 ### Conda package
 
-To install the `plantdb` conda package, simply do:
+To install the `plantdb` conda package in an environment named `romi`, simply do:
 
 ```shell
-conda create -n plantdb plantdb -c romi-eu -c open3d-admin --force
+conda create -n romi plantdb -c romi-eu
 ```
 
-To test package install, in the activated environment import `plantdb` in python:
+To test if the package installation was successful, activate the `romi` environment, then try to import `plantdb` in python:
 
 ```shell
-conda activate plantdb
+conda activate romi
 python -c 'import plantdb'
 ```
 
@@ -140,7 +140,32 @@ To manually install tests tools:
 poetry add --dev nose2[coverage] coverage[toml]
 ```
 
-## Serve the REST API
+
+## Usage
+
+### Python API
+
+Here is a minimal example how to use the `plantdb` library in Python:
+
+```python
+# Get the environment variable $DB_LOCATION
+import os
+
+db_path = os.environ['DB_LOCATION']
+# Use it to connect to DB:
+from plantdb import FSDB
+
+db = FSDB(db_path)
+db.connect()
+# Access to a dataset named `2018-12-17_17-05-35` (from the example database)
+dataset = db.get_scan("2018-12-17_17-05-35")
+# Get the 'images' fileset contained in this dataset
+img_fs = dataset.get_fileset('images')
+```
+
+A detailed documentation of the Python API is available here: https://romi.github.io/plantdb/reference.html
+
+### Serve the REST API
 
 Then you can start the REST API with `romi_scanner_rest_api`:
 
@@ -165,25 +190,8 @@ Open your favorite browser here:
 - scans: http://0.0.0.0:5000/scans
 - '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35
 
-## Python API
+A detailed documentation of the REST API is available here: https://romi.github.io/plantdb/webapi.html
 
-Here is a minimal example how to use the `plantdb` library in Python:
-
-```python
-# Get the environment variable $DB_LOCATION
-import os
-
-db_path = os.environ['DB_LOCATION']
-# Use it to connect to DB:
-from plantdb import FSDB
-
-db = FSDB(db_path)
-db.connect()
-# Access to a dataset named `2018-12-17_17-05-35` (from the example database)
-dataset = db.get_scan("2018-12-17_17-05-35")
-# Get the 'images' fileset contained in this dataset
-img_fs = dataset.get_fileset('images')
-```
 
 ## Developers & contributors
 
