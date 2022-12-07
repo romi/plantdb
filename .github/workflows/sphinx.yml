@@ -14,7 +14,8 @@ jobs:
       uses: ammaraskar/sphinx-action@master
       with:
         pre-build-command: |
-          python3 -m pip install sphinx sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
+          python3 -m pip install sphinx --upgrade
+          python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
           python3 -m pip install -r requirements.txt
           python3 -m pip install .
         docs-folder: "docs/"
