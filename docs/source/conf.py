@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'plantdb'
-copyright = '2021, Robotics for Microfarms'
+copyright = '2022, Robotics for Microfarms'
 author = 'Robotics for Microfarms'
 
 
@@ -34,6 +34,10 @@ extensions = [
     'sphinx.ext.intersphinx',  # Link to other projects’ documentation
     'sphinx.ext.napoleon',  # Support for NumPy and Google style docstrings
     'sphinx.ext.viewcode'  # Add links to highlighted source code
+    'sphinx_panels',  # Enable panels, cards & tabs usage
+    'sphinx_copybutton',  # Enable a copy button in each code-block
+    'sphinx-prompt',  # Show a prompt on each line but making it un-selectable, so the reader can just copy and paste
+    'sphinxarg.ext',  # To include tables describing command-line arguments for executable scripts
 ]
 
 myst_enable_extensions = [
