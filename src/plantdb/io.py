@@ -84,115 +84,210 @@ from plantdb.db import File
 from plantdb.db import Fileset
 from plantdb.db import Scan
 
+try:
+    import imageio.v3 as iio
+except:
+    import imageio as iio
+
 
 def read_json(dbfile):
     """Reads json from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
 
     Returns
     -------
     dict
         The deserialized JSON file.
+
+    Example
+    -------
+    >>> from plantdb.io import read_json, write_json
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_json")
+    >>> data = {"test": False, 'ROMI': 'RObotics for MIcrofarms'}
+    >>> write_json(f, data)
+    >>> f = fs.get_file("test_json")
+    >>> read_json(f)
+    {'test': False, 'ROMI': 'RObotics for MIcrofarms'}
+
     """
     import json
     return json.loads(dbfile.read())
 
 
 def write_json(dbfile, data, ext="json"):
-    """Writes json to a DB file.
+    """Writes json to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : dict
         The dictionary to save as a JSON file.
     ext : str, optional
         File extension, defaults to "json".
+
+    Example
+    -------
+    >>> from plantdb.io import write_json
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_json")
+    >>> data = {"test": False, 'ROMI': 'RObotics for MIcrofarms'}
+    >>> write_json(f, data)
+
     """
     import json
     dbfile.write(json.dumps(data, indent=4), ext)
+    return
 
 
 def read_toml(dbfile):
-    """Reads toml from a DB file.
+    """Reads toml from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
 
     Returns
     -------
     dict
         The deserialized TOML file.
+
+    Example
+    -------
+    >>> from plantdb.io import read_toml, write_toml
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_json")
+    >>> data = {"test": True, 'ROMI': 'RObotics for MIcrofarms'}
+    >>> write_toml(f, data)
+    >>> f = fs.get_file("test_json")
+    >>> read_toml(f)
+    {'test': True}
+
     """
     import toml
     return toml.loads(dbfile.read())
 
 
 def write_toml(dbfile, data, ext="toml"):
-    """Writes toml to a DB file.
+    """Writes toml to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : dict
         The dictionary to save as a TOML file.
     ext : str, optional
         File extension, defaults to "toml".
+
+    Example
+    -------
+    >>> from plantdb.io import write_toml
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_json")
+    >>> data = {"test": True, 'ROMI': 'RObotics for MIcrofarms'}
+    >>> write_toml(f, data)
+
     """
     import toml
     dbfile.write(toml.dumps(data), ext)
+    return
 
 
 def read_image(dbfile):
-    """Reads image from a DB file.
+    """Reads image from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
 
     Returns
     -------
     numpy.ndarray
         The image array.
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from plantdb.io import read_image, write_image
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_image")
+    >>> img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
+    >>> write_image(f, img)
+    >>> f = fs.get_file("test_image")
+    >>> img2 = read_image(f)
+    >>> np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!
+
     """
-    import imageio
-    return imageio.imread(dbfile.read_raw())
+    return iio.imread(dbfile.read_raw())
 
 
 def write_image(dbfile, data, ext="png"):
-    """Writes image to a DB file.
+    """Writes image to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : array like
         The array to save as an image.
     ext : {'png', 'jpeg', 'tiff'}, optional
         File extension, defaults to "png".
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from plantdb.io import write_image
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_image")
+    >>> img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
+    >>> write_image(f, img)
+
     """
-    import imageio
     if ext == "jpg" and len(data.shape) == 3:
         data = data[:, :, :3]
-    b = imageio.imwrite(imageio.RETURN_BYTES, data, format=ext)
+    b = iio.imwrite(iio.RETURN_BYTES, data, format=ext)
     dbfile.write_raw(b, ext)
+    return
 
 
 def read_volume(dbfile, ext="npz"):
-    """Reads volume from a DB file.
+    """Reads volume from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "npz".
@@ -201,17 +296,33 @@ def read_volume(dbfile, ext="npz"):
     -------
     numpy.ndarray
         The volume array.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from plantdb.io import , read_volumewrite_volume
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_volume')
+    >>> vol = np.random.rand(50, 10, 10)
+    >>> write_volume(f, vol)
+    >>> f = fs.get_file("test_volume")
+    >>> vol2 = read_volume(f)
+    >>> np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!
+
     """
-    import imageio
-    return imageio.volread(dbfile.read_raw(), format=ext)
+    return iio.volread(dbfile.read_raw(), format=ext)
 
 
 def write_volume(dbfile, data, ext="npz"):
-    """Writes volume to a DB file.
+    """Writes volume to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : array like
         The 3D array to save as volume. 
@@ -233,26 +344,43 @@ def write_volume(dbfile, data, ext="npz"):
     >>> write_volume(f, np.random.rand(50, 10, 10))
 
     """
-    import imageio
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.npz")
-        imageio.volwrite(fname, data, format=ext)
+        iio.volwrite(fname, data, format=ext)
         dbfile.import_file(fname)
+    return
 
 
 def read_npz(dbfile):
-    """Reads npz from a DB file.
+    """Reads a dictionary of arrays from an '.npz' ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
 
     Returns
     -------
-    numpy.ndarray
+    dict of numpy.ndarray
         The uncompressed numpy array.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from plantdb.io import read_npz, write_npz
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_npz')
+    >>> npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}
+    >>> write_npz(f, npz)
+    >>> f = fs.get_file("test_npz")
+    >>> npz2 = read_npz(f)
+    >>> np.testing.assert_array_equal(npz["0"], npz2["0"])  # raise an exception if not equal!
+
     """
     import numpy as np
     b = dbfile.read_raw()
@@ -264,14 +392,27 @@ def read_npz(dbfile):
 
 
 def write_npz(dbfile, data):
-    """Writes npz to a DB file.
+    """Writes a dictionary of arrays from an '.npz' ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
-    data : array like
-        A 3D array to save as volume.
+    data : dict of numpy.ndarray
+        A dictionary of arrays to save as a single compressed '.npz' file.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from plantdb.io import read_npz, write_npz
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_npz')
+    >>> npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}
+    >>> write_npz(f, npz)
 
     """
     import numpy as np
@@ -279,14 +420,15 @@ def write_npz(dbfile, data):
         fname = os.path.join(d, "temp.npz")
         np.savez_compressed(fname, **data)
         dbfile.import_file(fname)
+    return
 
 
 def read_point_cloud(dbfile, ext="ply"):
-    """Reads point cloud from a DB file.
+    """Reads a point cloud from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "ply".
@@ -306,30 +448,45 @@ def read_point_cloud(dbfile, ext="ply"):
 
 
 def write_point_cloud(dbfile, data, ext="ply"):
-    """Writes point cloud to a DB file.
+    """Writes a point cloud to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : open3d.geometry.PointCloud
         The point cloud object to save.
     ext : str, optional
         File extension, defaults to "ply".
+
+    Examples
+    --------
+    >>> import open3d as o3d
+    >>> from plantdb.io import write_point_cloud
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_npz')
+    >>> pcd = o3d.geometry.PointCloud()
+    >>> write_point_cloud(f, pcd)
+
     """
     from open3d import io
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         io.write_point_cloud(fname, data)
         dbfile.import_file(fname)
+    return
 
 
 def read_triangle_mesh(dbfile, ext="ply"):
-    """Reads triangular mesh from a DB file.
+    """Reads a triangular mesh from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "ply".
@@ -349,11 +506,11 @@ def read_triangle_mesh(dbfile, ext="ply"):
 
 
 def write_triangle_mesh(dbfile, data, ext="ply"):
-    """Writes triangular mesh to a DB file.
+    """Writes a triangular mesh to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : open3d.geometry.TriangleMesh
         The triangular mesh object to save.
@@ -365,14 +522,15 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
         fname = os.path.join(d, "temp.%s" % ext)
         io.write_triangle_mesh(fname, data)
         dbfile.import_file(fname)
+    return
 
 
 def read_voxel_grid(dbfile, ext="ply"):
-    """Reads voxel grid from a DB file.
+    """Reads a voxel grid from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "ply".
@@ -392,11 +550,11 @@ def read_voxel_grid(dbfile, ext="ply"):
 
 
 def write_voxel_grid(dbfile, data, ext="ply"):
-    """Writes voxel grid to a DB file.
+    """Writes a voxel grid to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : open3d.geometry.PointCloud
         The point cloud object to save.
@@ -408,14 +566,15 @@ def write_voxel_grid(dbfile, data, ext="ply"):
         fname = os.path.join(d, "temp.%s" % ext)
         io.write_voxel_grid(fname, data)
         dbfile.import_file(fname)
+    return
 
 
 def read_graph(dbfile, ext="p"):
-    """Reads treex tree from a DB file.
+    """Reads a networkx ``Graph`` from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "ply".
@@ -423,42 +582,80 @@ def read_graph(dbfile, ext="p"):
     Returns
     -------
     networkx.Graph
-        The loaded tree graph object.
+        The loaded (tree) graph object.
+
+    Example
+    -------
+    >>> import networkx as nx
+    >>> from plantdb.io import read_graph, write_graph
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_nx_graph")
+    >>> g = nx.path_graph(4)
+    >>> print(g)
+    Graph with 4 nodes and 3 edges
+    >>> write_graph(f, g)
+    >>> f = fs.get_file("test_nx_graph")
+    >>> g2 = read_graph(f)
+    >>> print(g2)
+    Graph with 4 nodes and 3 edges
+
     """
-    import networkx as nx
+    import pickle
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
         with open(fname, "wb") as fh:
             fh.write(b)
-        return nx.read_gpickle(fname)
+        with open(fname, 'rb') as f:
+            G = pickle.load(f)
+        return G
 
 
 def write_graph(dbfile, data, ext="p"):
-    """Writes treex tree to a DB file.
+    """Writes a networkx ``Graph`` to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to write the associated file.
-    data : treex.tree.Tree
-        The tree graph object to save.
+    data : networkx.Graph
+        The (tree) graph object to save.
     ext : str, optional
         File extension, defaults to "p".
+
+    Example
+    -------
+    >>> import networkx as nx
+    >>> from plantdb.io import write_graph
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_nx_graph")
+    >>> g = nx.path_graph(4)
+    >>> write_graph(f, g)
+
     """
-    import networkx as nx
+    import pickle
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.%s" % ext)
-        nx.write_gpickle(data, fname)
+        with open(fname, 'wb') as f:
+            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         dbfile.import_file(fname)
+    return
 
 
 def read_torch(dbfile, ext="pt"):
-    """Reads torch tensor from a DB file.
+    """Reads torch tensor from a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
         File extension, defaults to "pt".
@@ -478,11 +675,11 @@ def read_torch(dbfile, ext="pt"):
 
 
 def write_torch(dbfile, data, ext="pt"):
-    """Writes point cloud to a DB file.
+    """Writes point cloud to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : db.File
+    dbfile : DB.db.File
         The `File` object used to load the associated file.
     data : TorchTensor
         The torch tensor object to save.
@@ -494,6 +691,7 @@ def write_torch(dbfile, data, ext="pt"):
         fname = os.path.join(d, "temp.%s" % ext)
         torch.save(data, fname)
         dbfile.import_file(fname)
+    return
 
 
 def to_file(dbfile: File, path: str):
@@ -501,6 +699,7 @@ def to_file(dbfile: File, path: str):
     b = dbfile.read_raw()
     with open(path, "wb") as fh:
         fh.write(b)
+    return
 
 
 def dbfile_from_local_file(path: str):
@@ -515,7 +714,7 @@ def dbfile_from_local_file(path: str):
     # Initialize a `Fileset` instance:
     fileset = Fileset(db, scan, dirname)
     # Initialize a `File` instance & return it:
-    f = fsdb.File(db=db, fileset=fileset, id=id)
+    f = fsDB.db.File(db=db, fileset=fileset, id=id)
     f.filename = fname
     f.metadata = None
     return f
