@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,19 +51,16 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="REST URLs" href="../webapi.html" />
@@ -93,8 +91,7 @@
         <a href="../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -192,7 +189,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
@@ -310,62 +307,62 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="i-o-operations">
 <h1 id="reference-io--page-root">I/O operations<a class="headerlink" href="#reference-io--page-root" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<span class="target" id="module-plantdb.io"></span>
+<span class="target" id="module-plantdb.io"></span><section id="plantdb-io">
 <h2 id="plantdb-io">plantdb.io<a class="headerlink" href="#plantdb-io" title="Permalink to this heading">¶</a></h2>
 <p>ROMI Data IO
 This module contains all functions for reading and writing data.</p>
-
+<section id="file-formats">
 <h3 id="file-formats">File formats<a class="headerlink" href="#file-formats" title="Permalink to this heading">¶</a></h3>
-
+<section id="json">
 <h4 id="json">json<a class="headerlink" href="#json" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Python objects: dict, list</p></li>
 <li><p>File extensions: ‘json’</p></li>
 </ul>
-
-
+</section>
+<section id="toml">
 <h4 id="toml">toml<a class="headerlink" href="#toml" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Python objects: dict, list</p></li>
 <li><p>File extensions: ‘toml’</p></li>
 </ul>
-
-
+</section>
+<section id="d-image">
 <h4 id="d-image">2D image<a class="headerlink" href="#d-image" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Image data read and written using <code class="docutils literal notranslate"><span class="pre">imageio</span></code></p></li>
 </ul>
 <p>Python objects: np.ndarray
 File extensions: ‘jpg’, ‘png’</p>
-
-
+</section>
+<section id="d-volumes">
 <h4 id="d-volumes">3D Volumes<a class="headerlink" href="#d-volumes" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Volume data (3D numpy arrays) read and written using <code class="docutils literal notranslate"><span class="pre">imageio</span></code></p></li>
 </ul>
 <p>Python objects: np.ndarray
 File extensions: ‘tiff’</p>
-
-
+</section>
+<section id="point-clouds">
 <h4 id="point-clouds">Point Clouds<a class="headerlink" href="#point-clouds" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Python object: open3d.geometry.PointCloud</p></li>
 <li><p>File extensions: ‘ply’</p></li>
 </ul>
-
-
+</section>
+<section id="triangle-meshes">
 <h4 id="triangle-meshes">Triangle  Meshes<a class="headerlink" href="#triangle-meshes" title="Permalink to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Python object: open3d.geometry.TriangleMesh</p></li>
 <li><p>File extensions: ‘ply’</p></li>
 </ul>
-
-
-
+</section>
+</section>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.dbfile_from_local_file">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">dbfile_from_local_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#dbfile_from_local_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.dbfile_from_local_file" title="Permalink to this definition">¶</a></dt>
@@ -374,70 +371,136 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_graph">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads treex tree from a DB file.</p>
+<dd><p>Reads a networkx <code class="docutils literal notranslate"><span class="pre">Graph</span></code> from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>networkx.Graph</em> – The loaded tree graph object.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>networkx.Graph</em> – The loaded (tree) graph object.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_graph</span><span class="p">,</span> <span class="n">write_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_nx_graph"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">path_graph</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="go">Graph with 4 nodes and 3 edges</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_graph</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_nx_graph"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g2</span> <span class="o">=</span> <span class="n">read_graph</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g2</span><span class="p">)</span>
+<span class="go">Graph with 4 nodes and 3 edges</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_image">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads image from a DB file.</p>
+<dd><p>Reads image from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>numpy.ndarray</em> – The image array.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_image</span><span class="p">,</span> <span class="n">write_image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_image</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img2</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img2</span><span class="p">)</span>  <span class="c1"># raise an exception if not equal!</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_json">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads json from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict</em> – The deserialized JSON file.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_json</span><span class="p">,</span> <span class="n">write_json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"test"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'ROMI'</span><span class="p">:</span> <span class="s1">'RObotics for MIcrofarms'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_json</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_json</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="go">{'test': False, 'ROMI': 'RObotics for MIcrofarms'}</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_npz">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_npz" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads npz from a DB file.</p>
+<dd><p>Reads a dictionary of arrays from an ‘.npz’ ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>numpy.ndarray</em> – The uncompressed numpy array.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict of numpy.ndarray</em> – The uncompressed numpy array.</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_npz</span><span class="p">,</span> <span class="n">write_npz</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_npz'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_npz</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">npz</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_npz"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">npz2</span> <span class="o">=</span> <span class="n">read_npz</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">npz</span><span class="p">[</span><span class="s2">"0"</span><span class="p">],</span> <span class="n">npz2</span><span class="p">[</span><span class="s2">"0"</span><span class="p">])</span>  <span class="c1"># raise an exception if not equal!</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_point_cloud">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_point_cloud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_point_cloud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_point_cloud" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads point cloud from a DB file.</p>
+<dd><p>Reads a point cloud from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>open3d.geometry.PointCloud</em> – The loaded point cloud object.</p>
 </dd>
 </dl>
@@ -445,28 +508,43 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_toml">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_toml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads toml from a DB file.</p>
+<dd><p>Reads toml from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict</em> – The deserialized TOML file.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_toml</span><span class="p">,</span> <span class="n">write_toml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"test"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'ROMI'</span><span class="p">:</span> <span class="s1">'RObotics for MIcrofarms'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_toml</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_toml</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="go">{'test': True}</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_torch">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_torch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_torch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_torch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads torch tensor from a DB file.</p>
+<dd><p>Reads torch tensor from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “pt”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>Torch.Tensor</em> – The loaded tensor object.</p>
 </dd>
 </dl>
@@ -474,15 +552,15 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_triangle_mesh">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_triangle_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_triangle_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_triangle_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads triangular mesh from a DB file.</p>
+<dd><p>Reads a triangular mesh from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>open3d.geometry.PointCloud</em> – The loaded point cloud object.</p>
 </dd>
 </dl>
@@ -490,31 +568,47 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_volume">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'npz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads volume from a DB file.</p>
+<dd><p>Reads volume from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “npz”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>numpy.ndarray</em> – The volume array.</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="p">,</span> <span class="n">read_volumewrite_volume</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_volume'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_volume</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">vol</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_volume"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vol2</span> <span class="o">=</span> <span class="n">read_volume</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">vol</span><span class="p">,</span> <span class="n">vol2</span><span class="p">)</span>  <span class="c1"># raise an exception if not equal!</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.read_voxel_grid">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">read_voxel_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#read_voxel_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.read_voxel_grid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads voxel grid from a DB file.</p>
+<dd><p>Reads a voxel grid from a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>open3d.geometry.PointCloud</em> – The loaded point cloud object.</p>
 </dd>
 </dl>
@@ -532,94 +626,170 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_graph">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes treex tree to a DB file.</p>
+<dd><p>Writes a networkx <code class="docutils literal notranslate"><span class="pre">Graph</span></code> to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
-<li><p><strong>data</strong> (<em>treex.tree.Tree</em>) – The tree graph object to save.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>data</strong> (<em>networkx.Graph</em>) – The (tree) graph object to save.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “p”.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_nx_graph"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">path_graph</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_graph</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_image">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes image to a DB file.</p>
+<dd><p>Writes image to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<em>array like</em>) – The array to save as an image.</p></li>
 <li><p><strong>ext</strong> (<em>{'png'</em><em>, </em><em>'jpeg'</em><em>, </em><em>'tiff'}</em><em>, </em><em>optional</em>) – File extension, defaults to “png”.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_image</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_json">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes json to a DB file.</p>
+<dd><p>Writes json to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – The dictionary to save as a JSON file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “json”.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"test"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'ROMI'</span><span class="p">:</span> <span class="s1">'RObotics for MIcrofarms'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_json</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_npz">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_npz" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes npz to a DB file.</p>
+<dd><p>Writes a dictionary of arrays from an ‘.npz’ ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
-<li><p><strong>data</strong> (<em>array like</em>) – A 3D array to save as volume.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> of </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – A dictionary of arrays to save as a single compressed ‘.npz’ file.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_npz</span><span class="p">,</span> <span class="n">write_npz</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_npz'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_npz</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">npz</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_point_cloud">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_point_cloud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_point_cloud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_point_cloud" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes point cloud to a DB file.</p>
+<dd><p>Writes a point cloud to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<em>open3d.geometry.PointCloud</em>) – The point cloud object to save.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_point_cloud</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_npz'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">pcd</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_toml">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'toml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_toml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes toml to a DB file.</p>
+<dd><p>Writes toml to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – The dictionary to save as a TOML file.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “toml”.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_toml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_json"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"test"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'ROMI'</span><span class="p">:</span> <span class="s1">'RObotics for MIcrofarms'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_toml</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_torch">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_torch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_torch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_torch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes point cloud to a DB file.</p>
+<dd><p>Writes point cloud to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to load the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
 <li><p><strong>data</strong> (<em>TorchTensor</em>) – The torch tensor object to save.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “pt”.</p></li>
 </ul>
@@ -629,11 +799,11 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_triangle_mesh">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_triangle_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_triangle_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_triangle_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes triangular mesh to a DB file.</p>
+<dd><p>Writes a triangular mesh to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<em>open3d.geometry.TriangleMesh</em>) – The triangular mesh object to save.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
@@ -643,11 +813,11 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_volume">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'npz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes volume to a DB file.</p>
+<dd><p>Writes volume to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<em>array like</em>) – The 3D array to save as volume.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “npz”.</p></li>
 </ul>
@@ -671,18 +841,18 @@ File extensions: ‘tiff’</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="plantdb.io.write_voxel_grid">
 <span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">write_voxel_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ply'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#write_voxel_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.write_voxel_grid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes voxel grid to a DB file.</p>
+<dd><p>Writes a voxel grid to a ROMI database file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbfile</strong> (<a class="reference internal" href="db.html#plantdb.db.File" title="plantdb.db.File"><em>db.File</em></a>) – The <cite>File</cite> object used to write the associated file.</p></li>
+<li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to write the associated file.</p></li>
 <li><p><strong>data</strong> (<em>open3d.geometry.PointCloud</em>) – The point cloud object to save.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
-
+</section>
 
 
           </article>
@@ -731,7 +901,7 @@ File extensions: ‘tiff’</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

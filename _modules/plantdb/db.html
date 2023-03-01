@@ -50,19 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   
@@ -91,8 +88,7 @@
         <a href="../../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -190,7 +186,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../../index.html"
@@ -276,7 +272,7 @@
 
 
 <div class="viewcode-block" id="DB"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB">[docs]</a><span class="k">class</span> <span class="nc">DB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""Class defining the database object ``DB``.</span>
+<span class="w">    </span><span class="sd">"""Class defining the database object ``DB``.</span>
 
 <span class="sd">    Abstract class defining the API used to communicate with a database in the</span>
 <span class="sd">    ROMI project.</span>
@@ -286,7 +282,7 @@
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="DB.connect"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Connect to the database.</span>
+<span class="w">        </span><span class="sd">"""Connect to the database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -297,19 +293,19 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="DB.disconnect"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Disconnect from the database.</span>
+<span class="w">        </span><span class="sd">"""Disconnect from the database.</span>
 
 <span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="DB.get_scans"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.get_scans">[docs]</a>    <span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get the list of scans saved in the database.</span>
+<span class="w">        </span><span class="sd">"""Get the list of scans saved in the database.</span>
 
 <span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="DB.get_scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.get_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get a scan saved in the database.</span>
+<span class="w">        </span><span class="sd">"""Get a scan saved in the database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -326,7 +322,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="DB.create_scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.create_scan">[docs]</a>    <span class="k">def</span> <span class="nf">create_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a new scan object in the database.</span>
+<span class="w">        </span><span class="sd">"""Create a new scan object in the database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -341,7 +337,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="DB.delete_scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DB.delete_scan">[docs]</a>    <span class="k">def</span> <span class="nf">delete_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Delete a scan from the DB.</span>
+<span class="w">        </span><span class="sd">"""Delete a scan from the DB.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -353,7 +349,7 @@
 
 
 <div class="viewcode-block" id="Scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan">[docs]</a><span class="k">class</span> <span class="nc">Scan</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""Class defining the scan object ``Scan``.</span>
+<span class="w">    </span><span class="sd">"""Class defining the scan object ``Scan``.</span>
 
 <span class="sd">    Abstract class defining the API used to represent a scan in the ROMI project.</span>
 
@@ -366,7 +362,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        db : DB</span>
@@ -378,7 +374,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
 
 <div class="viewcode-block" id="Scan.get_id"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get scan id.</span>
+<span class="w">        </span><span class="sd">"""Get scan id.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -387,7 +383,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
 
 <div class="viewcode-block" id="Scan.get_db"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.get_db">[docs]</a>    <span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent db.</span>
+<span class="w">        </span><span class="sd">"""Get parent db.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -396,7 +392,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span></div>
 
 <div class="viewcode-block" id="Scan.get_filesets"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.get_filesets">[docs]</a>    <span class="k">def</span> <span class="nf">get_filesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get all sets of files.</span>
+<span class="w">        </span><span class="sd">"""Get all sets of files.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -405,7 +401,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Scan.get_fileset"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.get_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get a fileset with a given id.</span>
+<span class="w">        </span><span class="sd">"""Get a fileset with a given id.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -420,7 +416,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Scan.get_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -434,7 +430,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Scan.set_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        If value is ``None``, scan metadata is set to data.</span>
 <span class="sd">        If value is not ``None`` data is a key and is set to value.</span>
@@ -449,7 +445,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Scan.create_fileset"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.create_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">create_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a set of files.</span>
+<span class="w">        </span><span class="sd">"""Create a set of files.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -459,7 +455,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Scan.delete_fileset"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Scan.delete_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">delete_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">):</span>
-        <span class="sd">"""Delete a fileset from the DB.</span>
+<span class="w">        </span><span class="sd">"""Delete a fileset from the DB.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -470,7 +466,7 @@
 
 
 <div class="viewcode-block" id="Fileset"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset">[docs]</a><span class="k">class</span> <span class="nc">Fileset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""Class defining a set of files ``Fileset`` contained in a ``Scan``.</span>
+<span class="w">    </span><span class="sd">"""Class defining a set of files ``Fileset`` contained in a ``Scan``.</span>
 
 <span class="sd">    Abstract class defining the API used to represent a set of files in the ROMI</span>
 <span class="sd">    project.</span>
@@ -495,7 +491,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
 
 <div class="viewcode-block" id="Fileset.get_id"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get scan id.</span>
+<span class="w">        </span><span class="sd">"""Get scan id.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -504,7 +500,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
 
 <div class="viewcode-block" id="Fileset.get_db"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_db">[docs]</a>    <span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent db.</span>
+<span class="w">        </span><span class="sd">"""Get parent db.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -513,7 +509,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span></div>
 
 <div class="viewcode-block" id="Fileset.get_scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent scan.</span>
+<span class="w">        </span><span class="sd">"""Get parent scan.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -522,7 +518,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan</span></div>
 
 <div class="viewcode-block" id="Fileset.get_files"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get all files.</span>
+<span class="w">        </span><span class="sd">"""Get all files.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -531,7 +527,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Fileset.get_file"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get file with given id.</span>
+<span class="w">        </span><span class="sd">"""Get file with given id.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -547,7 +543,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Fileset.get_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -561,7 +557,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Fileset.set_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        If value is ``None``, scan metadata is set to data.</span>
 <span class="sd">        If value is not ``None`` data is a key and is set to value.</span>
@@ -576,7 +572,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Fileset.create_file"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.create_file">[docs]</a>    <span class="k">def</span> <span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a file.</span>
+<span class="w">        </span><span class="sd">"""Create a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -586,7 +582,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="Fileset.delete_file"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.Fileset.delete_file">[docs]</a>    <span class="k">def</span> <span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
-        <span class="sd">"""Delete a file from the DB.</span>
+<span class="w">        </span><span class="sd">"""Delete a file from the DB.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -597,7 +593,7 @@
 
 
 <div class="viewcode-block" id="File"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File">[docs]</a><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""Class defining a file ``File`` contained in a ``Fileset``.</span>
+<span class="w">    </span><span class="sd">"""Class defining a file ``File`` contained in a ``Fileset``.</span>
 
 <span class="sd">    Abstract class defining the API used to represent a file in the ROMI project.</span>
 
@@ -620,7 +616,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="File.get_id"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get file id.</span>
+<span class="w">        </span><span class="sd">"""Get file id.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -629,7 +625,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
 
 <div class="viewcode-block" id="File.get_db"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.get_db">[docs]</a>    <span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent db.</span>
+<span class="w">        </span><span class="sd">"""Get parent db.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -638,7 +634,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span></div>
 
 <div class="viewcode-block" id="File.get_scan"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.get_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent scan.</span>
+<span class="w">        </span><span class="sd">"""Get parent scan.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -647,7 +643,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span></div>
 
 <div class="viewcode-block" id="File.get_fileset"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.get_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Get parent fileset.</span>
+<span class="w">        </span><span class="sd">"""Get parent fileset.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -656,7 +652,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span></div>
 
 <div class="viewcode-block" id="File.get_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -670,7 +666,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.set_metadata"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get metadata associated to scan.</span>
+<span class="w">        </span><span class="sd">"""Get metadata associated to scan.</span>
 
 <span class="sd">        If value is ``None``, scan metadata is set to data.</span>
 <span class="sd">        If value is not ``None`` data is a key and is set to value.</span>
@@ -685,7 +681,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.import_file"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.import_file">[docs]</a>    <span class="k">def</span> <span class="nf">import_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">"""Import an existing file to the ``File`` object.</span>
+<span class="w">        </span><span class="sd">"""Import an existing file to the ``File`` object.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -695,7 +691,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.write_raw"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.write_raw">[docs]</a>    <span class="k">def</span> <span class="nf">write_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="sd">"""Writes bytes to a file.</span>
+<span class="w">        </span><span class="sd">"""Writes bytes to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -707,7 +703,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.read_raw"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.read_raw">[docs]</a>    <span class="k">def</span> <span class="nf">read_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Reads bytes from a file.</span>
+<span class="w">        </span><span class="sd">"""Reads bytes from a file.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -717,7 +713,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.write"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="sd">"""Writes text to a file.</span>
+<span class="w">        </span><span class="sd">"""Writes text to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -729,7 +725,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="File.read"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.File.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Reads text from a file</span>
+<span class="w">        </span><span class="sd">"""Reads text from a file</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -739,7 +735,7 @@
 
 
 <div class="viewcode-block" id="DBBusyError"><a class="viewcode-back" href="../../reference/db.html#plantdb.db.DBBusyError">[docs]</a><span class="k">class</span> <span class="nc">DBBusyError</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
-    <span class="sd">""" Raises an error if the database is busy.</span>
+<span class="w">    </span><span class="sd">""" Raises an error if the database is busy.</span>
 
 <span class="sd">    This error is raised when the database is busy and an operation cannot be</span>
 <span class="sd">     done on it.</span>
@@ -771,7 +767,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

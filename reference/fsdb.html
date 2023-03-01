@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,19 +51,16 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="plantdb.fsdb.FSDB" href="autosummary/plantdb.fsdb.FSDB.html" />
@@ -93,8 +91,7 @@
         <a href="../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -192,7 +189,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
@@ -382,7 +379,7 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="local-file-system-database">
 <h1 id="reference-fsdb--page-root">Local file system database<a class="headerlink" href="#reference-fsdb--page-root" title="Permalink to this heading">¶</a></h1>
 <p>Implementation of a database as a local file structure.</p>
 <p>Assuming that the <code class="docutils literal notranslate"><span class="pre">FSDB</span></code> root database directory is <code class="docutils literal notranslate"><span class="pre">dbroot/</span></code>, there is a <code class="docutils literal notranslate"><span class="pre">Scan</span></code> with <code class="docutils literal notranslate"><span class="pre">'myscan_001'</span></code> as <code class="docutils literal notranslate"><span class="pre">Scan.id</span></code> and there are some metadata (see below), you should have the following file structure:</p>
@@ -443,13 +440,9 @@
 <span class="n">myscan_001</span><span class="o">/</span><span class="n">metadata</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">scan_img_99</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
-
+<section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%"/>
-<col style="width: 90%"/>
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FSDB</span></code></a>(basedir)</p></td>
 <td><p>Implement a local <em>File System DataBase</em> version of abstract class <code class="docutils literal notranslate"><span class="pre">db.DB</span></code>.</p></td>
@@ -465,22 +458,18 @@
 </tr>
 </tbody>
 </table>
-
-
+</section>
+<section id="methods">
 <h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%"/>
-<col style="width: 90%"/>
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.fsdb.dummy_db" title="plantdb.fsdb.dummy_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dummy_db</span></code></a>([with_scan, with_fileset, with_file])</p></td>
 <td><p>Create a dummy temporary database.</p></td>
 </tr>
 </tbody>
 </table>
-
-
+</section>
+<section id="module-plantdb.fsdb">
 <span id="details"></span><h2 id="module-plantdb.fsdb">Details<a class="headerlink" href="#module-plantdb.fsdb" title="Permalink to this heading">¶</a></h2>
 <p>Implementation of a database as a local file structure.</p>
 <p>Assuming that the <code class="docutils literal notranslate"><span class="pre">FSDB</span></code> root database directory is <code class="docutils literal notranslate"><span class="pre">dbroot/</span></code>, there is a <code class="docutils literal notranslate"><span class="pre">Scan</span></code> with <code class="docutils literal notranslate"><span class="pre">'myscan_001'</span></code> as <code class="docutils literal notranslate"><span class="pre">Scan.id</span></code> and there are some metadata (see below), you should have the following file structure:</p>
@@ -558,7 +547,7 @@
 <span class="sig-name descname"><span class="pre">basedir</span></span><a class="headerlink" href="#plantdb.fsdb.FSDB.basedir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to the base directory containing the database</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -568,7 +557,7 @@
 <span class="sig-name descname"><span class="pre">lock_path</span></span><a class="headerlink" href="#plantdb.fsdb.FSDB.lock_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute path to the lock file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -578,7 +567,7 @@
 <span class="sig-name descname"><span class="pre">scans</span></span><a class="headerlink" href="#plantdb.fsdb.FSDB.scans" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of <code class="docutils literal notranslate"><span class="pre">Scan</span></code> objects found in the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
@@ -588,7 +577,7 @@
 <span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#plantdb.fsdb.FSDB.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the database is connected (locked directory), else <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -634,10 +623,10 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 <dd><p>Connect to the local database.</p>
 <p>Handle DB “locking” system by adding a <cite>LOCK_FILE_NAME</cite> file in the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – UNUSED</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.11)"><strong>IOError</strong></a> – If the given <cite>basedir</cite> is not an existing directory.
     If the <cite>MARKER_FILE_NAME</cite> is missing from the <cite>basedir</cite>.</p></li>
@@ -667,13 +656,13 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 <span class="sig-name descname"><span class="pre">create_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.create_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.create_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <cite>Scan</cite> instance in the local database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the scan to create. It should not exist in the local database.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>plantdb.fsdb.Scan</em> – The <cite>Scan</cite> instance created in the local database.</p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.11)"><strong>IOError</strong></a> – If the <cite>id</cite> already exists in the local database.
     If the <cite>id</cite> is not valid.</p>
 </dd>
@@ -698,10 +687,10 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 <span class="sig-name descname"><span class="pre">delete_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.delete_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.delete_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete an existing <cite>Scan</cite> from the local database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the scan to create. It should exist in the local database.</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.11)"><strong>IOError</strong></a> – If the <cite>id</cite> do not exist in the local database.</p>
 </dd>
 </dl>
@@ -733,7 +722,7 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 <dd><p>Disconnect from the local database.</p>
 <p>Handle DB “locking” system by removing the <cite>LOCK_FILE_NAME</cite> file from the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.11)"><strong>IOError</strong></a> – If the <cite>LOCK_FILE_NAME</cite> cannot be removed using the <code class="docutils literal notranslate"><span class="pre">lock_path</span></code> attribute.</p>
 </dd>
 </dl>
@@ -756,7 +745,7 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 <span class="sig-name descname"><span class="pre">get_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.get_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.get_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get or create a <cite>Scan</cite> instance in the local database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the scan dataset to get/create.
 It should exist if <cite>create</cite> is <cite>False</cite>.</p></li>
@@ -790,10 +779,10 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">get_scans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.get_scans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.get_scans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of <cite>Scan</cite> instances defined in the local database, possibly filtered using a <cite>query</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Query to use to get a list of scans.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>list of plantdb.fsdb.Scan</em> – List of <cite>Scan`s, filtered by the `query</cite> if any.</p>
 </dd>
 </dl>
@@ -848,7 +837,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.fsdb.File.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database where to find the scan</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB">plantdb.fsdb.FSDB</a></p>
 </dd>
 </dl>
@@ -858,7 +847,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">fileset</span></span><a class="headerlink" href="#plantdb.fsdb.File.fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of files containing the file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.fsdb.Fileset" title="plantdb.fsdb.Fileset">plantdb.fsdb.Fileset</a></p>
 </dd>
 </dl>
@@ -868,7 +857,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.fsdb.File.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the file in the database <code class="docutils literal notranslate"><span class="pre">fsdb.FSDB</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -878,7 +867,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#plantdb.fsdb.File.filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>File name.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -888,7 +877,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#plantdb.fsdb.File.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary of metadata attached to the file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
@@ -906,10 +895,10 @@ Else they are just referenced in the database!</p>
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata associated to a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A key that should exist in the file’s metadata.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>any</em> – If <cite>key</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns a dictionary.
 Else, returns the value attached to this key.</p>
 </dd>
@@ -920,7 +909,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">import_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.import_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.import_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Import the file from its local path to the current fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – Path to the file to import.</p>
 </dd>
 </dl>
@@ -948,7 +937,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the file and return its contents.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>str</em> – The contents of the file.</p>
 </dd>
 </dl>
@@ -980,7 +969,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">read_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.read_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.read_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the file and return its contents.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>bytes</em> – The contents of the file.</p>
 </dd>
 </dl>
@@ -1009,7 +998,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">set_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.set_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new metadata to the file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the metadata.</p></li>
 <li><p><strong>value</strong> (<em>any</em>) – Value to attach to this metadata. Should be transformable to JSON.</p></li>
@@ -1027,7 +1016,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a file from data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A string representation of the content to write.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The extension to use to save the file.</p></li>
@@ -1061,7 +1050,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">write_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.write_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.write_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a file from raw byte data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><em>bytes</em></a>) – The raw byte content to write.</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The extension to use to save the file.</p></li>
@@ -1106,7 +1095,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.fsdb.Fileset.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database where to find the <cite>scan</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB">plantdb.fsdb.FSDB</a></p>
 </dd>
 </dl>
@@ -1116,7 +1105,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.fsdb.Fileset.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the scan in the database <cite>db</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -1126,7 +1115,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">scan</span></span><a class="headerlink" href="#plantdb.fsdb.Fileset.scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scan containing the set of files of interest.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.fsdb.Scan" title="plantdb.fsdb.Scan">plantdb.fsdb.Scan</a></p>
 </dd>
 </dl>
@@ -1136,7 +1125,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#plantdb.fsdb.Fileset.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary of metadata attached to the fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
@@ -1146,7 +1135,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#plantdb.fsdb.Fileset.files" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of <cite>File</cite> objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a> of <a class="reference internal" href="#plantdb.fsdb.File" title="plantdb.fsdb.File">plantdb.fsdb.File</a></p>
 </dd>
 </dl>
@@ -1160,10 +1149,10 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.create_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.create_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <cite>File</cite> instance in the local database attached to the current <cite>Fileset</cite> instance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the file to create.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>plantdb.fsdb.File</em> – The <cite>File</cite> instance created in the current <cite>Fileset</cite> instance.</p>
 </dd>
 </dl>
@@ -1195,7 +1184,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.delete_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.delete_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a given file from the current fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the file to delete.</p>
 </dd>
 </dl>
@@ -1223,14 +1212,14 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.get_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.get_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get or create a <cite>File</cite> instance, of given <cite>id</cite>, in the current fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the file to get/create.</p></li>
 <li><p><strong>create</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), the given <cite>id</cite> should exist in the local database.
 Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>plantdb.fsdb.File</em> – The retrieved or created file.</p>
 </dd>
 </dl>
@@ -1253,10 +1242,10 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.get_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of <cite>File</cite> instances defined in the current fileset, possibly filtered using a <cite>query</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Query to use to get a list of files.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>list of plantdb.fsdb.File</em> – List of <a href="#id1"><span class="problematic" id="id2">`</span></a>File`s, filtered by the query if any.</p>
 </dd>
 </dl>
@@ -1283,10 +1272,10 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata associated to a fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A key that should exist in the fileset’s metadata.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>any</em> – If <cite>key</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns a dictionary.
 Else, returns the value attached to this key.</p>
 </dd>
@@ -1333,7 +1322,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">set_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.set_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new metadata to the fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the metadata.</p></li>
 <li><p><strong>value</strong> (<em>any</em>) – Value to attach to this metadata. Should be transformable to JSON.</p></li>
@@ -1374,7 +1363,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.fsdb.Scan.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database where to find the scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB">plantdb.fsdb.FSDB</a></p>
 </dd>
 </dl>
@@ -1384,7 +1373,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.fsdb.Scan.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The scan unique name in the local database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -1394,7 +1383,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#plantdb.fsdb.Scan.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary of metadata attached to the scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
@@ -1404,7 +1393,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">filesets</span></span><a class="headerlink" href="#plantdb.fsdb.Scan.filesets" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of <code class="docutils literal notranslate"><span class="pre">Fileset</span></code> objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a> of <a class="reference internal" href="#plantdb.fsdb.Fileset" title="plantdb.fsdb.Fileset">plantdb.fsdb.Fileset</a></p>
 </dd>
 </dl>
@@ -1467,13 +1456,13 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">create_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.create_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.create_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <cite>Fileset</cite> instance in the local database attached to the current <cite>Scan</cite> instance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the fileset to create. It should not exist in the current <cite>Scan</cite> instance.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>plantdb.fsdb.Fileset</em> – The <cite>Fileset</cite> instance created in the current <cite>Scan</cite> instance.</p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.11)"><strong>IOError</strong></a> – If the <cite>id</cite> already exists in the current <cite>Scan</cite> instance.
     If the <cite>id</cite> is not valid.</p>
 </dd>
@@ -1503,7 +1492,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">delete_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.delete_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.delete_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a given fileset from the scan dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the fileset to delete.</p>
 </dd>
 </dl>
@@ -1526,7 +1515,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">get_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.get_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.get_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get or create a <cite>Fileset</cite> instance, of given <cite>id</cite>, in the current scan dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the fileset to get/create.
 It should exist if <cite>create</cite> is <cite>False</cite>.</p></li>
@@ -1534,7 +1523,7 @@ It should exist if <cite>create</cite> is <cite>False</cite>.</p></li>
 Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>Fileset</em> – The retrieved or created fileset.</p>
 </dd>
 </dl>
@@ -1564,10 +1553,10 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">get_filesets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.get_filesets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.get_filesets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of <cite>Fileset</cite> instances defined in the current scan dataset, possibly filtered using a <cite>query</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Query to use to get a list of filesets.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>list of plantdb.fsdb.Fileset</em> – List of <cite>Fileset`s, filtered by the `query</cite> if any.</p>
 </dd>
 </dl>
@@ -1591,10 +1580,10 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="sig-name descname"><span class="pre">get_measures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.get_measures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.get_measures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the manual measurements associated to a scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A key that should exist in the scan’s manual measurements.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>any</em> – If <cite>key</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns a dictionary.
 Else, returns the value attached to this key.</p>
 </dd>
@@ -1608,10 +1597,10 @@ It is located at the root folder of the scan dataset.</p>
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata associated to a scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A key that should exist in the scan’s metadata.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>any</em> – If <cite>key</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns a dictionary.
 Else, returns the value attached to this key.</p>
 </dd>
@@ -1652,7 +1641,7 @@ Else, returns the value attached to this key.</p>
 <span class="sig-name descname"><span class="pre">set_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.set_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new metadata to the scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the metadata.</p></li>
 <li><p><strong>value</strong> (<em>any</em>) – Value to attach to this metadata. Should be transformable to JSON.</p></li>
@@ -1671,14 +1660,14 @@ Else, returns the value attached to this key.</p>
 <span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">dummy_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_scan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_fileset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#dummy_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.dummy_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a dummy temporary database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>with_scan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Add a dummy <code class="docutils literal notranslate"><span class="pre">Scan</span></code> to the dummy database.</p></li>
 <li><p><strong>with_fileset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Add a dummy <code class="docutils literal notranslate"><span class="pre">Fileset</span></code> to the dummy database.</p></li>
 <li><p><strong>with_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Add a dummy <code class="docutils literal notranslate"><span class="pre">File</span></code> to the dummy database.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>fsdb.FSDB</em> – The dummy database.</p>
 </dd>
 </dl>
@@ -1728,8 +1717,8 @@ Else, returns the value attached to this key.</p>
 </pre></div>
 </div>
 </dd></dl>
-
-
+</section>
+</section>
 
 
           </article>
@@ -1778,7 +1767,7 @@ Else, returns the value attached to this key.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

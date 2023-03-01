@@ -50,19 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   
@@ -91,8 +88,7 @@
         <a href="../../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -190,7 +186,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../../index.html"
@@ -352,7 +348,7 @@
 
 
 <div class="viewcode-block" id="dummy_db"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.dummy_db">[docs]</a><span class="k">def</span> <span class="nf">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_fileset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">"""Create a dummy temporary database.</span>
+<span class="w">    </span><span class="sd">"""Create a dummy temporary database.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -466,7 +462,7 @@
 
 
 <div class="viewcode-block" id="FSDB"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB">[docs]</a><span class="k">class</span> <span class="nc">FSDB</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DB</span><span class="p">):</span>
-    <span class="sd">"""Implement a local *File System DataBase* version of abstract class ``db.DB``.</span>
+<span class="w">    </span><span class="sd">"""Implement a local *File System DataBase* version of abstract class ``db.DB``.</span>
 
 <span class="sd">    Implement as a simple local file structure with following directory structure and marker files:</span>
 <span class="sd">      * directory ``${FSDB.basedir}`` as database root directory;</span>
@@ -525,7 +521,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">):</span>
-        <span class="sd">"""Database constructor.</span>
+<span class="w">        </span><span class="sd">"""Database constructor.</span>
 
 <span class="sd">        Check given ``basedir`` directory exists and load accessible ``Scan`` objects.</span>
 
@@ -543,7 +539,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="FSDB.connect"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Connect to the local database.</span>
+<span class="w">        </span><span class="sd">"""Connect to the local database.</span>
 
 <span class="sd">        Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.</span>
 
@@ -600,7 +596,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="FSDB.disconnect"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Disconnect from the local database.</span>
+<span class="w">        </span><span class="sd">"""Disconnect from the local database.</span>
 
 <span class="sd">        Handle DB "locking" system by removing the `LOCK_FILE_NAME` file from the DB.</span>
 
@@ -639,7 +635,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="FSDB.get_scans"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.get_scans">[docs]</a>    <span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.</span>
+<span class="w">        </span><span class="sd">"""Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -668,7 +664,7 @@
         <span class="k">return</span> <span class="n">_filter_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FSDB.get_scan"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.get_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get or create a `Scan` instance in the local database.</span>
+<span class="w">        </span><span class="sd">"""Get or create a `Scan` instance in the local database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -709,7 +705,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="FSDB.create_scan"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.create_scan">[docs]</a>    <span class="k">def</span> <span class="nf">create_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a new `Scan` instance in the local database.</span>
+<span class="w">        </span><span class="sd">"""Create a new `Scan` instance in the local database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -753,7 +749,7 @@
         <span class="k">return</span> <span class="n">scan</span></div>
 
 <div class="viewcode-block" id="FSDB.delete_scan"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.delete_scan">[docs]</a>    <span class="k">def</span> <span class="nf">delete_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Delete an existing `Scan` from the local database.</span>
+<span class="w">        </span><span class="sd">"""Delete an existing `Scan` from the local database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -795,7 +791,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="FSDB.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">"""Get the path to the local database root directory.</span>
+<span class="w">        </span><span class="sd">"""Get the path to the local database root directory.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -809,7 +805,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span></div>
 
 <div class="viewcode-block" id="FSDB.list_scans"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.list_scans">[docs]</a>    <span class="k">def</span> <span class="nf">list_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">"""Get the list of scans in the local database.</span>
+<span class="w">        </span><span class="sd">"""Get the list of scans in the local database.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -825,7 +821,7 @@
 
 
 <div class="viewcode-block" id="Scan"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan">[docs]</a><span class="k">class</span> <span class="nc">Scan</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Scan</span><span class="p">):</span>
-    <span class="sd">"""Implement ``Scan`` for the local *File System DataBase* from abstract class ``db.Scan``.</span>
+<span class="w">    </span><span class="sd">"""Implement ``Scan`` for the local *File System DataBase* from abstract class ``db.Scan``.</span>
 
 <span class="sd">    Implementation of a scan as a simple file structure with:</span>
 <span class="sd">      * directory ``${Scan.db.basedir}/${Scan.db.id}`` as scan root directory;</span>
@@ -900,7 +896,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Scan dataset constructor.</span>
+<span class="w">        </span><span class="sd">"""Scan dataset constructor.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -924,7 +920,7 @@
         <span class="k">return</span>
 
 <div class="viewcode-block" id="Scan.get_filesets"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.get_filesets">[docs]</a>    <span class="k">def</span> <span class="nf">get_filesets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.</span>
+<span class="w">        </span><span class="sd">"""Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -954,7 +950,7 @@
         <span class="k">return</span> <span class="n">_filter_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filesets</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Scan.get_fileset"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.get_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get or create a `Fileset` instance, of given `id`, in the current scan dataset.</span>
+<span class="w">        </span><span class="sd">"""Get or create a `Fileset` instance, of given `id`, in the current scan dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1001,7 +997,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesets</span><span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Scan.get_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the metadata associated to a scan.</span>
+<span class="w">        </span><span class="sd">"""Get the metadata associated to a scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1018,7 +1014,7 @@
         <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Scan.get_measures"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.get_measures">[docs]</a>    <span class="k">def</span> <span class="nf">get_measures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the manual measurements associated to a scan.</span>
+<span class="w">        </span><span class="sd">"""Get the manual measurements associated to a scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1040,7 +1036,7 @@
         <span class="k">return</span> <span class="n">_get_measures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measures</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Scan.set_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Add a new metadata to the scan.</span>
+<span class="w">        </span><span class="sd">"""Add a new metadata to the scan.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1057,7 +1053,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Scan.create_fileset"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.create_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">create_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a new `Fileset` instance in the local database attached to the current `Scan` instance.</span>
+<span class="w">        </span><span class="sd">"""Create a new `Fileset` instance in the local database attached to the current `Scan` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1107,12 +1103,12 @@
         <span class="k">return</span> <span class="n">fileset</span></div>
 
 <div class="viewcode-block" id="Scan.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
         <span class="n">_store_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Scan.delete_fileset"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.delete_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">delete_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">):</span>
-        <span class="sd">"""Delete a given fileset from the scan dataset.</span>
+<span class="w">        </span><span class="sd">"""Delete a given fileset from the scan dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1143,7 +1139,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Scan.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">"""Get the path to the local scan dataset.</span>
+<span class="w">        </span><span class="sd">"""Get the path to the local scan dataset.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1158,7 +1154,7 @@
         <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Scan.list_filesets"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.list_filesets">[docs]</a>    <span class="k">def</span> <span class="nf">list_filesets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">"""Get the list of filesets in the scan dataset.</span>
+<span class="w">        </span><span class="sd">"""Get the list of filesets in the scan dataset.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1176,7 +1172,7 @@
 
 
 <div class="viewcode-block" id="Fileset"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset">[docs]</a><span class="k">class</span> <span class="nc">Fileset</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Fileset</span><span class="p">):</span>
-    <span class="sd">"""Implement ``Fileset`` for the local *File System DataBase* from abstract class ``db.Fileset``.</span>
+<span class="w">    </span><span class="sd">"""Implement ``Fileset`` for the local *File System DataBase* from abstract class ``db.Fileset``.</span>
 
 <span class="sd">    Implementation of a fileset as a simple files structure with:</span>
 <span class="sd">      * directory ``${FSDB.basedir}/${FSDB.scan.id}/${Fileset.id}`` containing set of files;</span>
@@ -1215,7 +1211,7 @@
         <span class="k">return</span>
 
 <div class="viewcode-block" id="Fileset.get_files"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.get_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.</span>
+<span class="w">        </span><span class="sd">"""Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1248,7 +1244,7 @@
         <span class="k">return</span> <span class="n">_filter_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fileset.get_file"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.get_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""Get or create a `File` instance, of given `id`, in the current fileset.</span>
+<span class="w">        </span><span class="sd">"""Get or create a `File` instance, of given `id`, in the current fileset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1285,7 +1281,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Fileset.get_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the metadata associated to a fileset.</span>
+<span class="w">        </span><span class="sd">"""Get the metadata associated to a fileset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1302,7 +1298,7 @@
         <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fileset.set_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Add a new metadata to the fileset.</span>
+<span class="w">        </span><span class="sd">"""Add a new metadata to the fileset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1319,7 +1315,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Fileset.create_file"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.create_file">[docs]</a>    <span class="k">def</span> <span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">"""Create a new `File` instance in the local database attached to the current `Fileset` instance.</span>
+<span class="w">        </span><span class="sd">"""Create a new `File` instance in the local database attached to the current `Fileset` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1360,7 +1356,7 @@
         <span class="k">return</span> <span class="n">file</span></div>
 
 <div class="viewcode-block" id="Fileset.delete_file"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.delete_file">[docs]</a>    <span class="k">def</span> <span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
-        <span class="sd">"""Delete a given file from the current fileset.</span>
+<span class="w">        </span><span class="sd">"""Delete a given file from the current fileset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1395,12 +1391,12 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Fileset.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Fileset.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">"""Get the path to the local fileset.</span>
+<span class="w">        </span><span class="sd">"""Get the path to the local fileset.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1421,7 +1417,7 @@
         <span class="k">return</span> <span class="n">_fileset_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Fileset.list_files"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.list_files">[docs]</a>    <span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">"""Get the list of files in the fileset.</span>
+<span class="w">        </span><span class="sd">"""Get the list of files in the fileset.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1439,7 +1435,7 @@
 
 
 <div class="viewcode-block" id="File"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File">[docs]</a><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">File</span><span class="p">):</span>
-    <span class="sd">"""Implement ``File`` for the local *File System DataBase* from abstract class ``db.File``.</span>
+<span class="w">    </span><span class="sd">"""Implement ``File`` for the local *File System DataBase* from abstract class ``db.File``.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -1477,7 +1473,7 @@
         <span class="k">return</span>
 
 <div class="viewcode-block" id="File.get_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Get the metadata associated to a file.</span>
+<span class="w">        </span><span class="sd">"""Get the metadata associated to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1494,7 +1490,7 @@
         <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="File.set_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Add a new metadata to the file.</span>
+<span class="w">        </span><span class="sd">"""Add a new metadata to the file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1511,7 +1507,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.import_file"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.import_file">[docs]</a>    <span class="k">def</span> <span class="nf">import_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">"""Import the file from its local path to the current fileset.</span>
+<span class="w">        </span><span class="sd">"""Import the file from its local path to the current fileset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1528,12 +1524,12 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.read_raw"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.read_raw">[docs]</a>    <span class="k">def</span> <span class="nf">read_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Read the file and return its contents.</span>
+<span class="w">        </span><span class="sd">"""Read the file and return its contents.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1565,7 +1561,7 @@
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="File.write_raw"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.write_raw">[docs]</a>    <span class="k">def</span> <span class="nf">write_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="sd">"""Write a file from raw byte data.</span>
+<span class="w">        </span><span class="sd">"""Write a file from raw byte data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1602,7 +1598,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.read"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Read the file and return its contents.</span>
+<span class="w">        </span><span class="sd">"""Read the file and return its contents.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1637,7 +1633,7 @@
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="File.write"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="sd">"""Write a file from data.</span>
+<span class="w">        </span><span class="sd">"""Write a file from data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1676,7 +1672,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">"""Get the path to the local file.</span>
+<span class="w">        </span><span class="sd">"""Get the path to the local file.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1703,7 +1699,7 @@
 <span class="c1"># load the database</span>
 
 <span class="k">def</span> <span class="nf">_load_scans</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
-    <span class="sd">"""Load list of ``Scan`` from given database.</span>
+<span class="w">    </span><span class="sd">"""Load list of ``Scan`` from given database.</span>
 
 <span class="sd">    List subdirectories of ``db.basedir``.</span>
 
@@ -1757,7 +1753,7 @@
 
 
 <span class="k">def</span> <span class="nf">_load_scan_filesets</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Load list of ``Fileset`` from given scan.</span>
+<span class="w">    </span><span class="sd">"""Load list of ``Fileset`` from given scan.</span>
 
 <span class="sd">    Load the list of filesets using "filesets" top-level entry from ``files.json``.</span>
 
@@ -1812,7 +1808,7 @@
 
 
 <span class="k">def</span> <span class="nf">_load_fileset</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fileset_info</span><span class="p">):</span>
-    <span class="sd">"""Load a fileset and set its attributes.</span>
+<span class="w">    </span><span class="sd">"""Load a fileset and set its attributes.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2009,7 +2005,7 @@
 <span class="c1">################################################################################</span>
 
 <span class="k">def</span> <span class="nf">_make_fileset</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="sd">"""Create the fileset directory.</span>
+<span class="w">    </span><span class="sd">"""Create the fileset directory.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2028,7 +2024,7 @@
 
 
 <span class="k">def</span> <span class="nf">_make_scan</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Create the scan directory.</span>
+<span class="w">    </span><span class="sd">"""Create the scan directory.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2051,7 +2047,7 @@
 <span class="c1">################################################################################</span>
 
 <span class="k">def</span> <span class="nf">_get_filename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
-    <span class="sd">"""Returns a file's name.</span>
+<span class="w">    </span><span class="sd">"""Returns a file's name.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2069,7 +2065,7 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Get the path to given scan.</span>
+<span class="w">    </span><span class="sd">"""Get the path to given scan.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2086,7 +2082,7 @@
 
 
 <span class="k">def</span> <span class="nf">_fileset_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="sd">"""Get the path to given fileset.</span>
+<span class="w">    </span><span class="sd">"""Get the path to given fileset.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2104,7 +2100,7 @@
 
 
 <span class="k">def</span> <span class="nf">_file_path</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-    <span class="sd">"""Get the path to given file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to given file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2123,7 +2119,7 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_files_json</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Get the path to scan's "files.json" file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "files.json" file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2141,7 +2137,7 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Get the path to scan's "metadata.json" file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "metadata.json" file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2160,7 +2156,7 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_measures_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Get the path to scan's "measures.json" file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "measures.json" file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2178,7 +2174,7 @@
 
 
 <span class="k">def</span> <span class="nf">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="sd">"""Get the path to `fileset.id` metadata JSON file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to `fileset.id` metadata JSON file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2197,7 +2193,7 @@
 
 
 <span class="k">def</span> <span class="nf">_file_metadata_path</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-    <span class="sd">"""Get the path to `file.id` metadata JSON file.</span>
+<span class="w">    </span><span class="sd">"""Get the path to `file.id` metadata JSON file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2221,7 +2217,7 @@
 <span class="c1">################################################################################</span>
 
 <span class="k">def</span> <span class="nf">_file_to_dict</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-    <span class="sd">"""Returns a dict with the file "id" and "filename".</span>
+<span class="w">    </span><span class="sd">"""Returns a dict with the file "id" and "filename".</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2237,7 +2233,7 @@
 
 
 <span class="k">def</span> <span class="nf">_fileset_to_dict</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="sd">"""Returns a dict with the fileset "id" and the list of "files" dict.</span>
+<span class="w">    </span><span class="sd">"""Returns a dict with the fileset "id" and the list of "files" dict.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2260,7 +2256,7 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_to_dict</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Returns a dict with the scan's dictionary of `Fileset`s.</span>
+<span class="w">    </span><span class="sd">"""Returns a dict with the scan's dictionary of `Fileset`s.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2284,7 +2280,7 @@
 
 
 <span class="k">def</span> <span class="nf">_store_scan</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Dump the scan's JSON on drive.</span>
+<span class="w">    </span><span class="sd">"""Dump the scan's JSON on drive.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2309,7 +2305,7 @@
 
 
 <span class="k">def</span> <span class="nf">_is_db</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="sd">"""Test if the given path is indeed an FSDB database.</span>
+<span class="w">    </span><span class="sd">"""Test if the given path is indeed an FSDB database.</span>
 
 <span class="sd">    Do it by checking the presence of the ``MARKER_FILE_NAME``.</span>
 
@@ -2327,7 +2323,7 @@
 
 
 <span class="k">def</span> <span class="nf">_is_safe_to_delete</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="sd">"""Tests if given path is safe to delete.</span>
+<span class="w">    </span><span class="sd">"""Tests if given path is safe to delete.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2354,7 +2350,7 @@
 
 
 <span class="k">def</span> <span class="nf">_delete_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-    <span class="sd">"""Delete the given file.</span>
+<span class="w">    </span><span class="sd">"""Delete the given file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2388,7 +2384,7 @@
 
 
 <span class="k">def</span> <span class="nf">_delete_fileset</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="sd">"""Delete the given fileset, starting by its `File`(s).</span>
+<span class="w">    </span><span class="sd">"""Delete the given fileset, starting by its `File`(s).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2446,7 +2442,7 @@
 
 
 <span class="k">def</span> <span class="nf">_delete_scan</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-    <span class="sd">"""Delete the given scan, starting by its `Fileset`s.</span>
+<span class="w">    </span><span class="sd">"""Delete the given scan, starting by its `Fileset`s.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2481,7 +2477,7 @@
 
 
 <span class="k">def</span> <span class="nf">_filter_query</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">"""Filter a list of `Scan`s, `Fileset`s or `File`s using a `query` on their metadata.</span>
+<span class="w">    </span><span class="sd">"""Filter a list of `Scan`s, `Fileset`s or `File`s using a `query` on their metadata.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2557,7 +2553,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

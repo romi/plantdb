@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,19 +51,16 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="I/O operations" href="io.html" />
@@ -93,8 +91,7 @@
         <a href="../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -192,7 +189,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
@@ -262,15 +259,15 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="remote-file-system-database-with-ssh">
 <h1 id="reference-sshfsdb--page-root">Remote file system database with SSH<a class="headerlink" href="#reference-sshfsdb--page-root" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<span class="target" id="module-plantdb.sshfsdb"></span>
+<span class="target" id="module-plantdb.sshfsdb"></span><section id="plantdb-sshfsdb">
 <h2 id="plantdb-sshfsdb">plantdb.sshfsdb<a class="headerlink" href="#plantdb-sshfsdb" title="Permalink to this heading">¶</a></h2>
 <p>Implementation of a database as a file structure on a remote server
 using SSHFS.</p>
-
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.sshfsdb.</span></span><span class="sig-name descname"><span class="pre">SSHFSDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basedir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remotedir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/sshfsdb.html#SSHFSDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB" title="Permalink to this definition">¶</a></dt>
@@ -281,7 +278,7 @@ using SSHFS.</p>
 <span class="sig-name descname"><span class="pre">basedir</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.basedir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to the local directory where to mount the remote directory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -292,7 +289,7 @@ using SSHFS.</p>
 <dd><p>Path to the remote directory containing the database.
 Should be in the format <code class="docutils literal notranslate"><span class="pre">user@server:path</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -302,7 +299,7 @@ Should be in the format <code class="docutils literal notranslate"><span class="
 <span class="sig-name descname"><span class="pre">scans</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.scans" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of <code class="docutils literal notranslate"><span class="pre">Scan</span></code> objects found in the database</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
@@ -312,7 +309,7 @@ Should be in the format <code class="docutils literal notranslate"><span class="
 <span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the DB is connected (locked the directory), else <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -323,7 +320,7 @@ Should be in the format <code class="docutils literal notranslate"><span class="
 <dd><p>Connect to the remote database.</p>
 <p>Handle DB “locking” system by adding a <code class="docutils literal notranslate"><span class="pre">LOCK_FILE_NAME</span></code> file in the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – UNUSED</p>
 </dd>
 </dl>
@@ -358,7 +355,7 @@ Should be in the format <code class="docutils literal notranslate"><span class="
 </div>
 </dd></dl>
 </dd></dl>
-
+</section>
 
 
           </article>
@@ -407,7 +404,7 @@ Should be in the format <code class="docutils literal notranslate"><span class="
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

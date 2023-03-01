@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,19 +51,16 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Local file system database" href="fsdb.html" />
@@ -93,8 +91,7 @@
         <a href="../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -192,7 +189,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
@@ -350,18 +347,18 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="abstract-database-class">
 <h1 id="reference-db--page-root">Abstract database class<a class="headerlink" href="#reference-db--page-root" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<span class="target" id="module-plantdb.db"></span>
+<span class="target" id="module-plantdb.db"></span><section id="plantdb-db">
 <h2 id="plantdb-db">plantdb.db<a class="headerlink" href="#plantdb-db" title="Permalink to this heading">¶</a></h2>
 <p>API for the database module in the ROMI project.</p>
 <p>A database <code class="docutils literal notranslate"><span class="pre">DB</span></code> contains a list of scans <code class="docutils literal notranslate"><span class="pre">Scan</span></code> distinguishable by their id.
 A <code class="docutils literal notranslate"><span class="pre">Scan</span></code> can be made of several list of files <code class="docutils literal notranslate"><span class="pre">Fileset</span></code>.
 A <code class="docutils literal notranslate"><span class="pre">Fileset</span></code> is made of a list of files <code class="docutils literal notranslate"><span class="pre">Files</span></code>.
 A <code class="docutils literal notranslate"><span class="pre">File</span></code> can be an image, text of bytes.</p>
-
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="plantdb.db.DB">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.db.</span></span><span class="sig-name descname"><span class="pre">DB</span></span><a class="reference internal" href="../_modules/plantdb/db.html#DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.DB" title="Permalink to this definition">¶</a></dt>
@@ -373,7 +370,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">login_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#DB.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.DB.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Use this to access to a <code class="docutils literal notranslate"><span class="pre">DB</span></code> with credentials.</p>
 </dd>
 </dl>
@@ -383,10 +380,10 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">create_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#DB.create_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.DB.create_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new scan object in the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the scan to retrieve</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>db.Scan</em></p>
 </dd>
 </dl>
@@ -396,7 +393,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">delete_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#DB.delete_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.DB.delete_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a scan from the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the scan to delete</p>
 </dd>
 </dl>
@@ -411,13 +408,13 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#DB.get_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.DB.get_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a scan saved in the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the scan to retrieve</p></li>
 <li><p><strong>create</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Create the scan if it does not exist (default : <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>db.Scan</em></p>
 </dd>
 </dl>
@@ -447,7 +444,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.db.File.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>database where to find the file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.db.DB" title="plantdb.db.DB">DB</a></p>
 </dd>
 </dl>
@@ -457,7 +454,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">fileset</span></span><a class="headerlink" href="#plantdb.db.File.fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>set of files containing the file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.db.Fileset" title="plantdb.db.Fileset">db.Fileset</a></p>
 </dd>
 </dl>
@@ -467,7 +464,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.db.File.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>id of the file in the database <code class="docutils literal notranslate"><span class="pre">DB</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -477,7 +474,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#plantdb.db.File.filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>file format (default = None, can be deduced when importing file)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
@@ -487,7 +484,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.get_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.get_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent db.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.DB</em></p>
 </dd>
 </dl>
@@ -497,7 +494,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_fileset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.get_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.get_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent fileset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.Fileset</em></p>
 </dd>
 </dl>
@@ -507,7 +504,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.get_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get file id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>str</em></p>
 </dd>
 </dl>
@@ -517,10 +514,10 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get metadata associated to scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Metadata key to retrieve (defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict or value</em></p>
 </dd>
 </dl>
@@ -530,7 +527,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">get_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.get_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.get_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.Scan</em></p>
 </dd>
 </dl>
@@ -540,7 +537,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">import_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.import_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.import_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Import an existing file to the <code class="docutils literal notranslate"><span class="pre">File</span></code> object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Path of the file to import</p>
 </dd>
 </dl>
@@ -550,7 +547,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads text from a file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>str</em></p>
 </dd>
 </dl>
@@ -560,7 +557,7 @@ ROMI project.</p>
 <span class="sig-name descname"><span class="pre">read_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.read_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.read_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads bytes from a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>bytearray</em> – File buffer</p>
 </dd>
 </dl>
@@ -572,7 +569,7 @@ ROMI project.</p>
 <p>If value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, scan metadata is set to data.
 If value is not <code class="docutils literal notranslate"><span class="pre">None</span></code> data is a key and is set to value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Key or value to set as metadata</p></li>
 <li><p><strong>value</strong> (<em>any</em><em>, </em><em>optional</em>) – Value to set (default is <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
@@ -585,7 +582,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes text to a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Data to write</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension to use</p></li>
@@ -598,7 +595,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">write_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#File.write_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.File.write_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes bytes to a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>buffer</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.11)"><em>bytearray</em></a>) – Data to write</p></li>
 <li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension to use</p></li>
@@ -620,7 +617,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.db.Fileset.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>database where to find the scan</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.db.DB" title="plantdb.db.DB">db.DB</a></p>
 </dd>
 </dl>
@@ -630,7 +627,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.db.Fileset.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>id of the scan in the database <code class="docutils literal notranslate"><span class="pre">DB</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
@@ -640,7 +637,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">scan</span></span><a class="headerlink" href="#plantdb.db.Fileset.scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>scan containing the set of files</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.db.Scan" title="plantdb.db.Scan">db.Scan</a></p>
 </dd>
 </dl>
@@ -650,7 +647,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.create_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.create_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the new file</p>
 </dd>
 </dl>
@@ -660,7 +657,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.delete_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.delete_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a file from the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the file to delete.</p>
 </dd>
 </dl>
@@ -670,7 +667,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent db.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.DB</em></p>
 </dd>
 </dl>
@@ -680,13 +677,13 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get file with given id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – File id</p></li>
 <li><p><strong>create</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Create the file if it does not exist (default : <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>db.File</em></p>
 </dd>
 </dl>
@@ -696,7 +693,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>list</em></p>
 </dd>
 </dl>
@@ -706,7 +703,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get scan id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>str</em></p>
 </dd>
 </dl>
@@ -716,10 +713,10 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get metadata associated to scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Metadata key to retrieve (defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict or value</em></p>
 </dd>
 </dl>
@@ -729,7 +726,7 @@ project.</p>
 <span class="sig-name descname"><span class="pre">get_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Fileset.get_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Fileset.get_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.Scan</em></p>
 </dd>
 </dl>
@@ -741,7 +738,7 @@ project.</p>
 <p>If value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, scan metadata is set to data.
 If value is not <code class="docutils literal notranslate"><span class="pre">None</span></code> data is a key and is set to value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Key or value to set as metadata</p></li>
 <li><p><strong>value</strong> (<em>any</em><em>, </em><em>optional</em>) – Value to set (default is <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
@@ -760,7 +757,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">db</span></span><a class="headerlink" href="#plantdb.db.Scan.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database where to find the scan</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#plantdb.db.DB" title="plantdb.db.DB">db.DB</a></p>
 </dd>
 </dl>
@@ -770,7 +767,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.db.Scan.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Id of the scan in the database <code class="docutils literal notranslate"><span class="pre">DB</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
@@ -780,7 +777,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">create_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.create_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.create_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a set of files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the new fileset</p>
 </dd>
 </dl>
@@ -790,7 +787,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">delete_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.delete_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.delete_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a fileset from the DB.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Id of the fileset to delete</p>
 </dd>
 </dl>
@@ -800,7 +797,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">get_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.get_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.get_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent db.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>db.DB</em></p>
 </dd>
 </dl>
@@ -810,13 +807,13 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">get_fileset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.get_fileset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.get_fileset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a fileset with a given id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
 <li><p><strong>create</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Create the fileset if it does not exist (default : <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>db.Fileset</em></p>
 </dd>
 </dl>
@@ -826,7 +823,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">get_filesets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.get_filesets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.get_filesets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all sets of files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>list</em></p>
 </dd>
 </dl>
@@ -836,7 +833,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.get_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get scan id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>str</em></p>
 </dd>
 </dl>
@@ -846,10 +843,10 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/db.html#Scan.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.db.Scan.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get metadata associated to scan.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Metadata key to retrieve (defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict or value</em></p>
 </dd>
 </dl>
@@ -861,7 +858,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 <p>If value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, scan metadata is set to data.
 If value is not <code class="docutils literal notranslate"><span class="pre">None</span></code> data is a key and is set to value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Key or value</p></li>
 <li><p><strong>value</strong> – Value to set (default is None)</p></li>
@@ -870,7 +867,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
 </dl>
 </dd></dl>
 </dd></dl>
-
+</section>
 
 
           </article>
@@ -919,7 +916,7 @@ If value is not <code class="docutils literal notranslate"><span class="pre">Non
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,19 +51,16 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/material.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="_static/_static/css/extra.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="I/O operations" href="reference/io.html" />
@@ -92,8 +90,7 @@
         <a href="index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -190,7 +187,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="index.html"
@@ -274,40 +271,40 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="rest-urls">
 <h1 id="webapi--page-root">REST URLs<a class="headerlink" href="#webapi--page-root" title="Permalink to this heading">¶</a></h1>
-
+<section id="scans">
 <h2 id="scans">/scans<a class="headerlink" href="#scans" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Arguments: none</p></li>
 <li><p>Returns: JSON with a ScanList array.</p></li>
 </ul>
 <p>NOTE: Only scans that have a Visualisation fileset are included</p>
-
-
+</section>
+<section id="scans-scanid">
 <h2 id="scans-scanid">/scans/[scanid]<a class="headerlink" href="#scans-scanid" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Arguments: none</p></li>
 <li><p>Returns: JSON with a scan details object</p></li>
 </ul>
-
-
+</section>
+<section id="files-path">
 <h2 id="files-path">/files/[path]<a class="headerlink" href="#files-path" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Arguments: none</p></li>
 <li><p>Returns: The content of the file</p></li>
 </ul>
-
-
-
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="object-descriptions">
 <h1 id="object-descriptions">Object descriptions<a class="headerlink" href="#object-descriptions" title="Permalink to this heading">¶</a></h1>
-
+<section id="scanlist">
 <h2 id="scanlist">ScanList<a class="headerlink" href="#scanlist" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Array of scan summary objects</p></li>
 </ul>
-
-
+</section>
+<section id="scan-summary-object">
 <h2 id="scan-summary-object">Scan summary object<a class="headerlink" href="#scan-summary-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -319,8 +316,8 @@
 <li><p>hasSkeleton: Boolean</p></li>
 <li><p>hasAngleData: Boolean</p></li>
 </ul>
-
-
+</section>
+<section id="scan-details-object">
 <h2 id="scan-details-object">Scan details object<a class="headerlink" href="#scan-details-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -341,8 +338,8 @@
 </ul>
 </li>
 </ul>
-
-
+</section>
+<section id="metadata-object">
 <h2 id="metadata-object">Metadata object<a class="headerlink" href="#metadata-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -358,16 +355,16 @@
 </ul>
 </li>
 </ul>
-
-
+</section>
+<section id="camera-object">
 <h2 id="camera-object">Camera object<a class="headerlink" href="#camera-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
 <li><p>model: Model object</p></li>
 <li><p>poses: Array of Pose objects</p></li>
 </ul>
-
-
+</section>
+<section id="model-object">
 <h2 id="model-object">Model object<a class="headerlink" href="#model-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -381,8 +378,8 @@
 </ul>
 </li>
 </ul>
-
-
+</section>
+<section id="pose-object">
 <h2 id="pose-object">Pose object<a class="headerlink" href="#pose-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -392,16 +389,16 @@
 <li><p>thumbnailUri: String, URL, example “/files/[scanid]/Visualization/thumbnail_[id].jpg”</p></li>
 <li><p>photoUri: String, URL, example “/files/[scanid]/Visualization/image_[id].jpg”</p></li>
 </ul>
-
-
+</section>
+<section id="data-object">
 <h2 id="data-object">Data object<a class="headerlink" href="#data-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
 <li><p>angles: Array of Angle objects, required if hasAngleData is true</p></li>
 <li><p>skeleton: Skeleton object, required if hasSkeleton is true</p></li>
 </ul>
-
-
+</section>
+<section id="angles-object">
 <h2 id="angles-object">Angles object<a class="headerlink" href="#angles-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -411,8 +408,8 @@
 <li><p>measured_internodes: Array of numbers</p></li>
 <li><p>fruit_points: Array of ???</p></li>
 </ul>
-
-
+</section>
+<section id="workspace-object">
 <h2 id="workspace-object">Workspace object<a class="headerlink" href="#workspace-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
@@ -420,16 +417,16 @@
 <li><p>y: [min, max]</p></li>
 <li><p>z: [min, max]</p></li>
 </ul>
-
-
+</section>
+<section id="skeleton-object">
 <h2 id="skeleton-object">Skeleton object<a class="headerlink" href="#skeleton-object" title="Permalink to this heading">¶</a></h2>
 <p>Object with fields:</p>
 <ul class="simple">
 <li><p>points: Array of points [x, y, z]</p></li>
 <li><p>lines: Array of [pointIndex1, pointIndex2]</p></li>
 </ul>
-
-
+</section>
+</section>
 
 
           </article>
@@ -467,7 +464,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

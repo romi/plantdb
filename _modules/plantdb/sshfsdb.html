@@ -50,19 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <link rel="shortcut icon" href="../../_static/ROMI_favicon_green.png"/>
+    <link rel="icon" href="../../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   
@@ -91,8 +88,7 @@
         <a href="../../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-              <img src="../../_static/logo.svg" height="26"
-                   alt="plantdb logo">
+            &nbsp;
           
         </a>
       </div>
@@ -190,7 +186,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../../_static/logo.svg" alt=" logo" width="48" height="48">
+        <img src="../../_static/" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../../index.html"
@@ -282,7 +278,7 @@
 
 
 <div class="viewcode-block" id="SSHFSDB"><a class="viewcode-back" href="../../reference/sshfsdb.html#plantdb.sshfsdb.SSHFSDB">[docs]</a><span class="k">class</span> <span class="nc">SSHFSDB</span><span class="p">(</span><span class="n">fsdb</span><span class="o">.</span><span class="n">FSDB</span><span class="p">):</span>
-    <span class="sd">"""Subclass of FSDB that first mounts a remote directory using SSHFS.</span>
+<span class="w">    </span><span class="sd">"""Subclass of FSDB that first mounts a remote directory using SSHFS.</span>
 
 <span class="sd">    Implementation of a database on a remote file system.</span>
 
@@ -301,7 +297,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">,</span> <span class="n">remotedir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Database constructor.</span>
+<span class="w">        </span><span class="sd">"""Database constructor.</span>
 
 <span class="sd">        Mount ``remotedir`` directory on the ``basedir`` directory and</span>
 <span class="sd">        load accessible ``Scan`` objects.</span>
@@ -336,7 +332,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">remotedir</span> <span class="o">=</span> <span class="n">remotedir</span>
 
 <div class="viewcode-block" id="SSHFSDB.connect"><a class="viewcode-back" href="../../reference/sshfsdb.html#plantdb.sshfsdb.SSHFSDB.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">"""Connect to the remote database.</span>
+<span class="w">        </span><span class="sd">"""Connect to the remote database.</span>
 
 <span class="sd">        Handle DB "locking" system by adding a ``LOCK_FILE_NAME`` file in the DB.</span>
 
@@ -367,7 +363,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SSHFSDB.disconnect"><a class="viewcode-back" href="../../reference/sshfsdb.html#plantdb.sshfsdb.SSHFSDB.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""Disconnect from the database.</span>
+<span class="w">        </span><span class="sd">"""Disconnect from the database.</span>
 
 <span class="sd">        Handle DB "locking" system by removing the ``LOCK_FILE_NAME`` file from the DB.</span>
 
@@ -412,7 +408,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>
