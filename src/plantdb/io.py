@@ -91,7 +91,7 @@ except:
 
 
 def read_json(dbfile):
-    """Reads json from a ROMI database file.
+    """Reads a JSON from a ROMI database file.
 
     Parameters
     ----------
@@ -124,7 +124,7 @@ def read_json(dbfile):
 
 
 def write_json(dbfile, data, ext="json"):
-    """Writes json to a ROMI database file.
+    """Writes a JSON to a ROMI database file.
 
     Parameters
     ----------
@@ -154,7 +154,7 @@ def write_json(dbfile, data, ext="json"):
 
 
 def read_toml(dbfile):
-    """Reads toml from a ROMI database file.
+    """Reads a TOML from a ROMI database file.
 
     Parameters
     ----------
@@ -187,7 +187,7 @@ def read_toml(dbfile):
 
 
 def write_toml(dbfile, data, ext="toml"):
-    """Writes toml to a ROMI database file.
+    """Writes a TOML to a ROMI database file.
 
     Parameters
     ----------
@@ -217,7 +217,7 @@ def write_toml(dbfile, data, ext="toml"):
 
 
 def read_image(dbfile):
-    """Reads image from a ROMI database file.
+    """Reads an image from a ROMI database file.
 
     Parameters
     ----------
@@ -250,7 +250,7 @@ def read_image(dbfile):
 
 
 def write_image(dbfile, data, ext="png"):
-    """Writes image to a ROMI database file.
+    """Writes an image to a ROMI database file.
 
     Parameters
     ----------
@@ -283,7 +283,7 @@ def write_image(dbfile, data, ext="png"):
 
 
 def read_volume(dbfile, ext="npz"):
-    """Reads volume from a ROMI database file.
+    """Reads a volume from a ROMI database file.
 
     Parameters
     ----------
@@ -300,7 +300,7 @@ def read_volume(dbfile, ext="npz"):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.io import , read_volumewrite_volume
+    >>> from plantdb.io import read_volume, write_volume
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -318,7 +318,7 @@ def read_volume(dbfile, ext="npz"):
 
 
 def write_volume(dbfile, data, ext="npz"):
-    """Writes volume to a ROMI database file.
+    """Writes a volume to a ROMI database file.
 
     Parameters
     ----------
@@ -436,7 +436,29 @@ def read_point_cloud(dbfile, ext="ply"):
     Returns
     -------
     open3d.geometry.PointCloud
-        The loaded point cloud object. 
+        The loaded point cloud object.
+
+    Examples
+    --------
+    >>> import open3d as o3d
+    >>> import numpy as np
+    >>> from plantdb.io import read_point_cloud, write_point_cloud
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_npz')
+    >>> pcd = o3d.geometry.PointCloud()
+    >>> pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
+    >>> write_point_cloud(f, pcd)
+    >>> f = fs.get_file('test_npz')
+    >>> pcd = read_point_cloud(f)
+    >>> print(type(pcd))
+    <class 'open3d.cuda.pybind.geometry.PointCloud'>
+    >>> print(np.asarray(pcd.points))
+    [[1. 2. 3.]]
+
     """
     from open3d import io
     b = dbfile.read_raw()
@@ -462,6 +484,7 @@ def write_point_cloud(dbfile, data, ext="ply"):
     Examples
     --------
     >>> import open3d as o3d
+    >>> import numpy as np
     >>> from plantdb.io import write_point_cloud
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -470,6 +493,7 @@ def write_point_cloud(dbfile, data, ext="ply"):
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file('test_npz')
     >>> pcd = o3d.geometry.PointCloud()
+    >>> pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
     >>> write_point_cloud(f, pcd)
 
     """
@@ -714,7 +738,7 @@ def dbfile_from_local_file(path: str):
     # Initialize a `Fileset` instance:
     fileset = Fileset(db, scan, dirname)
     # Initialize a `File` instance & return it:
-    f = fsDB.db.File(db=db, fileset=fileset, id=id)
+    f = fsdb.File(db=db, fileset=fileset, id=id)
     f.filename = fname
     f.metadata = None
     return f
