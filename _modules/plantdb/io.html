@@ -549,7 +549,13 @@
 <span class="sd">    &gt;&gt;&gt; np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!</span>
 
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">iio</span><span class="o">.</span><span class="n">volread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span></div>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Try old `volread` method:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">volread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="c1"># Use v3 method:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
 
 
 <div class="viewcode-block" id="write_volume"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.write_volume">[docs]</a><span class="k">def</span> <span class="nf">write_volume</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"npz"</span><span class="p">):</span>
@@ -582,7 +588,12 @@
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.npz"</span><span class="p">)</span>
-        <span class="n">iio</span><span class="o">.</span><span class="n">volwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try old `volwrite` method:</span>
+            <span class="n">iio</span><span class="o">.</span><span class="n">volwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># Use v3 method:</span>
+            <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
 
