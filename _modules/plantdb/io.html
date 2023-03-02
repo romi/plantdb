@@ -512,7 +512,7 @@
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">"jpg"</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">iio</span><span class="o">.</span><span class="n">RETURN_BYTES</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="s2">"&lt;bytes&gt;"</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
     <span class="n">dbfile</span><span class="o">.</span><span class="n">write_raw</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
     <span class="k">return</span></div>
 
