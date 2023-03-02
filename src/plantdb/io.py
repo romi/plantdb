@@ -314,7 +314,13 @@ def read_volume(dbfile, ext="npz"):
     >>> np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!
 
     """
-    return iio.volread(dbfile.read_raw(), format=ext)
+    try:
+        # Try old `volread` method:
+        arr = iio.volread(dbfile.read_raw(), format=ext)
+    except AttributeError:
+        # Use v3 method:
+        arr = iio.imread(dbfile.read_raw(), extension=ext if ext.startswith('.') else f".{ext}")
+    return arr
 
 
 def write_volume(dbfile, data, ext="npz"):
@@ -347,7 +353,12 @@ def write_volume(dbfile, data, ext="npz"):
     import numpy as np
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, "temp.npz")
-        iio.volwrite(fname, data, format=ext)
+        try:
+            # Try old `volwrite` method:
+            iio.volwrite(fname, data, format=ext)
+        except AttributeError:
+            # Use v3 method:
+            iio.imwrite(fname, data, extension=ext if ext.startswith('.') else f".{ext}")
         dbfile.import_file(fname)
     return
 
