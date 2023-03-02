@@ -277,7 +277,7 @@ def write_image(dbfile, data, ext="png"):
     """
     if ext == "jpg" and len(data.shape) == 3:
         data = data[:, :, :3]
-    b = iio.imwrite(iio.RETURN_BYTES, data, format=ext)
+    b = iio.imwrite("<bytes>", data, format=ext)
     dbfile.write_raw(b, ext)
     return
 
