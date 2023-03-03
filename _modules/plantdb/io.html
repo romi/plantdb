@@ -262,8 +262,9 @@
 <span class="sd">plantdb.io</span>
 <span class="sd">===========</span>
 
-<span class="sd">ROMI Data IO</span>
-<span class="sd">This module contains all functions for reading and writing data.</span>
+<span class="sd">The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.</span>
+
+<span class="sd">Hereafter we detail the formats and their associated Python types and meanings.</span>
 
 <span class="sd">File formats</span>
 <span class="sd">------------</span>
@@ -271,58 +272,95 @@
 <span class="sd">json</span>
 <span class="sd">****</span>
 
-<span class="sd">* Python objects: dict, list</span>
+<span class="sd">Dictionaries or lists, read and written using ``json``.</span>
+
+<span class="sd">* Python objects: ``dict``, ``list``</span>
 <span class="sd">* File extensions: 'json'</span>
 
 <span class="sd">toml</span>
 <span class="sd">****</span>
 
-<span class="sd">* Python objects: dict, list</span>
+<span class="sd">Dictionaries or lists, read and written using ``toml``.</span>
+
+<span class="sd">* Python objects: ``dict``, ``list``</span>
 <span class="sd">* File extensions: 'toml'</span>
 
 <span class="sd">2D image</span>
 <span class="sd">********</span>
 
-<span class="sd">* Image data read and written using ``imageio``</span>
+<span class="sd">RGB or RGBA image data, read and written using ``imageio``.</span>
 
-<span class="sd">Python objects: np.ndarray</span>
-<span class="sd">File extensions: 'jpg', 'png'</span>
+<span class="sd">* Python objects: ``numpy.ndarray``</span>
+<span class="sd">* File extensions: 'jpg', 'png'</span>
 
-<span class="sd">3D Volumes</span>
+<span class="sd">3D volume</span>
+<span class="sd">*********</span>
+
+<span class="sd">Grayscale or binary volume image data, read and written using ``imageio``.</span>
+
+<span class="sd">* Python objects: ``numpy.ndarray``</span>
+<span class="sd">* File extensions: 'tiff'</span>
+
+<span class="sd">Labelled 3D volume</span>
+<span class="sd">******************</span>
+
+<span class="sd">Labelled volume image data, converted to dictionary of 3D (binary) numpy arrays, read and written using ``numpy``.</span>
+
+<span class="sd">* Python objects: ``dict`` of 3D ``numpy.ndarray``</span>
+<span class="sd">* File extensions: 'npz'</span>
+
+<span class="sd">Point cloud</span>
+<span class="sd">***********</span>
+
+<span class="sd">Point clouds, read and written using ``open3d``.</span>
+
+<span class="sd">* Python object: ``open3d.geometry.PointCloud``</span>
+<span class="sd">* File extensions: 'ply'</span>
+
+<span class="sd">Triangle mesh</span>
+<span class="sd">*************</span>
+
+<span class="sd">Triangular meshes, read and written using ``open3d``.</span>
+
+<span class="sd">* Python object: ``open3d.geometry.TriangleMesh``</span>
+<span class="sd">* File extensions: 'ply'</span>
+
+<span class="sd">Voxel grid</span>
 <span class="sd">**********</span>
 
-<span class="sd">* Volume data (3D numpy arrays) read and written using ``imageio``</span>
+<span class="sd">Voxel grids, read and written using ``open3d``.</span>
 
-<span class="sd">Python objects: np.ndarray</span>
-<span class="sd">File extensions: 'tiff'</span>
-
-<span class="sd">Point Clouds</span>
-<span class="sd">************</span>
-
-<span class="sd">* Python object: open3d.geometry.PointCloud</span>
+<span class="sd">* Python object: ``open3d.geometry.VoxelGrid``</span>
 <span class="sd">* File extensions: 'ply'</span>
 
-<span class="sd">Triangle  Meshes</span>
-<span class="sd">****************</span>
+<span class="sd">Tree graph</span>
+<span class="sd">**********</span>
 
-<span class="sd">* Python object: open3d.geometry.TriangleMesh</span>
-<span class="sd">* File extensions: 'ply'</span>
+<span class="sd">Tree graphs, read and written using ``networkx``.</span>
+
+<span class="sd">* Python object: ``networkx.Graph``</span>
+<span class="sd">* File extensions: 'p'</span>
+
+<span class="sd">Pytorch tensor</span>
+<span class="sd">**************</span>
+
+<span class="sd">Trained tensor, read and written using ``torch``.</span>
+
+<span class="sd">* Python object: ``torch.tensor``</span>
+<span class="sd">* File extensions: 'pt'</span>
 
 <span class="sd">"""</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 
+<span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
+
 <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">fsdb</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">DB</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">File</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">Fileset</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">Scan</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">imageio</span> <span class="k">as</span> <span class="nn">iio</span>
 
 
 <div class="viewcode-block" id="read_json"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.read_json">[docs]</a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">dbfile</span><span class="p">):</span>
@@ -384,6 +422,7 @@
 
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">json</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">dbfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">ext</span><span class="p">)</span>
     <span class="k">return</span></div>
 
@@ -447,12 +486,13 @@
 
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">toml</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">dbfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">toml</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">ext</span><span class="p">)</span>
     <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="read_image"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.read_image">[docs]</a><span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="n">dbfile</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Reads an image from a ROMI database file.</span>
+<span class="w">    </span><span class="sd">"""Reads a 2D image from a ROMI database file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -462,7 +502,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    numpy.ndarray</span>
-<span class="sd">        The image array.</span>
+<span class="sd">        The image as an RGB(A) array.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -485,14 +525,14 @@
 
 
 <div class="viewcode-block" id="write_image"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.write_image">[docs]</a><span class="k">def</span> <span class="nf">write_image</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"png"</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Writes an image to a ROMI database file.</span>
+<span class="w">    </span><span class="sd">"""Writes a 2D image to a ROMI database file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dbfile : DB.db.File</span>
 <span class="sd">        The `File` object used to write the associated file.</span>
 <span class="sd">    data : array like</span>
-<span class="sd">        The array to save as an image.</span>
+<span class="sd">        The 2D image (RGB array) to save.</span>
 <span class="sd">    ext : {'png', 'jpeg', 'tiff'}, optional</span>
 <span class="sd">        File extension, defaults to "png".</span>
 
@@ -510,27 +550,29 @@
 <span class="sd">    &gt;&gt;&gt; write_image(f, img)</span>
 
 <span class="sd">    """</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">"jpg"</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1"># Remove any alpha channel if JPEG format as it cannot handle it</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="s2">"&lt;bytes&gt;"</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="s2">"&lt;bytes&gt;"</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">dbfile</span><span class="o">.</span><span class="n">write_raw</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="read_volume"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.read_volume">[docs]</a><span class="k">def</span> <span class="nf">read_volume</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"npz"</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Reads a volume from a ROMI database file.</span>
+<div class="viewcode-block" id="read_volume"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.read_volume">[docs]</a><span class="k">def</span> <span class="nf">read_volume</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"tiff"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Reads a volume image from a ROMI database file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dbfile : DB.db.File</span>
 <span class="sd">        The `File` object used to load the associated file.</span>
 <span class="sd">    ext : str, optional</span>
-<span class="sd">        File extension, defaults to "npz".</span>
+<span class="sd">        File extension, defaults to "tiff".</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    numpy.ndarray</span>
-<span class="sd">        The volume array.</span>
+<span class="sd">        The volume as a 3D array.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -549,26 +591,24 @@
 <span class="sd">    &gt;&gt;&gt; np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!</span>
 
 <span class="sd">    """</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># Try old `volread` method:</span>
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">volread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="c1"># Use v3 method:</span>
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">iio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">arr</span></div>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
+    <span class="k">return</span> <span class="n">iio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="write_volume"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.write_volume">[docs]</a><span class="k">def</span> <span class="nf">write_volume</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"npz"</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Writes a volume to a ROMI database file.</span>
+<div class="viewcode-block" id="write_volume"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.write_volume">[docs]</a><span class="k">def</span> <span class="nf">write_volume</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">"tiff"</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Writes a volume image to a ROMI database file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dbfile : DB.db.File</span>
 <span class="sd">        The `File` object used to write the associated file.</span>
 <span class="sd">    data : array like</span>
-<span class="sd">        The 3D array to save as volume. </span>
+<span class="sd">        The 3D array to save as volume image.</span>
 <span class="sd">    ext : str, optional</span>
-<span class="sd">        File extension, defaults to "npz".</span>
+<span class="sd">        File extension, defaults to "tiff".</span>
+<span class="sd">    compress : bool, optional</span>
+<span class="sd">        Indicate if the volume file should be compressed.</span>
+<span class="sd">        Defaults to ``True``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -577,23 +617,23 @@
 <span class="sd">    &gt;&gt;&gt; from plantdb.io import write_volume</span>
 <span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import Scan, Fileset, File</span>
 <span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
-<span class="sd">    &gt;&gt;&gt; db = dummy_db()</span>
-<span class="sd">    &gt;&gt;&gt; # Example #1: Initialize a `Scan` object using an `FSBD` object:</span>
-<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('007', create=True)</span>
-<span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset('volume', create=True)</span>
-<span class="sd">    &gt;&gt;&gt; f = fs.get_file('test_volume', create=True)</span>
-<span class="sd">    &gt;&gt;&gt; write_volume(f, np.random.rand(50, 10, 10))</span>
+<span class="sd">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
+<span class="sd">    &gt;&gt;&gt; f = fs.create_file('test_volume')</span>
+<span class="sd">    &gt;&gt;&gt; vol = np.random.rand(50, 10, 10)</span>
+<span class="sd">    &gt;&gt;&gt; write_volume(f, vol)</span>
 
 <span class="sd">    """</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.npz"</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Try old `volwrite` method:</span>
-            <span class="n">iio</span><span class="o">.</span><span class="n">volwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="c1"># Use v3 method:</span>
-            <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+            <span class="c1"># Use LZW compression with TIFF:</span>
+            <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
 
@@ -609,7 +649,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict of numpy.ndarray</span>
-<span class="sd">        The uncompressed numpy array.</span>
+<span class="sd">        The dictionary of numpy arrays.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -707,9 +747,10 @@
 
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_point_cloud</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
@@ -744,8 +785,9 @@
 
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -767,9 +809,10 @@
 <span class="sd">        The loaded point cloud object.</span>
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_triangle_mesh</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
@@ -788,8 +831,9 @@
 <span class="sd">        File extension, defaults to "ply".</span>
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_triangle_mesh</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -807,13 +851,14 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    open3d.geometry.PointCloud</span>
+<span class="sd">    open3d.geometry.VoxelGrid</span>
 <span class="sd">        The loaded point cloud object.</span>
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_voxel_grid</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
@@ -826,14 +871,15 @@
 <span class="sd">    ----------</span>
 <span class="sd">    dbfile : DB.db.File</span>
 <span class="sd">        The `File` object used to write the associated file.</span>
-<span class="sd">    data : open3d.geometry.PointCloud</span>
-<span class="sd">        The point cloud object to save.</span>
+<span class="sd">    data : open3d.geometry.VoxelGrid</span>
+<span class="sd">        The voxel grid object to save.</span>
 <span class="sd">    ext : str, optional</span>
 <span class="sd">        File extension, defaults to "ply".</span>
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_voxel_grid</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -875,9 +921,10 @@
 
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">pickle</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -912,8 +959,9 @@
 
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">pickle</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -936,9 +984,10 @@
 <span class="sd">        The loaded tensor object.</span>
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">torch</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
@@ -957,8 +1006,9 @@
 <span class="sd">        File extension, defaults to "pt".</span>
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">torch</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.</span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
