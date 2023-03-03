@@ -27,7 +27,7 @@
 plantdb.io
 ===========
 
-ROMI Data IO
+ROMI Data IO.
 This module contains all functions for reading and writing data.
 
 File formats
@@ -36,58 +36,71 @@ File formats
 json
 ****
 
+Dictionaries, read and written using ``json``.
+
 * Python objects: dict, list
 * File extensions: 'json'
 
 toml
 ****
 
+Dictionaries, read and written using ``toml``.
+
 * Python objects: dict, list
 * File extensions: 'toml'
 
-2D image
-********
+2D images
+*********
 
-* Image data read and written using ``imageio``
+Image data, RGB or RGBA, read and written using ``imageio``.
 
-Python objects: np.ndarray
-File extensions: 'jpg', 'png'
+* Python objects: 2D numpy.ndarray
+* File extensions: 'jpg', 'png'
 
-3D Volumes
+3D volumes
 **********
 
-* Volume data (3D numpy arrays) read and written using ``imageio``
+Volume image data, 3D numpy arrays, read and written using ``imageio``.
 
-Python objects: np.ndarray
-File extensions: 'tiff'
+* Python objects: 3D numpy.ndarray
+* File extensions: 'tiff'
 
-Point Clouds
+Point clouds
 ************
+
+Point clouds, 3D coordinates, read and written using ``open3d``.
 
 * Python object: open3d.geometry.PointCloud
 * File extensions: 'ply'
 
-Triangle  Meshes
-****************
+Triangle meshes
+***************
+
+Triangular meshes, 3D coordinates, read and written using ``open3d``.
 
 * Python object: open3d.geometry.TriangleMesh
 * File extensions: 'ply'
+
+Tree graphs
+***********
+
+Tree graphs, read and written using ``networkx``.
+
+* Python object: networkx.Graph
+* File extensions: 'p'
 
 """
 
 import os
 import tempfile
 
+import imageio.v3 as iio
+
 from plantdb import fsdb
 from plantdb.db import DB
 from plantdb.db import File
 from plantdb.db import Fileset
 from plantdb.db import Scan
-
-try:
-    import imageio.v3 as iio
-except:
-    import imageio as iio
 
 
 def read_json(dbfile):
@@ -149,6 +162,7 @@ def write_json(dbfile, data, ext="json"):
 
     """
     import json
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     dbfile.write(json.dumps(data, indent=4), ext)
     return
 
@@ -212,12 +226,13 @@ def write_toml(dbfile, data, ext="toml"):
 
     """
     import toml
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     dbfile.write(toml.dumps(data), ext)
     return
 
 
 def read_image(dbfile):
-    """Reads an image from a ROMI database file.
+    """Reads a 2D image from a ROMI database file.
 
     Parameters
     ----------
@@ -227,7 +242,7 @@ def read_image(dbfile):
     Returns
     -------
     numpy.ndarray
-        The image array.
+        The image as an RGB(A) array.
 
     Example
     -------
@@ -250,14 +265,14 @@ def read_image(dbfile):
 
 
 def write_image(dbfile, data, ext="png"):
-    """Writes an image to a ROMI database file.
+    """Writes a 2D image to a ROMI database file.
 
     Parameters
     ----------
     dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : array like
-        The array to save as an image.
+        The 2D image (RGB array) to save.
     ext : {'png', 'jpeg', 'tiff'}, optional
         File extension, defaults to "png".
 
@@ -275,27 +290,29 @@ def write_image(dbfile, data, ext="png"):
     >>> write_image(f, img)
 
     """
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     if ext == "jpg" and len(data.shape) == 3:
+        # Remove any alpha channel if JPEG format as it cannot handle it
         data = data[:, :, :3]
-    b = iio.imwrite("<bytes>", data, format=ext)
+    b = iio.imwrite("<bytes>", data, extension=f".{ext}")
     dbfile.write_raw(b, ext)
     return
 
 
-def read_volume(dbfile, ext="npz"):
-    """Reads a volume from a ROMI database file.
+def read_volume(dbfile, ext="tiff"):
+    """Reads a volume image from a ROMI database file.
 
     Parameters
     ----------
     dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
-        File extension, defaults to "npz".
+        File extension, defaults to "tiff".
 
     Returns
     -------
     numpy.ndarray
-        The volume array.
+        The volume as a 3D array.
 
     Examples
     --------
@@ -314,26 +331,21 @@ def read_volume(dbfile, ext="npz"):
     >>> np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!
 
     """
-    try:
-        # Try old `volread` method:
-        arr = iio.volread(dbfile.read_raw(), format=ext)
-    except AttributeError:
-        # Use v3 method:
-        arr = iio.imread(dbfile.read_raw(), extension=ext if ext.startswith('.') else f".{ext}")
-    return arr
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
+    return iio.imread(dbfile.read_raw(), extension=f".{ext}")
 
 
-def write_volume(dbfile, data, ext="npz"):
-    """Writes a volume to a ROMI database file.
+def write_volume(dbfile, data, ext="tiff"):
+    """Writes a volume image to a ROMI database file.
 
     Parameters
     ----------
     dbfile : DB.db.File
         The `File` object used to write the associated file.
     data : array like
-        The 3D array to save as volume. 
+        The 3D array to save as volume image.
     ext : str, optional
-        File extension, defaults to "npz".
+        File extension, defaults to "tiff".
 
     Examples
     --------
@@ -342,23 +354,19 @@ def write_volume(dbfile, data, ext="npz"):
     >>> from plantdb.io import write_volume
     >>> from plantdb.fsdb import Scan, Fileset, File
     >>> from plantdb.fsdb import dummy_db
-    >>> db = dummy_db()
-    >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
-    >>> scan = db.get_scan('007', create=True)
-    >>> fs = scan.get_fileset('volume', create=True)
-    >>> f = fs.get_file('test_volume', create=True)
-    >>> write_volume(f, np.random.rand(50, 10, 10))
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file('test_volume')
+    >>> vol = np.random.rand(50, 10, 10)
+    >>> write_volume(f, vol)
 
     """
-    import numpy as np
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.npz")
-        try:
-            # Try old `volwrite` method:
-            iio.volwrite(fname, data, format=ext)
-        except AttributeError:
-            # Use v3 method:
-            iio.imwrite(fname, data, extension=ext if ext.startswith('.') else f".{ext}")
+        fname = os.path.join(d, f"temp.{ext}")
+        iio.imwrite(fname, data, extension=f".{ext}")
         dbfile.import_file(fname)
     return
 
@@ -472,9 +480,10 @@ def read_point_cloud(dbfile, ext="ply"):
 
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, "wb") as fh:
             fh.write(b)
         return io.read_point_cloud(fname)
@@ -509,8 +518,9 @@ def write_point_cloud(dbfile, data, ext="ply"):
 
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         io.write_point_cloud(fname, data)
         dbfile.import_file(fname)
     return
@@ -532,9 +542,10 @@ def read_triangle_mesh(dbfile, ext="ply"):
         The loaded point cloud object.
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, "wb") as fh:
             fh.write(b)
         return io.read_triangle_mesh(fname)
@@ -553,8 +564,9 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
         File extension, defaults to "ply".
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         io.write_triangle_mesh(fname, data)
         dbfile.import_file(fname)
     return
@@ -576,9 +588,10 @@ def read_voxel_grid(dbfile, ext="ply"):
         The loaded point cloud object.
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, "wb") as fh:
             fh.write(b)
         return io.read_voxel_grid(fname)
@@ -597,8 +610,9 @@ def write_voxel_grid(dbfile, data, ext="ply"):
         File extension, defaults to "ply".
     """
     from open3d import io
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         io.write_voxel_grid(fname, data)
         dbfile.import_file(fname)
     return
@@ -640,9 +654,10 @@ def read_graph(dbfile, ext="p"):
 
     """
     import pickle
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, "wb") as fh:
             fh.write(b)
         with open(fname, 'rb') as f:
@@ -677,8 +692,9 @@ def write_graph(dbfile, data, ext="p"):
 
     """
     import pickle
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, 'wb') as f:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         dbfile.import_file(fname)
@@ -701,9 +717,10 @@ def read_torch(dbfile, ext="pt"):
         The loaded tensor object.
     """
     import torch
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         with open(fname, "wb") as fh:
             fh.write(b)
         return torch.load(fname)
@@ -722,8 +739,9 @@ def write_torch(dbfile, data, ext="pt"):
         File extension, defaults to "pt".
     """
     import torch
+    ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.%s" % ext)
+        fname = os.path.join(d, f"temp.{ext}")
         torch.save(data, fname)
         dbfile.import_file(fname)
     return

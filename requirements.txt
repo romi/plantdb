@@ -4,7 +4,7 @@ appdirs
 flask
 flask-cors
 flask-restful
-imageio
+imageio>= 2.16.2
 scikit-image
 numpy
 pillow
