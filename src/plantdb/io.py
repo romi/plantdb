@@ -27,8 +27,9 @@
 plantdb.io
 ===========
 
-ROMI Data IO.
-This module contains all functions for reading and writing data.
+The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.
+
+Hereafter we detail the formats and their associated Python types and meanings.
 
 File formats
 ------------
@@ -36,58 +37,82 @@ File formats
 json
 ****
 
-Dictionaries, read and written using ``json``.
+Dictionaries or lists, read and written using ``json``.
 
-* Python objects: dict, list
+* Python objects: ``dict``, ``list``
 * File extensions: 'json'
 
 toml
 ****
 
-Dictionaries, read and written using ``toml``.
+Dictionaries or lists, read and written using ``toml``.
 
-* Python objects: dict, list
+* Python objects: ``dict``, ``list``
 * File extensions: 'toml'
 
-2D images
-*********
+2D image
+********
 
-Image data, RGB or RGBA, read and written using ``imageio``.
+RGB or RGBA image data, read and written using ``imageio``.
 
-* Python objects: 2D numpy.ndarray
+* Python objects: ``numpy.ndarray``
 * File extensions: 'jpg', 'png'
 
-3D volumes
-**********
+3D volume
+*********
 
-Volume image data, 3D numpy arrays, read and written using ``imageio``.
+Grayscale or binary volume image data, read and written using ``imageio``.
 
-* Python objects: 3D numpy.ndarray
+* Python objects: ``numpy.ndarray``
 * File extensions: 'tiff'
 
-Point clouds
-************
+Labelled 3D volume
+******************
 
-Point clouds, 3D coordinates, read and written using ``open3d``.
+Labelled volume image data, converted to dictionary of 3D (binary) numpy arrays, read and written using ``numpy``.
 
-* Python object: open3d.geometry.PointCloud
-* File extensions: 'ply'
+* Python objects: ``dict`` of 3D ``numpy.ndarray``
+* File extensions: 'npz'
 
-Triangle meshes
-***************
-
-Triangular meshes, 3D coordinates, read and written using ``open3d``.
-
-* Python object: open3d.geometry.TriangleMesh
-* File extensions: 'ply'
-
-Tree graphs
+Point cloud
 ***********
+
+Point clouds, read and written using ``open3d``.
+
+* Python object: ``open3d.geometry.PointCloud``
+* File extensions: 'ply'
+
+Triangle mesh
+*************
+
+Triangular meshes, read and written using ``open3d``.
+
+* Python object: ``open3d.geometry.TriangleMesh``
+* File extensions: 'ply'
+
+Voxel grid
+**********
+
+Voxel grids, read and written using ``open3d``.
+
+* Python object: ``open3d.geometry.VoxelGrid``
+* File extensions: 'ply'
+
+Tree graph
+**********
 
 Tree graphs, read and written using ``networkx``.
 
-* Python object: networkx.Graph
+* Python object: ``networkx.Graph``
 * File extensions: 'p'
+
+Pytorch tensor
+**************
+
+Trained tensor, read and written using ``torch``.
+
+* Python object: ``torch.tensor``
+* File extensions: 'pt'
 
 """
 
@@ -335,7 +360,7 @@ def read_volume(dbfile, ext="tiff"):
     return iio.imread(dbfile.read_raw(), extension=f".{ext}")
 
 
-def write_volume(dbfile, data, ext="tiff"):
+def write_volume(dbfile, data, ext="tiff", compress=True):
     """Writes a volume image to a ROMI database file.
 
     Parameters
@@ -346,6 +371,9 @@ def write_volume(dbfile, data, ext="tiff"):
         The 3D array to save as volume image.
     ext : str, optional
         File extension, defaults to "tiff".
+    compress : bool, optional
+        Indicate if the volume file should be compressed.
+        Defaults to ``True``.
 
     Examples
     --------
@@ -366,7 +394,11 @@ def write_volume(dbfile, data, ext="tiff"):
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as d:
         fname = os.path.join(d, f"temp.{ext}")
-        iio.imwrite(fname, data, extension=f".{ext}")
+        if compress:
+            # Use LZW compression with TIFF:
+            iio.imwrite(fname, data, extension=f".{ext}", compression=5)
+        else:
+            iio.imwrite(fname, data, extension=f".{ext}")
         dbfile.import_file(fname)
     return
 
@@ -382,7 +414,7 @@ def read_npz(dbfile):
     Returns
     -------
     dict of numpy.ndarray
-        The uncompressed numpy array.
+        The dictionary of numpy arrays.
 
     Examples
     --------
@@ -584,7 +616,7 @@ def read_voxel_grid(dbfile, ext="ply"):
 
     Returns
     -------
-    open3d.geometry.PointCloud
+    open3d.geometry.VoxelGrid
         The loaded point cloud object.
     """
     from open3d import io
@@ -604,8 +636,8 @@ def write_voxel_grid(dbfile, data, ext="ply"):
     ----------
     dbfile : DB.db.File
         The `File` object used to write the associated file.
-    data : open3d.geometry.PointCloud
-        The point cloud object to save.
+    data : open3d.geometry.VoxelGrid
+        The voxel grid object to save.
     ext : str, optional
         File extension, defaults to "ply".
     """

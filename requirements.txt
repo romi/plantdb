@@ -5,10 +5,11 @@ flask
 flask-cors
 flask-restful
 imageio>= 2.16.2
+imagecodecs
 scikit-image
 numpy
 pillow
 toml
-open3d>= 0.9.0.0  # open3d== 0.9.0.0
+open3d>= 0.9.0.0
 nose2
 coverage
