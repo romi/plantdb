@@ -2286,11 +2286,15 @@ def _filter_query(l, query=None):
         # Else apply the filter on metadata using key(s) and value(s) from `query`:
         query_result = []
         for f in l:
+            f_query = []  # boolean list gathering the "filter test results"
             for q in query.keys():
                 try:
                     assert f.get_metadata(q) == query[q]
                 except AssertionError:
-                    pass
+                    f_query.append(False)
                 else:
+                    f_query.append(True)
+            # All requirements have to be fulfilled:
+            if all(f_query):
                     query_result.append(f)
     return query_result
