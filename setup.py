@@ -13,6 +13,7 @@ opts = dict(
     package_dir={'': 'src'},
     include_package_data=False,
     scripts=[
+        'bin/fsdb_check',
         'bin/romi_fsdb_sync',
         'bin/romi_import_folder',
         'bin/romi_import_file',
