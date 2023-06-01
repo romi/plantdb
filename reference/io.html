@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -50,8 +50,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -224,8 +224,6 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#reference-io--page-root" class="md-nav__link">I/O operations</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#plantdb-io" class="md-nav__link">plantdb.io</a><nav class="md-nav">
-              <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#file-formats" class="md-nav__link">File formats</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#json" class="md-nav__link">json</a>
@@ -249,10 +247,8 @@
         <li class="md-nav__item"><a href="#pytorch-tensor" class="md-nav__link">Pytorch tensor</a>
         </li></ul>
             </nav>
-        </li></ul>
-            </nav>
         </li>
-        <li class="md-nav__item"><a href="#plantdb.io.dbfile_from_local_file" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">dbfile_from_local_file()</span></code></a>
+        <li class="md-nav__item"><a href="#plantdb.io.fsdbfile_from_local_file" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">fsdbfile_from_local_file()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#plantdb.io.read_graph" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">read_graph()</span></code></a>
         </li>
@@ -318,14 +314,12 @@
 <h1 id="reference-io--page-root">I/O operations<a class="headerlink" href="#reference-io--page-root" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<span class="target" id="module-plantdb.io"></span><section id="plantdb-io">
-<h2 id="plantdb-io">plantdb.io<a class="headerlink" href="#plantdb-io" title="Permalink to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">io</span></code> module of the ROMI <code class="docutils literal notranslate"><span class="pre">plantdb</span></code> library contains all functions for reading and writing data to database.</p>
+<span class="target" id="module-plantdb.io"></span><p>The <code class="docutils literal notranslate"><span class="pre">io</span></code> module of the ROMI <code class="docutils literal notranslate"><span class="pre">plantdb</span></code> library contains all functions for reading and writing data to database.</p>
 <p>Hereafter we detail the formats and their associated Python types and meanings.</p>
 <section id="file-formats">
-<h3 id="file-formats">File formats<a class="headerlink" href="#file-formats" title="Permalink to this heading">¶</a></h3>
+<h2 id="file-formats">File formats<a class="headerlink" href="#file-formats" title="Permalink to this heading">¶</a></h2>
 <section id="json">
-<h4 id="json">json<a class="headerlink" href="#json" title="Permalink to this heading">¶</a></h4>
+<h3 id="json">json<a class="headerlink" href="#json" title="Permalink to this heading">¶</a></h3>
 <p>Dictionaries or lists, read and written using <code class="docutils literal notranslate"><span class="pre">json</span></code>.</p>
 <ul class="simple">
 <li><p>Python objects: <code class="docutils literal notranslate"><span class="pre">dict</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code></p></li>
@@ -333,7 +327,7 @@
 </ul>
 </section>
 <section id="toml">
-<h4 id="toml">toml<a class="headerlink" href="#toml" title="Permalink to this heading">¶</a></h4>
+<h3 id="toml">toml<a class="headerlink" href="#toml" title="Permalink to this heading">¶</a></h3>
 <p>Dictionaries or lists, read and written using <code class="docutils literal notranslate"><span class="pre">toml</span></code>.</p>
 <ul class="simple">
 <li><p>Python objects: <code class="docutils literal notranslate"><span class="pre">dict</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code></p></li>
@@ -341,7 +335,7 @@
 </ul>
 </section>
 <section id="d-image">
-<h4 id="d-image">2D image<a class="headerlink" href="#d-image" title="Permalink to this heading">¶</a></h4>
+<h3 id="d-image">2D image<a class="headerlink" href="#d-image" title="Permalink to this heading">¶</a></h3>
 <p>RGB or RGBA image data, read and written using <code class="docutils literal notranslate"><span class="pre">imageio</span></code>.</p>
 <ul class="simple">
 <li><p>Python objects: <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></li>
@@ -349,7 +343,7 @@
 </ul>
 </section>
 <section id="d-volume">
-<h4 id="d-volume">3D volume<a class="headerlink" href="#d-volume" title="Permalink to this heading">¶</a></h4>
+<h3 id="d-volume">3D volume<a class="headerlink" href="#d-volume" title="Permalink to this heading">¶</a></h3>
 <p>Grayscale or binary volume image data, read and written using <code class="docutils literal notranslate"><span class="pre">imageio</span></code>.</p>
 <ul class="simple">
 <li><p>Python objects: <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></li>
@@ -357,7 +351,7 @@
 </ul>
 </section>
 <section id="labelled-3d-volume">
-<h4 id="labelled-3d-volume">Labelled 3D volume<a class="headerlink" href="#labelled-3d-volume" title="Permalink to this heading">¶</a></h4>
+<h3 id="labelled-3d-volume">Labelled 3D volume<a class="headerlink" href="#labelled-3d-volume" title="Permalink to this heading">¶</a></h3>
 <p>Labelled volume image data, converted to dictionary of 3D (binary) numpy arrays, read and written using <code class="docutils literal notranslate"><span class="pre">numpy</span></code>.</p>
 <ul class="simple">
 <li><p>Python objects: <code class="docutils literal notranslate"><span class="pre">dict</span></code> of 3D <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></li>
@@ -365,7 +359,7 @@
 </ul>
 </section>
 <section id="point-cloud">
-<h4 id="point-cloud">Point cloud<a class="headerlink" href="#point-cloud" title="Permalink to this heading">¶</a></h4>
+<h3 id="point-cloud">Point cloud<a class="headerlink" href="#point-cloud" title="Permalink to this heading">¶</a></h3>
 <p>Point clouds, read and written using <code class="docutils literal notranslate"><span class="pre">open3d</span></code>.</p>
 <ul class="simple">
 <li><p>Python object: <code class="docutils literal notranslate"><span class="pre">open3d.geometry.PointCloud</span></code></p></li>
@@ -373,7 +367,7 @@
 </ul>
 </section>
 <section id="triangle-mesh">
-<h4 id="triangle-mesh">Triangle mesh<a class="headerlink" href="#triangle-mesh" title="Permalink to this heading">¶</a></h4>
+<h3 id="triangle-mesh">Triangle mesh<a class="headerlink" href="#triangle-mesh" title="Permalink to this heading">¶</a></h3>
 <p>Triangular meshes, read and written using <code class="docutils literal notranslate"><span class="pre">open3d</span></code>.</p>
 <ul class="simple">
 <li><p>Python object: <code class="docutils literal notranslate"><span class="pre">open3d.geometry.TriangleMesh</span></code></p></li>
@@ -381,7 +375,7 @@
 </ul>
 </section>
 <section id="voxel-grid">
-<h4 id="voxel-grid">Voxel grid<a class="headerlink" href="#voxel-grid" title="Permalink to this heading">¶</a></h4>
+<h3 id="voxel-grid">Voxel grid<a class="headerlink" href="#voxel-grid" title="Permalink to this heading">¶</a></h3>
 <p>Voxel grids, read and written using <code class="docutils literal notranslate"><span class="pre">open3d</span></code>.</p>
 <ul class="simple">
 <li><p>Python object: <code class="docutils literal notranslate"><span class="pre">open3d.geometry.VoxelGrid</span></code></p></li>
@@ -389,7 +383,7 @@
 </ul>
 </section>
 <section id="tree-graph">
-<h4 id="tree-graph">Tree graph<a class="headerlink" href="#tree-graph" title="Permalink to this heading">¶</a></h4>
+<h3 id="tree-graph">Tree graph<a class="headerlink" href="#tree-graph" title="Permalink to this heading">¶</a></h3>
 <p>Tree graphs, read and written using <code class="docutils literal notranslate"><span class="pre">networkx</span></code>.</p>
 <ul class="simple">
 <li><p>Python object: <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code></p></li>
@@ -397,7 +391,7 @@
 </ul>
 </section>
 <section id="pytorch-tensor">
-<h4 id="pytorch-tensor">Pytorch tensor<a class="headerlink" href="#pytorch-tensor" title="Permalink to this heading">¶</a></h4>
+<h3 id="pytorch-tensor">Pytorch tensor<a class="headerlink" href="#pytorch-tensor" title="Permalink to this heading">¶</a></h3>
 <p>Trained tensor, read and written using <code class="docutils literal notranslate"><span class="pre">torch</span></code>.</p>
 <ul class="simple">
 <li><p>Python object: <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code></p></li>
@@ -405,10 +399,9 @@
 </ul>
 </section>
 </section>
-</section>
 <dl class="py function">
-<dt class="sig sig-object py" id="plantdb.io.dbfile_from_local_file">
-<span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">dbfile_from_local_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#dbfile_from_local_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.dbfile_from_local_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="plantdb.io.fsdbfile_from_local_file">
+<span class="sig-prename descclassname"><span class="pre">plantdb.io.</span></span><span class="sig-name descname"><span class="pre">fsdbfile_from_local_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/io.html#fsdbfile_from_local_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.io.fsdbfile_from_local_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a temporary (<em>i.e.</em> not in a DB) <code class="docutils literal notranslate"><span class="pre">File</span></code> object from a local file.</p>
 </dd></dl>
 <dl class="py function">
@@ -419,7 +412,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dbfile</strong> (<em>DB.db.File</em>) – The <cite>File</cite> object used to load the associated file.</p></li>
-<li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “ply”.</p></li>
+<li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File extension, defaults to “p”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -467,7 +460,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_image</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">img2</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -524,7 +518,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_npz'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_npz</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">npz</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_npz"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">npz2</span> <span class="o">=</span> <span class="n">read_npz</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -653,7 +648,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_volume'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_volume</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">vol</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_volume"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vol2</span> <span class="o">=</span> <span class="n">read_volume</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -736,7 +732,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>  <span class="c1"># an 8bit 5x5 RGB image</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_image</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -788,7 +785,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_npz'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">npz</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_npz</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">npz</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -901,9 +899,15 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># stupid volume file with only `1` values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f_lzw</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_volume_compress'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_volume</span><span class="p">(</span><span class="n">f_lzw</span><span class="p">,</span> <span class="n">vol</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s1">'test_volume'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">write_volume</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">vol</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">write_volume</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f_lzw</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+<span class="go">15283</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+<span class="go">48994</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -970,7 +974,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

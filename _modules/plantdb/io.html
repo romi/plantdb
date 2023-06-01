@@ -49,8 +49,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -257,11 +257,7 @@
 <span class="c1"># &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># ------------------------------------------------------------------------------</span>
 
-<span class="sd">"""</span>
-<span class="sd">plantdb.io</span>
-<span class="sd">===========</span>
-
-<span class="sd">The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.</span>
+<span class="sd">"""The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.</span>
 
 <span class="sd">Hereafter we detail the formats and their associated Python types and meanings.</span>
 
@@ -350,16 +346,16 @@
 
 <span class="sd">"""</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-
-<span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">fsdb</span>
-<span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">DB</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">File</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">Fileset</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">Scan</span>
+<span class="kn">from</span> <span class="nn">plantdb.log</span> <span class="kn">import</span> <span class="n">configure_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">configure_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="read_json"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.read_json">[docs]</a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">dbfile</span><span class="p">):</span>
@@ -513,13 +509,15 @@
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file("test_image")</span>
-<span class="sd">    &gt;&gt;&gt; img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">    &gt;&gt;&gt; img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image</span>
 <span class="sd">    &gt;&gt;&gt; write_image(f, img)</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.get_file("test_image")</span>
 <span class="sd">    &gt;&gt;&gt; img2 = read_image(f)</span>
 <span class="sd">    &gt;&gt;&gt; np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!</span>
 
 <span class="sd">    """</span>
+    <span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
     <span class="k">return</span> <span class="n">iio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">())</span></div>
 
 
@@ -545,10 +543,12 @@
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file("test_image")</span>
-<span class="sd">    &gt;&gt;&gt; img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">    &gt;&gt;&gt; img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image</span>
 <span class="sd">    &gt;&gt;&gt; write_image(f, img)</span>
 
 <span class="sd">    """</span>
+    <span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">"jpg"</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="c1"># Remove any alpha channel if JPEG format as it cannot handle it</span>
@@ -583,13 +583,15 @@
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file('test_volume')</span>
-<span class="sd">    &gt;&gt;&gt; vol = np.random.rand(50, 10, 10)</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">    &gt;&gt;&gt; vol = rng.random((50, 10, 10))</span>
 <span class="sd">    &gt;&gt;&gt; write_volume(f, vol)</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.get_file("test_volume")</span>
 <span class="sd">    &gt;&gt;&gt; vol2 = read_volume(f)</span>
 <span class="sd">    &gt;&gt;&gt; np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!</span>
 
 <span class="sd">    """</span>
+    <span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="k">return</span> <span class="n">iio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">(),</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
@@ -620,18 +622,36 @@
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
+<span class="sd">    &gt;&gt;&gt; vol = np.ones((50, 10, 10))  # stupid volume file with only `1` values</span>
+<span class="sd">    &gt;&gt;&gt; f_lzw = fs.create_file('test_volume_compress')</span>
+<span class="sd">    &gt;&gt;&gt; write_volume(f_lzw, vol)</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file('test_volume')</span>
-<span class="sd">    &gt;&gt;&gt; vol = np.random.rand(50, 10, 10)</span>
-<span class="sd">    &gt;&gt;&gt; write_volume(f, vol)</span>
+<span class="sd">    &gt;&gt;&gt; write_volume(f, vol, compress=False)</span>
+<span class="sd">    &gt;&gt;&gt; print(f_lzw.path().stat().st_size)</span>
+<span class="sd">    15283</span>
+<span class="sd">    &gt;&gt;&gt; print(f.path().stat().st_size)</span>
+<span class="sd">    48994</span>
 
 <span class="sd">    """</span>
+    <span class="kn">import</span> <span class="nn">imageio.v3</span> <span class="k">as</span> <span class="nn">iio</span>
+    <span class="kn">import</span> <span class="nn">tifffile</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">imagecodecs</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">pip_install</span> <span class="o">=</span> <span class="s2">"pip install imagecodecs"</span>
+        <span class="n">conda_install</span> <span class="o">=</span> <span class="s2">"conda install -c conda-forge imagecodecs"</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing 'imagecodecs' library to compress!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Install it with `</span><span class="si">{</span><span class="n">pip_install</span><span class="si">}</span><span class="s2">` or `</span><span class="si">{</span><span class="n">conda_install</span><span class="si">}</span><span class="s2">`."</span><span class="p">)</span>
+        <span class="n">compress</span> <span class="o">=</span> <span class="kc">False</span>
+
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
-            <span class="c1"># Use LZW compression with TIFF:</span>
-            <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="c1"># Use LZW compression with `tifffile.imwrite`:</span>
+            <span class="n">tifffile</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">"LZW"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># No compression with `imageio.v3`</span>
             <span class="n">iio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="sa">f</span><span class="s2">".</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -660,7 +680,8 @@
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file('test_npz')</span>
-<span class="sd">    &gt;&gt;&gt; npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">    &gt;&gt;&gt; npz = {f"{i}": rng.random((10, 10, 3)) for i in range(5)}</span>
 <span class="sd">    &gt;&gt;&gt; write_npz(f, npz)</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.get_file("test_npz")</span>
 <span class="sd">    &gt;&gt;&gt; npz2 = read_npz(f)</span>
@@ -669,11 +690,11 @@
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.npz"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.npz"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="write_npz"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.write_npz">[docs]</a><span class="k">def</span> <span class="nf">write_npz</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -696,13 +717,14 @@
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.create_file('test_npz')</span>
-<span class="sd">    &gt;&gt;&gt; npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}</span>
+<span class="sd">    &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">    &gt;&gt;&gt; npz = {f"{i}": rng.random((10, 10, 3)) for i in range(5)}</span>
 <span class="sd">    &gt;&gt;&gt; write_npz(f, npz)</span>
 
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"temp.npz"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.npz"</span>
         <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -748,9 +770,9 @@
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_point_cloud</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
@@ -785,8 +807,8 @@
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -810,9 +832,9 @@
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_triangle_mesh</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
@@ -831,8 +853,8 @@
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_triangle_mesh</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -856,9 +878,9 @@
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">read_voxel_grid</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
@@ -877,8 +899,8 @@
 <span class="sd">    """</span>
     <span class="kn">from</span> <span class="nn">open3d</span> <span class="kn">import</span> <span class="n">io</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_voxel_grid</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -892,7 +914,7 @@
 <span class="sd">    dbfile : DB.db.File</span>
 <span class="sd">        The `File` object used to load the associated file.</span>
 <span class="sd">    ext : str, optional</span>
-<span class="sd">        File extension, defaults to "ply".</span>
+<span class="sd">        File extension, defaults to "p".</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -922,11 +944,11 @@
     <span class="kn">import</span> <span class="nn">pickle</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">G</span></div>
 
@@ -959,9 +981,9 @@
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">pickle</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -982,12 +1004,11 @@
 <span class="sd">    Torch.Tensor</span>
 <span class="sd">        The loaded tensor object.</span>
 <span class="sd">    """</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">with</span> <span class="n">fname</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
@@ -1006,8 +1027,8 @@
 <span class="sd">    """</span>
     <span class="kn">import</span> <span class="nn">torch</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># remove potential leading dot from extension</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"temp.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
         <span class="n">dbfile</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span></div>
@@ -1016,26 +1037,29 @@
 <div class="viewcode-block" id="to_file"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.to_file">[docs]</a><span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="n">dbfile</span><span class="p">:</span> <span class="n">File</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Helper to write a `dbfile` to a file in the filesystem. """</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">read_raw</span><span class="p">()</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
         <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="dbfile_from_local_file"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.dbfile_from_local_file">[docs]</a><span class="k">def</span> <span class="nf">dbfile_from_local_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file. """</span>
-    <span class="n">dirname</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="nb">id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<div class="viewcode-block" id="fsdbfile_from_local_file"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.fsdbfile_from_local_file">[docs]</a><span class="k">def</span> <span class="nf">fsdbfile_from_local_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file."""</span>
+    <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">dirname</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
     <span class="c1"># Initialise the `DB` abstract class:</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">DB</span><span class="p">()</span>
-    <span class="n">db</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="s2">""</span>
-    <span class="c1"># Initialize a `Scan` instance:</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
-    <span class="c1"># Initialize a `Fileset` instance:</span>
-    <span class="n">fileset</span> <span class="o">=</span> <span class="n">Fileset</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
-    <span class="c1"># Initialize a `File` instance &amp; return it:</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">fsdb</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">fileset</span><span class="o">=</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">fname</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
+        <span class="c1"># Initialize a `Scan` instance:</span>
+        <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s2">"tmp"</span><span class="p">)</span>
+        <span class="c1"># Initialize a `Fileset` instance:</span>
+        <span class="n">fileset</span> <span class="o">=</span> <span class="n">Fileset</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+        <span class="c1"># Initialize a `File` instance &amp; return it:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fsdb</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">fileset</span><span class="o">=</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">fname</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -1043,7 +1067,7 @@
 <span class="w">    </span><span class="sd">"""Creates a temporary directory (*i.e.* not in a DB) to host the ``Fileset`` object and write files. """</span>
     <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fileset</span><span class="o">.</span><span class="n">get_files</span><span class="p">():</span>
-        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">filename</span>
         <span class="n">to_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmpdir</span></div>
 </pre></div>
@@ -1070,7 +1094,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

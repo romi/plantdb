@@ -49,8 +49,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -257,8 +257,7 @@
 <span class="c1"># &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># ------------------------------------------------------------------------------</span>
 
-<span class="sd">"""</span>
-<span class="sd">Implementation of a database as a local file structure.</span>
+<span class="sd">"""Implementation of a database as a local file structure.</span>
 
 <span class="sd">Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``Scan`` with ``'myscan_001'`` as ``Scan.id`` and there are some metadata (see below), you should have the following file structure:</span>
 
@@ -266,19 +265,23 @@
 
 <span class="sd">    dbroot/                            # base directory of the database</span>
 <span class="sd">    ├── myscan_001/                    # scan dataset directory, id=`myscan_001`</span>
-<span class="sd">    │   ├── files.json                 # JSON file referencing the files of the datataset</span>
-<span class="sd">    │   ├── images/                    # gather the 'images' `Fileset`</span>
+<span class="sd">    │   ├── files.json                 # JSON file referencing the all files for the dataset</span>
+<span class="sd">    │   ├── images/                    # `Fileset` gathering the 'images'</span>
 <span class="sd">    │   │   ├── scan_img_01.jpg        # 'image' `File` 01</span>
 <span class="sd">    │   │   ├── scan_img_02.jpg        # 'image' `File` 02</span>
-<span class="sd">    │   │   ├── [...]</span>
+<span class="sd">    │   │   ├── [...]                  #</span>
 <span class="sd">    │   │   └── scan_img_99.jpg        # 'image' `File` 99</span>
 <span class="sd">    │   ├── metadata/                  # metadata directory</span>
 <span class="sd">    │   │   ├── images                 # 'images' metadata directory</span>
-<span class="sd">    │   │   │   ├── scan_img_01.json   # JSON file with 'image' file metadata</span>
+<span class="sd">    │   │   │   ├── scan_img_01.json   # JSON metadata attached to this file</span>
 <span class="sd">    │   │   │   ├── scan_img_02.json   #</span>
-<span class="sd">    │   │   ├── [...]</span>
+<span class="sd">    │   │   │   [...]                  #</span>
 <span class="sd">    │   │   │   └── scan_img_99.json   #</span>
-<span class="sd">    │   │   └── metadata.json          # scan dataset metadata</span>
+<span class="sd">    │   │   ├── Task_A/                # optional, only present if metadata attached to one of the outputs from `Task_A`</span>
+<span class="sd">    │   │   │   └── outfile.json       # optional metadata attached to the output file from `Task_A`</span>
+<span class="sd">    │   │   └── (metadata.json)        # optional metadata attached to the dataset</span>
+<span class="sd">    │   ├── task_A/                    # `Fileset` gathering the outputs of `Task_A`</span>
+<span class="sd">    │   │   └── outfile.ext            # output file from `Task_A`</span>
 <span class="sd">    │   └── (measures.json)            # optional manual measurements file</span>
 <span class="sd">    ├── myscan_002/                    # scan dataset directory, id=`myscan_002`</span>
 <span class="sd">    :</span>
@@ -331,6 +334,8 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">rmtree</span>
 
@@ -360,7 +365,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fsdb.FSDB</span>
+<span class="sd">    plantdb.fsdb.FSDB</span>
 <span class="sd">        The dummy database.</span>
 
 <span class="sd">    Examples</span>
@@ -371,28 +376,28 @@
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; print(db.is_connected)</span>
 <span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; print(db.basedir)</span>
+<span class="sd">    &gt;&gt;&gt; print(db.path())  # the database directory</span>
 <span class="sd">    /tmp/romidb_********</span>
 
 <span class="sd">    &gt;&gt;&gt; db = dummy_db(with_scan=True)</span>
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
-<span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")  # get the created scan</span>
 <span class="sd">    &gt;&gt;&gt; print(type(scan))</span>
 <span class="sd">    &lt;class 'NoneType'&gt;</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.basedir))</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.path()))</span>
 <span class="sd">    ['lock', 'romidb', 'myscan_001']</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, "myscan_001")))</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(scan.path()))</span>
 <span class="sd">    ['metadata']</span>
 
 <span class="sd">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id)))</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(scan.path()))</span>
 <span class="sd">    ['metadata', 'files.json', 'fileset_001']</span>
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; print(type(fs))</span>
 <span class="sd">    &lt;class 'plantdb.fsdb.Fileset'&gt;</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))</span>
+<span class="sd">    &gt;&gt;&gt; print(list(fs.path().iterdir()))  # the fileset is empty as no file has been created</span>
 <span class="sd">    []</span>
 
 <span class="sd">    &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
@@ -401,17 +406,17 @@
 <span class="sd">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span class="sd">    &gt;&gt;&gt; f = fs.get_file("test_image")</span>
 <span class="sd">    &gt;&gt;&gt; print(type(f))</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))</span>
+<span class="sd">    &gt;&gt;&gt; print(list(fs.path().iterdir()))</span>
 <span class="sd">    ['test_image.png', 'test_json.json']</span>
-<span class="sd">    &gt;&gt;&gt; fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)</span>
+<span class="sd">    &gt;&gt;&gt; print(f.path())</span>
 
 <span class="sd">    """</span>
-    <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
     <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
     <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">io</span>
 
-    <span class="n">mydb</span> <span class="o">=</span> <span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'romidb_'</span><span class="p">)</span>
-    <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">mydb</span><span class="p">,</span> <span class="n">MARKER_FILE_NAME</span><span class="p">),</span> <span class="s1">'w'</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">mydb</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'romidb_'</span><span class="p">))</span>
+    <span class="n">marker_file</span> <span class="o">=</span> <span class="n">mydb</span> <span class="o">/</span> <span class="n">MARKER_FILE_NAME</span>
+    <span class="n">marker_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">'w'</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">mydb</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">with_file</span><span class="p">:</span>
@@ -445,7 +450,8 @@
         <span class="n">f</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="s2">"dummy image"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="c1"># -- Create a random RGB image:</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
-        <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="s2">"png"</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="s2">"random image"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="c1"># -- Create a dummy JSON</span>
@@ -475,7 +481,7 @@
 <span class="sd">    lock_path : str</span>
 <span class="sd">        Absolute path to the lock file.</span>
 <span class="sd">    scans : list</span>
-<span class="sd">        List of ``Scan`` objects found in the database.</span>
+<span class="sd">        The list of ``Scan`` objects found in the database.</span>
 <span class="sd">    is_connected : bool</span>
 <span class="sd">        ``True`` if the database is connected (locked directory), else ``False``.</span>
 
@@ -527,13 +533,13 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        basedir : str or pathlib.Path</span>
-<span class="sd">            Path to the root directory of the database.</span>
+<span class="sd">            The path to the root directory of the database.</span>
 
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># Defines attributes:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">basedir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">LOCK_FILE_NAME</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">/</span> <span class="n">LOCK_FILE_NAME</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -574,24 +580,21 @@
 
 <span class="sd">        """</span>
         <span class="c1"># Check the given path to root directory of the database is a directory:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Not a directory: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span>
-        <span class="c1"># Check the given path to root directory of the database is a "romi db", ie. have the `MARKER_FILE_NAME`:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-                <span class="s2">"Not a DB. Check that there is a marker named </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="n">MARKER_FILE_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="c1"># Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fsdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a DB! Check that there is a file named </span><span class="si">{</span><span class="n">MARKER_FILE_NAME</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">)</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">DBBusyError</span><span class="p">(</span>
-                    <span class="s2">"File </span><span class="si">%s</span><span class="s2"> exists in DB root: DB is busy, cannot connect."</span> <span class="o">%</span> <span class="n">LOCK_FILE_NAME</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">DBBusyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File </span><span class="si">{</span><span class="n">LOCK_FILE_NAME</span><span class="si">}</span><span class="s2"> exists in DB root: DB is busy, cannot connect."</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already connected to the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already connected to the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="FSDB.disconnect"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -622,15 +625,14 @@
             <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="p">:</span>
                 <span class="n">s</span><span class="o">.</span><span class="n">_erase</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="p">):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">atexit</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-                    <span class="s2">"Could not remove lock, maybe you messed with the lock_path attribute?"</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Could not remove lock, maybe you messed with the `lock_path` attribute?"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already disconnected from the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already disconnected from the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="FSDB.get_scans"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.get_scans">[docs]</a>    <span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -741,7 +743,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_valid_id</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Invalid id"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Duplicate scan name: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duplicate scan name: </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
         <span class="n">_make_scan</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
@@ -789,7 +791,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="FSDB.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="FSDB.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the path to the local database root directory.</span>
 
 <span class="sd">        Examples</span>
@@ -801,7 +803,7 @@
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span></div>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FSDB.list_scans"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.list_scans">[docs]</a>    <span class="k">def</span> <span class="nf">list_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the list of scans in the local database.</span>
@@ -860,7 +862,7 @@
 <span class="sd">    /tmp/romidb_j0pbkoo0/007</span>
 <span class="sd">    &gt;&gt;&gt; print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!</span>
 <span class="sd">    None</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.basedir))  # And it is NOT found under the `basedir` directory</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.path()))  # And it is NOT found under the `basedir` directory</span>
 <span class="sd">    ['romidb']</span>
 <span class="sd">    &gt;&gt;&gt; # HOWEVER if you add metadata to the `Scan` object:</span>
 <span class="sd">    &gt;&gt;&gt; scan.set_metadata({'Name': "Bond... James Bond!"})</span>
@@ -868,11 +870,11 @@
 <span class="sd">    {'Name': 'Bond... James Bond!'}</span>
 <span class="sd">    &gt;&gt;&gt; print(db.get_scan('007'))  # The `Scan` is still not found in the database!</span>
 <span class="sd">    None</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.basedir))  # BUT it is now found under the `basedir` directory</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.path()))  # BUT it is now found under the `basedir` directory</span>
 <span class="sd">    ['007', 'romidb']</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata</span>
 <span class="sd">    ['metadata']</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id, "metadata")))  # Same goes for the metadata</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.path(), scan.id, "metadata")))  # Same goes for the metadata</span>
 <span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">    &gt;&gt;&gt; # Example #2: Get it from an `FSDB` object:</span>
@@ -882,9 +884,9 @@
 <span class="sd">    &lt;class 'plantdb.fsdb.Scan'&gt;</span>
 <span class="sd">    &gt;&gt;&gt; print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`</span>
 <span class="sd">    &lt;plantdb.fsdb.Scan object at 0x7f34fc860fd0&gt;</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.basedir))  # And it is found under the `basedir` directory</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(db.path()))  # And it is found under the `basedir` directory</span>
 <span class="sd">    ['007', 'romidb']</span>
-<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata</span>
+<span class="sd">    &gt;&gt;&gt; print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata</span>
 <span class="sd">    ['metadata']</span>
 <span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
 <span class="sd">    &gt;&gt;&gt; # When reconnecting to db, if created scan is EMPTY (no Fileset &amp; File) it is not found!</span>
@@ -912,6 +914,7 @@
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_erase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Erase the filesets and metadata associated to this scan."""</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesets</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">_erase</span><span class="p">()</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
@@ -1032,7 +1035,7 @@
 <span class="sd">        It is located at the root folder of the scan dataset.</span>
 
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">_get_measures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measures</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measures</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Scan.set_metadata"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Add a new metadata to the scan.</span>
@@ -1092,9 +1095,9 @@
 
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_valid_id</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Invalid id"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid fileset id: </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Duplicate fileset name: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duplicate fileset name: </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">fileset</span> <span class="o">=</span> <span class="n">Fileset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
         <span class="n">_make_fileset</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filesets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
@@ -1102,8 +1105,9 @@
         <span class="k">return</span> <span class="n">fileset</span></div>
 
 <div class="viewcode-block" id="Scan.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan main JSON FILE (files.json)."""</span>
         <span class="n">_store_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The `files.json` file for scan '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">' has been updated!"</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Scan.delete_fileset"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.delete_fileset">[docs]</a>    <span class="k">def</span> <span class="nf">delete_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">):</span>
@@ -1137,7 +1141,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Scan.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="Scan.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Scan.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the path to the local scan dataset.</span>
 
 <span class="sd">        Examples</span>
@@ -1376,25 +1380,25 @@
 <span class="sd">        &gt;&gt;&gt; fs.list_files()</span>
 <span class="sd">        ['test_image', 'test_json']</span>
 <span class="sd">        &gt;&gt;&gt; import os</span>
-<span class="sd">        &gt;&gt;&gt; os.listdir(fs.path())  # the file has been removed from the drive and the database</span>
+<span class="sd">        &gt;&gt;&gt; list(fs.path().iterdir())  # the file has been removed from the drive and the database</span>
 <span class="sd">        ['test_image.png', 'test_json.json']</span>
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Invalid file ID: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">file_id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid file ID: </span><span class="si">{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">_delete_file</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Fileset.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan main JSON FILE (files.json)."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Fileset.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="Fileset.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.Fileset.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the path to the local fileset.</span>
 
 <span class="sd">        Examples</span>
@@ -1443,7 +1447,7 @@
 <span class="sd">    fileset : plantdb.fsdb.Fileset</span>
 <span class="sd">        Set of files containing the file.</span>
 <span class="sd">    id : str</span>
-<span class="sd">        Name of the file in the database ``fsdb.FSDB``.</span>
+<span class="sd">        Name of the file in the ``FSDB`` local database.</span>
 <span class="sd">    filename : str</span>
 <span class="sd">        File name.</span>
 <span class="sd">    metadata : dict</span>
@@ -1459,7 +1463,6 @@
 <span class="sd">    Else they are just referenced in the database!</span>
 
 <span class="sd">    Contrary to other classes (``Scan`` &amp; ``Fileset``) the uniqueness is not checked!</span>
-
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -1511,19 +1514,19 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path : str or pathlib.Path</span>
-<span class="sd">            Path to the file to import.</span>
-
+<span class="sd">            The path to the file to import.</span>
 <span class="sd">        """</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">_get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
         <span class="n">newpath</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">copyfile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">newpath</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="File.store"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Save changes to the scan's JSON."""</span>
+<span class="w">        </span><span class="sd">"""Save changes to the scan main JSON FILE (files.json)."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
@@ -1556,7 +1559,7 @@
 
 <span class="sd">        """</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="File.write_raw"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.write_raw">[docs]</a>    <span class="k">def</span> <span class="nf">write_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
@@ -1589,9 +1592,9 @@
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">_get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
@@ -1628,7 +1631,7 @@
 
 <span class="sd">        """</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="File.write"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
@@ -1663,9 +1666,9 @@
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">_get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
@@ -1738,33 +1741,33 @@
 
 <span class="sd">    """</span>
     <span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
         <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_scan_files_json</span><span class="p">(</span><span class="n">scan</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="c1"># If the `files.json` associated to the scan is found, parse it:</span>
+            <span class="k">if</span> <span class="n">_scan_json_file</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="n">scan</span><span class="o">.</span><span class="n">filesets</span> <span class="o">=</span> <span class="n">_load_scan_filesets</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
                 <span class="n">scan</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">_load_scan_metadata</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
                 <span class="n">scan</span><span class="o">.</span><span class="n">measures</span> <span class="o">=</span> <span class="n">_load_scan_measures</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-                <span class="c1"># scan.store()</span>
             <span class="n">scans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">scans</span>
 
 
 <span class="k">def</span> <span class="nf">_load_scan_filesets</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Load list of ``Fileset`` from given scan.</span>
+<span class="w">    </span><span class="sd">"""Load the list of ``Fileset`` from given `scan` dataset.</span>
 
 <span class="sd">    Load the list of filesets using "filesets" top-level entry from ``files.json``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    scan : plantdb.fsdb.Scan</span>
-<span class="sd">        The scan object to use to get the list of ``fsdb.Fileset``</span>
+<span class="sd">        The instance to use to get the list of ``Fileset``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list of plantdb.fsdb.Fileset</span>
-<span class="sd">         The list of ``fsdb.Fileset`` found in the scan.</span>
+<span class="sd">         The list of ``Fileset`` found in the scan.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1773,7 +1776,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    May delete a detected fileset if unable to load it!</span>
+<span class="sd">    May delete a fileset if unable to load it!</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1788,21 +1791,27 @@
 
 <span class="sd">    """</span>
     <span class="n">filesets</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">files_json</span> <span class="o">=</span> <span class="n">_scan_files_json</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">files_json</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="c1"># Get the path to the `files.json` associated to the `scan`:</span>
+    <span class="n">files_json</span> <span class="o">=</span> <span class="n">_scan_json_file</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="c1"># Load it:</span>
+    <span class="k">with</span> <span class="n">files_json</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">structure</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="c1"># Get the list of info (dict) about the filesets</span>
     <span class="n">filesets_info</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="s2">"filesets"</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filesets_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">fileset_info</span> <span class="ow">in</span> <span class="n">filesets_info</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">fileset_info</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filesets_info</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">fileset</span> <span class="o">=</span> <span class="n">_load_fileset</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fileset_info</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">FilesetNoIDError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not get an 'id' entry for the </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">-th 'filesets' entry from '</span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current `fileset_info`: </span><span class="si">{</span><span class="n">fileset_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">FilesetNotFoundError</span><span class="p">:</span>
+                <span class="n">fsid</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset directory '</span><span class="si">{</span><span class="n">fsid</span><span class="si">}</span><span class="s2">' not found for scan </span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, skip it."</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">filesets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="nb">id</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Unable to load fileset </span><span class="si">%s</span><span class="s2">, deleting..."</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>
-                <span class="n">scan</span><span class="o">.</span><span class="n">delete_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2">: filesets is not a list"</span> <span class="o">%</span> <span class="n">files_json</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find a list of filesets in '</span><span class="si">{</span><span class="n">files_json</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filesets</span>
 
 
@@ -1814,7 +1823,7 @@
 <span class="sd">    scan : plantdb.fsdb.Scan</span>
 <span class="sd">        The scan object to use to get the list of ``fsdb.Fileset``</span>
 <span class="sd">    fileset_info: dict</span>
-<span class="sd">        Dictionary with the fileset id and listing its files, {'files': [], 'id': str}.</span>
+<span class="sd">        Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1824,18 +1833,19 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import json</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import dummy_db, _load_fileset, _scan_files_json</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import dummy_db, _load_fileset, _scan_json_file</span>
 <span class="sd">    &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
-<span class="sd">    &gt;&gt;&gt; json_path = _scan_files_json(scan)</span>
-<span class="sd">    &gt;&gt;&gt; with open(json_path, "r") as f: structure = json.load(f)</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    &gt;&gt;&gt; json_path = _scan_json_file(scan)</span>
+<span class="sd">    &gt;&gt;&gt; with json_path.open(mode="r") as f: structure = json.load(f)</span>
 <span class="sd">    &gt;&gt;&gt; filesets_info = structure["filesets"]</span>
 <span class="sd">    &gt;&gt;&gt; fs = _load_fileset(scan, filesets_info[0])</span>
-<span class="sd">    &gt;&gt;&gt; print(fs)</span>
-<span class="sd">    &lt;plantdb.fsdb.Fileset object at 0x7f86bdf7a250&gt;</span>
-<span class="sd">    &gt;&gt;&gt; print(fs.files)</span>
-<span class="sd">    [&lt;plantdb.fsdb.File object at 0x7f8690459b50&gt;, &lt;plantdb.fsdb.File object at 0x7f8690459750&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; print(fs.id)</span>
+<span class="sd">    fileset_001</span>
+<span class="sd">    &gt;&gt;&gt; print([f.id for f in files])</span>
+<span class="sd">    ['dummy_image', 'test_image', 'test_json']</span>
 
 <span class="sd">    """</span>
     <span class="n">fileset</span> <span class="o">=</span> <span class="n">_parse_fileset</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">fileset_info</span><span class="p">)</span>
@@ -1844,159 +1854,464 @@
     <span class="k">return</span> <span class="n">fileset</span>
 
 
+<div class="viewcode-block" id="FilesetNoIDError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FilesetNoIDError">[docs]</a><span class="k">class</span> <span class="nc">FilesetNoIDError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""No 'id' entry could be found for this fileset."""</span></div>
+
+
+<div class="viewcode-block" id="FilesetNotFoundError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FilesetNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">FilesetNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Could not find the fileset directory."""</span></div>
+
+
 <span class="k">def</span> <span class="nf">_parse_fileset</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">fileset_info</span><span class="p">):</span>
-    <span class="nb">id</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Fileset: No ID"</span><span class="p">)</span>
-    <span class="n">fileset</span> <span class="o">=</span> <span class="n">Fileset</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Get a `Fileset` instance for given `db` &amp; `scan` by parsing provided `fileset_info`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db : plantdb.fsdb.FSDB</span>
+<span class="sd">        The database instance to associate the returned ``Fileset`` to.</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instance to associate the returned ``Fileset`` to.</span>
+<span class="sd">    fileset_info : dict</span>
+<span class="sd">        The fileset dictionary with the fileset 'id' entry</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plantdb.fsdb.Fileset</span>
+<span class="sd">        The ``Fileset`` instance from parsed JSON.</span>
+
+<span class="sd">    """</span>
+    <span class="n">fsid</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fsid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FilesetNoIDError</span><span class="p">(</span><span class="s2">"Fileset: No ID"</span><span class="p">)</span>
+
+    <span class="n">fileset</span> <span class="o">=</span> <span class="n">Fileset</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="n">fsid</span><span class="p">)</span>
+    <span class="c1"># Get the expected directory path and check it exists:</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_fileset_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset directory doesn't exists: %s"</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing fileset directory: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FilesetNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset directory '</span><span class="si">{</span><span class="n">fsid</span><span class="si">}</span><span class="s2">' not found for scan '</span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fileset</span>
 
 
 <span class="k">def</span> <span class="nf">_load_fileset_files</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="n">fileset_info</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load the list of ``File`` from given `fileset`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The instance to use to get the list of ``File``.</span>
+<span class="sd">    fileset_info : dict</span>
+<span class="sd">        Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of plantdb.fsdb.File</span>
+<span class="sd">         The list of ``File`` found in the `fileset`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    plantdb.fsdb._load_file</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    May delete a file if unable to load it!</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import json</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import FSDB</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import dummy_db, _scan_json_file, _parse_fileset, _load_fileset_files</span>
+<span class="sd">    &gt;&gt;&gt; db = dummy_db(with_fileset=True, with_file=True)</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    &gt;&gt;&gt; json_path = _scan_json_file(scan)</span>
+<span class="sd">    &gt;&gt;&gt; with json_path.open(mode="r") as f: structure = json.load(f)</span>
+<span class="sd">    &gt;&gt;&gt; filesets_info = structure["filesets"]</span>
+<span class="sd">    &gt;&gt;&gt; fileset = _parse_fileset(scan.db, scan, filesets_info[0])</span>
+<span class="sd">    &gt;&gt;&gt; files = _load_fileset_files(fileset, filesets_info[0])</span>
+<span class="sd">    &gt;&gt;&gt; print([f.id for f in files])</span>
+<span class="sd">    ['dummy_image', 'test_image', 'test_json']</span>
+
+<span class="sd">    """</span>
+    <span class="n">scan_id</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span>
     <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">files_info</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">files_info</span> <span class="o">=</span> <span class="n">fileset_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">file_info</span> <span class="ow">in</span> <span class="n">files_info</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">file_info</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files_info</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">file</span> <span class="o">=</span> <span class="n">_load_file</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="n">file_info</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">FileNoIDError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not get an 'id' entry for the </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">-th 'files' entry from '</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current `file_info`: </span><span class="si">{</span><span class="n">file_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">FileNoFileNameError</span><span class="p">:</span>
+                <span class="n">fs_id</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">fid</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not get a 'file' entry for file id '</span><span class="si">{</span><span class="n">fid</span><span class="si">}</span><span class="s2">' from '</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fs_id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current `file_info`: </span><span class="si">{</span><span class="n">file_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">fs_id</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find file '</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">' for '</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fs_id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current `file_info`: </span><span class="si">{</span><span class="n">file_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="nb">id</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Unable to load file </span><span class="si">%s</span><span class="s2">, deleting..."</span> <span class="o">%</span> <span class="nb">id</span><span class="p">)</span>
-                <span class="n">fileset</span><span class="o">.</span><span class="n">delete_file</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"files.json: expected a list for files"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a list of files in `files.json` from dataset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">files</span>
 
 
+<span class="k">def</span> <span class="nf">_load_fileset_metadata</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load the metadata for a fileset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The fileset to load the metadata for.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The metadata dictionary.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="FileNoIDError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FileNoIDError">[docs]</a><span class="k">class</span> <span class="nc">FileNoIDError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""No 'id' entry could be found for this file."""</span></div>
+
+
+<div class="viewcode-block" id="FileNoFileNameError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FileNoFileNameError">[docs]</a><span class="k">class</span> <span class="nc">FileNoFileNameError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""No 'file' entry could be found for this file."""</span></div>
+
+
 <span class="k">def</span> <span class="nf">_load_file</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="n">file_info</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get a `File` instance for given `fileset` using provided `file_info`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The instance to associate the returned ``File`` to.</span>
+<span class="sd">    file_info : dict</span>
+<span class="sd">        Dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plantdb.fsdb.File</span>
+<span class="sd">        The `File` instance with metadata.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    plantdb.fsdb._parse_file</span>
+<span class="sd">    plantdb.fsdb._load_file_metadata</span>
+<span class="sd">    """</span>
     <span class="n">file</span> <span class="o">=</span> <span class="n">_parse_file</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="n">file_info</span><span class="p">)</span>
     <span class="n">file</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">_load_file_metadata</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">file</span>
 
 
 <span class="k">def</span> <span class="nf">_parse_file</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="n">file_info</span><span class="p">):</span>
-    <span class="nb">id</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"File: No ID"</span><span class="p">)</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"File: No filename"</span><span class="p">)</span>
-    <span class="n">file</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
-    <span class="n">file</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+<span class="w">    </span><span class="sd">"""Get a `File` instance for given `fileset` by parsing provided `file_info`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The fileset instance to associate the returned ``File`` to.</span>
+<span class="sd">    file_info : dict</span>
+<span class="sd">        The file dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plantdb.fsdb.File</span>
+<span class="sd">        The ``File`` instance from parsed JSON.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNoIDError</span>
+<span class="sd">        If the 'id' entry is missing from `file_info`.</span>
+<span class="sd">    FileNoFileNameError</span>
+<span class="sd">        If the 'file' entry is missing from `file_info`.</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the file is not found on drive.</span>
+<span class="sd">    """</span>
+    <span class="n">fid</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input `file_info`: </span><span class="si">{</span><span class="n">file_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FileNoIDError</span><span class="p">(</span><span class="s2">"File: No ID"</span><span class="p">)</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input `file_info`: </span><span class="si">{</span><span class="n">file_info</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FileNoFileNameError</span><span class="p">(</span><span class="s2">"File: No filename"</span><span class="p">)</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>  <span class="c1"># set the filename attribute</span>
+    <span class="c1"># Get the expected file path and check it exists:</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"File doesn't exists: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"File: Not found"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">file</span>
 
 
 <span class="c1"># load/store metadata from disk</span>
 
 <span class="k">def</span> <span class="nf">_load_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Load a metadata dictionary from a JSON file.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        The path to the file containing the metadata to load.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The metadata dictionary.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError</span>
+<span class="sd">        If the data returned by ``json.load`` is not a dictionary.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Not a JSON object: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not obtain a dictionary from JSON: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If there is no scan metadata, simply return an empty dictionary:</span>
         <span class="k">return</span> <span class="p">{}</span>
 
 
 <span class="k">def</span> <span class="nf">_load_measures</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Load a measure dictionary from a JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        The path to the file containing the measure to load.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The measure dictionary.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError</span>
+<span class="sd">        If the data returned by ``json.load`` is not a dictionary.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Not a JSON object: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not obtain a dictionary from JSON: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If there is no measures for this scan, simply return an empty dictionary:</span>
         <span class="k">return</span> <span class="p">{}</span>
 
 
 <span class="k">def</span> <span class="nf">_load_scan_metadata</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load the metadata for a dataset.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The dataset to load the metadata for.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The metadata dictionary.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_load_scan_measures</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load the measures for a dataset.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The dataset to load the measures for.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The measures dictionary.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_load_measures</span><span class="p">(</span><span class="n">_scan_measures_path</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_load_fileset_metadata</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">))</span>
-
-
 <span class="k">def</span> <span class="nf">_load_file_metadata</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load the metadata for a file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file : plantdb.fsdb.File</span>
+<span class="sd">        The file to load the metadata for.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The metadata dictionary.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_file_metadata_path</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_mkdir_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="nb">dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Create the parent directories from given path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        The path to a file.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Used to check the availability of the 'metadata' directory inside a dataset.</span>
+<span class="sd">    """</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="nb">dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span>
 
 
 <span class="k">def</span> <span class="nf">_store_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Save a metadata dictionary as a JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        JSON file path to use for saving the metadata.</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The metadata dictionary to save.</span>
+<span class="sd">    """</span>
     <span class="n">_mkdir_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                  <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">': '</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">': '</span><span class="p">))</span>
     <span class="k">return</span>
 
 
 <span class="k">def</span> <span class="nf">_store_scan_metadata</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Save the metadata for a dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The dataset to save the metadata for.</span>
+<span class="sd">    """</span>
     <span class="n">_store_metadata</span><span class="p">(</span><span class="n">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">),</span> <span class="n">scan</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
     <span class="k">return</span>
 
 
 <span class="k">def</span> <span class="nf">_store_fileset_metadata</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-    <span class="n">_store_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">),</span> <span class="n">fileset</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Save the metadata for a dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Fileset</span>
+<span class="sd">        The fileset to save the metadata for.</span>
+<span class="sd">    """</span>
+    <span class="n">_store_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_json_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">),</span> <span class="n">fileset</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
     <span class="k">return</span>
 
 
 <span class="k">def</span> <span class="nf">_store_file_metadata</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Save the metadata for a dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.File</span>
+<span class="sd">        The file to save the metadata for.</span>
+<span class="sd">    """</span>
     <span class="n">_store_metadata</span><span class="p">(</span><span class="n">_file_metadata_path</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="n">file</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
     <span class="k">return</span>
 
 
-<span class="c1">#</span>
+<span class="k">def</span> <span class="nf">_get_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get a copy of `metadata[key]`.</span>
 
-<span class="k">def</span> <span class="nf">_get_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata : dict, optional</span>
+<span class="sd">        The metadata dictionary to get the key from.</span>
+<span class="sd">    key : str, optional</span>
+<span class="sd">        The key to get from the metadata dictionary.</span>
+<span class="sd">        If the key is not found, return ``None``.</span>
+<span class="sd">        By default, return a copy of the whole metadata dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Any</span>
+<span class="sd">        the value save under `metadata[key]`, if any.</span>
+<span class="sd">    """</span>
     <span class="c1"># Do a deepcopy of the value because we don't want the caller to inadvertently change the values.</span>
-    <span class="k">if</span> <span class="n">metadata</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
-    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
-
-
-<span class="k">def</span> <span class="nf">_get_measures</span><span class="p">(</span><span class="n">measures</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="c1"># Do a deepcopy of the value because we don't want the caller to inadvertently change the values.</span>
-    <span class="k">if</span> <span class="n">measures</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{}</span>
-    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_set_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Set a `data` `value` in `metadata` dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The metadata dictionary to get the key from.</span>
+<span class="sd">    data : str or dict</span>
+<span class="sd">        If a string, a key to address the `value`.</span>
+<span class="sd">        If a dictionary, update the metadata dictionary with `data` (`value` is then unused).</span>
+<span class="sd">    value : any, optional</span>
+<span class="sd">        The value to assign to `data` if the latest is not a dictionary.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError</span>
+<span class="sd">        If `value` is `None` when `data` is a string.</span>
+<span class="sd">        If `data` is not of the right type.</span>
+
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"No value given for key </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No value given for key '</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
         <span class="c1"># Do a deepcopy of the value because we don't want the caller to inadvertently change the values.</span>
         <span class="n">metadata</span><span class="p">[</span><span class="n">data</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">_set_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Invalid key: "</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid key: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">_get_filename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Returns a `file` name using its ``id`` attribute and given extension.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file : plantdb.fsdb.File</span>
+<span class="sd">        A File object.</span>
+<span class="sd">    ext : str</span>
+<span class="sd">        The file extension to use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The corresponding file's name.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Remove starting dot from extension:</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'.'</span><span class="p">):</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
 
 
 <span class="c1">################################################################################</span>
@@ -2017,8 +2332,8 @@
 <span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_fileset_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
     <span class="c1"># Create the fileset directory if it does not exist:</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span>
 
 
@@ -2036,31 +2351,14 @@
 <span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
     <span class="c1"># Create the scan directory if it does not exist:</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span>
 
 
 <span class="c1">################################################################################</span>
 <span class="c1"># paths - getters</span>
 <span class="c1">################################################################################</span>
-
-<span class="k">def</span> <span class="nf">_get_filename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a file's name.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    file : plantdb.fsdb.File</span>
-<span class="sd">        A File object.</span>
-<span class="sd">    ext : str</span>
-<span class="sd">        The file's extension to use.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The corresponding file's name.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s2">"."</span> <span class="o">+</span> <span class="n">ext</span>
 
 
 <span class="k">def</span> <span class="nf">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
@@ -2073,15 +2371,62 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The path to the scan.</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        The path to the scan directory.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span> <span class="o">/</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_scan_json_file</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "files.json" file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan to get the files JSON file path from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        Path to the scan's "files.json" file.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"files.json"</span>
+
+
+<span class="k">def</span> <span class="nf">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "metadata.json" file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan to get the metadata JSON file path from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        Path to the scan's "metadata.json" file.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"metadata"</span> <span class="o">/</span> <span class="s2">"metadata.json"</span>
+
+
+<span class="k">def</span> <span class="nf">_scan_measures_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the path to scan's "measures.json" file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan to get the measures JSON file path from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        Path to the scan's "measures.json" file.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"measures.json"</span>
 
 
 <span class="k">def</span> <span class="nf">_fileset_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Get the path to given fileset.</span>
+<span class="w">    </span><span class="sd">"""Get the path to given fileset directory.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2090,12 +2435,42 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The path to the fileset.</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        The path to the fileset directory.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span>
+
+
+<span class="k">def</span> <span class="nf">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the path to given fileset metadata directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The fileset to get the metadata directory path from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        Path to the fileset metadata directory.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"metadata"</span> <span class="o">/</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span>
+
+
+<span class="k">def</span> <span class="nf">_fileset_metadata_json_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the path to `fileset.id` metadata JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        Fileset to get the JSON file path from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        Path to the f`fileset.id` metadata JSON file.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"metadata"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json"</span>
 
 
 <span class="k">def</span> <span class="nf">_file_path</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
@@ -2108,87 +2483,10 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    pathlib.Path</span>
 <span class="sd">        The path to the file.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_scan_files_json</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Get the path to scan's "files.json" file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        The scan to get the files JSON file path from.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Path to the scan's "files.json" file.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="s2">"files.json"</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Get the path to scan's "metadata.json" file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        The scan to get the metadata JSON file path from.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Path to the scan's "metadata.json" file.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="s2">"metadata"</span><span class="p">,</span>
-                        <span class="s2">"metadata.json"</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_scan_measures_path</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Get the path to scan's "measures.json" file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        The scan to get the measures JSON file path from.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Path to the scan's "measures.json" file.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="s2">"measures.json"</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Get the path to `fileset.id` metadata JSON file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fileset : fsdb.Fileset</span>
-<span class="sd">        Fileset to get the JSON file path from.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Path to the "&lt;Fileset.id&gt;.json" file.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="s2">"metadata"</span><span class="p">,</span>
-                        <span class="n">fileset</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s2">".json"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_fileset_path</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="p">)</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span>
 
 
 <span class="k">def</span> <span class="nf">_file_metadata_path</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
@@ -2196,19 +2494,15 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file : fsdb.File</span>
+<span class="sd">    file : plantdb.fsdb.File</span>
 <span class="sd">        File to get the metadata JSON path from.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    pathlib.Path</span>
 <span class="sd">        Path to the "&lt;File.id&gt;.json" file.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="s2">"metadata"</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="n">file</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s2">".json"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"metadata"</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json"</span>
 
 
 <span class="c1">################################################################################</span>
@@ -2220,33 +2514,33 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file : fsdb.File</span>
+<span class="sd">    file : plantdb.fsdb.File</span>
 <span class="sd">        File to get "id" and "filename" from.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        {"id": file.get_id(), "file": file.filename}</span>
+<span class="sd">        ``{"id": file.get_id(), "file": file.filename}``</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="s2">"file"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_fileset_to_dict</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a dict with the fileset "id" and the list of "files" dict.</span>
+<span class="w">    </span><span class="sd">"""Returns a dict with the fileset "id" and the "files" dict.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    fileset : fsdb.Fileset</span>
-<span class="sd">        File to get "id" and "files" list from.</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        Fileset to get "id" and "files" dictionary from.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        {"id": fileset.get_id(), "files": [file.filename]}</span>
+<span class="sd">        ``{"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}``</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _file_to_dict</span>
+<span class="sd">    plantdb.fsdb._file_to_dict</span>
 <span class="sd">    """</span>
     <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fileset</span><span class="o">.</span><span class="n">get_files</span><span class="p">():</span>
@@ -2255,22 +2549,22 @@
 
 
 <span class="k">def</span> <span class="nf">_scan_to_dict</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a dict with the scan's dictionary of `Fileset`s.</span>
+<span class="w">    </span><span class="sd">"""Returns a dict with the scan's filesets and files structure.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        Scan to get "filesets" dictionary from.</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        Scan instance to get underlying filesets and files structure from.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        {"id": fileset.get_id(), "files": [file.filename]}</span>
+<span class="sd">        ``{"filesets": {"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}}``</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _fileset_to_dict</span>
-<span class="sd">    _file_to_dict</span>
+<span class="sd">    plantdb.fsdb._fileset_to_dict</span>
+<span class="sd">    plantdb.fsdb._file_to_dict</span>
 <span class="sd">    """</span>
     <span class="n">filesets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">fileset</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_filesets</span><span class="p">():</span>
@@ -2279,23 +2573,22 @@
 
 
 <span class="k">def</span> <span class="nf">_store_scan</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Dump the scan's JSON on drive.</span>
+<span class="w">    </span><span class="sd">"""Dump the fileset and files structure associated to a `scan` on drive.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        Scan to dump in the "files.json".</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        Scan instance to save by dumping its underlying structure in its "files.json".</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _scan_to_dict</span>
-<span class="sd">    _scan_files_json</span>
+<span class="sd">    plantdb.fsdb._scan_to_dict</span>
+<span class="sd">    plantdb.fsdb._scan_files_json</span>
 <span class="sd">    """</span>
     <span class="n">structure</span> <span class="o">=</span> <span class="n">_scan_to_dict</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-    <span class="n">files_json</span> <span class="o">=</span> <span class="n">_scan_files_json</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">files_json</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                  <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">': '</span><span class="p">))</span>
+    <span class="n">files_json</span> <span class="o">=</span> <span class="n">_scan_json_file</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">files_json</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="s1">': '</span><span class="p">))</span>
     <span class="k">return</span>
 
 
@@ -2303,22 +2596,24 @@
     <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># haha  (FIXME!)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_db</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_is_fsdb</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Test if the given path is indeed an FSDB database.</span>
 
 <span class="sd">    Do it by checking the presence of the ``MARKER_FILE_NAME``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
-<span class="sd">        Path to test as an FSDB database.</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        A path to test as a valid FSDB database.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
 <span class="sd">        ``True`` if an FSDB database, else ``False``.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MARKER_FILE_NAME</span><span class="p">))</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">marker_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">MARKER_FILE_NAME</span>
+    <span class="k">return</span> <span class="n">marker_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_is_safe_to_delete</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -2326,8 +2621,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
-<span class="sd">        Path to test for safe deletion.</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        A path to test for safe deletion.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -2338,12 +2633,16 @@
 <span class="sd">    -----</span>
 <span class="sd">    A path is safe to delete only if it's a sub-folder of a db.</span>
 <span class="sd">    """</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">_is_db</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="n">newpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pardir</span><span class="p">))</span>
+        <span class="c1"># Test if the current path is a local DB (FSDB):</span>
+        <span class="k">if</span> <span class="n">_is_fsdb</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># exit and return `True` if it is</span>
+        <span class="c1"># Else, move to the parent directory &amp; try again:</span>
+        <span class="n">newpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span>
+        <span class="c1"># Check if we have indeed moved up to the parent directory</span>
         <span class="k">if</span> <span class="n">newpath</span> <span class="o">==</span> <span class="n">path</span><span class="p">:</span>
+            <span class="c1"># Stop if we did not</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">newpath</span>
 
@@ -2353,90 +2652,128 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file : fsdb.File</span>
-<span class="sd">        The file to delete.</span>
+<span class="sd">    file : plantdb.fsdb.File</span>
+<span class="sd">        The file instance to delete.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    IOError</span>
-<span class="sd">        If the file's path is outside the file's database.</span>
+<span class="sd">        If the file path is outside the database.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We have to delete:</span>
+<span class="sd">      - the JSON metadata file associated to the file.</span>
+<span class="sd">      - the file</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _is_safe_to_delete</span>
+<span class="sd">    plantdb.fsdb._file_path</span>
+<span class="sd">    plantdb.fsdb._is_safe_to_delete</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># The filename attribute is defined when the file is written!</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No 'filename' attribute defined for file id '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"It means the file is not written on disk."</span><span class="p">)</span>
         <span class="k">return</span>
-    <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                            <span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Cannot delete files outside of a DB."</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">_file_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> is not in the current database."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File path: '</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Cannot delete files or directories outside of a local DB."</span><span class="p">)</span>
+
+    <span class="c1"># - Delete the JSON metadata file associated to the `File` instance:</span>
+    <span class="n">file_md_path</span> <span class="o">=</span> <span class="n">_file_metadata_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_md_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete file '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+            <span class="n">file_md_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Could not delete the JSON metadata file for file '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">' from '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"JSON metadata file path: '</span><span class="si">{</span><span class="n">file_md_path</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted file '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Deleted JSON metadata file for file '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">' from '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+    <span class="c1"># - Delete the file associated to the `File` instance:</span>
+    <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete file '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">' from '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File path: '</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted file '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">' from '</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
     <span class="k">return</span>
 
 
 <span class="k">def</span> <span class="nf">_delete_fileset</span><span class="p">(</span><span class="n">fileset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Delete the given fileset, starting by its `File`(s).</span>
+<span class="w">    </span><span class="sd">"""Delete the given fileset.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    fileset : fsdb.Fileset</span>
-<span class="sd">        The fileset to delete.</span>
+<span class="sd">    fileset : plantdb.fsdb.Fileset</span>
+<span class="sd">        The fileset instance to delete.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    IOError</span>
-<span class="sd">        If the fileset's path is outside the fileset's database.</span>
+<span class="sd">        If the fileset path is outside the database.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We have to delete:</span>
+<span class="sd">      - the files in the fileset</span>
+<span class="sd">      - the fileset JSON metadata file</span>
+<span class="sd">      - the fileset metadata directory</span>
+<span class="sd">      - the fileset directory</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _is_safe_to_delete</span>
+<span class="sd">    plantdb.fsdb._scan_path</span>
+<span class="sd">    plantdb.fsdb._fileset_path</span>
+<span class="sd">    plantdb.fsdb._is_safe_to_delete</span>
 <span class="sd">    """</span>
-    <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Cannot delete files outside of a DB."</span><span class="p">)</span>
+    <span class="n">fileset_path</span> <span class="o">=</span> <span class="n">_fileset_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">fileset_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset </span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> is not in the current database."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset path: '</span><span class="si">{</span><span class="n">fileset_path</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Cannot delete files or directories outside of a local DB."</span><span class="p">)</span>
 
-    <span class="c1"># - Delete the `Files` belonging to the `Fileset`:</span>
+    <span class="c1"># - Delete the `Files` (and their metadata) belonging to the `Fileset` instance:</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fileset</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
         <span class="n">fileset</span><span class="o">.</span><span class="n">delete_file</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-    <span class="c1"># - Delete metadata corresponding to the `Fileset`:</span>
-    <span class="n">json_md</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="s1">'metadata'</span><span class="p">,</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">'.json'</span><span class="p">)</span>
-    <span class="n">dir_md</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fileset</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="s1">'metadata'</span><span class="p">,</span> <span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="c1"># - Delete the JSON metadata file associated to the `Fileset` instance:</span>
+    <span class="n">json_md</span> <span class="o">=</span> <span class="n">_fileset_metadata_json_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">json_md</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_md</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete JSON metadata '</span><span class="si">{</span><span class="n">json_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find JSON metadata file '</span><span class="si">{</span><span class="n">json_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">json_md</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find the JSON metadata file for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"JSON metadata file path: '</span><span class="si">{</span><span class="n">json_md</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted JSON metadata '</span><span class="si">{</span><span class="n">json_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted the JSON metadata file for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+    <span class="c1"># - Delete the metadata directory associated to the `Fileset` instance:</span>
+    <span class="n">dir_md</span> <span class="o">=</span> <span class="n">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">rmtree</span><span class="p">(</span><span class="n">dir_md</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_md</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete metadata directory '</span><span class="si">{</span><span class="n">dir_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find metadata directory '</span><span class="si">{</span><span class="n">dir_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find metadata directory for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Metadata directory path: '</span><span class="si">{</span><span class="n">dir_md</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted metadata directory '</span><span class="si">{</span><span class="n">dir_md</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
-    <span class="c1"># - Delete the directory corresponding to the `Fileset`:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted metadata directory for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+    <span class="c1"># - Delete the directory associated to the `Fileset` instance:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">rmtree</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rmtree</span><span class="p">(</span><span class="n">fileset_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete Fileset directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find Fileset directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find directory for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fileset directory path: '</span><span class="si">{</span><span class="n">fileset_path</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted Fileset directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted directory for fileset '</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">return</span>
 
 
@@ -2445,32 +2782,31 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    scan : fsdb.Scan</span>
-<span class="sd">        The scan to delete.</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instance to delete.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    IOError</span>
-<span class="sd">        If the scan's path is outside the scan's database.</span>
+<span class="sd">        If the scan path is outside the database.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    _is_safe_to_delete</span>
+<span class="sd">    plantdb.fsdb._scan_path</span>
+<span class="sd">    plantdb.fsdb._is_safe_to_delete</span>
 <span class="sd">    """</span>
-    <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+    <span class="n">scan_path</span> <span class="o">=</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_safe_to_delete</span><span class="p">(</span><span class="n">scan_path</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">"Cannot delete files outside of a DB."</span><span class="p">)</span>
 
     <span class="c1"># - Delete the whole directory will get rid of everything (metadata, filesets, files):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">rmtree</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rmtree</span><span class="p">(</span><span class="n">scan_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not delete `Scan` directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find `Scan` directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find directory for scan '</span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Scan path: '</span><span class="si">{</span><span class="n">scan_path</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted `Scan` directory '</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s2">'!"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleted directory for scan '</span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
 
     <span class="k">return</span>
 
@@ -2530,7 +2866,7 @@
                     <span class="n">f_query</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># All requirements have to be fulfilled:</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">f_query</span><span class="p">):</span>
-                    <span class="n">query_result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">query_result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">query_result</span>
 </pre></div>
 
@@ -2556,7 +2892,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -50,8 +50,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/_static/css/extra.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -290,6 +290,10 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.FileNoFileNameError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FileNoFileNameError</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.FileNoIDError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FileNoIDError</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#plantdb.fsdb.Fileset" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Fileset</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#plantdb.fsdb.Fileset.db" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Fileset.db</span></code></a>
@@ -321,6 +325,10 @@
         <li class="md-nav__item"><a href="#plantdb.fsdb.Fileset.store" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Fileset.store()</span></code></a>
         </li></ul>
             </nav>
+        </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.FilesetNoIDError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FilesetNoIDError</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.FilesetNotFoundError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FilesetNotFoundError</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#plantdb.fsdb.LOCK_FILE_NAME" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">LOCK_FILE_NAME</span></code></a>
         </li>
@@ -384,19 +392,23 @@
 <p>Assuming that the <code class="docutils literal notranslate"><span class="pre">FSDB</span></code> root database directory is <code class="docutils literal notranslate"><span class="pre">dbroot/</span></code>, there is a <code class="docutils literal notranslate"><span class="pre">Scan</span></code> with <code class="docutils literal notranslate"><span class="pre">'myscan_001'</span></code> as <code class="docutils literal notranslate"><span class="pre">Scan.id</span></code> and there are some metadata (see below), you should have the following file structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>dbroot/                            # base directory of the database
 ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
-│   ├── files.json                 # JSON file referencing the files of the datataset
-│   ├── images/                    # gather the 'images' `Fileset`
+│   ├── files.json                 # JSON file referencing the all files for the dataset
+│   ├── images/                    # `Fileset` gathering the 'images'
 │   │   ├── scan_img_01.jpg        # 'image' `File` 01
 │   │   ├── scan_img_02.jpg        # 'image' `File` 02
-│   │   ├── [...]
+│   │   ├── [...]                  #
 │   │   └── scan_img_99.jpg        # 'image' `File` 99
 │   ├── metadata/                  # metadata directory
 │   │   ├── images                 # 'images' metadata directory
-│   │   │   ├── scan_img_01.json   # JSON file with 'image' file metadata
+│   │   │   ├── scan_img_01.json   # JSON metadata attached to this file
 │   │   │   ├── scan_img_02.json   #
-│   │   ├── [...]
+│   │   │   [...]                  #
 │   │   │   └── scan_img_99.json   #
-│   │   └── metadata.json          # scan dataset metadata
+│   │   ├── Task_A/                # optional, only present if metadata attached to one of the outputs from `Task_A`
+│   │   │   └── outfile.json       # optional metadata attached to the output file from `Task_A`
+│   │   └── (metadata.json)        # optional metadata attached to the dataset
+│   ├── task_A/                    # `Fileset` gathering the outputs of `Task_A`
+│   │   └── outfile.ext            # output file from `Task_A`
 │   └── (measures.json)            # optional manual measurements file
 ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
 :
@@ -474,19 +486,23 @@
 <p>Assuming that the <code class="docutils literal notranslate"><span class="pre">FSDB</span></code> root database directory is <code class="docutils literal notranslate"><span class="pre">dbroot/</span></code>, there is a <code class="docutils literal notranslate"><span class="pre">Scan</span></code> with <code class="docutils literal notranslate"><span class="pre">'myscan_001'</span></code> as <code class="docutils literal notranslate"><span class="pre">Scan.id</span></code> and there are some metadata (see below), you should have the following file structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>dbroot/                            # base directory of the database
 ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
-│   ├── files.json                 # JSON file referencing the files of the datataset
-│   ├── images/                    # gather the 'images' `Fileset`
+│   ├── files.json                 # JSON file referencing the all files for the dataset
+│   ├── images/                    # `Fileset` gathering the 'images'
 │   │   ├── scan_img_01.jpg        # 'image' `File` 01
 │   │   ├── scan_img_02.jpg        # 'image' `File` 02
-│   │   ├── [...]
+│   │   ├── [...]                  #
 │   │   └── scan_img_99.jpg        # 'image' `File` 99
 │   ├── metadata/                  # metadata directory
 │   │   ├── images                 # 'images' metadata directory
-│   │   │   ├── scan_img_01.json   # JSON file with 'image' file metadata
+│   │   │   ├── scan_img_01.json   # JSON metadata attached to this file
 │   │   │   ├── scan_img_02.json   #
-│   │   ├── [...]
+│   │   │   [...]                  #
 │   │   │   └── scan_img_99.json   #
-│   │   └── metadata.json          # scan dataset metadata
+│   │   ├── Task_A/                # optional, only present if metadata attached to one of the outputs from `Task_A`
+│   │   │   └── outfile.json       # optional metadata attached to the output file from `Task_A`
+│   │   └── (metadata.json)        # optional metadata attached to the dataset
+│   ├── task_A/                    # `Fileset` gathering the outputs of `Task_A`
+│   │   └── outfile.ext            # output file from `Task_A`
 │   └── (measures.json)            # optional manual measurements file
 ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
 :
@@ -564,7 +580,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="plantdb.fsdb.FSDB.scans">
 <span class="sig-name descname"><span class="pre">scans</span></span><a class="headerlink" href="#plantdb.fsdb.FSDB.scans" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of <code class="docutils literal notranslate"><span class="pre">Scan</span></code> objects found in the database.</p>
+<dd><p>The list of <code class="docutils literal notranslate"><span class="pre">Scan</span></code> objects found in the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
@@ -815,7 +831,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.FSDB.path">
-<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the path to the local database root directory.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
@@ -854,7 +870,7 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="plantdb.fsdb.File.id">
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#plantdb.fsdb.File.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of the file in the database <code class="docutils literal notranslate"><span class="pre">fsdb.FSDB</span></code>.</p>
+<dd><p>Name of the file in the <code class="docutils literal notranslate"><span class="pre">FSDB</span></code> local database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
@@ -909,7 +925,7 @@ Else, returns the value attached to this key.</p>
 <dd><p>Import the file from its local path to the current fileset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – Path to the file to import.</p>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – The path to the file to import.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1008,7 +1024,7 @@ Else, returns the value attached to this key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.File.store">
 <span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#File.store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.File.store" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save changes to the scan’s JSON.</p>
+<dd><p>Save changes to the scan main JSON FILE (files.json).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.File.write">
@@ -1076,6 +1092,16 @@ Else, returns the value attached to this key.</p>
 </pre></div>
 </div>
 </dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="plantdb.fsdb.FileNoFileNameError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">FileNoFileNameError</span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FileNoFileNameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FileNoFileNameError" title="Permalink to this definition">¶</a></dt>
+<dd><p>No ‘file’ entry could be found for this file.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="plantdb.fsdb.FileNoIDError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">FileNoIDError</span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FileNoIDError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FileNoIDError" title="Permalink to this definition">¶</a></dt>
+<dd><p>No ‘id’ entry could be found for this file.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="plantdb.fsdb.Fileset">
@@ -1200,7 +1226,7 @@ Else, returns the value attached to this key.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">list_files</span><span class="p">()</span>
 <span class="go">['test_image', 'test_json']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>  <span class="c1"># the file has been removed from the drive and the database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>  <span class="c1"># the file has been removed from the drive and the database</span>
 <span class="go">['test_image.png', 'test_json.json']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </pre></div>
@@ -1298,7 +1324,7 @@ Else, returns the value attached to this key.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.Fileset.path">
-<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the path to the local fileset.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
@@ -1332,8 +1358,18 @@ Else, returns the value attached to this key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.Fileset.store">
 <span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Fileset.store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Fileset.store" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save changes to the scan’s JSON.</p>
+<dd><p>Save changes to the scan main JSON FILE (files.json).</p>
 </dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="plantdb.fsdb.FilesetNoIDError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">FilesetNoIDError</span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FilesetNoIDError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FilesetNoIDError" title="Permalink to this definition">¶</a></dt>
+<dd><p>No ‘id’ entry could be found for this fileset.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="plantdb.fsdb.FilesetNotFoundError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">FilesetNotFoundError</span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FilesetNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FilesetNotFoundError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Could not find the fileset directory.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="plantdb.fsdb.LOCK_FILE_NAME">
@@ -1416,7 +1452,7 @@ Else, returns the value attached to this key.</p>
 <span class="go">/tmp/romidb_j0pbkoo0/007</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'007'</span><span class="p">))</span>  <span class="c1"># Note that it did NOT create this `Scan` in the database!</span>
 <span class="go">None</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">))</span>  <span class="c1"># And it is NOT found under the `basedir` directory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>  <span class="c1"># And it is NOT found under the `basedir` directory</span>
 <span class="go">['romidb']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># HOWEVER if you add metadata to the `Scan` object:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">({</span><span class="s1">'Name'</span><span class="p">:</span> <span class="s2">"Bond... James Bond!"</span><span class="p">})</span>
@@ -1424,11 +1460,11 @@ Else, returns the value attached to this key.</p>
 <span class="go">{'Name': 'Bond... James Bond!'}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'007'</span><span class="p">))</span>  <span class="c1"># The `Scan` is still not found in the database!</span>
 <span class="go">None</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">))</span>  <span class="c1"># BUT it is now found under the `basedir` directory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>  <span class="c1"># BUT it is now found under the `basedir` directory</span>
 <span class="go">['007', 'romidb']</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
 <span class="go">['metadata']</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">"metadata"</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">"metadata"</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1439,9 +1475,9 @@ Else, returns the value attached to this key.</p>
 <span class="go">&lt;class 'plantdb.fsdb.Scan'&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'007'</span><span class="p">))</span>  <span class="c1"># This time the `Scan` object is found in the `FSBD`</span>
 <span class="go">&lt;plantdb.fsdb.Scan object at 0x7f34fc860fd0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">))</span>  <span class="c1"># And it is found under the `basedir` directory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>  <span class="c1"># And it is found under the `basedir` directory</span>
 <span class="go">['007', 'romidb']</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
 <span class="go">['metadata']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># When reconnecting to db, if created scan is EMPTY (no Fileset &amp; File) it is not found!</span>
@@ -1623,7 +1659,7 @@ Else, returns the value attached to this key.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.Scan.path">
-<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the path to the local scan dataset.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
@@ -1651,7 +1687,7 @@ Else, returns the value attached to this key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.Scan.store">
 <span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan.store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan.store" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save changes to the scan’s JSON.</p>
+<dd><p>Save changes to the scan main JSON FILE (files.json).</p>
 </dd></dl>
 </dd></dl>
 <dl class="py function">
@@ -1667,7 +1703,7 @@ Else, returns the value attached to this key.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>fsdb.FSDB</em> – The dummy database.</p>
+<dd class="field-even"><p><em>plantdb.fsdb.FSDB</em> – The dummy database.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1677,30 +1713,30 @@ Else, returns the value attached to this key.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>  <span class="c1"># the database directory</span>
 <span class="go">/tmp/romidb_********</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>  <span class="c1"># get the created scan</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
 <span class="go">&lt;class 'NoneType'&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>
 <span class="go">['lock', 'romidb', 'myscan_001']</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="s2">"myscan_001"</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>
 <span class="go">['metadata']</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">()))</span>
 <span class="go">['metadata', 'files.json', 'fileset_001']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">fs</span><span class="p">))</span>
 <span class="go">&lt;class 'plantdb.fsdb.Fileset'&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()))</span>  <span class="c1"># the fileset is empty as no file has been created</span>
 <span class="go">[]</span>
 </pre></div>
 </div>
@@ -1710,9 +1746,9 @@ Else, returns the value attached to this key.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">"fileset_001"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"test_image"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()))</span>
 <span class="go">['test_image.png', 'test_json.json']</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1766,7 +1802,7 @@ Else, returns the value attached to this key.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

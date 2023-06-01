@@ -49,8 +49,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -257,23 +257,18 @@
 <span class="c1"># &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># ------------------------------------------------------------------------------</span>
 
-<span class="sd">"""</span>
-<span class="sd">plantdb.sshfsdb</span>
-<span class="sd">===============</span>
+<span class="sd">"""Implementation of a database as a file structure on a remote server using SSHFS."""</span>
 
-<span class="sd">Implementation of a database as a file structure on a remote server</span>
-<span class="sd">using SSHFS.</span>
-
-<span class="sd">"""</span>
-
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 
 <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">db</span>
 <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">fsdb</span>
+<span class="kn">from</span> <span class="nn">plantdb.log</span> <span class="kn">import</span> <span class="n">configure_logger</span>
 
 <span class="n">MARKER_FILE_NAME</span> <span class="o">=</span> <span class="s2">"romidb"</span>  <span class="c1"># This file must exist in the root of a folder for it to be considered a valid DB</span>
 <span class="n">LOCK_FILE_NAME</span> <span class="o">=</span> <span class="s2">"lock"</span>  <span class="c1"># This file prevents opening the DB if it is present in the root folder of a DB</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">configure_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SSHFSDB"><a class="viewcode-back" href="../../reference/sshfsdb.html#plantdb.sshfsdb.SSHFSDB">[docs]</a><span class="k">class</span> <span class="nc">SSHFSDB</span><span class="p">(</span><span class="n">fsdb</span><span class="o">.</span><span class="n">FSDB</span><span class="p">):</span>
@@ -285,11 +280,11 @@
 <span class="sd">    ----------</span>
 <span class="sd">    basedir : str</span>
 <span class="sd">        Path to the local directory where to mount the remote directory.</span>
-<span class="sd">    remotedir : str</span>
+<span class="sd">    remotedir : str, optional</span>
 <span class="sd">        Path to the remote directory containing the database.</span>
 <span class="sd">        Should be in the format ``user@server:path``</span>
 <span class="sd">    scans : list</span>
-<span class="sd">        List of ``Scan`` objects found in the database</span>
+<span class="sd">        The list of ``Scan`` objects found in the database</span>
 <span class="sd">    is_connected : bool</span>
 <span class="sd">        ``True`` if the DB is connected (locked the directory), else ``False``</span>
 
@@ -298,14 +293,13 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">,</span> <span class="n">remotedir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Database constructor.</span>
 
-<span class="sd">        Mount ``remotedir`` directory on the ``basedir`` directory and</span>
-<span class="sd">        load accessible ``Scan`` objects.</span>
+<span class="sd">        Mount ``remotedir`` directory on the ``basedir`` directory and load accessible ``Scan`` objects.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        basedir : str</span>
 <span class="sd">            Path to local directory of the database</span>
-<span class="sd">        remotedir : str</span>
+<span class="sd">        remotedir : str, optional</span>
 <span class="sd">            Path to the remote directory containing the database.</span>
 <span class="sd">            Should be in the format ``user@server:path``</span>
 
@@ -325,7 +319,6 @@
 <span class="sd">        &gt;&gt;&gt; print(type(new_scan))</span>
 <span class="sd">        &lt;class 'plantdb.fsdb.Scan'&gt;</span>
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
-
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remotedir</span> <span class="o">=</span> <span class="n">remotedir</span>
@@ -351,14 +344,13 @@
 <span class="sd">        True</span>
 
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remotedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sshfs"</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="s2">"idmap=user"</span><span class="p">,</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">remotedir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sshfs"</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="s2">"idmap=user"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remotedir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Connecting with: '</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">"The exit code was: </span><span class="si">%d</span><span class="s2">"</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The exit code was: </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SSHFSDB.disconnect"><a class="viewcode-back" href="../../reference/sshfsdb.html#plantdb.sshfsdb.SSHFSDB.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -381,8 +373,8 @@
 
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"fusermount"</span><span class="p">,</span> <span class="s2">"-u"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"The exit code was: </span><span class="si">%d</span><span class="s2">"</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span></div></div>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"fusermount"</span><span class="p">,</span> <span class="s2">"-u"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The exit code was: </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div></div>
 </pre></div>
 
           </article>
@@ -407,7 +399,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>
