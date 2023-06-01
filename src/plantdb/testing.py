@@ -78,7 +78,7 @@ class DBTestCase(unittest.TestCase):
         except:
             return
         from shutil import rmtree
-        rmtree(self.db.basedir, ignore_errors=True)
+        rmtree(self.db.path(), ignore_errors=True)
 
     def get_test_db(self, db_path=None):
         """Return the test ``FSDB`` database.

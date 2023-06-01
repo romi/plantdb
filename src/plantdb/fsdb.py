@@ -23,8 +23,7 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""
-Implementation of a database as a local file structure.
+"""Implementation of a database as a local file structure.
 
 Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``Scan`` with ``'myscan_001'`` as ``Scan.id`` and there are some metadata (see below), you should have the following file structure:
 
@@ -32,19 +31,23 @@ Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``
 
     dbroot/                            # base directory of the database
     ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
-    │   ├── files.json                 # JSON file referencing the files of the datataset
-    │   ├── images/                    # gather the 'images' `Fileset`
+    │   ├── files.json                 # JSON file referencing the all files for the dataset
+    │   ├── images/                    # `Fileset` gathering the 'images'
     │   │   ├── scan_img_01.jpg        # 'image' `File` 01
     │   │   ├── scan_img_02.jpg        # 'image' `File` 02
-    │   │   ├── [...]
+    │   │   ├── [...]                  #
     │   │   └── scan_img_99.jpg        # 'image' `File` 99
     │   ├── metadata/                  # metadata directory
     │   │   ├── images                 # 'images' metadata directory
-    │   │   │   ├── scan_img_01.json   # JSON file with 'image' file metadata
+    │   │   │   ├── scan_img_01.json   # JSON metadata attached to this file
     │   │   │   ├── scan_img_02.json   #
-    │   │   ├── [...]
+    │   │   │   [...]                  #
     │   │   │   └── scan_img_99.json   #
-    │   │   └── metadata.json          # scan dataset metadata
+    │   │   ├── Task_A/                # optional, only present if metadata attached to one of the outputs from `Task_A`
+    │   │   │   └── outfile.json       # optional metadata attached to the output file from `Task_A`
+    │   │   └── (metadata.json)        # optional metadata attached to the dataset
+    │   ├── task_A/                    # `Fileset` gathering the outputs of `Task_A`
+    │   │   └── outfile.ext            # output file from `Task_A`
     │   └── (measures.json)            # optional manual measurements file
     ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
     :
@@ -97,6 +100,8 @@ import copy
 import json
 import logging
 import os
+import pathlib
+from pathlib import Path
 from shutil import copyfile
 from shutil import rmtree
 
@@ -126,7 +131,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    fsdb.FSDB
+    plantdb.fsdb.FSDB
         The dummy database.
 
     Examples
@@ -137,28 +142,28 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> db.connect()
     >>> print(db.is_connected)
     True
-    >>> print(db.basedir)
+    >>> print(db.path())  # the database directory
     /tmp/romidb_********
 
     >>> db = dummy_db(with_scan=True)
     >>> db.connect()
-    >>> scan = db.get_scan("myscan_001")
+    >>> scan = db.get_scan("myscan_001")  # get the created scan
     >>> print(type(scan))
     <class 'NoneType'>
-    >>> print(os.listdir(db.basedir))
+    >>> print(os.listdir(db.path()))
     ['lock', 'romidb', 'myscan_001']
-    >>> print(os.listdir(os.path.join(db.basedir, "myscan_001")))
+    >>> print(os.listdir(scan.path()))
     ['metadata']
 
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))
+    >>> print(os.listdir(scan.path()))
     ['metadata', 'files.json', 'fileset_001']
     >>> fs = scan.get_fileset("fileset_001")
     >>> print(type(fs))
     <class 'plantdb.fsdb.Fileset'>
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))
+    >>> print(list(fs.path().iterdir()))  # the fileset is empty as no file has been created
     []
 
     >>> db = dummy_db(with_file=True)
@@ -167,17 +172,17 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.get_file("test_image")
     >>> print(type(f))
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id, fs.id)))
+    >>> print(list(fs.path().iterdir()))
     ['test_image.png', 'test_json.json']
-    >>> fpath = os.path.join(db.basedir, scan.id, fs.id, f.id)
+    >>> print(f.path())
 
     """
-    from os.path import join
     from tempfile import mkdtemp
     from plantdb import io
 
-    mydb = mkdtemp(prefix='romidb_')
-    open(join(mydb, MARKER_FILE_NAME), 'w').close()
+    mydb = Path(mkdtemp(prefix='romidb_'))
+    marker_file = mydb / MARKER_FILE_NAME
+    marker_file.open(mode='w').close()
     db = FSDB(mydb)
 
     if with_file:
@@ -211,7 +216,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
         f.set_metadata("dummy image", True)
         # -- Create a random RGB image:
         f = fs.create_file("test_image")
-        img = np.array(255 * np.random.rand(50, 50, 3), dtype='uint8')
+        rng = np.random.default_rng()
+        img = np.array(255 * rng.random((50, 50, 3)), dtype='uint8')
         io.write_image(f, img, "png")
         f.set_metadata("random image", True)
         # -- Create a dummy JSON
@@ -241,7 +247,7 @@ class FSDB(db.DB):
     lock_path : str
         Absolute path to the lock file.
     scans : list
-        List of ``Scan`` objects found in the database.
+        The list of ``Scan`` objects found in the database.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
 
@@ -293,13 +299,13 @@ class FSDB(db.DB):
         Parameters
         ----------
         basedir : str or pathlib.Path
-            Path to the root directory of the database.
+            The path to the root directory of the database.
 
         """
         super().__init__()
         # Defines attributes:
-        self.basedir = basedir
-        self.lock_path = os.path.abspath(os.path.join(basedir, LOCK_FILE_NAME))
+        self.basedir = Path(basedir).resolve()
+        self.lock_path = self.basedir / LOCK_FILE_NAME
         self.scans = []
         self.is_connected = False
 
@@ -340,24 +346,21 @@ class FSDB(db.DB):
 
         """
         # Check the given path to root directory of the database is a directory:
-        if not os.path.isdir(self.basedir):
-            raise IOError("Not a directory: %s" % self.basedir)
-        # Check the given path to root directory of the database is a "romi db", ie. have the `MARKER_FILE_NAME`:
-        if not _is_db(self.basedir):
-            raise IOError(
-                "Not a DB. Check that there is a marker named %s in %s" % (
-                    MARKER_FILE_NAME, self.basedir))
+        if not self.path().is_dir():
+            raise IOError(f"Not a directory: {self.path()}")
+        # Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:
+        if not _is_fsdb(self.path()):
+            raise IOError(f"Not a DB! Check that there is a file named {MARKER_FILE_NAME} in {self.path()}")
         if not self.is_connected:
             try:
-                with open(self.lock_path, "x") as _:
+                with self.lock_path.open(mode="x") as _:
                     self.scans = _load_scans(self)
                     self.is_connected = True
                 atexit.register(self.disconnect)
             except FileExistsError:
-                raise DBBusyError(
-                    "File %s exists in DB root: DB is busy, cannot connect." % LOCK_FILE_NAME)
+                raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
         else:
-            logger.info(f"Already connected to the database '{self.basedir}'")
+            logger.info(f"Already connected to the database '{self.path()}'")
         return
 
     def disconnect(self):
@@ -388,15 +391,14 @@ class FSDB(db.DB):
             for s in self.scans:
                 s._erase()
             if _is_safe_to_delete(self.lock_path):
-                os.remove(self.lock_path)
+                self.lock_path.unlink(missing_ok=True)
                 atexit.unregister(self.disconnect)
             else:
-                raise IOError(
-                    "Could not remove lock, maybe you messed with the lock_path attribute?")
+                raise IOError("Could not remove lock, maybe you messed with the `lock_path` attribute?")
             self.scans = []
             self.is_connected = False
         else:
-            logger.info(f"Already disconnected from the database '{self.basedir}'")
+            logger.info(f"Already disconnected from the database '{self.path()}'")
         return
 
     def get_scans(self, query=None):
@@ -507,7 +509,7 @@ class FSDB(db.DB):
         if not _is_valid_id(id):
             raise IOError("Invalid id")
         if self.get_scan(id) != None:
-            raise IOError("Duplicate scan name: %s" % id)
+            raise IOError(f"Duplicate scan name: {id}")
         scan = Scan(self, id)
         _make_scan(scan)
         self.scans.append(scan)
@@ -555,7 +557,7 @@ class FSDB(db.DB):
         self.scans.remove(scan)
         return
 
-    def path(self) -> str:
+    def path(self) -> pathlib.Path:
         """Get the path to the local database root directory.
 
         Examples
@@ -567,7 +569,7 @@ class FSDB(db.DB):
         >>> db.disconnect()
 
         """
-        return self.basedir
+        return copy.deepcopy(self.basedir)
 
     def list_scans(self, query=None) -> list:
         """Get the list of scans in the local database.
@@ -626,7 +628,7 @@ class Scan(db.Scan):
     /tmp/romidb_j0pbkoo0/007
     >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
     None
-    >>> print(os.listdir(db.basedir))  # And it is NOT found under the `basedir` directory
+    >>> print(os.listdir(db.path()))  # And it is NOT found under the `basedir` directory
     ['romidb']
     >>> # HOWEVER if you add metadata to the `Scan` object:
     >>> scan.set_metadata({'Name': "Bond... James Bond!"})
@@ -634,11 +636,11 @@ class Scan(db.Scan):
     {'Name': 'Bond... James Bond!'}
     >>> print(db.get_scan('007'))  # The `Scan` is still not found in the database!
     None
-    >>> print(os.listdir(db.basedir))  # BUT it is now found under the `basedir` directory
+    >>> print(os.listdir(db.path()))  # BUT it is now found under the `basedir` directory
     ['007', 'romidb']
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
     ['metadata']
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id, "metadata")))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.path(), scan.id, "metadata")))  # Same goes for the metadata
     >>> db.disconnect()
 
     >>> # Example #2: Get it from an `FSDB` object:
@@ -648,9 +650,9 @@ class Scan(db.Scan):
     <class 'plantdb.fsdb.Scan'>
     >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
     <plantdb.fsdb.Scan object at 0x7f34fc860fd0>
-    >>> print(os.listdir(db.basedir))  # And it is found under the `basedir` directory
+    >>> print(os.listdir(db.path()))  # And it is found under the `basedir` directory
     ['007', 'romidb']
-    >>> print(os.listdir(os.path.join(db.basedir, scan.id)))  # Same goes for the metadata
+    >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
     ['metadata']
     >>> db.disconnect()
     >>> # When reconnecting to db, if created scan is EMPTY (no Fileset & File) it is not found!
@@ -678,6 +680,7 @@ class Scan(db.Scan):
         return
 
     def _erase(self):
+        """Erase the filesets and metadata associated to this scan."""
         for f in self.filesets:
             f._erase()
         del self.metadata
@@ -798,7 +801,7 @@ class Scan(db.Scan):
         It is located at the root folder of the scan dataset.
 
         """
-        return _get_measures(self.measures, key)
+        return _get_metadata(self.measures, key)
 
     def set_metadata(self, data, value=None):
         """Add a new metadata to the scan.
@@ -858,9 +861,9 @@ class Scan(db.Scan):
 
         """
         if not _is_valid_id(id):
-            raise IOError("Invalid id")
+            raise IOError(f"Invalid fileset id: {id}")
         if self.get_fileset(id) != None:
-            raise IOError("Duplicate fileset name: %s" % id)
+            raise IOError(f"Duplicate fileset name: {id}")
         fileset = Fileset(self.db, self, id)
         _make_fileset(fileset)
         self.filesets.append(fileset)
@@ -868,8 +871,9 @@ class Scan(db.Scan):
         return fileset
 
     def store(self):
-        """Save changes to the scan's JSON."""
+        """Save changes to the scan main JSON FILE (files.json)."""
         _store_scan(self)
+        logger.debug(f"The `files.json` file for scan '{self.id}' has been updated!")
         return
 
     def delete_fileset(self, fileset_id):
@@ -903,7 +907,7 @@ class Scan(db.Scan):
         self.store()
         return
 
-    def path(self) -> str:
+    def path(self) -> pathlib.Path:
         """Get the path to the local scan dataset.
 
         Examples
@@ -1142,25 +1146,25 @@ class Fileset(db.Fileset):
         >>> fs.list_files()
         ['test_image', 'test_json']
         >>> import os
-        >>> os.listdir(fs.path())  # the file has been removed from the drive and the database
+        >>> list(fs.path().iterdir())  # the file has been removed from the drive and the database
         ['test_image.png', 'test_json.json']
         >>> db.disconnect()
 
         """
-        x = self.get_file(file_id)
+        x = self.get_file(file_id, create=False)
         if x is None:
-            raise IOError("Invalid file ID: %s" % file_id)
+            raise IOError(f"Invalid file ID: {file_id}")
         _delete_file(x)
         self.files.remove(x)
         self.store()
         return
 
     def store(self):
-        """Save changes to the scan's JSON."""
+        """Save changes to the scan main JSON FILE (files.json)."""
         self.scan.store()
         return
 
-    def path(self) -> str:
+    def path(self) -> pathlib.Path:
         """Get the path to the local fileset.
 
         Examples
@@ -1209,7 +1213,7 @@ class File(db.File):
     fileset : plantdb.fsdb.Fileset
         Set of files containing the file.
     id : str
-        Name of the file in the database ``fsdb.FSDB``.
+        Name of the file in the ``FSDB`` local database.
     filename : str
         File name.
     metadata : dict
@@ -1225,7 +1229,6 @@ class File(db.File):
     Else they are just referenced in the database!
 
     Contrary to other classes (``Scan`` & ``Fileset``) the uniqueness is not checked!
-
     """
 
     def __init__(self, db, fileset, id):
@@ -1277,19 +1280,19 @@ class File(db.File):
         Parameters
         ----------
         path : str or pathlib.Path
-            Path to the file to import.
-
+            The path to the file to import.
         """
-        filename = os.path.basename(path)
-        ext = os.path.splitext(filename)[-1][1:]
-        self.filename = '%s.%s' % (self.id, ext)
+        if isinstance(path, str):
+            path = Path(path)
+        ext = path.suffix[1:]
+        self.filename = _get_filename(self, ext)
         newpath = _file_path(self)
         copyfile(path, newpath)
         self.store()
         return
 
     def store(self):
-        """Save changes to the scan's JSON."""
+        """Save changes to the scan main JSON FILE (files.json)."""
         self.fileset.store()
         return
 
@@ -1322,7 +1325,7 @@ class File(db.File):
 
         """
         path = _file_path(self)
-        with open(path, "rb") as f:
+        with path.open(mode="rb") as f:
             return f.read()
 
     def write_raw(self, data, ext=""):
@@ -1355,9 +1358,9 @@ class File(db.File):
         >>> db.disconnect()
 
         """
-        self.filename = '%s.%s' % (self.id, ext)
+        self.filename = _get_filename(self, ext)
         path = _file_path(self)
-        with open(path, "wb") as f:
+        with path.open(mode="wb") as f:
             f.write(data)
         self.store()
         return
@@ -1394,7 +1397,7 @@ class File(db.File):
 
         """
         path = _file_path(self)
-        with open(path, "r") as f:
+        with path.open(mode="r") as f:
             return f.read()
 
     def write(self, data, ext=""):
@@ -1429,9 +1432,9 @@ class File(db.File):
         >>> db.disconnect()
 
         """
-        self.filename = '%s.%s' % (self.id, ext)
+        self.filename = _get_filename(self, ext)
         path = _file_path(self)
-        with open(path, "w") as f:
+        with path.open(mode="w") as f:
             f.write(data)
         self.store()
         return
@@ -1504,33 +1507,33 @@ def _load_scans(db):
 
     """
     scans = []
-    names = os.listdir(db.basedir)
+    names = os.listdir(db.path())
     for name in names:
         scan = Scan(db, name)
-        if os.path.isdir(_scan_path(scan)):
-            if os.path.isfile(_scan_files_json(scan)):
+        if _scan_path(scan).is_dir():
+            # If the `files.json` associated to the scan is found, parse it:
+            if _scan_json_file(scan).is_file():
                 scan.filesets = _load_scan_filesets(scan)
                 scan.metadata = _load_scan_metadata(scan)
                 scan.measures = _load_scan_measures(scan)
-                # scan.store()
             scans.append(scan)
     return scans
 
 
 def _load_scan_filesets(scan):
-    """Load list of ``Fileset`` from given scan.
+    """Load the list of ``Fileset`` from given `scan` dataset.
 
     Load the list of filesets using "filesets" top-level entry from ``files.json``.
 
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan object to use to get the list of ``fsdb.Fileset``
+        The instance to use to get the list of ``Fileset``.
 
     Returns
     -------
     list of plantdb.fsdb.Fileset
-         The list of ``fsdb.Fileset`` found in the scan.
+         The list of ``Fileset`` found in the scan.
 
     See Also
     --------
@@ -1539,7 +1542,7 @@ def _load_scan_filesets(scan):
 
     Notes
     -----
-    May delete a detected fileset if unable to load it!
+    May delete a fileset if unable to load it!
 
     Examples
     --------
@@ -1554,21 +1557,27 @@ def _load_scan_filesets(scan):
 
     """
     filesets = []
-    files_json = _scan_files_json(scan)
-    with open(files_json, "r") as f:
+    # Get the path to the `files.json` associated to the `scan`:
+    files_json = _scan_json_file(scan)
+    # Load it:
+    with files_json.open(mode="r") as f:
         structure = json.load(f)
+    # Get the list of info (dict) about the filesets
     filesets_info = structure["filesets"]
     if isinstance(filesets_info, list):
-        for fileset_info in filesets_info:
+        for n, fileset_info in enumerate(filesets_info):
             try:
                 fileset = _load_fileset(scan, fileset_info)
+            except FilesetNoIDError:
+                logger.error(f"Could not get an 'id' entry for the {n}-th 'filesets' entry from '{scan.id}'.")
+                logger.debug(f"Current `fileset_info`: {fileset_info}")
+            except FilesetNotFoundError:
+                fsid = fileset_info.get("id", None)
+                logger.error(f"Fileset directory '{fsid}' not found for scan {scan.id}, skip it.")
+            else:
                 filesets.append(fileset)
-            except:
-                id = fileset_info.get("id")
-                logger.warning("Unable to load fileset %s, deleting..." % id)
-                scan.delete_fileset(id)
     else:
-        raise IOError("%s: filesets is not a list" % files_json)
+        raise IOError(f"Could not find a list of filesets in '{files_json}'.")
     return filesets
 
 
@@ -1580,7 +1589,7 @@ def _load_fileset(scan, fileset_info):
     scan : plantdb.fsdb.Scan
         The scan object to use to get the list of ``fsdb.Fileset``
     fileset_info: dict
-        Dictionary with the fileset id and listing its files, {'files': [], 'id': str}.
+        Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
 
     Returns
     -------
@@ -1590,18 +1599,19 @@ def _load_fileset(scan, fileset_info):
     Examples
     --------
     >>> import json
-    >>> from plantdb.fsdb import dummy_db, _load_fileset, _scan_files_json
+    >>> from plantdb.fsdb import dummy_db, _load_fileset, _scan_json_file
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> json_path = _scan_files_json(scan)
-    >>> with open(json_path, "r") as f: structure = json.load(f)
+    >>> db.disconnect()
+    >>> json_path = _scan_json_file(scan)
+    >>> with json_path.open(mode="r") as f: structure = json.load(f)
     >>> filesets_info = structure["filesets"]
     >>> fs = _load_fileset(scan, filesets_info[0])
-    >>> print(fs)
-    <plantdb.fsdb.Fileset object at 0x7f86bdf7a250>
-    >>> print(fs.files)
-    [<plantdb.fsdb.File object at 0x7f8690459b50>, <plantdb.fsdb.File object at 0x7f8690459750>]
+    >>> print(fs.id)
+    fileset_001
+    >>> print([f.id for f in files])
+    ['dummy_image', 'test_image', 'test_json']
 
     """
     fileset = _parse_fileset(scan.db, scan, fileset_info)
@@ -1610,159 +1620,464 @@ def _load_fileset(scan, fileset_info):
     return fileset
 
 
+class FilesetNoIDError(Exception):
+    """No 'id' entry could be found for this fileset."""
+
+
+class FilesetNotFoundError(Exception):
+    """Could not find the fileset directory."""
+
+
 def _parse_fileset(db, scan, fileset_info):
-    id = fileset_info.get("id")
-    if id == None:
-        raise IOError("Fileset: No ID")
-    fileset = Fileset(db, scan, id)
+    """Get a `Fileset` instance for given `db` & `scan` by parsing provided `fileset_info`.
+
+    Parameters
+    ----------
+    db : plantdb.fsdb.FSDB
+        The database instance to associate the returned ``Fileset`` to.
+    scan : plantdb.fsdb.Scan
+        The scan instance to associate the returned ``Fileset`` to.
+    fileset_info : dict
+        The fileset dictionary with the fileset 'id' entry
+
+    Returns
+    -------
+    plantdb.fsdb.Fileset
+        The ``Fileset`` instance from parsed JSON.
+
+    """
+    fsid = fileset_info.get("id", None)
+    if fsid is None:
+        raise FilesetNoIDError("Fileset: No ID")
+
+    fileset = Fileset(db, scan, fsid)
+    # Get the expected directory path and check it exists:
     path = _fileset_path(fileset)
-    if not os.path.isdir(path):
-        logger.error(f"Fileset directory doesn't exists: %s" % path)
+    if not path.is_dir():
+        logger.debug(f"Missing fileset directory: {path}")
+        raise FilesetNotFoundError(f"Fileset directory '{fsid}' not found for scan '{scan.id}'")
     return fileset
 
 
 def _load_fileset_files(fileset, fileset_info):
+    """Load the list of ``File`` from given `fileset`.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The instance to use to get the list of ``File``.
+    fileset_info : dict
+        Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
+
+    Returns
+    -------
+    list of plantdb.fsdb.File
+         The list of ``File`` found in the `fileset`.
+
+    See Also
+    --------
+    plantdb.fsdb._load_file
+
+    Notes
+    -----
+    May delete a file if unable to load it!
+
+    Examples
+    --------
+    >>> import json
+    >>> from plantdb.fsdb import FSDB
+    >>> from plantdb.fsdb import dummy_db, _scan_json_file, _parse_fileset, _load_fileset_files
+    >>> db = dummy_db(with_fileset=True, with_file=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> db.disconnect()
+    >>> json_path = _scan_json_file(scan)
+    >>> with json_path.open(mode="r") as f: structure = json.load(f)
+    >>> filesets_info = structure["filesets"]
+    >>> fileset = _parse_fileset(scan.db, scan, filesets_info[0])
+    >>> files = _load_fileset_files(fileset, filesets_info[0])
+    >>> print([f.id for f in files])
+    ['dummy_image', 'test_image', 'test_json']
+
+    """
+    scan_id = fileset.scan.id
     files = []
-    files_info = fileset_info.get("files", [])
+    files_info = fileset_info.get("files", None)
     if isinstance(files_info, list):
-        for file_info in files_info:
+        for n, file_info in enumerate(files_info):
             try:
                 file = _load_file(fileset, file_info)
+            except FileNoIDError:
+                logger.error(f"Could not get an 'id' entry for the {n}-th 'files' entry from '{scan_id}'.")
+                logger.debug(f"Current `file_info`: {file_info}")
+            except FileNoFileNameError:
+                fs_id = fileset.id
+                fid = file_info.get("id")
+                logger.error(f"Could not get a 'file' entry for file id '{fid}' from '{scan_id}/{fs_id}'.")
+                logger.debug(f"Current `file_info`: {file_info}")
+            except FileNotFoundError:
+                fs_id = fileset.id
+                fname = file_info.get("file")
+                logger.error(f"Could not find file '{fname}' for '{scan_id}/{fs_id}'.")
+                logger.debug(f"Current `file_info`: {file_info}")
+            else:
                 files.append(file)
-            except:
-                id = file_info.get("id")
-                logger.warning("Unable to load file %s, deleting..." % id)
-                fileset.delete_file(id)
     else:
-        raise IOError("files.json: expected a list for files")
+        raise IOError(f"Expected a list of files in `files.json` from dataset '{fileset.scan.id}'!")
     return files
 
 
+def _load_fileset_metadata(fileset):
+    """Load the metadata for a fileset.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The fileset to load the metadata for.
+
+    Returns
+    -------
+    dict
+        The metadata dictionary.
+    """
+    return _load_metadata(_fileset_metadata_path(fileset))
+
+
+class FileNoIDError(Exception):
+    """No 'id' entry could be found for this file."""
+
+
+class FileNoFileNameError(Exception):
+    """No 'file' entry could be found for this file."""
+
+
 def _load_file(fileset, file_info):
+    """Get a `File` instance for given `fileset` using provided `file_info`.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The instance to associate the returned ``File`` to.
+    file_info : dict
+        Dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
+
+    Returns
+    -------
+    plantdb.fsdb.File
+        The `File` instance with metadata.
+
+    See Also
+    --------
+    plantdb.fsdb._parse_file
+    plantdb.fsdb._load_file_metadata
+    """
     file = _parse_file(fileset, file_info)
     file.metadata = _load_file_metadata(file)
     return file
 
 
 def _parse_file(fileset, file_info):
-    id = file_info.get("id")
-    if id == None:
-        raise IOError("File: No ID")
-    filename = file_info.get("file")
-    if filename == None:
-        raise IOError("File: No filename")
-    file = File(fileset.db, fileset, id)
-    file.filename = filename
+    """Get a `File` instance for given `fileset` by parsing provided `file_info`.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The fileset instance to associate the returned ``File`` to.
+    file_info : dict
+        The file dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
+
+    Returns
+    -------
+    plantdb.fsdb.File
+        The ``File`` instance from parsed JSON.
+
+    Raises
+    ------
+    FileNoIDError
+        If the 'id' entry is missing from `file_info`.
+    FileNoFileNameError
+        If the 'file' entry is missing from `file_info`.
+    FileNotFoundError
+        If the file is not found on drive.
+    """
+    fid = file_info.get("id", None)
+    if fid is None:
+        logger.debug(f"Input `file_info`: {file_info}")
+        raise FileNoIDError("File: No ID")
+
+    filename = file_info.get("file", None)
+    if filename is None:
+        logger.debug(f"Input `file_info`: {file_info}")
+        raise FileNoFileNameError("File: No filename")
+
+    file = File(fileset.db, fileset, fid)
+    file.filename = filename  # set the filename attribute
+    # Get the expected file path and check it exists:
     path = _file_path(file)
-    if not os.path.isfile(path):
-        logger.error("File doesn't exists: %s" % path)
+    if not path.is_file():
+        logger.debug(f"Missing file: {path}")
+        raise FileNotFoundError("File: Not found")
     return file
 
 
 # load/store metadata from disk
 
 def _load_metadata(path):
-    if os.path.isfile(path):
-        with open(path, "r") as f:
+    """Load a metadata dictionary from a JSON file.
+    
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        The path to the file containing the metadata to load.
+    
+    Returns
+    -------
+    dict
+        The metadata dictionary.
+
+    Raises
+    ------
+    IOError
+        If the data returned by ``json.load`` is not a dictionary.
+    """
+    path = Path(path)
+    if path.is_file():
+        with path.open(mode="r") as f:
             r = json.load(f)
         if not isinstance(r, dict):
-            raise IOError("Not a JSON object: %s" % path)
+            raise IOError(f"Could not obtain a dictionary from JSON: {path}")
         return r
     else:
+        # If there is no scan metadata, simply return an empty dictionary:
         return {}
 
 
 def _load_measures(path):
-    if os.path.isfile(path):
-        with open(path, "r") as f:
+    """Load a measure dictionary from a JSON file.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        The path to the file containing the measure to load.
+
+    Returns
+    -------
+    dict
+        The measure dictionary.
+
+    Raises
+    ------
+    IOError
+        If the data returned by ``json.load`` is not a dictionary.
+    """
+    path = Path(path)
+    if path.is_file():
+        with path.open(mode="r") as f:
             r = json.load(f)
         if not isinstance(r, dict):
-            raise IOError("Not a JSON object: %s" % path)
+            raise IOError(f"Could not obtain a dictionary from JSON: {path}")
         return r
     else:
+        # If there is no measures for this scan, simply return an empty dictionary:
         return {}
 
 
 def _load_scan_metadata(scan):
+    """Load the metadata for a dataset.
+    
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The dataset to load the metadata for.
+    
+    Returns
+    -------
+    dict
+        The metadata dictionary.
+    """
     return _load_metadata(_scan_metadata_path(scan))
 
 
 def _load_scan_measures(scan):
+    """Load the measures for a dataset.
+    
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The dataset to load the measures for.
+    
+    Returns
+    -------
+    dict
+        The measures dictionary.
+    """
     return _load_measures(_scan_measures_path(scan))
 
 
-def _load_fileset_metadata(fileset):
-    return _load_metadata(_fileset_metadata_path(fileset))
-
-
 def _load_file_metadata(file):
+    """Load the metadata for a file.
+
+    Parameters
+    ----------
+    file : plantdb.fsdb.File
+        The file to load the metadata for.
+
+    Returns
+    -------
+    dict
+        The metadata dictionary.
+    """
     return _load_metadata(_file_metadata_path(file))
 
 
 def _mkdir_metadata(path):
-    dir = os.path.dirname(path)
-    if not os.path.isdir(dir):
-        os.makedirs(dir)
+    """Create the parent directories from given path.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        The path to a file.
+
+    Notes
+    -----
+    Used to check the availability of the 'metadata' directory inside a dataset.
+    """
+    dir = Path(path).parent
+    if not dir.is_dir():
+        dir.mkdir(parents=True, exist_ok=True)
     return
 
 
 def _store_metadata(path, metadata):
+    """Save a metadata dictionary as a JSON file.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        JSON file path to use for saving the metadata.
+    metadata : dict
+        The metadata dictionary to save.
+    """
     _mkdir_metadata(path)
-    with open(path, "w") as f:
-        json.dump(metadata, f, sort_keys=True,
-                  indent=4, separators=(',', ': '))
+    with path.open(mode="w") as f:
+        json.dump(metadata, f, sort_keys=True, indent=4, separators=(',', ': '))
     return
 
 
 def _store_scan_metadata(scan):
+    """Save the metadata for a dataset.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The dataset to save the metadata for.
+    """
     _store_metadata(_scan_metadata_path(scan), scan.metadata)
     return
 
 
 def _store_fileset_metadata(fileset):
-    _store_metadata(_fileset_metadata_path(fileset), fileset.metadata)
+    """Save the metadata for a dataset.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Fileset
+        The fileset to save the metadata for.
+    """
+    _store_metadata(_fileset_metadata_json_path(fileset), fileset.metadata)
     return
 
 
 def _store_file_metadata(file):
+    """Save the metadata for a dataset.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.File
+        The file to save the metadata for.
+    """
     _store_metadata(_file_metadata_path(file), file.metadata)
     return
 
 
-#
+def _get_metadata(metadata=None, key=None):
+    """Get a copy of `metadata[key]`.
 
-def _get_metadata(metadata, key):
+    Parameters
+    ----------
+    metadata : dict, optional
+        The metadata dictionary to get the key from.
+    key : str, optional
+        The key to get from the metadata dictionary.
+        If the key is not found, return ``None``.
+        By default, return a copy of the whole metadata dictionary.
+
+    Returns
+    -------
+    Any
+        the value save under `metadata[key]`, if any.
+    """
     # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
-    if metadata == None:
+    if metadata is None:
         return {}
-    elif key == None:
+    elif key is None:
         return copy.deepcopy(metadata)
     else:
-        return copy.deepcopy(metadata.get(str(key)))
-
-
-def _get_measures(measures, key):
-    # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
-    if measures == None:
-        return {}
-    elif key == None:
-        return copy.deepcopy(measures)
-    else:
-        return copy.deepcopy(measures.get(str(key)))
+        return copy.deepcopy(metadata.get(str(key), None))
 
 
 def _set_metadata(metadata, data, value):
+    """Set a `data` `value` in `metadata` dictionary.
+
+    Parameters
+    ----------
+    metadata : dict
+        The metadata dictionary to get the key from.
+    data : str or dict
+        If a string, a key to address the `value`.
+        If a dictionary, update the metadata dictionary with `data` (`value` is then unused).
+    value : any, optional
+        The value to assign to `data` if the latest is not a dictionary.
+
+    Raises
+    ------
+    IOError
+        If `value` is `None` when `data` is a string.
+        If `data` is not of the right type.
+
+    """
     if isinstance(data, str):
         if value is None:
-            raise IOError("No value given for key %s" % data)
+            raise IOError(f"No value given for key '{data}'!")
         # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
         metadata[data] = copy.deepcopy(value)
     elif isinstance(data, dict):
         for key, value in data.items():
             _set_metadata(metadata, key, value)
     else:
-        raise IOError("Invalid key: ", data)
+        raise IOError(f"Invalid key: {data}")
     return
+
+
+def _get_filename(file, ext):
+    """Returns a `file` name using its ``id`` attribute and given extension.
+
+    Parameters
+    ----------
+    file : plantdb.fsdb.File
+        A File object.
+    ext : str
+        The file extension to use.
+
+    Returns
+    -------
+    str
+        The corresponding file's name.
+    """
+    # Remove starting dot from extension:
+    if ext.startswith('.'):
+        ext = ext[1:]
+    return f"{file.id}.{ext}"
 
 
 ################################################################################
@@ -1783,8 +2098,8 @@ def _make_fileset(fileset):
     """
     path = _fileset_path(fileset)
     # Create the fileset directory if it does not exist:
-    if not os.path.isdir(path):
-        os.makedirs(path)
+    if not path.is_dir():
+        path.mkdir(parents=True)
     return
 
 
@@ -1802,31 +2117,14 @@ def _make_scan(scan):
     """
     path = _scan_path(scan)
     # Create the scan directory if it does not exist:
-    if not os.path.isdir(path):
-        os.makedirs(path)
+    if not path.is_dir():
+        path.mkdir(parents=True)
     return
 
 
 ################################################################################
 # paths - getters
 ################################################################################
-
-def _get_filename(file, ext):
-    """Returns a file's name.
-
-    Parameters
-    ----------
-    file : plantdb.fsdb.File
-        A File object.
-    ext : str
-        The file's extension to use.
-
-    Returns
-    -------
-    str
-        The corresponding file's name.
-    """
-    return file.id + "." + ext
 
 
 def _scan_path(scan):
@@ -1839,15 +2137,62 @@ def _scan_path(scan):
 
     Returns
     -------
-    str
-        The path to the scan.
+    pathlib.Path
+        The path to the scan directory.
     """
-    return os.path.join(scan.db.basedir,
-                        scan.id)
+    return (scan.db.basedir / scan.id).resolve()
+
+
+def _scan_json_file(scan):
+    """Get the path to scan's "files.json" file.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The scan to get the files JSON file path from.
+
+    Returns
+    -------
+    pathlib.Path
+        Path to the scan's "files.json" file.
+    """
+    return _scan_path(scan) / "files.json"
+
+
+def _scan_metadata_path(scan):
+    """Get the path to scan's "metadata.json" file.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The scan to get the metadata JSON file path from.
+
+    Returns
+    -------
+    pathlib.Path
+        Path to the scan's "metadata.json" file.
+    """
+    return _scan_path(scan) / "metadata" / "metadata.json"
+
+
+def _scan_measures_path(scan):
+    """Get the path to scan's "measures.json" file.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The scan to get the measures JSON file path from.
+
+    Returns
+    -------
+    pathlib.Path
+        Path to the scan's "measures.json" file.
+    """
+    return _scan_path(scan) / "measures.json"
 
 
 def _fileset_path(fileset):
-    """Get the path to given fileset.
+    """Get the path to given fileset directory.
 
     Parameters
     ----------
@@ -1856,12 +2201,42 @@ def _fileset_path(fileset):
 
     Returns
     -------
-    str
-        The path to the fileset.
+    pathlib.Path
+        The path to the fileset directory.
     """
-    return os.path.join(fileset.db.basedir,
-                        fileset.scan.id,
-                        fileset.id)
+    return _scan_path(fileset.scan) / fileset.id
+
+
+def _fileset_metadata_path(fileset):
+    """Get the path to given fileset metadata directory.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The fileset to get the metadata directory path from.
+
+    Returns
+    -------
+    pathlib.Path
+        Path to the fileset metadata directory.
+    """
+    return _scan_path(fileset.scan) / "metadata" / fileset.id
+
+
+def _fileset_metadata_json_path(fileset):
+    """Get the path to `fileset.id` metadata JSON file.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        Fileset to get the JSON file path from.
+
+    Returns
+    -------
+    pathlib.Path
+        Path to the f`fileset.id` metadata JSON file.
+    """
+    return _scan_path(fileset.scan) / "metadata" / f"{fileset.id}.json"
 
 
 def _file_path(file):
@@ -1874,87 +2249,10 @@ def _file_path(file):
 
     Returns
     -------
-    str
+    pathlib.Path
         The path to the file.
     """
-    return os.path.join(file.db.basedir,
-                        file.fileset.scan.id,
-                        file.fileset.id,
-                        file.filename)
-
-
-def _scan_files_json(scan):
-    """Get the path to scan's "files.json" file.
-
-    Parameters
-    ----------
-    scan : fsdb.Scan
-        The scan to get the files JSON file path from.
-
-    Returns
-    -------
-    str
-        Path to the scan's "files.json" file.
-    """
-    return os.path.join(scan.db.basedir,
-                        scan.id,
-                        "files.json")
-
-
-def _scan_metadata_path(scan):
-    """Get the path to scan's "metadata.json" file.
-
-    Parameters
-    ----------
-    scan : fsdb.Scan
-        The scan to get the metadata JSON file path from.
-
-    Returns
-    -------
-    str
-        Path to the scan's "metadata.json" file.
-    """
-    return os.path.join(scan.db.basedir,
-                        scan.id,
-                        "metadata",
-                        "metadata.json")
-
-
-def _scan_measures_path(scan):
-    """Get the path to scan's "measures.json" file.
-
-    Parameters
-    ----------
-    scan : fsdb.Scan
-        The scan to get the measures JSON file path from.
-
-    Returns
-    -------
-    str
-        Path to the scan's "measures.json" file.
-    """
-    return os.path.join(scan.db.basedir,
-                        scan.id,
-                        "measures.json")
-
-
-def _fileset_metadata_path(fileset):
-    """Get the path to `fileset.id` metadata JSON file.
-
-    Parameters
-    ----------
-    fileset : fsdb.Fileset
-        Fileset to get the JSON file path from.
-
-    Returns
-    -------
-    str
-        Path to the "<Fileset.id>.json" file.
-    """
-    return os.path.join(fileset.db.basedir,
-                        fileset.scan.id,
-                        "metadata",
-                        fileset.id + ".json")
+    return _fileset_path(file.fileset) / file.filename
 
 
 def _file_metadata_path(file):
@@ -1962,19 +2260,15 @@ def _file_metadata_path(file):
 
     Parameters
     ----------
-    file : fsdb.File
+    file : plantdb.fsdb.File
         File to get the metadata JSON path from.
 
     Returns
     -------
-    str
+    pathlib.Path
         Path to the "<File.id>.json" file.
     """
-    return os.path.join(file.db.basedir,
-                        file.fileset.scan.id,
-                        "metadata",
-                        file.fileset.id,
-                        file.id + ".json")
+    return _scan_path(file.fileset.scan) / "metadata" / file.fileset.id / f"{file.id}.json"
 
 
 ################################################################################
@@ -1986,33 +2280,33 @@ def _file_to_dict(file):
 
     Parameters
     ----------
-    file : fsdb.File
+    file : plantdb.fsdb.File
         File to get "id" and "filename" from.
 
     Returns
     -------
     dict
-        {"id": file.get_id(), "file": file.filename}
+        ``{"id": file.get_id(), "file": file.filename}``
     """
     return {"id": file.get_id(), "file": file.filename}
 
 
 def _fileset_to_dict(fileset):
-    """Returns a dict with the fileset "id" and the list of "files" dict.
+    """Returns a dict with the fileset "id" and the "files" dict.
 
     Parameters
     ----------
-    fileset : fsdb.Fileset
-        File to get "id" and "files" list from.
+    fileset : plantdb.fsdb.Fileset
+        Fileset to get "id" and "files" dictionary from.
 
     Returns
     -------
     dict
-        {"id": fileset.get_id(), "files": [file.filename]}
+        ``{"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}``
 
     See Also
     --------
-    _file_to_dict
+    plantdb.fsdb._file_to_dict
     """
     files = []
     for f in fileset.get_files():
@@ -2021,22 +2315,22 @@ def _fileset_to_dict(fileset):
 
 
 def _scan_to_dict(scan):
-    """Returns a dict with the scan's dictionary of `Fileset`s.
+    """Returns a dict with the scan's filesets and files structure.
 
     Parameters
     ----------
-    scan : fsdb.Scan
-        Scan to get "filesets" dictionary from.
+    scan : plantdb.fsdb.Scan
+        Scan instance to get underlying filesets and files structure from.
 
     Returns
     -------
     dict
-        {"id": fileset.get_id(), "files": [file.filename]}
+        ``{"filesets": {"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}}``
 
     See Also
     --------
-    _fileset_to_dict
-    _file_to_dict
+    plantdb.fsdb._fileset_to_dict
+    plantdb.fsdb._file_to_dict
     """
     filesets = []
     for fileset in scan.get_filesets():
@@ -2045,23 +2339,22 @@ def _scan_to_dict(scan):
 
 
 def _store_scan(scan):
-    """Dump the scan's JSON on drive.
+    """Dump the fileset and files structure associated to a `scan` on drive.
 
     Parameters
     ----------
-    scan : fsdb.Scan
-        Scan to dump in the "files.json".
+    scan : plantdb.fsdb.Scan
+        Scan instance to save by dumping its underlying structure in its "files.json".
 
     See Also
     --------
-    _scan_to_dict
-    _scan_files_json
+    plantdb.fsdb._scan_to_dict
+    plantdb.fsdb._scan_files_json
     """
     structure = _scan_to_dict(scan)
-    files_json = _scan_files_json(scan)
-    with open(files_json, "w") as f:
-        json.dump(structure, f, sort_keys=True,
-                  indent=4, separators=(',', ': '))
+    files_json = _scan_json_file(scan)
+    with files_json.open(mode="w") as f:
+        json.dump(structure, f, sort_keys=True, indent=4, separators=(',', ': '))
     return
 
 
@@ -2069,22 +2362,24 @@ def _is_valid_id(id):
     return True  # haha  (FIXME!)
 
 
-def _is_db(path):
+def _is_fsdb(path):
     """Test if the given path is indeed an FSDB database.
 
     Do it by checking the presence of the ``MARKER_FILE_NAME``.
 
     Parameters
     ----------
-    path : str
-        Path to test as an FSDB database.
+    path : str or pathlib.Path
+        A path to test as a valid FSDB database.
 
     Returns
     -------
     bool
         ``True`` if an FSDB database, else ``False``.
     """
-    return os.path.exists(os.path.join(path, MARKER_FILE_NAME))
+    path = Path(path)
+    marker_path = path / MARKER_FILE_NAME
+    return marker_path.is_file()
 
 
 def _is_safe_to_delete(path):
@@ -2092,8 +2387,8 @@ def _is_safe_to_delete(path):
 
     Parameters
     ----------
-    path : str
-        Path to test for safe deletion.
+    path : str or pathlib.Path
+        A path to test for safe deletion.
 
     Returns
     -------
@@ -2104,12 +2399,16 @@ def _is_safe_to_delete(path):
     -----
     A path is safe to delete only if it's a sub-folder of a db.
     """
-    path = os.path.abspath(path)
+    path = Path(path).resolve()
     while True:
-        if _is_db(path):
-            return True
-        newpath = os.path.abspath(os.path.join(path, os.path.pardir))
+        # Test if the current path is a local DB (FSDB):
+        if _is_fsdb(path):
+            return True  # exit and return `True` if it is
+        # Else, move to the parent directory & try again:
+        newpath = path.parent
+        # Check if we have indeed moved up to the parent directory
         if newpath == path:
+            # Stop if we did not
             return False
         path = newpath
 
@@ -2119,90 +2418,128 @@ def _delete_file(file):
 
     Parameters
     ----------
-    file : fsdb.File
-        The file to delete.
+    file : plantdb.fsdb.File
+        The file instance to delete.
 
     Raises
     ------
     IOError
-        If the file's path is outside the file's database.
+        If the file path is outside the database.
+
+    Notes
+    -----
+    We have to delete:
+      - the JSON metadata file associated to the file.
+      - the file
 
     See Also
     --------
-    _is_safe_to_delete
+    plantdb.fsdb._file_path
+    plantdb.fsdb._is_safe_to_delete
     """
     if file.filename is None:
+        # The filename attribute is defined when the file is written!
+        logger.error(f"No 'filename' attribute defined for file id '{file.id}'.")
+        logger.info("It means the file is not written on disk.")
         return
-    fullpath = os.path.join(file.fileset.scan.db.basedir, file.fileset.scan.id,
-                            file.fileset.id, file.filename)
-    if not _is_safe_to_delete(fullpath):
-        raise IOError("Cannot delete files outside of a DB.")
 
-    if os.path.exists(fullpath):
+    file_path = _file_path(file)
+    if not _is_safe_to_delete(file_path):
+        logger.error(f"File {file.filename} is not in the current database.")
+        logger.debug(f"File path: '{file_path}'")
+        raise IOError("Cannot delete files or directories outside of a local DB.")
+
+    # - Delete the JSON metadata file associated to the `File` instance:
+    file_md_path = _file_metadata_path(file)
+    if file_md_path.is_file():
         try:
-            os.remove(fullpath)
-        except:
-            logger.error(f"Could not delete file '{fullpath}'!")
+            file_md_path.unlink(missing_ok=False)
+        except FileNotFoundError:
+            logger.error(
+                f"Could not delete the JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+            logger.debug(f"JSON metadata file path: '{file_md_path}'.")
         else:
-            logger.info(f"Deleted file '{fullpath}'!")
+            logger.info(
+                f"Deleted JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+
+    # - Delete the file associated to the `File` instance:
+    if file_path.is_file():
+        try:
+            file_path.unlink(missing_ok=False)
+        except FileNotFoundError:
+            logger.error(f"Could not delete file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+            logger.debug(f"File path: '{file_path}'.")
+        else:
+            logger.info(f"Deleted file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+
     return
 
 
 def _delete_fileset(fileset):
-    """Delete the given fileset, starting by its `File`(s).
+    """Delete the given fileset.
 
     Parameters
     ----------
-    fileset : fsdb.Fileset
-        The fileset to delete.
+    fileset : plantdb.fsdb.Fileset
+        The fileset instance to delete.
 
     Raises
     ------
     IOError
-        If the fileset's path is outside the fileset's database.
+        If the fileset path is outside the database.
+
+    Notes
+    -----
+    We have to delete:
+      - the files in the fileset
+      - the fileset JSON metadata file
+      - the fileset metadata directory
+      - the fileset directory
 
     See Also
     --------
-    _is_safe_to_delete
+    plantdb.fsdb._scan_path
+    plantdb.fsdb._fileset_path
+    plantdb.fsdb._is_safe_to_delete
     """
-    fullpath = os.path.join(fileset.scan.db.basedir, fileset.scan.id, fileset.id)
-    if not _is_safe_to_delete(fullpath):
-        raise IOError("Cannot delete files outside of a DB.")
+    fileset_path = _fileset_path(fileset)
+    if not _is_safe_to_delete(fileset_path):
+        logger.error(f"Fileset {fileset.id} is not in the current database.")
+        logger.debug(f"Fileset path: '{fileset_path}'.")
+        raise IOError("Cannot delete files or directories outside of a local DB.")
 
-    # - Delete the `Files` belonging to the `Fileset`:
+    # - Delete the `Files` (and their metadata) belonging to the `Fileset` instance:
     for f in fileset.files:
         fileset.delete_file(f.id)
-    # - Delete metadata corresponding to the `Fileset`:
-    json_md = os.path.join(fileset.scan.path(), 'metadata', fileset.id + '.json')
-    dir_md = os.path.join(fileset.scan.path(), 'metadata', fileset.id)
+
+    # - Delete the JSON metadata file associated to the `Fileset` instance:
+    json_md = _fileset_metadata_json_path(fileset)
     try:
-        os.remove(json_md)
-    except:
-        if os.path.exists(json_md):
-            logger.error(f"Could not delete JSON metadata '{json_md}'!")
-        else:
-            logger.warning(f"Could not find JSON metadata file '{json_md}'!")
+        json_md.unlink(missing_ok=False)
+    except FileNotFoundError:
+        logger.warning(f"Could not find the JSON metadata file for fileset '{fileset.id}'.")
+        logger.debug(f"JSON metadata file path: '{json_md}'.")
     else:
-        logger.info(f"Deleted JSON metadata '{json_md}'!")
+        logger.info(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
+
+    # - Delete the metadata directory associated to the `Fileset` instance:
+    dir_md = _fileset_metadata_path(fileset)
     try:
         rmtree(dir_md, ignore_errors=True)
     except:
-        if os.path.exists(dir_md):
-            logger.error(f"Could not delete metadata directory '{dir_md}'!")
-        else:
-            logger.warning(f"Could not find metadata directory '{dir_md}'!")
+        logger.warning(f"Could not find metadata directory for fileset '{fileset.id}'.")
+        logger.debug(f"Metadata directory path: '{dir_md}'.")
     else:
-        logger.info(f"Deleted metadata directory '{dir_md}'!")
-    # - Delete the directory corresponding to the `Fileset`:
+        logger.info(f"Deleted metadata directory for fileset '{fileset.id}'.")
+
+    # - Delete the directory associated to the `Fileset` instance:
     try:
-        rmtree(fullpath, ignore_errors=True)
+        rmtree(fileset_path, ignore_errors=True)
     except:
-        if os.path.exists(fullpath):
-            logger.error(f"Could not delete Fileset directory '{fullpath}'!")
-        else:
-            logger.warning(f"Could not find Fileset directory '{fullpath}'!")
+        logger.warning(f"Could not find directory for fileset '{fileset.id}'.")
+        logger.debug(f"Fileset directory path: '{fileset_path}'.")
     else:
-        logger.info(f"Deleted Fileset directory '{fullpath}'!")
+        logger.info(f"Deleted directory for fileset '{fileset.id}'.")
     return
 
 
@@ -2211,32 +2548,31 @@ def _delete_scan(scan):
 
     Parameters
     ----------
-    scan : fsdb.Scan
-        The scan to delete.
+    scan : plantdb.fsdb.Scan
+        The scan instance to delete.
 
     Raises
     ------
     IOError
-        If the scan's path is outside the scan's database.
+        If the scan path is outside the database.
 
     See Also
     --------
-    _is_safe_to_delete
+    plantdb.fsdb._scan_path
+    plantdb.fsdb._is_safe_to_delete
     """
-    fullpath = os.path.join(scan.db.basedir, scan.id)
-    if not _is_safe_to_delete(fullpath):
+    scan_path = _scan_path(scan)
+    if not _is_safe_to_delete(scan_path):
         raise IOError("Cannot delete files outside of a DB.")
 
     # - Delete the whole directory will get rid of everything (metadata, filesets, files):
     try:
-        rmtree(fullpath, ignore_errors=True)
+        rmtree(scan_path, ignore_errors=True)
     except:
-        if os.path.exists(fullpath):
-            logger.error(f"Could not delete `Scan` directory '{fullpath}'!")
-        else:
-            logger.warning(f"Could not find `Scan` directory '{fullpath}'!")
+        logger.warning(f"Could not find directory for scan '{scan.id}'.")
+        logger.debug(f"Scan path: '{scan_path}'.")
     else:
-        logger.info(f"Deleted `Scan` directory '{fullpath}'!")
+        logger.info(f"Deleted directory for scan '{scan.id}'.")
 
     return
 
@@ -2296,5 +2632,5 @@ def _filter_query(l, query=None):
                     f_query.append(True)
             # All requirements have to be fulfilled:
             if all(f_query):
-                    query_result.append(f)
+                query_result.append(f)
     return query_result
