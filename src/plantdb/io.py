@@ -540,7 +540,7 @@ def read_point_cloud(dbfile, ext="ply"):
         fname = Path(tmpdir) / f"temp.{ext}"
         with fname.open(mode="wb") as fh:
             fh.write(b)
-        return io.read_point_cloud(fname)
+        return io.read_point_cloud(str(fname))
 
 
 def write_point_cloud(dbfile, data, ext="ply"):
@@ -575,7 +575,7 @@ def write_point_cloud(dbfile, data, ext="ply"):
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as tmpdir:
         fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_point_cloud(fname, data)
+        io.write_point_cloud(str(fname), data)
         dbfile.import_file(fname)
     return
 
@@ -602,7 +602,7 @@ def read_triangle_mesh(dbfile, ext="ply"):
         fname = Path(tmpdir) / f"temp.{ext}"
         with fname.open(mode="wb") as fh:
             fh.write(b)
-        return io.read_triangle_mesh(fname)
+        return io.read_triangle_mesh(str(fname))
 
 
 def write_triangle_mesh(dbfile, data, ext="ply"):
@@ -621,7 +621,7 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as tmpdir:
         fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_triangle_mesh(fname, data)
+        io.write_triangle_mesh(str(fname), data)
         dbfile.import_file(fname)
     return
 
@@ -648,7 +648,7 @@ def read_voxel_grid(dbfile, ext="ply"):
         fname = Path(tmpdir) / f"temp.{ext}"
         with fname.open(mode="wb") as fh:
             fh.write(b)
-        return io.read_voxel_grid(fname)
+        return io.read_voxel_grid(str(fname))
 
 
 def write_voxel_grid(dbfile, data, ext="ply"):
@@ -667,7 +667,7 @@ def write_voxel_grid(dbfile, data, ext="ply"):
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     with tempfile.TemporaryDirectory() as tmpdir:
         fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_voxel_grid(fname, data)
+        io.write_voxel_grid(str(fname), data)
         dbfile.import_file(fname)
     return
 
