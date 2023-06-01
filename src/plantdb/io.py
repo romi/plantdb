@@ -23,11 +23,7 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""
-plantdb.io
-===========
-
-The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.
+"""The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.
 
 Hereafter we detail the formats and their associated Python types and meanings.
 
@@ -116,16 +112,16 @@ Trained tensor, read and written using ``torch``.
 
 """
 
-import os
 import tempfile
-
-import imageio.v3 as iio
+from pathlib import Path
 
 from plantdb import fsdb
-from plantdb.db import DB
 from plantdb.db import File
 from plantdb.db import Fileset
 from plantdb.db import Scan
+from plantdb.log import configure_logger
+
+logger = configure_logger(__name__)
 
 
 def read_json(dbfile):
@@ -279,13 +275,15 @@ def read_image(dbfile):
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file("test_image")
-    >>> img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
+    >>> rng = np.random.default_rng()
+    >>> img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
     >>> write_image(f, img)
     >>> f = fs.get_file("test_image")
     >>> img2 = read_image(f)
     >>> np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!
 
     """
+    import imageio.v3 as iio
     return iio.imread(dbfile.read_raw())
 
 
@@ -311,10 +309,12 @@ def write_image(dbfile, data, ext="png"):
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file("test_image")
-    >>> img = np.array(np.random.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
+    >>> rng = np.random.default_rng()
+    >>> img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
     >>> write_image(f, img)
 
     """
+    import imageio.v3 as iio
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     if ext == "jpg" and len(data.shape) == 3:
         # Remove any alpha channel if JPEG format as it cannot handle it
@@ -349,13 +349,15 @@ def read_volume(dbfile, ext="tiff"):
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file('test_volume')
-    >>> vol = np.random.rand(50, 10, 10)
+    >>> rng = np.random.default_rng()
+    >>> vol = rng.random((50, 10, 10))
     >>> write_volume(f, vol)
     >>> f = fs.get_file("test_volume")
     >>> vol2 = read_volume(f)
     >>> np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!
 
     """
+    import imageio.v3 as iio
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     return iio.imread(dbfile.read_raw(), extension=f".{ext}")
 
@@ -386,18 +388,36 @@ def write_volume(dbfile, data, ext="tiff", compress=True):
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
+    >>> vol = np.ones((50, 10, 10))  # stupid volume file with only `1` values
+    >>> f_lzw = fs.create_file('test_volume_compress')
+    >>> write_volume(f_lzw, vol)
     >>> f = fs.create_file('test_volume')
-    >>> vol = np.random.rand(50, 10, 10)
-    >>> write_volume(f, vol)
+    >>> write_volume(f, vol, compress=False)
+    >>> print(f_lzw.path().stat().st_size)
+    15283
+    >>> print(f.path().stat().st_size)
+    48994
 
     """
+    import imageio.v3 as iio
+    import tifffile
+    try:
+        import imagecodecs
+    except ImportError:
+        pip_install = "pip install imagecodecs"
+        conda_install = "conda install -c conda-forge imagecodecs"
+        logger.error(f"Missing 'imagecodecs' library to compress!")
+        logger.info(f"Install it with `{pip_install}` or `{conda_install}`.")
+        compress = False
+
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
         if compress:
-            # Use LZW compression with TIFF:
-            iio.imwrite(fname, data, extension=f".{ext}", compression=5)
+            # Use LZW compression with `tifffile.imwrite`:
+            tifffile.imwrite(fname, data, compression="LZW")
         else:
+            # No compression with `imageio.v3`
             iio.imwrite(fname, data, extension=f".{ext}")
         dbfile.import_file(fname)
     return
@@ -426,7 +446,8 @@ def read_npz(dbfile):
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file('test_npz')
-    >>> npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}
+    >>> rng = np.random.default_rng()
+    >>> npz = {f"{i}": rng.random((10, 10, 3)) for i in range(5)}
     >>> write_npz(f, npz)
     >>> f = fs.get_file("test_npz")
     >>> npz2 = read_npz(f)
@@ -435,11 +456,11 @@ def read_npz(dbfile):
     """
     import numpy as np
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.npz")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.npz"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
-        return np.load(fname)
+        return dict(np.load(fname))
 
 
 def write_npz(dbfile, data):
@@ -462,13 +483,14 @@ def write_npz(dbfile, data):
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
     >>> f = fs.create_file('test_npz')
-    >>> npz = {f"{i}": np.random.rand(10, 10) for i in range(5)}
+    >>> rng = np.random.default_rng()
+    >>> npz = {f"{i}": rng.random((10, 10, 3)) for i in range(5)}
     >>> write_npz(f, npz)
 
     """
     import numpy as np
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, "temp.npz")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.npz"
         np.savez_compressed(fname, **data)
         dbfile.import_file(fname)
     return
@@ -514,9 +536,9 @@ def read_point_cloud(dbfile, ext="ply"):
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
         return io.read_point_cloud(fname)
 
@@ -551,8 +573,8 @@ def write_point_cloud(dbfile, data, ext="ply"):
     """
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
         io.write_point_cloud(fname, data)
         dbfile.import_file(fname)
     return
@@ -576,9 +598,9 @@ def read_triangle_mesh(dbfile, ext="ply"):
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
         return io.read_triangle_mesh(fname)
 
@@ -597,8 +619,8 @@ def write_triangle_mesh(dbfile, data, ext="ply"):
     """
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
         io.write_triangle_mesh(fname, data)
         dbfile.import_file(fname)
     return
@@ -622,9 +644,9 @@ def read_voxel_grid(dbfile, ext="ply"):
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
         return io.read_voxel_grid(fname)
 
@@ -643,8 +665,8 @@ def write_voxel_grid(dbfile, data, ext="ply"):
     """
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
         io.write_voxel_grid(fname, data)
         dbfile.import_file(fname)
     return
@@ -658,7 +680,7 @@ def read_graph(dbfile, ext="p"):
     dbfile : DB.db.File
         The `File` object used to load the associated file.
     ext : str, optional
-        File extension, defaults to "ply".
+        File extension, defaults to "p".
 
     Returns
     -------
@@ -688,11 +710,11 @@ def read_graph(dbfile, ext="p"):
     import pickle
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
-        with open(fname, 'rb') as f:
+        with fname.open(mode='rb') as f:
             G = pickle.load(f)
         return G
 
@@ -725,9 +747,9 @@ def write_graph(dbfile, data, ext="p"):
     """
     import pickle
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, 'wb') as f:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode='wb') as f:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         dbfile.import_file(fname)
     return
@@ -748,12 +770,11 @@ def read_torch(dbfile, ext="pt"):
     Torch.Tensor
         The loaded tensor object.
     """
-    import torch
     ext = ext.replace('.', '')  # remove potential leading dot from extension
     b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
-        with open(fname, "wb") as fh:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
+        with fname.open(mode="wb") as fh:
             fh.write(b)
         return torch.load(fname)
 
@@ -772,8 +793,8 @@ def write_torch(dbfile, data, ext="pt"):
     """
     import torch
     ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as d:
-        fname = os.path.join(d, f"temp.{ext}")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fname = Path(tmpdir) / f"temp.{ext}"
         torch.save(data, fname)
         dbfile.import_file(fname)
     return
@@ -782,26 +803,29 @@ def write_torch(dbfile, data, ext="pt"):
 def to_file(dbfile: File, path: str):
     """Helper to write a `dbfile` to a file in the filesystem. """
     b = dbfile.read_raw()
-    with open(path, "wb") as fh:
+    path = Path(path)
+    with path.open(mode="wb") as fh:
         fh.write(b)
     return
 
 
-def dbfile_from_local_file(path: str):
-    """Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file. """
-    dirname, fname = os.path.split(path)
-    id = os.path.splitext(fname)[0]
+def fsdbfile_from_local_file(path: str):
+    """Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file."""
+    from plantdb import FSDB
+    path = Path(path)
+    dirname, fname = path.parent, path.name
+    id = Path(fname).stem
     # Initialise the `DB` abstract class:
-    db = DB()
-    db.basedir = ""
-    # Initialize a `Scan` instance:
-    scan = Scan(db, "")
-    # Initialize a `Fileset` instance:
-    fileset = Fileset(db, scan, dirname)
-    # Initialize a `File` instance & return it:
-    f = fsdb.File(db=db, fileset=fileset, id=id)
-    f.filename = fname
-    f.metadata = None
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = FSDB(tmpdir)
+        # Initialize a `Scan` instance:
+        scan = Scan(db, "tmp")
+        # Initialize a `Fileset` instance:
+        fileset = Fileset(db, scan, dirname)
+        # Initialize a `File` instance & return it:
+        f = fsdb.File(db=db, fileset=fileset, id=id)
+        f.filename = fname
+        f.metadata = None
     return f
 
 
@@ -809,6 +833,6 @@ def tmpdir_from_fileset(fileset: Fileset):
     """Creates a temporary directory (*i.e.* not in a DB) to host the ``Fileset`` object and write files. """
     tmpdir = tempfile.TemporaryDirectory()
     for f in fileset.get_files():
-        filepath = os.path.join(tmpdir.name, f.filename)
+        filepath = Path(tmpdir.name) / f.filename
         to_file(f, filepath)
     return tmpdir
