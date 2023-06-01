@@ -1,6 +1,9 @@
-import os
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import tempfile
 import unittest
+from pathlib import Path
 
 from plantdb.fsdb import MARKER_FILE_NAME
 from plantdb.sync import FSDBSync
@@ -12,9 +15,9 @@ class TestSync(DBTestCase):
         db = self.get_test_db()
         db.disconnect()
         with tempfile.TemporaryDirectory() as tmpdir:
-            lock_path = os.path.abspath(os.path.join(tmpdir, MARKER_FILE_NAME))
-            with open(lock_path, "x") as _:
-                x = FSDBSync(db.basedir, tmpdir)
+            lock_path = Path(tmpdir) / MARKER_FILE_NAME
+            with lock_path.open(mode="x") as _:
+                x = FSDBSync(db.path(), tmpdir)
                 x.sync()
     # How to test remote sync?
 
