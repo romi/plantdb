@@ -242,9 +242,9 @@ class FSDB(db.DB):
 
     Attributes
     ----------
-    basedir : str
-        Path to the base directory containing the database
-    lock_path : str
+    basedir : pathlib.Path
+        Absolute path to the base directory hosting the database.
+    lock_path : pathlib.Path
         Absolute path to the lock file.
     scans : list
         The list of ``Scan`` objects found in the database.
