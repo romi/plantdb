@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Serve the plant database through a REST API.
-"""
+"""Serve the plant database through a REST API."""
+
 import argparse
-from cmath import log
 import json
 import logging
 import os
@@ -20,7 +18,7 @@ from flask_restful import Resource
 
 from plantdb import io
 from plantdb import webcache
-from plantdb.fsdb import FSDB as DB
+from plantdb.fsdb import FSDB
 
 
 def parsing():
@@ -39,7 +37,7 @@ def fmt_date(scan):
         time = time.replace('-', ':')
     except:
         date, time = "01-01-00", "00:00:00"
-    return "%s %s" % (date, time)
+    return f"{date} {time}"
 
 
 def compute_fileset_matches(scan):
@@ -55,7 +53,8 @@ def get_path(f):
     scan = fs.scan
     return os.path.join(db_prefix, scan.id, fs.id, f.filename)
 
-def get_default_scan_response(id : str):
+
+def get_default_scan_response(id: str):
     return {
         "id": id,
         "metadata": {
@@ -81,7 +80,7 @@ def get_default_scan_response(id : str):
         "hasManualMeasures": False,
         "hasAutomatedMeasures": False,
         "hasSegmentedPointCloud": False,
-        "error": False      
+        "error": False
     }
 
 
@@ -99,7 +98,7 @@ def fmt_scan_minimal(scan):
 
         if 'species' in obj:
             response_meta['environment'] = obj['environment']
-        
+
         if 'plant_id' in obj:
             response_meta['plant'] = obj['plant_id']
 
@@ -127,8 +126,8 @@ def fmt_scan_minimal(scan):
     response['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
     response['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
     response['hasManualMeasures'] = "measures" in metadata or \
-        (files_metadata["measures"] is not None and \
-        len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
+                                    (files_metadata["measures"] is not None and \
+                                     len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
 
     response['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
@@ -201,7 +200,8 @@ def fmt_scan(scan):
                 res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
             except KeyError:
                 measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
-                res["data"]["angles"]["measured_internodes"] = measures["internodes"] if "internodes" in measures.keys() else []
+                res["data"]["angles"]["measured_internodes"] = measures[
+                    "internodes"] if "internodes" in measures.keys() else []
 
     # backward compatibility
     try:
@@ -230,7 +230,7 @@ def fmt_scan(scan):
     logger.info("-------------------------------------------------")
     logger.info(files_metadata["images"])
 
-    keys = list(map(lambda e : os.path.splitext(poses[e]['name'])[0], poses.keys()))
+    keys = list(map(lambda e: os.path.splitext(poses[e]['name'])[0], poses.keys()))
     for i, im in enumerate(files_metadata["images"]):
         f = fileset_visu.get_file(im)
         id = f.get_metadata("image_id")
@@ -243,16 +243,16 @@ def fmt_scan(scan):
                 'rotmat': poses[k]['rotmat'],
                 'photoUri': get_path(f),
                 'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
-                'isMatched' : True
+                'isMatched': True
             })
         else:
             res['camera']['poses'].append({
                 'id': id,
-                'tvec': [0,0,0],
-                'rotmat': [[0,0,0],[0,0,0],[0,0,0]],
+                'tvec': [0, 0, 0],
+                'rotmat': [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                 'photoUri': get_path(f),
                 'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
-                'isMatched' : False
+                'isMatched': False
             })
 
     return res
@@ -285,13 +285,26 @@ class Refresh(Resource):
 
 
 class Image(Resource):
-    """Class representing a image HTTP request, subclass of
-    flask_restful's Resource class.
-    """
+    """Class representing a image HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
 
     def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the image data. Resize the image if
-        necessary.
+        """Return the HTTP response with the image data.
+
+        Resize the image if necessary.
+
+        Parameters
+        ----------
+        scanid : str
+            The scan id.
+        filesetid : str
+            The scan id.
+        fileid : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
         """
         global db
         size = request.args.get('size', default='thumb', type=str)
@@ -302,13 +315,26 @@ class Image(Resource):
 
 
 class PointCloud(Resource):
-    """Class representing a point cloud HTTP request, subclass of
-    flask_restful's Resource class.
-    """
+    """Class representing a point cloud HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
 
     def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the point cloud data. Downsample the
-        point cloud if necessary.
+        """Return the HTTP response with the point cloud data.
+
+        Downsample the point cloud if necessary.
+
+        Parameters
+        ----------
+        scanid : str
+            The scan id.
+        filesetid : str
+            The scan id.
+        fileid : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
         """
         global db
         size = request.args.get('size', default='preview', type=str)
@@ -319,13 +345,26 @@ class PointCloud(Resource):
 
 
 class PointCloudGroundTruth(Resource):
-    """Class representing a point cloud HTTP request, subclass of
-    flask_restful's Resource class.
-    """
+    """Class representing a point cloud HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
 
     def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the point cloud data. Downsample the
-        point cloud if necessary.
+        """Return the HTTP response with the point cloud data.
+
+        Downsample the point cloud if necessary.
+
+        Parameters
+        ----------
+        scanid : str
+            The scan id.
+        filesetid : str
+            The scan id.
+        fileid : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
         """
         global db
         size = request.args.get('size', default='preview', type=str)
@@ -336,13 +375,26 @@ class PointCloudGroundTruth(Resource):
 
 
 class Mesh(Resource):
-    """Class representing a mesh HTTP request, subclass of
-    flask_restful's Resource class.
-    """
+    """Class representing a mesh HTTP request, subclass of ``flask_restful``'s ``Resource`` class.    """
 
     def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the mesh data. Downsample the
-        mesh if necessary.
+        """Return the HTTP response with the mesh data.
+
+        Downsample the mesh if necessary.
+
+        Parameters
+        ----------
+        scanid : str
+            The scan id.
+        filesetid : str
+            The scan id.
+        fileid : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
         """
         global db
         size = request.args.get('size', default='orig', type=str)
@@ -352,46 +404,47 @@ class Mesh(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 
-parser = parsing()
-args = parser.parse_args()
+if __name__ == '__main__':
+    parser = parsing()
+    args = parser.parse_args()
 
-app = Flask(__name__)
-CORS(app)
-api = Api(app)
+    app = Flask(__name__)
+    CORS(app)
+    api = Api(app)
 
-global db_location
-global db_prefix
+    global db_location
+    global db_prefix
 
-if args.db_location == "":
-    try:
-        db_location = os.environ["DB_LOCATION"]
-    except:
-        raise ValueError("DB_LOCATION environment variable is not set")
-else:
-    db_location = args.db_location
+    if args.db_location == "":
+        try:
+            db_location = os.environ["DB_LOCATION"]
+        except KeyError:
+            raise ValueError("DB_LOCATION environment variable is not set")
+    else:
+        db_location = args.db_location
 
-if args.db_prefix == "":
-    try:
-        db_prefix = os.environ["DB_PREFIX"]
-    except:
-        db_prefix = "/files/"
+    if args.db_prefix == "":
+        try:
+            db_prefix = os.environ["DB_PREFIX"]
+        except KeyError:
+            db_prefix = "/files/"
 
-global db
-db = DB(db_location)
-db.connect()
+    global db
+    db = FSDB(db_location)
+    db.connect()
 
-print("n scans = %i" % len(db.get_scans()))
+    global logger
+    logger = logging.getLogger('werkzeug')
 
-# This variable is left here for debug purpose
-global logger
-logger = logging.getLogger('werkzeug')
-api.add_resource(ScanList, '/scans')
-api.add_resource(Scan, '/scans/<scan_id>')
-api.add_resource(File, '/files/<path:path>')
-api.add_resource(Refresh, '/refresh')
-api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
-api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
+    logger.info(f"Got {len(db.get_scans())} scans from DB '{db.path()}'.")
 
-app.run(host='0.0.0.0')
+    api.add_resource(ScanList, '/scans')
+    api.add_resource(Scan, '/scans/<scan_id>')
+    api.add_resource(File, '/files/<path:path>')
+    api.add_resource(Refresh, '/refresh')
+    api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
+    api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
+
+    app.run(host='0.0.0.0')
