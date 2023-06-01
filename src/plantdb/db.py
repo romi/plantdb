@@ -500,10 +500,9 @@ class File(object):
 
 
 class DBBusyError(OSError):
-    """ Raises an error if the database is busy.
+    """Raises an error if the database is busy.
 
-    This error is raised when the database is busy and an operation cannot be
-     done on it.
+    This error is raised when the database is busy and an operation cannot be done on it.
     """
 
     def __init__(self, message):
