@@ -808,10 +808,27 @@ class Scan(db.Scan):
 
         Parameters
         ----------
-        data : str
-            Name of the metadata.
-        value : any
-            Value to attach to this metadata. Should be transformable to JSON.
+        data : str or dict
+            If a string, a key to address the `value`.
+            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).
+        value : any, optional
+            The value to assign to `data` if the latest is not a dictionary.
+
+        Examples
+        --------
+        >>> import json
+        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.fsdb import _scan_metadata_path
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> scan.set_metadata("test", "value")
+        >>> p = _scan_metadata_path(scan)
+        >>> print(p.exists())
+        True
+        >>> print(json.load(p.open(mode='r')))
+        {'test': 'value'}
+        >>> db.disconnect()
 
         """
         if self.metadata == None:
@@ -930,7 +947,6 @@ class Scan(db.Scan):
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> db.connect()
-        >>> db.list_scans()
         >>> scan = db.get_scan("myscan_001")
         >>> scan.list_filesets()
         ['fileset_001']
@@ -1063,6 +1079,24 @@ class Fileset(db.Fileset):
             If `key` is ``None``, returns a dictionary.
             Else, returns the value attached to this key.
 
+        Examples
+        --------
+        >>> import json
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> fs.set_metadata("test", "value")
+        >>> print(fs.get_metadata("test"))
+        'value'
+        >>> db.disconnect()
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> print(fs.get_metadata("test"))
+        'value'
+
         """
         return _get_metadata(self.metadata, key)
 
@@ -1071,10 +1105,28 @@ class Fileset(db.Fileset):
 
         Parameters
         ----------
-        data : str
-            Name of the metadata.
-        value : any
-            Value to attach to this metadata. Should be transformable to JSON.
+        data : str or dict
+            If a string, a key to address the `value`.
+            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).
+        value : any, optional
+            The value to assign to `data` if the latest is not a dictionary.
+
+        Examples
+        --------
+        >>> import json
+        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.fsdb import _fileset_metadata_json_path
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> fs.set_metadata("test", "value")
+        >>> p = _fileset_metadata_json_path(fs)
+        >>> print(p.exists())
+        True
+        >>> print(json.load(p.open(mode='r')))
+        {'test': 'value'}
+        >>> db.disconnect()
 
         """
         if self.metadata == None:
@@ -1254,6 +1306,19 @@ class File(db.File):
             If `key` is ``None``, returns a dictionary.
             Else, returns the value attached to this key.
 
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.fsdb import _file_metadata_path
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> f = fs.get_file("test_json")
+        >>> print(f.get_metadata())
+        {'random json': True}
+        >>> db.disconnect()
+
         """
         return _get_metadata(self.metadata, key)
 
@@ -1262,10 +1327,29 @@ class File(db.File):
 
         Parameters
         ----------
-        data : str
-            Name of the metadata.
-        value : any
-            Value to attach to this metadata. Should be transformable to JSON.
+        data : str or dict
+            If a string, a key to address the `value`.
+            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).
+        value : any, optional
+            The value to assign to `data` if the latest is not a dictionary.
+
+        Examples
+        --------
+        >>> import json
+        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.fsdb import _file_metadata_path
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> file = fs.get_file("test_json")
+        >>> file.set_metadata("test", "value")
+        >>> p = _file_metadata_path(file)
+        >>> print(p.exists())
+        True
+        >>> print(json.load(p.open(mode='r')))
+        {'random json': True, 'test': 'value'}
+        >>> db.disconnect()
 
         """
         if self.metadata == None:
@@ -1281,6 +1365,22 @@ class File(db.File):
         ----------
         path : str or pathlib.Path
             The path to the file to import.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.fsdb import _file_metadata_path
+        >>> db = dummy_db(with_file=True)
+        >>> db.connect()
+        >>> scan = db.get_scan("myscan_001")
+        >>> fs = scan.get_fileset('fileset_001')
+        >>> file = fs.get_file("test_json")
+        >>> new_file = fs.create_file('test_json2')
+        >>> new_file.import_file(file.path())
+        >>> print(new_file.path().exists())
+        True
+        >>> db.disconnect()
+
         """
         if isinstance(path, str):
             path = Path(path)
@@ -1439,7 +1539,7 @@ class File(db.File):
         self.store()
         return
 
-    def path(self) -> str:
+    def path(self) -> pathlib.Path:
         """Get the path to the local file.
 
         Examples
@@ -1740,7 +1840,7 @@ def _load_fileset_metadata(fileset):
     dict
         The metadata dictionary.
     """
-    return _load_metadata(_fileset_metadata_path(fileset))
+    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 class FileNoIDError(Exception):
