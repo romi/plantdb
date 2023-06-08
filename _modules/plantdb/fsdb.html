@@ -49,8 +49,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -1042,10 +1042,27 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data : str</span>
-<span class="sd">            Name of the metadata.</span>
-<span class="sd">        value : any</span>
-<span class="sd">            Value to attach to this metadata. Should be transformable to JSON.</span>
+<span class="sd">        data : str or dict</span>
+<span class="sd">            If a string, a key to address the `value`.</span>
+<span class="sd">            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).</span>
+<span class="sd">        value : any, optional</span>
+<span class="sd">            The value to assign to `data` if the latest is not a dictionary.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import json</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import _scan_metadata_path</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; scan.set_metadata("test", "value")</span>
+<span class="sd">        &gt;&gt;&gt; p = _scan_metadata_path(scan)</span>
+<span class="sd">        &gt;&gt;&gt; print(p.exists())</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; print(json.load(p.open(mode='r')))</span>
+<span class="sd">        {'test': 'value'}</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -1164,7 +1181,6 @@
 <span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
 <span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
 <span class="sd">        &gt;&gt;&gt; db.connect()</span>
-<span class="sd">        &gt;&gt;&gt; db.list_scans()</span>
 <span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span class="sd">        &gt;&gt;&gt; scan.list_filesets()</span>
 <span class="sd">        ['fileset_001']</span>
@@ -1297,6 +1313,24 @@
 <span class="sd">            If `key` is ``None``, returns a dictionary.</span>
 <span class="sd">            Else, returns the value attached to this key.</span>
 
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import json</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; fs.set_metadata("test", "value")</span>
+<span class="sd">        &gt;&gt;&gt; print(fs.get_metadata("test"))</span>
+<span class="sd">        'value'</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; print(fs.get_metadata("test"))</span>
+<span class="sd">        'value'</span>
+
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
@@ -1305,10 +1339,28 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data : str</span>
-<span class="sd">            Name of the metadata.</span>
-<span class="sd">        value : any</span>
-<span class="sd">            Value to attach to this metadata. Should be transformable to JSON.</span>
+<span class="sd">        data : str or dict</span>
+<span class="sd">            If a string, a key to address the `value`.</span>
+<span class="sd">            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).</span>
+<span class="sd">        value : any, optional</span>
+<span class="sd">            The value to assign to `data` if the latest is not a dictionary.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import json</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import _fileset_metadata_json_path</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; fs.set_metadata("test", "value")</span>
+<span class="sd">        &gt;&gt;&gt; p = _fileset_metadata_json_path(fs)</span>
+<span class="sd">        &gt;&gt;&gt; print(p.exists())</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; print(json.load(p.open(mode='r')))</span>
+<span class="sd">        {'test': 'value'}</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -1488,6 +1540,19 @@
 <span class="sd">            If `key` is ``None``, returns a dictionary.</span>
 <span class="sd">            Else, returns the value attached to this key.</span>
 
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import _file_metadata_path</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; f = fs.get_file("test_json")</span>
+<span class="sd">        &gt;&gt;&gt; print(f.get_metadata())</span>
+<span class="sd">        {'random json': True}</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
+
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
@@ -1496,10 +1561,29 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data : str</span>
-<span class="sd">            Name of the metadata.</span>
-<span class="sd">        value : any</span>
-<span class="sd">            Value to attach to this metadata. Should be transformable to JSON.</span>
+<span class="sd">        data : str or dict</span>
+<span class="sd">            If a string, a key to address the `value`.</span>
+<span class="sd">            If a dictionary, update the metadata dictionary with `data` (`value` is then unused).</span>
+<span class="sd">        value : any, optional</span>
+<span class="sd">            The value to assign to `data` if the latest is not a dictionary.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import json</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import _file_metadata_path</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; file = fs.get_file("test_json")</span>
+<span class="sd">        &gt;&gt;&gt; file.set_metadata("test", "value")</span>
+<span class="sd">        &gt;&gt;&gt; p = _file_metadata_path(file)</span>
+<span class="sd">        &gt;&gt;&gt; print(p.exists())</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; print(json.load(p.open(mode='r')))</span>
+<span class="sd">        {'random json': True, 'test': 'value'}</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -1515,6 +1599,22 @@
 <span class="sd">        ----------</span>
 <span class="sd">        path : str or pathlib.Path</span>
 <span class="sd">            The path to the file to import.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">        &gt;&gt;&gt; from plantdb.fsdb import _file_metadata_path</span>
+<span class="sd">        &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
+<span class="sd">        &gt;&gt;&gt; db.connect()</span>
+<span class="sd">        &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">        &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
+<span class="sd">        &gt;&gt;&gt; file = fs.get_file("test_json")</span>
+<span class="sd">        &gt;&gt;&gt; new_file = fs.create_file('test_json2')</span>
+<span class="sd">        &gt;&gt;&gt; new_file.import_file(file.path())</span>
+<span class="sd">        &gt;&gt;&gt; print(new_file.path().exists())</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
+
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -1673,7 +1773,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="File.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="File.path"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.File.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the path to the local file.</span>
 
 <span class="sd">        Examples</span>
@@ -1974,7 +2074,7 @@
 <span class="sd">    dict</span>
 <span class="sd">        The metadata dictionary.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_fileset_metadata_json_path</span><span class="p">(</span><span class="n">fileset</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="FileNoIDError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FileNoIDError">[docs]</a><span class="k">class</span> <span class="nc">FileNoIDError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
