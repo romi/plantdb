@@ -1940,16 +1940,21 @@ def _load_metadata(path):
     IOError
         If the data returned by ``json.load`` is not a dictionary.
     """
+    from json import JSONDecodeError
     path = Path(path)
+    md = {}
     if path.is_file():
         with path.open(mode="r") as f:
-            r = json.load(f)
-        if not isinstance(r, dict):
+            try:
+                md = json.load(f)
+            except JSONDecodeError:
+                logger.error(f"Could not load JSON file '{path}'")
+        if not isinstance(md, dict):
             raise IOError(f"Could not obtain a dictionary from JSON: {path}")
-        return r
     else:
-        # If there is no scan metadata, simply return an empty dictionary:
-        return {}
+        logger.error(f"Could not find JSON file '{path}'")
+
+    return md
 
 
 def _load_measures(path):
@@ -1970,16 +1975,7 @@ def _load_measures(path):
     IOError
         If the data returned by ``json.load`` is not a dictionary.
     """
-    path = Path(path)
-    if path.is_file():
-        with path.open(mode="r") as f:
-            r = json.load(f)
-        if not isinstance(r, dict):
-            raise IOError(f"Could not obtain a dictionary from JSON: {path}")
-        return r
-    else:
-        # If there is no measures for this scan, simply return an empty dictionary:
-        return {}
+    return _load_metadata(path)
 
 
 def _load_scan_metadata(scan):
