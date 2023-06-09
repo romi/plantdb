@@ -1952,7 +1952,7 @@ def _load_metadata(path):
         if not isinstance(md, dict):
             raise IOError(f"Could not obtain a dictionary from JSON: {path}")
     else:
-        logger.error(f"Could not find JSON file '{path}'")
+        logger.debug(f"Could not find JSON file '{path}'")
 
     return md
 
