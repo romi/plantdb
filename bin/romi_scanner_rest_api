@@ -126,7 +126,7 @@ def fmt_scan_minimal(scan):
     response['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
     response['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
     response['hasManualMeasures'] = "measures" in metadata or \
-                                    (files_metadata["measures"] is not None and \
+                                    (files_metadata.get("measures", None) is not None and \
                                      len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
 
     response['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
