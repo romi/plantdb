@@ -1,21 +1,33 @@
 #!/bin/bash
+# - Defines colors and message types:
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+NC="\033[0m" # No Color
+INFO="${GREEN}INFO${NC}    "
+WARNING="${YELLOW}WARNING${NC} "
+ERROR="${RED}ERROR${NC}   "
+bold() { echo -e "\e[1m$*\e[0m"; }
 
+# - Default variables
+# Image tag to use, 'latest' by default:
 vtag="latest"
+# String aggregating the docker build options to use:
 docker_opts=""
 
 usage() {
-  echo "USAGE:"
-  echo "  ./docker/build.sh [OPTIONS]
-    "
+  echo -e "$(bold USAGE):"
+  echo "  ./docker/build.sh [OPTIONS]"
+  echo ""
 
-  echo "DESCRIPTION:"
+  echo -e "$(bold DESCRIPTION):"
   echo "  Build a docker image named 'roboticsmicrofarms/plantdb' using 'Dockerfile' in the same location.
-  It must be run from the \`plantdb/\` repository root folder as it is the build context and it will be copied during at image build time!
-  "
+  It must be run from the 'plantdb' repository root folder as it is the build context and it will be copied during at image build time!"
+  echo ""
 
-  echo "OPTIONS:"
+  echo -e "$(bold OPTIONS):"
   echo "  -t, --tag
-    Docker image tag to use, default to '$vtag'."
+    Docker image tag to use, default to '${vtag}'."
   # -- Docker options:
   echo "  --no-cache
     Do not use cache when building the image, (re)start from scratch."
@@ -33,11 +45,11 @@ while [ "$1" != "" ]; do
     ;;
   --no-cache)
     shift
-    docker_opts="$docker_opts --no-cache"
+    docker_opts="${docker_opts} --no-cache"
     ;;
   --pull)
     shift
-    docker_opts="$docker_opts --pull"
+    docker_opts="${docker_opts} --pull"
     ;;
   -h | --help)
     usage
@@ -53,18 +65,16 @@ done
 
 # Get the date to estimate docker image build time:
 start_time=$(date +%s)
-
 # Start the docker image build:
-docker build -t roboticsmicrofarms/plantdb:$vtag $docker_opts -f docker/Dockerfile .
-
-# Important to CI/CD pipeline to track docker build failure
+docker build -t roboticsmicrofarms/plantdb:${vtag} ${docker_opts} \
+  -f docker/Dockerfile .
+# Get docker build status:
 docker_build_status=$?
-if [ $docker_build_status != 0 ]; then
-  echo "docker build failed with $docker_build_status code"
+# Print build time if successful (code 0), else print exit code
+if [ ${docker_build_status} == 0 ]; then
+  echo -e "\n${INFO}Docker build SUCCEEDED in $(expr $(date +%s) - ${start_time})s!"
+else
+  echo -e "\n${ERROR}Docker build FAILED after $(expr $(date +%s) - ${start_time})s with code ${docker_build_status}!"
 fi
-
-# Print docker image build time:
-echo
-echo Build time is $(expr $(date +%s) - $start_time) s
-
-exit $docker_build_status
+# Exit with 'docker build' exit code:
+exit ${docker_build_status}
