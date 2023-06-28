@@ -15,6 +15,7 @@ opts = dict(
     scripts=[
         'bin/fsdb_check',
         'bin/romi_fsdb_sync',
+        'bin/romi_import_images',
         'bin/romi_import_folder',
         'bin/romi_import_file',
         'bin/romi_scanner_rest_api'
