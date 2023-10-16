@@ -24,9 +24,9 @@ This library is intended to:
    mkdir -p /data/ROMI/DB
    touch /data/ROMI/DB/romidb
    ```
-2. Then define its location in an environment variable `DB_LOCATION`:
+2. Then define its location in an environment variable `ROMI_DB`:
    ```shell
-   export DB_LOCATION=/data/ROMI/DB
+   export ROMI_DB=/data/ROMI/DB
    ```
 
 **Notes**:
@@ -46,7 +46,7 @@ Then download the test archive and extract it to the location od the DB:
 
 ```shell
 wget https://media.romi-project.eu/data/test_db_small.tar.gz
-tar -xf test_db_small.tar.gz -C $DB_LOCATION
+tar -xf test_db_small.tar.gz -C $ROMI_DB
 ```
 
 ### Docker image
@@ -55,7 +55,7 @@ A docker image, named `roboticsmicrofarms/plantdb`, is distributed by the ROMI g
 If you want to use it, simply do:
 
 ```shell
-docker run -p 5000:5000 -v $DB_LOCATION:/myapp/db -it roboticsmicrofarms/plantdb
+docker run -p 5000:5000 -v $ROMI_DB:/myapp/db -it roboticsmicrofarms/plantdb
 ```
 
 **Obviously you have to install docker first!**
@@ -148,10 +148,10 @@ poetry add --dev nose2[coverage] coverage[toml]
 Here is a minimal example how to use the `plantdb` library in Python:
 
 ```python
-# Get the environment variable $DB_LOCATION
+# Get the environment variable $ROMI_DB
 import os
 
-db_path = os.environ['DB_LOCATION']
+db_path = os.environ['ROMI_DB']
 # Use it to connect to DB:
 from plantdb import FSDB
 

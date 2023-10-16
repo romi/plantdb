@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# 
+#
 # plantdb - Data handling tools for the ROMI project
-# 
+#
 # Copyright (C) 2018-2019 Sony Computer Science Laboratories
 # Authors: D. Colliaux, T. Wintz, P. Hanappe
-# 
+#
 # This file is part of plantdb.
-# 
+#
 # plantdb is free software: you can redistribute it
 # and/or modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
-# 
+#
 # plantdb is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
@@ -282,7 +282,7 @@ class FSDB(db.DB):
     >>> # EXAMPLE 2: Use a local database:
     >>> import os
     >>> from plantdb.fsdb import FSDB
-    >>> db = FSDB(os.environ.get('DB_LOCATION', "/data/ROMI/DB/"))
+    >>> db = FSDB(os.environ.get('ROMI_DB', "/data/ROMI/DB/"))
     >>> db.connect()
     >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
     >>> scan = db.get_scans()[1]
@@ -1924,12 +1924,12 @@ def _parse_file(fileset, file_info):
 
 def _load_metadata(path):
     """Load a metadata dictionary from a JSON file.
-    
+
     Parameters
     ----------
     path : str or pathlib.Path
         The path to the file containing the metadata to load.
-    
+
     Returns
     -------
     dict
@@ -1980,12 +1980,12 @@ def _load_measures(path):
 
 def _load_scan_metadata(scan):
     """Load the metadata for a dataset.
-    
+
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
         The dataset to load the metadata for.
-    
+
     Returns
     -------
     dict
@@ -1996,12 +1996,12 @@ def _load_scan_metadata(scan):
 
 def _load_scan_measures(scan):
     """Load the measures for a dataset.
-    
+
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
         The dataset to load the measures for.
-    
+
     Returns
     -------
     dict

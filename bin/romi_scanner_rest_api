@@ -417,9 +417,9 @@ if __name__ == '__main__':
 
     if args.db_location == "":
         try:
-            db_location = os.environ["DB_LOCATION"]
+            db_location = os.environ["ROMI_DB"]
         except KeyError:
-            raise ValueError("DB_LOCATION environment variable is not set")
+            raise ValueError("ROMI_DB environment variable is not set")
     else:
         db_location = args.db_location
 
