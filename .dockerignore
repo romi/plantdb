@@ -27,3 +27,6 @@
 # IDEs
 **/.vscode
 **/.idea
+
+# Exclude RUFF cache
+**/.ruff_cache
