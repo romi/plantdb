@@ -116,7 +116,7 @@ if [ "${host_db}" != "" ]; then
 else
   group_name='myuser'
   gid=1000
-  # Only raise next ERROR message if not a SELF-TEST:
+  # Only raise next WARNING message if not a SELF-TEST:
   if [ ${self_test} == 0 ]; then
     echo -e "${WARNING}Using default group name '${group_name}' & '${gid}'."
   fi
