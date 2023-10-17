@@ -35,13 +35,13 @@ RUN apt-get update && \
     adduser --disabled-password --gecos '' --ingroup romi --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
     # Create the folder used to mount the database:
-    mkdir -m 777 -p ${ROMI_DB}
+    mkdir -p ${ROMI_DB}
 
 # Change to non-root user:
 USER ${USER_NAME}
 # Change working directory:
 WORKDIR /home/${USER_NAME}
-# Copy the root foler (relative to context build):
+# Copy the source files starting from the root folder (relative to context build):
 COPY --chown=${USER_NAME} ./ ./plantdb/
 
 RUN cd plantdb/ && \
@@ -53,4 +53,5 @@ RUN cd plantdb/ && \
     # Clean pip cache:
     rm -rf .cache/pip
 
+# By default, start the `romi_scanner_rest_api` CLI at container startup:
 CMD ["/bin/bash", "-c", "romi_scanner_rest_api"]
