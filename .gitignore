@@ -123,3 +123,6 @@ dmypy.json
 *.tcl
 CMakeCache.txt
 CMakeFiles/
+
+# JetBrain IDE
+.idea/
