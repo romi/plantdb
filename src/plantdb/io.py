@@ -592,8 +592,8 @@ def read_triangle_mesh(dbfile, ext="ply"):
 
     Returns
     -------
-    open3d.geometry.PointCloud
-        The loaded point cloud object.
+    open3d.geometry.TriangleMesh
+        The loaded triangular mesh object.
     """
     from open3d import io
     ext = ext.replace('.', '')  # remove potential leading dot from extension
