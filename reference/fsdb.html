@@ -255,6 +255,8 @@
         <li class="md-nav__item"><a href="#plantdb.fsdb.FSDB.list_scans" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FSDB.list_scans()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#plantdb.fsdb.FSDB.path" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FSDB.path()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.FSDB.reload" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FSDB.reload()</span></code></a>
         </li></ul>
             </nav>
         </li>
@@ -634,12 +636,15 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="plantdb.fsdb.FSDB.connect">
-<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">login_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.connect" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">login_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsafe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the local database.</p>
 <p>Handle DB “locking” system by adding a <cite>LOCK_FILE_NAME</cite> file in the DB.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – UNUSED</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – UNUSED</p></li>
+<li><p><strong>unsafe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> do not use the <cite>LOCK_FILE_NAME</cite> file.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -841,6 +846,11 @@ Else the given <cite>id</cite> should NOT exist as they are unique.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </pre></div>
 </div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="plantdb.fsdb.FSDB.reload">
+<span class="sig-name descname"><span class="pre">reload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#FSDB.reload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.FSDB.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the database by scanning datasets.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">

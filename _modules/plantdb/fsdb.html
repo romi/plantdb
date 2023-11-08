@@ -339,6 +339,8 @@
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">rmtree</span>
 
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
 <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">db</span>
 <span class="kn">from</span> <span class="nn">plantdb.db</span> <span class="kn">import</span> <span class="n">DBBusyError</span>
 <span class="kn">from</span> <span class="nn">plantdb.log</span> <span class="kn">import</span> <span class="n">configure_logger</span>
@@ -543,7 +545,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="FSDB.connect"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FSDB.connect"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unsafe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Connect to the local database.</span>
 
 <span class="sd">        Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.</span>
@@ -552,6 +554,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        login_data : bool</span>
 <span class="sd">            UNUSED</span>
+<span class="sd">        unsafe : bool</span>
+<span class="sd">            If ``True`` do not use the `LOCK_FILE_NAME` file.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -586,13 +590,17 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fsdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a DB! Check that there is a file named </span><span class="si">{</span><span class="n">MARKER_FILE_NAME</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">DBBusyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File </span><span class="si">{</span><span class="n">LOCK_FILE_NAME</span><span class="si">}</span><span class="s2"> exists in DB root: DB is busy, cannot connect."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unsafe</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DBBusyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File </span><span class="si">{</span><span class="n">LOCK_FILE_NAME</span><span class="si">}</span><span class="s2"> exists in DB root: DB is busy, cannot connect."</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already connected to the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
         <span class="k">return</span></div>
@@ -634,6 +642,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Already disconnected from the database '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
         <span class="k">return</span></div>
+
+<div class="viewcode-block" id="FSDB.reload"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Reload the database by scanning datasets."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Reloading the database..."</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Done!"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"You are not connected to the database!"</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FSDB.get_scans"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB.get_scans">[docs]</a>    <span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.</span>
@@ -1842,7 +1859,7 @@
 <span class="sd">    """</span>
     <span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">"scan"</span><span class="p">):</span>
         <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">_scan_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="c1"># If the `files.json` associated to the scan is found, parse it:</span>
