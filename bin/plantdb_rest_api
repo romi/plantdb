@@ -19,6 +19,9 @@ from flask_restful import Resource
 from plantdb import io
 from plantdb import webcache
 from plantdb.fsdb import FSDB
+from plantdb.rest_api import compute_fileset_matches
+from plantdb.rest_api import get_scan_template
+from plantdb.rest_api import get_path
 
 
 def parsing():
@@ -39,79 +42,25 @@ def parsing():
     return parser
 
 
-def fmt_date(scan):
-    try:
-        x = scan.id
-        date, time = x.split('_')
-        time = time.replace('-', ':')
-    except:
-        date, time = "01-01-00", "00:00:00"
-    return f"{date} {time}"
-
-
-def compute_fileset_matches(scan):
-    filesets_matches = {}
-    for fs in scan.get_filesets():
-        x = fs.id.split('_')[0]
-        filesets_matches[x] = fs.id
-    return filesets_matches
-
-
-def get_path(f):
-    fs = f.fileset
-    scan = fs.scan
-    return os.path.join(db_prefix, scan.id, fs.id, f.filename)
-
-
-def get_default_scan_response(id: str):
-    return {
-        "id": id,
-        "metadata": {
-            "date": "01-01-00 00:00:00",
-            "species": 'N/A',
-            "plant": "N/A",
-            "environment": "N/A",
-            "nbPhotos": 0,
-            "files": {
-                "metadatas": None,
-                "archive": None
-            }
-        },
-        "thumbnailUri": "",
-        "hasMesh": False,
-        "hasPointCloud": False,
-        "hasPcdGroundTruth": False,
-        "hasSkeleton": False,
-        "hasAngleData": False,
-        "hasSegmentation2D": False,
-        "hasSegmentedPcdEvaluation": False,
-        "hasPointCloudEvaluation": False,
-        "hasManualMeasures": False,
-        "hasAutomatedMeasures": False,
-        "hasSegmentedPointCloud": False,
-        "error": False
-    }
-
-
 def fmt_scan_minimal(scan):
-    metadata = scan.get_metadata()
-    response = get_default_scan_response(scan.id)
+    scan_md = scan.get_metadata()
+    template = get_scan_template(scan.id)
 
     # From here, we edit the metadatas of the dataset
-    response_meta = response["metadata"]
+    template_md = template["metadata"]
 
-    if 'object' in metadata:
-        obj = metadata['object']
+    if 'object' in scan_md:
+        obj = scan_md['object']
         if 'species' in obj:
-            response_meta['species'] = obj['species']
+            template_md['species'] = obj['species']
 
         if 'species' in obj:
-            response_meta['environment'] = obj['environment']
+            template_md['environment'] = obj['environment']
 
         if 'plant_id' in obj:
-            response_meta['plant'] = obj['plant_id']
+            template_md['plant'] = obj['plant_id']
 
-    response_meta['nbPhotos'] = len(scan.get_fileset('images').get_files())
+    template_md['nbPhotos'] = len(scan.get_fileset('images').get_files())
 
     fileset_visu = scan.get_fileset("Visualization")
     files_metadata = fileset_visu.get_metadata("files")
@@ -119,31 +68,32 @@ def fmt_scan_minimal(scan):
     fileset_visu_zip = get_path(fileset_visu.get_file(files_metadata["zip"]))
     metadata_json_path = os.path.join(db_prefix, scan.id, "metadata", "metadata.json")
 
-    response_meta['files']['archive'] = fileset_visu_zip
-    response_meta['files']['metadatas'] = metadata_json_path
+    template_md['files']['archive'] = fileset_visu_zip
+    template_md['files']['metadatas'] = metadata_json_path
 
     # Metadata part is complete
-    response['thumbnailUri'] = get_path(fileset_visu.get_file(files_metadata["thumbnails"][0]))
+    template['thumbnailUri'] = get_path(fileset_visu.get_file(files_metadata["thumbnails"][0]))
 
-    response['hasMesh'] = files_metadata["mesh"] is not None
-    response['hasPointCloud'] = files_metadata["point_cloud"] is not None
-    response['hasPcdGroundTruth'] = files_metadata["pcd_ground_truth"] is not None
-    response['hasSkeleton'] = files_metadata["skeleton"] is not None
-    response['hasAngleData'] = files_metadata["angles"] is not None
-    response['hasAutomatedMeasures'] = files_metadata["angles"] is not None
-    response['hasSegmentation2D'] = files_metadata["segmentation2d_evaluation"] is not None
-    response['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
-    response['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
-    response['hasManualMeasures'] = "measures" in metadata or \
+    template['hasMesh'] = files_metadata["mesh"] is not None
+    template['hasPointCloud'] = files_metadata["point_cloud"] is not None
+    template['hasPcdGroundTruth'] = files_metadata["pcd_ground_truth"] is not None
+    template['hasSkeleton'] = files_metadata["skeleton"] is not None
+    template['hasAngleData'] = files_metadata["angles"] is not None
+    template['hasAutomatedMeasures'] = files_metadata["angles"] is not None
+    template['hasSegmentation2D'] = files_metadata["segmentation2d_evaluation"] is not None
+    template['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
+    template['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
+    template['hasManualMeasures'] = "measures" in scan_md or \
                                     (files_metadata.get("measures", None) is not None and \
                                      len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
 
-    response['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
+    template['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
 
-    return response
+    return template
 
 
 def fmt_scans(scans, query):
+    """"""
     res = []
     for scan in scans:
         filesets_matches = compute_fileset_matches(scan)
@@ -151,49 +101,60 @@ def fmt_scans(scans, query):
             metadata = scan.get_metadata()
             if query is not None and not (query.lower() in json.dumps(metadata).lower()):
                 continue
-            res.append(fmt_scan_minimal(scan))
+            try:
+                scan_info = fmt_scan_minimal(scan)
+            except:
+                logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
+                scan_info = get_scan_template(scan.id)
+                scan_info['error'] = True
         else:
-            response = get_default_scan_response(scan.id)
-            response['error'] = True
-            res.append(response)
+            logger.warning(f"Scan dataset '{scan.id}' has no `Visualization` fileset!")
+            scan_info = get_scan_template(scan.id)
+            scan_info['error'] = True
+        res.append(scan_info)
     return res
 
 
 def fmt_scan(scan):
-    fileset_visu = scan.get_fileset("Visualization")
-    files_metadata = fileset_visu.get_metadata("files")
+    global logger
+
+    visu_fileset = scan.get_fileset("Visualization")
+    if visu_fileset is None:
+        logger.warning(f"Scan dataset '{scan.id}' has no `Visualization` fileset!")
+
+    files_metadata = visu_fileset.get_metadata("files")
     res = fmt_scan_minimal(scan)
     metadata = scan.get_metadata()
 
     files_uri = {}
     if (res["hasMesh"]):
-        files_uri["mesh"] = get_path(fileset_visu.get_file(files_metadata["mesh"]))
+        files_uri["mesh"] = get_path(visu_fileset.get_file(files_metadata["mesh"]))
     if (res["hasPointCloud"]):
-        files_uri["pointCloud"] = get_path(fileset_visu.get_file(files_metadata["point_cloud"]))
+        files_uri["pointCloud"] = get_path(visu_fileset.get_file(files_metadata["point_cloud"]))
     if (res["hasPcdGroundTruth"]):
-        files_uri["pcdGroundTruth"] = get_path(fileset_visu.get_file(files_metadata["pcd_ground_truth"]))
+        files_uri["pcdGroundTruth"] = get_path(visu_fileset.get_file(files_metadata["pcd_ground_truth"]))
 
     res["filesUri"] = files_uri
     res["data"] = {}
 
     if (res["hasSkeleton"]):
-        x = io.read_json(fileset_visu.get_file(files_metadata["skeleton"]))
+        x = io.read_json(visu_fileset.get_file(files_metadata["skeleton"]))
         res["data"]["skeleton"] = x
 
     if (res["hasSegmentation2D"]):
-        x = io.read_json(fileset_visu.get_file(files_metadata["segmentation2d_evaluation"]))
+        x = io.read_json(visu_fileset.get_file(files_metadata["segmentation2d_evaluation"]))
         res["data"]["segmentation2D"] = x
 
     if (res["hasSegmentedPcdEvaluation"]):
-        x = io.read_json(fileset_visu.get_file(files_metadata["segmented_pcd_evaluation"]))
+        x = io.read_json(visu_fileset.get_file(files_metadata["segmented_pcd_evaluation"]))
         res["data"]["segmentedPcdEvaluation"] = x
 
     if (res["hasPointCloudEvaluation"]):
-        x = io.read_json(fileset_visu.get_file(files_metadata["point_cloud_evaluation"]))
+        x = io.read_json(visu_fileset.get_file(files_metadata["point_cloud_evaluation"]))
         res["data"]["pointCloudEvaluation"] = x
 
     if (res["hasAngleData"]):
-        x = io.read_json(fileset_visu.get_file(files_metadata["angles"]))
+        x = io.read_json(visu_fileset.get_file(files_metadata["angles"]))
         if "fruit_points" not in x:
             x["fruit_points"] = []
         res["data"]["angles"] = x
@@ -202,13 +163,13 @@ def fmt_scan(scan):
             try:
                 res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
             except KeyError:
-                measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
+                measures = io.read_json(visu_fileset.get_file(files_metadata["measures"]))
                 res["data"]["angles"]["measured_angles"] = measures["angles"] if "angles" in measures.keys() else []
 
             try:
                 res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
             except KeyError:
-                measures = io.read_json(fileset_visu.get_file(files_metadata["measures"]))
+                measures = io.read_json(visu_fileset.get_file(files_metadata["measures"]))
                 res["data"]["angles"]["measured_internodes"] = measures[
                     "internodes"] if "internodes" in measures.keys() else []
 
@@ -218,7 +179,7 @@ def fmt_scan(scan):
         res["workspace"] = metadata["scanner"]["workspace"]
     except KeyError:
         # new version
-        camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
+        camera_model = io.read_json(visu_fileset.get_file(files_metadata["camera"]))
         res["workspace"] = camera_model["bounding_box"]
 
     res["camera"] = {}
@@ -229,19 +190,18 @@ def fmt_scan(scan):
         res["camera"]["model"] = metadata["computed"]["camera_model"]
     except KeyError:
         # new version
-        camera_model = io.read_json(fileset_visu.get_file(files_metadata["camera"]))
+        camera_model = io.read_json(visu_fileset.get_file(files_metadata["camera"]))
         res["camera"]["model"] = camera_model["1"]
 
     res["camera"]["poses"] = []
 
-    poses = io.read_json(fileset_visu.get_file(files_metadata["poses"]))
-    global logger
+    poses = io.read_json(visu_fileset.get_file(files_metadata["poses"]))
     logger.info("-------------------------------------------------")
     logger.info(files_metadata["images"])
 
     keys = list(map(lambda e: os.path.splitext(poses[e]['name'])[0], poses.keys()))
     for i, im in enumerate(files_metadata["images"]):
-        f = fileset_visu.get_file(im)
+        f = visu_fileset.get_file(im)
         id = f.get_metadata("image_id")
 
         if id in keys:
@@ -251,7 +211,7 @@ def fmt_scan(scan):
                 'tvec': poses[k]['tvec'],
                 'rotmat': poses[k]['rotmat'],
                 'photoUri': get_path(f),
-                'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
+                'thumbnailUri': get_path(visu_fileset.get_file(files_metadata["thumbnails"][i])),
                 'isMatched': True
             })
         else:
@@ -260,7 +220,7 @@ def fmt_scan(scan):
                 'tvec': [0, 0, 0],
                 'rotmat': [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                 'photoUri': get_path(f),
-                'thumbnailUri': get_path(fileset_visu.get_file(files_metadata["thumbnails"][i])),
+                'thumbnailUri': get_path(visu_fileset.get_file(files_metadata["thumbnails"][i])),
                 'isMatched': False
             })
 
@@ -288,8 +248,7 @@ class File(Resource):
 class Refresh(Resource):
     def get(self):
         global db
-        db.disconnect()
-        db.connect()
+        db.reload()
         return 200
 
 
@@ -306,9 +265,9 @@ class Image(Resource):
         scanid : str
             The scan id.
         filesetid : str
-            The scan id.
+            The fileset id.
         fileid : str
-            The scan id.
+            The file id.
 
         Returns
         -------
@@ -336,9 +295,9 @@ class PointCloud(Resource):
         scanid : str
             The scan id.
         filesetid : str
-            The scan id.
+            The fileset id.
         fileid : str
-            The scan id.
+            The file id.
 
         Returns
         -------
@@ -366,9 +325,9 @@ class PointCloudGroundTruth(Resource):
         scanid : str
             The scan id.
         filesetid : str
-            The scan id.
+            The fileset id.
         fileid : str
-            The scan id.
+            The file id.
 
         Returns
         -------
@@ -396,9 +355,9 @@ class Mesh(Resource):
         scanid : str
             The scan id.
         filesetid : str
-            The scan id.
+            The fileset id.
         fileid : str
-            The scan id.
+            The file id.
 
         Returns
         -------
@@ -440,7 +399,7 @@ if __name__ == '__main__':
 
     global db
     db = FSDB(db_location)
-    db.connect()
+    db.connect(unsafe=True)
 
     global logger
     logger = logging.getLogger('werkzeug')
