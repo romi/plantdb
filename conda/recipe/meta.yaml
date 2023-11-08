@@ -42,7 +42,7 @@ test:
     - romi_fsdb_sync -h
     - romi_import_folder -h
     - romi_import_file -h
-    - romi_scanner_rest_api -h
+    - plantdb_rest_api -h
 
 about:
   home: https://docs.romi-project.eu/plant_imager/

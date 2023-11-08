@@ -18,7 +18,7 @@ opts = dict(
         'bin/romi_import_images',
         'bin/romi_import_folder',
         'bin/romi_import_file',
-        'bin/romi_scanner_rest_api'
+        'bin/plantdb_rest_api'
     ],
     description='Database package for the ROMI project.',
     long_description=long_description,

@@ -167,17 +167,17 @@ A detailed documentation of the Python API is available here: https://romi.githu
 
 ### Serve the REST API
 
-Then you can start the REST API with `romi_scanner_rest_api`:
+Then you can start the REST API with `plantdb_rest_api`:
 
 ```shell
-romi_scanner_rest_api
+plantdb_rest_api
 ```
 
 You should see something like:
 
 ```
 n scans = 2
- * Serving Flask app "romi_scanner_rest_api" (lazy loading)
+ * Serving Flask app "plantdb_rest_api" (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
    Use a production WSGI server instead.

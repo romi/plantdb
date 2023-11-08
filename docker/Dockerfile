@@ -53,5 +53,5 @@ RUN cd plantdb/ && \
     # Clean pip cache:
     rm -rf .cache/pip
 
-# By default, start the `romi_scanner_rest_api` CLI at container startup:
-CMD ["/bin/bash", "-c", "romi_scanner_rest_api"]
+# By default, start the `plantdb_rest_api` CLI at container startup:
+CMD ["/bin/bash", "-c", "plantdb_rest_api"]
