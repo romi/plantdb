@@ -22,11 +22,20 @@ from plantdb.fsdb import FSDB
 
 
 def parsing():
-    parser = argparse.ArgumentParser(description='Serve the plant database through a REST API.')
+    parser = argparse.ArgumentParser(description='Serve a local plantdb database (FSDB) through a REST API.')
     parser.add_argument('-db', '--db_location', type=str, default="",
-                        help='Local database to serve.')
+                        help='location of the database to serve')
     parser.add_argument('-prefix', '--db_prefix', type=str, default="",
-                        help='Prefix to use with the database.')
+                        help='prefix to use with the database')
+
+    app_args = parser.add_argument_group("webserver options")
+    app_args.add_argument('--host', type=str, default="0.0.0.0",
+                          help="the hostname to listen on")
+    app_args.add_argument('--port', type=int, default=5000,
+                          help="the port of the webserver")
+    app_args.add_argument('--debug', action='store_true',
+                          help="enable debug mode")
+
     return parser
 
 
@@ -447,4 +456,4 @@ if __name__ == '__main__':
     api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
     api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
 
-    app.run(host='0.0.0.0')
+    app.run(host=args.host, port=args.port, debug=args.debug)
