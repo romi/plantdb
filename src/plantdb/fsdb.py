@@ -105,6 +105,8 @@ from pathlib import Path
 from shutil import copyfile
 from shutil import rmtree
 
+from tqdm import tqdm
+
 from plantdb import db
 from plantdb.db import DBBusyError
 from plantdb.log import configure_logger
@@ -309,7 +311,7 @@ class FSDB(db.DB):
         self.scans = []
         self.is_connected = False
 
-    def connect(self, login_data=None):
+    def connect(self, login_data=None, unsafe=False):
         """Connect to the local database.
 
         Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
@@ -318,6 +320,8 @@ class FSDB(db.DB):
         ----------
         login_data : bool
             UNUSED
+        unsafe : bool
+            If ``True`` do not use the `LOCK_FILE_NAME` file.
 
         Raises
         ------
@@ -352,13 +356,17 @@ class FSDB(db.DB):
         if not _is_fsdb(self.path()):
             raise IOError(f"Not a DB! Check that there is a file named {MARKER_FILE_NAME} in {self.path()}")
         if not self.is_connected:
-            try:
-                with self.lock_path.open(mode="x") as _:
-                    self.scans = _load_scans(self)
-                    self.is_connected = True
-                atexit.register(self.disconnect)
-            except FileExistsError:
-                raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
+            if unsafe:
+                self.scans = _load_scans(self)
+                self.is_connected = True
+            else:
+                try:
+                    with self.lock_path.open(mode="x") as _:
+                        self.scans = _load_scans(self)
+                        self.is_connected = True
+                    atexit.register(self.disconnect)
+                except FileExistsError:
+                    raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
         else:
             logger.info(f"Already connected to the database '{self.path()}'")
         return
@@ -400,6 +408,15 @@ class FSDB(db.DB):
         else:
             logger.info(f"Already disconnected from the database '{self.path()}'")
         return
+
+    def reload(self):
+        """Reload the database by scanning datasets."""
+        if self.is_connected:
+            logger.error("Reloading the database...")
+            self.scans = _load_scans(self)
+            logger.info("Done!")
+        else:
+            logger.error(f"You are not connected to the database!")
 
     def get_scans(self, query=None):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
@@ -1608,7 +1625,7 @@ def _load_scans(db):
     """
     scans = []
     names = os.listdir(db.path())
-    for name in names:
+    for name in tqdm(names, unit="scan"):
         scan = Scan(db, name)
         if _scan_path(scan).is_dir():
             # If the `files.json` associated to the scan is found, parse it:
