@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
+import json
 import os
 
+from plantdb.io import read_json
 
 
 def get_scan_date(scan):
@@ -125,3 +127,204 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "hasSegmentedPointCloud": False,
         "error": error
     }
+
+
+def list_scans_info(scans, query=None):
+    """List scans information.
+
+    Parameters
+    ----------
+    scans : list of plantdb.fsdb.Scan
+        The list of scan instances to get information from.
+    query : str, optional
+        A scan filtering query, to be matched in the scan metadata keys.
+
+    Returns
+    -------
+    list of dict
+        The list of scans information dictionaries.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api import list_scans_info
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> list_scans_info(db.get_scans())
+
+    """
+    res = []
+    for scan in scans:
+        metadata = scan.get_metadata()
+        if query is not None and not (query.lower() in json.dumps(metadata).lower()):
+            continue  # filter scans info list by matching the query with metadata keys
+        try:
+            scan_info = get_scan_info(scan)
+        except:
+            # logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
+            scan_info = get_scan_template(scan.id, error=True)
+        res.append(scan_info)
+    return res
+
+
+def get_scan_info(scan):
+    """Get the information related to a single scan dataset.
+
+    Parameters
+    ----------
+    scans : plantdb.fsdb.Scan
+        The scan instances to get information from.
+
+    Returns
+    -------
+    dict
+        The scan information dictionary.
+
+    Examples
+    --------
+    >>> from os import environ
+    >>> from plantdb.rest_api import get_scan_info
+    >>> from plantdb.fsdb import FSDB
+    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
+    >>> db.connect(unsafe=True)
+    >>> scan = db.get_scan('sango_90_300_36')
+    >>> scan_info = get_scan_info(scan)
+    >>> print(scan_info)
+    >>> db.disconnect()
+
+    """
+    # Map the scan tasks to fileset names:
+    task_fs_map = compute_fileset_matches(scan)
+    # Get the scan metadata dictionary:
+    scan_md = scan.get_metadata()
+    # Initialize the scan information template:
+    scan_info = get_scan_template(scan.id)
+
+    # - Gather "metadata" information from scan:
+    # Get acquisition date:
+    scan_info["metadata"]['date'] = get_scan_date(scan)
+    # Import 'object' related scan metadata to scan info template:
+    if 'object' in scan_md:
+        scan_obj = scan_md['object']  # get the 'object' related dictionary
+        scan_info["metadata"]['species'] = scan_obj.get('species', 'N/A')
+        scan_info["metadata"]['environment'] = scan_obj.get('environment', 'N/A')
+        scan_info["metadata"]['plant'] = scan_obj.get('plant_id', 'N/A')
+    # Get the number of 'images' in the dataset:
+    scan_info["metadata"]['nbPhotos'] = len(scan.get_fileset('images').get_files())
+
+    def _try_has_file(task, file):
+        if task not in task_fs_map:
+            return False
+        elif scan.get_fileset(task_fs_map[task]) is None:
+            return False
+        else:
+            return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
+
+    # - Gather information about tasks:
+    scan_info['hasPointCloud'] = _try_has_file('PointCloud', 'PointCloud')
+    scan_info['hasMesh'] = _try_has_file('TriangleMesh', 'TriangleMesh')
+    scan_info['hasSkeleton'] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
+    scan_info['hasTreeGraph'] = _try_has_file('TreeGraph', 'TreeGraph')
+    scan_info['hasAngleData'] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
+    scan_info['hasAutomatedMeasures'] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
+    scan_info['hasManualMeasures'] = 'measures.json' in scan.path().iterdir()
+    scan_info['hasSegmentation2D'] = _try_has_file('Segmentation2D', '')
+    scan_info['hasPcdGroundTruth'] = _try_has_file('PointCloudGroundTruth', 'PointCloudGroundTruth')
+    scan_info['hasPointCloudEvaluation'] = _try_has_file('PointCloudEvaluation', 'PointCloudEvaluation')
+    scan_info['hasSegmentedPointCloud'] = _try_has_file('SegmentedPointCloud', 'SegmentedPointCloud')
+    scan_info['hasSegmentedPcdEvaluation'] = _try_has_file('SegmentedPointCloudEvaluation',
+                                                           'SegmentedPointCloudEvaluation')
+
+    return scan_info
+
+
+def get_scan_data(scan):
+    """Get the scan information and data.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The scan instance to get the information and data from.
+
+    Returns
+    -------
+    dict
+        The scan information dictionary.
+
+    Examples
+    --------
+    >>> from os import environ
+    >>> from plantdb.rest_api import get_scan_data
+    >>> from plantdb.fsdb import FSDB
+    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
+    >>> db.connect(unsafe=True)
+    >>> scan = db.get_scan('sango_90_300_36')
+    >>> scan_data = get_scan_data(scan)
+    >>> print(scan_data)
+    >>> db.disconnect()
+    """
+    task_fs_map = compute_fileset_matches(scan)
+    scan_data = get_scan_info(scan)
+
+    # - Get the paths to data files:
+    scan_data["filesUri"] = {}
+    # Get the URI to the PointCloud related file:
+    if scan_data["hasPointCloud"]:
+        scan_data["filesUri"]["pointCloud"] = scan.get_fileset(task_fs_map['PointCloud']).get_file('PointCloud').path()
+    # Get the URI to the TriangleMesh related file:
+    if scan_data["hasMesh"]:
+        scan_data["filesUri"]["mesh"] = scan.get_fileset(task_fs_map['TriangleMesh']).get_file('TriangleMesh').path()
+    # Get the URI to the TreeGraph related file:
+    if scan_data["hasSkeleton"]:
+        scan_data["filesUri"]["skeleton"] = scan.get_fileset(task_fs_map['Skeleton']).get_file('Skeleton').path()
+    # Get the URI to the TreeGraph related file:
+    if scan_data["hasTreeGraph"]:
+        scan_data["filesUri"]["tree"] = scan.get_fileset(task_fs_map['TreeGraph']).get_file('TreeGraph').path()
+
+    # - Load some of the data:
+    scan_data['data'] = {}
+    # Load the skeleton data:
+    if scan_data["hasSkeleton"]:
+        scan_data['data']["skeleton"] = read_json(scan.get_fileset(task_fs_map['Skeleton']).get_file('Skeleton'))
+    # Load the measured angles and internodes:
+    if scan_data["hasAngleData"]:
+        measures = read_json(scan.get_fileset(task_fs_map['AnglesAndInternodes']).get_file('AnglesAndInternodes'))
+        # scan_data['data']["angles"] = measures.get("angles", {})
+        # scan_data['data']["internodes"] = measures.get("internodes", {})
+        scan_data['data']["angles"] = measures
+    # Load the manually measured angles and internodes:
+    if scan_data["hasManualMeasures"]:
+        measures = scan.get_measures()
+        if measures is None:
+            measures = dict([])
+        scan_data['data']["angles"]["measured_angles"] = measures.get('angles', [])
+        scan_data['data']["angles"]["measured_internodes"] = measures.get("internodes", [])
+    # Load the workspace, aka bounding-box:
+    try:
+        # old version: get scanner workspace
+        scan_data["workspace"] = scan.get_metadata("scanner")["workspace"]
+    except KeyError:
+        # new version: get it from colmap fileset metadata 'bounding-box'
+        scan_data["workspace"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("bounding_box")
+
+    # - Load camera information
+    scan_data["camera"] = {}
+    # Load the camera model:
+    try:
+        # old version
+        scan_data["camera"]["model"] = scan.get_metadata("computed")["camera_model"]
+    except KeyError:
+        # new version: get it from colmap fileset metadata 'task_params'/'camera_model':
+        scan_data["camera"]["model"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("task_params")[
+            'camera_model']
+    # Load the camera poses from the images metadata:
+    img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
+    for img_idx, img_f in enumerate(img_fs.get_files()):
+        camera_md = img_f.get_metadata("colmap_camera")
+        scan_data['camera']['poses'].append({
+            'id': img_idx+1,
+            'tvec': camera_md['tvec'],
+            'rotmat': camera_md['rotmat'],
+            'photoUri': img_f.path(),
+            'isMatched': True
+        })
