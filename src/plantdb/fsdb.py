@@ -677,6 +677,14 @@ class Scan(db.Scan):
     >>> print(db.get_scan('007'))
     None
 
+    >>> # Example #3: Use an existing database:
+    >>> from os import environ
+    >>> from plantdb.fsdb import FSDB
+    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
+    >>> db.connect(unsafe=True)
+    >>> scan = db.get_scan('sango_90_300_36')
+    >>> scan.get_metadata()
+
     """
 
     def __init__(self, db, id):
@@ -1996,7 +2004,7 @@ def _load_measures(path):
 
 
 def _load_scan_metadata(scan):
-    """Load the metadata for a dataset.
+    """Load the metadata for a scan dataset.
 
     Parameters
     ----------
@@ -2008,7 +2016,18 @@ def _load_scan_metadata(scan):
     dict
         The metadata dictionary.
     """
-    return _load_metadata(_scan_metadata_path(scan))
+    scan_md = {}
+    md_path = _scan_metadata_path(scan)
+    if md_path.exists():
+        scan_md.update(_load_metadata(md_path))
+    # FIXME: next lines are here to solve the issue that most scans dataset have no metadata as they have been saved in the 'images' fileset metadata...
+    img_fs_path = md_path.parent / 'images.json'  # path to 'images' fileset metadata
+    if img_fs_path.exists():
+        img_fs_md = _load_metadata(img_fs_path)
+        scan_md.update({'object': img_fs_md.get('object', {})})
+        scan_md.update({'hardware': img_fs_md.get('hardware', {})})
+        scan_md.update({'acquisition_date': img_fs_md.get('acquisition_date', None)})
+    return scan_md
 
 
 def _load_scan_measures(scan):
@@ -2022,7 +2041,7 @@ def _load_scan_measures(scan):
     Returns
     -------
     dict
-        The measures dictionary.
+        The measures' dictionary.
     """
     return _load_measures(_scan_measures_path(scan))
 
