@@ -20,6 +20,7 @@ from plantdb import io
 from plantdb import webcache
 from plantdb.fsdb import FSDB
 from plantdb.rest_api import compute_fileset_matches
+from plantdb.rest_api import get_scan_date
 from plantdb.rest_api import get_scan_template
 from plantdb.rest_api import get_path
 
@@ -48,15 +49,13 @@ def fmt_scan_minimal(scan):
 
     # From here, we edit the metadatas of the dataset
     template_md = template["metadata"]
-
+    template_md['date'] = get_scan_date(scan)
     if 'object' in scan_md:
         obj = scan_md['object']
         if 'species' in obj:
             template_md['species'] = obj['species']
-
-        if 'species' in obj:
+        if 'environment' in obj:
             template_md['environment'] = obj['environment']
-
         if 'plant_id' in obj:
             template_md['plant'] = obj['plant_id']
 
@@ -397,14 +396,15 @@ if __name__ == '__main__':
         except KeyError:
             db_prefix = "/files/"
 
-    global db
-    db = FSDB(db_location)
-    db.connect(unsafe=True)
-
     global logger
     logger = logging.getLogger('werkzeug')
 
-    logger.info(f"Got {len(db.get_scans())} scans from DB '{db.path()}'.")
+    global db
+    db = FSDB(db_location)
+    logger.info(f"Connecting to local plant database...")
+    db.connect(unsafe=True)
+    logger.info("Done.")
+    logger.info(f"Found {len(db.get_scans())} scans dataset in local plant database.")
 
     api.add_resource(ScanList, '/scans')
     api.add_resource(Scan, '/scans/<scan_id>')
