@@ -911,6 +911,14 @@
 <span class="sd">    &gt;&gt;&gt; print(db.get_scan('007'))</span>
 <span class="sd">    None</span>
 
+<span class="sd">    &gt;&gt;&gt; # Example #3: Use an existing database:</span>
+<span class="sd">    &gt;&gt;&gt; from os import environ</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import FSDB</span>
+<span class="sd">    &gt;&gt;&gt; db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))</span>
+<span class="sd">    &gt;&gt;&gt; db.connect(unsafe=True)</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('sango_90_300_36')</span>
+<span class="sd">    &gt;&gt;&gt; scan.get_metadata()</span>
+
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -2230,7 +2238,7 @@
 
 
 <span class="k">def</span> <span class="nf">_load_scan_metadata</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Load the metadata for a dataset.</span>
+<span class="w">    </span><span class="sd">"""Load the metadata for a scan dataset.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2242,7 +2250,18 @@
 <span class="sd">    dict</span>
 <span class="sd">        The metadata dictionary.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
+    <span class="n">scan_md</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">md_path</span> <span class="o">=</span> <span class="n">_scan_metadata_path</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">md_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">scan_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_load_metadata</span><span class="p">(</span><span class="n">md_path</span><span class="p">))</span>
+    <span class="c1"># FIXME: next lines are here to solve the issue that most scans dataset have no metadata as they have been saved in the 'images' fileset metadata...</span>
+    <span class="n">img_fs_path</span> <span class="o">=</span> <span class="n">md_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'images.json'</span>  <span class="c1"># path to 'images' fileset metadata</span>
+    <span class="k">if</span> <span class="n">img_fs_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">img_fs_md</span> <span class="o">=</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">img_fs_path</span><span class="p">)</span>
+        <span class="n">scan_md</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'object'</span><span class="p">:</span> <span class="n">img_fs_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'object'</span><span class="p">,</span> <span class="p">{})})</span>
+        <span class="n">scan_md</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'hardware'</span><span class="p">:</span> <span class="n">img_fs_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'hardware'</span><span class="p">,</span> <span class="p">{})})</span>
+        <span class="n">scan_md</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'acquisition_date'</span><span class="p">:</span> <span class="n">img_fs_md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'acquisition_date'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)})</span>
+    <span class="k">return</span> <span class="n">scan_md</span>
 
 
 <span class="k">def</span> <span class="nf">_load_scan_measures</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
@@ -2256,7 +2275,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        The measures dictionary.</span>
+<span class="sd">        The measures' dictionary.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_load_measures</span><span class="p">(</span><span class="n">_scan_measures_path</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
 
