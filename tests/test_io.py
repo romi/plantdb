@@ -150,23 +150,23 @@ class TestIO(DBTestCase):
         self._test_read_file(fpath, obj, 'npz')
 
     def test_write_pcd(self):
-        dataset = o3d.data.EaglePointCloud()
+        dataset = o3d.data.EaglePointCloud('/tmp')
         pcd = o3d.io.read_point_cloud(dataset.path)
         self._test_write_file(pcd, "pointcloud")
 
     def test_read_pcd(self):
-        dataset = o3d.data.EaglePointCloud()
+        dataset = o3d.data.EaglePointCloud('/tmp')
         pcd = o3d.io.read_point_cloud(dataset.path)
         fpath, obj, _ = self._test_write_file(pcd, 'pointcloud')
         self._test_read_file(fpath, obj, "pointcloud")
 
     def test_write_mesh(self):
-        dataset = o3d.data.BunnyMesh()
+        dataset = o3d.data.BunnyMesh('/tmp')
         mesh = o3d.io.read_triangle_mesh(dataset.path)
         self._test_write_file(mesh, "mesh")
 
     def test_read_mesh(self):
-        dataset = o3d.data.BunnyMesh()
+        dataset = o3d.data.BunnyMesh('/tmp')
         mesh = o3d.io.read_triangle_mesh(dataset.path)
         fpath, obj, _ = self._test_write_file(mesh, 'mesh')
         self._test_read_file(fpath, obj, "mesh")

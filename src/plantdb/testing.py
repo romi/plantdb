@@ -25,6 +25,7 @@
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from plantdb.fsdb import FSDB
 from plantdb.fsdb import dummy_db
@@ -125,7 +126,7 @@ class DBTestCase(unittest.TestCase):
         fileset = scan.get_fileset("fileset_001")
         return fileset
 
-    def get_test_file(self):
+    def get_test_image_file(self):
         """Return the default test ``File`` object named 'test_image'.
 
         Returns

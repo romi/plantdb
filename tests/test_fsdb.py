@@ -112,7 +112,7 @@ class TestFSDB(DBTestCase):
         self.assertTrue(file.path().is_file())
 
     def test_set_file_metadata(self):
-        file = self.get_test_file()
+        file = self.get_test_image_file()
         md = {"test": "value"}
         file.set_metadata(md)
         db = file.get_db()
