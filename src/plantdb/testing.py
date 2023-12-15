@@ -22,6 +22,14 @@
 # License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+
+"""
+plantdb.testing
+===============
+
+This module provides a set of classes useful for testing procedures.
+"""
+
 import shutil
 import tempfile
 import unittest
