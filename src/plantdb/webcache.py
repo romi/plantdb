@@ -255,7 +255,7 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
     return img_path
 
 
-def image_path(db, scan_id, fileset_id, file_id, size):
+def image_path(db, scan_id, fileset_id, file_id, size='orig'):
     """Get the path to an image file.
 
     Parameters
@@ -268,13 +268,31 @@ def image_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'}
-        The requested size ('orig', 'large', or 'thumb')
+    size : {'orig', 'large', 'thumb'}, optional
+        The requested image size, works as follows:
+           * 'orig': original image, no chache;
+           * 'large': image max width and height to `1500`;
+           * 'thumb': image max width and height to `150`.
+        Default to 'orig'.
 
     Returns
     -------
     pathlib.Path
         The path to the original or cached image.
+
+    Examples
+    --------
+    >>> from plantdb.webcache import image_path
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> # Example 1: Get the original image:
+    >>> image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'orig')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg')
+    >>> # Example 2: Get a thumbnail of the image:
+    >>> image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'thumb')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg')
+    >>> db.disconnect()
     """
     if size == "orig":
         print("Using original image file")
@@ -413,7 +431,7 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
     return pcd_path
 
 
-def pointcloud_path(db, scan_id, fileset_id, file_id, size):
+def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
     """Get the path to a point cloud file.
 
     Parameters
@@ -426,16 +444,31 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float
+    size : {'orig', 'preview'} or float, optional
         The requested size of the point cloud.
         Obviously 'orig' preserve the original point cloud.
         'preview' will resize the point cloud to a `1.8` voxel size.
         A float will resize the point cloud to given voxel size.
+        Default to 'orig'.
 
     Returns
     -------
     pathlib.Path
         The path to the original or cached pointcloud.
+
+    Examples
+    --------
+    >>> from plantdb.webcache import pointcloud_path
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> # Example 1: Get the original pointcloud:
+    >>> pointcloud_path(db, 'real_plant_analyzed', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'PointCloud', 'orig')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply')
+    >>> # Example 2: Get a down-sampled version of the pointcloud:
+    >>> pointcloud_path(db, 'real_plant_analyzed', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'PointCloud', 'preview')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply')
+    >>> db.disconnect()
     """
     if size == "orig":
         print("Using original pointcloud file")
@@ -454,7 +487,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size):
 # -----------------------------------------------------------------------------
 # Mesh
 # -----------------------------------------------------------------------------
-def mesh_path(db, scan_id, fileset_id, file_id, size):
+def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
     """Get the path to a mesh file.
 
     Parameters
@@ -467,13 +500,22 @@ def mesh_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : any
+    size : any, optional
         UNUSED.
 
     Returns
     -------
     pathlib.Path
         The path to the original mesh.
+
+    Examples
+    --------
+    >>> from plantdb.webcache import mesh_path
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> # Example 1: Get the original pointcloud:
+    >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')
     """
     print("Using original mesh file")
     return __file_path(db, scan_id, fileset_id, file_id)

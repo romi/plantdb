@@ -50,9 +50,8 @@ def read_image_from_file(filename):
     --------
     >>> from plantdb.utils import read_image_from_file
     >>> from plantdb.webcache import image_path
-    >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.test_database import setup_test_database
-    >>> db = FSDB(setup_test_database('real_plant', '/tmp/ROMI_DB'))
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant')
     >>> db.connect()
     >>> img_path = image_path(db, 'real_plant', 'images', '00000_rgb', 'orig')
     >>> image = read_image_from_file(img_path)
@@ -88,8 +87,8 @@ def locate_task_filesets(scan, tasks):
     --------
     >>> from plantdb.utils import locate_task_filesets
     >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.test_database import setup_test_database
-    >>> db = FSDB(setup_test_database('real_plant_analyzed', '/tmp/ROMI_DB'))
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> tasks_fs = locate_task_filesets(scan, ['Masks', 'PointCloud', 'UnknownTask'])

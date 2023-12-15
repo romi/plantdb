@@ -54,16 +54,14 @@ def get_scan_date(scan):
 
     Examples
     --------
-    >>> from os import environ
     >>> from plantdb.rest_api import get_scan_date
-    >>> from plantdb.fsdb import FSDB
-    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
-    >>> db.connect(unsafe=True)
-    >>> scan = db.get_scan('sango_90_300_36')
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
     >>> print(get_scan_date(scan))
-    '23-10-17 00:36:03'
+    2023-12-15 16:37:15
     >>> db.disconnect()
-
     """
     dt = scan.get_metadata('acquisition_date')
     try:
@@ -100,6 +98,7 @@ def compute_fileset_matches(scan):
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
     {'fileset': 'fileset_001'}
+    >>> db.disconnect()
     """
     filesets_matches = {}
     for fs in scan.get_filesets():
@@ -177,11 +176,13 @@ def list_scans_info(scans, query=None):
     Examples
     --------
     >>> from plantdb.rest_api import list_scans_info
-    >>> from plantdb.fsdb import dummy_db
-    >>> db = dummy_db(with_fileset=True)
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
-    >>> list_scans_info(db.get_scans())
-
+    >>> scans_info = list_scans_info(db.get_scans())
+    >>> print(scans_info)
+    [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]
+    >>> db.disconnect()
     """
     res = []
     for scan in scans:
@@ -212,14 +213,14 @@ def get_scan_info(scan):
 
     Examples
     --------
-    >>> from os import environ
     >>> from plantdb.rest_api import get_scan_info
-    >>> from plantdb.fsdb import FSDB
-    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
-    >>> db.connect(unsafe=True)
-    >>> scan = db.get_scan('sango_90_300_36')
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_info = get_scan_info(scan)
     >>> print(scan_info)
+    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
 
     """
