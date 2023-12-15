@@ -27,10 +27,8 @@ from plantdb.rest_api import ScanList
 
 def parsing():
     parser = argparse.ArgumentParser(description='Serve a local plantdb database (FSDB) through a REST API.')
-    parser.add_argument('-db', '--db_location', type=str, default="",
+    parser.add_argument('-db', '--db_location', type=str, default=os.environ.get("ROMI_DB", "/none"),
                         help='location of the database to serve')
-    parser.add_argument('-prefix', '--db_prefix', type=str, default="",
-                        help='prefix to use with the database')
 
     app_args = parser.add_argument_group("webserver options")
     app_args.add_argument('--host', type=str, default="0.0.0.0",
@@ -47,26 +45,25 @@ if __name__ == '__main__':
     parser = parsing()
     args = parser.parse_args()
 
+    # Instantiate the Flask application:
     app = Flask(__name__)
     CORS(app)
     api = Api(app)
+    # Instantiate the logger:
+    wlogger = logging.getLogger('werkzeug')
+    logger = configure_logger('plantdb_rest_api')
 
-    global db_location
-    global db_prefix
+    if args.db_location == "/none":
+        logger.error("Can't serve a local plantdb as no path to the database was specified!")
+        logger.info("To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
+        sleep(1)
+        sys.exit("Wrong database location!")
 
-    if args.db_location == "":
-        try:
-            db_location = os.environ["ROMI_DB"]
-        except KeyError:
-            raise ValueError("ROMI_DB environment variable is not set")
-    else:
-        db_location = args.db_location
-
-    if args.db_prefix == "":
-        try:
-            db_prefix = os.environ["DB_PREFIX"]
-        except KeyError:
-            db_prefix = "/files/"
+    # Connect to the database:
+    db = FSDB(args.db_location)
+    logger.info(f"Connecting to local plant database located at '{db.path()}'...")
+    db.connect(unsafe=True)  # to avoid locking the database
+    logger.info(f"Found {len(db.list_scans())} scans dataset to serve in local plant database.")
 
     # Initialize RESTful resources to serve:
     api.add_resource(ScanList, '/scans',
