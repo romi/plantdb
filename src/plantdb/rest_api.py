@@ -33,8 +33,16 @@ This module regroup the methods used to serve a REST API using ``plantdb_rest_ap
 import datetime
 import json
 import os
+from math import degrees
 
+from flask import request
+from flask import send_file
+from flask import send_from_directory
+from flask_restful import Resource
+
+from plantdb import webcache
 from plantdb.io import read_json
+from plantdb.utils import is_radians
 
 
 def get_scan_date(scan):
@@ -303,29 +311,37 @@ def get_scan_data(scan):
 
     # - Get the paths to data files:
     scan_data["filesUri"] = {}
-    # Get the URI to the PointCloud related file:
+    # Get the URI (file path) to the output of the `PointCloud` task:
     if scan_data["hasPointCloud"]:
-        scan_data["filesUri"]["pointCloud"] = scan.get_fileset(task_fs_map['PointCloud']).get_file('PointCloud').path()
-    # Get the URI to the TriangleMesh related file:
+        fs = scan.get_fileset(task_fs_map['PointCloud'])
+        scan_data["filesUri"]["pointCloud"] = str(fs.get_file('PointCloud').path())
+    # Get the URI (file path) to the output of the `TriangleMesh` task:
     if scan_data["hasMesh"]:
-        scan_data["filesUri"]["mesh"] = scan.get_fileset(task_fs_map['TriangleMesh']).get_file('TriangleMesh').path()
-    # Get the URI to the TreeGraph related file:
+        fs = scan.get_fileset(task_fs_map['TriangleMesh'])
+        scan_data["filesUri"]["mesh"] = str(fs.get_file('TriangleMesh').path())
+    # Get the URI (file path) to the output of the `CurveSkeleton` task:
     if scan_data["hasSkeleton"]:
-        scan_data["filesUri"]["skeleton"] = scan.get_fileset(task_fs_map['CurveSkeleton']).get_file('CurveSkeleton').path()
-    # Get the URI to the TreeGraph related file:
+        fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
+        scan_data["filesUri"]["skeleton"] = str(fs.get_file('CurveSkeleton').path())
+    # Get the URI (file path) to the output of the `TreeGraph` task:
     if scan_data["hasTreeGraph"]:
-        scan_data["filesUri"]["tree"] = scan.get_fileset(task_fs_map['TreeGraph']).get_file('TreeGraph').path()
+        fs = scan.get_fileset(task_fs_map['TreeGraph'])
+        scan_data["filesUri"]["tree"] = str(fs.get_file('TreeGraph').path())
 
     # - Load some of the data:
     scan_data['data'] = {}
     # Load the skeleton data:
     if scan_data["hasSkeleton"]:
-        scan_data['data']["skeleton"] = read_json(scan.get_fileset(task_fs_map['CurveSkeleton']).get_file('CurveSkeleton'))
+        fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
+        scan_data['data']["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
     # Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
-        measures = read_json(scan.get_fileset(task_fs_map['AnglesAndInternodes']).get_file('AnglesAndInternodes'))
+        fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
+        measures = read_json(fs.get_file('AnglesAndInternodes'))
         # scan_data['data']["angles"] = measures.get("angles", {})
         # scan_data['data']["internodes"] = measures.get("internodes", {})
+        if is_radians(measures["angles"]):
+            measures["angles"] = list(map(degrees, measures["angles"]))
         scan_data['data']["angles"] = measures
     # Load the manually measured angles and internodes:
     if scan_data["hasManualMeasures"]:
@@ -340,7 +356,8 @@ def get_scan_data(scan):
         scan_data["workspace"] = scan.get_metadata()["scanner"]["workspace"]
     except KeyError:
         # new version: get it from colmap fileset metadata 'bounding-box'
-        scan_data["workspace"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("bounding_box")
+        fs = scan.get_fileset(task_fs_map['Colmap'])
+        scan_data["workspace"] = fs.get_metadata("bounding_box")
 
     # - Load camera information
     scan_data["camera"] = {}
@@ -350,8 +367,8 @@ def get_scan_data(scan):
         scan_data["camera"]["model"] = scan.get_metadata()["computed"]["camera_model"]
     except KeyError:
         # new version: get it from colmap fileset metadata 'task_params'/'camera_model':
-        scan_data["camera"]["model"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("task_params")[
-            'camera_model']
+        fs = scan.get_fileset(task_fs_map['Colmap'])
+        scan_data["camera"]["model"] = fs.get_metadata("task_params")['camera_model']
     # Load the camera poses from the images metadata:
     scan_data['camera']['poses'] = []  # initialize list of poses to gather
     img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
@@ -361,7 +378,223 @@ def get_scan_data(scan):
             'id': img_idx + 1,
             'tvec': camera_md['tvec'],
             'rotmat': camera_md['rotmat'],
-            'photoUri': img_f.path(),
+            'photoUri': str(img_f.path()),
             'isMatched': True
         })
     return scan_data
+
+
+class ScanList(Resource):
+    """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self):
+        """Returns a list of scan dataset information.
+
+        Returns
+        -------
+        dict
+            The list of dictionaries to serve (as JSON)
+        """
+        return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'))
+
+
+class Scan(Resource):
+    """Concrete RESTful resource to serve a scan dataset upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id):
+        """Returns the scan dataset information.
+
+        Parameters
+        ----------
+        scan_id : str
+            The name of the scan for which to serve the information.
+
+        Returns
+        -------
+        dict
+            The dictionary to serve (as JSON)
+        """
+        return get_scan_data(self.db.get_scan(scan_id))
+
+
+class File(Resource):
+    """Concrete RESTful resource to serve a file upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, path):
+        """Returns a requested file.
+
+        Parameters
+        ----------
+        path : str
+            The relative path to the file to serve.
+            The global variable `db_location` is used to set the absolute path.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        return send_from_directory(self.db.path(), path)
+
+
+class Refresh(Resource):
+    """Concrete RESTful resource to reload the database upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self):
+        """Force the plant database to reload."""
+        self.db.reload()
+        return 200
+
+
+class Image(Resource):
+    """Concrete RESTful resource to serve an image upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id, fileset_id, file_id):
+        """Send the requested (cached) image, may resize it if necessary.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+        fileset_id : str
+            The fileset id.
+        file_id : str
+            The file id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        size = request.args.get('size', default='thumb', type=str)
+        # Make sure that the 'size' argument we got is a valid option:
+        if not size in ['orig', 'thumb', 'large']:
+            size = 'thumb'
+        # Get the path to the image resource:
+        path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
+        return send_file(path, mimetype='image/jpeg')
+
+
+class PointCloud(Resource):
+    """Concrete RESTful resource to serve a point-cloud upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id, fileset_id, file_id):
+        """Send the requested (cached) point-cloud, may down-sample it if necessary.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+        fileset_id : str
+            The fileset id.
+        file_id : str
+            The file id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        size = request.args.get('size', default='preview', type=str)
+        # Try to convert the 'size' argument as a float:
+        try:
+            vxs = float(size)
+        except ValueError:
+            pass
+        else:
+            size = vxs
+        # If a string, make sure that the 'size' argument we got is a valid option:
+        if isinstance(size, str) and size not in ['orig', 'preview']:
+            size = 'preview'
+        # Get the path to the pointcloud resource:
+        path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
+        return send_file(path, mimetype='application/octet-stream')
+
+
+class PointCloudGroundTruth(Resource):
+    """Concrete RESTful resource to serve a ground-truth point-cloud upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id, fileset_id, file_id):
+        """Send the requested (cached) ground-truth point-cloud, may down-sample it if necessary.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+        fileset_id : str
+            The fileset id.
+        file_id : str
+            The file id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        size = request.args.get('size', default='preview', type=str)
+        # Try to convert the 'size' argument as a float:
+        try:
+            vxs = float(size)
+        except ValueError:
+            pass
+        else:
+            size = vxs
+        # If a string, make sure that the 'size' argument we got is a valid option:
+        if isinstance(size, str) and size not in ['orig', 'preview']:
+            size = 'preview'
+        # Get the path to the pointcloud resource:
+        path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
+        return send_file(path, mimetype='application/octet-stream')
+
+
+class Mesh(Resource):
+    """Concrete RESTful resource to serve a triangular mesh upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id, fileset_id, file_id):
+        """Send the requested (cached) triangular mesh, may down-sample it if necessary.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+        fileset_id : str
+            The fileset id.
+        file_id : str
+            The file id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        size = request.args.get('size', default='orig', type=str)
+        # Make sure that the 'size' argument we got is a valid option:
+        if not size in ['orig']:
+            size = 'orig'
+        # Get the path to the mesh resource:
+        path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size)
+        return send_file(path, mimetype='application/octet-stream')

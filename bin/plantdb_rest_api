@@ -4,25 +4,25 @@
 """Serve the plant database through a REST API."""
 
 import argparse
-import json
 import logging
 import os
+import sys
+from time import sleep
 
 from flask import Flask
-from flask import request
-from flask import send_file
-from flask import send_from_directory
 from flask_cors import CORS
 from flask_restful import Api
-from flask_restful import Resource
 
-from plantdb import io
-from plantdb import webcache
 from plantdb.fsdb import FSDB
-from plantdb.rest_api import compute_fileset_matches
-from plantdb.rest_api import get_path
-from plantdb.rest_api import get_scan_date
-from plantdb.rest_api import get_scan_template
+from plantdb.log import configure_logger
+from plantdb.rest_api import File
+from plantdb.rest_api import Image
+from plantdb.rest_api import Mesh
+from plantdb.rest_api import PointCloud
+from plantdb.rest_api import PointCloudGroundTruth
+from plantdb.rest_api import Refresh
+from plantdb.rest_api import Scan
+from plantdb.rest_api import ScanList
 
 
 def parsing():
@@ -41,366 +41,6 @@ def parsing():
                           help="enable debug mode")
 
     return parser
-
-
-def fmt_scan_minimal(scan):
-    scan_md = scan.get_metadata()
-    template = get_scan_template(scan.id)
-
-    # From here, we edit the metadatas of the dataset
-    template_md = template["metadata"]
-    template_md['date'] = get_scan_date(scan)
-    if 'object' in scan_md:
-        obj = scan_md['object']
-        if 'species' in obj:
-            template_md['species'] = obj['species']
-        if 'environment' in obj:
-            template_md['environment'] = obj['environment']
-        if 'plant_id' in obj:
-            template_md['plant'] = obj['plant_id']
-
-    template_md['nbPhotos'] = len(scan.get_fileset('images').get_files())
-
-    fileset_visu = scan.get_fileset("Visualization")
-    files_metadata = fileset_visu.get_metadata("files")
-
-    fileset_visu_zip = get_path(fileset_visu.get_file(files_metadata["zip"]))
-    metadata_json_path = os.path.join(db_prefix, scan.id, "metadata", "metadata.json")
-
-    template_md['files']['archive'] = fileset_visu_zip
-    template_md['files']['metadatas'] = metadata_json_path
-
-    # Metadata part is complete
-    template['thumbnailUri'] = get_path(fileset_visu.get_file(files_metadata["thumbnails"][0]))
-
-    template['hasMesh'] = files_metadata["mesh"] is not None
-    template['hasPointCloud'] = files_metadata["point_cloud"] is not None
-    template['hasPcdGroundTruth'] = files_metadata["pcd_ground_truth"] is not None
-    template['hasSkeleton'] = files_metadata["skeleton"] is not None
-    template['hasAngleData'] = files_metadata["angles"] is not None
-    template['hasAutomatedMeasures'] = files_metadata["angles"] is not None
-    template['hasSegmentation2D'] = files_metadata["segmentation2d_evaluation"] is not None
-    template['hasSegmentedPcdEvaluation'] = files_metadata["segmented_pcd_evaluation"] is not None
-    template['hasPointCloudEvaluation'] = files_metadata["point_cloud_evaluation"] is not None
-    template['hasManualMeasures'] = "measures" in scan_md or \
-                                    (files_metadata.get("measures", None) is not None and \
-                                     len(io.read_json(fileset_visu.get_file(files_metadata["measures"]))) > 0)
-
-    template['hasSegmentedPointCloud'] = len([f.id for f in scan.get_filesets() if 'SegmentedPointCloud' in f.id]) > 0
-
-    return template
-
-
-def fmt_scans(scans, query):
-    """"""
-    res = []
-    for scan in scans:
-        filesets_matches = compute_fileset_matches(scan)
-        if 'Visualization' in filesets_matches:
-            metadata = scan.get_metadata()
-            if query is not None and not (query.lower() in json.dumps(metadata).lower()):
-                continue
-            try:
-                scan_info = fmt_scan_minimal(scan)
-            except:
-                logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
-                scan_info = get_scan_template(scan.id)
-                scan_info['error'] = True
-        else:
-            logger.warning(f"Scan dataset '{scan.id}' has no `Visualization` fileset!")
-            scan_info = get_scan_template(scan.id)
-            scan_info['error'] = True
-        res.append(scan_info)
-    return res
-
-
-def is_radians(angles):
-    """Guess if the sequence of angles is in radians.
-
-    Parameters
-    ----------
-    angles : list of float
-        Sequence of angle values.
-
-    Returns
-    -------
-    bool
-        `True` if the sequence is in radians, else `False.
-
-    Notes
-    -----
-    This assumes that the angles can not be greater than 360 degrees or its equivalent in radians.
-    """
-    from math import radians
-    if all([angle < radians(360) for angle in angles]):
-        return True
-    else:
-        return False
-
-
-def fmt_scan(scan):
-    global logger
-
-    visu_fileset = scan.get_fileset("Visualization")
-    if visu_fileset is None:
-        logger.warning(f"Scan dataset '{scan.id}' has no `Visualization` fileset!")
-
-    files_metadata = visu_fileset.get_metadata("files")
-    res = fmt_scan_minimal(scan)
-    metadata = scan.get_metadata()
-
-    files_uri = {}
-    if (res["hasMesh"]):
-        files_uri["mesh"] = get_path(visu_fileset.get_file(files_metadata["mesh"]))
-    if (res["hasPointCloud"]):
-        files_uri["pointCloud"] = get_path(visu_fileset.get_file(files_metadata["point_cloud"]))
-    if (res["hasPcdGroundTruth"]):
-        files_uri["pcdGroundTruth"] = get_path(visu_fileset.get_file(files_metadata["pcd_ground_truth"]))
-
-    res["filesUri"] = files_uri
-    res["data"] = {}
-
-    if (res["hasSkeleton"]):
-        x = io.read_json(visu_fileset.get_file(files_metadata["skeleton"]))
-        res["data"]["skeleton"] = x
-
-    if (res["hasSegmentation2D"]):
-        x = io.read_json(visu_fileset.get_file(files_metadata["segmentation2d_evaluation"]))
-        res["data"]["segmentation2D"] = x
-
-    if (res["hasSegmentedPcdEvaluation"]):
-        x = io.read_json(visu_fileset.get_file(files_metadata["segmented_pcd_evaluation"]))
-        res["data"]["segmentedPcdEvaluation"] = x
-
-    if (res["hasPointCloudEvaluation"]):
-        x = io.read_json(visu_fileset.get_file(files_metadata["point_cloud_evaluation"]))
-        res["data"]["pointCloudEvaluation"] = x
-
-    if (res["hasAngleData"]):
-        x = io.read_json(visu_fileset.get_file(files_metadata["angles"]))
-        if "fruit_points" not in x:
-            x["fruit_points"] = []
-        res["data"]["angles"] = x
-        # The plant-3D-explorer expect angles in radians:
-        if not is_radians(res["data"]["angles"]["angles"]):
-            from math import radians
-            res["data"]["angles"]["angles"] = list(map(radians, res["data"]["angles"]["angles"]))
-
-        if res["hasManualMeasures"]:
-            try:
-                res["data"]["angles"]["measured_angles"] = metadata["measures"]["angles"]
-            except KeyError:
-                measures = io.read_json(visu_fileset.get_file(files_metadata["measures"]))
-                res["data"]["angles"]["measured_angles"] = measures["angles"] if "angles" in measures.keys() else []
-            # The plant-3D-explorer expect angles in radians:
-            if not is_radians(res["data"]["angles"]["measured_angles"]):
-                from math import radians
-                res["data"]["angles"]["measured_angles"] = list(map(radians, res["data"]["angles"]["measured_angles"]))
-
-            try:
-                res["data"]["angles"]["measured_internodes"] = metadata["measures"]["internodes"]
-            except KeyError:
-                measures = io.read_json(visu_fileset.get_file(files_metadata["measures"]))
-                res["data"]["angles"]["measured_internodes"] = measures[
-                    "internodes"] if "internodes" in measures.keys() else []
-
-    # backward compatibility
-    try:
-        # old version
-        res["workspace"] = metadata["scanner"]["workspace"]
-    except KeyError:
-        # new version
-        camera_model = io.read_json(visu_fileset.get_file(files_metadata["camera"]))
-        res["workspace"] = camera_model["bounding_box"]
-
-    res["camera"] = {}
-
-    # backward compatibility
-    try:
-        # old version
-        res["camera"]["model"] = metadata["computed"]["camera_model"]
-    except KeyError:
-        # new version
-        camera_model = io.read_json(visu_fileset.get_file(files_metadata["camera"]))
-        res["camera"]["model"] = camera_model["1"]
-
-    res["camera"]["poses"] = []
-
-    poses = io.read_json(visu_fileset.get_file(files_metadata["poses"]))
-    logger.info("-------------------------------------------------")
-    logger.info(files_metadata["images"])
-
-    keys = list(map(lambda e: os.path.splitext(poses[e]['name'])[0], poses.keys()))
-    for i, im in enumerate(files_metadata["images"]):
-        f = visu_fileset.get_file(im)
-        id = f.get_metadata("image_id")
-
-        if id in keys:
-            k = list(poses.keys())[keys.index(id)]
-            res['camera']['poses'].append({
-                'id': id,
-                'tvec': poses[k]['tvec'],
-                'rotmat': poses[k]['rotmat'],
-                'photoUri': get_path(f),
-                'thumbnailUri': get_path(visu_fileset.get_file(files_metadata["thumbnails"][i])),
-                'isMatched': True
-            })
-        else:
-            res['camera']['poses'].append({
-                'id': id,
-                'tvec': [0, 0, 0],
-                'rotmat': [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-                'photoUri': get_path(f),
-                'thumbnailUri': get_path(visu_fileset.get_file(files_metadata["thumbnails"][i])),
-                'isMatched': False
-            })
-
-    return res
-
-
-class ScanList(Resource):
-    def get(self):
-        query = request.args.get('filterQuery')
-        scans = fmt_scans(db.get_scans(), query=query)
-        return scans
-
-
-class Scan(Resource):
-    def get(self, scan_id):
-        scan = db.get_scan(scan_id)
-        return fmt_scan(scan)
-
-
-class File(Resource):
-    def get(self, path):
-        return send_from_directory(db_location, path)
-
-
-class Refresh(Resource):
-    def get(self):
-        global db
-        db.reload()
-        return 200
-
-
-class Image(Resource):
-    """Class representing a image HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
-
-    def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the image data.
-
-        Resize the image if necessary.
-
-        Parameters
-        ----------
-        scanid : str
-            The scan id.
-        filesetid : str
-            The fileset id.
-        fileid : str
-            The file id.
-
-        Returns
-        -------
-        flask.Response
-            The HTTP response from the flask server.
-        """
-        global db
-        size = request.args.get('size', default='thumb', type=str)
-        if not size in ['orig', 'thumb', 'large']:
-            size = 'thumb'
-        path = webcache.image_path(db, scanid, filesetid, fileid, size)
-        return send_file(path, mimetype='image/jpeg')
-
-
-class PointCloud(Resource):
-    """Class representing a point cloud HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
-
-    def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the point cloud data.
-
-        Downsample the point cloud if necessary.
-
-        Parameters
-        ----------
-        scanid : str
-            The scan id.
-        filesetid : str
-            The fileset id.
-        fileid : str
-            The file id.
-
-        Returns
-        -------
-        flask.Response
-            The HTTP response from the flask server.
-        """
-        global db
-        size = request.args.get('size', default='preview', type=str)
-        if not size in ['orig', 'preview']:
-            size = 'preview'
-        path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
-        return send_file(path, mimetype='application/octet-stream')
-
-
-class PointCloudGroundTruth(Resource):
-    """Class representing a point cloud HTTP request, subclass of ``flask_restful``'s ``Resource`` class."""
-
-    def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the point cloud data.
-
-        Downsample the point cloud if necessary.
-
-        Parameters
-        ----------
-        scanid : str
-            The scan id.
-        filesetid : str
-            The fileset id.
-        fileid : str
-            The file id.
-
-        Returns
-        -------
-        flask.Response
-            The HTTP response from the flask server.
-        """
-        global db
-        size = request.args.get('size', default='preview', type=str)
-        if not size in ['orig', 'preview']:
-            size = 'preview'
-        path = webcache.pointcloud_path(db, scanid, filesetid, fileid, size)
-        return send_file(path, mimetype='application/octet-stream')
-
-
-class Mesh(Resource):
-    """Class representing a mesh HTTP request, subclass of ``flask_restful``'s ``Resource`` class.    """
-
-    def get(self, scanid, filesetid, fileid):
-        """Return the HTTP response with the mesh data.
-
-        Downsample the mesh if necessary.
-
-        Parameters
-        ----------
-        scanid : str
-            The scan id.
-        filesetid : str
-            The fileset id.
-        fileid : str
-            The file id.
-
-        Returns
-        -------
-        flask.Response
-            The HTTP response from the flask server.
-        """
-        global db
-        size = request.args.get('size', default='orig', type=str)
-        if not size in ['orig']:
-            size = 'orig'
-        path = webcache.mesh_path(db, scanid, filesetid, fileid, size)
-        return send_file(path, mimetype='application/octet-stream')
 
 
 if __name__ == '__main__':
@@ -428,23 +68,23 @@ if __name__ == '__main__':
         except KeyError:
             db_prefix = "/files/"
 
-    global logger
-    logger = logging.getLogger('werkzeug')
+    # Initialize RESTful resources to serve:
+    api.add_resource(ScanList, '/scans',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Scan, '/scans/<scan_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(File, '/files/<path:path>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Refresh, '/refresh',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Image, '/image/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(PointCloud, '/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
 
-    global db
-    db = FSDB(db_location)
-    logger.info(f"Connecting to local plant database...")
-    db.connect(unsafe=True)
-    logger.info("Done.")
-    logger.info(f"Found {len(db.get_scans())} scans dataset in local plant database.")
-
-    api.add_resource(ScanList, '/scans')
-    api.add_resource(Scan, '/scans/<scan_id>')
-    api.add_resource(File, '/files/<path:path>')
-    api.add_resource(Refresh, '/refresh')
-    api.add_resource(Image, '/image/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(PointCloud, '/pointcloud/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scanid>/<string:filesetid>/<string:fileid>')
-    api.add_resource(Mesh, '/mesh/<string:scanid>/<string:filesetid>/<string:fileid>')
-
+    # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
