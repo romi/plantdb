@@ -336,6 +336,8 @@
         </li>
         <li class="md-nav__item"><a href="#plantdb.fsdb.MARKER_FILE_NAME" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MARKER_FILE_NAME</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#plantdb.fsdb.NotAnFSDBError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NotAnFSDBError</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#plantdb.fsdb.Scan" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scan</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#plantdb.fsdb.Scan.db" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scan.db</span></code></a>
@@ -647,16 +649,12 @@ Lock file <code class="docutils literal notranslate"><span class="pre">LOCK_FILE
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.12)"><strong>IOError</strong></a> – If the given <cite>basedir</cite> is not an existing directory.
-    If the <cite>MARKER_FILE_NAME</cite> is missing from the <cite>basedir</cite>.</p></li>
-<li><p><a class="reference internal" href="db.html#plantdb.db.DBBusyError" title="plantdb.db.DBBusyError"><strong>DBBusyError</strong></a> – If the <cite>LOCK_FILE_NAME</cite> lock fil is found in the <cite>basedir</cite>.</p></li>
-</ul>
+<dd class="field-even"><p><a class="reference internal" href="db.html#plantdb.db.DBBusyError" title="plantdb.db.DBBusyError"><strong>DBBusyError</strong></a> – If the <cite>LOCK_FILE_NAME</cite> lock fil is found in the <cite>basedir</cite>.</p>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#plantdb.fsdb.MARKER_FILE_NAME" title="plantdb.fsdb.MARKER_FILE_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plantdb.fsdb.MARKER_FILE_NAME</span></code></a>, <a class="reference internal" href="#plantdb.fsdb.LOCK_FILE_NAME" title="plantdb.fsdb.LOCK_FILE_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plantdb.fsdb.LOCK_FILE_NAME</span></code></a></p>
+<p><a class="reference internal" href="#plantdb.fsdb.LOCK_FILE_NAME" title="plantdb.fsdb.LOCK_FILE_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plantdb.fsdb.LOCK_FILE_NAME</span></code></a></p>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
@@ -1474,6 +1472,10 @@ If a dictionary, update the metadata dictionary with <cite>data</cite> (<cite>va
 <span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">MARKER_FILE_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'romidb'</span></em><a class="headerlink" href="#plantdb.fsdb.MARKER_FILE_NAME" title="Permalink to this definition">¶</a></dt>
 <dd><p>This file must exist in the root of a folder for it to be considered a valid DB</p>
 </dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="plantdb.fsdb.NotAnFSDBError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">NotAnFSDBError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#NotAnFSDBError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.NotAnFSDBError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="plantdb.fsdb.Scan">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.fsdb.</span></span><span class="sig-name descname"><span class="pre">Scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/fsdb.html#Scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.fsdb.Scan" title="Permalink to this definition">¶</a></dt>

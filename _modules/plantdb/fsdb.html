@@ -468,6 +468,11 @@
     <span class="k">return</span> <span class="n">db</span></div>
 
 
+<div class="viewcode-block" id="NotAnFSDBError"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.NotAnFSDBError">[docs]</a><span class="k">class</span> <span class="nc">NotAnFSDBError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
 <div class="viewcode-block" id="FSDB"><a class="viewcode-back" href="../../reference/fsdb.html#plantdb.fsdb.FSDB">[docs]</a><span class="k">class</span> <span class="nc">FSDB</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DB</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Implement a local *File System DataBase* version of abstract class ``db.DB``.</span>
 
@@ -537,9 +542,28 @@
 <span class="sd">        basedir : str or pathlib.Path</span>
 <span class="sd">            The path to the root directory of the database.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotADirectoryError</span>
+<span class="sd">            If the given `basedir` is not an existing directory.</span>
+<span class="sd">        NotAnFSDBError</span>
+<span class="sd">            If the `MARKER_FILE_NAME` is missing from the `basedir`.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        plantdb.fsdb.MARKER_FILE_NAME</span>
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># Defines attributes:</span>
+
+        <span class="n">basedir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span>
+        <span class="c1"># Check the given path to root directory of the database is a directory:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">basedir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Directory </span><span class="si">{</span><span class="n">basedir</span><span class="si">}</span><span class="s2"> does not exists!"</span><span class="p">)</span>
+        <span class="c1"># Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fsdb</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">NotAnFSDBError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not an FSDB! Check that there is a file named </span><span class="si">{</span><span class="n">MARKER_FILE_NAME</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">basedir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="c1"># Initialize attributes:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">/</span> <span class="n">LOCK_FILE_NAME</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="p">[]</span>
@@ -559,15 +583,11 @@
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
-<span class="sd">        IOError</span>
-<span class="sd">            If the given `basedir` is not an existing directory.</span>
-<span class="sd">            If the `MARKER_FILE_NAME` is missing from the `basedir`.</span>
 <span class="sd">        DBBusyError</span>
 <span class="sd">            If the `LOCK_FILE_NAME` lock fil is found in the `basedir`.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
-<span class="sd">        plantdb.fsdb.MARKER_FILE_NAME</span>
 <span class="sd">        plantdb.fsdb.LOCK_FILE_NAME</span>
 
 <span class="sd">        Examples</span>
@@ -583,12 +603,6 @@
 <span class="sd">        &gt;&gt;&gt; db.disconnect()</span>
 
 <span class="sd">        """</span>
-        <span class="c1"># Check the given path to root directory of the database is a directory:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="c1"># Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fsdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()):</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a DB! Check that there is a file named </span><span class="si">{</span><span class="n">MARKER_FILE_NAME</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">unsafe</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">_load_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
