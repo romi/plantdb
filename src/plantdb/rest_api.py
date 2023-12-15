@@ -284,14 +284,18 @@ def get_scan_data(scan):
 
     Examples
     --------
-    >>> from os import environ
     >>> from plantdb.rest_api import get_scan_data
-    >>> from plantdb.fsdb import FSDB
-    >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
-    >>> db.connect(unsafe=True)
-    >>> scan = db.get_scan('sango_90_300_36')
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_data = get_scan_data(scan)
-    >>> print(scan_data)
+    >>> print(scan_data['id'])
+    real_plant_analyzed
+    >>> print(scan_data['filesUri'])
+    {'pointCloud': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'), 'mesh': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply'), 'skeleton': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/CurveSkeleton__TriangleMesh_0393cb5708/CurveSkeleton.json'), 'tree': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TreeGraph__False_CurveSkeleton_c304a2cc71/TreeGraph.p')}
+    >>> print(scan_data['camera']["model"])
+    SIMPLE_RADIAL
     >>> db.disconnect()
     """
     task_fs_map = compute_fileset_matches(scan)
@@ -307,7 +311,7 @@ def get_scan_data(scan):
         scan_data["filesUri"]["mesh"] = scan.get_fileset(task_fs_map['TriangleMesh']).get_file('TriangleMesh').path()
     # Get the URI to the TreeGraph related file:
     if scan_data["hasSkeleton"]:
-        scan_data["filesUri"]["skeleton"] = scan.get_fileset(task_fs_map['Skeleton']).get_file('Skeleton').path()
+        scan_data["filesUri"]["skeleton"] = scan.get_fileset(task_fs_map['CurveSkeleton']).get_file('CurveSkeleton').path()
     # Get the URI to the TreeGraph related file:
     if scan_data["hasTreeGraph"]:
         scan_data["filesUri"]["tree"] = scan.get_fileset(task_fs_map['TreeGraph']).get_file('TreeGraph').path()
@@ -316,7 +320,7 @@ def get_scan_data(scan):
     scan_data['data'] = {}
     # Load the skeleton data:
     if scan_data["hasSkeleton"]:
-        scan_data['data']["skeleton"] = read_json(scan.get_fileset(task_fs_map['Skeleton']).get_file('Skeleton'))
+        scan_data['data']["skeleton"] = read_json(scan.get_fileset(task_fs_map['CurveSkeleton']).get_file('CurveSkeleton'))
     # Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
         measures = read_json(scan.get_fileset(task_fs_map['AnglesAndInternodes']).get_file('AnglesAndInternodes'))
@@ -333,7 +337,7 @@ def get_scan_data(scan):
     # Load the workspace, aka bounding-box:
     try:
         # old version: get scanner workspace
-        scan_data["workspace"] = scan.get_metadata("scanner")["workspace"]
+        scan_data["workspace"] = scan.get_metadata()["scanner"]["workspace"]
     except KeyError:
         # new version: get it from colmap fileset metadata 'bounding-box'
         scan_data["workspace"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("bounding_box")
@@ -343,19 +347,21 @@ def get_scan_data(scan):
     # Load the camera model:
     try:
         # old version
-        scan_data["camera"]["model"] = scan.get_metadata("computed")["camera_model"]
+        scan_data["camera"]["model"] = scan.get_metadata()["computed"]["camera_model"]
     except KeyError:
         # new version: get it from colmap fileset metadata 'task_params'/'camera_model':
         scan_data["camera"]["model"] = scan.get_fileset(task_fs_map['Colmap']).get_metadata("task_params")[
             'camera_model']
     # Load the camera poses from the images metadata:
+    scan_data['camera']['poses'] = []  # initialize list of poses to gather
     img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
     for img_idx, img_f in enumerate(img_fs.get_files()):
         camera_md = img_f.get_metadata("colmap_camera")
         scan_data['camera']['poses'].append({
-            'id': img_idx+1,
+            'id': img_idx + 1,
             'tvec': camera_md['tvec'],
             'rotmat': camera_md['rotmat'],
             'photoUri': img_f.path(),
             'isMatched': True
         })
+    return scan_data
