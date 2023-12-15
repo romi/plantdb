@@ -338,6 +338,7 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     >>> setup_test_database(['real_plant', 'virtual_plant'], '/tmp/ROMI_DB', with_configs=True)
     """
     from plantdb.fsdb import MARKER_FILE_NAME
+    from plantdb.fsdb import LOCK_FILE_NAME
     if isinstance(out_path, str):
         out_path = Path(out_path)
     # Make sure the path to the database exists:
@@ -345,6 +346,9 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     # Make sure the marker file exists:
     marker_path = out_path / MARKER_FILE_NAME
     marker_path.touch(exist_ok=True)
+    # Make sure the locking file do NOT exist:
+    lock_path = out_path / LOCK_FILE_NAME
+    lock_path.unlink(missing_ok=True)
     # Get the list of all test dataset if required:
     if isinstance(dataset, str) and dataset.lower() == "all":
         dataset = DATASET
