@@ -7,10 +7,10 @@ from pathlib import Path
 
 from plantdb.fsdb import MARKER_FILE_NAME
 from plantdb.sync import FSDBSync
-from plantdb.testing import DBTestCase
+from plantdb.testing import DummyDBTestCase
 
 
-class TestSync(DBTestCase):
+class TestSyncDummy(DummyDBTestCase):
     def test_sync_local_local(self):
         db = self.get_test_db()
         db.disconnect()

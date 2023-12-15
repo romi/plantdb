@@ -3,10 +3,10 @@
 import json
 import subprocess
 
-from plantdb.testing import DBTestCase
+from plantdb.testing import DummyDBTestCase
 
 
-class TestFSDB(DBTestCase):
+class TestFSDBDummy(DummyDBTestCase):
 
     def test_import(self):
         db = self.get_test_db()

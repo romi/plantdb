@@ -8,12 +8,12 @@ import open3d as o3d
 
 from plantdb import io
 from plantdb.io import fsdbfile_from_local_file
-from plantdb.testing import DBTestCase
+from plantdb.testing import DummyDBTestCase
 
 rng = np.random.default_rng()
 
 
-class TestIO(DBTestCase):
+class TestIODummy(DummyDBTestCase):
     """Test the IO module."""
 
     def _test_write_file(self, obj, ext, **kwargs):

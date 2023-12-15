@@ -7,10 +7,10 @@ from plantdb import FSDB
 from plantdb.fsdb import File
 from plantdb.fsdb import Fileset
 from plantdb.fsdb import Scan
-from plantdb.testing import DBTestCase
+from plantdb.testing import DummyDBTestCase
 
 
-class TestFSDB(DBTestCase):
+class TestFSDBDummy(DummyDBTestCase):
 
     def test_connect(self):
         db = self.get_test_db()

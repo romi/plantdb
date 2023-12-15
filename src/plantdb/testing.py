@@ -56,15 +56,15 @@ class TemporaryCloneDB(object):
             return
 
 
-class DBTestCase(unittest.TestCase):
-    """A test database.
+class DummyDBTestCase(unittest.TestCase):
+    """A dummy test database.
 
     Attributes
     ----------
-    db : plantdb.FSDB
+    db : plantdb.fsdb.FSDB
         The temporary directory.
-    tmpclone : TemporaryCloneDB
-        A local temporary copy of a test database.
+    tmpclone : plantdb.testing.TemporaryCloneDB
+        A local temporary copy of a dummy test database.
     """
 
     def setUp(self):
