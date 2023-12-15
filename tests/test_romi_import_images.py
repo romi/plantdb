@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import json
 import subprocess
 
@@ -33,6 +34,6 @@ class TestFSDBDummy(DummyDBTestCase):
         # Test metadata exists
         self.assertIsNotNone(fs.metadata)
         # Compare to original JSON
-        with open(scan.path()/"metadata"/"images.json") as json_f:
+        with open(scan.path() / "metadata" / "images.json") as json_f:
             md_json = json.load(json_f)
         self.assertDictEqual(fs.metadata, md_json)
