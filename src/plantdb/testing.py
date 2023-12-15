@@ -29,6 +29,8 @@ from pathlib import Path
 
 from plantdb.fsdb import FSDB
 from plantdb.fsdb import dummy_db
+from plantdb.test_database import setup_test_database
+from plantdb.utils import locate_task_filesets
 
 
 class TemporaryCloneDB(object):
@@ -137,3 +139,61 @@ class DummyDBTestCase(unittest.TestCase):
         fileset = self.get_test_fileset()
         file = fileset.get_file("test_image")
         return file
+
+
+class FSDBTestCase(unittest.TestCase):
+    """A local FSDB test database.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        The temporary test database with the 'real_plant_analyzed' dataset.
+    """
+
+    def setUp(self):
+        """Set up a test database with the 'real_plant_analyzed' dataset."""
+        db_path = setup_test_database('real_plant_analyzed', out_path=Path(tempfile.gettempdir()) / 'ROMI_DB', keep_tmp=True)
+        self.db = FSDB(db_path)
+
+    def tearDown(self):
+        """Clean up after test."""
+        try:
+            self.db.disconnect()
+        except:
+            pass
+        from shutil import rmtree
+        rmtree(self.db.path(), ignore_errors=True)
+
+    def get_test_db(self) -> FSDB:
+        """Return the test ``FSDB`` database."""
+        self.db.connect()
+        return self.db
+
+    def get_test_scan(self):
+        """Return the default test ``Scan`` object named 'real_plant_analyzed'.
+
+        Returns
+        -------
+        plantdb.fsdb.Scan
+            The default ``Scan`` instance to test.
+        """
+        db = self.get_test_db()
+        scan = db.get_scan("real_plant_analyzed")
+        return scan
+
+    def get_task_fileset(self, task_name):
+        """Return the fileset for the corresponding task.
+
+        Parameters
+        ----------
+        task_name : str
+            The name of the task to get the fileset for.
+
+        Returns
+        -------
+        plantdb.fsdb.Fileset
+            The ``Fileset`` instance to use.
+        """
+        scan = self.get_test_scan()
+        return locate_task_filesets(scan, [task_name])[task_name]
+
