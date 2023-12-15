@@ -234,6 +234,11 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     return db
 
 
+class NotAnFSDBError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class FSDB(db.DB):
     """Implement a local *File System DataBase* version of abstract class ``db.DB``.
 
@@ -303,9 +308,28 @@ class FSDB(db.DB):
         basedir : str or pathlib.Path
             The path to the root directory of the database.
 
+        Raises
+        ------
+        NotADirectoryError
+            If the given `basedir` is not an existing directory.
+        NotAnFSDBError
+            If the `MARKER_FILE_NAME` is missing from the `basedir`.
+
+        See Also
+        --------
+        plantdb.fsdb.MARKER_FILE_NAME
         """
         super().__init__()
-        # Defines attributes:
+
+        basedir = Path(basedir)
+        # Check the given path to root directory of the database is a directory:
+        if not basedir.is_dir():
+            raise NotADirectoryError(f"Directory {basedir} does not exists!")
+        # Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:
+        if not _is_fsdb(basedir):
+            raise NotAnFSDBError(f"Not an FSDB! Check that there is a file named {MARKER_FILE_NAME} in {basedir}")
+
+        # Initialize attributes:
         self.basedir = Path(basedir).resolve()
         self.lock_path = self.basedir / LOCK_FILE_NAME
         self.scans = []
@@ -325,15 +349,11 @@ class FSDB(db.DB):
 
         Raises
         ------
-        IOError
-            If the given `basedir` is not an existing directory.
-            If the `MARKER_FILE_NAME` is missing from the `basedir`.
         DBBusyError
             If the `LOCK_FILE_NAME` lock fil is found in the `basedir`.
 
         See Also
         --------
-        plantdb.fsdb.MARKER_FILE_NAME
         plantdb.fsdb.LOCK_FILE_NAME
 
         Examples
@@ -349,12 +369,6 @@ class FSDB(db.DB):
         >>> db.disconnect()
 
         """
-        # Check the given path to root directory of the database is a directory:
-        if not self.path().is_dir():
-            raise IOError(f"Not a directory: {self.path()}")
-        # Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:
-        if not _is_fsdb(self.path()):
-            raise IOError(f"Not a DB! Check that there is a file named {MARKER_FILE_NAME} in {self.path()}")
         if not self.is_connected:
             if unsafe:
                 self.scans = _load_scans(self)
