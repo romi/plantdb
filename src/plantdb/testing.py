@@ -33,11 +33,10 @@ This module provides a set of classes useful for testing procedures.
 import shutil
 import tempfile
 import unittest
-from pathlib import Path
 
 from plantdb.fsdb import FSDB
 from plantdb.fsdb import dummy_db
-from plantdb.test_database import setup_test_database
+from plantdb.test_database import test_database
 from plantdb.utils import locate_task_filesets
 
 
@@ -160,8 +159,7 @@ class FSDBTestCase(unittest.TestCase):
 
     def setUp(self):
         """Set up a test database with the 'real_plant_analyzed' dataset."""
-        db_path = setup_test_database('real_plant_analyzed', out_path=Path(tempfile.gettempdir()) / 'ROMI_DB', keep_tmp=True)
-        self.db = FSDB(db_path)
+        self.db = test_database('real_plant_analyzed')
 
     def tearDown(self):
         """Clean up after test."""
@@ -204,4 +202,3 @@ class FSDBTestCase(unittest.TestCase):
         """
         scan = self.get_test_scan()
         return locate_task_filesets(scan, [task_name])[task_name]
-
