@@ -98,6 +98,8 @@ ZIP_MD5S = {
 ROOT = Path(__file__).absolute().parent.parent.parent
 #: Path to `plantdb` module "tests/testdata" directory:
 TEST_DIR = ROOT / "tests" / "testdata"
+#: Path to the temporary test database directory.
+TMP_TEST_DIR = Path(gettempdir()) / 'ROMI_DB'
 
 logger = configure_logger(__name__)
 
@@ -353,11 +355,13 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
 
     Examples
     --------
-    >>> from plantdb.test_database import setup_test_database
+    >>> from plantdb.test_database import setup_test_database, TMP_TEST_DIR
     >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
     >>> setup_test_database('real_plant')
+    PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
     >>> # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':
-    >>> setup_test_database(['real_plant', 'virtual_plant'], '/tmp/ROMI_DB', with_configs=True)
+    >>> setup_test_database(['real_plant', 'virtual_plant'], TMP_TEST_DIR, with_configs=True)
+    PosixPath('/tmp/ROMI_DB')
     """
     from plantdb.fsdb import MARKER_FILE_NAME
     from plantdb.fsdb import LOCK_FILE_NAME
@@ -389,3 +393,45 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
 
     logger.info(f"The test database is set up under '{out_path}'.")
     return out_path
+
+
+def test_database(dataset='real_plant_analyzed', out_path=TMP_TEST_DIR, **kwargs):
+    """Create and return an FSDB test database.
+
+    Parameters
+    ----------
+    dataset : str or list of str, optional
+        The (list of) test dataset to use, by default 'real_plant_analyzed'.
+    out_path : str or pathlib.Path, optional
+        The path where to set up the database.
+        Defaults to the temporary directory under 'ROMI_DB', as defined by ``TMP_TEST_DIR``.
+
+    Other Parameters
+    ----------------
+    keep_tmp : bool
+        Whether to keep the temporary files. Defaults to ``False``.
+    with_configs : bool
+        Whether to download the config files. Defaults to ``False``.
+    with_models : bool
+        Whether to download the trained CNN model files. Defaults to ``False``.
+    force : bool
+        Whether to force redownload of archive. Defaults to ``False``.
+
+    Returns
+    -------
+    plantdb.fsdb.FSDB
+        The FSDB test database.
+
+    Examples
+    --------
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database()
+    >>> db.connect()
+    >>> db.list_scans()
+    ['real_plant_analyzed']
+    >>> db.path()
+    PosixPath('/tmp/ROMI_DB')
+    >>> db.disconnect()
+    """
+    from plantdb.fsdb import FSDB
+    return FSDB(setup_test_database(dataset, out_path=out_path, **kwargs))
