@@ -1043,14 +1043,16 @@
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="fsdbfile_from_local_file"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.fsdbfile_from_local_file">[docs]</a><span class="k">def</span> <span class="nf">fsdbfile_from_local_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="fsdb_file_from_local_file"><a class="viewcode-back" href="../../reference/io.html#plantdb.io.fsdb_file_from_local_file">[docs]</a><span class="k">def</span> <span class="nf">fsdb_file_from_local_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file."""</span>
     <span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+    <span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">MARKER_FILE_NAME</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">dirname</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
     <span class="nb">id</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
-    <span class="c1"># Initialise the `DB` abstract class:</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="c1"># Initialise a temporary `FSDB`:</span>
+        <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tmpdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">MARKER_FILE_NAME</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>  <span class="c1"># add the db marker file</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
         <span class="c1"># Initialize a `Scan` instance:</span>
         <span class="n">scan</span> <span class="o">=</span> <span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s2">"tmp"</span><span class="p">)</span>
