@@ -80,9 +80,9 @@ DATASET = ["real_plant", "real_plant_analyzed",
 BASE_URL = "https://zenodo.org/records/10379172/files/"
 #: The ZENODO URL corresponding to the pipeline configurations, trained CNN models and test datasets archives:
 ZIP_URLS = {
-               "configs": BASE_URL + "configs.zip",
-               "models": BASE_URL + "models.zip",
-           } | {ds: BASE_URL + f"{ds}.zip" for ds in DATASET}
+    **{"configs": BASE_URL + "configs.zip", "models": BASE_URL + "models.zip"},
+    **{ds: BASE_URL + f"{ds}.zip" for ds in DATASET}
+}
 #: The ZENODO MD5 hashes corresponding to the pipeline configurations, trained CNN models and test datasets archives:
 ZIP_MD5S = {
     "configs": "41e3739a3f9311ee50d328ff1c3087c8",

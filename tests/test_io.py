@@ -7,7 +7,7 @@ import numpy as np
 import open3d as o3d
 
 from plantdb import io
-from plantdb.io import fsdbfile_from_local_file
+from plantdb.io import fsdb_file_from_local_file
 from plantdb.testing import DummyDBTestCase
 
 rng = np.random.default_rng()
@@ -44,7 +44,7 @@ class TestIODummy(DummyDBTestCase):
         return fpath, obj, ext
 
     def _test_read_file(self, fpath, ref_obj, ext):
-        dbfile = fsdbfile_from_local_file(fpath)
+        dbfile = fsdb_file_from_local_file(fpath)
         if ext == "json":
             io_obj = io.read_json(dbfile)
         elif ext == "toml":

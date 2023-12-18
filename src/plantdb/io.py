@@ -809,14 +809,16 @@ def to_file(dbfile: File, path: str):
     return
 
 
-def fsdbfile_from_local_file(path: str):
+def fsdb_file_from_local_file(path: str):
     """Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file."""
     from plantdb import FSDB
+    from plantdb.fsdb import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem
-    # Initialise the `DB` abstract class:
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Initialise a temporary `FSDB`:
+        Path(f"{tmpdir}/{MARKER_FILE_NAME}").touch()  # add the db marker file
         db = FSDB(tmpdir)
         # Initialize a `Scan` instance:
         scan = Scan(db, "tmp")
