@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.Image
+=======================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: Image
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Image.__init__
+      ~Image.as_view
+      ~Image.dispatch_request
+      ~Image.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Image.decorators
+      ~Image.init_every_request
+      ~Image.method_decorators
+      ~Image.methods
+      ~Image.provide_automatic_options
+      ~Image.representations
+   
+   

@@ -8,6 +8,8 @@
 
 ```
 
+## Details
+
 ```{eval-rst}
 .. automodule:: plantdb.io
    :members:

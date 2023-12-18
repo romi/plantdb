@@ -1,6 +1,7 @@
+
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -46,19 +47,20 @@
   
   
     <title>plantdb.db &#8212; plantdb  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=83e35b93" />
-    <link rel="stylesheet" type="text/css" href="../../_static/material.css?v=79c92029" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css?v=2a6c4383" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css?v=45cf7dbc" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css?v=d290406d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <link rel="icon" href="../../_static/ROMI_favicon_green.png"/>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   
@@ -87,7 +89,8 @@
         <a href="../../index.html" title="plantdb  documentation"
            class="md-header-nav__button md-logo">
           
-            &nbsp;
+              <img src="../../_static/logo.svg" height="26"
+                   alt="plantdb logo">
           
         </a>
       </div>
@@ -185,7 +188,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="../../index.html" title="plantdb documentation" class="md-nav__button md-logo">
       
-        <img src="../../_static/" alt=" logo" width="48" height="48">
+        <img src="../../_static/logo.svg" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../../index.html"
@@ -234,39 +237,38 @@
   <h1 id="modules-plantdb-db--page-root">Source code for plantdb.db</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># plantdb - Data handling tools for the ROMI project</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (C) 2018-2019 Sony Computer Science Laboratories</span>
 <span class="c1"># Authors: D. Colliaux, T. Wintz, P. Hanappe</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># This file is part of plantdb.</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># plantdb is free software: you can redistribute it</span>
 <span class="c1"># and/or modify it under the terms of the GNU Lesser General Public</span>
 <span class="c1"># License as published by the Free Software Foundation, either</span>
 <span class="c1"># version 3 of the License, or (at your option) any later version.</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># plantdb is distributed in the hope that it will be</span>
 <span class="c1"># useful, but WITHOUT ANY WARRANTY; without even the implied</span>
 <span class="c1"># warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
 <span class="c1"># See the GNU General Public License for more details.</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU Lesser General Public</span>
 <span class="c1"># License along with plantdb.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 <span class="c1"># ------------------------------------------------------------------------------</span>
 
 <span class="sd">"""</span>
-<span class="sd">plantdb.db</span>
-<span class="sd">===========</span>
-
 <span class="sd">API for the database module in the ROMI project.</span>
 
-<span class="sd">A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.</span>
-<span class="sd">A ``Scan`` can be made of several list of files ``Fileset``.</span>
-<span class="sd">A ``Fileset`` is made of a list of files ``Files``.</span>
-<span class="sd">A ``File`` can be an image, text of bytes.</span>
+<span class="sd">The following classes are defined:</span>
+<span class="sd">  * A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.</span>
+<span class="sd">  * A ``Scan`` can be made of several list of files ``Fileset``.</span>
+<span class="sd">  * A ``Fileset`` is made of a list of files ``Files``.</span>
+<span class="sd">  * A ``File`` can be an image, text of bytes.</span>
 
+<span class="sd">It should be subclassed to implement an actual database interface.</span>
 <span class="sd">"""</span>
 
 
@@ -765,7 +767,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

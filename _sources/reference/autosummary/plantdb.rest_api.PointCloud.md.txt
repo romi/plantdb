@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.PointCloud
+============================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: PointCloud
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PointCloud.__init__
+      ~PointCloud.as_view
+      ~PointCloud.dispatch_request
+      ~PointCloud.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointCloud.decorators
+      ~PointCloud.init_every_request
+      ~PointCloud.method_decorators
+      ~PointCloud.methods
+      ~PointCloud.provide_automatic_options
+      ~PointCloud.representations
+   
+   
