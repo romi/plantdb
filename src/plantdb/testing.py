@@ -188,7 +188,7 @@ class FSDBTestCase(unittest.TestCase):
         return scan
 
     def get_task_fileset(self, task_name):
-        """Return the fileset for the corresponding task.
+        """Return the fileset id for the corresponding task.
 
         Parameters
         ----------
@@ -197,8 +197,8 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.fsdb.Fileset
-            The ``Fileset`` instance to use.
+        str
+            The ``Fileset`` name corresponding to the given task.
         """
         scan = self.get_test_scan()
         return locate_task_filesets(scan, [task_name])[task_name]
