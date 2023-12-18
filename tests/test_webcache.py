@@ -45,7 +45,7 @@ class TestWebCache(FSDBTestCase):
     def test_orig_pcd_path(self):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'PointCloud' task:
-        fs_id = self.get_task_fileset('PointCloud').id
+        fs_id = self.get_task_fileset('PointCloud')
         # Get the path to the original file using webcache module:
         pcd_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'PointCloud', 'orig')
         # Get the path to the original file using FSDB methods:
@@ -56,7 +56,7 @@ class TestWebCache(FSDBTestCase):
     def test_preview_pcd_path(self):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'PointCloud' task:
-        fs_id = self.get_task_fileset('PointCloud').id
+        fs_id = self.get_task_fileset('PointCloud')
         # Get the path to the preview file using webcache module:
         pcd_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'PointCloud', 'preview')
         # Assert the folder containing the preview pcd is 'webcache':
@@ -65,7 +65,7 @@ class TestWebCache(FSDBTestCase):
     def test_orig_mesh_path(self):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'TriangleMesh' task:
-        fs_id = self.get_task_fileset('TriangleMesh').id
+        fs_id = self.get_task_fileset('TriangleMesh')
         # Get the path to the original file using webcache module:
         mesh_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'TriangleMesh', 'orig')
         # Get the path to the original file using FSDB methods:
