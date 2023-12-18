@@ -3,8 +3,12 @@
 
 import json
 import subprocess
+import unittest
+from pathlib import Path
 
 from plantdb.testing import DummyDBTestCase
+
+TESTS_ROOT = Path(__file__).parent  # path to the 'plantdb/tests/' directory
 
 
 class TestFSDBDummy(DummyDBTestCase):
@@ -12,10 +16,16 @@ class TestFSDBDummy(DummyDBTestCase):
     def test_import(self):
         db = self.get_test_db()
         db.disconnect()
-        out = subprocess.run(["romi_import_images", str(db.path()), "testdata/testscan/testfileset/",
+        copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
+        out = subprocess.run(["romi_import_images", str(db.path()), copy_path,
                               "--name", "test_import_img",
-                              "--metadata", "testdata/testscan/files.json"], capture_output=True)
-        self.assertTrue(out.returncode == 0)
+                              "--metadata", TESTS_ROOT / "testdata" / "testscan" / "files.json"], capture_output=True)
+        rcode = out.returncode
+        if rcode != 0:
+            print(f"Return code: {rcode}")
+            print(f"Captured stdout: {out.stdout}")
+            print(f"Captured stderr: {out.stderr}")
+        self.assertTrue(rcode == 0, msg=f"Return code is {rcode}: {out.stderr}")
         db.connect()
         # Test database path:
         self.assertTrue(db.path().is_dir())
@@ -37,3 +47,7 @@ class TestFSDBDummy(DummyDBTestCase):
         with open(scan.path() / "metadata" / "images.json") as json_f:
             md_json = json.load(json_f)
         self.assertDictEqual(fs.metadata, md_json)
+
+
+if __name__ == "__main__":
+    unittest.main()
