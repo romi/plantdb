@@ -1,16 +1,17 @@
 setuptools
 wheel
 appdirs
+colorlog
 flask
 flask-cors
 flask-restful
-imageio>= 2.16.2
 imagecodecs
-scikit-image
-colorlog
+imageio>= 2.16.2
 numpy
-pillow
-toml
 open3d>= 0.9.0.0
+pillow
+scikit-image
+toml
+tqdm
 nose2
 coverage
