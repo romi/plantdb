@@ -26,7 +26,7 @@ opts = dict(
     url="https://docs.romi-project.eu/plant_imager/",
     package_data={"tests": ["test_fsdb.py", "test_io.py", "test_sync.py"]},
     zip_safe=False,
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
