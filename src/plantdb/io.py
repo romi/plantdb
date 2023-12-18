@@ -23,7 +23,8 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.
+"""
+The ``io`` module of the ROMI ``plantdb`` library contains all functions for reading and writing data to database.
 
 Hereafter we detail the formats and their associated Python types and meanings.
 

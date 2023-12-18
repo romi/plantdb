@@ -23,7 +23,8 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Implementation of a database as a local file structure.
+"""
+This module implement a database as a **local file structure**.
 
 Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``Scan`` with ``'myscan_001'`` as ``Scan.id`` and there are some metadata (see below), you should have the following file structure:
 

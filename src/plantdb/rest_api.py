@@ -24,10 +24,7 @@
 # ------------------------------------------------------------------------------
 
 """
-plantdb.rest_api
-================
-
-This module regroup the methods used to serve a REST API using ``plantdb_rest_api`` CLI.
+This module regroup the classes and methods used to serve a REST API using ``plantdb_rest_api`` CLI.
 """
 
 import datetime

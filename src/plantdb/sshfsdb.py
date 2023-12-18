@@ -23,7 +23,9 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Implementation of a database as a file structure on a remote server using SSHFS."""
+"""
+This module implement a database as a **file structure on a remote server using SSHFS**.
+"""
 
 import subprocess
 

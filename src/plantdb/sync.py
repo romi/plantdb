@@ -23,6 +23,10 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+"""
+This module provides a synchronization mechanism for PlantDB.
+"""
+
 import subprocess
 from pathlib import Path
 

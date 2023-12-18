@@ -24,9 +24,6 @@
 # ------------------------------------------------------------------------------
 
 """
-plantdb.test_database
-=====================
-
 This module regroup tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
 It aims at simplifying the creation of a test database for demonstration or CI purposes.
 

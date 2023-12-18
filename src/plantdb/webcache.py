@@ -24,16 +24,12 @@
 # ------------------------------------------------------------------------------
 
 """
-plantdb.webcache
-=============
+This module provides three utility functions that are used in combination with the
+DB interface to create downsized versions of images, point clouds, and mesh resources.
+The resources are identified using the ``Scan``, ``Fileset``, and `File` IDs.
+The downsized versions are cached in the `'webcache'` directory in the scan directory.
 
-Provides three utility functions that are used in combination with the
-DB interface to create downsized versions of images, point clouds, and
-mesh resources. The resources are identified using the scan, fileset,
-and file IDs.  The downsized versions are cached in the 'webcache'
-directory in the scan directory.
-
-The following size specifications are available:
+The following **size specifications** are available:
 
 * Images: 'thumb' (max. 150x150), 'large' (max. 1500x1500), and 'orig' (original size).
 * Point clouds: 'preview' (max. 10k points), and 'orig' (original size).
@@ -273,6 +269,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
            * 'orig': original image, no chache;
            * 'large': image max width and height to `1500`;
            * 'thumb': image max width and height to `150`.
+
         Default to 'orig'.
 
     Returns

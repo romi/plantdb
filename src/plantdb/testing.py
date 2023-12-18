@@ -24,9 +24,6 @@
 # ------------------------------------------------------------------------------
 
 """
-plantdb.testing
-===============
-
 This module provides a set of classes useful for testing procedures.
 """
 
