@@ -14,7 +14,7 @@ jobs:
       uses: ammaraskar/sphinx-action@master
       with:
         pre-build-command: |
-          apt install libgl1-mesa-glx
+          apt-get install libgl1-mesa-glx -y
           python3 -m pip install sphinx --upgrade
           python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
           python3 -m pip install -r requirements.txt
