@@ -124,7 +124,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
                        'scikit-learn': ('https://scikit-learn.org/stable/', None),
                        'scikit-image': ('https://scikit-image.org/docs/stable/', None),
-                       'scipy': ('https://docs.scipy.org/doc/scipy/', None)
+                       'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+                       'flask': ('https://flask.palletsprojects.com/en/3.0.x/', None),
                        }
 
 # List of `intersphinx_mapping`:
