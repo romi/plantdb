@@ -20,14 +20,20 @@ requirements:
     - python  {{ python }}
   run:
     - python  {{ python }}
+    - numpy
     - appdirs
+    - colorlog
     - flask
     - flask-cors
     - flask-restful
-    - imageio
+    - imagecodecs
+    - imageio>= 2.16.2
     - numpy
+    - open3d>= 0.9.0.0
     - pillow
+    - scikit-image
     - toml
+    - tqdm
 
 test:
   imports:
