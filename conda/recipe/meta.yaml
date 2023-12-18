@@ -29,7 +29,7 @@ requirements:
     - imagecodecs
     - imageio>= 2.16.2
     - numpy
-    - open3d>= 0.9.0.0
+    - open3d>= 0.9.0.0,<0.15
     - pillow
     - scikit-image
     - toml
