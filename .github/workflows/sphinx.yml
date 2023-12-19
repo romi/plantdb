@@ -22,13 +22,16 @@ jobs:
         with:
           python-version: '3.9'  # select python version
           cache: 'pip'  # caching pip dependencies
-        run: |  # installing sphinx and dependencies
+
+      - name: Install Sphinx & requirements
+        run: |
           python3 -m pip install sphinx --upgrade
           python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
-          python3 -m pip install -r requirements.txt
 
-      - name: Install PlantDB
-        run: python3 -m pip install -e .
+      - name: Install PlantDB & requirements
+        run: |
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -e .
 
       - name: Build documentation with Sphinx
         run: |
