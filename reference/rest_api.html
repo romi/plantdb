@@ -64,7 +64,7 @@
     <link rel="shortcut icon" href="../_static/ROMI_favicon_green.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="plantdb.rest_api.ScanList" href="autosummary/plantdb.rest_api.ScanList.html" />
+    <link rel="next" title="REST URLs" href="../webapi.html" />
     <link rel="prev" title="Webcache module" href="webcache.html" />
   
    
@@ -231,7 +231,7 @@
         </li>
         <li class="md-nav__item"><a href="#methods" class="md-nav__link">Methods</a>
         </li>
-        <li class="md-nav__item"><a href="#module-plantdb.rest_api" class="md-nav__link">Details</a>
+        <li class="md-nav__item"><a href="#details" class="md-nav__link">Details</a>
         </li></ul>
             </nav>
         </li>
@@ -251,7 +251,6 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="rest-api">
 <h1 id="reference-rest-api--page-root">REST API<a class="headerlink" href="#reference-rest-api--page-root" title="Permalink to this headline">¶</a></h1>
-<p>This module regroup the classes and methods used to serve a REST API using <code class="docutils literal notranslate"><span class="pre">plantdb_rest_api</span></code> CLI.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -260,30 +259,6 @@
 <col style="width: 90%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.ScanList" title="plantdb.rest_api.ScanList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScanList</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.Scan" title="plantdb.rest_api.Scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Scan</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve a scan dataset upon request (GET method).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.File" title="plantdb.rest_api.File"><code class="xref py py-obj docutils literal notranslate"><span class="pre">File</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve a file upon request (GET method).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.Refresh" title="plantdb.rest_api.Refresh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Refresh</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to reload the database upon request (GET method).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.Image" title="plantdb.rest_api.Image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Image</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve an image upon request (GET method).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.PointCloud" title="plantdb.rest_api.PointCloud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCloud</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve a point-cloud upon request (GET method).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.PointCloudGroundTruth" title="plantdb.rest_api.PointCloudGroundTruth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCloudGroundTruth</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve a ground-truth point-cloud upon request (GET method).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.Mesh" title="plantdb.rest_api.Mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mesh</span></code></a>(db)</p></td>
-<td><p>Concrete RESTful resource to serve a triangular mesh upon request (GET method).</p></td>
-</tr>
 </tbody>
 </table>
 </section>
@@ -295,334 +270,11 @@
 <col style="width: 90%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.get_scan_date" title="plantdb.rest_api.get_scan_date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scan_date</span></code></a>(scan)</p></td>
-<td><p>Get the acquisition datetime of a scan.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.compute_fileset_matches" title="plantdb.rest_api.compute_fileset_matches"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_fileset_matches</span></code></a>(scan)</p></td>
-<td><p>Return a dictionary mapping the scan tasks to fileset names.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.get_path" title="plantdb.rest_api.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(f[, db_prefix])</p></td>
-<td><p>Return the path to a file.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.get_scan_template" title="plantdb.rest_api.get_scan_template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scan_template</span></code></a>(scan_id[, error])</p></td>
-<td><p>Template dictionary for a scan.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.list_scans_info" title="plantdb.rest_api.list_scans_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_scans_info</span></code></a>(scans[, query])</p></td>
-<td><p>List scans information.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.rest_api.get_scan_info" title="plantdb.rest_api.get_scan_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scan_info</span></code></a>(scan)</p></td>
-<td><p>Get the information related to a single scan dataset.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.rest_api.get_scan_data" title="plantdb.rest_api.get_scan_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scan_data</span></code></a>(scan)</p></td>
-<td><p>Get the scan information and data.</p></td>
-</tr>
 </tbody>
 </table>
 </section>
-<section id="module-plantdb.rest_api">
-<span id="details"></span><h2 id="module-plantdb.rest_api">Details<a class="headerlink" href="#module-plantdb.rest_api" title="Permalink to this headline">¶</a></h2>
-<p>This module regroup the classes and methods used to serve a REST API using <code class="docutils literal notranslate"><span class="pre">plantdb_rest_api</span></code> CLI.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.File">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.File" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve a file upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.File.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#File.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.File.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a requested file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The relative path to the file to serve.
-The global variable <cite>db_location</cite> is used to set the absolute path.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>flask.Response</em> – The HTTP response from the flask server.</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.Image">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">Image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve an image upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.Image.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Image.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Image.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the requested (cached) image, may resize it if necessary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The scan id.</p></li>
-<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The fileset id.</p></li>
-<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The file id.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>flask.Response</em> – The HTTP response from the flask server.</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.Mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">Mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve a triangular mesh upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.Mesh.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Mesh.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Mesh.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the requested (cached) triangular mesh, may down-sample it if necessary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The scan id.</p></li>
-<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The fileset id.</p></li>
-<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The file id.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>flask.Response</em> – The HTTP response from the flask server.</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.PointCloud">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">PointCloud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#PointCloud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.PointCloud" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve a point-cloud upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.PointCloud.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#PointCloud.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.PointCloud.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the requested (cached) point-cloud, may down-sample it if necessary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The scan id.</p></li>
-<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The fileset id.</p></li>
-<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The file id.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>flask.Response</em> – The HTTP response from the flask server.</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.PointCloudGroundTruth">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">PointCloudGroundTruth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#PointCloudGroundTruth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.PointCloudGroundTruth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve a ground-truth point-cloud upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.PointCloudGroundTruth.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#PointCloudGroundTruth.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.PointCloudGroundTruth.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the requested (cached) ground-truth point-cloud, may down-sample it if necessary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The scan id.</p></li>
-<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The fileset id.</p></li>
-<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The file id.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>flask.Response</em> – The HTTP response from the flask server.</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.Refresh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">Refresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Refresh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Refresh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to reload the database upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.Refresh.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Refresh.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Refresh.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Force the plant database to reload.</p>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.Scan">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">Scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Scan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve a scan dataset upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.Scan.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#Scan.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.Scan.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the scan dataset information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The name of the scan for which to serve the information.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>dict</em> – The dictionary to serve (as JSON)</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="plantdb.rest_api.ScanList">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">ScanList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#ScanList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.ScanList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="plantdb.rest_api.ScanList.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#ScanList.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.ScanList.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of scan dataset information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><em>dict</em> – The list of dictionaries to serve (as JSON)</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.compute_fileset_matches">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">compute_fileset_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#compute_fileset_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.compute_fileset_matches" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary mapping the scan tasks to fileset names.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scan</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.Scan" title="plantdb.fsdb.Scan"><em>plantdb.fsdb.Scan</em></a>) – The scan instance to list the filesets from.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>dict</em> – A dictionary mapping the scan tasks to fileset names.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.rest_api</span> <span class="kn">import</span> <span class="n">compute_fileset_matches</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">"myscan_001"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">compute_fileset_matches</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-<span class="go">{'fileset': 'fileset_001'}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.get_path">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/files/'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.get_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the path to a file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>plantdb.FSDB.File</em>) – The file to get the path for.</p></li>
-<li><p><strong>db_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – A prefix to use… ???</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>str</em> – The path to the file.</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.get_scan_data">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">get_scan_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#get_scan_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.get_scan_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the scan information and data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scan</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.Scan" title="plantdb.fsdb.Scan"><em>plantdb.fsdb.Scan</em></a>) – The scan instance to get the information and data from.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>dict</em> – The scan information dictionary.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.rest_api</span> <span class="kn">import</span> <span class="n">get_scan_data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan_data</span> <span class="o">=</span> <span class="n">get_scan_data</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scan_data</span><span class="p">[</span><span class="s1">'id'</span><span class="p">])</span>
-<span class="go">real_plant_analyzed</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scan_data</span><span class="p">[</span><span class="s1">'filesUri'</span><span class="p">])</span>
-<span class="go">{'pointCloud': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'), 'mesh': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply'), 'skeleton': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/CurveSkeleton__TriangleMesh_0393cb5708/CurveSkeleton.json'), 'tree': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TreeGraph__False_CurveSkeleton_c304a2cc71/TreeGraph.p')}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scan_data</span><span class="p">[</span><span class="s1">'camera'</span><span class="p">][</span><span class="s2">"model"</span><span class="p">])</span>
-<span class="go">SIMPLE_RADIAL</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.get_scan_date">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">get_scan_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#get_scan_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.get_scan_date" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the acquisition datetime of a scan.</p>
-<p>Try to get the data from the scan metadata ‘acquisition_date’, else from the directory creation time.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scan</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.Scan" title="plantdb.fsdb.Scan"><em>plantdb.fsdb.Scan</em></a>) – The scan instance to get the date &amp; time from.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>str</em> – The formatted datetime string.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.rest_api</span> <span class="kn">import</span> <span class="n">get_scan_date</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_scan_date</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
-<span class="go">2023-12-15 16:37:15</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.get_scan_info">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">get_scan_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#get_scan_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.get_scan_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the information related to a single scan dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scans</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.Scan" title="plantdb.fsdb.Scan"><em>plantdb.fsdb.Scan</em></a>) – The scan instances to get information from.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>dict</em> – The scan information dictionary.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.rest_api</span> <span class="kn">import</span> <span class="n">get_scan_info</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scan_info</span> <span class="o">=</span> <span class="n">get_scan_info</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scan_info</span><span class="p">)</span>
-<span class="go">{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.get_scan_template">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">get_scan_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/plantdb/rest_api.html#get_scan_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.get_scan_template" title="Permalink to this definition">¶</a></dt>
-<dd><p>Template dictionary for a scan.</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="plantdb.rest_api.list_scans_info">
-<span class="sig-prename descclassname"><span class="pre">plantdb.rest_api.</span></span><span class="sig-name descname"><span class="pre">list_scans_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/rest_api.html#list_scans_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.rest_api.list_scans_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>List scans information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scans</strong> (<em>list of plantdb.fsdb.Scan</em>) – The list of scan instances to get information from.</p></li>
-<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – A scan filtering query, to be matched in the scan metadata keys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>list of dict</em> – The list of scans information dictionaries.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.rest_api</span> <span class="kn">import</span> <span class="n">list_scans_info</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scans_info</span> <span class="o">=</span> <span class="n">list_scans_info</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_scans</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scans_info</span><span class="p">)</span>
-<span class="go">[{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
+<section id="details">
+<h2 id="details">Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 
@@ -650,12 +302,12 @@ The global variable <cite>db_location</cite> is used to set the absolute path.</
             </a>
           
           
-            <a href="autosummary/plantdb.rest_api.ScanList.html" title="plantdb.rest_api.ScanList"
+            <a href="../webapi.html" title="REST URLs"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> plantdb.rest_api.ScanList </span>
+                class="md-footer-nav__direction"> "Next" </span> REST URLs </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
