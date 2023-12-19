@@ -138,7 +138,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "id": scan_id,
         "metadata": {
             "date": "01-01-00 00:00:00",
-            "species": 'N/A',
+            "species": "N/A",
             "plant": "N/A",
             "environment": "N/A",
             "nbPhotos": 0,
@@ -148,17 +148,18 @@ def get_scan_template(scan_id: str, error=False) -> dict:
             }
         },
         "thumbnailUri": "",
-        "hasMesh": False,
         "hasPointCloud": False,
-        "hasPcdGroundTruth": False,
+        "hasMesh": False,
         "hasSkeleton": False,
+        "hasTreeGraph": False,
         "hasAngleData": False,
-        "hasSegmentation2D": False,
-        "hasSegmentedPcdEvaluation": False,
-        "hasPointCloudEvaluation": False,
-        "hasManualMeasures": False,
         "hasAutomatedMeasures": False,
+        "hasManualMeasures": False,
+        "hasSegmentation2D": False,
+        "hasPcdGroundTruth": False,
+        "hasPointCloudEvaluation": False,
         "hasSegmentedPointCloud": False,
+        "hasSegmentedPcdEvaluation": False,
         "error": error
     }
 
@@ -171,7 +172,7 @@ def list_scans_info(scans, query=None):
     scans : list of plantdb.fsdb.Scan
         The list of scan instances to get information from.
     query : str, optional
-        A scan filtering query, to be matched in the scan metadata keys.
+        A scan filtering query, to be matched in the scan metadata.
 
     Returns
     -------
@@ -326,27 +327,27 @@ def get_scan_data(scan):
         scan_data["filesUri"]["tree"] = str(fs.get_file('TreeGraph').path())
 
     # - Load some of the data:
-    scan_data['data'] = {}
+    scan_data["data"] = {}
     # Load the skeleton data:
     if scan_data["hasSkeleton"]:
         fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        scan_data['data']["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
+        scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
     # Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
         fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
         measures = read_json(fs.get_file('AnglesAndInternodes'))
-        # scan_data['data']["angles"] = measures.get("angles", {})
-        # scan_data['data']["internodes"] = measures.get("internodes", {})
+        # scan_data["data"]["angles"] = measures.get("angles", {})
+        # scan_data["data"]["internodes"] = measures.get("internodes", {})
         if is_radians(measures["angles"]):
             measures["angles"] = list(map(degrees, measures["angles"]))
-        scan_data['data']["angles"] = measures
+        scan_data["data"]["angles"] = measures
     # Load the manually measured angles and internodes:
     if scan_data["hasManualMeasures"]:
         measures = scan.get_measures()
         if measures is None:
             measures = dict([])
-        scan_data['data']["angles"]["measured_angles"] = measures.get('angles', [])
-        scan_data['data']["angles"]["measured_internodes"] = measures.get("internodes", [])
+        scan_data["data"]["angles"]["measured_angles"] = measures.get('angles', [])
+        scan_data["data"]["angles"]["measured_internodes"] = measures.get("internodes", [])
     # Load the workspace, aka bounding-box:
     try:
         # old version: get scanner workspace
@@ -367,16 +368,16 @@ def get_scan_data(scan):
         fs = scan.get_fileset(task_fs_map['Colmap'])
         scan_data["camera"]["model"] = fs.get_metadata("task_params")['camera_model']
     # Load the camera poses from the images metadata:
-    scan_data['camera']['poses'] = []  # initialize list of poses to gather
+    scan_data["camera"]["poses"] = []  # initialize list of poses to gather
     img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
     for img_idx, img_f in enumerate(img_fs.get_files()):
         camera_md = img_f.get_metadata("colmap_camera")
-        scan_data['camera']['poses'].append({
-            'id': img_idx + 1,
-            'tvec': camera_md['tvec'],
-            'rotmat': camera_md['rotmat'],
-            'photoUri': str(img_f.path()),
-            'isMatched': True
+        scan_data["camera"]["poses"].append({
+            "id": img_idx + 1,
+            "tvec": camera_md['tvec'],
+            "rotmat": camera_md['rotmat'],
+            "photoUri": str(img_f.path()),
+            "isMatched": True
         })
     return scan_data
 
@@ -392,7 +393,7 @@ class ScanList(Resource):
 
         Returns
         -------
-        dict
+        list of dict
             The list of dictionaries to serve (as JSON)
         """
         return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'))
