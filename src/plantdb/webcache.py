@@ -217,7 +217,10 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
     maxsize = IMG_RESOLUTIONS.get(size)
     image = __image_resize(image, maxsize)
     # Save the resized image in the "webcache" directory:
-    image.save(dst, ext.upper(), quality=84)
+    save_kwargs = {}
+    if ext.lower() in ['jpg', 'jpeg']:
+        save_kwargs.update({'quality': 84})
+    image.save(dst, **save_kwargs)
 
     print(f"Converted '{src}' to '{dst}', using size '{maxsize}'")
 
