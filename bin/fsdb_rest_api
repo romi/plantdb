@@ -15,6 +15,7 @@ from flask_restful import Api
 
 from plantdb.fsdb import FSDB
 from plantdb.log import configure_logger
+from plantdb.rest_api import Archive
 from plantdb.rest_api import File
 from plantdb.rest_api import Image
 from plantdb.rest_api import Mesh
@@ -64,7 +65,8 @@ if __name__ == '__main__':
 
     if args.db_location == "/none":
         logger.error("Can't serve a local plantdb as no path to the database was specified!")
-        logger.info("To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
+        logger.info(
+            "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
         sleep(1)
         sys.exit("Wrong database location!")
 
@@ -90,6 +92,8 @@ if __name__ == '__main__':
     api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db]))
 
     # Start the Flask application:
