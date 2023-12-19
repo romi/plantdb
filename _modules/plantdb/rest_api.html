@@ -375,7 +375,7 @@
         <span class="s2">"id"</span><span class="p">:</span> <span class="n">scan_id</span><span class="p">,</span>
         <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"date"</span><span class="p">:</span> <span class="s2">"01-01-00 00:00:00"</span><span class="p">,</span>
-            <span class="s2">"species"</span><span class="p">:</span> <span class="s1">'N/A'</span><span class="p">,</span>
+            <span class="s2">"species"</span><span class="p">:</span> <span class="s2">"N/A"</span><span class="p">,</span>
             <span class="s2">"plant"</span><span class="p">:</span> <span class="s2">"N/A"</span><span class="p">,</span>
             <span class="s2">"environment"</span><span class="p">:</span> <span class="s2">"N/A"</span><span class="p">,</span>
             <span class="s2">"nbPhotos"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -385,17 +385,18 @@
             <span class="p">}</span>
         <span class="p">},</span>
         <span class="s2">"thumbnailUri"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
-        <span class="s2">"hasMesh"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasPointCloud"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">"hasPcdGroundTruth"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasMesh"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasSkeleton"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasTreeGraph"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasAngleData"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">"hasSegmentation2D"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">"hasSegmentedPcdEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">"hasPointCloudEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">"hasManualMeasures"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasAutomatedMeasures"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasManualMeasures"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSegmentation2D"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasPcdGroundTruth"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasPointCloudEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasSegmentedPointCloud"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSegmentedPcdEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"error"</span><span class="p">:</span> <span class="n">error</span>
     <span class="p">}</span></div>
 
@@ -408,7 +409,7 @@
 <span class="sd">    scans : list of plantdb.fsdb.Scan</span>
 <span class="sd">        The list of scan instances to get information from.</span>
 <span class="sd">    query : str, optional</span>
-<span class="sd">        A scan filtering query, to be matched in the scan metadata keys.</span>
+<span class="sd">        A scan filtering query, to be matched in the scan metadata.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -563,27 +564,27 @@
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"tree"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'TreeGraph'</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
 
     <span class="c1"># - Load some of the data:</span>
-    <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># Load the skeleton data:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'CurveSkeleton'</span><span class="p">])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">))</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">))</span>
     <span class="c1"># Load the measured angles and internodes:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasAngleData"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'AnglesAndInternodes'</span><span class="p">])</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'AnglesAndInternodes'</span><span class="p">))</span>
-        <span class="c1"># scan_data['data']["angles"] = measures.get("angles", {})</span>
-        <span class="c1"># scan_data['data']["internodes"] = measures.get("internodes", {})</span>
+        <span class="c1"># scan_data["data"]["angles"] = measures.get("angles", {})</span>
+        <span class="c1"># scan_data["data"]["internodes"] = measures.get("internodes", {})</span>
         <span class="k">if</span> <span class="n">is_radians</span><span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]):</span>
             <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]))</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span>
     <span class="c1"># Load the manually measured angles and internodes:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasManualMeasures"</span><span class="p">]:</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_measures</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">measures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">measures</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'angles'</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_internodes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"internodes"</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'angles'</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_internodes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"internodes"</span><span class="p">,</span> <span class="p">[])</span>
     <span class="c1"># Load the workspace, aka bounding-box:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># old version: get scanner workspace</span>
@@ -604,16 +605,16 @@
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"task_params"</span><span class="p">)[</span><span class="s1">'camera_model'</span><span class="p">]</span>
     <span class="c1"># Load the camera poses from the images metadata:</span>
-    <span class="n">scan_data</span><span class="p">[</span><span class="s1">'camera'</span><span class="p">][</span><span class="s1">'poses'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># initialize list of poses to gather</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># initialize list of poses to gather</span>
     <span class="n">img_fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'images'</span><span class="p">])</span>  <span class="c1"># get the 'images' fileset</span>
     <span class="k">for</span> <span class="n">img_idx</span><span class="p">,</span> <span class="n">img_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img_fs</span><span class="o">.</span><span class="n">get_files</span><span class="p">()):</span>
         <span class="n">camera_md</span> <span class="o">=</span> <span class="n">img_f</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"colmap_camera"</span><span class="p">)</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'camera'</span><span class="p">][</span><span class="s1">'poses'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">'id'</span><span class="p">:</span> <span class="n">img_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s1">'tvec'</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'tvec'</span><span class="p">],</span>
-            <span class="s1">'rotmat'</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'rotmat'</span><span class="p">],</span>
-            <span class="s1">'photoUri'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_f</span><span class="o">.</span><span class="n">path</span><span class="p">()),</span>
-            <span class="s1">'isMatched'</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="n">img_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"tvec"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'tvec'</span><span class="p">],</span>
+            <span class="s2">"rotmat"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'rotmat'</span><span class="p">],</span>
+            <span class="s2">"photoUri"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_f</span><span class="o">.</span><span class="n">path</span><span class="p">()),</span>
+            <span class="s2">"isMatched"</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">})</span>
     <span class="k">return</span> <span class="n">scan_data</span></div>
 
@@ -629,7 +630,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict</span>
+<span class="sd">        list of dict</span>
 <span class="sd">            The list of dictionaries to serve (as JSON)</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">list_scans_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(),</span> <span class="n">query</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'filterQuery'</span><span class="p">))</span></div></div>

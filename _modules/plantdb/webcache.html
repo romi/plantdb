@@ -448,12 +448,13 @@
 
     <span class="c1"># Load the image and resize it:</span>
     <span class="n">src</span> <span class="o">=</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># get the extension and remove the dot</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
     <span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
     <span class="n">maxsize</span> <span class="o">=</span> <span class="n">IMG_RESOLUTIONS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">__image_resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">)</span>
     <span class="c1"># Save the resized image in the "webcache" directory:</span>
-    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="s2">"JPEG"</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">84</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">ext</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">quality</span><span class="o">=</span><span class="mi">84</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Converted '</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2">' to '</span><span class="si">{</span><span class="n">dst</span><span class="si">}</span><span class="s2">', using size '</span><span class="si">{</span><span class="n">maxsize</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 
@@ -750,6 +751,8 @@
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; # Example 1: Get the original pointcloud:</span>
 <span class="sd">    &gt;&gt;&gt; mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')</span>
+<span class="sd">    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply')</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
 <span class="sd">    """</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Using original mesh file"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span></div>
