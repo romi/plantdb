@@ -211,12 +211,13 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
 
     # Load the image and resize it:
     src = __file_path(db, scan_id, fileset_id, file_id)
+    ext = src.suffix.replace('.', '')  # get the extension and remove the dot
     image = Image.open(src)
     image.load()
     maxsize = IMG_RESOLUTIONS.get(size)
     image = __image_resize(image, maxsize)
     # Save the resized image in the "webcache" directory:
-    image.save(dst, "JPEG", quality=84)
+    image.save(dst, ext.upper(), quality=84)
 
     print(f"Converted '{src}' to '{dst}', using size '{maxsize}'")
 
@@ -513,6 +514,8 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> db.connect()
     >>> # Example 1: Get the original pointcloud:
     >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply')
+    >>> db.disconnect()
     """
     print("Using original mesh file")
     return __file_path(db, scan_id, fileset_id, file_id)
