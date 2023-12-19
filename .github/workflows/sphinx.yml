@@ -17,7 +17,7 @@ jobs:
         python-version: '3.9'
 
     - name: Install PlantDB, Sphinx & requirements
-      run:
+      run: |
         apt-get update -y
         apt-get install libgl1-mesa-glx -y
         python3 -m pip install sphinx --upgrade
@@ -26,7 +26,7 @@ jobs:
         python3 -m pip install -e .
 
     - name: Build documentation with Sphinx
-      run:
+      run: |
         cd docs/
         make html
 
