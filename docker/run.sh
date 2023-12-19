@@ -18,6 +18,8 @@ unittest="nose2 -s plantdb/tests/"
 cmd=''
 # Volume mounting options:
 mount_option=""
+# Port to use to serve the REST API
+port='5000'
 # If the `ROMI_DB` variable is set, use it as default database location, else set it to empty:
 if [ -z ${ROMI_DB+x} ]; then
   host_db=''
@@ -78,6 +80,10 @@ while [ "$1" != "" ]; do
     shift
     mount_option="${mount_option} -v $1" # append
     ;;
+  -p | --port)
+    shift
+    port=$1
+    ;;
   -h | --help)
     usage
     exit
@@ -131,14 +137,14 @@ fi
 
 if [ "${cmd}" = "" ]; then
   # Start in interactive mode:
-  docker run --rm -p 5000:5000 ${mount_option} \
+  docker run --rm -p ${port}:5000 ${mount_option} \
     --user myuser:${gid} \
     ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} # try to keep the `-it` to be able to kill the process/container!
 else
   # Get the date to estimate command execution time:
   start_time=$(date +%s)
   # Start in non-interactive mode (run the command):
-  docker run --rm -p 5000:5000 ${mount_option} \
+  docker run --rm -p ${port}:5000 ${mount_option} \
     --user myuser:${gid} \
     ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
     bash -c "${cmd}" # try to keep the `-it` to be able to kill the process/container!
