@@ -184,7 +184,19 @@ class FSDBTestCase(unittest.TestCase):
         scan = db.get_scan("real_plant_analyzed")
         return scan
 
-    def get_task_fileset(self, task_name):
+    def get_test_fileset(self, fs_id, create=False):
+        """Return the default test ``Fileset`` object named 'fileset_001'.
+
+        Returns
+        -------
+        plantdb.Scan
+            The default fileset instance to test.
+        """
+        scan = self.get_test_scan()
+        fileset = scan.get_fileset(fs_id, create=create)
+        return fileset
+
+    def get_task_fileset_id(self, task_name):
         """Return the fileset id for the corresponding task.
 
         Parameters
@@ -199,3 +211,19 @@ class FSDBTestCase(unittest.TestCase):
         """
         scan = self.get_test_scan()
         return locate_task_filesets(scan, [task_name])[task_name]
+
+    def get_task_fileset(self, task_name):
+        """Return the fileset for the corresponding task.
+
+        Parameters
+        ----------
+        task_name : str
+            The name of the task to get the fileset for.
+
+        Returns
+        -------
+        plantdb.fsdb.Fileset
+            The ``Fileset`` corresponding to the given task.
+        """
+        scan = self.get_test_scan()
+        return scan.get_fileset(self.get_task_fileset_id(task_name))

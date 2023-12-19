@@ -9,12 +9,13 @@ import open3d as o3d
 from plantdb import io
 from plantdb.io import fsdb_file_from_local_file
 from plantdb.testing import DummyDBTestCase
+from plantdb.testing import FSDBTestCase
 
 rng = np.random.default_rng()
 
 
 class TestIODummy(DummyDBTestCase):
-    """Test the IO module."""
+    """Test the IO module with dummy data."""
 
     def _test_write_file(self, obj, ext, **kwargs):
         fs = self.get_test_fileset()
@@ -150,26 +151,68 @@ class TestIODummy(DummyDBTestCase):
         self._test_read_file(fpath, obj, 'npz')
 
     def test_write_pcd(self):
-        dataset = o3d.data.EaglePointCloud('/tmp')
-        pcd = o3d.io.read_point_cloud(dataset.path)
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
         self._test_write_file(pcd, "pointcloud")
 
     def test_read_pcd(self):
-        dataset = o3d.data.EaglePointCloud('/tmp')
-        pcd = o3d.io.read_point_cloud(dataset.path)
-        fpath, obj, _ = self._test_write_file(pcd, 'pointcloud')
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
+        fpath, obj, _ = self._test_write_file(pcd, "pointcloud")
         self._test_read_file(fpath, obj, "pointcloud")
 
     def test_write_mesh(self):
-        dataset = o3d.data.BunnyMesh('/tmp')
-        mesh = o3d.io.read_triangle_mesh(dataset.path)
+        mesh = o3d.geometry.TriangleMesh.create_arrow(cylinder_radius=1.0, cone_radius=1.5, cylinder_height=5.0,
+                                                      cone_height=4.0, resolution=20, cylinder_split=4, cone_split=1)
         self._test_write_file(mesh, "mesh")
 
     def test_read_mesh(self):
-        dataset = o3d.data.BunnyMesh('/tmp')
-        mesh = o3d.io.read_triangle_mesh(dataset.path)
+        mesh = o3d.geometry.TriangleMesh.create_arrow(cylinder_radius=1.0, cone_radius=1.5, cylinder_height=5.0,
+                                                      cone_height=4.0, resolution=20, cylinder_split=4, cone_split=1)
         fpath, obj, _ = self._test_write_file(mesh, 'mesh')
         self._test_read_file(fpath, obj, "mesh")
+
+
+class TestIOFSDB(FSDBTestCase):
+    """Test the IO module with real data."""
+
+    def test_read_images(self):
+        fs = self.get_task_fileset('images')
+        img = io.read_image(fs.get_file('00000_rgb'))
+        self.assertTrue(isinstance(img, np.ndarray))
+        self.assertTrue(img.size > 0)  # Non-empty
+        self.assertTrue(len(img.shape) == 3)  # RGB 2D array
+        self.assertTrue(img.shape[2] == 3)  # RGB 2D array
+
+    def test_read_volume(self):
+        fs = self.get_task_fileset('Voxels')
+        vol = io.read_volume(fs.get_file('Voxels'), ext='tiff')
+        self.assertTrue(isinstance(vol, np.ndarray))
+        self.assertTrue(vol.size > 0)  # Non-empty
+        self.assertTrue(len(vol.shape) == 3)  # 3D array
+
+    def test_read_pcd(self):
+        fs = self.get_task_fileset('PointCloud')
+        pcd = io.read_point_cloud(fs.get_file('PointCloud'), ext='ply')
+        self.assertTrue(isinstance(pcd, o3d.geometry.PointCloud))
+        self.assertTrue(len(pcd.points) > 0)  # Non-empty
+
+    def test_read_mesh(self):
+        fs = self.get_task_fileset('TriangleMesh')
+        mesh = io.read_triangle_mesh(fs.get_file('TriangleMesh'), ext='ply')
+        self.assertTrue(isinstance(mesh, o3d.geometry.TriangleMesh))
+        self.assertTrue(len(mesh.vertices) > 0)  # Non-empty
+        self.assertTrue(len(mesh.triangles) > 0)  # Non-empty
+
+    def test_read_skeleton(self):
+        fs = self.get_task_fileset('CurveSkeleton')
+        skel = io.read_json(fs.get_file('CurveSkeleton'))
+        self.assertTrue(len(skel) > 0)  # Non-empty
+
+    def test_read_tree(self):
+        fs = self.get_task_fileset('TreeGraph')
+        skel = io.read_graph(fs.get_file('TreeGraph'), ext='p')
+        self.assertTrue(len(skel) > 0)  # Non-empty
 
 
 if __name__ == "__main__":
