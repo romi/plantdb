@@ -31,6 +31,9 @@ import datetime
 import json
 import os
 from math import degrees
+from pathlib import Path
+from tempfile import gettempdir
+from zipfile import ZipFile
 
 from flask import request
 from flask import send_file
@@ -209,8 +212,8 @@ def get_scan_info(scan):
 
     Parameters
     ----------
-    scans : plantdb.fsdb.Scan
-        The scan instances to get information from.
+    scan : plantdb.fsdb.Scan
+        The scan instance to get information from.
 
     Returns
     -------
@@ -243,11 +246,24 @@ def get_scan_info(scan):
     # Import 'object' related scan metadata to scan info template:
     if 'object' in scan_md:
         scan_obj = scan_md['object']  # get the 'object' related dictionary
-        scan_info["metadata"]['species'] = scan_obj.get('species', 'N/A')
-        scan_info["metadata"]['environment'] = scan_obj.get('environment', 'N/A')
-        scan_info["metadata"]['plant'] = scan_obj.get('plant_id', 'N/A')
+        scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
+        scan_info["metadata"]["environment"] = scan_obj.get('environment', 'N/A')
+        scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
     # Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan.get_fileset('images').get_files())
+
+    # Get the URL to the archive:
+    scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
+
+    # Get the path to the JSON metadata file:
+    metadata_json_path = os.path.join("/files/", scan.id, "metadata", "metadata.json")
+    scan_info["metadata"]["files"]["metadatas"] = metadata_json_path
+
+    # Get the URI to first image to create thumbnail:
+    # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
+    img_fs = scan.get_fileset("images")
+    img_f = img_fs.get_files()[0]
+    scan_info["thumbnailUri"] = f"/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
@@ -258,18 +274,18 @@ def get_scan_info(scan):
             return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
 
     # - Gather information about tasks:
-    scan_info['hasPointCloud'] = _try_has_file('PointCloud', 'PointCloud')
-    scan_info['hasMesh'] = _try_has_file('TriangleMesh', 'TriangleMesh')
-    scan_info['hasSkeleton'] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
-    scan_info['hasTreeGraph'] = _try_has_file('TreeGraph', 'TreeGraph')
-    scan_info['hasAngleData'] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
-    scan_info['hasAutomatedMeasures'] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
-    scan_info['hasManualMeasures'] = 'measures.json' in scan.path().iterdir()
-    scan_info['hasSegmentation2D'] = _try_has_file('Segmentation2D', '')
-    scan_info['hasPcdGroundTruth'] = _try_has_file('PointCloudGroundTruth', 'PointCloudGroundTruth')
-    scan_info['hasPointCloudEvaluation'] = _try_has_file('PointCloudEvaluation', 'PointCloudEvaluation')
-    scan_info['hasSegmentedPointCloud'] = _try_has_file('SegmentedPointCloud', 'SegmentedPointCloud')
-    scan_info['hasSegmentedPcdEvaluation'] = _try_has_file('SegmentedPointCloudEvaluation',
+    scan_info["hasPointCloud"] = _try_has_file('PointCloud', 'PointCloud')
+    scan_info["hasMesh"] = _try_has_file('TriangleMesh', 'TriangleMesh')
+    scan_info["hasSkeleton"] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
+    scan_info["hasTreeGraph"] = _try_has_file('TreeGraph', 'TreeGraph')
+    scan_info["hasAngleData"] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
+    scan_info["hasAutomatedMeasures"] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
+    scan_info["hasManualMeasures"] = "measures.json" in [f.name for f in scan.path().iterdir()]
+    scan_info["hasSegmentation2D"] = _try_has_file('Segmentation2D', '')
+    scan_info["hasPcdGroundTruth"] = _try_has_file('PointCloudGroundTruth', 'PointCloudGroundTruth')
+    scan_info["hasPointCloudEvaluation"] = _try_has_file('PointCloudEvaluation', 'PointCloudEvaluation')
+    scan_info["hasSegmentedPointCloud"] = _try_has_file('SegmentedPointCloud', 'SegmentedPointCloud')
+    scan_info["hasSegmentedPcdEvaluation"] = _try_has_file('SegmentedPointCloudEvaluation',
                                                            'SegmentedPointCloudEvaluation')
 
     return scan_info
@@ -307,24 +323,27 @@ def get_scan_data(scan):
     task_fs_map = compute_fileset_matches(scan)
     scan_data = get_scan_info(scan)
 
+    def _get_file_uri(scan, fileset, file):
+        return f"/files/{scan.id}/{fileset.id}/{file.path().name}"
+
     # - Get the paths to data files:
     scan_data["filesUri"] = {}
     # Get the URI (file path) to the output of the `PointCloud` task:
     if scan_data["hasPointCloud"]:
         fs = scan.get_fileset(task_fs_map['PointCloud'])
-        scan_data["filesUri"]["pointCloud"] = str(fs.get_file('PointCloud').path())
+        scan_data["filesUri"]["pointCloud"] = _get_file_uri(scan, fs, fs.get_file('PointCloud'))
     # Get the URI (file path) to the output of the `TriangleMesh` task:
     if scan_data["hasMesh"]:
         fs = scan.get_fileset(task_fs_map['TriangleMesh'])
-        scan_data["filesUri"]["mesh"] = str(fs.get_file('TriangleMesh').path())
+        scan_data["filesUri"]["mesh"] = _get_file_uri(scan, fs, fs.get_file('TriangleMesh'))
     # Get the URI (file path) to the output of the `CurveSkeleton` task:
     if scan_data["hasSkeleton"]:
         fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        scan_data["filesUri"]["skeleton"] = str(fs.get_file('CurveSkeleton').path())
+        scan_data["filesUri"]["skeleton"] = _get_file_uri(scan, fs, fs.get_file('CurveSkeleton'))
     # Get the URI (file path) to the output of the `TreeGraph` task:
     if scan_data["hasTreeGraph"]:
         fs = scan.get_fileset(task_fs_map['TreeGraph'])
-        scan_data["filesUri"]["tree"] = str(fs.get_file('TreeGraph').path())
+        scan_data["filesUri"]["tree"] = _get_file_uri(scan, fs, fs.get_file('TreeGraph'))
 
     # - Load some of the data:
     scan_data["data"] = {}
@@ -364,9 +383,9 @@ def get_scan_data(scan):
         # old version
         scan_data["camera"]["model"] = scan.get_metadata()["computed"]["camera_model"]
     except KeyError:
-        # new version: get it from colmap fileset metadata 'task_params'/'camera_model':
+        # new version: get it from colmap 'cameras.json':
         fs = scan.get_fileset(task_fs_map['Colmap'])
-        scan_data["camera"]["model"] = fs.get_metadata("task_params")['camera_model']
+        scan_data["camera"]["model"] = json.loads(fs.get_file("cameras").read())['1']
     # Load the camera poses from the images metadata:
     scan_data["camera"]["poses"] = []  # initialize list of poses to gather
     img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
@@ -376,7 +395,8 @@ def get_scan_data(scan):
             "id": img_idx + 1,
             "tvec": camera_md['tvec'],
             "rotmat": camera_md['rotmat'],
-            "photoUri": str(img_f.path()),
+            "photoUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'orig')),
+            "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
             "isMatched": True
         })
     return scan_data
@@ -596,3 +616,36 @@ class Mesh(Resource):
         # Get the path to the mesh resource:
         path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size)
         return send_file(path, mimetype='application/octet-stream')
+
+
+class Archive(Resource):
+    """Concrete RESTful resource to serve an archive of the dataset upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id):
+        """Send the requested scan dataset archive.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+        """
+        scan = self.db.get_scan(scan_id)
+        tmp_dir = Path(gettempdir())
+        zpath = tmp_dir / f'{scan_id}.zip'
+        with ZipFile(zpath, 'w') as zf:
+            path = str(scan.path())
+            for root, _dirs, files in os.walk(path):
+                for file in files:
+                    zf.write(
+                        os.path.join(root, file),
+                        os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
+                    )
+        return send_file(zpath, mimetype='application/zip')
