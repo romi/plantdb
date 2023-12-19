@@ -8,36 +8,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v1
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.9'
+      - name: Install system requirements
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libgl1-mesa-glx
+          version: 1.0
 
-    - name: Install PlantDB, Sphinx & requirements
-      run: |
-        apt-get update -y
-        apt-get install libgl1-mesa-glx -y
-        python3 -m pip install sphinx --upgrade
-        python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
-        python3 -m pip install -r requirements.txt
-        python3 -m pip install -e .
+      - name: Set up Python 3.9 & install Sphinx & requirements
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'  # select python version
+          cache: 'pip'  # caching pip dependencies
+        run: |  # installing sphinx and dependencies
+          python3 -m pip install sphinx --upgrade
+          python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
+          python3 -m pip install -r requirements.txt
 
-    - name: Build documentation with Sphinx
-      run: |
-        cd docs/
-        make html
+      - name: Install PlantDB
+        run: python3 -m pip install -e .
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: html-docs
-        path: docs/build/html/
+      - name: Build documentation with Sphinx
+        run: |
+          cd docs/
+          make html
 
-    - name: Deploy documentation
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/build/html
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-docs
+          path: docs/build/html/
+
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html
