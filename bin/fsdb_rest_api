@@ -51,7 +51,7 @@ if __name__ == '__main__':
     api = Api(app)
     # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
-    logger = configure_logger('plantdb_rest_api')
+    logger = configure_logger('fsdb_rest_api')
 
     if args.db_location == "/none":
         logger.error("Can't serve a local plantdb as no path to the database was specified!")

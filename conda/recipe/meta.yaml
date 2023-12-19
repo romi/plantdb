@@ -45,10 +45,10 @@ test:
     - coverage
   commands:
     - nose2 -v
-    - romi_fsdb_sync -h
-    - romi_import_folder -h
-    - romi_import_file -h
-    - plantdb_rest_api -h
+    - fsdb_sync -h
+    - fsdb_import_folder -h
+    - fsdb_import_file -h
+    - fsdb_rest_api -h
 
 about:
   home: https://docs.romi-project.eu/plant_imager/

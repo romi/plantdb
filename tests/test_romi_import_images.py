@@ -17,7 +17,7 @@ class TestFSDBDummy(DummyDBTestCase):
         db = self.get_test_db()
         db.disconnect()
         copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
-        out = subprocess.run(["romi_import_images", str(db.path()), copy_path,
+        out = subprocess.run(["fsdb_import_images", str(db.path()), copy_path,
                               "--name", "test_import_img",
                               "--metadata", TESTS_ROOT / "testdata" / "testscan" / "files.json"], capture_output=True)
         rcode = out.returncode

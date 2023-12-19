@@ -170,7 +170,7 @@ A detailed documentation of the Python API is available here: https://romi.githu
 Then you can start the REST API with `plantdb_rest_api`:
 
 ```shell
-plantdb_rest_api
+fsdb_rest_api
 ```
 
 You should see something like:
