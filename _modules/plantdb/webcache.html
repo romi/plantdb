@@ -454,7 +454,10 @@
     <span class="n">maxsize</span> <span class="o">=</span> <span class="n">IMG_RESOLUTIONS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">__image_resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">)</span>
     <span class="c1"># Save the resized image in the "webcache" directory:</span>
-    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">ext</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">quality</span><span class="o">=</span><span class="mi">84</span><span class="p">)</span>
+    <span class="n">save_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'jpg'</span><span class="p">,</span> <span class="s1">'jpeg'</span><span class="p">]:</span>
+        <span class="n">save_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">'quality'</span><span class="p">:</span> <span class="mi">84</span><span class="p">})</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="o">**</span><span class="n">save_kwargs</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Converted '</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2">' to '</span><span class="si">{</span><span class="n">dst</span><span class="si">}</span><span class="s2">', using size '</span><span class="si">{</span><span class="n">maxsize</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 

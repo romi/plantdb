@@ -47,7 +47,7 @@
   
   
   
-    <title>REST URLs &#8212; plantdb  documentation</title>
+    <title>plantDB REST API &#8212; plantdb  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/material.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -102,7 +102,7 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           <span class="md-header-nav__topic">plantdb</span>
-          <span class="md-header-nav__topic"> REST URLs </span>
+          <span class="md-header-nav__topic"> plantDB REST API </span>
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -223,39 +223,49 @@
 <nav class="md-nav md-nav--secondary">
     <label class="md-nav__title" for="__toc">"Contents"</label>
   <ul class="md-nav__list" data-md-scrollfix="">
-        <li class="md-nav__item"><a href="#webapi--page-root" class="md-nav__link">REST URLs</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#webapi--page-root" class="md-nav__link">plantDB REST API</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#rest-urls" class="md-nav__link">REST URLs</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#scans" class="md-nav__link">/scans</a>
         </li>
-        <li class="md-nav__item"><a href="#scans-scanid" class="md-nav__link">/scans/[scanid]</a>
+        <li class="md-nav__item"><a href="#scans-scan-id" class="md-nav__link">/scans/<scan_id></a>
         </li>
-        <li class="md-nav__item"><a href="#files-path" class="md-nav__link">/files/[path]</a>
+        <li class="md-nav__item"><a href="#files-path" class="md-nav__link">/files/<path></path></a>
+        </li>
+        <li class="md-nav__item"><a href="#archive-scan-id" class="md-nav__link">/archive/<scan_id></a>
+        </li>
+        <li class="md-nav__item"><a href="#image-scan-id-fileset-id-file-id" class="md-nav__link">/image/<scan_id>/<fileset_id>/<file_id></a>
+        </li>
+        <li class="md-nav__item"><a href="#pointcloud-scan-id-fileset-id-file-id" class="md-nav__link">/pointcloud/<scan_id>/<fileset_id>/<file_id></a>
+        </li>
+        <li class="md-nav__item"><a href="#pcgroundtruth-scan-id-fileset-id-file-id" class="md-nav__link">/pcGroundTruth/<scan_id>/<fileset_id>/<file_id></a>
+        </li>
+        <li class="md-nav__item"><a href="#mesh-scan-id-fileset-id-file-id" class="md-nav__link">/mesh/<scan_id>/<fileset_id>/<file_id></a>
+        </li>
+        <li class="md-nav__item"><a href="#refresh" class="md-nav__link">/refresh</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#object-descriptions" class="md-nav__link">Object descriptions</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#scan-summary" class="md-nav__link">Scan summary</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#scanlist" class="md-nav__link">ScanList</a>
+        <li class="md-nav__item"><a href="#id" class="md-nav__link">id</a>
         </li>
-        <li class="md-nav__item"><a href="#scan-summary-object" class="md-nav__link">Scan summary object</a>
+        <li class="md-nav__item"><a href="#metadata" class="md-nav__link">metadata</a>
         </li>
-        <li class="md-nav__item"><a href="#scan-details-object" class="md-nav__link">Scan details object</a>
+        <li class="md-nav__item"><a href="#thumbnailuri" class="md-nav__link">thumbnailUri</a>
         </li>
-        <li class="md-nav__item"><a href="#metadata-object" class="md-nav__link">Metadata object</a>
+        <li class="md-nav__item"><a href="#has" class="md-nav__link">has*</a>
+        </li></ul>
+            </nav>
         </li>
-        <li class="md-nav__item"><a href="#camera-object" class="md-nav__link">Camera object</a>
+        <li class="md-nav__item"><a href="#scan-detailed-summary" class="md-nav__link">Scan detailed summary</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#camera-model" class="md-nav__link">Camera model</a>
         </li>
-        <li class="md-nav__item"><a href="#model-object" class="md-nav__link">Model object</a>
-        </li>
-        <li class="md-nav__item"><a href="#pose-object" class="md-nav__link">Pose object</a>
-        </li>
-        <li class="md-nav__item"><a href="#data-object" class="md-nav__link">Data object</a>
-        </li>
-        <li class="md-nav__item"><a href="#angles-object" class="md-nav__link">Angles object</a>
-        </li>
-        <li class="md-nav__item"><a href="#workspace-object" class="md-nav__link">Workspace object</a>
-        </li>
-        <li class="md-nav__item"><a href="#skeleton-object" class="md-nav__link">Skeleton object</a>
+        <li class="md-nav__item"><a href="#camera-poses" class="md-nav__link">Camera poses</a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li>
@@ -273,160 +283,304 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  <section class="tex2jax_ignore mathjax_ignore" id="rest-urls">
-<h1 id="webapi--page-root">REST URLs<a class="headerlink" href="#webapi--page-root" title="Permalink to this headline">¶</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="plantdb-rest-api">
+<h1 id="webapi--page-root">plantDB REST API<a class="headerlink" href="#webapi--page-root" title="Permalink to this headline">¶</a></h1>
+<section id="rest-urls">
+<h2 id="rest-urls">REST URLs<a class="headerlink" href="#rest-urls" title="Permalink to this headline">¶</a></h2>
 <section id="scans">
-<h2 id="scans">/scans<a class="headerlink" href="#scans" title="Permalink to this headline">¶</a></h2>
+<h3 id="scans">/scans<a class="headerlink" href="#scans" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/scans</span></code> URL:</p>
 <ul class="simple">
-<li><p>Arguments: none</p></li>
-<li><p>Returns: JSON with a ScanList array.</p></li>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.ScanList</span></code></span></p></li>
+<li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">filterQuery</span></code></p></li>
+<li><p>Returns: a JSON compliant list of dictionaries.</p></li>
+<li><p>Example:</p>
+<ul>
+<li><p>Get all scans: “http://127.0.0.1:5000/scans”</p></li>
+<li><p>Search for “arabidopsis” in metadata: “http://127.0.0.1:5000/scans?filterQuery=arabidopsis”</p></li>
 </ul>
-<p>NOTE: Only scans that have a Visualisation fileset are included</p>
+</li>
+</ul>
 </section>
-<section id="scans-scanid">
-<h2 id="scans-scanid">/scans/[scanid]<a class="headerlink" href="#scans-scanid" title="Permalink to this headline">¶</a></h2>
+<section id="scans-scan-id">
+<h3 id="scans-scan-id">/scans/&lt;scan_id&gt;<a class="headerlink" href="#scans-scan-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/scans/&lt;scan_id&gt;</span></code> URLs:</p>
 <ul class="simple">
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Scan</span></code></span></p></li>
 <li><p>Arguments: none</p></li>
-<li><p>Returns: JSON with a scan details object</p></li>
+<li><p>Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset</p></li>
+<li><p>Examples with the test database:</p>
+<ul>
+<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"real_plant_analyzed"</span></code> dataset: “http://127.0.0.1:5000/scans/real_plant_analyzed”</p></li>
+<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"virtual_plant_analyzed"</span></code> dataset: “http://127.0.0.1:5000/scans/virtual_plant_analyzed”</p></li>
 </ul>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This requires the <cite>Colmap</cite> task!
+In other words it will fail (response <cite>500</cite>) if this task is missing from the dataset.</p>
+</div>
 </section>
 <section id="files-path">
-<h2 id="files-path">/files/[path]<a class="headerlink" href="#files-path" title="Permalink to this headline">¶</a></h2>
+<h3 id="files-path">/files/<path><a class="headerlink" href="#files-path" title="Permalink to this headline">¶</a></path></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/files/&lt;path&gt;</span></code> URLs:</p>
 <ul class="simple">
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.File</span></code></span></p></li>
 <li><p>Arguments: none</p></li>
-<li><p>Returns: The content of the file</p></li>
-</ul>
-</section>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="object-descriptions">
-<h1 id="object-descriptions">Object descriptions<a class="headerlink" href="#object-descriptions" title="Permalink to this headline">¶</a></h1>
-<section id="scanlist">
-<h2 id="scanlist">ScanList<a class="headerlink" href="#scanlist" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Array of scan summary objects</p></li>
-</ul>
-</section>
-<section id="scan-summary-object">
-<h2 id="scan-summary-object">Scan summary object<a class="headerlink" href="#scan-summary-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
-<ul class="simple">
-<li><p>id: String</p></li>
-<li><p>thumbnailUri: String, URL, example “/files/[scanid]/Visualization/thumbnail_pict20190201_134037_0.jpg”</p></li>
-<li><p>metadata: Scan metadata (see below)</p></li>
-<li><p>hasPointCloud: Boolean</p></li>
-<li><p>hasMesh: Boolean</p></li>
-<li><p>hasSkeleton: Boolean</p></li>
-<li><p>hasAngleData: Boolean</p></li>
-</ul>
-</section>
-<section id="scan-details-object">
-<h2 id="scan-details-object">Scan details object<a class="headerlink" href="#scan-details-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
-<ul class="simple">
-<li><p>id: String</p></li>
-<li><p>thumbnailUri: String, URL, example “/files/[scanid]/Visualization/thumbnail_pict20190201_134037_0.jpg”</p></li>
-<li><p>metadata: Metadata object</p></li>
-<li><p>hasPointCloud: Boolean</p></li>
-<li><p>hasMesh: Boolean</p></li>
-<li><p>hasSkeleton: Boolean</p></li>
-<li><p>hasAngleData: Boolean</p></li>
-<li><p>camera: Camera object</p></li>
-<li><p>data: Data object</p></li>
-<li><p>workspace: Workspace object</p></li>
-<li><p>filesUri:</p>
+<li><p>Returns: The content of the file.</p></li>
+<li><p>Examples  <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset (from the test database):</p>
 <ul>
-<li><p>mesh: String URL, if hasMesh is true</p></li>
-<li><p>pointCloud: String URL, if hasPointCloud is true</p></li>
+<li><p>Get the first image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>): “http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg”</p></li>
+<li><p>Get the first mask image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>): “http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png”</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="metadata-object">
-<h2 id="metadata-object">Metadata object<a class="headerlink" href="#metadata-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="archive-scan-id">
+<h3 id="archive-scan-id">/archive/&lt;scan_id&gt;<a class="headerlink" href="#archive-scan-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/archive/&lt;scan_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>date: String, example “2019-02-01 13:35:42”</p></li>
-<li><p>plant: String</p></li>
-<li><p>species: String</p></li>
-<li><p>nbPhotos: Number</p></li>
-<li><p>environment: String</p></li>
-<li><p>files: Object</p>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Archive</span></code></span></p></li>
+<li><p>Arguments: none</p></li>
+<li><p>Returns: A zip file containing the dataset.</p></li>
+<li><p>Examples:</p>
 <ul>
-<li><p>files.metadatas: String, URL, example “/files/[scanid]/metadata/metadata.json”</p></li>
-<li><p>files.archive: String, URL, example “/files/[scanid]/Visualization/scan.zip”</p></li>
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> archive: “http://127.0.0.1:5000/archive/real_plant_analyzed/”</p></li>
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">virtual_plant_analyzed</span></code> archive: “http://127.0.0.1:5000/archive/virtual_plant_analyzed/”</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="camera-object">
-<h2 id="camera-object">Camera object<a class="headerlink" href="#camera-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="image-scan-id-fileset-id-file-id">
+<h3 id="image-scan-id-fileset-id-file-id">/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#image-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>model: Model object</p></li>
-<li><p>poses: Array of Pose objects</p></li>
-</ul>
-</section>
-<section id="model-object">
-<h2 id="model-object">Model object<a class="headerlink" href="#model-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
-<ul class="simple">
-<li><p>id: Number</p></li>
-<li><p>width: Number</p></li>
-<li><p>height: Number</p></li>
-<li><p>model: String (“OPENCV”, …)</p></li>
-<li><p>params: distortion parameters</p>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Image</span></code></span></p></li>
+<li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">large</span></code>, <code class="docutils literal notranslate"><span class="pre">thumb</span></code>} to control the max size (width or height) of the image to return.</p></li>
+<li><p>Returns: The image file, resized by default.</p></li>
+<li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset (from the test database) and the first image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>):</p>
 <ul>
-<li><p>For “OPENCV”: 9x1 array, example [4202.147, 4202.147, 3000, 2000, 0.0050338, 0.0050338, 0, 0]</p></li>
+<li><p>Get the preview image: “http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb”</p></li>
+<li><p>Get the original image: “http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig”</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="pose-object">
-<h2 id="pose-object">Pose object<a class="headerlink" href="#pose-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="pointcloud-scan-id-fileset-id-file-id">
+<h3 id="pointcloud-scan-id-fileset-id-file-id">/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#pointcloud-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>id: String, ID of the picture</p></li>
-<li><p>rotmat: Rotation matrix, Array 3x3</p></li>
-<li><p>tvec: Translation vector, Array 3x1</p></li>
-<li><p>thumbnailUri: String, URL, example “/files/[scanid]/Visualization/thumbnail_[id].jpg”</p></li>
-<li><p>photoUri: String, URL, example “/files/[scanid]/Visualization/image_[id].jpg”</p></li>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloud</span></code></span></p></li>
+<li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">preview</span></code>} or a <code class="docutils literal notranslate"><span class="pre">float</span></code> to control the voxel-size of the pointcloud to returns.</p></li>
+<li><p>Returns: The point cloud file, preview size by default.</p></li>
+<li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset:</p>
+<ul>
+<li><p>Get the preview point cloud: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud”</p></li>
+<li><p>Get the original point cloud: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig”</p></li>
+<li><p>Get the point cloud with a voxel size of <code class="docutils literal notranslate"><span class="pre">2.3</span></code>: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3”</p></li>
+</ul>
+</li>
 </ul>
 </section>
-<section id="data-object">
-<h2 id="data-object">Data object<a class="headerlink" href="#data-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="pcgroundtruth-scan-id-fileset-id-file-id">
+<h3 id="pcgroundtruth-scan-id-fileset-id-file-id">/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#pcgroundtruth-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>angles: Array of Angle objects, required if hasAngleData is true</p></li>
-<li><p>skeleton: Skeleton object, required if hasSkeleton is true</p></li>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloudGroundTruth</span></code></span></p></li>
+<li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">preview</span></code>} or a <code class="docutils literal notranslate"><span class="pre">float</span></code> to control the voxel-size of the pointcloud to returns.</p></li>
+<li><p>Returns: The ground-truth pointcloud file, original size by default.</p></li>
 </ul>
 </section>
-<section id="angles-object">
-<h2 id="angles-object">Angles object<a class="headerlink" href="#angles-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="mesh-scan-id-fileset-id-file-id">
+<h3 id="mesh-scan-id-fileset-id-file-id">/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#mesh-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>angles: Array of numbers</p></li>
-<li><p>measured_angles: Array of numbers</p></li>
-<li><p>internodes: Array of numbers</p></li>
-<li><p>measured_internodes: Array of numbers</p></li>
-<li><p>fruit_points: Array of ???</p></li>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Mesh</span></code></span></p></li>
+<li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>}, no control of the size of the mesh to returns.</p></li>
+<li><p>Returns: The mesh file, original size by default.</p></li>
+<li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset:</p>
+<ul>
+<li><p>Get the original mesh: “http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh”</p></li>
+</ul>
+</li>
 </ul>
 </section>
-<section id="workspace-object">
-<h2 id="workspace-object">Workspace object<a class="headerlink" href="#workspace-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+<section id="refresh">
+<h3 id="refresh">/refresh<a class="headerlink" href="#refresh" title="Permalink to this headline">¶</a></h3>
+<p>Refresh the list of scans in the <code class="docutils literal notranslate"><span class="pre">plantdb.fsdb.FSDB</span></code> database.</p>
+<p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/refresh</span></code> URL:</p>
 <ul class="simple">
-<li><p>x: [min, max]</p></li>
-<li><p>y: [min, max]</p></li>
-<li><p>z: [min, max]</p></li>
+<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Refresh</span></code></span></p></li>
+<li><p>Arguments: none</p></li>
+<li><p>Returns: <code class="docutils literal notranslate"><span class="pre">200</span></code> on completion.</p></li>
+<li><p>Example: “http://127.0.0.1:5000/refresh”</p></li>
 </ul>
 </section>
-<section id="skeleton-object">
-<h2 id="skeleton-object">Skeleton object<a class="headerlink" href="#skeleton-object" title="Permalink to this headline">¶</a></h2>
-<p>Object with fields:</p>
+</section>
+<section id="scan-summary">
+<h2 id="scan-summary">Scan summary<a class="headerlink" href="#scan-summary" title="Permalink to this headline">¶</a></h2>
+<p>Information about scans dataset, obtained with the ‘/scans’ URL, are grouped in a JSON dictionary.
+The template can be accessed here: <code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.get_scan_template</span></code></p>
+<p>It is organized as follows:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"scan_id"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01-01-00 00:00:00"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"species"</span><span class="p">:</span><span class="w"> </span><span class="s2">"N/A"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"plant"</span><span class="p">:</span><span class="w"> </span><span class="s2">"N/A"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"environment"</span><span class="p">:</span><span class="w"> </span><span class="s2">"N/A"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"nbPhotos"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"files"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"metadatas"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"archive"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"thumbnailUri"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasPointCloud"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasMesh"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasSkeleton"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasTreeGraph"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasAngleData"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasAutomatedMeasures"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasManualMeasures"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasSegmentation2D"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasPcdGroundTruth"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasPointCloudEvaluation"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"hasSegmentedPointCloud"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="p">}</span>
+</pre></div>
+</div>
+<section id="id">
+<h3 id="id">id<a class="headerlink" href="#id" title="Permalink to this headline">¶</a></h3>
+<p>The name of the corresponding scan dataset.</p>
+</section>
+<section id="metadata">
+<h3 id="metadata">metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h3>
+<p>Some metadata gathered from the corresponding scan dataset.</p>
+<p>JSON dictionary with fields:</p>
 <ul class="simple">
-<li><p>points: Array of points [x, y, z]</p></li>
-<li><p>lines: Array of [pointIndex1, pointIndex2]</p></li>
+<li><p>“date”: String, example “2019-02-01 13:35:42”</p></li>
+<li><p>“plant”: String</p></li>
+<li><p>“species”: String</p></li>
+<li><p>“nbPhotos”: Number</p></li>
+<li><p>“environment”: String</p></li>
+<li><p>“files”: Object</p>
+<ul>
+<li><p>“files.metadatas”: String, URL, example “/files/<scanid>/metadata/metadata.json”</scanid></p></li>
+<li><p>“files.archive”: String, URL, example “/files/<scanid>/Visualization/scan.zip”</scanid></p></li>
 </ul>
+</li>
+</ul>
+</section>
+<section id="thumbnailuri">
+<h3 id="thumbnailuri">thumbnailUri<a class="headerlink" href="#thumbnailuri" title="Permalink to this headline">¶</a></h3>
+<p>A path to the thumbnail image to use as “preview” to represent the dataset in the webapp.</p>
+<ul class="simple">
+<li><p>thumbnailUri: example “/files/<scanid>/Visualization/thumbnail_pict20190201_134037_0.jpg”</scanid></p></li>
+</ul>
+</section>
+<section id="has">
+<h3 id="has">has*<a class="headerlink" href="#has" title="Permalink to this headline">¶</a></h3>
+<p>All of the <code class="docutils literal notranslate"><span class="pre">has*</span></code> entries indicate if there is an output for a list of selected tasks:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasPointCloud"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">PointCloud</span></code> has a <code class="docutils literal notranslate"><span class="pre">PointCloud.ply</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasMesh"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">TriangleMesh</span></code> has a <code class="docutils literal notranslate"><span class="pre">TriangleMesh.ply</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasSkeleton"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">CurveSkeleton</span></code> has a <code class="docutils literal notranslate"><span class="pre">CurveSkeleton.json</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasAngleData"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">AngleAndInternodes</span></code> has a <code class="docutils literal notranslate"><span class="pre">AnglesAndInternodes.json</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasAutomatedMeasures"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">AutomatedMeasures</span></code> has a <code class="docutils literal notranslate"><span class="pre">AnglesAndInternodes</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasSegmentation2D"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">Segmentation2D</span></code> has a `` file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasSegmentedPcdEvaluation"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">Segmentation2DEvaluation</span></code> has a `` file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasPointCloudEvaluation"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">PointCloudEvaluation</span></code> has a `` file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasSegmentedPointCloud"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">SegmentedPointCloud</span></code> has a <code class="docutils literal notranslate"><span class="pre">SegmentedPointCloud.ply</span></code> file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"hasPcdGroundTruth"</span></code>: output of the task <code class="docutils literal notranslate"><span class="pre">PointCloudGroundTruth</span></code> has a <code class="docutils literal notranslate"><span class="pre">PointCloudGroundTruth.ply</span></code> file</p></li>
+</ul>
+<p>Finally, <code class="docutils literal notranslate"><span class="pre">hasManualMeasures</span></code> refers to the presence of a JSON file with manual measurements saved as <code class="docutils literal notranslate"><span class="pre">measures.json</span></code>.
+This file should be present at the scan dataset root directory.</p>
+</section>
+</section>
+<section id="scan-detailed-summary">
+<h2 id="scan-detailed-summary">Scan detailed summary<a class="headerlink" href="#scan-detailed-summary" title="Permalink to this headline">¶</a></h2>
+<p>Information about a specific scan dataset, obtained with the ‘/scans/&lt;scan_id&gt;’ URL, are grouped in a JSON dictionary.</p>
+<p>It has the same information as those gathered with the ‘/scans’ URL, but also add:</p>
+<ul class="simple">
+<li><p>the files URI when the following <code class="docutils literal notranslate"><span class="pre">has*</span></code> entries are <code class="docutils literal notranslate"><span class="pre">True</span></code>:</p>
+<ul>
+<li><p>“hasPointCloud”, under <code class="docutils literal notranslate"><span class="pre">"filesUri"/"pointCloud"</span></code></p></li>
+<li><p>“hasMesh”, under <code class="docutils literal notranslate"><span class="pre">"filesUri"/"mesh"</span></code></p></li>
+<li><p>“hasSkeleton”, under <code class="docutils literal notranslate"><span class="pre">"filesUri"/"skeleton"</span></code></p></li>
+<li><p>“hasTreeGraph”, under <code class="docutils literal notranslate"><span class="pre">"filesUri"/"tree"</span></code></p></li>
+</ul>
+</li>
+<li><p>the data from the files when the following <code class="docutils literal notranslate"><span class="pre">has*</span></code> entries are <code class="docutils literal notranslate"><span class="pre">True</span></code>:</p>
+<ul>
+<li><p>“hasSkeleton”, under <code class="docutils literal notranslate"><span class="pre">"data"/"skeleton"</span></code></p></li>
+<li><p>“hasAngleData”, under:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">"data"/"angles"/"angles"</span></code> for the angle values</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"data"/"angles"/"internodes"</span></code> for the internodes values</p></li>
+</ul>
+</li>
+<li><p>“hasManualMeasures”, under:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">"data"/"angles"/"measured_angles"</span></code> for the angle values</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"data"/"angles"/"measured_internodes"</span></code> for the internodes values</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>the reconstruction bounding-box (formerly known as ‘workspace’) under <code class="docutils literal notranslate"><span class="pre">"workspace"</span></code>, for example <code class="docutils literal notranslate"><span class="pre">"{"x":</span> <span class="pre">[340,</span> <span class="pre">440],</span> <span class="pre">"y":</span> <span class="pre">[330,</span> <span class="pre">410],</span> <span class="pre">"z":</span> <span class="pre">[-180,</span> <span class="pre">105]}"</span></code></p></li>
+<li><p>the camera model and its parameters under <code class="docutils literal notranslate"><span class="pre">"camera"/"model"</span></code>, see <a class="reference internal" href="#camera-model"><span class="std std-doc">here</span></a> for more details</p></li>
+<li><p>the list of camera poses under <code class="docutils literal notranslate"><span class="pre">"camera"/"poses"</span></code>, for example with the first image: <code class="docutils literal notranslate"><span class="pre">"{"id":</span> <span class="pre">1,</span> <span class="pre">"tvec":</span> <span class="pre">[369.4279687732083,</span> <span class="pre">120.36109311437637,</span> <span class="pre">-62.07043190848918],</span> <span class="pre">"rotmat":</span> <span class="pre">[[0.06475585405884698,</span> <span class="pre">-0.9971710205080586,</span> <span class="pre">0.038165890845442085],</span> <span class="pre">[-0.3390191175518756,</span> <span class="pre">-0.0579549181538338,</span> <span class="pre">-0.9389926865509284],</span> <span class="pre">[0.9385481965778085,</span> <span class="pre">0.04786630673761355,</span> <span class="pre">-0.34181295964290737]],</span> <span class="pre">"photoUri":</span> <span class="pre">"/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg",</span> <span class="pre">"isMatched":</span> <span class="pre">true}"</span></code></p></li>
+</ul>
+<section id="camera-model">
+<h3 id="camera-model">Camera model<a class="headerlink" href="#camera-model" title="Permalink to this headline">¶</a></h3>
+<p>The details about the camera poses accessible under <code class="docutils literal notranslate"><span class="pre">"camera"/"model"</span></code> are:</p>
+<ul class="simple">
+<li><p>“id”: the id of the camera model, should always be <code class="docutils literal notranslate"><span class="pre">1</span></code> if we use a single camera</p></li>
+<li><p>“model”: the name of the camera model, should always be ‘OPENCV’ as this is how we save it</p></li>
+<li><p>“width”: the width of the images</p></li>
+<li><p>“height”: the height of the images</p></li>
+<li><p>“params”: the ‘OPENCV’ intrinsic camera parameters, that is <code class="docutils literal notranslate"><span class="pre">fx</span></code>, <code class="docutils literal notranslate"><span class="pre">fy</span></code>, <code class="docutils literal notranslate"><span class="pre">cx</span></code>, <code class="docutils literal notranslate"><span class="pre">cy</span></code>, <code class="docutils literal notranslate"><span class="pre">k1</span></code>, <code class="docutils literal notranslate"><span class="pre">k2</span></code>, <code class="docutils literal notranslate"><span class="pre">p1</span></code>, <code class="docutils literal notranslate"><span class="pre">p2</span></code>.</p></li>
+</ul>
+<p>For example with the first image:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"OPENCV"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"width"</span><span class="p">:</span><span class="w"> </span><span class="mi">1440</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"height"</span><span class="p">:</span><span class="w"> </span><span class="mi">1080</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"params"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1166.9518889440105</span><span class="p">,</span><span class="w"> </span><span class="mf">1166.9518889440105</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0013571157486977348</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0013571157486977348</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="camera-poses">
+<h3 id="camera-poses">Camera poses<a class="headerlink" href="#camera-poses" title="Permalink to this headline">¶</a></h3>
+<p>The details about the camera poses accessible under <code class="docutils literal notranslate"><span class="pre">"camera"/"poses"</span></code> are:</p>
+<ul class="simple">
+<li><p>“id”: index of the picture (starts at 1 by COLMAP convention)</p></li>
+<li><p>“rotmat”: Rotation matrix, 3x3 array</p></li>
+<li><p>“tvec”: Translation vector, 3x1 array</p></li>
+<li><p>“thumbnailUri”: URI to the thumbnail image, example “/images/<scanid>/images/&lt;image_id&gt;?size=thumb.jpg”</scanid></p></li>
+<li><p>“photoUri”: URI to the original image, example “/images/<scanid>/images/&lt;image_id&gt;?size=orig.jpg”</scanid></p></li>
+</ul>
+<p>For example with the first image:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"tvec"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">369.4279687732083</span><span class="p">,</span><span class="w"> </span><span class="mf">120.36109311437637</span><span class="p">,</span><span class="w"> </span><span class="mf">-62.07043190848918</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"rotmat"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">0.06475585405884698</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.9971710205080586</span><span class="p">,</span><span class="w"> </span><span class="mf">0.038165890845442085</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">-0.3390191175518756</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0579549181538338</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.9389926865509284</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">0.9385481965778085</span><span class="p">,</span><span class="w"> </span><span class="mf">0.04786630673761355</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.34181295964290737</span><span class="p">]</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"photoUri"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"thumbnailUri"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg"</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">"isMatched"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 
