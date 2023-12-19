@@ -6,21 +6,29 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v1
 
-    - name: Build documentation with Sphinx
-      uses: romi/sphinxdoc-action@v5.3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
       with:
-        pre-build-command: |
-          apt-get update -y
-          apt-get install libgl1-mesa-glx -y
-          python3 -m pip install sphinx --upgrade
-          python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
-          python3 -m pip install -r requirements.txt
-          python3 -m pip install .
-        docs-folder: "docs/"
+        python-version: '3.9'
+
+    - name: Install PlantDB, Sphinx & requirements
+      run:
+        apt-get update -y
+        apt-get install libgl1-mesa-glx -y
+        python3 -m pip install sphinx --upgrade
+        python3 -m pip install sphinx-argparse sphinx-copybutton sphinx-panels sphinx-material sphinx-prompt myst-parser
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install -e .
+
+    - name: Build documentation with Sphinx
+      run:
+        cd docs/
+        make html
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
