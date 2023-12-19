@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.Mesh
+======================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: Mesh
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Mesh.__init__
+      ~Mesh.as_view
+      ~Mesh.dispatch_request
+      ~Mesh.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Mesh.decorators
+      ~Mesh.init_every_request
+      ~Mesh.method_decorators
+      ~Mesh.methods
+      ~Mesh.provide_automatic_options
+      ~Mesh.representations
+   
+   

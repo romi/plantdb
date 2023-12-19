@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.Refresh
+=========================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: Refresh
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Refresh.__init__
+      ~Refresh.as_view
+      ~Refresh.dispatch_request
+      ~Refresh.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Refresh.decorators
+      ~Refresh.init_every_request
+      ~Refresh.method_decorators
+      ~Refresh.methods
+      ~Refresh.provide_automatic_options
+      ~Refresh.representations
+   
+   

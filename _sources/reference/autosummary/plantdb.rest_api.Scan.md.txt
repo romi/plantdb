@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.Scan
+======================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: Scan
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Scan.__init__
+      ~Scan.as_view
+      ~Scan.dispatch_request
+      ~Scan.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Scan.decorators
+      ~Scan.init_every_request
+      ~Scan.method_decorators
+      ~Scan.methods
+      ~Scan.provide_automatic_options
+      ~Scan.representations
+   
+   

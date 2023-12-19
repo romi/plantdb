@@ -65,7 +65,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="I/O operations" href="io.html" />
-    <link rel="prev" title="Local file system database" href="fsdb.html" />
+    <link rel="prev" title="plantdb.fsdb.File" href="autosummary/plantdb.fsdb.File.html" />
   
    
 
@@ -242,6 +242,94 @@
 <h1 id="reference-sshfsdb--page-root">Remote file system database with SSH<a class="headerlink" href="#reference-sshfsdb--page-root" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<span class="target" id="module-plantdb.sshfsdb"></span><p>This module implement a database as a <strong>file structure on a remote server using SSHFS</strong>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plantdb.sshfsdb.</span></span><span class="sig-name descname"><span class="pre">SSHFSDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basedir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remotedir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/sshfsdb.html#SSHFSDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of FSDB that first mounts a remote directory using SSHFS.</p>
+<p>Implementation of a database on a remote file system.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.basedir">
+<span class="sig-name descname"><span class="pre">basedir</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.basedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the local directory where to mount the remote directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.remotedir">
+<span class="sig-name descname"><span class="pre">remotedir</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.remotedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the remote directory containing the database.
+Should be in the format <code class="docutils literal notranslate"><span class="pre">user@server:path</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.scans">
+<span class="sig-name descname"><span class="pre">scans</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.scans" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of <code class="docutils literal notranslate"><span class="pre">Scan</span></code> objects found in the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.is_connected">
+<span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the DB is connected (locked the directory), else <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">login_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/sshfsdb.html#SSHFSDB.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to the remote database.</p>
+<p>Handle DB “locking” system by adding a <code class="docutils literal notranslate"><span class="pre">LOCK_FILE_NAME</span></code> file in the DB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>login_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – UNUSED</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">SSHFSDB</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="s2">"someone@example.com:/data"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="plantdb.sshfsdb.SSHFSDB.disconnect">
+<span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/sshfsdb.html#SSHFSDB.disconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.sshfsdb.SSHFSDB.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the database.</p>
+<p>Handle DB “locking” system by removing the <code class="docutils literal notranslate"><span class="pre">LOCK_FILE_NAME</span></code> file from the DB.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">SSHFSDB</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="s2">"someone@example.com:/data"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+</dd></dl>
 </section>
 
 
@@ -254,7 +342,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="fsdb.html" title="Local file system database"
+            <a href="autosummary/plantdb.fsdb.File.html" title="plantdb.fsdb.File"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -263,7 +351,7 @@
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> Local file system database </span>
+                      class="md-footer-nav__direction"> "Previous" </span> plantdb.fsdb.File </span>
               </div>
             </a>
           

@@ -1,0 +1,35 @@
+﻿plantdb.fsdb.File
+=================
+
+.. currentmodule:: plantdb.fsdb
+
+.. autoclass:: File
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~File.__init__
+      ~File.get_db
+      ~File.get_fileset
+      ~File.get_id
+      ~File.get_metadata
+      ~File.get_scan
+      ~File.import_file
+      ~File.path
+      ~File.read
+      ~File.read_raw
+      ~File.set_metadata
+      ~File.store
+      ~File.write
+      ~File.write_raw
+   
+   
+
+   
+   
+   

@@ -1,0 +1,36 @@
+﻿plantdb.rest\_api.PointCloudGroundTruth
+=======================================
+
+.. currentmodule:: plantdb.rest_api
+
+.. autoclass:: PointCloudGroundTruth
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PointCloudGroundTruth.__init__
+      ~PointCloudGroundTruth.as_view
+      ~PointCloudGroundTruth.dispatch_request
+      ~PointCloudGroundTruth.get
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PointCloudGroundTruth.decorators
+      ~PointCloudGroundTruth.init_every_request
+      ~PointCloudGroundTruth.method_decorators
+      ~PointCloudGroundTruth.methods
+      ~PointCloudGroundTruth.provide_automatic_options
+      ~PointCloudGroundTruth.representations
+   
+   

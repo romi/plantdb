@@ -1,0 +1,870 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../../_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="../../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../../_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>plantdb.rest_api &#8212; plantdb  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/_static/css/extra.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../_static/ROMI_favicon_green.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=green data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#_modules/plantdb/rest_api" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../../index.html" title="plantdb  documentation"
+           class="md-header-nav__button md-logo">
+          
+              <img src="../../_static/logo.svg" height="26"
+                   alt="plantdb logo">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">plantdb</span>
+          <span class="md-header-nav__topic"> plantdb.rest_api </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../../search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/romi/plantdb/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="../../_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = "../../"versions.json"",
+        target_loc = "../../../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">plantdb</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../../index.html" title="plantdb documentation" class="md-nav__button md-logo">
+      
+        <img src="../../_static/logo.svg" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="../../index.html"
+       title="plantdb documentation">plantdb</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/romi/plantdb/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    
+  </div>
+</a>
+    </div>
+  
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <h1 id="modules-plantdb-rest-api--page-root">Source code for plantdb.rest_api</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># plantdb - Data handling tools for the ROMI project</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2018-2019 Sony Computer Science Laboratories</span>
+<span class="c1"># Authors: D. Colliaux, T. Wintz, P. Hanappe</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of plantdb.</span>
+<span class="c1">#</span>
+<span class="c1"># plantdb is free software: you can redistribute it</span>
+<span class="c1"># and/or modify it under the terms of the GNU Lesser General Public</span>
+<span class="c1"># License as published by the Free Software Foundation, either</span>
+<span class="c1"># version 3 of the License, or (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># plantdb is distributed in the hope that it will be</span>
+<span class="c1"># useful, but WITHOUT ANY WARRANTY; without even the implied</span>
+<span class="c1"># warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+<span class="c1"># See the GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public</span>
+<span class="c1"># License along with plantdb.  If not, see</span>
+<span class="c1"># &lt;https://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># ------------------------------------------------------------------------------</span>
+
+<span class="sd">"""</span>
+<span class="sd">This module regroup the classes and methods used to serve a REST API using ``fsdb_rest_api`` CLI.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">degrees</span>
+
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">send_file</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">send_from_directory</span>
+<span class="kn">from</span> <span class="nn">flask_restful</span> <span class="kn">import</span> <span class="n">Resource</span>
+
+<span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">webcache</span>
+<span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_json</span>
+<span class="kn">from</span> <span class="nn">plantdb.utils</span> <span class="kn">import</span> <span class="n">is_radians</span>
+
+
+<div class="viewcode-block" id="get_scan_date"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.get_scan_date">[docs]</a><span class="k">def</span> <span class="nf">get_scan_date</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the acquisition datetime of a scan.</span>
+
+<span class="sd">    Try to get the data from the scan metadata 'acquisition_date', else from the directory creation time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instance to get the date &amp; time from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The formatted datetime string.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import get_scan_date</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span class="sd">    &gt;&gt;&gt; db = test_database('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; print(get_scan_date(scan))</span>
+<span class="sd">    2023-12-15 16:37:15</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    """</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s1">'acquisition_date'</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">c_time</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">lstat</span><span class="p">()</span><span class="o">.</span><span class="n">st_ctime</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">c_time</span><span class="p">)</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">date</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+<div class="viewcode-block" id="compute_fileset_matches"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.compute_fileset_matches">[docs]</a><span class="k">def</span> <span class="nf">compute_fileset_matches</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return a dictionary mapping the scan tasks to fileset names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instance to list the filesets from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary mapping the scan tasks to fileset names.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import compute_fileset_matches</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.fsdb import dummy_db</span>
+<span class="sd">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
+<span class="sd">    &gt;&gt;&gt; compute_fileset_matches(scan)</span>
+<span class="sd">    {'fileset': 'fileset_001'}</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    """</span>
+    <span class="n">filesets_matches</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_filesets</span><span class="p">():</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'_'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># get the task name</span>
+        <span class="n">filesets_matches</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">return</span> <span class="n">filesets_matches</span></div>
+
+
+<div class="viewcode-block" id="get_path"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.get_path">[docs]</a><span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">db_prefix</span><span class="o">=</span><span class="s2">"/files/"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the path to a file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : plantdb.FSDB.File</span>
+<span class="sd">        The file to get the path for.</span>
+<span class="sd">    db_prefix : str, optional</span>
+<span class="sd">        A prefix to use... ???</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The path to the file.</span>
+<span class="sd">    """</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">fileset</span>  <span class="c1"># get the corresponding fileset</span>
+    <span class="n">scan</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">scan</span>  <span class="c1"># get the corresponding scan</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_prefix</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_scan_template"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.get_scan_template">[docs]</a><span class="k">def</span> <span class="nf">get_scan_template</span><span class="p">(</span><span class="n">scan_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Template dictionary for a scan."""</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">scan_id</span><span class="p">,</span>
+        <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"date"</span><span class="p">:</span> <span class="s2">"01-01-00 00:00:00"</span><span class="p">,</span>
+            <span class="s2">"species"</span><span class="p">:</span> <span class="s1">'N/A'</span><span class="p">,</span>
+            <span class="s2">"plant"</span><span class="p">:</span> <span class="s2">"N/A"</span><span class="p">,</span>
+            <span class="s2">"environment"</span><span class="p">:</span> <span class="s2">"N/A"</span><span class="p">,</span>
+            <span class="s2">"nbPhotos"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"files"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"metadatas"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">"archive"</span><span class="p">:</span> <span class="kc">None</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">"thumbnailUri"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"hasMesh"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasPointCloud"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasPcdGroundTruth"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSkeleton"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasAngleData"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSegmentation2D"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSegmentedPcdEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasPointCloudEvaluation"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasManualMeasures"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasAutomatedMeasures"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"hasSegmentedPointCloud"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"error"</span><span class="p">:</span> <span class="n">error</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="list_scans_info"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.list_scans_info">[docs]</a><span class="k">def</span> <span class="nf">list_scans_info</span><span class="p">(</span><span class="n">scans</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""List scans information.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scans : list of plantdb.fsdb.Scan</span>
+<span class="sd">        The list of scan instances to get information from.</span>
+<span class="sd">    query : str, optional</span>
+<span class="sd">        A scan filtering query, to be matched in the scan metadata keys.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of dict</span>
+<span class="sd">        The list of scans information dictionaries.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import list_scans_info</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span class="sd">    &gt;&gt;&gt; db = test_database('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scans_info = list_scans_info(db.get_scans())</span>
+<span class="sd">    &gt;&gt;&gt; print(scans_info)</span>
+<span class="sd">    [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">scan</span> <span class="ow">in</span> <span class="n">scans</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+            <span class="k">continue</span>  <span class="c1"># filter scans info list by matching the query with metadata keys</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">scan_info</span> <span class="o">=</span> <span class="n">get_scan_info</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")</span>
+            <span class="n">scan_info</span> <span class="o">=</span> <span class="n">get_scan_template</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan_info</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="get_scan_info"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.get_scan_info">[docs]</a><span class="k">def</span> <span class="nf">get_scan_info</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the information related to a single scan dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scans : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instances to get information from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The scan information dictionary.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import get_scan_info</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span class="sd">    &gt;&gt;&gt; db = test_database('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; scan_info = get_scan_info(scan)</span>
+<span class="sd">    &gt;&gt;&gt; print(scan_info)</span>
+<span class="sd">    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+
+<span class="sd">    """</span>
+    <span class="c1"># Map the scan tasks to fileset names:</span>
+    <span class="n">task_fs_map</span> <span class="o">=</span> <span class="n">compute_fileset_matches</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="c1"># Get the scan metadata dictionary:</span>
+    <span class="n">scan_md</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
+    <span class="c1"># Initialize the scan information template:</span>
+    <span class="n">scan_info</span> <span class="o">=</span> <span class="n">get_scan_template</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="c1"># - Gather "metadata" information from scan:</span>
+    <span class="c1"># Get acquisition date:</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s1">'date'</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_scan_date</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="c1"># Import 'object' related scan metadata to scan info template:</span>
+    <span class="k">if</span> <span class="s1">'object'</span> <span class="ow">in</span> <span class="n">scan_md</span><span class="p">:</span>
+        <span class="n">scan_obj</span> <span class="o">=</span> <span class="n">scan_md</span><span class="p">[</span><span class="s1">'object'</span><span class="p">]</span>  <span class="c1"># get the 'object' related dictionary</span>
+        <span class="n">scan_info</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s1">'species'</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'N/A'</span><span class="p">)</span>
+        <span class="n">scan_info</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s1">'environment'</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'environment'</span><span class="p">,</span> <span class="s1">'N/A'</span><span class="p">)</span>
+        <span class="n">scan_info</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s1">'plant'</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'plant_id'</span><span class="p">,</span> <span class="s1">'N/A'</span><span class="p">)</span>
+    <span class="c1"># Get the number of 'images' in the dataset:</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s1">'nbPhotos'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s1">'images'</span><span class="p">)</span><span class="o">.</span><span class="n">get_files</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_try_has_file</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">task_fs_map</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="n">task</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="n">task</span><span class="p">])</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="c1"># - Gather information about tasks:</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasPointCloud'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'PointCloud'</span><span class="p">,</span> <span class="s1">'PointCloud'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasMesh'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'TriangleMesh'</span><span class="p">,</span> <span class="s1">'TriangleMesh'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasSkeleton'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">,</span> <span class="s1">'CurveSkeleton'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasTreeGraph'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'TreeGraph'</span><span class="p">,</span> <span class="s1">'TreeGraph'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasAngleData'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'AnglesAndInternodes'</span><span class="p">,</span> <span class="s1">'AnglesAndInternodes'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasAutomatedMeasures'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'AnglesAndInternodes'</span><span class="p">,</span> <span class="s1">'AnglesAndInternodes'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasManualMeasures'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'measures.json'</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasSegmentation2D'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'Segmentation2D'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasPcdGroundTruth'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'PointCloudGroundTruth'</span><span class="p">,</span> <span class="s1">'PointCloudGroundTruth'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasPointCloudEvaluation'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'PointCloudEvaluation'</span><span class="p">,</span> <span class="s1">'PointCloudEvaluation'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasSegmentedPointCloud'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'SegmentedPointCloud'</span><span class="p">,</span> <span class="s1">'SegmentedPointCloud'</span><span class="p">)</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s1">'hasSegmentedPcdEvaluation'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'SegmentedPointCloudEvaluation'</span><span class="p">,</span>
+                                                           <span class="s1">'SegmentedPointCloudEvaluation'</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">scan_info</span></div>
+
+
+<div class="viewcode-block" id="get_scan_data"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.get_scan_data">[docs]</a><span class="k">def</span> <span class="nf">get_scan_data</span><span class="p">(</span><span class="n">scan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Get the scan information and data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scan : plantdb.fsdb.Scan</span>
+<span class="sd">        The scan instance to get the information and data from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The scan information dictionary.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import get_scan_data</span>
+<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span class="sd">    &gt;&gt;&gt; db = test_database('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; db.connect()</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; scan_data = get_scan_data(scan)</span>
+<span class="sd">    &gt;&gt;&gt; print(scan_data['id'])</span>
+<span class="sd">    real_plant_analyzed</span>
+<span class="sd">    &gt;&gt;&gt; print(scan_data['filesUri'])</span>
+<span class="sd">    {'pointCloud': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'), 'mesh': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply'), 'skeleton': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/CurveSkeleton__TriangleMesh_0393cb5708/CurveSkeleton.json'), 'tree': PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TreeGraph__False_CurveSkeleton_c304a2cc71/TreeGraph.p')}</span>
+<span class="sd">    &gt;&gt;&gt; print(scan_data['camera']["model"])</span>
+<span class="sd">    SIMPLE_RADIAL</span>
+<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
+<span class="sd">    """</span>
+    <span class="n">task_fs_map</span> <span class="o">=</span> <span class="n">compute_fileset_matches</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+    <span class="n">scan_data</span> <span class="o">=</span> <span class="n">get_scan_info</span><span class="p">(</span><span class="n">scan</span><span class="p">)</span>
+
+    <span class="c1"># - Get the paths to data files:</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Get the URI (file path) to the output of the `PointCloud` task:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasPointCloud"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'PointCloud'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"pointCloud"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'PointCloud'</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
+    <span class="c1"># Get the URI (file path) to the output of the `TriangleMesh` task:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasMesh"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'TriangleMesh'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"mesh"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'TriangleMesh'</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
+    <span class="c1"># Get the URI (file path) to the output of the `CurveSkeleton` task:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'CurveSkeleton'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
+    <span class="c1"># Get the URI (file path) to the output of the `TreeGraph` task:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasTreeGraph"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'TreeGraph'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"tree"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'TreeGraph'</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
+
+    <span class="c1"># - Load some of the data:</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Load the skeleton data:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'CurveSkeleton'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">))</span>
+    <span class="c1"># Load the measured angles and internodes:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasAngleData"</span><span class="p">]:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'AnglesAndInternodes'</span><span class="p">])</span>
+        <span class="n">measures</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'AnglesAndInternodes'</span><span class="p">))</span>
+        <span class="c1"># scan_data['data']["angles"] = measures.get("angles", {})</span>
+        <span class="c1"># scan_data['data']["internodes"] = measures.get("internodes", {})</span>
+        <span class="k">if</span> <span class="n">is_radians</span><span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]):</span>
+            <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]))</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span>
+    <span class="c1"># Load the manually measured angles and internodes:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasManualMeasures"</span><span class="p">]:</span>
+        <span class="n">measures</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_measures</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">measures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">measures</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'angles'</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'data'</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_internodes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"internodes"</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="c1"># Load the workspace, aka bounding-box:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># old version: get scanner workspace</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()[</span><span class="s2">"scanner"</span><span class="p">][</span><span class="s2">"workspace"</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1"># new version: get it from colmap fileset metadata 'bounding-box'</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"bounding_box"</span><span class="p">)</span>
+
+    <span class="c1"># - Load camera information</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Load the camera model:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># old version</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()[</span><span class="s2">"computed"</span><span class="p">][</span><span class="s2">"camera_model"</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1"># new version: get it from colmap fileset metadata 'task_params'/'camera_model':</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"task_params"</span><span class="p">)[</span><span class="s1">'camera_model'</span><span class="p">]</span>
+    <span class="c1"># Load the camera poses from the images metadata:</span>
+    <span class="n">scan_data</span><span class="p">[</span><span class="s1">'camera'</span><span class="p">][</span><span class="s1">'poses'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># initialize list of poses to gather</span>
+    <span class="n">img_fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'images'</span><span class="p">])</span>  <span class="c1"># get the 'images' fileset</span>
+    <span class="k">for</span> <span class="n">img_idx</span><span class="p">,</span> <span class="n">img_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img_fs</span><span class="o">.</span><span class="n">get_files</span><span class="p">()):</span>
+        <span class="n">camera_md</span> <span class="o">=</span> <span class="n">img_f</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"colmap_camera"</span><span class="p">)</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s1">'camera'</span><span class="p">][</span><span class="s1">'poses'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">'id'</span><span class="p">:</span> <span class="n">img_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">'tvec'</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'tvec'</span><span class="p">],</span>
+            <span class="s1">'rotmat'</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'rotmat'</span><span class="p">],</span>
+            <span class="s1">'photoUri'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_f</span><span class="o">.</span><span class="n">path</span><span class="p">()),</span>
+            <span class="s1">'isMatched'</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">})</span>
+    <span class="k">return</span> <span class="n">scan_data</span></div>
+
+
+<div class="viewcode-block" id="ScanList"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.ScanList">[docs]</a><span class="k">class</span> <span class="nc">ScanList</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="ScanList.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.ScanList.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a list of scan dataset information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            The list of dictionaries to serve (as JSON)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">list_scans_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(),</span> <span class="n">query</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'filterQuery'</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Scan"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Scan">[docs]</a><span class="k">class</span> <span class="nc">Scan</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve a scan dataset upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="Scan.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Scan.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the scan dataset information.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scan_id : str</span>
+<span class="sd">            The name of the scan for which to serve the information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            The dictionary to serve (as JSON)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">get_scan_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="n">scan_id</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="File"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.File">[docs]</a><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve a file upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="File.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.File.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a requested file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The relative path to the file to serve.</span>
+<span class="sd">            The global variable `db_location` is used to set the absolute path.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flask.Response</span>
+<span class="sd">            The HTTP response from the flask server.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Refresh"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Refresh">[docs]</a><span class="k">class</span> <span class="nc">Refresh</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to reload the database upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="Refresh.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Refresh.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Force the plant database to reload."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">200</span></div></div>
+
+
+<div class="viewcode-block" id="Image"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Image">[docs]</a><span class="k">class</span> <span class="nc">Image</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve an image upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="Image.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Image.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Send the requested (cached) image, may resize it if necessary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scan_id : str</span>
+<span class="sd">            The scan id.</span>
+<span class="sd">        fileset_id : str</span>
+<span class="sd">            The fileset id.</span>
+<span class="sd">        file_id : str</span>
+<span class="sd">            The file id.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flask.Response</span>
+<span class="sd">            The HTTP response from the flask server.</span>
+<span class="sd">        """</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'size'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'thumb'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="c1"># Make sure that the 'size' argument we got is a valid option:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'orig'</span><span class="p">,</span> <span class="s1">'thumb'</span><span class="p">,</span> <span class="s1">'large'</span><span class="p">]:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="s1">'thumb'</span>
+        <span class="c1"># Get the path to the image resource:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">'image/jpeg'</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PointCloud"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.PointCloud">[docs]</a><span class="k">class</span> <span class="nc">PointCloud</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve a point-cloud upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="PointCloud.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.PointCloud.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Send the requested (cached) point-cloud, may down-sample it if necessary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scan_id : str</span>
+<span class="sd">            The scan id.</span>
+<span class="sd">        fileset_id : str</span>
+<span class="sd">            The fileset id.</span>
+<span class="sd">        file_id : str</span>
+<span class="sd">            The file id.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flask.Response</span>
+<span class="sd">            The HTTP response from the flask server.</span>
+<span class="sd">        """</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'size'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'preview'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="c1"># Try to convert the 'size' argument as a float:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vxs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">vxs</span>
+        <span class="c1"># If a string, make sure that the 'size' argument we got is a valid option:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'orig'</span><span class="p">,</span> <span class="s1">'preview'</span><span class="p">]:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="s1">'preview'</span>
+        <span class="c1"># Get the path to the pointcloud resource:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">'application/octet-stream'</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PointCloudGroundTruth"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.PointCloudGroundTruth">[docs]</a><span class="k">class</span> <span class="nc">PointCloudGroundTruth</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve a ground-truth point-cloud upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="PointCloudGroundTruth.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.PointCloudGroundTruth.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Send the requested (cached) ground-truth point-cloud, may down-sample it if necessary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scan_id : str</span>
+<span class="sd">            The scan id.</span>
+<span class="sd">        fileset_id : str</span>
+<span class="sd">            The fileset id.</span>
+<span class="sd">        file_id : str</span>
+<span class="sd">            The file id.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flask.Response</span>
+<span class="sd">            The HTTP response from the flask server.</span>
+<span class="sd">        """</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'size'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'preview'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="c1"># Try to convert the 'size' argument as a float:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vxs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">vxs</span>
+        <span class="c1"># If a string, make sure that the 'size' argument we got is a valid option:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'orig'</span><span class="p">,</span> <span class="s1">'preview'</span><span class="p">]:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="s1">'preview'</span>
+        <span class="c1"># Get the path to the pointcloud resource:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">'application/octet-stream'</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Mesh"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Mesh">[docs]</a><span class="k">class</span> <span class="nc">Mesh</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Concrete RESTful resource to serve a triangular mesh upon request (GET method)."""</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+<div class="viewcode-block" id="Mesh.get"><a class="viewcode-back" href="../../reference/rest_api.html#plantdb.rest_api.Mesh.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Send the requested (cached) triangular mesh, may down-sample it if necessary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scan_id : str</span>
+<span class="sd">            The scan id.</span>
+<span class="sd">        fileset_id : str</span>
+<span class="sd">            The fileset id.</span>
+<span class="sd">        file_id : str</span>
+<span class="sd">            The file id.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flask.Response</span>
+<span class="sd">            The HTTP response from the flask server.</span>
+<span class="sd">        """</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'size'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'orig'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="c1"># Make sure that the 'size' argument we got is a valid option:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'orig'</span><span class="p">]:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="s1">'orig'</span>
+        <span class="c1"># Get the path to the mesh resource:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">webcache</span><span class="o">.</span><span class="n">mesh_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">'application/octet-stream'</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2022, Robotics for Microfarms.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../../_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

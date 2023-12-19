@@ -229,7 +229,7 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#methods" class="md-nav__link">Methods</a>
         </li>
-        <li class="md-nav__item"><a href="#details" class="md-nav__link">Details</a>
+        <li class="md-nav__item"><a href="#module-plantdb.webcache" class="md-nav__link">Details</a>
         </li></ul>
             </nav>
         </li>
@@ -249,6 +249,35 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="webcache-module">
 <h1 id="reference-webcache--page-root">Webcache module<a class="headerlink" href="#reference-webcache--page-root" title="Permalink to this headline">¶</a></h1>
+<p>This module provides three utility functions that are used in combination with the
+DB interface to create downsized versions of images, point clouds, and mesh resources.
+The resources are identified using the <code class="docutils literal notranslate"><span class="pre">Scan</span></code>, <code class="docutils literal notranslate"><span class="pre">Fileset</span></code>, and <cite>File</cite> IDs.
+The downsized versions are cached in the <cite>‘webcache’</cite> directory in the scan directory.</p>
+<p>The following <strong>size specifications</strong> are available:</p>
+<ul class="simple">
+<li><p>Images: ‘thumb’ (max. 150x150), ‘large’ (max. 1500x1500), and ‘orig’ (original size).</p></li>
+<li><p>Point clouds: ‘preview’ (max. 10k points), and ‘orig’ (original size).</p></li>
+<li><p>Mesh: ‘orig’ (original size). TODO: add remeshing</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">webcache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'ROMI_DB'</span><span class="p">,</span> <span class="s2">"/data/ROMI/DB/"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original image:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango36'</span><span class="p">,</span><span class="s1">'images'</span><span class="p">,</span><span class="s1">'00000_rgb'</span><span class="p">,</span><span class="s1">'orig'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the thumb image (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango36'</span><span class="p">,</span><span class="s1">'images'</span><span class="p">,</span><span class="s1">'00000_rgb'</span><span class="p">,</span><span class="s1">'thumb'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original pointcloud:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'orig'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the preview pointcloud (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'preview'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to a downsampled pointcloud (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'2.3'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
 <section id="methods">
 <h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -257,11 +286,156 @@
 <col style="width: 90%"/>
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.webcache.image_path" title="plantdb.webcache.image_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image_path</span></code></a>(db, scan_id, fileset_id, file_id)</p></td>
+<td><p>Get the path to an image file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#plantdb.webcache.pointcloud_path" title="plantdb.webcache.pointcloud_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pointcloud_path</span></code></a>(db, scan_id, fileset_id, file_id)</p></td>
+<td><p>Get the path to a point cloud file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#plantdb.webcache.mesh_path" title="plantdb.webcache.mesh_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mesh_path</span></code></a>(db, scan_id, fileset_id, file_id)</p></td>
+<td><p>Get the path to a mesh file.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
-<section id="details">
-<h2 id="details">Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
+<section id="module-plantdb.webcache">
+<span id="details"></span><h2 id="module-plantdb.webcache">Details<a class="headerlink" href="#module-plantdb.webcache" title="Permalink to this headline">¶</a></h2>
+<p>This module provides three utility functions that are used in combination with the
+DB interface to create downsized versions of images, point clouds, and mesh resources.
+The resources are identified using the <code class="docutils literal notranslate"><span class="pre">Scan</span></code>, <code class="docutils literal notranslate"><span class="pre">Fileset</span></code>, and <cite>File</cite> IDs.
+The downsized versions are cached in the <cite>‘webcache’</cite> directory in the scan directory.</p>
+<p>The following <strong>size specifications</strong> are available:</p>
+<ul class="simple">
+<li><p>Images: ‘thumb’ (max. 150x150), ‘large’ (max. 1500x1500), and ‘orig’ (original size).</p></li>
+<li><p>Point clouds: ‘preview’ (max. 10k points), and ‘orig’ (original size).</p></li>
+<li><p>Mesh: ‘orig’ (original size). TODO: add remeshing</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">webcache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'ROMI_DB'</span><span class="p">,</span> <span class="s2">"/data/ROMI/DB/"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original image:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango36'</span><span class="p">,</span><span class="s1">'images'</span><span class="p">,</span><span class="s1">'00000_rgb'</span><span class="p">,</span><span class="s1">'orig'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the thumb image (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango36'</span><span class="p">,</span><span class="s1">'images'</span><span class="p">,</span><span class="s1">'00000_rgb'</span><span class="p">,</span><span class="s1">'thumb'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original pointcloud:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'orig'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the preview pointcloud (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'preview'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to a downsampled pointcloud (resized and cached):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">'sango_90_300_36'</span><span class="p">,</span><span class="s1">'PointCloud_1_0_0_0_10_0_ca07eb2790'</span><span class="p">,</span><span class="s1">'PointCloud'</span><span class="p">,</span><span class="s1">'2.3'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="plantdb.webcache.image_path">
+<span class="sig-prename descclassname"><span class="pre">plantdb.webcache.</span></span><span class="sig-name descname"><span class="pre">image_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'orig'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/webcache.html#image_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.webcache.image_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to an image file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB"><em>plantdb.fsdb.FSDB</em></a>) – The database object.</p></li>
+<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the scan in the database.</p></li>
+<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the fileset in the scan.</p></li>
+<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the file in the fileset.</p></li>
+<li><p><strong>size</strong> (<em>{'orig'</em><em>, </em><em>'large'</em><em>, </em><em>'thumb'}</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The requested image size, works as follows:</dt><dd><ul>
+<li><p>’orig’: original image, no chache;</p></li>
+<li><p>’large’: image max width and height to <cite>1500</cite>;</p></li>
+<li><p>’thumb’: image max width and height to <cite>150</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Default to ‘orig’.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>pathlib.Path</em> – The path to the original or cached image.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">image_path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original image:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">'real_plant_analyzed'</span><span class="p">,</span> <span class="s1">'images'</span><span class="p">,</span> <span class="s1">'00000_rgb'</span><span class="p">,</span> <span class="s1">'orig'</span><span class="p">)</span>
+<span class="go">PosixPath('/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Get a thumbnail of the image:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">'real_plant_analyzed'</span><span class="p">,</span> <span class="s1">'images'</span><span class="p">,</span> <span class="s1">'00000_rgb'</span><span class="p">,</span> <span class="s1">'thumb'</span><span class="p">)</span>
+<span class="go">PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="plantdb.webcache.mesh_path">
+<span class="sig-prename descclassname"><span class="pre">plantdb.webcache.</span></span><span class="sig-name descname"><span class="pre">mesh_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'orig'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/webcache.html#mesh_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.webcache.mesh_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to a mesh file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB"><em>plantdb.fsdb.FSDB</em></a>) – The database object.</p></li>
+<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the scan in the database.</p></li>
+<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the fileset in the scan.</p></li>
+<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the file in the fileset.</p></li>
+<li><p><strong>size</strong> (<em>any</em><em>, </em><em>optional</em>) – UNUSED.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>pathlib.Path</em> – The path to the original mesh.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">mesh_path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original pointcloud:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">'real_plant_analyzed'</span><span class="p">,</span> <span class="s1">'TriangleMesh_9_most_connected_t_open3d_00e095c359'</span><span class="p">,</span> <span class="s1">'TriangleMesh'</span><span class="p">,</span> <span class="s1">'orig'</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="plantdb.webcache.pointcloud_path">
+<span class="sig-prename descclassname"><span class="pre">plantdb.webcache.</span></span><span class="sig-name descname"><span class="pre">pointcloud_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'orig'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plantdb/webcache.html#pointcloud_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plantdb.webcache.pointcloud_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to a point cloud file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<a class="reference internal" href="fsdb.html#plantdb.fsdb.FSDB" title="plantdb.fsdb.FSDB"><em>plantdb.fsdb.FSDB</em></a>) – The database object.</p></li>
+<li><p><strong>scan_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the scan in the database.</p></li>
+<li><p><strong>fileset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the fileset in the scan.</p></li>
+<li><p><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The ID of the file in the fileset.</p></li>
+<li><p><strong>size</strong> (<em>{'orig'</em><em>, </em><em>'preview'}</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – The requested size of the point cloud.
+Obviously ‘orig’ preserve the original point cloud.
+‘preview’ will resize the point cloud to a <cite>1.8</cite> voxel size.
+A float will resize the point cloud to given voxel size.
+Default to ‘orig’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>pathlib.Path</em> – The path to the original or cached pointcloud.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">pointcloud_path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">'real_plant_analyzed'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original pointcloud:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">'real_plant_analyzed'</span><span class="p">,</span> <span class="s1">'PointCloud_1_0_1_0_10_0_7ee836e5a9'</span><span class="p">,</span> <span class="s1">'PointCloud'</span><span class="p">,</span> <span class="s1">'orig'</span><span class="p">)</span>
+<span class="go">PosixPath('/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Get a down-sampled version of the pointcloud:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">'real_plant_analyzed'</span><span class="p">,</span> <span class="s1">'PointCloud_1_0_1_0_10_0_7ee836e5a9'</span><span class="p">,</span> <span class="s1">'PointCloud'</span><span class="p">,</span> <span class="s1">'preview'</span><span class="p">)</span>
+<span class="go">PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 </section>
 </section>
 
