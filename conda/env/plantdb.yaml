@@ -2,8 +2,9 @@ name: plantdb
 channels:
   - defaults
   - open3d-admin
+  - conda-forge
 dependencies:
-  - python >=3.8,<3.12
+  - python >=3.8,<3.10
   - numpy
   - appdirs
   - colorlog
