@@ -285,19 +285,23 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="plantdb-rest-api">
 <h1 id="webapi--page-root">plantDB REST API<a class="headerlink" href="#webapi--page-root" title="Permalink to this headline">¶</a></h1>
+<p>Hereafter we introduce the URLS to use to communicate via the REST API.
+The Python implementation is done in the <code class="docutils literal notranslate"><span class="pre">plantdb.rest_api</span></code> module and the CLI to start a Flask server is in <code class="docutils literal notranslate"><span class="pre">fsdb_rest_api</span></code>.</p>
 <section id="rest-urls">
 <h2 id="rest-urls">REST URLs<a class="headerlink" href="#rest-urls" title="Permalink to this headline">¶</a></h2>
 <section id="scans">
 <h3 id="scans">/scans<a class="headerlink" href="#scans" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/scans</span></code> URL:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.ScanList</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.ScanList</span></code></span></a></p></li>
 <li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">filterQuery</span></code></p></li>
 <li><p>Returns: a JSON compliant list of dictionaries.</p></li>
 <li><p>Example:</p>
 <ul>
-<li><p>Get all scans: “http://127.0.0.1:5000/scans”</p></li>
-<li><p>Search for “arabidopsis” in metadata: “http://127.0.0.1:5000/scans?filterQuery=arabidopsis”</p></li>
+<li><p>Get all scans:
+<a class="reference external" href="http://127.0.0.1:5000/scans">http://127.0.0.1:5000/scans</a></p></li>
+<li><p>Search for “arabidopsis” in metadata:
+<a class="reference external" href="http://127.0.0.1:5000/scans?filterQuery=arabidopsis">http://127.0.0.1:5000/scans?filterQuery=arabidopsis</a></p></li>
 </ul>
 </li>
 </ul>
@@ -306,13 +310,15 @@
 <h3 id="scans-scan-id">/scans/&lt;scan_id&gt;<a class="headerlink" href="#scans-scan-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/scans/&lt;scan_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Scan</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Scan</span></code></span></a></p></li>
 <li><p>Arguments: none</p></li>
 <li><p>Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset</p></li>
 <li><p>Examples with the test database:</p>
 <ul>
-<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"real_plant_analyzed"</span></code> dataset: “http://127.0.0.1:5000/scans/real_plant_analyzed”</p></li>
-<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"virtual_plant_analyzed"</span></code> dataset: “http://127.0.0.1:5000/scans/virtual_plant_analyzed”</p></li>
+<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"real_plant_analyzed"</span></code> dataset:
+<a class="reference external" href="http://127.0.0.1:5000/scans/real_plant_analyzed">http://127.0.0.1:5000/scans/real_plant_analyzed</a></p></li>
+<li><p>Get scan info for the <code class="docutils literal notranslate"><span class="pre">"virtual_plant_analyzed"</span></code> dataset:
+<a class="reference external" href="http://127.0.0.1:5000/scans/virtual_plant_analyzed">http://127.0.0.1:5000/scans/virtual_plant_analyzed</a></p></li>
 </ul>
 </li>
 </ul>
@@ -326,13 +332,15 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="files-path">/files/<path><a class="headerlink" href="#files-path" title="Permalink to this headline">¶</a></path></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/files/&lt;path&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.File</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.File</span></code></span></a></p></li>
 <li><p>Arguments: none</p></li>
 <li><p>Returns: The content of the file.</p></li>
 <li><p>Examples  <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset (from the test database):</p>
 <ul>
-<li><p>Get the first image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>): “http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg”</p></li>
-<li><p>Get the first mask image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>): “http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png”</p></li>
+<li><p>Get the first image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>):
+<a class="reference external" href="http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg">http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg</a></p></li>
+<li><p>Get the first mask image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>):
+<a class="reference external" href="http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png">http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png</a></p></li>
 </ul>
 </li>
 </ul>
@@ -341,13 +349,15 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="archive-scan-id">/archive/&lt;scan_id&gt;<a class="headerlink" href="#archive-scan-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/archive/&lt;scan_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Archive</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Archive</span></code></span></a></p></li>
 <li><p>Arguments: none</p></li>
 <li><p>Returns: A zip file containing the dataset.</p></li>
 <li><p>Examples:</p>
 <ul>
-<li><p>Get <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> archive: “http://127.0.0.1:5000/archive/real_plant_analyzed/”</p></li>
-<li><p>Get <code class="docutils literal notranslate"><span class="pre">virtual_plant_analyzed</span></code> archive: “http://127.0.0.1:5000/archive/virtual_plant_analyzed/”</p></li>
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> archive:
+<a class="reference external" href="http://127.0.0.1:5000/archive/real_plant_analyzed/">http://127.0.0.1:5000/archive/real_plant_analyzed/</a></p></li>
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">virtual_plant_analyzed</span></code> archive:
+<a class="reference external" href="http://127.0.0.1:5000/archive/virtual_plant_analyzed/">http://127.0.0.1:5000/archive/virtual_plant_analyzed/</a></p></li>
 </ul>
 </li>
 </ul>
@@ -356,13 +366,15 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="image-scan-id-fileset-id-file-id">/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#image-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Image</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Image</span></code></span></a></p></li>
 <li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">large</span></code>, <code class="docutils literal notranslate"><span class="pre">thumb</span></code>} to control the max size (width or height) of the image to return.</p></li>
 <li><p>Returns: The image file, resized by default.</p></li>
 <li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset (from the test database) and the first image of the scan (<code class="docutils literal notranslate"><span class="pre">00000_rgb</span></code>):</p>
 <ul>
-<li><p>Get the preview image: “http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb”</p></li>
-<li><p>Get the original image: “http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig”</p></li>
+<li><p>Get the preview image:
+<a class="reference external" href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb</a></p></li>
+<li><p>Get the original image:
+<a class="reference external" href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig</a></p></li>
 </ul>
 </li>
 </ul>
@@ -371,14 +383,17 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="pointcloud-scan-id-fileset-id-file-id">/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#pointcloud-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloud</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloud</span></code></span></a></p></li>
 <li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">preview</span></code>} or a <code class="docutils literal notranslate"><span class="pre">float</span></code> to control the voxel-size of the pointcloud to returns.</p></li>
 <li><p>Returns: The point cloud file, preview size by default.</p></li>
 <li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset:</p>
 <ul>
-<li><p>Get the preview point cloud: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud”</p></li>
-<li><p>Get the original point cloud: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig”</p></li>
-<li><p>Get the point cloud with a voxel size of <code class="docutils literal notranslate"><span class="pre">2.3</span></code>: “http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3”</p></li>
+<li><p>Get the preview point cloud:
+<a class="reference external" href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud</a></p></li>
+<li><p>Get the original point cloud:
+<a class="reference external" href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig</a></p></li>
+<li><p>Get the point cloud with a voxel size of <code class="docutils literal notranslate"><span class="pre">2.3</span></code>:
+<a class="reference external" href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3</a></p></li>
 </ul>
 </li>
 </ul>
@@ -387,7 +402,7 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="pcgroundtruth-scan-id-fileset-id-file-id">/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#pcgroundtruth-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloudGroundTruth</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.PointCloudGroundTruth</span></code></span></a></p></li>
 <li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>, <code class="docutils literal notranslate"><span class="pre">preview</span></code>} or a <code class="docutils literal notranslate"><span class="pre">float</span></code> to control the voxel-size of the pointcloud to returns.</p></li>
 <li><p>Returns: The ground-truth pointcloud file, original size by default.</p></li>
 </ul>
@@ -396,12 +411,13 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <h3 id="mesh-scan-id-fileset-id-file-id">/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;<a class="headerlink" href="#mesh-scan-id-fileset-id-file-id" title="Permalink to this headline">¶</a></h3>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</span></code> URLs:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Mesh</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Mesh</span></code></span></a></p></li>
 <li><p>Arguments: <code class="docutils literal notranslate"><span class="pre">size</span></code> in {<code class="docutils literal notranslate"><span class="pre">orig</span></code>}, no control of the size of the mesh to returns.</p></li>
 <li><p>Returns: The mesh file, original size by default.</p></li>
 <li><p>Examples with the <code class="docutils literal notranslate"><span class="pre">real_plant_analyzed</span></code> dataset:</p>
 <ul>
-<li><p>Get the original mesh: “http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh”</p></li>
+<li><p>Get the original mesh:
+<a class="reference external" href="http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh">http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh</a></p></li>
 </ul>
 </li>
 </ul>
@@ -411,17 +427,18 @@ In other words it will fail (response <cite>500</cite>) if this task is missing 
 <p>Refresh the list of scans in the <code class="docutils literal notranslate"><span class="pre">plantdb.fsdb.FSDB</span></code> database.</p>
 <p>Here are the specifications for the <code class="docutils literal notranslate"><span class="pre">/refresh</span></code> URL:</p>
 <ul class="simple">
-<li><p>Resource: <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Refresh</span></code></span></p></li>
+<li><p>Resource: <a class="reference internal" href="reference/rest_api.html#classes"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.Refresh</span></code></span></a></p></li>
 <li><p>Arguments: none</p></li>
 <li><p>Returns: <code class="docutils literal notranslate"><span class="pre">200</span></code> on completion.</p></li>
-<li><p>Example: “http://127.0.0.1:5000/refresh”</p></li>
+<li><p>Example:
+<a class="reference external" href="http://127.0.0.1:5000/refresh">http://127.0.0.1:5000/refresh</a></p></li>
 </ul>
 </section>
 </section>
 <section id="scan-summary">
 <h2 id="scan-summary">Scan summary<a class="headerlink" href="#scan-summary" title="Permalink to this headline">¶</a></h2>
 <p>Information about scans dataset, obtained with the ‘/scans’ URL, are grouped in a JSON dictionary.
-The template can be accessed here: <code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.get_scan_template</span></code></p>
+The template can be accessed here: <a class="reference internal" href="reference/rest_api.html#methods"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">plantdb.rest_api.get_scan_template</span></code></span></a></p>
 <p>It is organized as follows:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"scan_id"</span><span class="p">,</span>
