@@ -182,16 +182,16 @@ A path to the thumbnail image to use as "preview" to represent the dataset in th
 ### has*
 All of the `has*` entries indicate if there is an output for a list of selected tasks:
 
-  * `"hasPointCloud"`: output of the task `PointCloud` has a `PointCloud.ply` file
-  * `"hasMesh"`: output of the task `TriangleMesh` has a `TriangleMesh.ply` file
-  * `"hasSkeleton"`: output of the task `CurveSkeleton` has a `CurveSkeleton.json` file
-  * `"hasAngleData"`: output of the task `AngleAndInternodes` has a `AnglesAndInternodes.json` file
-  * `"hasAutomatedMeasures"`: output of the task `AutomatedMeasures` has a `AnglesAndInternodes` file
-  * `"hasSegmentation2D"`: output of the task `Segmentation2D` has a `` file
-  * `"hasSegmentedPcdEvaluation"`: output of the task `Segmentation2DEvaluation` has a `` file
-  * `"hasPointCloudEvaluation"`: output of the task `PointCloudEvaluation` has a `` file
-  * `"hasSegmentedPointCloud"`: output of the task `SegmentedPointCloud` has a `SegmentedPointCloud.ply` file
-  * `"hasPcdGroundTruth"`: output of the task `PointCloudGroundTruth` has a `PointCloudGroundTruth.ply` file
+  * `hasPointCloud`: output of the task `PointCloud` has a `PointCloud.ply` file
+  * `hasMesh`: output of the task `TriangleMesh` has a `TriangleMesh.ply` file
+  * `hasSkeleton`: output of the task `CurveSkeleton` has a `CurveSkeleton.json` file
+  * `hasAngleData`: output of the task `AngleAndInternodes` has a `AnglesAndInternodes.json` file
+  * `hasAutomatedMeasures`: output of the task `AutomatedMeasures` has a `AnglesAndInternodes` file
+  * `hasSegmentation2D`: output of the task `Segmentation2D` has a `` file
+  * `hasSegmentedPcdEvaluation`: output of the task `Segmentation2DEvaluation` has a `` file
+  * `hasPointCloudEvaluation`: output of the task `PointCloudEvaluation` has a `` file
+  * `hasSegmentedPointCloud`: output of the task `SegmentedPointCloud` has a `SegmentedPointCloud.ply` file
+  * `hasPcdGroundTruth`: output of the task `PointCloudGroundTruth` has a `PointCloudGroundTruth.ply` file
 
 Finally, `hasManualMeasures` refers to the presence of a JSON file with manual measurements saved as `measures.json`.
 This file should be present at the scan dataset root directory.
@@ -200,31 +200,31 @@ This file should be present at the scan dataset root directory.
 Information about a specific scan dataset, obtained with the '/scans/<scan_id>' URL, are grouped in a JSON dictionary.
 
 It has the same information as those gathered with the '/scans' URL, but also add:
-  * the files URI when the following `has*` entries are `True`:
-    * "hasPointCloud", under `"filesUri"/"pointCloud"`
-    * "hasMesh", under `"filesUri"/"mesh"`
-    * "hasSkeleton", under `"filesUri"/"skeleton"`
-    * "hasTreeGraph", under `"filesUri"/"tree"`
-  * the data from the files when the following `has*` entries are `True`: 
-    * "hasSkeleton", under `"data"/"skeleton"`
-    * "hasAngleData", under:
+  * the **files URI** when the following `has*` entries are `True`:
+    * `hasPointCloud`, under `"filesUri"/"pointCloud"`
+    * `hasMesh`, under `"filesUri"/"mesh"`
+    * `hasSkeleton`, under `"filesUri"/"skeleton"`
+    * `hasTreeGraph`, under `"filesUri"/"tree"`
+  * the **files data** when the following `has*` entries are `True`: 
+    * `hasSkeleton`, under `"data"/"skeleton"`
+    * `hasAngleData`, under:
       * `"data"/"angles"/"angles"` for the angle values
       * `"data"/"angles"/"internodes"` for the internodes values
-    * "hasManualMeasures", under:
+    * `hasManualMeasures`, under:
       *   `"data"/"angles"/"measured_angles"` for the angle values
       *   `"data"/"angles"/"measured_internodes"` for the internodes values
-  * the reconstruction bounding-box (formerly known as 'workspace') under `"workspace"`, for example `"{"x": [340, 440], "y": [330, 410], "z": [-180, 105]}"`
-  * the camera model and its parameters under `"camera"/"model"`, see [here](#camera-model) for more details
-  * the list of camera poses under `"camera"/"poses"`, for example with the first image: `"{"id": 1, "tvec": [369.4279687732083, 120.36109311437637, -62.07043190848918], "rotmat": [[0.06475585405884698, -0.9971710205080586, 0.038165890845442085], [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284], [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]], "photoUri": "/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg", "isMatched": true}"` 
+  * the **reconstruction bounding-box** (formerly known as 'workspace') under `"workspace"`, for example `"{"x": [340, 440], "y": [330, 410], "z": [-180, 105]}"`
+  * the **camera model** and its **intrinsics parameters** under `"camera"/"model"`, see [here](#camera-model) for more details
+  * the list of **camera poses**, a.k.a. **extrinsic parameters**, under `"camera"/"poses"`, see [here](#camera-poses) for more details
 
 ### Camera model
 
 The details about the camera poses accessible under `"camera"/"model"` are:
-  * "id": the id of the camera model, should always be `1` if we use a single camera
-  * "model": the name of the camera model, should always be 'OPENCV' as this is how we save it
-  * "width": the width of the images
-  * "height": the height of the images
-  * "params": the 'OPENCV' intrinsic camera parameters, that is `fx`, `fy`, `cx`, `cy`, `k1`, `k2`, `p1`, `p2`.  
+  * `id`: the id of the camera model, should always be `1` if we use a single camera
+  * `model`: the name of the camera model, should always be 'OPENCV' as this is how we save it
+  * `width`: the width of the images
+  * `height`: the height of the images
+  * `params`: the 'OPENCV' intrinsic camera parameters, that is `fx`, `fy`, `cx`, `cy`, `k1`, `k2`, `p1`, `p2`.  
 
 For example with the first image:
 ```json
