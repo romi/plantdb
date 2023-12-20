@@ -11,8 +11,11 @@
 name: Publish Docker image
 
 on:
+  # Automatic trigger on release
   release:
     types: [ published ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   push_to_registry:
