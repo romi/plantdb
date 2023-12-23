@@ -167,7 +167,7 @@ A detailed documentation of the Python API is available here: https://romi.githu
 
 ### Serve the REST API
 
-Then you can start the REST API with `plantdb_rest_api`:
+Then you can start the REST API with `fsdb_rest_api`:
 
 ```shell
 fsdb_rest_api
@@ -177,7 +177,7 @@ You should see something like:
 
 ```
 n scans = 2
- * Serving Flask app "plantdb_rest_api" (lazy loading)
+ * Serving Flask app "fsdb_rest_api" (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
    Use a production WSGI server instead.
@@ -221,7 +221,7 @@ conda build conda/recipe/ -c conda-forge --user romi-eu
 This requires the `conda-build` package to be installed in the `base` environment!
 
 ```shell
-conda install conda-build
+conda install conda-build -n base
 ```
 
 To upload the built package, you need a valid account (here `romi-eu`) on [anaconda.org](www.anaconda.org) & to log ONCE
@@ -234,7 +234,7 @@ anaconda upload ~/miniconda3/conda-bld/linux-64/plantdb*.tar.bz2 --user romi-eu
 This requires the `anaconda-client` package to be installed in the `base` environment!
 
 ```shell
-conda install anaconda-client
+conda install anaconda-client -n base
 ```
 
 ### Docker `build.sh` & `run.sh` scripts

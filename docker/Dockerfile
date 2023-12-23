@@ -54,4 +54,4 @@ RUN cd plantdb/ && \
     rm -rf .cache/pip
 
 # By default, start the `fsdb_rest_api` CLI at container startup:
-CMD ["/bin/bash", "-c", "plantdb_rest_api"]
+CMD ["/bin/bash", "-c", "fsdb_rest_api"]
