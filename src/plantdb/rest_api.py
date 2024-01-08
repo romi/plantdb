@@ -153,6 +153,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
             }
         },
         "thumbnailUri": "",
+        "hasColmap": False,
         "hasPointCloud": False,
         "hasMesh": False,
         "hasSkeleton": False,
@@ -276,6 +277,7 @@ def get_scan_info(scan):
             return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
 
     # - Gather information about tasks:
+    scan_info["hasColmap"] = _try_has_file('Colmap', 'cameras')
     scan_info["hasPointCloud"] = _try_has_file('PointCloud', 'PointCloud')
     scan_info["hasMesh"] = _try_has_file('TriangleMesh', 'TriangleMesh')
     scan_info["hasSkeleton"] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
@@ -328,33 +330,42 @@ def get_scan_data(scan):
     def _get_file_uri(scan, fileset, file):
         return f"/files/{scan.id}/{fileset.id}/{file.path().name}"
 
-    # - Get the paths to data files:
+    # Get the paths to data files:
     scan_data["filesUri"] = {}
-    # Get the URI (file path) to the output of the `PointCloud` task:
+    ## Get the URI (file path) to the output of the `PointCloud` task:
     if scan_data["hasPointCloud"]:
         fs = scan.get_fileset(task_fs_map['PointCloud'])
         scan_data["filesUri"]["pointCloud"] = _get_file_uri(scan, fs, fs.get_file('PointCloud'))
-    # Get the URI (file path) to the output of the `TriangleMesh` task:
+    ## Get the URI (file path) to the output of the `TriangleMesh` task:
     if scan_data["hasMesh"]:
         fs = scan.get_fileset(task_fs_map['TriangleMesh'])
         scan_data["filesUri"]["mesh"] = _get_file_uri(scan, fs, fs.get_file('TriangleMesh'))
-    # Get the URI (file path) to the output of the `CurveSkeleton` task:
+    ## Get the URI (file path) to the output of the `CurveSkeleton` task:
     if scan_data["hasSkeleton"]:
         fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
         scan_data["filesUri"]["skeleton"] = _get_file_uri(scan, fs, fs.get_file('CurveSkeleton'))
-    # Get the URI (file path) to the output of the `TreeGraph` task:
+    ## Get the URI (file path) to the output of the `TreeGraph` task:
     if scan_data["hasTreeGraph"]:
         fs = scan.get_fileset(task_fs_map['TreeGraph'])
         scan_data["filesUri"]["tree"] = _get_file_uri(scan, fs, fs.get_file('TreeGraph'))
 
-    # - Load some of the data:
+    # Load some of the data:
     scan_data["data"] = {}
-    # Load the skeleton data:
+    ## Load the manually measured angles and internodes:
+    if scan_data["hasManualMeasures"]:
+        scan_data["data"]["angles"] = {}
+        measures = scan.get_measures()
+        if measures is None:
+            measures = dict([])
+        scan_data["data"]["angles"]["measured_angles"] = measures.get('angles', [])
+        scan_data["data"]["angles"]["measured_internodes"] = measures.get("internodes", [])
+    ## Load the skeleton data:
     if scan_data["hasSkeleton"]:
         fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
         scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
-    # Load the measured angles and internodes:
+    ## Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
+        scan_data["data"]["angles"] = {}
         fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
         measures = read_json(fs.get_file('AnglesAndInternodes'))
         # scan_data["data"]["angles"] = measures.get("angles", {})
@@ -362,45 +373,40 @@ def get_scan_data(scan):
         if is_radians(measures["angles"]):
             measures["angles"] = list(map(degrees, measures["angles"]))
         scan_data["data"]["angles"] = measures
-    # Load the manually measured angles and internodes:
-    if scan_data["hasManualMeasures"]:
-        measures = scan.get_measures()
-        if measures is None:
-            measures = dict([])
-        scan_data["data"]["angles"]["measured_angles"] = measures.get('angles', [])
-        scan_data["data"]["angles"]["measured_internodes"] = measures.get("internodes", [])
-    # Load the workspace, aka bounding-box:
-    try:
-        # old version: get scanner workspace
-        scan_data["workspace"] = scan.get_metadata()["scanner"]["workspace"]
-    except KeyError:
-        # new version: get it from colmap fileset metadata 'bounding-box'
-        fs = scan.get_fileset(task_fs_map['Colmap'])
-        scan_data["workspace"] = fs.get_metadata("bounding_box")
 
-    # - Load camera information
-    scan_data["camera"] = {}
-    # Load the camera model:
-    try:
-        # old version
-        scan_data["camera"]["model"] = scan.get_metadata()["computed"]["camera_model"]
-    except KeyError:
-        # new version: get it from colmap 'cameras.json':
-        fs = scan.get_fileset(task_fs_map['Colmap'])
-        scan_data["camera"]["model"] = json.loads(fs.get_file("cameras").read())['1']
-    # Load the camera poses from the images metadata:
-    scan_data["camera"]["poses"] = []  # initialize list of poses to gather
-    img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
-    for img_idx, img_f in enumerate(img_fs.get_files()):
-        camera_md = img_f.get_metadata("colmap_camera")
-        scan_data["camera"]["poses"].append({
-            "id": img_idx + 1,
-            "tvec": camera_md['tvec'],
-            "rotmat": camera_md['rotmat'],
-            "photoUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'orig')),
-            "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
-            "isMatched": True
-        })
+    # Load the reconstruction bounding-box and camera parameters (intrinsic and extrinsic)
+    if scan_data['hasColmap']:
+        ## Load the workspace, aka bounding-box:
+        try:
+            # old version: get scanner workspace
+            scan_data["workspace"] = scan.get_metadata("scanner")["workspace"]
+        except KeyError:
+            # new version: get it from Colmap fileset metadata 'bounding-box'
+            fs = scan.get_fileset(task_fs_map['Colmap'])
+            scan_data["workspace"] = fs.get_metadata("bounding_box")
+            scan_data["camera"] = {}
+        ## Load the camera model (intrinsic parameters):
+        try:
+            # old version
+            scan_data["camera"]["model"] = scan.get_metadata("computed")["camera_model"]
+        except KeyError:
+            # new version: get it from Colmap 'cameras.json':
+            fs = scan.get_fileset(task_fs_map['Colmap'])
+            scan_data["camera"]["model"] = json.loads(fs.get_file("cameras").read())['1']
+        ## Load the camera poses (extrinsic parameters) from the images metadata:
+        scan_data["camera"]["poses"] = []  # initialize list of poses to gather
+        img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
+        for img_idx, img_f in enumerate(img_fs.get_files()):
+            camera_md = img_f.get_metadata("colmap_camera")
+            scan_data["camera"]["poses"].append({
+                "id": img_idx + 1,
+                "tvec": camera_md['tvec'],
+                "rotmat": camera_md['rotmat'],
+                "photoUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'orig')),
+                "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
+                "isMatched": True
+            })
+
     return scan_data
 
 
