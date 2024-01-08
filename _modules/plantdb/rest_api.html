@@ -301,17 +301,19 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from plantdb.rest_api import get_scan_date</span>
 <span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
-<span class="sd">    &gt;&gt;&gt; db = test_database('real_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; db = test_database(['real_plant_analyzed', 'virtual_plant_analyzed'])</span>
 <span class="sd">    &gt;&gt;&gt; db.connect()</span>
 <span class="sd">    &gt;&gt;&gt; scan = db.get_scan('real_plant_analyzed')</span>
 <span class="sd">    &gt;&gt;&gt; print(get_scan_date(scan))</span>
-<span class="sd">    2023-12-15 16:37:15</span>
+<span class="sd">    &gt;&gt;&gt; scan = db.get_scan('virtual_plant_analyzed')</span>
+<span class="sd">    &gt;&gt;&gt; print(get_scan_date(scan))</span>
 <span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
 <span class="sd">    """</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s1">'acquisition_date'</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Get directory creation date as acquisition date</span>
         <span class="n">c_time</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">lstat</span><span class="p">()</span><span class="o">.</span><span class="n">st_ctime</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">c_time</span><span class="p">)</span>
         <span class="n">date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>
@@ -388,6 +390,7 @@
             <span class="p">}</span>
         <span class="p">},</span>
         <span class="s2">"thumbnailUri"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"hasColmap"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasPointCloud"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasMesh"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">"hasSkeleton"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -511,6 +514,7 @@
             <span class="k">return</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="n">task</span><span class="p">])</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="c1"># - Gather information about tasks:</span>
+    <span class="n">scan_info</span><span class="p">[</span><span class="s2">"hasColmap"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'Colmap'</span><span class="p">,</span> <span class="s1">'cameras'</span><span class="p">)</span>
     <span class="n">scan_info</span><span class="p">[</span><span class="s2">"hasPointCloud"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'PointCloud'</span><span class="p">,</span> <span class="s1">'PointCloud'</span><span class="p">)</span>
     <span class="n">scan_info</span><span class="p">[</span><span class="s2">"hasMesh"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'TriangleMesh'</span><span class="p">,</span> <span class="s1">'TriangleMesh'</span><span class="p">)</span>
     <span class="n">scan_info</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_try_has_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">,</span> <span class="s1">'CurveSkeleton'</span><span class="p">)</span>
@@ -563,33 +567,42 @@
     <span class="k">def</span> <span class="nf">_get_file_uri</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"/files/</span><span class="si">{</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fileset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
 
-    <span class="c1"># - Get the paths to data files:</span>
+    <span class="c1"># Get the paths to data files:</span>
     <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c1"># Get the URI (file path) to the output of the `PointCloud` task:</span>
+    <span class="c1">## Get the URI (file path) to the output of the `PointCloud` task:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasPointCloud"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'PointCloud'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"pointCloud"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_file_uri</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'PointCloud'</span><span class="p">))</span>
-    <span class="c1"># Get the URI (file path) to the output of the `TriangleMesh` task:</span>
+    <span class="c1">## Get the URI (file path) to the output of the `TriangleMesh` task:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasMesh"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'TriangleMesh'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"mesh"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_file_uri</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'TriangleMesh'</span><span class="p">))</span>
-    <span class="c1"># Get the URI (file path) to the output of the `CurveSkeleton` task:</span>
+    <span class="c1">## Get the URI (file path) to the output of the `CurveSkeleton` task:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'CurveSkeleton'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_file_uri</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">))</span>
-    <span class="c1"># Get the URI (file path) to the output of the `TreeGraph` task:</span>
+    <span class="c1">## Get the URI (file path) to the output of the `TreeGraph` task:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasTreeGraph"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'TreeGraph'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"filesUri"</span><span class="p">][</span><span class="s2">"tree"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_file_uri</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'TreeGraph'</span><span class="p">))</span>
 
-    <span class="c1"># - Load some of the data:</span>
+    <span class="c1"># Load some of the data:</span>
     <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c1"># Load the skeleton data:</span>
+    <span class="c1">## Load the manually measured angles and internodes:</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasManualMeasures"</span><span class="p">]:</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">measures</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_measures</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">measures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">measures</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'angles'</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_internodes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"internodes"</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="c1">## Load the skeleton data:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasSkeleton"</span><span class="p">]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'CurveSkeleton'</span><span class="p">])</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"skeleton"</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'CurveSkeleton'</span><span class="p">))</span>
-    <span class="c1"># Load the measured angles and internodes:</span>
+    <span class="c1">## Load the measured angles and internodes:</span>
     <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasAngleData"</span><span class="p">]:</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'AnglesAndInternodes'</span><span class="p">])</span>
         <span class="n">measures</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s1">'AnglesAndInternodes'</span><span class="p">))</span>
         <span class="c1"># scan_data["data"]["angles"] = measures.get("angles", {})</span>
@@ -597,45 +610,40 @@
         <span class="k">if</span> <span class="n">is_radians</span><span class="p">(</span><span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]):</span>
             <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">measures</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">]))</span>
         <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span>
-    <span class="c1"># Load the manually measured angles and internodes:</span>
-    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s2">"hasManualMeasures"</span><span class="p">]:</span>
-        <span class="n">measures</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_measures</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">measures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">measures</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_angles"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'angles'</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"angles"</span><span class="p">][</span><span class="s2">"measured_internodes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">measures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"internodes"</span><span class="p">,</span> <span class="p">[])</span>
-    <span class="c1"># Load the workspace, aka bounding-box:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># old version: get scanner workspace</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()[</span><span class="s2">"scanner"</span><span class="p">][</span><span class="s2">"workspace"</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="c1"># new version: get it from colmap fileset metadata 'bounding-box'</span>
-        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"bounding_box"</span><span class="p">)</span>
 
-    <span class="c1"># - Load camera information</span>
-    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c1"># Load the camera model:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># old version</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()[</span><span class="s2">"computed"</span><span class="p">][</span><span class="s2">"camera_model"</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="c1"># new version: get it from colmap 'cameras.json':</span>
-        <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"cameras"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="s1">'1'</span><span class="p">]</span>
-    <span class="c1"># Load the camera poses from the images metadata:</span>
-    <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># initialize list of poses to gather</span>
-    <span class="n">img_fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'images'</span><span class="p">])</span>  <span class="c1"># get the 'images' fileset</span>
-    <span class="k">for</span> <span class="n">img_idx</span><span class="p">,</span> <span class="n">img_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img_fs</span><span class="o">.</span><span class="n">get_files</span><span class="p">()):</span>
-        <span class="n">camera_md</span> <span class="o">=</span> <span class="n">img_f</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"colmap_camera"</span><span class="p">)</span>
-        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s2">"id"</span><span class="p">:</span> <span class="n">img_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">"tvec"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'tvec'</span><span class="p">],</span>
-            <span class="s2">"rotmat"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'rotmat'</span><span class="p">],</span>
-            <span class="s2">"photoUri"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">'orig'</span><span class="p">)),</span>
-            <span class="s2">"thumbnailUri"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">'thumb'</span><span class="p">)),</span>
-            <span class="s2">"isMatched"</span><span class="p">:</span> <span class="kc">True</span>
-        <span class="p">})</span>
+    <span class="c1"># Load the reconstruction bounding-box and camera parameters (intrinsic and extrinsic)</span>
+    <span class="k">if</span> <span class="n">scan_data</span><span class="p">[</span><span class="s1">'hasColmap'</span><span class="p">]:</span>
+        <span class="c1">## Load the workspace, aka bounding-box:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># old version: get scanner workspace</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"scanner"</span><span class="p">)[</span><span class="s2">"workspace"</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># new version: get it from Colmap fileset metadata 'bounding-box'</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"bounding_box"</span><span class="p">)</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1">## Load the camera model (intrinsic parameters):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># old version</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"computed"</span><span class="p">)[</span><span class="s2">"camera_model"</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># new version: get it from Colmap 'cameras.json':</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'Colmap'</span><span class="p">])</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"cameras"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="s1">'1'</span><span class="p">]</span>
+        <span class="c1">## Load the camera poses (extrinsic parameters) from the images metadata:</span>
+        <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># initialize list of poses to gather</span>
+        <span class="n">img_fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">task_fs_map</span><span class="p">[</span><span class="s1">'images'</span><span class="p">])</span>  <span class="c1"># get the 'images' fileset</span>
+        <span class="k">for</span> <span class="n">img_idx</span><span class="p">,</span> <span class="n">img_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img_fs</span><span class="o">.</span><span class="n">get_files</span><span class="p">()):</span>
+            <span class="n">camera_md</span> <span class="o">=</span> <span class="n">img_f</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">"colmap_camera"</span><span class="p">)</span>
+            <span class="n">scan_data</span><span class="p">[</span><span class="s2">"camera"</span><span class="p">][</span><span class="s2">"poses"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">"id"</span><span class="p">:</span> <span class="n">img_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">"tvec"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'tvec'</span><span class="p">],</span>
+                <span class="s2">"rotmat"</span><span class="p">:</span> <span class="n">camera_md</span><span class="p">[</span><span class="s1">'rotmat'</span><span class="p">],</span>
+                <span class="s2">"photoUri"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">'orig'</span><span class="p">)),</span>
+                <span class="s2">"thumbnailUri"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">scan</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_fs</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">img_f</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">'thumb'</span><span class="p">)),</span>
+                <span class="s2">"isMatched"</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">})</span>
+
     <span class="k">return</span> <span class="n">scan_data</span></div>
 
 
