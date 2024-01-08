@@ -260,7 +260,11 @@ def get_test_dataset(dataset, out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.test_database import get_test_dataset
     >>> get_test_dataset()  # download and extract the test dataset to `plantdb/tests/testdata` directory
     """
-    out_path = _get_extract_archive(dataset, out_path=out_path, keep_tmp=keep_tmp, force=force)
+    ds_path = out_path / dataset
+    if ds_path.exists() and not force:
+        out_path = ds_path
+    else:
+        out_path = _get_extract_archive(dataset, out_path=out_path, keep_tmp=keep_tmp, force=force)
     return out_path
 
 
@@ -286,7 +290,11 @@ def get_models_dataset(out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.test_database import get_models_dataset
     >>> get_models_dataset()  # download and extract the trained CNN models to `plantdb/tests/testdata` directory
     """
-    out_path = _get_extract_archive("models", out_path=out_path, keep_tmp=keep_tmp, force=force)
+    ds_path = out_path / "models"
+    if ds_path.exists() and not force:
+        out_path = ds_path
+    else:
+        out_path = _get_extract_archive("models", out_path=out_path, keep_tmp=keep_tmp, force=force)
     return out_path
 
 
@@ -312,7 +320,11 @@ def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.test_database import get_configs
     >>> get_configs()  # download and extract the pipeline configurations to `plantdb/tests/testdata` directory
     """
-    out_path = _get_extract_archive("configs", out_path=out_path, keep_tmp=keep_tmp, force=force)
+    ds_path = out_path / "configs"
+    if ds_path.exists() and not force:
+        out_path = ds_path
+    else:
+        out_path = _get_extract_archive("configs", out_path=out_path, keep_tmp=keep_tmp, force=force)
     return out_path
 
 
