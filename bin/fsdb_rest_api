@@ -64,7 +64,7 @@ if __name__ == '__main__':
         args.db_location = test_database(DATASET, with_configs=True, with_models=True).path()
 
     if args.db_location == "/none":
-        logger.error("Can't serve a local plantdb as no path to the database was specified!")
+        logger.error("Can't serve a local PlantDB as no path to the database was specified!")
         logger.info(
             "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
         sleep(1)
