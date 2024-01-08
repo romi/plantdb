@@ -2158,13 +2158,12 @@ def _get_metadata(metadata=None, key=None):
         The metadata dictionary to get the key from.
     key : str, optional
         The key to get from the metadata dictionary.
-        If the key is not found, return ``None``.
         By default, return a copy of the whole metadata dictionary.
 
     Returns
     -------
     Any
-        the value save under `metadata[key]`, if any.
+        The value saved under `metadata['key']`, if any.
     """
     # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
     if metadata is None:
@@ -2172,7 +2171,7 @@ def _get_metadata(metadata=None, key=None):
     elif key is None:
         return copy.deepcopy(metadata)
     else:
-        return copy.deepcopy(metadata.get(str(key), None))
+        return copy.deepcopy(metadata.get(str(key), {}))
 
 
 def _set_metadata(metadata, data, value):
