@@ -1609,7 +1609,7 @@ class File(db.File):
 def _load_scans(db):
     """Load list of ``Scan`` from given database.
 
-    List subdirectories of ``db.basedir``.
+    List subdirectories of ``db.basedir`` with an `'images'` directory.
 
     Parameters
     ----------
@@ -1650,7 +1650,9 @@ def _load_scans(db):
     names = os.listdir(db.path())
     for name in tqdm(names, unit="scan"):
         scan = Scan(db, name)
-        if _scan_path(scan).is_dir():
+        scan_path = _scan_path(scan)
+        scan_image_path = scan_path / 'images'
+        if scan_path.is_dir() and scan_image_path.is_dir():
             # If the `files.json` associated to the scan is found, parse it:
             if _scan_json_file(scan).is_file():
                 scan.filesets = _load_scan_filesets(scan)
