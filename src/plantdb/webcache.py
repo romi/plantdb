@@ -144,7 +144,7 @@ def __hash(resource_type, scan_id, fileset_id, file_id, size):
 # Image
 # -----------------------------------------------------------------------------
 def __image_hash(scan_id, fileset_id, file_id, size):
-    """Create a hash for an image resource.
+    """Create a file name for an image resource using a hash value.
 
     Parameters
     ----------
@@ -160,7 +160,7 @@ def __image_hash(scan_id, fileset_id, file_id, size):
     Returns
     -------
     str
-        The hash of the image resource.
+        The image resource file name.
     """
     return __hash("image", scan_id, fileset_id, file_id, size) + ".jpeg"
 
@@ -205,23 +205,24 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
     pathlib.Path
         The path to the cached image.
     """
+    # Get the path to the original image:
+    src = __file_path(db, scan_id, fileset_id, file_id)
+
     # Get the path to the 'webcache' directory:
     cache_dir = __webcache_path(db, scan_id)
     dst = cache_dir / __image_hash(scan_id, fileset_id, file_id, size)
 
     # Load the image and resize it:
-    src = __file_path(db, scan_id, fileset_id, file_id)
-    ext = src.suffix.replace('.', '')  # get the extension and remove the dot
     image = Image.open(src)
     image.load()
     maxsize = IMG_RESOLUTIONS.get(size)
     image = __image_resize(image, maxsize)
+    # Make sure we have an RGB image to be able to save in this format:
+    if image.mode != "RGB":
+        image = image.convert(mode="RGB")
+    save_kwargs = {'quality': 84}
     # Save the resized image in the "webcache" directory:
-    save_kwargs = {}
-    if ext.lower() in ['jpg', 'jpeg']:
-        save_kwargs.update({'quality': 84})
     image.save(dst, **save_kwargs)
-
     print(f"Converted '{src}' to '{dst}', using size '{maxsize}'")
 
     return dst
@@ -484,6 +485,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
             raise ValueError(f"Unknown pointcloud size specification: {size}")
         else:
             return path
+
 
 # -----------------------------------------------------------------------------
 # Mesh
