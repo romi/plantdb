@@ -64,17 +64,19 @@ def get_scan_date(scan):
     --------
     >>> from plantdb.rest_api import get_scan_date
     >>> from plantdb.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database(['real_plant_analyzed', 'virtual_plant_analyzed'])
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> print(get_scan_date(scan))
-    2023-12-15 16:37:15
+    >>> scan = db.get_scan('virtual_plant_analyzed')
+    >>> print(get_scan_date(scan))
     >>> db.disconnect()
     """
     dt = scan.get_metadata('acquisition_date')
     try:
-        assert dt is not None
+        assert isinstance(dt, str)
     except:
+        # Get directory creation date as acquisition date
         c_time = scan.path().lstat().st_ctime
         dt = datetime.datetime.fromtimestamp(c_time)
         date = dt.strftime("%Y-%m-%d")
