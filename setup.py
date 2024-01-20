@@ -28,7 +28,21 @@ opts = dict(
                       ["test_fsdb.py", "test_io.py", "test_romi_import_images.py", "test_sync.py", "test_webcache.py"]
                   },
     zip_safe=False,
-    python_requires='>=3.8,<3.10',
+    python_requires='>=3.8',
+    install_requires=[
+        'numpy',
+        'appdirs',
+        'colorlog',
+        'flask',
+        'flask-cors',
+        'flask-restful',
+        'imagecodecs',
+        'imageio>=2.16.2',
+        'open3d>=0.9.0.0',
+        'pillow',
+        'toml',
+        'tqdm',
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
