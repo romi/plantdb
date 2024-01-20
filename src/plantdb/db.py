@@ -33,6 +33,7 @@ The following classes are defined:
 
 It should be subclassed to implement an actual database interface.
 """
+from copy import deepcopy
 
 
 class DB(object):
@@ -53,18 +54,27 @@ class DB(object):
         login_data : list or dict, optional
             Use this to access to a ``DB`` with credentials.
 
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def disconnect(self):
         """Disconnect from the database.
 
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def get_scans(self):
         """Get the list of scans saved in the database.
 
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -74,14 +84,13 @@ class DB(object):
         Parameters
         ----------
         id : str
-            Id of the scan to retrieve
+            Id of the scan instance to retrieve.
         create : bool, optional
-            Create the scan if it does not exist (default : ``False``)
+            Create the scan if it does not exist, default to ``False``.
 
-        Returns
-        -------
-        db.Scan
-
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -93,10 +102,9 @@ class DB(object):
         id : str
             Id of the scan to retrieve
 
-        Returns
-        -------
-        db.Scan
-
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -108,6 +116,9 @@ class DB(object):
         id : str
             Id of the scan to delete
 
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -119,48 +130,51 @@ class Scan(object):
 
     Attributes
     ----------
-    db : db.DB
-        Database where to find the scan
+    db : plantdb.db.DB
+        Database instance where to find the scan.
     id : int
-        Id of the scan in the database ``DB``
+        Id of the scan instance.
     """
 
     def __init__(self, db, id):
-        """
+        """Constructor.
+
         Parameters
         ----------
-        db : DB
-            Db to create the scan in
+        db : plantdb.db.DB
+            Database instance where to find the scan.
         id : str
-            Scan id
+            Id of the scan instance.
         """
         self.db = db
         self.id = id
 
     def get_id(self):
-        """Get scan id.
+        """Get the scan instance id.
 
         Returns
         -------
         str
+            Id of the scan instance.
         """
-        return self.id
+        return deepcopy(self.id)
 
     def get_db(self):
-        """Get parent db.
+        """Get parent database instance.
 
         Returns
         -------
-        db.DB
+        plantdb.db.DB
+            Database instance where to find the scan.
         """
         return self.db
 
     def get_filesets(self):
         """Get all sets of files.
 
-        Returns
-        -------
-        list
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -170,12 +184,13 @@ class Scan(object):
         Parameters
         ----------
         id : str
+            Id of the fileset to be retrieved.
         create : bool, optional
-            Create the fileset if it does not exist (default : ``False``)
+            Create the fileset if it does not exist, default to ``False``.
 
-        Returns
-        -------
-        db.Fileset
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -185,11 +200,11 @@ class Scan(object):
         Parameters
         ----------
         key : str
-            Metadata key to retrieve (defaults to ``None``)
+            Metadata key to retrieve, default to ``None``.
 
-        Returns
-        -------
-        dict or value
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -202,19 +217,27 @@ class Scan(object):
         Parameters
         ----------
         data : str or dict
-            Key or value
-        value
-            Value to set (default is None)
+            Key or value.
+        value : any, optional
+            Value to set, default to ``None``.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def create_fileset(self, id):
-        """Create a set of files.
+        """Create a fileset.
 
         Parameters
         ----------
         id : str
-            Id of the new fileset
+            Id of the new fileset.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -224,7 +247,11 @@ class Scan(object):
         Parameters
         ----------
         id : str
-            Id of the fileset to delete
+            Id of the fileset to delete.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -241,52 +268,64 @@ class Fileset(object):
 
     Attributes
     ----------
-    db : db.DB
-        database where to find the scan
+    db : plantdb.db.DB
+        Database instance where to find the scan and fileset.
+    scan : plantdb.db.Scan
+        Scan instance containing the fileset.
     id : int
-        id of the scan in the database ``DB``
-    scan : db.Scan
-        scan containing the set of files
+        Id of the fileset instance.
     """
 
-    def __init__(self, db, scan, id):
-        self.db = db
+    def __init__(self, scan, id):
+        """Constructor.
+
+        Parameters
+        ----------
+        scan : plantdb.db.Scan
+            Scan instance containing the fileset.
+        id : str
+            Id of the fileset instance.
+        """
+        self.db = scan.get_db()
         self.scan = scan
         self.id = id
 
     def get_id(self):
-        """Get scan id.
+        """Get the fileset instance id.
 
         Returns
         -------
         str
+            The id of the fileset instance.
         """
-        return self.id
+        return deepcopy(self.id)
 
     def get_db(self):
-        """Get parent db.
+        """Get parent database instance.
 
         Returns
         -------
-        db.DB
+        plantdb.db.DB
+            The parent database instance.
         """
         return self.db
 
     def get_scan(self):
-        """Get parent scan.
+        """Get parent scan instance.
 
         Returns
         -------
-        db.Scan
+        plantdb.db.Scan
+            The parent scan instance.
         """
         return self.scan
 
     def get_files(self):
         """Get all files.
 
-        Returns
-        -------
-        list
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -296,13 +335,13 @@ class Fileset(object):
         Parameters
         ----------
         id : str
-            File id
+            File instance id.
         create : bool, optional
-            Create the file if it does not exist (default : ``False``)
+            Create the file if it does not exist, default to ``False``.
 
-        Returns
-        -------
-        db.File
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -312,11 +351,11 @@ class Fileset(object):
         Parameters
         ----------
         key : str
-            Metadata key to retrieve (defaults to ``None``)
+            Metadata key to retrieve, default to ``None``.
 
-        Returns
-        -------
-        dict or value
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -329,9 +368,13 @@ class Fileset(object):
         Parameters
         ----------
         data : str or dict
-            Key or value to set as metadata
+            Key or value to set as metadata.
         value : any, optional
-            Value to set (default is ``None``)
+            Value to set, default to ``None``.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -341,17 +384,25 @@ class Fileset(object):
         Parameters
         ----------
         id : str
-            Id of the new file
+            Id of the new file.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def delete_file(self, file_id):
-        """Delete a file from the DB.
+        """Delete a file.
 
         Parameters
         ----------
         id : str
             Id of the file to delete.
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -363,21 +414,37 @@ class File(object):
 
     Attributes
     ----------
-    db : DB
-        database where to find the file
-    fileset : db.Fileset
-        set of files containing the file
+    db : plantdb.db.DB
+        Database instance where to find the scan, fileset and file.
+    scan : plantdb.db.Scan
+        Scan instance containing the fileset and file.
+    fileset : plantdb.db.Fileset
+        Fileset instance containing the file.
     id : str
-        id of the file in the database ``DB``
-    filename : str
-        file format (default = None, can be deduced when importing file)
+        Id of the file instance.
     """
 
-    def __init__(self, db, fileset, id):
-        self.db = db
+    def __init__(self, fileset, id, **kwargs):
+        """Constructor.
+
+        Parameters
+        ----------
+        fileset : plantdb.db.Fileset
+            Instance containing the file.
+        id : str
+            Id of the file instance.
+
+        Other Parameters
+        ----------------
+        ext : str
+            The extension of the file.
+        """
+        self.db = fileset.get_db()
+        self.scan = fileset.get_scan()
         self.fileset = fileset
         self.id = id
-        self.filename = None
+        ext = kwargs.get('ext', '')
+        self.filename = id + ext if ext != '' else None
 
     def get_id(self):
         """Get file id.
@@ -385,33 +452,37 @@ class File(object):
         Returns
         -------
         str
+            The id of the file instance.
         """
-        return self.id
+        return deepcopy(self.id)
 
     def get_db(self):
-        """Get parent db.
+        """Get parent database instance.
 
         Returns
         -------
-        db.DB
+        plantdb.db.DB
+            The parent database instance.
         """
-        return self.fileset.scan.db
+        return self.db
 
     def get_scan(self):
-        """Get parent scan.
+        """Get parent scan instance.
 
         Returns
         -------
-        db.Scan
+        plantdb.db.Scan
+            The parent scan instance.
         """
-        return self.fileset.scan
+        return self.scan
 
     def get_fileset(self):
         """Get parent fileset.
 
         Returns
         -------
-        db.Fileset
+        plantdb.db.Fileset
+            The parent fileset instance.
         """
         return self.fileset
 
@@ -423,9 +494,9 @@ class File(object):
         key : str, optional
             Metadata key to retrieve (defaults to ``None``)
 
-        Returns
-        -------
-        dict or value
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -441,7 +512,11 @@ class File(object):
             Key or value to set as metadata
         value : any, optional
             Value to set (default is ``None``)
-        """
+
+        Raises
+        ------
+        NotImplementedError
+       """
         raise NotImplementedError
 
     def import_file(self, path):
@@ -451,6 +526,10 @@ class File(object):
         ----------
         path : str
             Path of the file to import
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -463,6 +542,10 @@ class File(object):
             Data to write
         ext : str, optional
             File extension to use
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
@@ -473,11 +556,15 @@ class File(object):
         -------
         bytearray
             File buffer
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def write(self, str, ext=""):
-        """Writes text to a file.
+        """Writes to a file.
 
         Parameters
         ----------
@@ -485,15 +572,19 @@ class File(object):
             Data to write
         ext : str, optional
             File extension to use
+
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
     def read(self):
-        """Reads text from a file
+        """Reads from a file.
 
-        Returns
-        -------
-        str
+        Raises
+        ------
+        NotImplementedError
         """
         raise NotImplementedError
 
