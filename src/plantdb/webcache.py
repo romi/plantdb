@@ -154,8 +154,9 @@ def __image_hash(scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'}
-        The requested size ('orig', 'large', or 'thumb')
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string in the given list.
 
     Returns
     -------
@@ -197,8 +198,9 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : str
-        The requested size.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string in the given list.
 
     Returns
     -------
@@ -215,7 +217,10 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
     # Load the image and resize it:
     image = Image.open(src)
     image.load()
-    maxsize = IMG_RESOLUTIONS.get(size)
+    if isinstance(size, int):
+        maxsize = size
+    else:
+        maxsize = IMG_RESOLUTIONS.get(size)
     image = __image_resize(image, maxsize)
     # Make sure we have an RGB image to be able to save in this format:
     if image.mode != "RGB":
@@ -241,8 +246,9 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : str
-        The requested size.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string in the given list.
 
     Returns
     -------
@@ -269,13 +275,12 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'}, optional
-        The requested image size, works as follows:
-           * 'orig': original image, no chache;
-           * 'large': image max width and height to `1500`;
-           * 'thumb': image max width and height to `150`.
-
-        Default to 'orig'.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string, defaulting to `'orig'`, and it works as follows:
+           * `'thumb'`: image max width and height to `150`.
+           * `'large'`: image max width and height to `1500`;
+           * `'orig'`: original image, no chache;
 
     Returns
     -------
@@ -296,11 +301,15 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
     PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg')
     >>> db.disconnect()
     """
+    try:
+        size = int(size)
+    except ValueError:
+        pass
+    print(f"Requested '{file_id}' with size '{size}' (as '{type(size).__name__}')")
+
     if size == "orig":
-        print("Using original image file")
         return __file_path(db, scan_id, fileset_id, file_id)
-    elif size == "large" or size == "thumb":
-        print("Using cached image file")
+    elif size == "large" or size == "thumb" or isinstance(size, int):
         return __image_cached_path(db, scan_id, fileset_id, file_id, size)
     else:
         raise ValueError(f"Unknown image size specification: {size}")
@@ -481,7 +490,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
     else:
         try:
             path = __pointcloud_cached_path(db, scan_id, fileset_id, file_id, float(size))
-        except:
+        except ValueError:
             raise ValueError(f"Unknown pointcloud size specification: {size}")
         else:
             return path
