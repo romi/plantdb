@@ -30,7 +30,6 @@ opts = dict(
     zip_safe=False,
     python_requires='>=3.8',
     install_requires=[
-        'numpy',
         'appdirs',
         'colorlog',
         'flask',
@@ -38,6 +37,7 @@ opts = dict(
         'flask-restful',
         'imagecodecs',
         'imageio>=2.16.2',
+        'numpy',
         'open3d>=0.9.0.0',
         'pillow',
         'toml',
