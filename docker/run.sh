@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # - Defines colors and message types:
 RED="\033[0;31m"
 GREEN="\033[0;32m"
@@ -13,7 +14,7 @@ ERROR="${RED}$(bold ERROR)${NC}   "
 # Image tag to use, 'latest' by default:
 vtag="latest"
 # Command to use to run unit tests:
-unittest="nose2 -s plantdb/tests/"
+unittest="python3 -m pip install nose2 && nose2 -s plantdb/tests/"
 # Command to execute after starting the docker container:
 cmd=''
 # Volume mounting options:
@@ -97,7 +98,7 @@ while [ "$1" != "" ]; do
 done
 
 # If the `ROMI_DB` variable is set, use it as default database location, else set it to empty:
-if [ -z ${ROMI_DB+x} ]; then
+if [ -z ${ROMI_DB+x} ] && [ ${self_test} == 0 ]; then
   echo -e "${WARNING}Environment variable 'ROMI_DB' is not defined, set it to use as default database location!"
 fi
 
@@ -120,7 +121,7 @@ if [ "${host_db}" != "" ]; then
   gid=$(getent group ${group_name} | cut --delimiter ':' --fields 3) # get the 'gid' of this group
   echo -e "${INFO}Using host database path group name '${group_name}' & '${gid}'."
 else
-  group_name='myuser'
+  group_name='romi'
   gid=1000
   # Only raise next WARNING message if not a SELF-TEST:
   if [ ${self_test} == 0 ]; then
@@ -138,14 +139,14 @@ fi
 if [ "${cmd}" = "" ]; then
   # Start in interactive mode:
   docker run --rm -p ${port}:5000 ${mount_option} \
-    --user myuser:${gid} \
+    --user romi:${gid} \
     ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} # try to keep the `-it` to be able to kill the process/container!
 else
   # Get the date to estimate command execution time:
   start_time=$(date +%s)
   # Start in non-interactive mode (run the command):
   docker run --rm -p ${port}:5000 ${mount_option} \
-    --user myuser:${gid} \
+    --user romi:${gid} \
     ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
     bash -c "${cmd}" # try to keep the `-it` to be able to kill the process/container!
   # Get command exit code:
