@@ -921,7 +921,7 @@ class Scan(db.Scan):
             raise IOError(f"Invalid fileset id: {id}")
         if self.get_fileset(id) != None:
             raise IOError(f"Duplicate fileset name: {id}")
-        fileset = Fileset(self.db, self, id)
+        fileset = Fileset(self, id)
         _make_fileset(fileset)
         self.filesets.append(fileset)
         self.store()
@@ -1023,12 +1023,22 @@ class Fileset(db.Fileset):
 
     """
 
-    def __init__(self, db, scan, id):
-        super().__init__(db, scan, id)
+    def __init__(self, scan, id):
+        """Constructor.
+
+        Parameters
+        ----------
+        scan : plantdb.fsdb.Scan
+            Scan instance containing the fileset.
+        id : str
+            Id of the fileset instance.
+        """
+        super().__init__(scan, id)
         self.metadata = None
         self.files = []
 
     def _erase(self):
+        """Erase the files and metadata associated to this fileset."""
         for f in self.files:
             f._erase()
         self.metadata = None
@@ -1211,7 +1221,7 @@ class Fileset(db.Fileset):
         >>> db.disconnect()
 
         """
-        file = File(self.db, self, id)
+        file = File(self, id)
         self.files.append(file)
         self.store()
         return file
@@ -1301,7 +1311,7 @@ class File(db.File):
     Attributes
     ----------
     db : plantdb.fsdb.FSDB
-        Database where to find the scan
+        Database where to find the fileset.
     fileset : plantdb.fsdb.Fileset
         Set of files containing the file.
     id : str
@@ -1323,8 +1333,8 @@ class File(db.File):
     Contrary to other classes (``Scan`` & ``Fileset``) the uniqueness is not checked!
     """
 
-    def __init__(self, db, fileset, id):
-        super().__init__(db, fileset, id)
+    def __init__(self, fileset, id, **kwargs):
+        super().__init__(fileset, id, **kwargs)
         self.metadata = None
 
     def _erase(self):
@@ -1756,7 +1766,7 @@ def _load_fileset(scan, fileset_info):
     ['dummy_image', 'test_image', 'test_json']
 
     """
-    fileset = _parse_fileset(scan.db, scan, fileset_info)
+    fileset = _parse_fileset(scan, fileset_info)
     fileset.files = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
     return fileset
@@ -1770,7 +1780,7 @@ class FilesetNotFoundError(Exception):
     """Could not find the fileset directory."""
 
 
-def _parse_fileset(db, scan, fileset_info):
+def _parse_fileset(scan, fileset_info):
     """Get a `Fileset` instance for given `db` & `scan` by parsing provided `fileset_info`.
 
     Parameters
@@ -1792,7 +1802,7 @@ def _parse_fileset(db, scan, fileset_info):
     if fsid is None:
         raise FilesetNoIDError("Fileset: No ID")
 
-    fileset = Fileset(db, scan, fsid)
+    fileset = Fileset(scan, fsid)
     # Get the expected directory path and check it exists:
     path = _fileset_path(fileset)
     if not path.is_dir():
@@ -1952,7 +1962,7 @@ def _parse_file(fileset, file_info):
         logger.debug(f"Input `file_info`: {file_info}")
         raise FileNoFileNameError("File: No filename")
 
-    file = File(fileset.db, fileset, fid)
+    file = File(fileset, fid)
     file.filename = filename  # set the filename attribute
     # Get the expected file path and check it exists:
     path = _file_path(file)
