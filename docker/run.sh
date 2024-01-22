@@ -122,7 +122,7 @@ if [ "${host_db}" != "" ]; then
   echo -e "${INFO}Using host database path group name '${group_name}' & '${gid}'."
 else
   group_name='romi'
-  gid=1000
+  gid=2020
   # Only raise next WARNING message if not a SELF-TEST:
   if [ ${self_test} == 0 ]; then
     echo -e "${WARNING}Using default group name '${group_name}' & '${gid}'."
