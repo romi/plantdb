@@ -141,43 +141,21 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     --------
     >>> import os
     >>> from plantdb.fsdb import dummy_db
-    >>> db = dummy_db()
-    >>> db.connect()
-    >>> print(db.is_connected)
-    True
-    >>> print(db.path())  # the database directory
-    /tmp/romidb_********
-
-    >>> db = dummy_db(with_scan=True)
-    >>> db.connect()
-    >>> scan = db.get_scan("myscan_001")  # get the created scan
-    >>> print(type(scan))
-    <class 'NoneType'>
-    >>> print(os.listdir(db.path()))
-    ['lock', 'romidb', 'myscan_001']
-    >>> print(os.listdir(scan.path()))
-    ['metadata']
-
-    >>> db = dummy_db(with_fileset=True)
-    >>> db.connect()
-    >>> scan = db.get_scan("myscan_001")
-    >>> print(os.listdir(scan.path()))
-    ['metadata', 'files.json', 'fileset_001']
-    >>> fs = scan.get_fileset("fileset_001")
-    >>> print(type(fs))
-    <class 'plantdb.fsdb.Fileset'>
-    >>> print(list(fs.path().iterdir()))  # the fileset is empty as no file has been created
-    []
-
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
-    >>> scan = db.get_scan("myscan_001")
+    >>> print(db.path())  # the database directory
+    /tmp/romidb_********
+    >>> print(db.list_scans())
+    ['myscan_001']
+    >>> scan = db.get_scan("myscan_001")  # get the existing scan
+    >>> print(scan.list_filesets())
+    ['fileset_001']
     >>> fs = scan.get_fileset("fileset_001")
+    >>> print(list(fs.list_files()))
+    ['dummy_image', 'test_image', 'test_json']
     >>> f = fs.get_file("test_image")
-    >>> print(type(f))
-    >>> print(list(fs.path().iterdir()))
-    ['test_image.png', 'test_json.json']
     >>> print(f.path())
+    /tmp/romidb_********/myscan_001/fileset_001/test_image.png
 
     """
     from tempfile import mkdtemp
@@ -186,7 +164,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     mydb = Path(mkdtemp(prefix='romidb_'))
     marker_file = mydb / MARKER_FILE_NAME
     marker_file.open(mode='w').close()
-    db = FSDB(mydb)
+    db = FSDB(mydb, required_filesets=None)
 
     if with_file:
         # To create a `File`, existing `Scan` & `Fileset` are required
@@ -299,7 +277,7 @@ class FSDB(db.DB):
 
     """
 
-    def __init__(self, basedir):
+    def __init__(self, basedir, required_filesets=['images']):
         """Database constructor.
 
         Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
@@ -308,6 +286,10 @@ class FSDB(db.DB):
         ----------
         basedir : str or pathlib.Path
             The path to the root directory of the database.
+        required_filesets : list of str, optional
+            A list of required filesets to consider a scan valid.
+            Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
+            Defaults to ``['images']`` to limit scans to the `basedir` subdirectories that have an 'images' directory (fileset).
 
         Raises
         ------
@@ -335,6 +317,7 @@ class FSDB(db.DB):
         self.lock_path = self.basedir / LOCK_FILE_NAME
         self.scans = []
         self.is_connected = False
+        self.required_filesets = required_filesets
 
     def connect(self, login_data=None, unsafe=False):
         """Connect to the local database.
@@ -421,7 +404,7 @@ class FSDB(db.DB):
             self.scans = []
             self.is_connected = False
         else:
-            logger.info(f"Already disconnected from the database '{self.path()}'")
+            logger.info(f"Not connected!")
         return
 
     def reload(self):
@@ -1619,12 +1602,13 @@ class File(db.File):
 def _load_scans(db):
     """Load list of ``Scan`` from given database.
 
-    List subdirectories of ``db.basedir`` with an `'images'` directory.
+    List subdirectories of ``db.basedir`` as ``Scan`` instances.
+    May be restrited to the presense of subdirectories in .
 
     Parameters
     ----------
     db : plantdb.fsdb.FSDB
-        The database object to use to get the list of ``fsdb.Scan``
+        The database instance to use to list the ``Scan``.
 
     Returns
     -------
@@ -1658,11 +1642,16 @@ def _load_scans(db):
     """
     scans = []
     names = os.listdir(db.path())
+    required_fs = db.required_filesets
     for name in tqdm(names, unit="scan"):
         scan = Scan(db, name)
         scan_path = _scan_path(scan)
-        scan_image_path = scan_path / 'images'
-        if scan_path.is_dir() and scan_image_path.is_dir():
+        # If specific filesets are required, test if they exist as subdirectories:
+        if required_fs is not None:
+            req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
+        else:
+            req_subdir = True
+        if scan_path.is_dir() and req_subdir:
             # If the `files.json` associated to the scan is found, parse it:
             if _scan_json_file(scan).is_file():
                 scan.filesets = _load_scan_filesets(scan)
