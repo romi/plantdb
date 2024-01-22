@@ -153,6 +153,8 @@ def get_scan_template(scan_id: str, error=False) -> dict:
             }
         },
         "thumbnailUri": "",
+        "images": None,  # list of original image filenames
+        "tasks_fileset": None,  # dict mapping task names to fileset names
         "hasColmap": False,
         "hasPointCloud": False,
         "hasMesh": False,
@@ -166,7 +168,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "hasPointCloudEvaluation": False,
         "hasSegmentedPointCloud": False,
         "hasSegmentedPcdEvaluation": False,
-        "error": error
+        "error": error,
     }
 
 
@@ -236,47 +238,52 @@ def get_scan_info(scan):
     >>> db.disconnect()
 
     """
-    # Map the scan tasks to fileset names:
-    task_fs_map = compute_fileset_matches(scan)
-    # Get the scan metadata dictionary:
-    scan_md = scan.get_metadata()
     # Initialize the scan information template:
     scan_info = get_scan_template(scan.id)
 
-    # - Gather "metadata" information from scan:
-    # Get acquisition date:
+    # Map the scan tasks to fileset names:
+    task_fs_map = compute_fileset_matches(scan)
+    scan_info["tasks_fileset"] = task_fs_map
+
+    # Get the list of original image filenames:
+    img_fs = scan.get_fileset("images")
+    scan_info["images"] = [img_f.filename for img_f in img_fs.get_files(query={"channel": 'rgb'})]
+
+    # Gather "metadata" information from scan:
+    scan_md = scan.get_metadata()
+    ## Get acquisition date:
     scan_info["metadata"]['date'] = get_scan_date(scan)
-    # Import 'object' related scan metadata to scan info template:
+    ## Import 'object' related scan metadata to scan info template:
     if 'object' in scan_md:
         scan_obj = scan_md['object']  # get the 'object' related dictionary
         scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
         scan_info["metadata"]["environment"] = scan_obj.get('environment', 'N/A')
         scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
-    # Get the number of 'images' in the dataset:
-    scan_info["metadata"]['nbPhotos'] = len(scan.get_fileset('images').get_files())
-
-    # Get the URL to the archive:
+    ## Get the number of 'images' in the dataset:
+    scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
+    ## Get the URL to the archive:
     scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
-
-    # Get the path to the JSON metadata file:
+    ## Get the path to the JSON metadata file:
     metadata_json_path = os.path.join("/files/", scan.id, "metadata", "metadata.json")
     scan_info["metadata"]["files"]["metadatas"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
-    img_fs = scan.get_fileset("images")
     img_f = img_fs.get_files()[0]
     scan_info["thumbnailUri"] = f"/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
+            # If not in the dict mapping `task` names to fileset names
             return False
         elif scan.get_fileset(task_fs_map[task]) is None:
+            # If ``Fileset`` is None:
             return False
         else:
+            # Test if `file` is found in `task` ``Fileset``:
             return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
 
-    # - Gather information about tasks:
+    # Set boolean information about tasks presence/absence for given dataset:
     scan_info["hasColmap"] = _try_has_file('Colmap', 'cameras')
     scan_info["hasPointCloud"] = _try_has_file('PointCloud', 'PointCloud')
     scan_info["hasMesh"] = _try_has_file('TriangleMesh', 'TriangleMesh')
@@ -508,9 +515,6 @@ class Image(Resource):
             The HTTP response from the flask server.
         """
         size = request.args.get('size', default='thumb', type=str)
-        # Make sure that the 'size' argument we got is a valid option:
-        if not size in ['orig', 'thumb', 'large']:
-            size = 'thumb'
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
         return send_file(path, mimetype='image/jpeg')
