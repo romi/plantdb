@@ -277,7 +277,7 @@ class FSDB(db.DB):
 
     """
 
-    def __init__(self, basedir, required_filesets=['images']):
+    def __init__(self, basedir, required_filesets=['metadata']):
         """Database constructor.
 
         Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
@@ -289,7 +289,7 @@ class FSDB(db.DB):
         required_filesets : list of str, optional
             A list of required filesets to consider a scan valid.
             Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
-            Defaults to ``['images']`` to limit scans to the `basedir` subdirectories that have an 'images' directory (fileset).
+            Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
 
         Raises
         ------
