@@ -194,13 +194,16 @@ class Scan(object):
         """
         raise NotImplementedError
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default=None):
         """Get metadata associated to scan.
 
         Parameters
         ----------
         key : str
             Metadata key to retrieve, default to ``None``.
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is ``None``.
 
         Raises
         ------
@@ -345,13 +348,16 @@ class Fileset(object):
         """
         raise NotImplementedError
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default=None):
         """Get metadata associated to scan.
 
         Parameters
         ----------
         key : str
             Metadata key to retrieve, default to ``None``.
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is ``None``.
 
         Raises
         ------
@@ -486,13 +492,16 @@ class File(object):
         """
         return self.fileset
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default=None):
         """Get metadata associated to scan.
 
         Parameters
         ----------
         key : str, optional
             Metadata key to retrieve (defaults to ``None``)
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is ``None``.
 
         Raises
         ------

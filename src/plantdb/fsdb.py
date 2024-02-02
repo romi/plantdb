@@ -787,13 +787,16 @@ class Scan(db.Scan):
             return None
         return self.filesets[ids.index(id)]
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a scan.
 
         Parameters
         ----------
         key : str
             A key that should exist in the scan's metadata.
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is an empty dictionary``{}``.
 
         Returns
         -------
@@ -802,7 +805,7 @@ class Scan(db.Scan):
             Else, returns the value attached to this key.
 
         """
-        return _get_metadata(self.metadata, key)
+        return _get_metadata(self.metadata, key, default)
 
     def get_measures(self, key=None):
         """Get the manual measurements associated to a scan.
@@ -1098,13 +1101,16 @@ class Fileset(db.Fileset):
             return None
         return self.files[ids.index(id)]
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a fileset.
 
         Parameters
         ----------
         key : str
             A key that should exist in the fileset's metadata.
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is an empty dictionary``{}``.
 
         Returns
         -------
@@ -1131,7 +1137,7 @@ class Fileset(db.Fileset):
         'value'
 
         """
-        return _get_metadata(self.metadata, key)
+        return _get_metadata(self.metadata, key, default)
 
     def set_metadata(self, data, value=None):
         """Add a new metadata to the fileset.
@@ -1325,13 +1331,16 @@ class File(db.File):
         self.metadata = None
         return
 
-    def get_metadata(self, key=None):
+    def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a file.
 
         Parameters
         ----------
         key : str
             A key that should exist in the file's metadata.
+        default : Any, optional
+            The default value to return if the key do not exist in the metadata.
+            Default is an empty dictionary``{}``.
 
         Returns
         -------
@@ -1353,7 +1362,7 @@ class File(db.File):
         >>> db.disconnect()
 
         """
-        return _get_metadata(self.metadata, key)
+        return _get_metadata(self.metadata, key, default)
 
     def set_metadata(self, data, value=None):
         """Add a new metadata to the file.
@@ -2148,7 +2157,7 @@ def _store_file_metadata(file):
     return
 
 
-def _get_metadata(metadata=None, key=None):
+def _get_metadata(metadata=None, key=None, default={}):
     """Get a copy of `metadata[key]`.
 
     Parameters
@@ -2158,6 +2167,9 @@ def _get_metadata(metadata=None, key=None):
     key : str, optional
         The key to get from the metadata dictionary.
         By default, return a copy of the whole metadata dictionary.
+    default : Any, optional
+        The default value to return if the key do not exist in the metadata.
+        Default is an empty dictionary``{}``.
 
     Returns
     -------
@@ -2166,11 +2178,11 @@ def _get_metadata(metadata=None, key=None):
     """
     # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
     if metadata is None:
-        return {}
+        return default
     elif key is None:
         return copy.deepcopy(metadata)
     else:
-        return copy.deepcopy(metadata.get(str(key), {}))
+        return copy.deepcopy(metadata.get(str(key), default))
 
 
 def _set_metadata(metadata, data, value):
