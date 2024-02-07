@@ -26,6 +26,8 @@
 """
 This module contains utility functions.
 """
+import tempfile
+from pathlib import Path
 
 from PIL import Image
 
@@ -128,3 +130,76 @@ def is_radians(angles):
         return True
     else:
         return False
+
+
+def to_file(dbfile, path):
+    """Write a `dbfile` to a file in the filesystem.
+
+    Parameters
+    ----------
+    dbfile : plantdb.fsdb.File
+        The ``File`` instance to save under given `path`.
+    path : pathlib.Path or str
+        The file path to use to save the `dbfile`.
+    """
+    b = dbfile.read_raw()
+    path = Path(path)
+    with path.open(mode="wb") as fh:
+        fh.write(b)
+    return
+
+
+def fsdb_file_from_local_file(path):
+    """Creates a temporary ``fsdb.File`` object from a local file.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        The file path to use to create the temporary local database.
+
+    Returns
+    -------
+    plantdb.fsdb.File
+        The temporary ``fsdb.File``.
+    """
+    from plantdb.fsdb import FSDB
+    from plantdb.fsdb import Scan
+    from plantdb.fsdb import Fileset
+    from plantdb.fsdb import File
+    from plantdb.fsdb import MARKER_FILE_NAME
+    path = Path(path)
+    dirname, fname = path.parent, path.name
+    id = Path(fname).stem
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Initialise a temporary `FSDB`:
+        Path(f"{tmpdir}/{MARKER_FILE_NAME}").touch()  # add the db marker file
+        db = FSDB(tmpdir)
+        # Initialize a `Scan` instance:
+        scan = Scan(db, "tmp")
+        # Initialize a `Fileset` instance:
+        fileset = Fileset(scan, dirname)
+        # Initialize a `File` instance & return it:
+        f = File(db=db, fileset=fileset, id=id)
+        f.filename = fname
+        f.metadata = None
+    return f
+
+
+def tmpdir_from_fileset(fileset):
+    """Creates a temporary directory to host the ``Fileset`` object and write files.
+
+    Parameters
+    ----------
+    fileset : plantdb.fsdb.Fileset
+        The fileset to use to create the temporary local database.
+
+    Returns
+    -------
+    tempfile.TemporaryDirectory
+        The temporary directory hosting the fileset and file(s), if any.
+    """
+    tmpdir = tempfile.TemporaryDirectory()
+    for f in fileset.get_files():
+        filepath = Path(tmpdir.name) / f.filename
+        to_file(f, filepath)
+    return tmpdir

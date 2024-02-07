@@ -801,41 +801,18 @@ def write_torch(dbfile, data, ext="pt"):
     return
 
 
-def to_file(dbfile: File, path: str):
-    """Helper to write a `dbfile` to a file in the filesystem. """
-    b = dbfile.read_raw()
-    path = Path(path)
-    with path.open(mode="wb") as fh:
-        fh.write(b)
+def write_torch(file, data, ext="pt", **kwargs):
+    """Writes a torch tensor to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
+    data : TorchTensor
+        The torch tensor object to save.
+    ext : str, optional
+        File extension, defaults to "pt".
+    """
+    _writer(file, data, ext, _write_torch, **kwargs)
     return
-
-
-def fsdb_file_from_local_file(path: str):
-    """Creates a temporary (*i.e.* not in a DB) ``File`` object from a local file."""
-    from plantdb import FSDB
-    from plantdb.fsdb import MARKER_FILE_NAME
-    path = Path(path)
-    dirname, fname = path.parent, path.name
-    id = Path(fname).stem
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Initialise a temporary `FSDB`:
-        Path(f"{tmpdir}/{MARKER_FILE_NAME}").touch()  # add the db marker file
-        db = FSDB(tmpdir)
-        # Initialize a `Scan` instance:
-        scan = Scan(db, "tmp")
-        # Initialize a `Fileset` instance:
-        fileset = Fileset(db, scan, dirname)
-        # Initialize a `File` instance & return it:
-        f = fsdb.File(db=db, fileset=fileset, id=id)
-        f.filename = fname
-        f.metadata = None
-    return f
-
-
-def tmpdir_from_fileset(fileset: Fileset):
-    """Creates a temporary directory (*i.e.* not in a DB) to host the ``Fileset`` object and write files. """
-    tmpdir = tempfile.TemporaryDirectory()
-    for f in fileset.get_files():
-        filepath = Path(tmpdir.name) / f.filename
-        to_file(f, filepath)
-    return tmpdir
