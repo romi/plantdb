@@ -116,22 +116,87 @@ Trained tensor, read and written using ``torch``.
 import tempfile
 from pathlib import Path
 
-from plantdb import fsdb
-from plantdb.db import File
-from plantdb.db import Fileset
-from plantdb.db import Scan
+import plantdb.db
 from plantdb.log import configure_logger
 
 logger = configure_logger(__name__)
 
 
-def read_json(dbfile):
-    """Reads a JSON from a ROMI database file.
+def _reader(file, reader, **kwargs):
+    """Read the data from given file, can be from a database or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
+    reader : function
+        The function to use to read the data.
+
+    Returns
+    -------
+    Any
+        The loaded data.
+    """
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    # Load the file with selected reader:
+    with open(file, 'r') as f:
+        data = reader(f, **kwargs)
+    return data
+
+
+def _write_db_file(dbfile, data, ext, writer, **kwargs):
+    """Write the data in the database to the associated database/scan/fileset.
+
+    Parameters
+    ----------
+    dbfile : plantdb.db.File
+        The ``File`` instance to save the data to.
+    data : Any
+        The data to save.
+    ext : str
+        The file extension to use.
+    writer : function
+        The function to use to write the `data`.
+    """
+    if ext.startswith('.'):
+        ext = ext[1:]  # remove potential leading dot from extension
+    with tempfile.NamedTemporaryFile(suffix=f".{ext}") as fname:
+        writer(fname.name, data, **kwargs)
+        dbfile.import_file(fname.name)
+    return
+
+
+def _writer(file, data, ext, writer, **kwargs):
+    """Write the data as a file or to a database.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the point cloud data to the given file path, ignoring the extension parameter `ext`.
+    data : Any
+        The data to save.
+    ext : str
+        The file extension to use.
+    writer : function
+        The function to use to write the `data`.
+    """
+    if isinstance(file, plantdb.db.File):
+        _write_db_file(file, data, ext, writer, **kwargs)
+    else:
+        writer(file, data, **kwargs)
+    return
+
+
+def read_json(file, **kwargs):
+    """Reads a JSON from a ROMI database file or a path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -155,16 +220,41 @@ def read_json(dbfile):
 
     """
     import json
-    return json.loads(dbfile.read())
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    # Load the file:
+    with open(file, mode='r') as f:
+        data = json.loads(f.read(), **kwargs)
+    return data
 
 
-def write_json(dbfile, data, ext="json"):
-    """Writes a JSON to a ROMI database file.
+def _write_json(fname, data, **kwargs):
+    """Writes a JSON to a file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : Any
+        The data object to save.
+    """
+    import json
+    if 'indent' not in kwargs:
+        kwargs.update({'indent': 2})
+    with open(fname, 'w') as f:
+        f.writelines(json.dumps(data, **kwargs))
+    return
+
+
+def write_json(file, data, ext="json", **kwargs):
+    """Writes a JSON to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict
         The dictionary to save as a JSON file.
     ext : str, optional
@@ -183,19 +273,17 @@ def write_json(dbfile, data, ext="json"):
     >>> write_json(f, data)
 
     """
-    import json
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    dbfile.write(json.dumps(data, indent=4), ext)
+    _writer(file, data, ext, _write_json, **kwargs)
     return
 
 
-def read_toml(dbfile):
-    """Reads a TOML from a ROMI database file.
+def read_toml(file, **kwargs):
+    """Reads a TOML from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -219,16 +307,39 @@ def read_toml(dbfile):
 
     """
     import toml
-    return toml.loads(dbfile.read())
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    # Load the file:
+    with open(file, mode='r') as f:
+        data = toml.loads(f.read(), **kwargs)
+    return data
 
 
-def write_toml(dbfile, data, ext="toml"):
-    """Writes a TOML to a ROMI database file.
+def _write_toml(fname, data, **kwargs):
+    """Writes a TOML to a file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : Any
+        The data object to save.
+    """
+    import toml
+    with open(fname, 'w') as f:
+        f.writelines(toml.dumps(data, **kwargs))
+    return
+
+
+def write_toml(file, data, ext="toml", **kwargs):
+    """Writes a TOML to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict
         The dictionary to save as a TOML file.
     ext : str, optional
@@ -247,19 +358,17 @@ def write_toml(dbfile, data, ext="toml"):
     >>> write_toml(f, data)
 
     """
-    import toml
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    dbfile.write(toml.dumps(data), ext)
+    _writer(file, data, ext, _write_toml, **kwargs)
     return
 
 
-def read_image(dbfile):
-    """Reads a 2D image from a ROMI database file.
+def read_image(file, **kwargs):
+    """Reads a 2D image from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -285,16 +394,58 @@ def read_image(dbfile):
 
     """
     import imageio.v3 as iio
-    return iio.imread(dbfile.read_raw())
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return iio.imread(file, **kwargs)
 
 
-def write_image(dbfile, data, ext="png"):
-    """Writes a 2D image to a ROMI database file.
+def _write_image(fname, data, **kwargs):
+    """Writes a 2D image to a file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : array like
+        The 2D image, RGB(A) array to save.
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from plantdb.io import write_image
+    >>> from plantdb.fsdb import dummy_db
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> f = fs.create_file("test_image")
+    >>> rng = np.random.default_rng()
+    >>> img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
+    >>> write_image(f, img)
+
+    """
+    import imageio.v3 as iio
+    fname = Path(fname)
+    ext = fname.suffix[1:]  # get the extension, without the leading dot
+    # Override extension if specified in keyword-argument:
+    kwargs['extension'] = f".{ext}"
+    # Remove any alpha channel if JPEG format as it cannot handle it
+    has_alpha_channel = data.ndim == 3 and data.shape[2] > 3
+    if ext in ["jpg", "jpeg"] and has_alpha_channel:
+        data = data[:, :, :3]
+    iio.imwrite(fname, data, **kwargs)
+    return
+
+
+def write_image(file, data, ext="png", **kwargs):
+    """Writes a 2D image to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : array like
         The 2D image (RGB array) to save.
     ext : {'png', 'jpeg', 'tiff'}, optional
@@ -315,23 +466,17 @@ def write_image(dbfile, data, ext="png"):
     >>> write_image(f, img)
 
     """
-    import imageio.v3 as iio
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    if ext == "jpg" and len(data.shape) == 3:
-        # Remove any alpha channel if JPEG format as it cannot handle it
-        data = data[:, :, :3]
-    b = iio.imwrite("<bytes>", data, extension=f".{ext}")
-    dbfile.write_raw(b, ext)
+    _writer(file, data, ext, _write_image, **kwargs)
     return
 
 
-def read_volume(dbfile, ext="tiff"):
-    """Reads a volume image from a ROMI database file.
+def read_volume(file, ext="tiff", **kwargs):
+    """Reads a volume image from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
     ext : str, optional
         File extension, defaults to "tiff".
 
@@ -359,21 +504,63 @@ def read_volume(dbfile, ext="tiff"):
 
     """
     import imageio.v3 as iio
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    return iio.imread(dbfile.read_raw(), extension=f".{ext}")
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return iio.imread(file, **kwargs)
 
 
-def write_volume(dbfile, data, ext="tiff", compress=True):
+def _write_volume(fname, data, **kwargs):
+    """Writes a volume image to a file.
+
+    Parameters
+    ----------
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : Any
+        The data object to save.
+    """
+    import imageio.v3 as iio
+    import tifffile
+    try:
+        import imagecodecs
+    except ImportError:
+        pip_install = "pip install imagecodecs"
+        conda_install = "conda install -c conda-forge imagecodecs"
+        logger.error(f"Missing 'imagecodecs' library to compress!")
+        logger.info(f"Install it with `{pip_install}` or `{conda_install}`.")
+        kwargs['compress'] = False
+
+    fname = Path(fname)
+    ext = fname.suffix  # get the extension
+    # Override extension if specified in keyword-argument:
+    kwargs['extension'] = ext
+    if kwargs.get('compress', False):
+        # By default, use LZW compression with `tifffile.imwrite`:
+        if 'compression' not in kwargs:
+            kwargs['compression'] = 'LZW'
+        tifffile.imwrite(fname, data, **kwargs)
+    else:
+        kwargs.pop('compress', None)
+        # No compression with `imageio.v3`
+        iio.imwrite(fname, data, **kwargs)
+    return
+
+
+def write_volume(file, data, ext="tiff", **kwargs):
     """Writes a volume image to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
+    file : plantdb.db.File
         The `File` object used to write the associated file.
     data : array like
         The 3D array to save as volume image.
     ext : str, optional
         File extension, defaults to "tiff".
+
+    Other Parameters
+    ----------------
     compress : bool, optional
         Indicate if the volume file should be compressed.
         Defaults to ``True``.
@@ -400,37 +587,17 @@ def write_volume(dbfile, data, ext="tiff", compress=True):
     48994
 
     """
-    import imageio.v3 as iio
-    import tifffile
-    try:
-        import imagecodecs
-    except ImportError:
-        pip_install = "pip install imagecodecs"
-        conda_install = "conda install -c conda-forge imagecodecs"
-        logger.error(f"Missing 'imagecodecs' library to compress!")
-        logger.info(f"Install it with `{pip_install}` or `{conda_install}`.")
-        compress = False
-
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        if compress:
-            # Use LZW compression with `tifffile.imwrite`:
-            tifffile.imwrite(fname, data, compression="LZW")
-        else:
-            # No compression with `imageio.v3`
-            iio.imwrite(fname, data, extension=f".{ext}")
-        dbfile.import_file(fname)
+    _writer(file, data, ext, _write_volume, **kwargs)
     return
 
 
-def read_npz(dbfile):
-    """Reads a dictionary of arrays from an '.npz' ROMI database file.
+def read_npz(file, **kwargs):
+    """Reads a dictionary of arrays from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -456,21 +623,35 @@ def read_npz(dbfile):
 
     """
     import numpy as np
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.npz"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        return dict(np.load(fname))
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return dict(np.load(file, **kwargs))
 
 
-def write_npz(dbfile, data):
-    """Writes a dictionary of arrays from an '.npz' ROMI database file.
+def _write_npz(fname, data, **kwargs):
+    """Writes a dictionary of arrays to a file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : Any
+        The data object to save.
+    """
+    import numpy as np
+    np.savez_compressed(fname, **data)
+    return
+
+
+def write_npz(file, data, **kwargs):
+    """Writes a dictionary of arrays to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    dbfile : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict of numpy.ndarray
         A dictionary of arrays to save as a single compressed '.npz' file.
 
@@ -487,25 +668,18 @@ def write_npz(dbfile, data):
     >>> rng = np.random.default_rng()
     >>> npz = {f"{i}": rng.random((10, 10, 3)) for i in range(5)}
     >>> write_npz(f, npz)
-
     """
-    import numpy as np
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.npz"
-        np.savez_compressed(fname, **data)
-        dbfile.import_file(fname)
+    _writer(file, data, 'npz', _write_npz, **kwargs)
     return
 
 
-def read_point_cloud(dbfile, ext="ply"):
-    """Reads a point cloud from a ROMI database file.
+def read_point_cloud(file, **kwargs):
+    """Reads a point cloud from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
-    ext : str, optional
-        File extension, defaults to "ply".
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -525,7 +699,7 @@ def read_point_cloud(dbfile, ext="ply"):
     >>> f = fs.create_file('test_npz')
     >>> pcd = o3d.geometry.PointCloud()
     >>> pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
-    >>> write_point_cloud(f, pcd)
+    >>> write_point_cloud(f,pcd)
     >>> f = fs.get_file('test_npz')
     >>> pcd = read_point_cloud(f)
     >>> print(type(pcd))
@@ -535,22 +709,35 @@ def read_point_cloud(dbfile, ext="ply"):
 
     """
     from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        return io.read_point_cloud(str(fname))
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return io.read_point_cloud(str(file), **kwargs)
 
 
-def write_point_cloud(dbfile, data, ext="ply"):
-    """Writes a point cloud to a ROMI database file.
+def _write_point_cloud(fname, data, **kwargs):
+    """Writes a point cloud to a file using the ``open3d`` library.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : open3d.geometry.PointCloud
+        The point cloud object to save.
+    """
+    from open3d import io
+    io.write_point_cloud(str(fname), data, **kwargs)
+    return
+
+
+def write_point_cloud(file, data, ext="ply", **kwargs):
+    """Writes a point cloud to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : open3d.geometry.PointCloud
         The point cloud object to save.
     ext : str, optional
@@ -569,27 +756,20 @@ def write_point_cloud(dbfile, data, ext="ply"):
     >>> f = fs.create_file('test_npz')
     >>> pcd = o3d.geometry.PointCloud()
     >>> pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
-    >>> write_point_cloud(f, pcd)
+    >>> write_point_cloud(f,pcd)
 
     """
-    from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_point_cloud(str(fname), data)
-        dbfile.import_file(fname)
+    _writer(file, data, ext, _write_point_cloud, **kwargs)
     return
 
 
-def read_triangle_mesh(dbfile, ext="ply"):
-    """Reads a triangular mesh from a ROMI database file.
+def read_triangle_mesh(file, **kwargs):
+    """Reads a triangular mesh from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
-    ext : str, optional
-        File extension, defaults to "ply".
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -597,45 +777,51 @@ def read_triangle_mesh(dbfile, ext="ply"):
         The loaded triangular mesh object.
     """
     from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        return io.read_triangle_mesh(str(fname))
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return io.read_triangle_mesh(str(file), **kwargs)
 
 
-def write_triangle_mesh(dbfile, data, ext="ply"):
-    """Writes a triangular mesh to a ROMI database file.
+def _write_triangle_mesh(fname, data, **kwargs):
+    """Writer for point-cloud data using the ``open3d`` library.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : open3d.geometry.TriangleMesh
+        The triangular mesh object to save.
+    """
+    from open3d import io
+    io.write_triangle_mesh(str(fname), data, **kwargs)
+    return
+
+
+def write_triangle_mesh(file, data, ext="ply", **kwargs):
+    """Writes a triangular mesh to a ROMI database file or to a given path.
+
+    Parameters
+    ----------
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : open3d.geometry.TriangleMesh
         The triangular mesh object to save.
     ext : str, optional
         File extension, defaults to "ply".
     """
-    from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_triangle_mesh(str(fname), data)
-        dbfile.import_file(fname)
+    _writer(file, data, ext, _write_triangle_mesh, **kwargs)
     return
 
 
-def read_voxel_grid(dbfile, ext="ply"):
-    """Reads a voxel grid from a ROMI database file.
+def read_voxel_grid(file, **kwargs):
+    """Reads a voxel grid from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
-    ext : str, optional
-        File extension, defaults to "ply".
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
 
     Returns
     -------
@@ -643,43 +829,55 @@ def read_voxel_grid(dbfile, ext="ply"):
         The loaded point cloud object.
     """
     from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        return io.read_voxel_grid(str(fname))
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return io.read_voxel_grid(str(file), **kwargs)
 
 
-def write_voxel_grid(dbfile, data, ext="ply"):
+def _write_voxel_grid(fname, data, **kwargs):
+    """Writes a voxel grid to a file.
+
+    Parameters
+    ----------
+    file : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : open3d.geometry.VoxelGrid
+        The voxel grid object to save.
+    """
+    from open3d import io
+    io.write_voxel_grid(str(fname), data, **kwargs)
+    return
+
+
+def write_voxel_grid(file, data, ext="ply", **kwargs):
     """Writes a voxel grid to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
+    file : plantdb.db.File
         The `File` object used to write the associated file.
     data : open3d.geometry.VoxelGrid
         The voxel grid object to save.
     ext : str, optional
         File extension, defaults to "ply".
+
+    See Also
+    --------
+    plantdb.io._write_voxel_grid
+    open3d.cuda.pybind.io.write_voxel_grid
     """
-    from open3d import io
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        io.write_voxel_grid(str(fname), data)
-        dbfile.import_file(fname)
+    _writer(file, data, ext, _write_voxel_grid, **kwargs)
     return
 
 
-def read_graph(dbfile, ext="p"):
-    """Reads a networkx ``Graph`` from a ROMI database file.
+def read_graph(file, **kwargs):
+    """Reads a networkx ``Graph`` from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
     ext : str, optional
         File extension, defaults to "p".
 
@@ -706,27 +904,43 @@ def read_graph(dbfile, ext="p"):
     >>> g2 = read_graph(f)
     >>> print(g2)
     Graph with 4 nodes and 3 edges
-
     """
     import pickle
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        with fname.open(mode='rb') as f:
-            G = pickle.load(f)
-        return G
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    # Load the pickled file:
+    with open(file, mode='rb') as f:
+        G = pickle.load(f, **kwargs)
+    return G
 
 
-def write_graph(dbfile, data, ext="p"):
+def _write_graph(fname, data, **kwargs):
+    """Writes a networkx ``Graph`` to a file.
+
+    Parameters
+    ----------
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
+    data : networkx.Graph
+        The (tree) graph object to save.
+    """
+    import pickle
+    if 'protocol' not in kwargs:
+        kwargs['protocol'] = pickle.HIGHEST_PROTOCOL
+    with fname.open(mode='wb') as f:
+        pickle.dump(data, f, **kwargs)
+    return
+
+
+def write_graph(file, data, ext="p", **kwargs):
     """Writes a networkx ``Graph`` to a ROMI database file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to write the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
+        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : networkx.Graph
         The (tree) graph object to save.
     ext : str, optional
@@ -746,23 +960,17 @@ def write_graph(dbfile, data, ext="p"):
     >>> write_graph(f, g)
 
     """
-    import pickle
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode='wb') as f:
-            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
-        dbfile.import_file(fname)
+    _writer(file, data, ext, _write_graph, **kwargs)
     return
 
 
-def read_torch(dbfile, ext="pt"):
-    """Reads torch tensor from a ROMI database file.
+def read_torch(file, ext="pt", **kwargs):
+    """Reads a torch tensor from a ROMI database file or a path.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    file : plantdb.db.File or pathlib.Path or str
+        A ``File`` instance or file path, to read from.
     ext : str, optional
         File extension, defaults to "pt".
 
@@ -771,33 +979,25 @@ def read_torch(dbfile, ext="pt"):
     Torch.Tensor
         The loaded tensor object.
     """
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    b = dbfile.read_raw()
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        with fname.open(mode="wb") as fh:
-            fh.write(b)
-        return torch.load(fname)
+    import torch
+    # Get path to file if in a database:
+    if isinstance(file, plantdb.fsdb.File):
+        file = file.path()
+    return torch.load(file, **kwargs)
 
 
-def write_torch(dbfile, data, ext="pt"):
-    """Writes point cloud to a ROMI database file.
+def _write_torch(fname, data, **kwargs):
+    """Writes a torch tensor to a file.
 
     Parameters
     ----------
-    dbfile : DB.db.File
-        The `File` object used to load the associated file.
+    fname : pathlib.Path or str
+        The file path to use to save the `data`.
     data : TorchTensor
         The torch tensor object to save.
-    ext : str, optional
-        File extension, defaults to "pt".
     """
     import torch
-    ext = ext.replace('.', '')  # remove potential leading dot from extension
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fname = Path(tmpdir) / f"temp.{ext}"
-        torch.save(data, fname)
-        dbfile.import_file(fname)
+    torch.save(data, fname, **kwargs)
     return
 
 

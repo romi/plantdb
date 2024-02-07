@@ -7,7 +7,6 @@ import numpy as np
 import open3d as o3d
 
 from plantdb import io
-from plantdb.io import fsdb_file_from_local_file
 from plantdb.testing import DummyDBTestCase
 from plantdb.testing import FSDBTestCase
 
@@ -45,23 +44,20 @@ class TestIODummy(DummyDBTestCase):
         return fpath, obj, ext
 
     def _test_read_file(self, fpath, ref_obj, ext):
-        dbfile = fsdb_file_from_local_file(fpath)
         if ext == "json":
-            io_obj = io.read_json(dbfile)
+            io_obj = io.read_json(fpath)
         elif ext == "toml":
-            io_obj = io.read_toml(dbfile)
+            io_obj = io.read_toml(fpath)
         elif ext in ("jpg", "png"):
-            io_obj = io.read_image(dbfile)
+            io_obj = io.read_image(fpath)
         elif ext == "volume":
-            io_obj = io.read_volume(dbfile)
+            io_obj = io.read_volume(fpath)
         elif ext == "npz":
-            io_obj = io.read_npz(dbfile)
+            io_obj = io.read_npz(fpath)
         elif ext == "pointcloud":
-            ext = "ply"
-            io_obj = io.read_point_cloud(dbfile, ext=ext)
+            io_obj = io.read_point_cloud(fpath)
         elif ext == "mesh":
-            ext = "ply"
-            io_obj = io.read_triangle_mesh(dbfile, ext=ext)
+            io_obj = io.read_triangle_mesh(fpath)
         else:
             raise ValueError(f"Unknown extension {ext}!")
 
@@ -193,13 +189,13 @@ class TestIOFSDB(FSDBTestCase):
 
     def test_read_pcd(self):
         fs = self.get_task_fileset('PointCloud')
-        pcd = io.read_point_cloud(fs.get_file('PointCloud'), ext='ply')
+        pcd = io.read_point_cloud(fs.get_file('PointCloud'))
         self.assertTrue(isinstance(pcd, o3d.geometry.PointCloud))
         self.assertTrue(len(pcd.points) > 0)  # Non-empty
 
     def test_read_mesh(self):
         fs = self.get_task_fileset('TriangleMesh')
-        mesh = io.read_triangle_mesh(fs.get_file('TriangleMesh'), ext='ply')
+        mesh = io.read_triangle_mesh(fs.get_file('TriangleMesh'))
         self.assertTrue(isinstance(mesh, o3d.geometry.TriangleMesh))
         self.assertTrue(len(mesh.vertices) > 0)  # Non-empty
         self.assertTrue(len(mesh.triangles) > 0)  # Non-empty
@@ -211,7 +207,7 @@ class TestIOFSDB(FSDBTestCase):
 
     def test_read_tree(self):
         fs = self.get_task_fileset('TreeGraph')
-        skel = io.read_graph(fs.get_file('TreeGraph'), ext='p')
+        skel = io.read_graph(fs.get_file('TreeGraph'))
         self.assertTrue(len(skel) > 0)  # Non-empty
 
 
