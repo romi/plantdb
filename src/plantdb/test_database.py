@@ -346,7 +346,7 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     with_models : bool, optional
         Whether to download the trained CNN model files. Defaults to ``False``.
     force : bool, optional
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force download of archive. Defaults to ``False``.
 
     Returns
     -------

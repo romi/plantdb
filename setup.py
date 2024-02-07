@@ -18,7 +18,8 @@ opts = dict(
         'bin/fsdb_import_images',
         'bin/fsdb_import_folder',
         'bin/fsdb_import_file',
-        'bin/fsdb_rest_api'
+        'bin/fsdb_rest_api',
+        'bin/shared_fsdb',
     ],
     description='Database package for the ROMI project.',
     long_description=long_description,
