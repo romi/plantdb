@@ -8,24 +8,79 @@ The documentation of the _Plant Imager_ project can be found here: https://docs.
 
 The API documentation of the `plantdb` library can be found here: https://romi.github.io/plantdb/ 
 
-## Getting started
+## About
 
 This library is intended to:
 
 1. provide a **Python API** to interact with the data, as for the `plant-3d-vision` library
 2. run in the background as a **REST API** serving JSON information from the DB, as for the `plant-3d-explorer` library
 
+## Installation
 
-### Setup
+We strongly advise to create isolated environments to install the ROMI libraries.
 
-1. You need to create a directory where to put the data, *e.g.* `/data/ROMI/DB` and add a file called `romidb`:
+We often use `conda` as an environment and python package manager.
+If you do not yet have `miniconda3` installed on your system, have a look [here](https://docs.conda.io/en/latest/miniconda.html).
+
+The `plantdb` package is available from the `romi-eu` channel.
+
+### Existing conda environment
+To install the `plantdb` conda package in an existing environment, first activate it, then proceed as follows:
+```shell
+conda install plantdb -c romi-eu
+```
+
+### New conda environment
+To install the `plantdb` conda package in a new environment, here named `romi`, proceed as follows:
+```shell
+conda create -n romi plantdb -c romi-eu
+```
+
+### Installation from sources
+To install this library, simply clone the repo and use `pip` to install it and the required dependencies.
+Again, we strongly advise to create a `conda` environment.
+
+All this can be done as follows:
+```shell
+git clone https://github.com/romi/plantdb.git -b dev  # git clone the 'dev' branch of plantdb
+cd plantdb
+conda create -n romi 'python =3.10'
+conda activate romi  # do not forget to activate your environment!
+python -m pip install -e .  # install the sources
+```
+
+Note that the `-e` option is to install the `plantdb` sources in "developer mode".
+That is, if you make changes to the source code of `plantdb` you will not have to `pip install` it again.
+
+### Tests the library
+First you need to install the tests tools:
+```shell
+python -m pip install -e .[test]
+```
+
+Then, to test the `plantdb` library:
+ - Run all tests with verbose output (from the `plantdb` root directory):
+    ```shell
+    nose2 -s tests/ -v
+    ```
+ - Run all tests with coverage report (from the `plantdb` root directory):
+    ```shell
+    nose2 -s tests/ --with-coverage
+    ```
+
+
+## Getting started
+
+### Set up a local database
+
+1. You need to create a directory where to put the data, *e.g.* `/data/ROMI_DB` and add a file called `romidb`:
    ```shell
-   mkdir -p /data/ROMI/DB
-   touch /data/ROMI/DB/romidb
+   mkdir -p /data/ROMI_DB
+   touch /data/ROMI_DB/romidb
    ```
 2. Then define its location in an environment variable `ROMI_DB`:
    ```shell
-   export ROMI_DB=/data/ROMI/DB
+   export ROMI_DB=/data/ROMI_DB
    ```
 
 **Notes**:
@@ -33,19 +88,9 @@ This library is intended to:
 
 ### Example datasets
 
-To populate your database with example datasets, we provide some examples [here](https://media.romi-project.eu/data/test_db_small.tar.gz).
-
-Make sure you have `wget`:
-
+To populate your database with example datasets, you may use the `shared_fsdb` CLI as follows:
 ```shell
-sudo apt-get install wget
-```
-
-Then download the test archive and extract it to the location od the DB:
-
-```shell
-wget https://media.romi-project.eu/data/test_db_small.tar.gz
-tar -xf test_db_small.tar.gz -C $ROMI_DB
+shared_fsdb $ROMI_DB --dataset all
 ```
 
 ### Docker image
@@ -58,86 +103,6 @@ docker run -p 5000:5000 -v $ROMI_DB:/myapp/db -it roboticsmicrofarms/plantdb
 ```
 
 **Obviously you have to install docker first!**
-
-## Installation
-
-### Conda package
-
-To install the `plantdb` conda package in an environment named `romi`, simply do:
-
-```shell
-conda create -n romi plantdb -c romi-eu
-```
-
-To test if the package installation was successful, activate the `romi` environment, then try to import `plantdb` in python:
-
-```shell
-conda activate romi
-python -c 'import plantdb'
-```
-
-**Obviously you have to install anaconda/miniconda first!**
-
-### From sources
-
-#### System requirements
-
-You will need:
-
-- `git`
-- `python3-pip`
-
-On Debian and Ubuntu, you can install them with:
-
-```shell
-sudo apt-get update && apt-get install -y git python3-pip
-```
-
-#### Install sources in a conda environment
-
-You may want to install `poetry` system-wide and skip the optional step.
-To do so, have a look at the official [installation](https://python-poetry.org/docs/#installation) page.
-
-Let's assume you want to create a new `romi` conda environment (if not replace `romi` by the desired name for the conda environment):
-
-1. Clone the sources:
-    ```shell
-    git clone https://github.com/romi/plantdb.git
-    cd plantdb/  # move to the cloned folder
-    ```
-2. Create a conda environment named `romi` (or use your own and skip this step):
-    ```shell
-    conda create -n romi python=3.7
-    conda activate romi
-    ```
-3. OPTIONAL - Install poetry with `pip` if not available system-wide:
-    ```shell
-    python3 -m pip install poetry
-    ```
-4. Install sources (add `--no-dev` if you don't want the tools to build the documentation):
-    ```shell
-    poetry install
-    ```
-5. Test import of `plantdb` library:
-    ```shell
-    conda activate romi
-    python3 -c 'import plantdb'
-    ```
-6. Test `plantdb` library:
-   Run all tests with verbose output (from the `plantdb` root directory):
-    ```shell
-    nose2 -s tests/ -v
-    ```
-   Run all tests with coverage report (from the `plantdb` root directory):
-    ```shell
-    nose2 -s tests/ --with-coverage
-    ```
-
-To manually install tests tools:
-
-```shell
-poetry add --dev nose2[coverage] coverage[toml]
-```
 
 
 ## Usage
@@ -156,8 +121,8 @@ from plantdb import FSDB
 
 db = FSDB(db_path)
 db.connect()
-# Access to a dataset named `2018-12-17_17-05-35` (from the example database)
-dataset = db.get_scan("2018-12-17_17-05-35")
+# Access to a dataset named `real_plant` (from the example database)
+dataset = db.get_scan("real_plant")
 # Get the 'images' fileset contained in this dataset
 img_fs = dataset.get_fileset('images')
 ```
@@ -169,13 +134,12 @@ A detailed documentation of the Python API is available here: https://romi.githu
 Then you can start the REST API with `fsdb_rest_api`:
 
 ```shell
-fsdb_rest_api
+fsdb_rest_api -db $ROMI_DB
 ```
 
 You should see something like:
-
 ```
-n scans = 2
+n scans = 5
  * Serving Flask app "fsdb_rest_api" (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
@@ -187,7 +151,7 @@ n scans = 2
 Open your favorite browser here:
 
 - scans: http://0.0.0.0:5000/scans
-- '2018-12-17_17-05-35' dataset: http://0.0.0.0:5000/scans/2018-12-17_17-05-35
+- 'real_plant_analyzed' dataset: http://0.0.0.0:5000/scans/real_plant_analyzed
 
 A detailed documentation of the REST API is available here: https://romi.github.io/plantdb/webapi.html
 
@@ -209,31 +173,44 @@ Notes:
 - the `-C` option generate a coverage report, as defined by the `.coveragerc` file.
 - this requires the `nose2` & `coverage` packages listed in the `requirements.txt` file.
 
+You first have to install the library from sources as explained [here](#installation-from-sources).
+
 ### Conda packaging
+Start by installing the required `conda-build` & `anaconda-client` conda packages in the `base` environment as follows:
+```shell
+conda install -n base conda-build anaconda-client
+```
 
-To build the `plantdb` conda package, from the `base` conda environment, run:
-
+#### Build a conda package
+To build the `romitask` conda package, from the root directory of the repository and the `base` conda environment, run:
 ```shell
 conda build conda/recipe/ -c conda-forge --user romi-eu
 ```
 
-This requires the `conda-build` package to be installed in the `base` environment!
-
+If you are struggling with some of the modifications you made to the recipe, 
+notably when using environment variables or Jinja2 stuffs, you can always render the recipe with:
 ```shell
-conda install conda-build -n base
+conda render conda/recipe/
 ```
 
+The official documentation for `conda-render` can be found [here](https://docs.conda.io/projects/conda-build/en/stable/resources/commands/conda-render.html).
+
+#### Upload a conda package
 To upload the built package, you need a valid account (here `romi-eu`) on [anaconda.org](www.anaconda.org) & to log ONCE
 with `anaconda login`, then:
-
 ```shell
-anaconda upload ~/miniconda3/conda-bld/linux-64/plantdb*.tar.bz2 --user romi-eu
+anaconda upload ~/miniconda3/conda-bld/linux-64/romitask*.tar.bz2 --user romi-eu
 ```
 
-This requires the `anaconda-client` package to be installed in the `base` environment!
-
+#### Clean builds
+To clean the source and build intermediates:
 ```shell
-conda install anaconda-client -n base
+conda build purge
+```
+
+To clean **ALL** the built packages & build environments:
+```shell
+conda build purge-all
 ```
 
 ### Docker `build.sh` & `run.sh` scripts
