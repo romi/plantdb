@@ -21,6 +21,7 @@ jobs:
   push_to_dockerhub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    environment: docker-hub
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
