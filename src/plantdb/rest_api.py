@@ -35,15 +35,20 @@ from pathlib import Path
 from tempfile import gettempdir
 from zipfile import ZipFile
 
+import numpy as np
 from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
 
 from plantdb import webcache
+from plantdb.io import read_graph
 from plantdb.io import read_json
+from plantdb.io import read_point_cloud
+from plantdb.io import read_triangle_mesh
+from plantdb.io import read_volume
 from plantdb.utils import is_radians
-
+from plantdb.fsdb import File as FSDBFile
 
 def get_scan_date(scan):
     """Get the acquisition datetime of a scan.
@@ -455,6 +460,94 @@ class Scan(Resource):
         """
         return get_scan_data(self.db.get_scan(scan_id))
 
+
+class TaskFilesetMapping(Resource):
+    """Concrete RESTful resource to serve a mapping of task to known fileset."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id):
+        """Returns a mapping of task to known fileset.
+
+        Parameters
+        ----------
+        scan_id : str
+            The name of the scan for which to serve the information.
+
+        Other Parameters
+        ----------------
+        task : str
+            Get the value of the task if it exists, else return false.
+            For example, append '?task=images' as '?argument=value' to the GET request to get the name (id) of the matching fileset. .
+
+        Returns
+        -------
+        dict or str
+            A task name indexed mapping dictionary to serve (as JSON).
+            If a ``task`` argument is provided, try to retrieve the corresponding fileset name.
+            If it does not exist, return ``false``.
+
+        Examples
+        --------
+        >>> import requests
+        >>> print(requests.get('http://127.0.0.1:5000/tasks/real_plant').json())
+        {'images': 'images'}
+        >>> print(requests.get('http://127.0.0.1:5000/tasks/real_plant?task=images').json())
+        'images'
+        >>> print(requests.get('http://127.0.0.1:5000/tasks/real_plant?task=PointCloud').json())
+        False
+        """
+        task_fileset_map = compute_fileset_matches(self.db.get_scan(scan_id))
+        query = request.args.get('task', None)
+        if query is not None:
+            return task_fileset_map.get(query, False)
+        else:
+            return task_fileset_map
+
+TASK2READER = {
+    'Voxels': read_volume,
+    'PointCloud': read_point_cloud,
+    'TriangleMesh': read_triangle_mesh,
+    'CurveSkeleton': read_json,
+    'TreeGraph': read_graph,
+    'AnglesAndInternodes': read_json,
+}
+
+class TaskData(Resource):
+    """Concrete RESTful resource to serve task output data."""
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id, task):
+        size = request.args.get('size', default='orig', type=str)
+        fileset_id = compute_fileset_matches(self.db.get_scan(scan_id)).get(task, None)
+        reader = TASK2READER.get(task, None)
+        if fileset_id is None or reader is None:
+            return None
+        else:
+            if task in ['CurveSkeleton', 'AnglesAndInternodes']:
+                return reader(self.db.get_scan(scan_id).get_fileset(fileset_id).get_file(task))
+            elif task == 'PointCloud':
+                # Get the path to the pointcloud resource:
+                path = Path(webcache.pointcloud_path(self.db, scan_id, fileset_id, task, size))
+                fileset = self.db.get_scan(scan_id).get_fileset(fileset_id)
+                pcd = reader(FSDBFile(fileset, path.stem, ext=path.suffix))
+                return np.array(pcd.points).T.tolist()
+            elif task == 'TriangleMesh':
+                # Get the path to the pointcloud resource:
+                path = Path(webcache.mesh_path(self.db, scan_id, fileset_id, task, size))
+                fileset = self.db.get_scan(scan_id).get_fileset(fileset_id)
+                mesh = reader(FSDBFile(fileset, path.stem, ext=path.suffix))
+                return {
+                    'vertices': np.array(mesh.vertices).T.tolist(),
+                    'triangles': np.array(mesh.triangles).T.tolist()
+                }
+            elif task == 'TreeGraph':
+                tree = reader(self.db.get_scan(scan_id).get_fileset(fileset_id).get_file(task))
+                return tree
+            else:
+                return None
 
 class File(Resource):
     """Concrete RESTful resource to serve a file upon request (GET method)."""
