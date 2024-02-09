@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plantdb"
+version = "0.13.01"
+dependencies = [
+    "appdirs",
+    "colorlog",
+    "flask",
+    "flask-cors",
+    "flask-restful",
+    "imagecodecs",
+    "imageio >=2.16.2",
+    "numpy",
+    "open3d >=0.9.0.0",
+    "pillow",
+    "toml",
+    "tqdm",
+]
+description = "Database library for the ROMI project."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
+    { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
+    { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+]
+maintainers = [
+    { name = "Jonathan Legrand", email = "jonathan.legrand@ens-lyon.fr" }
+]
+keywords = [
+    "Robotics for Microfarms",
+    "ROMI",
+    "Database",
+    "REST API",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+]
+
+[project.scripts]
+fsdb_check = "plantdb.cli.fsdb_check:main"
+fsdb_import_file = "plantdb.cli.fsdb_import_file:main"
+fsdb_import_folder = "plantdb.cli.fsdb_import_folder:main"
+fsdb_import_images = "plantdb.cli.fsdb_import_images:main"
+fsdb_rest_api = "plantdb.cli.fsdb_rest_api:main"
+fsdb_sync = "plantdb.cli.fsdb_sync:main"
+shared_fsdb = "plantdb.cli.shared_fsdb:main"
+
+[project.urls]
+Homepage = "https://romi-project.eu/"
+Documentation = "https://docs.romi-project.eu/plant_imager/"
+Repository = "https://github.com/romi/plantdb"
+Issues = "https://github.com/romi/plantdb/issues"
+
+[project.optional-dependencies]
+doc = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pymdown-extensions",
+    "markdown-exec[ansi]",
+]
