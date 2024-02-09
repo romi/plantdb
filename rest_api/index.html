@@ -1,0 +1,1637 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="PlantDB documentation.">
+      
+      
+        <meta name="author" content="ROMI Team">
+      
+      
+        <link rel="canonical" href="https://docs.romi-project.eu/rest_api/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../reference/plantdb/">
+      
+      
+      <link rel="icon" href="../assets/images/ROMI_ICON_green.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.8">
+    
+    
+      
+        <title>REST API - PlantDB</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.f2e4d321.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,300i,400,400i,700,700i%7CUbuntu+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Nunito Sans";--md-code-font:"Ubuntu Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_markdown_exec_pyodide.css">
+    
+      <link rel="stylesheet" href="../assets/_markdown_exec_ansi.css">
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#plantdb-rest-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://docs.romi-project.eu/" title="PlantDB" class="md-header__button md-logo" aria-label="PlantDB" data-md-component="logo">
+      
+  <img src="../assets/images/ROMI_logo_white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PlantDB
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              REST API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/romi/plantdb" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  REST API
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/plantdb/" class="md-tabs__link">
+          
+  
+  Reference API
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://docs.romi-project.eu/" title="PlantDB" class="md-nav__button md-logo" aria-label="PlantDB" data-md-component="logo">
+      
+  <img src="../assets/images/ROMI_logo_white.svg" alt="logo">
+
+    </a>
+    PlantDB
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/romi/plantdb" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    REST API
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    REST API
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rest-urls" class="md-nav__link">
+    <span class="md-ellipsis">
+      REST URLs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="REST URLs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scans" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scansscan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filespath" class="md-nav__link">
+    <span class="md-ellipsis">
+      /files/&lt;path&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archivescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /archive/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imagescan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pointcloudscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pcgroundtruthscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meshscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      /refresh
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scan summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scan summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      metadata
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thumbnailuri" class="md-nav__link">
+    <span class="md-ellipsis">
+      thumbnailUri
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#has" class="md-nav__link">
+    <span class="md-ellipsis">
+      has*
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan-detailed-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scan detailed summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scan detailed summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#camera-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Camera model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#camera-poses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Camera poses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/plantdb/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    plantdb
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            plantdb
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/plantdb/cli/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    cli
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_1_1" id="__nav_3_1_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            cli
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_check/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_check
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_import_file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_import_file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_import_folder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_import_folder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_import_images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_import_images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_rest_api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_rest_api
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/fsdb_sync/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb_sync
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/cli/shared_fsdb/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    shared_fsdb
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/db/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    db
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/fsdb/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fsdb
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/io/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    io
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/log/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    log
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/rest_api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rest_api
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/sshfsdb/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    sshfsdb
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/sync/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    sync
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/test_database/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    test_database
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    testing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/plantdb/webcache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    webcache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rest-urls" class="md-nav__link">
+    <span class="md-ellipsis">
+      REST URLs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="REST URLs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scans" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scansscan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filespath" class="md-nav__link">
+    <span class="md-ellipsis">
+      /files/&lt;path&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archivescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /archive/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imagescan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pointcloudscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pcgroundtruthscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meshscan_idfileset_idfile_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      /refresh
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scan summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scan summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    <span class="md-ellipsis">
+      id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      metadata
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thumbnailuri" class="md-nav__link">
+    <span class="md-ellipsis">
+      thumbnailUri
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#has" class="md-nav__link">
+    <span class="md-ellipsis">
+      has*
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan-detailed-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scan detailed summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scan detailed summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#camera-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Camera model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#camera-poses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Camera poses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="plantdb-rest-api">PlantDB REST API<a class="headerlink" href="#plantdb-rest-api" title="Permanent link">Link</a></h1>
+<p>Hereafter we introduce the URLS to use to communicate via the REST API.
+The Python implementation is done in the <code>plantdb.rest_api</code> module and the CLI to start a Flask server is in <code>fsdb_rest_api</code>.</p>
+<h2 id="rest-urls">REST URLs<a class="headerlink" href="#rest-urls" title="Permanent link">Link</a></h2>
+<h3 id="scans"><code>/scans</code><a class="headerlink" href="#scans" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/scans</code> URL:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.ScanList</code></a></li>
+<li>Arguments: <code>filterQuery</code></li>
+<li>Returns: a JSON compliant list of dictionaries.</li>
+<li>Example:</li>
+<li>Get all scans:
+  <a href="http://127.0.0.1:5000/scans">http://127.0.0.1:5000/scans</a></li>
+<li>Search for "arabidopsis" in metadata:
+  <a href="http://127.0.0.1:5000/scans?filterQuery=arabidopsis">http://127.0.0.1:5000/scans?filterQuery=arabidopsis</a></li>
+</ul>
+<h3 id="scansscan_id"><code>/scans/&lt;scan_id&gt;</code><a class="headerlink" href="#scansscan_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/scans/&lt;scan_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Scan</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset</li>
+<li>Examples with the test database:</li>
+<li>Get scan info for the <code>"real_plant_analyzed"</code> dataset:
+  <a href="http://127.0.0.1:5000/scans/real_plant_analyzed">http://127.0.0.1:5000/scans/real_plant_analyzed</a></li>
+<li>Get scan info for the <code>"virtual_plant_analyzed"</code> dataset:
+  <a href="http://127.0.0.1:5000/scans/virtual_plant_analyzed">http://127.0.0.1:5000/scans/virtual_plant_analyzed</a></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This requires the <code>Colmap</code> task!
+In other words it will fail (response <code>500</code>) if this task is missing from the dataset.</p>
+</div>
+<h3 id="filespath"><code>/files/&lt;path&gt;</code><a class="headerlink" href="#filespath" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/files/&lt;path&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.File</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: The content of the file.</li>
+<li>Examples  <code>real_plant_analyzed</code> dataset (from the test database):</li>
+<li>Get the first image of the scan (<code>00000_rgb</code>):
+  <a href="http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg">http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg</a></li>
+<li>Get the first mask image of the scan (<code>00000_rgb</code>):
+  <a href="http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png">http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0<strong><em>_channel</em></strong>_rgb_5619aa428d/00000_rgb.png</a></li>
+</ul>
+<h3 id="archivescan_id"><code>/archive/&lt;scan_id&gt;</code><a class="headerlink" href="#archivescan_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/archive/&lt;scan_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Archive</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: A zip file containing the dataset.</li>
+<li>Examples:</li>
+<li>Get <code>real_plant_analyzed</code> archive:
+  <a href="http://127.0.0.1:5000/archive/real_plant_analyzed/">http://127.0.0.1:5000/archive/real_plant_analyzed/</a></li>
+<li>Get <code>virtual_plant_analyzed</code> archive:
+  <a href="http://127.0.0.1:5000/archive/virtual_plant_analyzed/">http://127.0.0.1:5000/archive/virtual_plant_analyzed/</a></li>
+</ul>
+<h3 id="imagescan_idfileset_idfile_id"><code>/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#imagescan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Image</code></a></li>
+<li>Arguments: <code>size</code> in {<code>orig</code>, <code>large</code>, <code>thumb</code>} to control the max size (width or height) of the image to return.</li>
+<li>Returns: The image file, resized by default.</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset (from the test database) and the first image of the scan (<code>00000_rgb</code>):</li>
+<li>Get the preview image:
+  <a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb</a></li>
+<li>Get the original image:
+  <a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig</a></li>
+</ul>
+<h3 id="pointcloudscan_idfileset_idfile_id"><code>/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#pointcloudscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.PointCloud</code></a></li>
+<li>Arguments: <code>size</code> in {<code>orig</code>, <code>preview</code>} or a <code>float</code> to control the voxel-size of the pointcloud to returns.</li>
+<li>Returns: The point cloud file, preview size by default.</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset:</li>
+<li>Get the preview point cloud:
+  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud</a></li>
+<li>Get the original point cloud:
+  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig</a></li>
+<li>Get the point cloud with a voxel size of <code>2.3</code>:
+  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3</a></li>
+</ul>
+<h3 id="pcgroundtruthscan_idfileset_idfile_id"><code>/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#pcgroundtruthscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.PointCloudGroundTruth</code></a></li>
+<li>Arguments: <code>size</code> in {<code>orig</code>, <code>preview</code>} or a <code>float</code> to control the voxel-size of the pointcloud to returns.</li>
+<li>Returns: The ground-truth pointcloud file, original size by default.</li>
+</ul>
+<h3 id="meshscan_idfileset_idfile_id"><code>/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#meshscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Mesh</code></a></li>
+<li>Arguments: <code>size</code> in {<code>orig</code>}, no control of the size of the mesh to returns.</li>
+<li>Returns: The mesh file, original size by default.</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset:</li>
+<li>Get the original mesh:
+  <a href="http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh">http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh</a></li>
+</ul>
+<h3 id="refresh"><code>/refresh</code><a class="headerlink" href="#refresh" title="Permanent link">Link</a></h3>
+<p>Refresh the list of scans in the <code>plantdb.fsdb.FSDB</code> database.</p>
+<p>Here are the specifications for the <code>/refresh</code> URL:</p>
+<ul>
+<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Refresh</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: <code>200</code> on completion.</li>
+<li>Example:
+<a href="http://127.0.0.1:5000/refresh">http://127.0.0.1:5000/refresh</a></li>
+</ul>
+<h2 id="scan-summary">Scan summary<a class="headerlink" href="#scan-summary" title="Permanent link">Link</a></h2>
+<p>Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
+The template can be accessed here: <a href="reference/rest_api.md#methods"><code>plantdb.rest_api.get_scan_template</code></a></p>
+<p>It is organized as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;scan_id&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;01-01-00 00:00:00&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;species&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;environment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;nbPhotos&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;metadatas&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;archive&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;thumbnailUri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasPointCloud&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasMesh&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasSkeleton&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasTreeGraph&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasAngleData&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasAutomatedMeasures&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasManualMeasures&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasSegmentation2D&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasPcdGroundTruth&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasPointCloudEvaluation&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;hasSegmentedPointCloud&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="id">id<a class="headerlink" href="#id" title="Permanent link">Link</a></h3>
+<p>The name of the corresponding scan dataset.</p>
+<h3 id="metadata">metadata<a class="headerlink" href="#metadata" title="Permanent link">Link</a></h3>
+<p>Some metadata gathered from the corresponding scan dataset.</p>
+<p>JSON dictionary with fields:</p>
+<ul>
+<li>"date": String, example "2019-02-01 13:35:42"</li>
+<li>"plant": String</li>
+<li>"species": String</li>
+<li>"nbPhotos": Number</li>
+<li>"environment": String</li>
+<li>"files": Object<ul>
+<li>"files.metadatas": String, URL, example "/files/<scanid>/metadata/metadata.json"</li>
+<li>"files.archive": String, URL, example "/files/<scanid>/Visualization/scan.zip"</li>
+</ul>
+</li>
+</ul>
+<h3 id="thumbnailuri">thumbnailUri<a class="headerlink" href="#thumbnailuri" title="Permanent link">Link</a></h3>
+<p>A path to the thumbnail image to use as "preview" to represent the dataset in the webapp.<br />
+* thumbnailUri: example "/files/<scanid>/Visualization/thumbnail_pict20190201_134037_0.jpg"</p>
+<h3 id="has">has*<a class="headerlink" href="#has" title="Permanent link">Link</a></h3>
+<p>All of the <code>has*</code> entries indicate if there is an output for a list of selected tasks:</p>
+<ul>
+<li><code>hasPointCloud</code>: output of the task <code>PointCloud</code> has a <code>PointCloud.ply</code> file</li>
+<li><code>hasMesh</code>: output of the task <code>TriangleMesh</code> has a <code>TriangleMesh.ply</code> file</li>
+<li><code>hasSkeleton</code>: output of the task <code>CurveSkeleton</code> has a <code>CurveSkeleton.json</code> file</li>
+<li><code>hasAngleData</code>: output of the task <code>AngleAndInternodes</code> has a <code>AnglesAndInternodes.json</code> file</li>
+<li><code>hasAutomatedMeasures</code>: output of the task <code>AutomatedMeasures</code> has a <code>AnglesAndInternodes</code> file</li>
+<li><code>hasSegmentation2D</code>: output of the task <code>Segmentation2D</code> has a `` file</li>
+<li><code>hasSegmentedPcdEvaluation</code>: output of the task <code>Segmentation2DEvaluation</code> has a `` file</li>
+<li><code>hasPointCloudEvaluation</code>: output of the task <code>PointCloudEvaluation</code> has a `` file</li>
+<li><code>hasSegmentedPointCloud</code>: output of the task <code>SegmentedPointCloud</code> has a <code>SegmentedPointCloud.ply</code> file</li>
+<li><code>hasPcdGroundTruth</code>: output of the task <code>PointCloudGroundTruth</code> has a <code>PointCloudGroundTruth.ply</code> file</li>
+</ul>
+<p>Finally, <code>hasManualMeasures</code> refers to the presence of a JSON file with manual measurements saved as <code>measures.json</code>.
+This file should be present at the scan dataset root directory.</p>
+<h2 id="scan-detailed-summary">Scan detailed summary<a class="headerlink" href="#scan-detailed-summary" title="Permanent link">Link</a></h2>
+<p>Information about a specific scan dataset, obtained with the '/scans/<scan_id>' URL, are grouped in a JSON dictionary.</p>
+<p>It has the same information as those gathered with the '/scans' URL, but also add:
+  * the <strong>files URI</strong> when the following <code>has*</code> entries are <code>True</code>:
+    * <code>hasPointCloud</code>, under <code>"filesUri"/"pointCloud"</code>
+    * <code>hasMesh</code>, under <code>"filesUri"/"mesh"</code>
+    * <code>hasSkeleton</code>, under <code>"filesUri"/"skeleton"</code>
+    * <code>hasTreeGraph</code>, under <code>"filesUri"/"tree"</code>
+  * the <strong>files data</strong> when the following <code>has*</code> entries are <code>True</code>: 
+    * <code>hasSkeleton</code>, under <code>"data"/"skeleton"</code>
+    * <code>hasAngleData</code>, under:
+      * <code>"data"/"angles"/"angles"</code> for the angle values
+      * <code>"data"/"angles"/"internodes"</code> for the internodes values
+    * <code>hasManualMeasures</code>, under:
+      *   <code>"data"/"angles"/"measured_angles"</code> for the angle values
+      *   <code>"data"/"angles"/"measured_internodes"</code> for the internodes values
+  * the <strong>reconstruction bounding-box</strong> (formerly known as 'workspace') under <code>"workspace"</code>, for example <code>"{"x": [340, 440], "y": [330, 410], "z": [-180, 105]}"</code>
+  * the <strong>camera model</strong> and its <strong>intrinsics parameters</strong> under <code>"camera"/"model"</code>, see <a href="#camera-model">here</a> for more details
+  * the list of <strong>camera poses</strong>, a.k.a. <strong>extrinsic parameters</strong>, under <code>"camera"/"poses"</code>, see <a href="#camera-poses">here</a> for more details</p>
+<h3 id="camera-model">Camera model<a class="headerlink" href="#camera-model" title="Permanent link">Link</a></h3>
+<p>The details about the camera poses accessible under <code>"camera"/"model"</code> are:
+  * <code>id</code>: the id of the camera model, should always be <code>1</code> if we use a single camera
+  * <code>model</code>: the name of the camera model, should always be 'OPENCV' as this is how we save it
+  * <code>width</code>: the width of the images
+  * <code>height</code>: the height of the images
+  * <code>params</code>: the 'OPENCV' intrinsic camera parameters, that is <code>fx</code>, <code>fy</code>, <code>cx</code>, <code>cy</code>, <code>k1</code>, <code>k2</code>, <code>p1</code>, <code>p2</code>.  </p>
+<p>For example with the first image:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OPENCV&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;width&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1440</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;height&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1080</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1166.9518889440105</span><span class="p">,</span><span class="w"> </span><span class="mf">1166.9518889440105</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0013571157486977348</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0013571157486977348</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="camera-poses">Camera poses<a class="headerlink" href="#camera-poses" title="Permanent link">Link</a></h3>
+<p>The details about the camera poses accessible under <code>"camera"/"poses"</code> are:
+  * "id": index of the picture (starts at 1 by COLMAP convention)
+  * "rotmat": Rotation matrix, 3x3 array 
+  * "tvec": Translation vector, 3x1 array
+  * "thumbnailUri": URI to the thumbnail image, example "/images/<scanid>/images/<image_id>?size=thumb.jpg"
+  * "photoUri": URI to the original image, example "/images/<scanid>/images/<image_id>?size=orig.jpg"</p>
+<p>For example with the first image:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;tvec&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">369.4279687732083</span><span class="p">,</span><span class="w"> </span><span class="mf">120.36109311437637</span><span class="p">,</span><span class="w"> </span><span class="mf">-62.07043190848918</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;rotmat&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">0.06475585405884698</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.9971710205080586</span><span class="p">,</span><span class="w"> </span><span class="mf">0.038165890845442085</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">-0.3390191175518756</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.0579549181538338</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.9389926865509284</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="mf">0.9385481965778085</span><span class="p">,</span><span class="w"> </span><span class="mf">0.04786630673761355</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.34181295964290737</span><span class="p">]</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;photoUri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;thumbnailUri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;isMatched&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      CC Attribution-NonCommercial-ShareAlike 4.0 International
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/ROMI_EU_PROJECT" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.facebook.com/ROMIEUProject" target="_blank" rel="noopener" title="www.facebook.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256c0 120 82.7 220.8 194.2 248.5V334.2h-52.8V256h52.8v-33.7c0-87.1 39.4-127.5 125-127.5 16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287v175.9C413.8 494.8 512 386.9 512 256z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/romi/plantdb" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+        <script src="../assets/_markdown_exec_pyodide.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+        <script src="https://buttons.github.io/buttons.js"></script>
+      
+    
+  </body>
+</html>
