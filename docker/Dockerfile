@@ -14,6 +14,8 @@ ENV USER_NAME=romi
 ENV USER_ID=1010
 # Required by `pip`:
 ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
+# https://github.com/pypa/setuptools/issues/3269#issuecomment-1254507377
+ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 # Required by `romi_run_task`:
 ENV ROMI_DB="/myapp/db"
 
