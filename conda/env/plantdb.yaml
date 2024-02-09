@@ -1,12 +1,12 @@
-{% set data = load_setup_py_data() %}  # loads data from the `setup.py` file
-{% set python_requires = data.get('python_requires') %}  # get the 'version' from loaded data
+{% set pyproject = load_file_data('../../pyproject.toml', 'toml', from_recipe_dir=True) %}
+{% set requires-python = pyproject.get('project', {}).get('requires-python') %}
 
 name: plantdb
 channels:
   - defaults
   - conda-forge
 dependencies:
-  - python {{ python_requires }}
+  - python {{ requires-python }}
   - numpy
   - appdirs
   - colorlog

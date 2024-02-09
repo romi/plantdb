@@ -1,16 +1,23 @@
-{% set data = load_setup_py_data() %}  # loads data from the `setup.py` file
-{% set version = data.get('version') %}  # get the 'version' from loaded data
-{% set summary = data.get('description') %}  # get the 'description' from loaded data
+{% set pyproject = load_file_data('../../pyproject.toml', 'toml', from_recipe_dir=True) %}
+{% set project = pyproject.get('project', {}) %}
+{% set deps = project.get('dependencies', {}) %}
+{% set urls = project.get('urls', {}) %}
 # https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html#loading-data-from-other-files
+# Source code for Jinja context: https://github.com/conda/conda-build/blob/main/conda_build/jinja_context.py
+# Then search for the `load_file_data` function.
+
 package:
-  name: plantdb
-  version: {{ version }}
+  name: {{ project.get('name') }}
+  version: {{ project.get('version') }}
 
 source:
-  path: ../../
+  path: ../../  # to build from cloned sources
+#  git_url: https://github.com/romi/romitask.git
+#  git_tag: dev
 
 build:
-  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  string: {{ 'py'+ PY_VER.replace('.','') + '_' + environ.get('GIT_DESCRIBE_HASH', 'latest') }}
+  script: python -m pip install .
 
 requirements:
   build:
@@ -18,28 +25,19 @@ requirements:
     - python  {{ python }}
   run:
     - python  {{ python }}
-    - numpy
-    - appdirs
-    - colorlog
-    - flask
-    - flask-cors
-    - flask-restful
-    - imagecodecs
-    - imageio>= 2.16.2
-    - numpy
-    - pillow
-    - scikit-image
-    - toml
-    - tqdm
+    {% for dep in deps %}
+    {% if not dep.startswith('open3d') %}
+    - {{ dep }}
+    {% endif %}
+    {% endfor %}
 
 about:
-  home: https://docs.romi-project.eu/plant_imager/
+  home: {{ urls.get('Homepage') }}
   license: LGPL-3.0-or-later
   license_file: LICENSE
-  summary: {{ summary }}
+  summary: {{ project.get('description') }}
   description: |
     The _3D plant phenotyping platform_ of the ROMI project allows to performs a full 3D analysis of plants.
     It combines an imaging station with a powerful image processing pipeline, to build a 3D representation of plants.
     This package is intended to act as the central database hosting the data required by the other ROMI libraries.
-  dev_url: https://github.com/romi/plantdb
-  doc_source_url: https://docs.romi-project.eu/plant_imager/
+  dev_url: {{ urls.get('Repository') }}
