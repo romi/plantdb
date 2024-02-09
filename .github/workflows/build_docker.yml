@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: docker-hub
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
@@ -37,8 +39,7 @@ jobs:
           file: docker/Dockerfile
           tags: roboticsmicrofarms/plantdb:latest
       - name: Test
-        run: |
-          docker run --rm roboticsmicrofarms/plantdb:latest
+        run: docker run --rm roboticsmicrofarms/plantdb:latest
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
