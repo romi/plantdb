@@ -18,8 +18,12 @@ def parsing():
     parser.add_argument('path', type=str,
                         help='Path to the test database to set up.')
     parser.add_argument('-d', '--dataset', type=str, nargs="+",
-                        default=['real_plant'], choices=DATASET,
-                        help="Test dataset to clone.")
+                        default=['real_plant'],
+                        help="Test dataset to clone, use 'all' to get all of them. " +\
+                             "You can list several dataset names to clone. " +\
+                             "Available dataset names are: " +\
+                             ", ".join([f"'{ds}'" for ds in DATASET]) + ". " +\
+                             "By default we clone the 'real_plant' dataset.")
     parser.add_argument('--config', action='store_true',
                         help='Use this to also clone the configuration files.')
     parser.add_argument('--models', action='store_true',
@@ -33,6 +37,14 @@ def main():
     parser = parsing()
     args = parser.parse_args()
 
+    if args.dataset[0] == "all":
+        args.dataset = DATASET
+
+    args.dataset = list(set(args.dataset) & set(DATASET))
+    if len(args.dataset) == 0:
+        logger.critical(f"No valid dataset name defined, select among {' ,'.join(DATASET)}.")
+        raise ValueError("No valid dataset name defined!")
+
     out_path = setup_test_database(args.dataset,
                                    out_path=args.path,
                                    with_configs=args.config,
@@ -40,6 +52,7 @@ def main():
                                    force=args.force,
                                    )
     logger.info(f"Done cloning dataset{'s' if len(args.dataset) > 1 else ''}: {', '.join(args.dataset)}.")
+
 
 if __name__ == "__main__":
     main()
