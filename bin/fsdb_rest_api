@@ -24,6 +24,8 @@ from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
 from plantdb.rest_api import Scan
 from plantdb.rest_api import ScanList
+from plantdb.rest_api import TaskData
+from plantdb.rest_api import TaskFilesetMapping
 from plantdb.test_database import DATASET
 from plantdb.test_database import test_database
 
@@ -80,6 +82,10 @@ if __name__ == '__main__':
     api.add_resource(ScanList, '/scans',
                      resource_class_args=tuple([db]))
     api.add_resource(Scan, '/scans/<string:scan_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(TaskFilesetMapping, '/tasks/<string:scan_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(TaskData, '/data/<string:scan_id>/<string:task>',
                      resource_class_args=tuple([db]))
     api.add_resource(File, '/files/<path:path>',
                      resource_class_args=tuple([db]))
