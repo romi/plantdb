@@ -48,7 +48,7 @@ def parsing():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     parser = parsing()
     args = parser.parse_args()
 
@@ -98,3 +98,7 @@ if __name__ == '__main__':
 
     # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
+
+
+if __name__ == '__main__':
+    main()

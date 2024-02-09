@@ -21,7 +21,7 @@ def parsing():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     parser = parsing()
     args = parser.parse_args()
 
@@ -48,3 +48,6 @@ if __name__ == '__main__':
         file.set_metadata(metadata)
 
     db.disconnect()
+
+if __name__ == '__main__':
+    main()
