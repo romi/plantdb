@@ -83,7 +83,7 @@ def same_jsons(file_a, file_b) -> bool:
     return json_a == json_b
 
 
-if __name__ == '__main__':
+def main():
     # - Parse the input arguments to variables:
     parser = parsing()
     args = parser.parse_args()
@@ -117,3 +117,6 @@ if __name__ == '__main__':
         raise NotImplementedError
 
     db.disconnect()
+
+if __name__ == '__main__':
+    main()

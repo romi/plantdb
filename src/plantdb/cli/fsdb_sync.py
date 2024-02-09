@@ -18,8 +18,11 @@ def parsing():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     parser = parsing()
     args = parser.parse_args()
     fsdb_sync = FSDBSync(args.origin, args.target)
     fsdb_sync.sync()
+
+if __name__ == '__main__':
+    main()

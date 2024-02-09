@@ -29,7 +29,7 @@ def parsing():
     return parser
 
 
-if __name__ == "__main__":
+def main():
     parser = parsing()
     args = parser.parse_args()
 
@@ -40,3 +40,6 @@ if __name__ == "__main__":
                                    force=args.force,
                                    )
     logger.info(f"Done cloning dataset{'s' if len(args.dataset) > 1 else ''}: {', '.join(args.dataset)}.")
+
+if __name__ == "__main__":
+    main()
