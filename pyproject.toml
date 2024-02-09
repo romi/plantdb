@@ -67,3 +67,7 @@ doc = [
     "pymdown-extensions",
     "markdown-exec[ansi]",
 ]
+test = [
+    "nose2[coverage]",
+    "coverage[toml]",
+]
