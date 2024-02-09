@@ -14,7 +14,6 @@ jobs:
         with:
           python-version: '3.9'  # select python version
           cache: 'pip'  # caching pip dependencies
-      - name: Install library & documentation requirements
         run: python3 -m pip install .[doc]
       - name: Build documentation with mkdocs
         run: mkdocs build
