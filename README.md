@@ -1,7 +1,6 @@
 # PlantDB
 
 [![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/version.svg)](https://anaconda.org/romi-eu/plantdb)
-[![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/latest_release_date.svg)](https://anaconda.org/romi-eu/plantdb)
 [![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/platforms.svg)](https://anaconda.org/romi-eu/plantdb)
 [![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/license.svg)](https://anaconda.org/romi-eu/plantdb)
 
