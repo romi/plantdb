@@ -66,6 +66,9 @@ doc = [
     "mkdocstrings[python]",
     "pymdown-extensions",
     "markdown-exec[ansi]",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
 ]
 test = [
     "nose2[coverage]",

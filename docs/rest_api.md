@@ -1,11 +1,11 @@
-# plantDB REST API
+# PlantDB REST API
 
 Hereafter we introduce the URLS to use to communicate via the REST API.
 The Python implementation is done in the `plantdb.rest_api` module and the CLI to start a Flask server is in `fsdb_rest_api`.
 
 ## REST URLs
 
-### /scans
+### `/scans`
 
 Here are the specifications for the `/scans` URL:
 
@@ -18,7 +18,7 @@ Here are the specifications for the `/scans` URL:
   * Search for "arabidopsis" in metadata:
   [http://127.0.0.1:5000/scans?filterQuery=arabidopsis](http://127.0.0.1:5000/scans?filterQuery=arabidopsis)
 
-### /scans/<scan_id>
+### `/scans/<scan_id>`
 
 Here are the specifications for the `/scans/<scan_id>` URLs:
 
@@ -31,14 +31,12 @@ Here are the specifications for the `/scans/<scan_id>` URLs:
   * Get scan info for the `"virtual_plant_analyzed"` dataset:
   [http://127.0.0.1:5000/scans/virtual_plant_analyzed](http://127.0.0.1:5000/scans/virtual_plant_analyzed)
 
-```{eval-rst}
-.. warning::
+!!! warning
+    This requires the `Colmap` task!
+    In other words it will fail (response `500`) if this task is missing from the dataset.
 
-   This requires the `Colmap` task!
-   In other words it will fail (response `500`) if this task is missing from the dataset.
-```
 
-### /files/<path>
+### `/files/<path>`
 
 Here are the specifications for the `/files/<path>` URLs:
 
@@ -51,7 +49,7 @@ Here are the specifications for the `/files/<path>` URLs:
   * Get the first mask image of the scan (`00000_rgb`):
   [http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png](http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png)
 
-### /archive/<scan_id>
+### `/archive/<scan_id>`
 
 Here are the specifications for the `/archive/<scan_id>` URLs:
 
@@ -64,7 +62,7 @@ Here are the specifications for the `/archive/<scan_id>` URLs:
   * Get `virtual_plant_analyzed` archive:
   [http://127.0.0.1:5000/archive/virtual_plant_analyzed/](http://127.0.0.1:5000/archive/virtual_plant_analyzed/)
 
-### /image/<scan_id>/<fileset_id>/<file_id>
+### `/image/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` URLs:
 
@@ -77,7 +75,7 @@ Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` UR
   * Get the original image:
   [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig)
 
-### /pointcloud/<scan_id>/<fileset_id>/<file_id>
+### `/pointcloud/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id>` URLs:
 
@@ -92,7 +90,7 @@ Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id
   * Get the point cloud with a voxel size of `2.3`:
   [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3)
 
-### /pcGroundTruth/<scan_id>/<fileset_id>/<file_id>
+### `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>` URLs:
 
@@ -100,7 +98,7 @@ Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file
 * Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
 * Returns: The ground-truth pointcloud file, original size by default.
 
-### /mesh/<scan_id>/<fileset_id>/<file_id>
+### `/mesh/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URLs:
 
@@ -111,7 +109,7 @@ Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URL
   * Get the original mesh:
   [http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh](http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh)
 
-### /refresh
+### `/refresh`
 Refresh the list of scans in the `plantdb.fsdb.FSDB` database.
 
 Here are the specifications for the `/refresh` URL:
@@ -121,6 +119,7 @@ Here are the specifications for the `/refresh` URL:
 * Returns: `200` on completion.
 * Example:
 [http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
+
 
 ## Scan summary
 Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
@@ -195,6 +194,7 @@ All of the `has*` entries indicate if there is an output for a list of selected 
 
 Finally, `hasManualMeasures` refers to the presence of a JSON file with manual measurements saved as `measures.json`.
 This file should be present at the scan dataset root directory.
+
 
 ## Scan detailed summary
 Information about a specific scan dataset, obtained with the '/scans/<scan_id>' URL, are grouped in a JSON dictionary.
