@@ -39,7 +39,8 @@ RUN apt-get update && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
     # Create the folder used to mount the database:
     mkdir -p ${ROMI_DB} && \
-    touch ${ROMI_DB}/romidb
+    touch ${ROMI_DB}/romidb && \
+    chown -R ${USER_NAME} ${ROMI_DB}
 
 # Change to non-root user:
 USER ${USER_NAME}
