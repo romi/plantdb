@@ -37,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: roboticsmicrofarms/${{ github.repository }}
+          images: roboticsmicrofarms/plantdb
           tags: type=sha,format=short,prefix=
       - name: Build and push
         # https://github.com/marketplace/actions/build-and-push-docker-images
@@ -47,11 +47,18 @@ jobs:
           push: true
           file: docker/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
+      - name: Cache docker image
+        # https://github.com/marketplace/actions/build-and-push-docker-images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/myimage.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: roboticsmicrofarms/${{ github.repository }}
+          name: roboticsmicrofarms/plantdb
           path: /tmp/myimage.tar
 
   test_docker:
@@ -63,7 +70,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: roboticsmicrofarms/${{ github.repository }}
+          name: roboticsmicrofarms/plantdb
           path: /tmp
       - name: Load image
         run: |
@@ -73,10 +80,10 @@ jobs:
         run: |
           docker run --rm ${{ steps.meta.outputs.tags }} \
             -c "export ROMI_DB='/myapp/db' && mkdir -p $ROMI_DB && shared_fsdb $ROMI_DB -d all"
-      - name: Build and push
+      - name: Push as latest
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           file: docker/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: roboticsmicrofarms/plantdb:latest
