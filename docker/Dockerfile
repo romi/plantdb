@@ -38,7 +38,8 @@ RUN apt-get update && \
     adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
     # Create the folder used to mount the database:
-    mkdir -p ${ROMI_DB}
+    mkdir -p ${ROMI_DB} && \
+    touch ${ROMI_DB}/romidb
 
 # Change to non-root user:
 USER ${USER_NAME}
