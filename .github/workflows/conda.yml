@@ -26,5 +26,5 @@ jobs:
       - name: Conda build
         run: |
           conda install conda-build anaconda-client
-          anaconda login --username ${{ secrets.ANACONDA_LOGIN }} --password ${{ secrets.ANACONDA_PWD }}
+          ANACONDA_API_TOKEN=${{ secrets.ANACONDA_PWD }}
           conda build conda/recipe/ -c conda-forge --user romi-eu
