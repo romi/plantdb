@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://docs.romi-project.eu/</loc>
+         <loc>https://romi.github.io/plantdb/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/rest_api/</loc>
+         <loc>https://romi.github.io/plantdb/rest_api/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/SUMMARY/</loc>
+         <loc>https://romi.github.io/plantdb/reference/SUMMARY/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/db/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/db/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/fsdb/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/fsdb/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/io/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/io/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/log/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/log/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/rest_api/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/rest_api/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/sshfsdb/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/sshfsdb/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/sync/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/sync/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/test_database/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/test_database/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/testing/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/testing/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/utils/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/utils/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/webcache/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/webcache/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_check/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_check/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_import_file/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_import_file/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_import_folder/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_import_folder/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_import_images/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_import_images/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_rest_api/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_rest_api/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/fsdb_sync/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_sync/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.romi-project.eu/reference/plantdb/cli/shared_fsdb/</loc>
+         <loc>https://romi.github.io/plantdb/reference/plantdb/cli/shared_fsdb/</loc>
          <lastmod>2024-02-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
