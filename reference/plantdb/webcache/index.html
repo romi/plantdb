@@ -1232,7 +1232,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">webcache</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ROMI_DB&#39;</span><span class="p">,</span> <span class="s2">&quot;/data/ROMI/DB/&quot;</span><span class="p">))</span>
@@ -1268,7 +1268,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__file_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__file_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1375,7 +1375,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
 <span class="normal"> 92</span>
 <span class="normal"> 93</span>
 <span class="normal"> 94</span>
@@ -1432,7 +1432,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__hash" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__hash</span><span class="p">(</span><span class="n">resource_type</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__hash</span><span class="p">(</span><span class="n">resource_type</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1553,7 +1553,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
@@ -1614,7 +1614,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__image_cache" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__image_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__image_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__image_cache" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1736,7 +1736,7 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
@@ -1839,7 +1839,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_cached_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__image_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__image_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__image_cached_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1961,7 +1961,7 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">236</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
@@ -2026,7 +2026,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_hash" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__image_hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2134,7 +2134,7 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
@@ -2187,7 +2187,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_resize" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__image_resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__image_resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__image_resize" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2266,7 +2266,7 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
@@ -2311,7 +2311,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_cache" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__pointcloud_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__pointcloud_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__pointcloud_cache" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2439,7 +2439,7 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
 <span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
@@ -2552,7 +2552,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_cached_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__pointcloud_cached_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2676,7 +2676,7 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">414</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">414</span>
 <span class="normal">415</span>
 <span class="normal">416</span>
 <span class="normal">417</span>
@@ -2745,7 +2745,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_hash" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__pointcloud_hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2852,7 +2852,7 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">321</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">321</span>
 <span class="normal">322</span>
 <span class="normal">323</span>
 <span class="normal">324</span>
@@ -2903,7 +2903,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_resize" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__pointcloud_resize</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__pointcloud_resize</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__pointcloud_resize" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2982,7 +2982,7 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
 <span class="normal">346</span>
@@ -3025,7 +3025,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__webcache_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.__webcache_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3104,7 +3104,7 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -3151,7 +3151,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.image_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.image_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3277,7 +3277,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">image_path</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">image_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -3292,7 +3292,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">265</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">265</span>
 <span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
@@ -3405,7 +3405,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <h2 id="plantdb.webcache.mesh_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.mesh_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3527,7 +3527,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">mesh_path</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">mesh_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -3539,7 +3539,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">502</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">502</span>
 <span class="normal">503</span>
 <span class="normal">504</span>
 <span class="normal">505</span>
@@ -3618,7 +3618,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <h2 id="plantdb.webcache.pointcloud_path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
 
 <a href="#plantdb.webcache.pointcloud_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3744,7 +3744,7 @@ Default to 'orig'.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">pointcloud_path</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">pointcloud_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -3759,7 +3759,7 @@ Default to 'orig'.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">445</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">445</span>
 <span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>

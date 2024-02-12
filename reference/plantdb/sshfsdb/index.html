@@ -1052,7 +1052,7 @@
 
 
 <h2 id="plantdb.sshfsdb.SSHFSDB" class="doc doc-heading">
-            <code class=" language-python"><span class="n">SSHFSDB</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">remotedir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">SSHFSDB</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">remotedir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.sshfsdb.SSHFSDB" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1176,7 +1176,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1: Use a temporary dummy database:</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1: Use a temporary dummy database:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">SSHFSDB</span><span class="p">(</span><span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;someone@example.com:/data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span>
@@ -1194,7 +1194,7 @@ Should be in the format <code>user@server:path</code></p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/sshfsdb.py</code></summary>
-                  <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
@@ -1278,7 +1278,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <h3 id="plantdb.sshfsdb.SSHFSDB.connect" class="doc doc-heading">
-          <code class=" language-python"><span class="n">connect</span><span class="p">(</span><span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">connect</span><span class="p">(</span><span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.sshfsdb.SSHFSDB.connect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1321,7 +1321,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">SSHFSDB</span><span class="p">(</span><span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;someone@example.com:/data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
 <span class="go">False</span>
@@ -1332,7 +1332,7 @@ Should be in the format <code>user@server:path</code></p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sshfsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -1401,7 +1401,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <h3 id="plantdb.sshfsdb.SSHFSDB.disconnect" class="doc doc-heading">
-          <code class=" language-python"><span class="n">disconnect</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">disconnect</span><span class="p">()</span></code>
 
 <a href="#plantdb.sshfsdb.SSHFSDB.disconnect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1414,7 +1414,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">SSHFSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">SSHFSDB</span><span class="p">(</span><span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;someone@example.com:/data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
 <span class="go">False</span>
@@ -1428,7 +1428,7 @@ Should be in the format <code>user@server:path</code></p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sshfsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>

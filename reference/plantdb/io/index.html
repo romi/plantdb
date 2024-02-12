@@ -1422,7 +1422,7 @@
 
 
 <h2 id="plantdb.io.read_graph" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_graph</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_graph</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_graph" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1526,7 +1526,7 @@ Graph with 4 nodes and 3 edges</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">874</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">874</span>
 <span class="normal">875</span>
 <span class="normal">876</span>
 <span class="normal">877</span>
@@ -1621,7 +1621,7 @@ Graph with 4 nodes and 3 edges</p>
 
 
 <h2 id="plantdb.io.read_image" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_image" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1709,7 +1709,7 @@ np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">365</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">365</span>
 <span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
@@ -1792,7 +1792,7 @@ np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!</p>
 
 
 <h2 id="plantdb.io.read_json" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_json" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1877,7 +1877,7 @@ read_json(f)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
@@ -1962,7 +1962,7 @@ read_json(f)</p>
 
 
 <h2 id="plantdb.io.read_npz" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_npz</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_npz</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_npz" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2028,7 +2028,7 @@ read_json(f)</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_npz</span><span class="p">,</span> <span class="n">write_npz</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2046,7 +2046,7 @@ read_json(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">594</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">594</span>
 <span class="normal">595</span>
 <span class="normal">596</span>
 <span class="normal">597</span>
@@ -2129,7 +2129,7 @@ read_json(f)</p>
 
 
 <h2 id="plantdb.io.read_point_cloud" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_point_cloud</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_point_cloud</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_point_cloud" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2195,7 +2195,7 @@ read_json(f)</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_point_cloud</span><span class="p">,</span> <span class="n">write_point_cloud</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
@@ -2217,7 +2217,7 @@ read_json(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">676</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">676</span>
 <span class="normal">677</span>
 <span class="normal">678</span>
 <span class="normal">679</span>
@@ -2308,7 +2308,7 @@ read_json(f)</p>
 
 
 <h2 id="plantdb.io.read_toml" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_toml</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_toml</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_toml" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2393,7 +2393,7 @@ read_toml(f)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
@@ -2478,7 +2478,7 @@ read_toml(f)</p>
 
 
 <h2 id="plantdb.io.read_torch" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_torch</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_torch</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_torch" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2557,7 +2557,7 @@ read_toml(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">967</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">967</span>
 <span class="normal">968</span>
 <span class="normal">969</span>
 <span class="normal">970</span>
@@ -2608,7 +2608,7 @@ read_toml(f)</p>
 
 
 <h2 id="plantdb.io.read_triangle_mesh" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_triangle_mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_triangle_mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2673,7 +2673,7 @@ read_toml(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">766</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">766</span>
 <span class="normal">767</span>
 <span class="normal">768</span>
 <span class="normal">769</span>
@@ -2720,7 +2720,7 @@ read_toml(f)</p>
 
 
 <h2 id="plantdb.io.read_volume" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_volume</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_volume</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_volume" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2800,7 +2800,7 @@ read_toml(f)</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_volume</span><span class="p">,</span> <span class="n">write_volume</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2818,7 +2818,7 @@ read_toml(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">473</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">473</span>
 <span class="normal">474</span>
 <span class="normal">475</span>
 <span class="normal">476</span>
@@ -2905,7 +2905,7 @@ read_toml(f)</p>
 
 
 <h2 id="plantdb.io.read_voxel_grid" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_voxel_grid</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">read_voxel_grid</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.read_voxel_grid" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2970,7 +2970,7 @@ read_toml(f)</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">818</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">818</span>
 <span class="normal">819</span>
 <span class="normal">820</span>
 <span class="normal">821</span>
@@ -3017,7 +3017,7 @@ read_toml(f)</p>
 
 
 <h2 id="plantdb.io.write_graph" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_graph</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_graph</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_graph" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3106,7 +3106,7 @@ write_graph(f, g)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">936</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">936</span>
 <span class="normal">937</span>
 <span class="normal">938</span>
 <span class="normal">939</span>
@@ -3175,7 +3175,7 @@ write_graph(f, g)</p>
 
 
 <h2 id="plantdb.io.write_image" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_image" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3265,7 +3265,7 @@ write_image(f, img)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">441</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">441</span>
 <span class="normal">442</span>
 <span class="normal">443</span>
 <span class="normal">444</span>
@@ -3336,7 +3336,7 @@ write_image(f, img)</p>
 
 
 <h2 id="plantdb.io.write_json" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_json" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3424,7 +3424,7 @@ write_json(f, data)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
@@ -3491,7 +3491,7 @@ write_json(f, data)</p>
 
 
 <h2 id="plantdb.io.write_npz" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_npz</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_npz</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_npz" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3548,7 +3548,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">read_npz</span><span class="p">,</span> <span class="n">write_npz</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -3563,7 +3563,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">647</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">647</span>
 <span class="normal">648</span>
 <span class="normal">649</span>
 <span class="normal">650</span>
@@ -3628,7 +3628,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <h2 id="plantdb.io.write_point_cloud" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_point_cloud" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3699,7 +3699,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_point_cloud</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
@@ -3715,7 +3715,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">733</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">733</span>
 <span class="normal">734</span>
 <span class="normal">735</span>
 <span class="normal">736</span>
@@ -3788,7 +3788,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <h2 id="plantdb.io.write_toml" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_toml</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;toml&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_toml</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;toml&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_toml" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3876,7 +3876,7 @@ write_toml(f, data)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">335</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">335</span>
 <span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
@@ -3943,7 +3943,7 @@ write_toml(f, data)</p>
 
 
 <h2 id="plantdb.io.write_torch" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_torch</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_torch</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_torch" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4013,7 +4013,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1004</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1004</span>
 <span class="normal">1005</span>
 <span class="normal">1006</span>
 <span class="normal">1007</span>
@@ -4054,7 +4054,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <h2 id="plantdb.io.write_triangle_mesh" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_triangle_mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_triangle_mesh</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4124,7 +4124,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">801</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">801</span>
 <span class="normal">802</span>
 <span class="normal">803</span>
 <span class="normal">804</span>
@@ -4165,7 +4165,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <h2 id="plantdb.io.write_volume" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_volume</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_volume</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;tiff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_volume" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4262,7 +4262,7 @@ Defaults to <code>True</code>.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.io</span> <span class="kn">import</span> <span class="n">write_volume</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">Scan</span><span class="p">,</span> <span class="n">Fileset</span><span class="p">,</span> <span class="n">File</span>
@@ -4284,7 +4284,7 @@ Defaults to <code>True</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
 <span class="normal">553</span>
@@ -4379,7 +4379,7 @@ Defaults to <code>True</code>.</p>
 
 
 <h2 id="plantdb.io.write_voxel_grid" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_voxel_grid</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_voxel_grid</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.io.write_voxel_grid" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4453,7 +4453,7 @@ open3d.cuda.pybind.io.write_voxel_grid</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/io.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">853</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">853</span>
 <span class="normal">854</span>
 <span class="normal">855</span>
 <span class="normal">856</span>

@@ -1064,7 +1064,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">setup_test_database</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">setup_test_database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1 - Download and extract the &#39;real_plant&#39; test database to `plantdb/tests/testdata` module directory:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db_path</span> <span class="o">=</span> <span class="n">setup_test_database</span><span class="p">(</span><span class="s1">&#39;real_plant&#39;</span><span class="p">)</span>
 <span class="go">INFO     [plantdb.test_database] File &#39;real_plant.zip&#39; exists locally. Skipping download.</span>
@@ -1111,7 +1111,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <h2 id="plantdb.test_database.get_configs" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_configs</span><span class="p">(</span><span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_configs</span><span class="p">(</span><span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.test_database.get_configs" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1205,13 +1205,13 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_configs</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_configs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_configs</span><span class="p">()</span>  <span class="c1"># download and extract the pipeline configurations to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/test_database.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">301</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">301</span>
 <span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
@@ -1278,7 +1278,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <h2 id="plantdb.test_database.get_models_dataset" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_models_dataset</span><span class="p">(</span><span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_models_dataset</span><span class="p">(</span><span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.test_database.get_models_dataset" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1372,13 +1372,13 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_models_dataset</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_models_dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_models_dataset</span><span class="p">()</span>  <span class="c1"># download and extract the trained CNN models to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/test_database.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
 <span class="normal">274</span>
@@ -1445,7 +1445,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <h2 id="plantdb.test_database.get_test_dataset" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_test_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_test_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.test_database.get_test_dataset" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1553,13 +1553,13 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_test_dataset</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">get_test_dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_test_dataset</span><span class="p">()</span>  <span class="c1"># download and extract the test dataset to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/test_database.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
@@ -1630,7 +1630,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 <h2 id="plantdb.test_database.setup_test_database" class="doc doc-heading">
-          <code class=" language-python"><span class="n">setup_test_database</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_configs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">setup_test_database</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="n">keep_tmp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_configs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.test_database.setup_test_database" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1777,7 +1777,7 @@ See notes below for a list of dataset names and their meanings.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">setup_test_database</span><span class="p">,</span> <span class="n">TMP_TEST_DIR</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">setup_test_database</span><span class="p">,</span> <span class="n">TMP_TEST_DIR</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1 - Download and extract the &#39;real_plant&#39; test database to `plantdb/tests/testdata` module directory:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">setup_test_database</span><span class="p">(</span><span class="s1">&#39;real_plant&#39;</span><span class="p">)</span>
 <span class="go">PosixPath(&#39;/home/jonathan/Projects/plantdb/tests/testdata&#39;)</span>
@@ -1788,7 +1788,7 @@ See notes below for a list of dataset names and their meanings.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/test_database.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">331</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">331</span>
 <span class="normal">332</span>
 <span class="normal">333</span>
 <span class="normal">334</span>
@@ -1947,7 +1947,7 @@ See notes below for a list of dataset names and their meanings.</p>
 
 
 <h2 id="plantdb.test_database.test_database" class="doc doc-heading">
-          <code class=" language-python"><span class="n">test_database</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TMP_TEST_DIR</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">test_database</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">TMP_TEST_DIR</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.test_database.test_database" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2087,7 +2087,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">list_scans</span><span class="p">()</span>
@@ -2099,7 +2099,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 
           <details class="quote">
             <summary>Source code in <code>plantdb/test_database.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">407</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">407</span>
 <span class="normal">408</span>
 <span class="normal">409</span>
 <span class="normal">410</span>

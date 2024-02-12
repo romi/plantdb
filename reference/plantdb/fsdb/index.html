@@ -1956,7 +1956,7 @@ myscan_001/metadata/images/scan_img_99.json
 
 
 <h2 id="plantdb.fsdb.FSDB" class="doc doc-heading">
-            <code class=" language-python"><span class="n">FSDB</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">required_filesets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span></code>
+            <code class="highlight language-python"><span class="n">FSDB</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">required_filesets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span></code>
 
 <a href="#plantdb.fsdb.FSDB" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2045,7 +2045,7 @@ plantdb.fsdb.LOCK_FILE_NAME</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1: Use a temporary dummy local database:</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1: Use a temporary dummy local database:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">db</span><span class="p">))</span>
@@ -2060,7 +2060,7 @@ plantdb.fsdb.LOCK_FILE_NAME</p>
 <span class="go">&lt;class &#39;plantdb.fsdb.Scan&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </code></pre></div>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 2: Use a local database:</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 2: Use a local database:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ROMI_DB&#39;</span><span class="p">,</span> <span class="s2">&quot;/data/ROMI/DB/&quot;</span><span class="p">))</span>
@@ -2160,7 +2160,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
@@ -2262,7 +2262,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
 
 <h3 id="plantdb.fsdb.FSDB.connect" class="doc doc-heading">
-          <code class=" language-python"><span class="n">connect</span><span class="p">(</span><span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unsafe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">connect</span><span class="p">(</span><span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unsafe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.connect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2347,7 +2347,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
@@ -2360,7 +2360,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">322</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">322</span>
 <span class="normal">323</span>
 <span class="normal">324</span>
 <span class="normal">325</span>
@@ -2469,7 +2469,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
 
 <h3 id="plantdb.fsdb.FSDB.create_scan" class="doc doc-heading">
-          <code class=" language-python"><span class="n">create_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">create_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.create_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2565,7 +2565,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_scan</span><span class="p">(</span><span class="s1">&#39;007&#39;</span><span class="p">)</span>
@@ -2576,7 +2576,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">489</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">489</span>
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span>
@@ -2673,7 +2673,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.delete_scan" class="doc doc-heading">
-          <code class=" language-python"><span class="n">delete_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">delete_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.delete_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2743,7 +2743,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -2761,7 +2761,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">533</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">533</span>
 <span class="normal">534</span>
 <span class="normal">535</span>
 <span class="normal">536</span>
@@ -2854,7 +2854,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.disconnect" class="doc doc-heading">
-          <code class=" language-python"><span class="n">disconnect</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">disconnect</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.FSDB.disconnect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2891,7 +2891,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
 <span class="go">False</span>
@@ -2905,7 +2905,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">372</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">372</span>
 <span class="normal">373</span>
 <span class="normal">374</span>
 <span class="normal">375</span>
@@ -2990,7 +2990,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.get_scan" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.get_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3052,7 +3052,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">list_scans</span><span class="p">()</span>
@@ -3070,7 +3070,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">448</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">448</span>
 <span class="normal">449</span>
 <span class="normal">450</span>
 <span class="normal">451</span>
@@ -3161,7 +3161,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.get_scans" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_scans</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_scans</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.get_scans" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3231,7 +3231,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get_scans</span><span class="p">()</span>
@@ -3241,7 +3241,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">419</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
@@ -3308,7 +3308,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.list_scans" class="doc doc-heading">
-          <code class=" language-python"><span class="n">list_scans</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">list_scans</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.FSDB.list_scans" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3320,7 +3320,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">list_scans</span><span class="p">()</span>
@@ -3330,7 +3330,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">589</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">589</span>
 <span class="normal">590</span>
 <span class="normal">591</span>
 <span class="normal">592</span>
@@ -3369,7 +3369,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">path</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">path</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.FSDB.path" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3381,7 +3381,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">()</span>
@@ -3390,7 +3390,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
 <span class="normal">576</span>
 <span class="normal">577</span>
 <span class="normal">578</span>
@@ -3427,7 +3427,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.FSDB.reload" class="doc doc-heading">
-          <code class=" language-python"><span class="n">reload</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">reload</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.FSDB.reload" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3438,7 +3438,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">410</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">410</span>
 <span class="normal">411</span>
 <span class="normal">412</span>
 <span class="normal">413</span>
@@ -3473,7 +3473,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h2 id="plantdb.fsdb.File" class="doc doc-heading">
-            <code class=" language-python"><span class="n">File</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">File</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.File" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3567,7 +3567,7 @@ Else they are just referenced in the database!</p>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1325</span>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1325</span>
 <span class="normal">1326</span>
 <span class="normal">1327</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -3593,7 +3593,7 @@ Else they are just referenced in the database!</p>
 
 
 <h3 id="plantdb.fsdb.File.get_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
+          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
 
 <a href="#plantdb.fsdb.File.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3675,7 +3675,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">_file_metadata_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -3689,7 +3689,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1334</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1334</span>
 <span class="normal">1335</span>
 <span class="normal">1336</span>
 <span class="normal">1337</span>
@@ -3764,7 +3764,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.File.import_file" class="doc doc-heading">
-          <code class=" language-python"><span class="n">import_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">import_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.File.import_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3806,7 +3806,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">_file_metadata_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -3822,7 +3822,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1403</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1403</span>
 <span class="normal">1404</span>
 <span class="normal">1405</span>
 <span class="normal">1406</span>
@@ -3897,7 +3897,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.File.path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">path</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">path</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.File.path" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3909,7 +3909,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -3923,7 +3923,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1584</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1584</span>
 <span class="normal">1585</span>
 <span class="normal">1586</span>
 <span class="normal">1587</span>
@@ -3970,7 +3970,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.File.read" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">read</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.File.read" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4006,7 +4006,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -4029,7 +4029,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1510</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1510</span>
 <span class="normal">1511</span>
 <span class="normal">1512</span>
 <span class="normal">1513</span>
@@ -4108,7 +4108,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.File.read_raw" class="doc doc-heading">
-          <code class=" language-python"><span class="n">read_raw</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">read_raw</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.File.read_raw" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4168,7 +4168,7 @@ db.disconnect()</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1441</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1441</span>
 <span class="normal">1442</span>
 <span class="normal">1443</span>
 <span class="normal">1444</span>
@@ -4241,7 +4241,7 @@ db.disconnect()</p>
 
 
 <h3 id="plantdb.fsdb.File.set_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.File.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4298,7 +4298,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">_file_metadata_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -4317,7 +4317,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1367</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1367</span>
 <span class="normal">1368</span>
 <span class="normal">1369</span>
 <span class="normal">1370</span>
@@ -4398,7 +4398,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.File.store" class="doc doc-heading">
-          <code class=" language-python"><span class="n">store</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">store</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.File.store" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4409,7 +4409,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1436</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1436</span>
 <span class="normal">1437</span>
 <span class="normal">1438</span>
 <span class="normal">1439</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -4428,7 +4428,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.File.write" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.File.write" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4484,7 +4484,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -4506,7 +4506,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1545</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1545</span>
 <span class="normal">1546</span>
 <span class="normal">1547</span>
 <span class="normal">1548</span>
@@ -4593,7 +4593,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.File.write_raw" class="doc doc-heading">
-          <code class=" language-python"><span class="n">write_raw</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">write_raw</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.File.write_raw" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4649,7 +4649,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -4669,7 +4669,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1473</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1473</span>
 <span class="normal">1474</span>
 <span class="normal">1475</span>
 <span class="normal">1476</span>
@@ -4808,7 +4808,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h2 id="plantdb.fsdb.Fileset" class="doc doc-heading">
-            <code class=" language-python"><span class="n">Fileset</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">Fileset</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4946,7 +4946,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1012</span>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1012</span>
 <span class="normal">1013</span>
 <span class="normal">1014</span>
 <span class="normal">1015</span>
@@ -4992,7 +4992,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Fileset.create_file" class="doc doc-heading">
-          <code class=" language-python"><span class="n">create_file</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">create_file</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.create_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5058,7 +5058,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -5081,7 +5081,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1177</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1177</span>
 <span class="normal">1178</span>
 <span class="normal">1179</span>
 <span class="normal">1180</span>
@@ -5172,7 +5172,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Fileset.delete_file" class="doc doc-heading">
-          <code class=" language-python"><span class="n">delete_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">delete_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.delete_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5214,7 +5214,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -5233,7 +5233,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1218</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1218</span>
 <span class="normal">1219</span>
 <span class="normal">1220</span>
 <span class="normal">1221</span>
@@ -5312,7 +5312,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Fileset.get_file" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_file</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_file</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.get_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5393,7 +5393,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -5407,7 +5407,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1067</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1067</span>
 <span class="normal">1068</span>
 <span class="normal">1069</span>
 <span class="normal">1070</span>
@@ -5490,7 +5490,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.Fileset.get_files" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_files</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_files</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.get_files" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5560,7 +5560,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -5574,7 +5574,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1034</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1034</span>
 <span class="normal">1035</span>
 <span class="normal">1036</span>
 <span class="normal">1037</span>
@@ -5649,7 +5649,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.Fileset.get_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
+          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
 
 <a href="#plantdb.fsdb.Fileset.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5731,7 +5731,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -5750,7 +5750,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1104</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1104</span>
 <span class="normal">1105</span>
 <span class="normal">1106</span>
 <span class="normal">1107</span>
@@ -5835,7 +5835,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Fileset.list_files" class="doc doc-heading">
-          <code class=" language-python"><span class="n">list_files</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">list_files</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.list_files" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5847,7 +5847,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -5859,7 +5859,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1279</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1279</span>
 <span class="normal">1280</span>
 <span class="normal">1281</span>
 <span class="normal">1282</span>
@@ -5902,7 +5902,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Fileset.path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">path</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">path</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.Fileset.path" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5914,7 +5914,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">scan</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">scan</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scans</span><span class="p">()]</span>  <span class="c1"># list scan ids found in database</span>
@@ -5930,7 +5930,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1258</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1258</span>
 <span class="normal">1259</span>
 <span class="normal">1260</span>
 <span class="normal">1261</span>
@@ -5981,7 +5981,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Fileset.set_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Fileset.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -6038,7 +6038,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">_fileset_metadata_json_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -6056,7 +6056,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1142</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1142</span>
 <span class="normal">1143</span>
 <span class="normal">1144</span>
 <span class="normal">1145</span>
@@ -6135,7 +6135,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Fileset.store" class="doc doc-heading">
-          <code class=" language-python"><span class="n">store</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">store</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.Fileset.store" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -6146,7 +6146,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1253</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1253</span>
 <span class="normal">1254</span>
 <span class="normal">1255</span>
 <span class="normal">1256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -6221,7 +6221,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h2 id="plantdb.fsdb.Scan" class="doc doc-heading">
-            <code class=" language-python"><span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -6307,7 +6307,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">Scan</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
@@ -6334,7 +6334,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">)))</span>  <span class="c1"># Same goes for the metadata</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </code></pre></div>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example #2: Get it from an `FSDB` object:</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example #2: Get it from an `FSDB` object:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;007&#39;</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scan</span><span class="p">))</span>
@@ -6351,7 +6351,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;007&#39;</span><span class="p">))</span>
 <span class="go">None</span>
 </code></pre></div>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example #3: Use an existing database:</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example #3: Use an existing database:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ROMI_DB&#39;</span><span class="p">,</span> <span class="s2">&quot;/data/ROMI/DB/&quot;</span><span class="p">))</span>
@@ -6408,7 +6408,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">688</span>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">688</span>
 <span class="normal">689</span>
 <span class="normal">690</span>
 <span class="normal">691</span>
@@ -6460,7 +6460,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Scan.create_fileset" class="doc doc-heading">
-          <code class=" language-python"><span class="n">create_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">create_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.create_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -6556,7 +6556,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -6572,7 +6572,7 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">866</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">866</span>
 <span class="normal">867</span>
 <span class="normal">868</span>
 <span class="normal">869</span>
@@ -6681,7 +6681,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <h3 id="plantdb.fsdb.Scan.delete_fileset" class="doc doc-heading">
-          <code class=" language-python"><span class="n">delete_fileset</span><span class="p">(</span><span class="n">fileset_id</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">delete_fileset</span><span class="p">(</span><span class="n">fileset_id</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.delete_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -6723,7 +6723,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -6737,7 +6737,7 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">922</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">922</span>
 <span class="normal">923</span>
 <span class="normal">924</span>
 <span class="normal">925</span>
@@ -6808,7 +6808,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <h3 id="plantdb.fsdb.Scan.get_fileset" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.get_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -6894,7 +6894,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -6913,7 +6913,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">743</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">743</span>
 <span class="normal">744</span>
 <span class="normal">745</span>
 <span class="normal">746</span>
@@ -7016,7 +7016,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.get_filesets" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_filesets</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_filesets</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.get_filesets" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7086,7 +7086,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s1">&#39;myscan_001&#39;</span><span class="p">)</span>
@@ -7097,7 +7097,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">713</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">713</span>
 <span class="normal">714</span>
 <span class="normal">715</span>
 <span class="normal">716</span>
@@ -7166,7 +7166,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.get_measures" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_measures</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_measures</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.get_measures" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7237,7 +7237,7 @@ It is located at the root folder of the scan dataset.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">810</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">810</span>
 <span class="normal">811</span>
 <span class="normal">812</span>
 <span class="normal">813</span>
@@ -7290,7 +7290,7 @@ It is located at the root folder of the scan dataset.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.get_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
+          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span></code>
 
 <a href="#plantdb.fsdb.Scan.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7371,7 +7371,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">790</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">790</span>
 <span class="normal">791</span>
 <span class="normal">792</span>
 <span class="normal">793</span>
@@ -7420,7 +7420,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.list_filesets" class="doc doc-heading">
-          <code class=" language-python"><span class="n">list_filesets</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">list_filesets</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.list_filesets" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7432,7 +7432,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -7443,7 +7443,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">968</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">968</span>
 <span class="normal">969</span>
 <span class="normal">970</span>
 <span class="normal">971</span>
@@ -7484,7 +7484,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.path" class="doc doc-heading">
-          <code class=" language-python"><span class="n">path</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">path</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.Scan.path" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7496,7 +7496,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
@@ -7506,7 +7506,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">953</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">953</span>
 <span class="normal">954</span>
 <span class="normal">955</span>
 <span class="normal">956</span>
@@ -7545,7 +7545,7 @@ Else, returns the value attached to this key.</p>
 
 
 <h3 id="plantdb.fsdb.Scan.set_metadata" class="doc doc-heading">
-          <code class=" language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.Scan.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7602,7 +7602,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">_scan_metadata_path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -7619,7 +7619,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">832</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">832</span>
 <span class="normal">833</span>
 <span class="normal">834</span>
 <span class="normal">835</span>
@@ -7696,7 +7696,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h3 id="plantdb.fsdb.Scan.store" class="doc doc-heading">
-          <code class=" language-python"><span class="n">store</span><span class="p">()</span></code>
+          <code class="highlight language-python"><span class="n">store</span><span class="p">()</span></code>
 
 <a href="#plantdb.fsdb.Scan.store" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -7707,7 +7707,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">916</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">916</span>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
@@ -7738,7 +7738,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <h2 id="plantdb.fsdb.dummy_db" class="doc doc-heading">
-          <code class=" language-python"><span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_fileset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_fileset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#plantdb.fsdb.dummy_db" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -7832,7 +7832,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">dummy_db</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
@@ -7853,7 +7853,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
