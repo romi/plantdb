@@ -54,7 +54,7 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar
           docker image ls -a
-          docker run --rm ${{ steps.meta.outputs.tags[0] }} \
+          docker run --rm ${{ steps.meta.outputs.tags }}[0] \
             /bin/bash -c "echo "ROMI_DB=${ROMI_DB}" && shared_fsdb ${ROMI_DB} -d all"
       - name: Login to Docker Hub
         uses: docker/login-action@v3
