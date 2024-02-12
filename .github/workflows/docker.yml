@@ -58,7 +58,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: roboticsmicrofarms/plantdb
+          name: myimage
           path: /tmp/myimage.tar
 
   test_docker:
@@ -70,7 +70,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: roboticsmicrofarms/plantdb
+          name: myimage
           path: /tmp
       - name: Load image
         run: |
