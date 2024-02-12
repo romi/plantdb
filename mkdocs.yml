@@ -46,19 +46,22 @@ markdown_extensions:
   - attr_list
   - codehilite
   - footnotes
+  - toc:
+      permalink: Link
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
-  - pymdownx.tabbed:
-      alternate_style: true
-  - toc:
-      permalink: Link
+  - pymdownx.highlight:
+      use_pygments: true
+      pygments_lang_class: true
   - pymdownx.superfences:
       custom_fences:
         - name: python
           class: python
           validator: !!python/name:markdown_exec.validator
           format: !!python/name:markdown_exec.formatter
+  - pymdownx.tabbed:
+      alternate_style: true
 
 
 plugins:
@@ -68,7 +71,7 @@ plugins:
       scripts:
         - scripts/gen_ref_pages.py
   - literate-nav:
-     nav_file: SUMMARY.md
+      nav_file: SUMMARY.md
   - section-index
   - mkdocstrings:
       default_handler: python
