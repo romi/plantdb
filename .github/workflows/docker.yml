@@ -44,13 +44,13 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: myimage_${{ steps.meta.outputs.tags }}
+          name: myimage_${{ steps.meta.outputs.tags.split(':')[-1] }}
           path: /tmp/myimage.tar
           retention-days: 2
           overwrite: true
       - name: Test image
         run: |
-          docker run --rm roboticsmicrofarms/plantdb:${{ steps.meta.outputs.tags }} \
+          docker run --rm ${{ steps.meta.outputs.tags }} \
             /bin/bash -c "echo "ROMI_DB=${ROMI_DB}" && shared_fsdb ${ROMI_DB} -d all"
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -65,4 +65,4 @@ jobs:
           file: docker/Dockerfile
           tags: |
             ${{ steps.meta.outputs.tags }}
-            latest
+            ${{ steps.meta.outputs.tags.split(':')[0]+":latest" }}
