@@ -27,5 +27,5 @@ jobs:
         run: |
           conda install conda-build anaconda-client
           conda config --set anaconda_upload yes
-          ANACONDA_API_TOKEN=${{ secrets.ANACONDA_PWD }}
+          ANACONDA_API_TOKEN=${{ secrets.ANACONDA_TOKEN }}
           conda build conda/recipe/ -c conda-forge --user romi-eu
