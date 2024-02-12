@@ -1,7 +1,7 @@
 site_name: PlantDB
 site_description: PlantDB documentation.
 site_author: ROMI Team
-site_url: https://docs.romi-project.eu/
+site_url: https://romi.github.io/plantdb/
 copyright: 'CC Attribution-NonCommercial-ShareAlike 4.0 International'
 repo_url: https://github.com/romi/plantdb
 
@@ -27,7 +27,7 @@ theme:
 
 
 extra:
-  homepage: https://docs.romi-project.eu/
+  homepage: https://romi.github.io/plantdb/
   social:
     - icon: fontawesome/brands/twitter
       link: 'https://twitter.com/ROMI_EU_PROJECT'
