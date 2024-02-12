@@ -1,12 +1,13 @@
 # This workflow will build the Docker image and publish it to Docker Hub in the 'roboticsmicrofarms' repo.
 
+# Github context:
+#   https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
 # This action is inspired from official GitHub doc:
 #  https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-docker-hub
-# Metadata configuration here:
-#  https://github.com/docker/metadata-action
-# Build & push job configuration here:
-#  https://github.com/docker/build-push-action
-# https://github.com/docker/login-action
+# -- Metadata configuration here:
+#  https://github.com/marketplace/actions/docker-metadata-action
+# -- Build & push job configuration here:
+#  https://github.com/marketplace/actions/build-and-push-docker-images
 
 name: Docker image
 
@@ -33,14 +34,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
-        # https://github.com/marketplace/actions/docker-metadata-action
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: roboticsmicrofarms/plantdb
           tags: type=sha,format=short,prefix=
       - name: Build and push
-        # https://github.com/marketplace/actions/build-and-push-docker-images
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -48,7 +47,6 @@ jobs:
           file: docker/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
       - name: Cache docker image
-        # https://github.com/marketplace/actions/build-and-push-docker-images
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -76,10 +74,15 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar
           docker image ls -a
-      - name: Test
+      - name: Test image
         run: |
           docker run --rm ${{ steps.meta.outputs.tags }} \
-            -c "export ROMI_DB='/myapp/db' && mkdir -p $ROMI_DB && shared_fsdb $ROMI_DB -d all"
+            /bin/bash -c "export ROMI_DB='/myapp/db' && mkdir -p $ROMI_DB && shared_fsdb $ROMI_DB -d all"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push as latest
         uses: docker/build-push-action@v5
         with:
