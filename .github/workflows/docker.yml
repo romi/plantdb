@@ -54,7 +54,6 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar
           docker image ls -a
-          echo "SHA=${{sha}}"
           docker run --rm roboticsmicrofarms/plantdb:latest \
             /bin/bash -c 'shared_fsdb $ROMI_DB -d all'
       - name: Login to Docker Hub
