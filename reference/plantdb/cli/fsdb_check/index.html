@@ -1042,7 +1042,7 @@
 
 
 <h2 id="plantdb.cli.fsdb_check.backup_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">backup_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></code>
+          <code class="highlight language-python">backup_file(file)</code>
 
 <a href="#plantdb.cli.fsdb_check.backup_file" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1083,27 +1083,27 @@
 
           <details class="quote">
             <summary>Source code in <code>plantdb/cli/fsdb_check.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">backup_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backup a file by creating a timestamped copy.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">57</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">58</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">59</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">60</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">61</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">62</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">backup_file</span>(file):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Backup a file by creating a timestamped copy.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    file : str or pathlib.Path</span>
-<span class="sd">        The path to the file to backup.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">bak_fname</span> <span class="o">=</span> <span class="n">backup_filename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-    <span class="n">copy</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">bak_fname</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">bak_fname</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    file : str or pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the file to backup.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    bak_fname <span style="color: #666666">=</span> backup_filename(file)
+    copy(file, bak_fname)
+    <span style="color: #008000; font-weight: bold">return</span> bak_fname
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1116,7 +1116,7 @@
 
 
 <h2 id="plantdb.cli.fsdb_check.backup_filename" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">backup_filename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></code>
+          <code class="highlight language-python">backup_filename(file)</code>
 
 <a href="#plantdb.cli.fsdb_check.backup_filename" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1158,47 +1158,47 @@
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">backup_filename</span><span class="p">(</span><span class="s2">&quot;test/file.json&quot;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;test/file_230601_105815.json&#39;)</span>
+    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>backup_filename(<span style="color: #BA2121">&quot;test/file.json&quot;</span>)
+<span style="color: #717171">PosixPath(&#39;test/file_230601_105815.json&#39;)</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/cli/fsdb_check.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">backup_filename</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a backup a filename by adding a timestamp.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">37</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">38</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">39</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">40</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">41</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">42</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">43</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">44</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">45</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">46</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">47</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">48</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">49</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">50</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">51</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">52</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">53</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">54</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">backup_filename</span>(file):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a backup a filename by adding a timestamp.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    file : str or pathlib.Path</span>
-<span class="sd">        The path to the file to backup.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    file : str or pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the file to backup.</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; backup_filename(&quot;test/file.json&quot;)</span>
-<span class="sd">    PosixPath(&#39;test/file_230601_105815.json&#39;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">)</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">stem</span>
-    <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="n">with_stem</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; backup_filename(&quot;test/file.json&quot;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;test/file_230601_105815.json&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    file <span style="color: #666666">=</span> Path(file)
+    now <span style="color: #666666">=</span> datetime<span style="color: #666666">.</span>datetime<span style="color: #666666">.</span>now()
+    timestamp <span style="color: #666666">=</span> now<span style="color: #666666">.</span>strftime(<span style="color: #BA2121">&quot;%y%m</span><span style="color: #A45A77; font-weight: bold">%d</span><span style="color: #BA2121">_%H%M%S&quot;</span>)
+    fname <span style="color: #666666">=</span> file<span style="color: #666666">.</span>stem
+    <span style="color: #008000; font-weight: bold">return</span> file<span style="color: #666666">.</span>with_stem(<span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>fname<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">_</span><span style="color: #A45A77; font-weight: bold">{</span>timestamp<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1211,7 +1211,7 @@
 
 
 <h2 id="plantdb.cli.fsdb_check.same_jsons" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">same_jsons</span><span class="p">(</span><span class="n">file_a</span><span class="p">,</span> <span class="n">file_b</span><span class="p">)</span></code>
+          <code class="highlight language-python">same_jsons(file_a, file_b)</code>
 
 <a href="#plantdb.cli.fsdb_check.same_jsons" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1222,21 +1222,21 @@
 
           <details class="quote">
             <summary>Source code in <code>plantdb/cli/fsdb_check.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">same_jsons</span><span class="p">(</span><span class="n">file_a</span><span class="p">,</span> <span class="n">file_b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test if two JSON files have the same content.&quot;&quot;&quot;</span>
-    <span class="c1"># Basic check, maybe using a third-party lib like `deepdiff` could give more insight.</span>
-    <span class="n">file_a</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_a</span><span class="p">)</span>
-    <span class="n">file_b</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_b</span><span class="p">)</span>
-    <span class="n">json_a</span> <span class="o">=</span> <span class="n">_load_json</span><span class="p">(</span><span class="n">file_a</span><span class="p">)</span>
-    <span class="n">json_b</span> <span class="o">=</span> <span class="n">_load_json</span><span class="p">(</span><span class="n">file_b</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">json_a</span> <span class="o">==</span> <span class="n">json_b</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">80</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">same_jsons</span>(file_a, file_b) <span style="color: #666666">-&gt;</span> <span style="color: #008000">bool</span>:
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Test if two JSON files have the same content.&quot;&quot;&quot;</span>
+    <span style="color: #3D7B7B; font-style: italic"># Basic check, maybe using a third-party lib like `deepdiff` could give more insight.</span>
+    file_a <span style="color: #666666">=</span> Path(file_a)
+    file_b <span style="color: #666666">=</span> Path(file_b)
+    json_a <span style="color: #666666">=</span> _load_json(file_a)
+    json_b <span style="color: #666666">=</span> _load_json(file_b)
+    <span style="color: #008000; font-weight: bold">return</span> json_a <span style="color: #666666">==</span> json_b
 </code></pre></div></td></tr></table></div>
           </details>
   </div>

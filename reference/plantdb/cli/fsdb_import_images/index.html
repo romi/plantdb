@@ -1008,7 +1008,7 @@
 
 
 <h2 id="plantdb.cli.fsdb_import_images.list_image_files" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">list_image_files</span><span class="p">(</span><span class="n">images_path</span><span class="p">)</span></code>
+          <code class="highlight language-python">list_image_files(images_path)</code>
 
 <a href="#plantdb.cli.fsdb_import_images.list_image_files" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1073,35 +1073,35 @@
 
           <details class="quote">
             <summary>Source code in <code>plantdb/cli/fsdb_import_images.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">list_image_files</span><span class="p">(</span><span class="n">images_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;List image files in the path.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">43</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">44</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">45</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">46</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">47</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">48</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">49</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">50</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">51</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">52</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">53</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">54</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">55</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">56</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">57</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_image_files</span>(images_path):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List image files in the path.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    images_path : pathlib.Path</span>
-<span class="sd">        The path to the folder containing the dataset.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    images_path : pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the folder containing the dataset.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list</span>
-<span class="sd">        The list of image files, selected by their extensions.</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    list</span>
+<span style="color: #BA2121; font-style: italic">        The list of image files, selected by their extensions.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">images_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">IMG_EXT</span><span class="p">]</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> [f <span style="color: #008000; font-weight: bold">for</span> f <span style="color: #AA22FF; font-weight: bold">in</span> images_path<span style="color: #666666">.</span>iterdir() <span style="color: #008000; font-weight: bold">if</span> f<span style="color: #666666">.</span>suffix <span style="color: #AA22FF; font-weight: bold">in</span> IMG_EXT]
 </code></pre></div></td></tr></table></div>
           </details>
   </div>

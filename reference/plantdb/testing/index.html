@@ -1367,7 +1367,7 @@
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.get_test_db" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_db</span><span class="p">(</span><span class="n">db_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_test_db(db_path<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.get_test_db" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1433,45 +1433,45 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the test ``FSDB`` database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 95</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_db</span>(<span style="color: #008000">self</span>, db_path<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the test ``FSDB`` database.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db_path : str, optional</span>
-<span class="sd">        If `None` (default), return the dummy database.</span>
-<span class="sd">        Else, should be the location of the source database to clone in the temporary folder.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db_path : str, optional</span>
+<span style="color: #BA2121; font-style: italic">        If `None` (default), return the dummy database.</span>
+<span style="color: #BA2121; font-style: italic">        Else, should be the location of the source database to clone in the temporary folder.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.FSDB</span>
-<span class="sd">        The database to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">db_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmpclone</span> <span class="o">=</span> <span class="n">TemporaryCloneDB</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpclone</span><span class="o">.</span><span class="n">tmpdir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">if</span> db_path <span style="color: #AA22FF; font-weight: bold">is</span> <span style="color: #AA22FF; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
+        <span style="color: #008000">self</span><span style="color: #666666">.</span>tmpclone <span style="color: #666666">=</span> TemporaryCloneDB(db_path)
+        <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> FSDB(<span style="color: #008000">self</span><span style="color: #666666">.</span>tmpclone<span style="color: #666666">.</span>tmpdir<span style="color: #666666">.</span>name)
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>connect()
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>db
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1484,7 +1484,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.get_test_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_fileset</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_test_fileset()</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.get_test_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1519,27 +1519,27 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">127</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">128</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_fileset</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.Scan</span>
-<span class="sd">        The default fileset instance to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_scan</span><span class="p">()</span>
-    <span class="n">fileset</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="s2">&quot;fileset_001&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fileset</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The default fileset instance to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_scan()
+    fileset <span style="color: #666666">=</span> scan<span style="color: #666666">.</span>get_fileset(<span style="color: #BA2121">&quot;fileset_001&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> fileset
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1552,7 +1552,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.get_test_image_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_image_file</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_test_image_file()</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.get_test_image_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1587,27 +1587,27 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_image_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the default test ``File`` object named &#39;test_image&#39;.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_image_file</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``File`` object named &#39;test_image&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.File</span>
-<span class="sd">        The default image file instance to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fileset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_fileset</span><span class="p">()</span>
-    <span class="n">file</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">&quot;test_image&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">file</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.File</span>
+<span style="color: #BA2121; font-style: italic">        The default image file instance to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    fileset <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_fileset()
+    file <span style="color: #666666">=</span> fileset<span style="color: #666666">.</span>get_file(<span style="color: #BA2121">&quot;test_image&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> file
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1620,7 +1620,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.get_test_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_scan</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_test_scan()</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.get_test_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1655,27 +1655,27 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;myscan_001&#39;.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">115</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;myscan_001&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.Scan</span>
-<span class="sd">        The default scan instance to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_db</span><span class="p">()</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;myscan_001&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">scan</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The default scan instance to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    db <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_db()
+    scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> scan
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1688,7 +1688,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.setUp" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setUp</span><span class="p">()</span></code>
+          <code class="highlight language-python">setUp()</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.setUp" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1699,13 +1699,13 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up a dummy database with fake scan, fileset &amp; files.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">dummy_db</span><span class="p">(</span><span class="n">with_scan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_fileset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">tmpclone</span> <span class="o">=</span> <span class="kc">None</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">setUp</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Set up a dummy database with fake scan, fileset &amp; files.&quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_fileset<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>tmpclone <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">None</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1718,7 +1718,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.DummyDBTestCase.tearDown" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">tearDown</span><span class="p">()</span></code>
+          <code class="highlight language-python">tearDown()</code>
 
 <a href="#plantdb.testing.DummyDBTestCase.tearDown" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1729,21 +1729,21 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up after test.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">return</span>
-    <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">rmtree</span>
-    <span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">tearDown</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Clean up after test.&quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">try</span>:
+        <span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>disconnect()
+    <span style="color: #008000; font-weight: bold">except</span>:
+        <span style="color: #008000; font-weight: bold">return</span>
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">shutil</span> <span style="color: #008000; font-weight: bold">import</span> rmtree
+    rmtree(<span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>path(), ignore_errors<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1822,7 +1822,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.get_task_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_task_fileset</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_task_fileset(task_name)</code>
 
 <a href="#plantdb.testing.FSDBTestCase.get_task_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1887,35 +1887,35 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_task_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the fileset for the corresponding task.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_task_fileset</span>(<span style="color: #008000">self</span>, task_name):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the fileset for the corresponding task.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    task_name : str</span>
-<span class="sd">        The name of the task to get the fileset for.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    task_name : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the task to get the fileset for.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.fsdb.Fileset</span>
-<span class="sd">        The ``Fileset`` corresponding to the given task.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_scan</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_task_fileset_id</span><span class="p">(</span><span class="n">task_name</span><span class="p">))</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.fsdb.Fileset</span>
+<span style="color: #BA2121; font-style: italic">        The ``Fileset`` corresponding to the given task.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_scan()
+    <span style="color: #008000; font-weight: bold">return</span> scan<span style="color: #666666">.</span>get_fileset(<span style="color: #008000">self</span><span style="color: #666666">.</span>get_task_fileset_id(task_name))
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1928,7 +1928,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.get_task_fileset_id" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_task_fileset_id</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_task_fileset_id(task_name)</code>
 
 <a href="#plantdb.testing.FSDBTestCase.get_task_fileset_id" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1993,35 +1993,35 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_task_fileset_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the fileset id for the corresponding task.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">203</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">204</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">207</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_task_fileset_id</span>(<span style="color: #008000">self</span>, task_name):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the fileset id for the corresponding task.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    task_name : str</span>
-<span class="sd">        The name of the task to get the fileset for.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    task_name : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the task to get the fileset for.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The ``Fileset`` name corresponding to the given task.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_scan</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">locate_task_filesets</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="p">[</span><span class="n">task_name</span><span class="p">])[</span><span class="n">task_name</span><span class="p">]</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The ``Fileset`` name corresponding to the given task.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_scan()
+    <span style="color: #008000; font-weight: bold">return</span> locate_task_filesets(scan, [task_name])[task_name]
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2034,7 +2034,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.get_test_db" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_db</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_test_db()</code>
 
 <a href="#plantdb.testing.FSDBTestCase.get_test_db" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2045,13 +2045,13 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_db</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FSDB</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the test ``FSDB`` database.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_db</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> FSDB:
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the test ``FSDB`` database.&quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>connect()
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>db
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2064,7 +2064,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.get_test_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_fileset</span><span class="p">(</span><span class="n">fs_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_test_fileset(fs_id, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)</code>
 
 <a href="#plantdb.testing.FSDBTestCase.get_test_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2099,27 +2099,27 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">187</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">188</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">191</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_fileset</span>(<span style="color: #008000">self</span>, fs_id, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.Scan</span>
-<span class="sd">        The default fileset instance to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_scan</span><span class="p">()</span>
-    <span class="n">fileset</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">fs_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="n">create</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fileset</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The default fileset instance to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_scan()
+    fileset <span style="color: #666666">=</span> scan<span style="color: #666666">.</span>get_fileset(fs_id, create<span style="color: #666666">=</span>create)
+    <span style="color: #008000; font-weight: bold">return</span> fileset
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2132,7 +2132,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.get_test_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_test_scan</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_test_scan()</code>
 
 <a href="#plantdb.testing.FSDBTestCase.get_test_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2167,27 +2167,27 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;real_plant_analyzed&#39;.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">179</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">180</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">185</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_test_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;real_plant_analyzed&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.fsdb.Scan</span>
-<span class="sd">        The default ``Scan`` instance to test.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_db</span><span class="p">()</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="s2">&quot;real_plant_analyzed&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">scan</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.fsdb.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The default ``Scan`` instance to test.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    db <span style="color: #666666">=</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>get_test_db()
+    scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;real_plant_analyzed&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> scan
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2200,7 +2200,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.setUp" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setUp</span><span class="p">()</span></code>
+          <code class="highlight language-python">setUp()</code>
 
 <a href="#plantdb.testing.FSDBTestCase.setUp" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2211,11 +2211,11 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up a test database with the &#39;real_plant_analyzed&#39; dataset.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">setUp</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Set up a test database with the &#39;real_plant_analyzed&#39; dataset.&quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> test_database(<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2228,7 +2228,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h3 id="plantdb.testing.FSDBTestCase.tearDown" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">tearDown</span><span class="p">()</span></code>
+          <code class="highlight language-python">tearDown()</code>
 
 <a href="#plantdb.testing.FSDBTestCase.tearDown" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2239,21 +2239,21 @@ Else, should be the location of the source database to clone in the temporary fo
 
           <details class="quote">
             <summary>Source code in <code>plantdb/testing.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up after test.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">rmtree</span>
-    <span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">tearDown</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Clean up after test.&quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">try</span>:
+        <span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>disconnect()
+    <span style="color: #008000; font-weight: bold">except</span>:
+        <span style="color: #008000; font-weight: bold">pass</span>
+    <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">shutil</span> <span style="color: #008000; font-weight: bold">import</span> rmtree
+    rmtree(<span style="color: #008000">self</span><span style="color: #666666">.</span>db<span style="color: #666666">.</span>path(), ignore_errors<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2274,7 +2274,7 @@ Else, should be the location of the source database to clone in the temporary fo
 
 
 <h2 id="plantdb.testing.TemporaryCloneDB" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">TemporaryCloneDB</span><span class="p">(</span><span class="n">db_location</span><span class="p">)</span></code>
+            <code class="highlight language-python">TemporaryCloneDB(db_location)</code>
 
 <a href="#plantdb.testing.TemporaryCloneDB" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2344,11 +2344,11 @@ Else, should be the location of the source database to clone in the temporary fo
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/testing.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_location</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">tmpdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">db_location</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmpdir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">54</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">55</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">56</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, db_location):
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>tmpdir <span style="color: #666666">=</span> tempfile<span style="color: #666666">.</span>TemporaryDirectory()
+    shutil<span style="color: #666666">.</span>copytree(db_location, <span style="color: #008000">self</span><span style="color: #666666">.</span>tmpdir<span style="color: #666666">.</span>name)
 </code></pre></div></td></tr></table></div>
                 </details>
 

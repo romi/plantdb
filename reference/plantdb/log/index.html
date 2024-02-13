@@ -1022,7 +1022,7 @@
 
 
 <h2 id="plantdb.log.configure_logger" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">configure_logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">configure_logger(name, log_path<span style="color: #666666">=</span><span style="color: #BA2121">&#39;&#39;</span>, log_level<span style="color: #666666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>)</code>
 
 <a href="#plantdb.log.configure_logger" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1093,79 +1093,79 @@ Defaults to <code>'INFO'</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/log.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a configured logger.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 79</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 80</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 88</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 89</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 95</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">configure_logger</span>(name, log_path<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>, log_level<span style="color: #666666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return a configured logger.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    name : str</span>
-<span class="sd">        The name of the logger.</span>
-<span class="sd">    log_path : str</span>
-<span class="sd">        A file path to save the log.</span>
-<span class="sd">        Defaults to `&#39;&#39;`.</span>
-<span class="sd">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
-<span class="sd">        A valid logging level.</span>
-<span class="sd">        Defaults to `&#39;INFO&#39;`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">colored_formatter</span> <span class="o">=</span> <span class="n">ColoredFormatter</span><span class="p">(</span>
-        <span class="s2">&quot;</span><span class="si">%(log_color)s%(levelname)-8s%(reset)s</span><span class="s2"> </span><span class="si">%(bg_blue)s</span><span class="s2">[</span><span class="si">%(name)s</span><span class="s2">]</span><span class="si">%(reset)s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">datefmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">style</span><span class="o">=</span><span class="s1">&#39;%&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">simple_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(lineno)d</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    name : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the logger.</span>
+<span style="color: #BA2121; font-style: italic">    log_path : str</span>
+<span style="color: #BA2121; font-style: italic">        A file path to save the log.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
+<span style="color: #BA2121; font-style: italic">        A valid logging level.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;INFO&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    colored_formatter <span style="color: #666666">=</span> ColoredFormatter(
+        <span style="color: #BA2121">&quot;</span><span style="color: #A45A77; font-weight: bold">%(log_color)s%(levelname)-8s%(reset)s</span><span style="color: #BA2121"> </span><span style="color: #A45A77; font-weight: bold">%(bg_blue)s</span><span style="color: #BA2121">[</span><span style="color: #A45A77; font-weight: bold">%(name)s</span><span style="color: #BA2121">]</span><span style="color: #A45A77; font-weight: bold">%(reset)s</span><span style="color: #BA2121"> </span><span style="color: #A45A77; font-weight: bold">%(message)s</span><span style="color: #BA2121">&quot;</span>,
+        datefmt<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>,
+        reset<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>,
+        style<span style="color: #666666">=</span><span style="color: #BA2121">&#39;%&#39;</span>,
+    )
+    simple_formatter <span style="color: #666666">=</span> logging<span style="color: #666666">.</span>Formatter(<span style="color: #BA2121">&quot;</span><span style="color: #A45A77; font-weight: bold">%(asctime)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(levelname)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(name)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(lineno)d</span><span style="color: #BA2121">: </span><span style="color: #A45A77; font-weight: bold">%(message)s</span><span style="color: #BA2121">&quot;</span>)
 
-    <span class="c1"># create console handler:</span>
-    <span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">colored_formatter</span><span class="p">)</span>
+    <span style="color: #3D7B7B; font-style: italic"># create console handler:</span>
+    console <span style="color: #666666">=</span> logging<span style="color: #666666">.</span>StreamHandler()
+    console<span style="color: #666666">.</span>setFormatter(colored_formatter)
 
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="p">))</span>
+    logger <span style="color: #666666">=</span> logging<span style="color: #666666">.</span>getLogger(name)
+    logger<span style="color: #666666">.</span>addHandler(console)
+    logger<span style="color: #666666">.</span>setLevel(<span style="color: #008000">getattr</span>(logging, log_level))
 
-    <span class="k">if</span> <span class="n">log_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">log_path</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-        <span class="c1"># create file handler:</span>
-        <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">log_path</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.log&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-        <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">simple_formatter</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+    <span style="color: #008000; font-weight: bold">if</span> log_path <span style="color: #AA22FF; font-weight: bold">is</span> <span style="color: #AA22FF; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #AA22FF; font-weight: bold">and</span> log_path <span style="color: #666666">!=</span> <span style="color: #BA2121">&quot;&quot;</span>:
+        <span style="color: #3D7B7B; font-style: italic"># create file handler:</span>
+        fh <span style="color: #666666">=</span> logging<span style="color: #666666">.</span>FileHandler(Path(log_path) <span style="color: #666666">/</span> <span style="color: #BA2121">f&#39;</span><span style="color: #A45A77; font-weight: bold">{</span>name<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.log&#39;</span>, mode<span style="color: #666666">=</span><span style="color: #BA2121">&#39;w&#39;</span>)
+        fh<span style="color: #666666">.</span>setFormatter(simple_formatter)
+        logger<span style="color: #666666">.</span>addHandler(fh)
 
-    <span class="k">return</span> <span class="n">logger</span>
+    <span style="color: #008000; font-weight: bold">return</span> logger
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1178,7 +1178,7 @@ Defaults to <code>'INFO'</code>.</p>
 
 
 <h2 id="plantdb.log.get_logging_config" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_logging_config</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_logging_config(name<span style="color: #666666">=</span><span style="color: #BA2121">&#39;root&#39;</span>, log_level<span style="color: #666666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>)</code>
 
 <a href="#plantdb.log.get_logging_config" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1235,31 +1235,31 @@ Defaults to <code>'INFO'</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/log.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_logging_config</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the logging configuration.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">61</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">62</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">70</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_logging_config</span>(name<span style="color: #666666">=</span><span style="color: #BA2121">&#39;root&#39;</span>, log_level<span style="color: #666666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the logging configuration.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    name : str</span>
-<span class="sd">        The name of the logger.</span>
-<span class="sd">        Defaults to `&#39;root&#39;`.</span>
-<span class="sd">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
-<span class="sd">        A valid logging level.</span>
-<span class="sd">        Defaults to `&#39;INFO&#39;`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">LOGGING_CFG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">log_level</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    name : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the logger.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;root&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
+<span style="color: #BA2121; font-style: italic">        A valid logging level.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;INFO&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> LOGGING_CFG<span style="color: #666666">.</span>format(name, log_level)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>

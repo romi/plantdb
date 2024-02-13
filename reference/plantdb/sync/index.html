@@ -1070,7 +1070,7 @@
 
 
 <h2 id="plantdb.sync.FSDBSync" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">FSDBSync</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></code>
+            <code class="highlight language-python">FSDBSync(source, target)</code>
 
 <a href="#plantdb.sync.FSDBSync" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1191,33 +1191,33 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/sync.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class constructor.</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">70</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">74</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">75</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, source, target):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Class constructor.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    source : str</span>
-<span class="sd">        Source database path (remote or local)</span>
-<span class="sd">    target : str</span>
-<span class="sd">        Target database path (remote or local)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">source_str</span> <span class="o">=</span> <span class="n">source</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">target_str</span> <span class="o">=</span> <span class="n">target</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">_fmt_path</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">_fmt_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    source : str</span>
+<span style="color: #BA2121; font-style: italic">        Source database path (remote or local)</span>
+<span style="color: #BA2121; font-style: italic">    target : str</span>
+<span style="color: #BA2121; font-style: italic">        Target database path (remote or local)</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>source_str <span style="color: #666666">=</span> source
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>target_str <span style="color: #666666">=</span> target
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>source <span style="color: #666666">=</span> _fmt_path(source)
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>target <span style="color: #666666">=</span> _fmt_path(target)
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -1239,7 +1239,7 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
 
 <h3 id="plantdb.sync.FSDBSync.lock" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">lock</span><span class="p">()</span></code>
+          <code class="highlight language-python">lock()</code>
 
 <a href="#plantdb.sync.FSDBSync.lock" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1250,19 +1250,19 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lock the source and target DB before sync.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
-            <span class="n">_lock_local</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;remove&quot;</span><span class="p">:</span>
-            <span class="n">_lock_remote</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">lock</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Lock the source and target DB before sync.&quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">for</span> x <span style="color: #AA22FF; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666666">.</span>source, <span style="color: #008000">self</span><span style="color: #666666">.</span>target]:
+        <span style="color: #008000; font-weight: bold">if</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
+            _lock_local(x)
+        <span style="color: #008000; font-weight: bold">elif</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;remove&quot;</span>:
+            _lock_remote(x)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1275,7 +1275,7 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
 
 <h3 id="plantdb.sync.FSDBSync.sync" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">sync</span><span class="p">()</span></code>
+          <code class="highlight language-python">sync()</code>
 
 <a href="#plantdb.sync.FSDBSync.sync" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1286,15 +1286,15 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sync the two DBs.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;rsync&quot;</span><span class="p">,</span> <span class="s2">&quot;-av&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_str</span><span class="p">])</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">sync</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sync the two DBs.&quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>lock()
+    subprocess<span style="color: #666666">.</span>run([<span style="color: #BA2121">&quot;rsync&quot;</span>, <span style="color: #BA2121">&quot;-av&quot;</span>, <span style="color: #008000">self</span><span style="color: #666666">.</span>source_str, <span style="color: #008000">self</span><span style="color: #666666">.</span>target_str])
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>unlock()
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1307,7 +1307,7 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
 
 <h3 id="plantdb.sync.FSDBSync.unlock" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">unlock</span><span class="p">()</span></code>
+          <code class="highlight language-python">unlock()</code>
 
 <a href="#plantdb.sync.FSDBSync.unlock" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1318,19 +1318,19 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unlock the source and target DB after sync.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
-            <span class="n">_unlock_local</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;remove&quot;</span><span class="p">:</span>
-            <span class="n">_unlock_remote</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">80</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">unlock</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Unlock the source and target DB after sync.&quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">for</span> x <span style="color: #AA22FF; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666666">.</span>source, <span style="color: #008000">self</span><span style="color: #666666">.</span>target]:
+        <span style="color: #008000; font-weight: bold">if</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
+            _unlock_local(x)
+        <span style="color: #008000; font-weight: bold">elif</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;remove&quot;</span>:
+            _unlock_remote(x)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>

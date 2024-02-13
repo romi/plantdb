@@ -1742,7 +1742,7 @@
 
 
 <h2 id="plantdb.db.DB" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DB</span><span class="p">()</span></code>
+            <code class="highlight language-python">DB()</code>
 
 <a href="#plantdb.db.DB" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1758,9 +1758,9 @@ ROMI project.</p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/db.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">pass</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">46</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">47</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>):
+    <span style="color: #008000; font-weight: bold">pass</span>
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -1782,7 +1782,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.connect" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">connect</span><span class="p">(</span><span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">connect(login_data<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.DB.connect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1847,31 +1847,31 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">login_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect to the database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">49</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">50</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">51</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">52</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">53</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">54</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">55</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">56</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">57</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">58</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">59</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">60</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">61</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">connect</span>(<span style="color: #008000">self</span>, login_data<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Connect to the database.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    login_data : list or dict, optional</span>
-<span class="sd">        Use this to access to a ``DB`` with credentials.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    login_data : list or dict, optional</span>
+<span style="color: #BA2121; font-style: italic">        Use this to access to a ``DB`` with credentials.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1884,7 +1884,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.create_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python">create_scan(<span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.DB.create_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1949,31 +1949,31 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new scan object in the database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new scan object in the database.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the scan to retrieve</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the scan to retrieve</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1986,7 +1986,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.delete_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">delete_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python">delete_scan(<span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.DB.delete_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2051,31 +2051,31 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a scan from the DB.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">115</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete a scan from the DB.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the scan to delete</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the scan to delete</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2088,7 +2088,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.disconnect" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">disconnect</span><span class="p">()</span></code>
+          <code class="highlight language-python">disconnect()</code>
 
 <a href="#plantdb.db.DB.disconnect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2123,21 +2123,21 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disconnect from the database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">70</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">disconnect</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Disconnect from the database.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2150,7 +2150,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.get_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_scan</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_scan(<span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)</code>
 
 <a href="#plantdb.db.DB.get_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2229,35 +2229,35 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a scan saved in the database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">95</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get a scan saved in the database.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the scan instance to retrieve.</span>
-<span class="sd">    create : bool, optional</span>
-<span class="sd">        Create the scan if it does not exist, default to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the scan instance to retrieve.</span>
+<span style="color: #BA2121; font-style: italic">    create : bool, optional</span>
+<span style="color: #BA2121; font-style: italic">        Create the scan if it does not exist, default to ``False``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2270,7 +2270,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.DB.get_scans" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_scans</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_scans()</code>
 
 <a href="#plantdb.db.DB.get_scans" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2305,21 +2305,21 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the list of scans saved in the database.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">74</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">75</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scans</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of scans saved in the database.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2340,7 +2340,7 @@ ROMI project.</p>
 
 
 <h2 id="plantdb.db.DBBusyError" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DBBusyError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></code>
+            <code class="highlight language-python">DBBusyError(message)</code>
 
 <a href="#plantdb.db.DBBusyError" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2355,9 +2355,9 @@ ROMI project.</p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/db.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">607</span>
-<span class="normal">608</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">607</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">608</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, message):
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>message <span style="color: #666666">=</span> message
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -2387,7 +2387,7 @@ ROMI project.</p>
 
 
 <h2 id="plantdb.db.File" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">File</span><span class="p">(</span><span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python">File(fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs)</code>
 
 <a href="#plantdb.db.File" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2533,47 +2533,47 @@ ROMI project.</p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/db.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Constructor.</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">435</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">436</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">441</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">442</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">443</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">453</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Constructor.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fileset : plantdb.db.Fileset</span>
-<span class="sd">        Instance containing the file.</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the file instance.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    fileset : plantdb.db.Fileset</span>
+<span style="color: #BA2121; font-style: italic">        Instance containing the file.</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the file instance.</span>
 
-<span class="sd">    Other Parameters</span>
-<span class="sd">    ----------------</span>
-<span class="sd">    ext : str</span>
-<span class="sd">        The extension of the file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">get_db</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">scan</span> <span class="o">=</span> <span class="n">fileset</span><span class="o">.</span><span class="n">get_scan</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span> <span class="o">=</span> <span class="n">fileset</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ext&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="nb">id</span> <span class="o">+</span> <span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="kc">None</span>
+<span style="color: #BA2121; font-style: italic">    Other Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------------</span>
+<span style="color: #BA2121; font-style: italic">    ext : str</span>
+<span style="color: #BA2121; font-style: italic">        The extension of the file.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> fileset<span style="color: #666666">.</span>get_db()
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>scan <span style="color: #666666">=</span> fileset<span style="color: #666666">.</span>get_scan()
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>fileset <span style="color: #666666">=</span> fileset
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>id <span style="color: #666666">=</span> <span style="color: #008000">id</span>
+    ext <span style="color: #666666">=</span> kwargs<span style="color: #666666">.</span>get(<span style="color: #BA2121">&#39;ext&#39;</span>, <span style="color: #BA2121">&#39;&#39;</span>)
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>filename <span style="color: #666666">=</span> <span style="color: #008000">id</span> <span style="color: #666666">+</span> ext <span style="color: #008000; font-weight: bold">if</span> ext <span style="color: #666666">!=</span> <span style="color: #BA2121">&#39;&#39;</span> <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">None</span>
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -2595,7 +2595,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.File.get_db" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_db</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_db()</code>
 
 <a href="#plantdb.db.File.get_db" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2630,23 +2630,23 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent database instance.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">465</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">466</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">467</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">468</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">469</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">470</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">471</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">472</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">473</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_db</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent database instance.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.DB</span>
-<span class="sd">        The parent database instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.DB</span>
+<span style="color: #BA2121; font-style: italic">        The parent database instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>db
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2659,7 +2659,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.File.get_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_fileset</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_fileset()</code>
 
 <a href="#plantdb.db.File.get_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2694,23 +2694,23 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">485</span>
-<span class="normal">486</span>
-<span class="normal">487</span>
-<span class="normal">488</span>
-<span class="normal">489</span>
-<span class="normal">490</span>
-<span class="normal">491</span>
-<span class="normal">492</span>
-<span class="normal">493</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent fileset.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_fileset</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent fileset.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.Fileset</span>
-<span class="sd">        The parent fileset instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileset</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.Fileset</span>
+<span style="color: #BA2121; font-style: italic">        The parent fileset instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>fileset
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2723,7 +2723,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.File.get_id" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_id</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_id()</code>
 
 <a href="#plantdb.db.File.get_id" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2758,23 +2758,23 @@ ROMI project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get file id.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">455</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">456</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">457</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">458</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">459</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">460</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">462</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">463</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_id</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get file id.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The id of the file instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The id of the file instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> deepcopy(<span style="color: #008000">self</span><span style="color: #666666">.</span>id)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2787,7 +2787,7 @@ ROMI project.</p>
 
 
 <h3 id="plantdb.db.File.get_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_metadata(key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.File.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2867,37 +2867,37 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">495</span>
-<span class="normal">496</span>
-<span class="normal">497</span>
-<span class="normal">498</span>
-<span class="normal">499</span>
-<span class="normal">500</span>
-<span class="normal">501</span>
-<span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span>
-<span class="normal">506</span>
-<span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">501</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">502</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">503</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">504</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">505</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">510</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    key : str, optional</span>
-<span class="sd">        Metadata key to retrieve (defaults to ``None``)</span>
-<span class="sd">    default : Any, optional</span>
-<span class="sd">        The default value to return if the key do not exist in the metadata.</span>
-<span class="sd">        Default is ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    key : str, optional</span>
+<span style="color: #BA2121; font-style: italic">        Metadata key to retrieve (defaults to ``None``)</span>
+<span style="color: #BA2121; font-style: italic">    default : Any, optional</span>
+<span style="color: #BA2121; font-style: italic">        The default value to return if the key do not exist in the metadata.</span>
+<span style="color: #BA2121; font-style: italic">        Default is ``None``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2910,7 +2910,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.File.get_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_scan</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_scan()</code>
 
 <a href="#plantdb.db.File.get_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -2945,23 +2945,23 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">475</span>
-<span class="normal">476</span>
-<span class="normal">477</span>
-<span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
-<span class="normal">482</span>
-<span class="normal">483</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent scan instance.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">476</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">477</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">479</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">480</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent scan instance.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.Scan</span>
-<span class="sd">        The parent scan instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The parent scan instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>scan
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2974,7 +2974,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.File.import_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">import_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+          <code class="highlight language-python">import_file(path)</code>
 
 <a href="#plantdb.db.File.import_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3039,31 +3039,31 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">import_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import an existing file to the ``File`` object.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">539</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">540</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">541</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">542</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">543</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">import_file</span>(<span style="color: #008000">self</span>, path):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Import an existing file to the ``File`` object.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
-<span class="sd">        Path of the file to import</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    path : str</span>
+<span style="color: #BA2121; font-style: italic">        Path of the file to import</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3076,7 +3076,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.File.read" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">read</span><span class="p">()</span></code>
+          <code class="highlight language-python">read()</code>
 
 <a href="#plantdb.db.File.read" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3111,21 +3111,21 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads from a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">592</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">593</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">594</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">595</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reads from a file.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3138,7 +3138,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.File.read_raw" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">read_raw</span><span class="p">()</span></code>
+          <code class="highlight language-python">read_raw()</code>
 
 <a href="#plantdb.db.File.read_raw" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3197,31 +3197,31 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
-<span class="normal">568</span>
-<span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads bytes from a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">561</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">562</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">563</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">564</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">565</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">566</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">567</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">568</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">569</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">570</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">571</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">572</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">573</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read_raw</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reads bytes from a file.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    bytearray</span>
-<span class="sd">        File buffer</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    bytearray</span>
+<span style="color: #BA2121; font-style: italic">        File buffer</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3234,7 +3234,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.File.set_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">set_metadata(data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.File.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3315,41 +3315,41 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">512</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">515</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">516</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">517</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">518</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">519</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">520</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">521</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">522</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">523</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">524</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">525</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">528</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    If value is ``None``, scan metadata is set to data.</span>
-<span class="sd">    If value is not ``None`` data is a key and is set to value.</span>
+<span style="color: #BA2121; font-style: italic">    If value is ``None``, scan metadata is set to data.</span>
+<span style="color: #BA2121; font-style: italic">    If value is not ``None`` data is a key and is set to value.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data : str or dict</span>
-<span class="sd">        Key or value to set as metadata</span>
-<span class="sd">    value : any, optional</span>
-<span class="sd">        Value to set (default is ``None``)</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    data : str or dict</span>
+<span style="color: #BA2121; font-style: italic">        Key or value to set as metadata</span>
+<span style="color: #BA2121; font-style: italic">    value : any, optional</span>
+<span style="color: #BA2121; font-style: italic">        Value to set (default is ``None``)</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">   &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">   &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3362,7 +3362,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.File.write" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">write(<span style="color: #008000">str</span>, ext<span style="color: #666666">=</span><span style="color: #BA2121">&#39;&#39;</span>)</code>
 
 <a href="#plantdb.db.File.write" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3441,35 +3441,35 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Writes to a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">579</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write</span>(<span style="color: #008000">self</span>, <span style="color: #008000">str</span>, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Writes to a file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data : str</span>
-<span class="sd">        Data to write</span>
-<span class="sd">    ext : str, optional</span>
-<span class="sd">        File extension to use</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    data : str</span>
+<span style="color: #BA2121; font-style: italic">        Data to write</span>
+<span style="color: #BA2121; font-style: italic">    ext : str, optional</span>
+<span style="color: #BA2121; font-style: italic">        File extension to use</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3482,7 +3482,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.File.write_raw" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">write_raw</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">write_raw(buffer, ext<span style="color: #666666">=</span><span style="color: #BA2121">&#39;&#39;</span>)</code>
 
 <a href="#plantdb.db.File.write_raw" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3561,35 +3561,35 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Writes bytes to a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">545</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">546</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">547</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">548</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">549</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">550</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">551</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">552</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">553</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">554</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">555</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">556</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">557</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">558</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">559</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write_raw</span>(<span style="color: #008000">self</span>, buffer, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Writes bytes to a file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    buffer : bytearray</span>
-<span class="sd">        Data to write</span>
-<span class="sd">    ext : str, optional</span>
-<span class="sd">        File extension to use</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    buffer : bytearray</span>
+<span style="color: #BA2121; font-style: italic">        Data to write</span>
+<span style="color: #BA2121; font-style: italic">    ext : str, optional</span>
+<span style="color: #BA2121; font-style: italic">        File extension to use</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3610,7 +3610,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h2 id="plantdb.db.Fileset" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Fileset</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
+            <code class="highlight language-python">Fileset(scan, <span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.Fileset" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3724,31 +3724,31 @@ project.</p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/db.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Constructor.</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, scan, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Constructor.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan : plantdb.db.Scan</span>
-<span class="sd">        Scan instance containing the fileset.</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the fileset instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_db</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">scan</span> <span class="o">=</span> <span class="n">scan</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    scan : plantdb.db.Scan</span>
+<span style="color: #BA2121; font-style: italic">        Scan instance containing the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the fileset instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> scan<span style="color: #666666">.</span>get_db()
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>scan <span style="color: #666666">=</span> scan
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>id <span style="color: #666666">=</span> <span style="color: #008000">id</span>
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -3770,7 +3770,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.create_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create_file</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python">create_file(<span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.Fileset.create_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3835,31 +3835,31 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">387</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">388</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">389</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">390</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">391</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">392</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">393</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">394</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">395</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">396</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">397</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">398</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">399</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the new file.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the new file.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3872,7 +3872,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.delete_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">delete_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">)</span></code>
+          <code class="highlight language-python">delete_file(file_id)</code>
 
 <a href="#plantdb.db.Fileset.delete_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -3937,31 +3937,31 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">401</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">403</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_file</span>(<span style="color: #008000">self</span>, file_id):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete a file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the file to delete.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the file to delete.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3974,7 +3974,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_db" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_db</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_db()</code>
 
 <a href="#plantdb.db.Fileset.get_db" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4009,23 +4009,23 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent database instance.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">306</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">312</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_db</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent database instance.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.DB</span>
-<span class="sd">        The parent database instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.DB</span>
+<span style="color: #BA2121; font-style: italic">        The parent database instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>db
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4038,7 +4038,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_file" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_file</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_file(<span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)</code>
 
 <a href="#plantdb.db.Fileset.get_file" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4117,35 +4117,35 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get file with given id.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">335</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">336</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">337</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">338</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">339</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">340</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">341</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">342</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get file with given id.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        File instance id.</span>
-<span class="sd">    create : bool, optional</span>
-<span class="sd">        Create the file if it does not exist, default to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        File instance id.</span>
+<span style="color: #BA2121; font-style: italic">    create : bool, optional</span>
+<span style="color: #BA2121; font-style: italic">        Create the file if it does not exist, default to ``False``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4158,7 +4158,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_files" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_files</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_files()</code>
 
 <a href="#plantdb.db.Fileset.get_files" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4193,21 +4193,21 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all files.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">329</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">330</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_files</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get all files.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4220,7 +4220,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_id" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_id</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_id()</code>
 
 <a href="#plantdb.db.Fileset.get_id" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4255,23 +4255,23 @@ project.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the fileset instance id.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">300</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_id</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the fileset instance id.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The id of the fileset instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The id of the fileset instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> deepcopy(<span style="color: #008000">self</span><span style="color: #666666">.</span>id)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4284,7 +4284,7 @@ project.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_metadata(key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.Fileset.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4364,37 +4364,37 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
-<span class="normal">363</span>
-<span class="normal">364</span>
-<span class="normal">365</span>
-<span class="normal">366</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    key : str</span>
-<span class="sd">        Metadata key to retrieve, default to ``None``.</span>
-<span class="sd">    default : Any, optional</span>
-<span class="sd">        The default value to return if the key do not exist in the metadata.</span>
-<span class="sd">        Default is ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    key : str</span>
+<span style="color: #BA2121; font-style: italic">        Metadata key to retrieve, default to ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    default : Any, optional</span>
+<span style="color: #BA2121; font-style: italic">        The default value to return if the key do not exist in the metadata.</span>
+<span style="color: #BA2121; font-style: italic">        Default is ``None``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4407,7 +4407,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.Fileset.get_scan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_scan</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_scan()</code>
 
 <a href="#plantdb.db.Fileset.get_scan" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4442,23 +4442,23 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent scan instance.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent scan instance.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.Scan</span>
-<span class="sd">        The parent scan instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.Scan</span>
+<span style="color: #BA2121; font-style: italic">        The parent scan instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>scan
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4471,7 +4471,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.Fileset.set_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">set_metadata(data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.Fileset.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4552,41 +4552,41 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">381</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">384</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">385</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    If value is ``None``, scan metadata is set to data.</span>
-<span class="sd">    If value is not ``None`` data is a key and is set to value.</span>
+<span style="color: #BA2121; font-style: italic">    If value is ``None``, scan metadata is set to data.</span>
+<span style="color: #BA2121; font-style: italic">    If value is not ``None`` data is a key and is set to value.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data : str or dict</span>
-<span class="sd">        Key or value to set as metadata.</span>
-<span class="sd">    value : any, optional</span>
-<span class="sd">        Value to set, default to ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    data : str or dict</span>
+<span style="color: #BA2121; font-style: italic">        Key or value to set as metadata.</span>
+<span style="color: #BA2121; font-style: italic">    value : any, optional</span>
+<span style="color: #BA2121; font-style: italic">        Value to set, default to ``None``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4607,7 +4607,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h2 id="plantdb.db.Scan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Scan</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span></code>
+            <code class="highlight language-python">Scan(db, <span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.Scan" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -4705,29 +4705,29 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/db.py</code></summary>
-                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Constructor.</span>
+                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">146</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">149</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, db, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Constructor.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.db.DB</span>
-<span class="sd">        Database instance where to find the scan.</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the scan instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.db.DB</span>
+<span style="color: #BA2121; font-style: italic">        Database instance where to find the scan.</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the scan instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>db <span style="color: #666666">=</span> db
+    <span style="color: #008000">self</span><span style="color: #666666">.</span>id <span style="color: #666666">=</span> <span style="color: #008000">id</span>
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -4749,7 +4749,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.create_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></code>
+          <code class="highlight language-python">create_fileset(<span style="color: #008000">id</span>)</code>
 
 <a href="#plantdb.db.Scan.create_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4814,31 +4814,31 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a fileset.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">241</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">242</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">244</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">245</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a fileset.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the new fileset.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the new fileset.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4851,7 +4851,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.delete_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">delete_fileset</span><span class="p">(</span><span class="n">fileset_id</span><span class="p">)</span></code>
+          <code class="highlight language-python">delete_fileset(fileset_id)</code>
 
 <a href="#plantdb.db.Scan.delete_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4916,31 +4916,31 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a fileset from the DB.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">247</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">248</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">249</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">250</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">251</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">252</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">253</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">254</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">256</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">258</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">259</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_fileset</span>(<span style="color: #008000">self</span>, fileset_id):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete a fileset from the DB.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the fileset to delete.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the fileset to delete.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4953,7 +4953,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.get_db" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_db</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_db()</code>
 
 <a href="#plantdb.db.Scan.get_db" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -4988,23 +4988,23 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parent database instance.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_db</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get parent database instance.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    plantdb.db.DB</span>
-<span class="sd">        Database instance where to find the scan.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.db.DB</span>
+<span style="color: #BA2121; font-style: italic">        Database instance where to find the scan.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>db
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -5017,7 +5017,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.get_fileset" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_fileset</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_fileset(<span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)</code>
 
 <a href="#plantdb.db.Scan.get_fileset" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5096,35 +5096,35 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_fileset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a fileset with a given id.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">185</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">186</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">187</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">188</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">191</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get a fileset with a given id.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : str</span>
-<span class="sd">        Id of the fileset to be retrieved.</span>
-<span class="sd">    create : bool, optional</span>
-<span class="sd">        Create the fileset if it does not exist, default to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    id : str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the fileset to be retrieved.</span>
+<span style="color: #BA2121; font-style: italic">    create : bool, optional</span>
+<span style="color: #BA2121; font-style: italic">        Create the fileset if it does not exist, default to ``False``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -5137,7 +5137,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.get_filesets" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_filesets</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_filesets()</code>
 
 <a href="#plantdb.db.Scan.get_filesets" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5172,21 +5172,21 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_filesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all sets of files.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">179</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_filesets</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get all sets of files.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -5199,7 +5199,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.get_id" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_id</span><span class="p">()</span></code>
+          <code class="highlight language-python">get_id()</code>
 
 <a href="#plantdb.db.Scan.get_id" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5234,23 +5234,23 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the scan instance id.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_id</span>(<span style="color: #008000">self</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the scan instance id.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        Id of the scan instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        Id of the scan instance.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> deepcopy(<span style="color: #008000">self</span><span style="color: #666666">.</span>id)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -5263,7 +5263,7 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
 
 <h3 id="plantdb.db.Scan.get_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">get_metadata(key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.Scan.get_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5343,37 +5343,37 @@ Default is <code>None</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">203</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">204</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">207</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    key : str</span>
-<span class="sd">        Metadata key to retrieve, default to ``None``.</span>
-<span class="sd">    default : Any, optional</span>
-<span class="sd">        The default value to return if the key do not exist in the metadata.</span>
-<span class="sd">        Default is ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    key : str</span>
+<span style="color: #BA2121; font-style: italic">        Metadata key to retrieve, default to ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    default : Any, optional</span>
+<span style="color: #BA2121; font-style: italic">        The default value to return if the key do not exist in the metadata.</span>
+<span style="color: #BA2121; font-style: italic">        Default is ``None``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -5386,7 +5386,7 @@ Default is <code>None</code>.</p>
 
 
 <h3 id="plantdb.db.Scan.set_metadata" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+          <code class="highlight language-python">set_metadata(data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
 
 <a href="#plantdb.db.Scan.set_metadata" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -5467,41 +5467,41 @@ If value is not <code>None</code> data is a key and is set to value.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/db.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get metadata associated to scan.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get metadata associated to scan.</span>
 
-<span class="sd">    If value is ``None``, scan metadata is set to data.</span>
-<span class="sd">    If value is not ``None`` data is a key and is set to value.</span>
+<span style="color: #BA2121; font-style: italic">    If value is ``None``, scan metadata is set to data.</span>
+<span style="color: #BA2121; font-style: italic">    If value is not ``None`` data is a key and is set to value.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data : str or dict</span>
-<span class="sd">        Key or value.</span>
-<span class="sd">    value : any, optional</span>
-<span class="sd">        Value to set, default to ``None``.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    data : str or dict</span>
+<span style="color: #BA2121; font-style: italic">        Key or value.</span>
+<span style="color: #BA2121; font-style: italic">    value : any, optional</span>
+<span style="color: #BA2121; font-style: italic">        Value to set, default to ``None``.</span>
 
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    NotImplementedError</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>

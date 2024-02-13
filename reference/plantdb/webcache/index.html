@@ -1232,22 +1232,22 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.fsdb</span> <span class="kn">import</span> <span class="n">FSDB</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb</span> <span class="kn">import</span> <span class="n">webcache</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">FSDB</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ROMI_DB&#39;</span><span class="p">,</span> <span class="s2">&quot;/data/ROMI/DB/&quot;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original image:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">&#39;sango36&#39;</span><span class="p">,</span><span class="s1">&#39;images&#39;</span><span class="p">,</span><span class="s1">&#39;00000_rgb&#39;</span><span class="p">,</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the thumb image (resized and cached):</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">&#39;sango36&#39;</span><span class="p">,</span><span class="s1">&#39;images&#39;</span><span class="p">,</span><span class="s1">&#39;00000_rgb&#39;</span><span class="p">,</span><span class="s1">&#39;thumb&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the original pointcloud:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">&#39;sango_90_300_36&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud&#39;</span><span class="p">,</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to the preview pointcloud (resized and cached):</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">&#39;sango_90_300_36&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud&#39;</span><span class="p">,</span><span class="s1">&#39;preview&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the path to a downsampled pointcloud (resized and cached):</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">webcache</span><span class="o">.</span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span><span class="s1">&#39;sango_90_300_36&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span><span class="p">,</span><span class="s1">&#39;PointCloud&#39;</span><span class="p">,</span><span class="s1">&#39;2.3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">os</span> <span style="color: #008000; font-weight: bold">import</span> environ
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb</span> <span style="color: #008000; font-weight: bold">import</span> webcache
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> FSDB(environ<span style="color: #666666">.</span>get(<span style="color: #BA2121">&#39;ROMI_DB&#39;</span>, <span style="color: #BA2121">&quot;/data/ROMI/DB/&quot;</span>))
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the path to the original image:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>webcache<span style="color: #666666">.</span>image_path(db,<span style="color: #BA2121">&#39;sango36&#39;</span>,<span style="color: #BA2121">&#39;images&#39;</span>,<span style="color: #BA2121">&#39;00000_rgb&#39;</span>,<span style="color: #BA2121">&#39;orig&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the path to the thumb image (resized and cached):</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>webcache<span style="color: #666666">.</span>image_path(db,<span style="color: #BA2121">&#39;sango36&#39;</span>,<span style="color: #BA2121">&#39;images&#39;</span>,<span style="color: #BA2121">&#39;00000_rgb&#39;</span>,<span style="color: #BA2121">&#39;thumb&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the path to the original pointcloud:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>webcache<span style="color: #666666">.</span>pointcloud_path(db,<span style="color: #BA2121">&#39;sango_90_300_36&#39;</span>,<span style="color: #BA2121">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span>,<span style="color: #BA2121">&#39;PointCloud&#39;</span>,<span style="color: #BA2121">&#39;orig&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the path to the preview pointcloud (resized and cached):</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>webcache<span style="color: #666666">.</span>pointcloud_path(db,<span style="color: #BA2121">&#39;sango_90_300_36&#39;</span>,<span style="color: #BA2121">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span>,<span style="color: #BA2121">&#39;PointCloud&#39;</span>,<span style="color: #BA2121">&#39;preview&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the path to a downsampled pointcloud (resized and cached):</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>webcache<span style="color: #666666">.</span>pointcloud_path(db,<span style="color: #BA2121">&#39;sango_90_300_36&#39;</span>,<span style="color: #BA2121">&#39;PointCloud_1_0_0_0_10_0_ca07eb2790&#39;</span>,<span style="color: #BA2121">&#39;PointCloud&#39;</span>,<span style="color: #BA2121">&#39;2.3&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
 
   
@@ -1268,7 +1268,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__file_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span></code>
+          <code class="highlight language-python">__file_path(db, scan_id, fileset_id, file_id)</code>
 
 <a href="#plantdb.webcache.__file_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1375,51 +1375,51 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the path to a file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 95</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__file_path</span>(db, scan_id, fileset_id, file_id):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the path to a file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">scan</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_scan</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">fs</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="n">get_fileset</span><span class="p">(</span><span class="n">fileset_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">basedir</span> <span class="o">/</span> <span class="n">scan</span><span class="o">.</span><span class="n">id</span> <span class="o">/</span> <span class="n">fs</span><span class="o">.</span><span class="n">id</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">filename</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the file.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(scan_id, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    fs <span style="color: #666666">=</span> scan<span style="color: #666666">.</span>get_fileset(fileset_id, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    f <span style="color: #666666">=</span> fs<span style="color: #666666">.</span>get_file(file_id, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    <span style="color: #008000; font-weight: bold">return</span> db<span style="color: #666666">.</span>basedir <span style="color: #666666">/</span> scan<span style="color: #666666">.</span>id <span style="color: #666666">/</span> fs<span style="color: #666666">.</span>id <span style="color: #666666">/</span> f<span style="color: #666666">.</span>filename
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1432,7 +1432,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__hash" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__hash</span><span class="p">(</span><span class="n">resource_type</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__hash(resource_type, scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1553,55 +1553,55 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__hash</span><span class="p">(</span><span class="n">resource_type</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a hash for a resource.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">127</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">128</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__hash</span>(resource_type, scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a hash for a resource.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    resource_type : str</span>
-<span class="sd">        The name of the resource type, *e.g.* &quot;image&quot; or &quot;pointcloud&quot;.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : str</span>
-<span class="sd">        The requested size.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    resource_type : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the resource type, *e.g.* &quot;image&quot; or &quot;pointcloud&quot;.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : str</span>
+<span style="color: #BA2121; font-style: italic">        The requested size.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The hash of the resource.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource_type</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">scan_id</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">fileset_id</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The hash of the resource.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    m <span style="color: #666666">=</span> hashlib<span style="color: #666666">.</span>sha1()
+    key <span style="color: #666666">=</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>resource_type<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">|</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">|</span><span style="color: #A45A77; font-weight: bold">{</span>fileset_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">|</span><span style="color: #A45A77; font-weight: bold">{</span>file_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">|</span><span style="color: #A45A77; font-weight: bold">{</span>size<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
+    m<span style="color: #666666">.</span>update(key<span style="color: #666666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>))
+    <span style="color: #008000; font-weight: bold">return</span> m<span style="color: #666666">.</span>hexdigest()
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1614,7 +1614,7 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <h2 id="plantdb.webcache.__image_cache" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__image_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__image_cache(db, scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__image_cache" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1736,97 +1736,97 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__image_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a cache for an image resource.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">188</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">191</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">203</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">204</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">207</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">232</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__image_cache</span>(db, scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a cache for an image resource.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
-<span class="sd">        If an integer, use  it as the size of the cached image to create and return.</span>
-<span class="sd">        Else, should be a string in the given list.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
+<span style="color: #BA2121; font-style: italic">        If an integer, use  it as the size of the cached image to create and return.</span>
+<span style="color: #BA2121; font-style: italic">        Else, should be a string in the given list.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the cached image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Get the path to the original image:</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the cached image.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #3D7B7B; font-style: italic"># Get the path to the original image:</span>
+    src <span style="color: #666666">=</span> __file_path(db, scan_id, fileset_id, file_id)
 
-    <span class="c1"># Get the path to the &#39;webcache&#39; directory:</span>
-    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span>
-    <span class="n">dst</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span style="color: #3D7B7B; font-style: italic"># Get the path to the &#39;webcache&#39; directory:</span>
+    cache_dir <span style="color: #666666">=</span> __webcache_path(db, scan_id)
+    dst <span style="color: #666666">=</span> cache_dir <span style="color: #666666">/</span> __image_hash(scan_id, fileset_id, file_id, size)
 
-    <span class="c1"># Load the image and resize it:</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-    <span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">maxsize</span> <span class="o">=</span> <span class="n">size</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">maxsize</span> <span class="o">=</span> <span class="n">IMG_RESOLUTIONS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">__image_resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">)</span>
-    <span class="c1"># Make sure we have an RGB image to be able to save in this format:</span>
-    <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">:</span>
-        <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
-    <span class="n">save_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;quality&#39;</span><span class="p">:</span> <span class="mi">84</span><span class="p">}</span>
-    <span class="c1"># Save the resized image in the &quot;webcache&quot; directory:</span>
-    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="o">**</span><span class="n">save_kwargs</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted &#39;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">dst</span><span class="si">}</span><span class="s2">&#39;, using size &#39;</span><span class="si">{</span><span class="n">maxsize</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span style="color: #3D7B7B; font-style: italic"># Load the image and resize it:</span>
+    image <span style="color: #666666">=</span> Image<span style="color: #666666">.</span>open(src)
+    image<span style="color: #666666">.</span>load()
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(size, <span style="color: #008000">int</span>):
+        maxsize <span style="color: #666666">=</span> size
+    <span style="color: #008000; font-weight: bold">else</span>:
+        maxsize <span style="color: #666666">=</span> IMG_RESOLUTIONS<span style="color: #666666">.</span>get(size)
+    image <span style="color: #666666">=</span> __image_resize(image, maxsize)
+    <span style="color: #3D7B7B; font-style: italic"># Make sure we have an RGB image to be able to save in this format:</span>
+    <span style="color: #008000; font-weight: bold">if</span> image<span style="color: #666666">.</span>mode <span style="color: #666666">!=</span> <span style="color: #BA2121">&quot;RGB&quot;</span>:
+        image <span style="color: #666666">=</span> image<span style="color: #666666">.</span>convert(mode<span style="color: #666666">=</span><span style="color: #BA2121">&quot;RGB&quot;</span>)
+    save_kwargs <span style="color: #666666">=</span> {<span style="color: #BA2121">&#39;quality&#39;</span>: <span style="color: #666666">84</span>}
+    <span style="color: #3D7B7B; font-style: italic"># Save the resized image in the &quot;webcache&quot; directory:</span>
+    image<span style="color: #666666">.</span>save(dst, <span style="color: #666666">**</span>save_kwargs)
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;Converted &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>src<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; to &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>dst<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;, using size &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>maxsize<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
 
-    <span class="k">return</span> <span class="n">dst</span>
+    <span style="color: #008000; font-weight: bold">return</span> dst
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1839,7 +1839,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_cached_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__image_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__image_cached_path(db, scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__image_cached_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1961,59 +1961,59 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__image_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get The path to the cached image.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">241</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">242</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">244</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">245</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">246</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">247</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">248</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">249</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">250</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">251</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">252</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">253</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">254</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">256</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">258</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">259</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">260</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">261</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">262</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__image_cached_path</span>(db, scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get The path to the cached image.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
-<span class="sd">        If an integer, use  it as the size of the cached image to create and return.</span>
-<span class="sd">        Else, should be a string in the given list.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
+<span style="color: #BA2121; font-style: italic">        If an integer, use  it as the size of the cached image to create and return.</span>
+<span style="color: #BA2121; font-style: italic">        Else, should be a string in the given list.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the cached image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span>
-    <span class="n">img_path</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">img_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-        <span class="n">__image_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">img_path</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the cached image.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    cache_dir <span style="color: #666666">=</span> __webcache_path(db, scan_id)
+    img_path <span style="color: #666666">=</span> cache_dir <span style="color: #666666">/</span> __image_hash(scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> img_path<span style="color: #666666">.</span>is_file():
+        __image_cache(db, scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">return</span> img_path
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2026,7 +2026,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_hash" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__image_hash(scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__image_hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2134,47 +2134,47 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__image_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a file name for an image resource using a hash value.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">146</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">149</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__image_hash</span>(scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a file name for an image resource using a hash value.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
-<span class="sd">        If an integer, use  it as the size of the cached image to create and return.</span>
-<span class="sd">        Else, should be a string in the given list.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
+<span style="color: #BA2121; font-style: italic">        If an integer, use  it as the size of the cached image to create and return.</span>
+<span style="color: #BA2121; font-style: italic">        Else, should be a string in the given list.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The image resource file name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">__hash</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.jpeg&quot;</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The image resource file name.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> __hash(<span style="color: #BA2121">&quot;image&quot;</span>, scan_id, fileset_id, file_id, size) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.jpeg&quot;</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2187,7 +2187,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__image_resize" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__image_resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__image_resize(img, max_size)</code>
 
 <a href="#plantdb.webcache.__image_resize" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2266,39 +2266,39 @@ Else, should be a string in the given list.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__image_resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resize a ``Pillow`` image.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">179</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">180</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">185</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__image_resize</span>(img, max_size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Resize a ``Pillow`` image.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    img : PIL.Image.Image</span>
-<span class="sd">        A ``Pillow`` image to resize.</span>
-<span class="sd">    max_size : int</span>
-<span class="sd">        The requested max width or height size, in pixels.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    img : PIL.Image.Image</span>
+<span style="color: #BA2121; font-style: italic">        A ``Pillow`` image to resize.</span>
+<span style="color: #BA2121; font-style: italic">    max_size : int</span>
+<span style="color: #BA2121; font-style: italic">        The requested max width or height size, in pixels.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    PIL.Image.Image</span>
-<span class="sd">        The resized image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">img</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">((</span><span class="n">max_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">img</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    PIL.Image.Image</span>
+<span style="color: #BA2121; font-style: italic">        The resized image.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    img<span style="color: #666666">.</span>thumbnail((max_size, max_size))
+    <span style="color: #008000; font-weight: bold">return</span> img
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2311,7 +2311,7 @@ Else, should be a string in the given list.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_cache" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__pointcloud_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__pointcloud_cache(db, scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__pointcloud_cache" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2439,107 +2439,107 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
-<span class="normal">362</span>
-<span class="normal">363</span>
-<span class="normal">364</span>
-<span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
-<span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__pointcloud_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a cache for a pointcloud resource.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">381</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">384</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">385</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">386</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">387</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">388</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">389</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">390</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">391</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">392</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">393</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">394</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">395</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">396</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">397</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">398</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">399</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">400</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">401</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">403</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__pointcloud_cache</span>(db, scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a cache for a pointcloud resource.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;preview&#39;} or float</span>
-<span class="sd">        The requested size of the point cloud.</span>
-<span class="sd">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
-<span class="sd">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
-<span class="sd">        A float will resize the point cloud to given voxel size.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;preview&#39;} or float</span>
+<span style="color: #BA2121; font-style: italic">        The requested size of the point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
+<span style="color: #BA2121; font-style: italic">        A float will resize the point cloud to given voxel size.</span>
 
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    __pointcloud_resize</span>
+<span style="color: #BA2121; font-style: italic">    See Also</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    __pointcloud_resize</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the cached pointcloud.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">read_pointcloud</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_point_cloud</span>
-    <span class="n">write_pointcloud</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write_point_cloud</span>
-    <span class="c1"># Get the path to the &#39;webcache&#39; directory:</span>
-    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span>
-    <span class="n">dst</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the cached pointcloud.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    read_pointcloud <span style="color: #666666">=</span> o3d<span style="color: #666666">.</span>io<span style="color: #666666">.</span>read_point_cloud
+    write_pointcloud <span style="color: #666666">=</span> o3d<span style="color: #666666">.</span>io<span style="color: #666666">.</span>write_point_cloud
+    <span style="color: #3D7B7B; font-style: italic"># Get the path to the &#39;webcache&#39; directory:</span>
+    cache_dir <span style="color: #666666">=</span> __webcache_path(db, scan_id)
+    dst <span style="color: #666666">=</span> cache_dir <span style="color: #666666">/</span> __pointcloud_hash(scan_id, fileset_id, file_id, size)
 
-    <span class="c1"># Load the pointcloud and resize it:</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
-    <span class="n">pcd</span> <span class="o">=</span> <span class="n">read_pointcloud</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
-    <span class="n">pcd_npts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>  <span class="c1"># get the number of points</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="n">vxs</span> <span class="o">=</span> <span class="n">size</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">vxs</span> <span class="o">=</span> <span class="mf">1.8</span>
-    <span class="n">pcd_lowres</span> <span class="o">=</span> <span class="n">__pointcloud_resize</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">vxs</span><span class="p">)</span>
-    <span class="n">pcd_lowres_npts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcd_lowres</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>  <span class="c1"># get the number of points</span>
-    <span class="n">write_pointcloud</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">),</span> <span class="n">pcd_lowres</span><span class="p">)</span>
+    <span style="color: #3D7B7B; font-style: italic"># Load the pointcloud and resize it:</span>
+    src <span style="color: #666666">=</span> __file_path(db, scan_id, fileset_id, file_id)
+    pcd <span style="color: #666666">=</span> read_pointcloud(<span style="color: #008000">str</span>(src))
+    pcd_npts <span style="color: #666666">=</span> <span style="color: #008000">len</span>(pcd<span style="color: #666666">.</span>points)  <span style="color: #3D7B7B; font-style: italic"># get the number of points</span>
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(size, <span style="color: #008000">float</span>):
+        vxs <span style="color: #666666">=</span> size
+    <span style="color: #008000; font-weight: bold">else</span>:
+        vxs <span style="color: #666666">=</span> <span style="color: #666666">1.8</span>
+    pcd_lowres <span style="color: #666666">=</span> __pointcloud_resize(pcd, vxs)
+    pcd_lowres_npts <span style="color: #666666">=</span> <span style="color: #008000">len</span>(pcd_lowres<span style="color: #666666">.</span>points)  <span style="color: #3D7B7B; font-style: italic"># get the number of points</span>
+    write_pointcloud(<span style="color: #008000">str</span>(dst), pcd_lowres)
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted &#39;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">dst</span><span class="si">}</span><span class="s2">&#39;, using voxelsize &#39;</span><span class="si">{</span><span class="n">vxs</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - Original number of points: </span><span class="si">{</span><span class="n">pcd_npts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - Resized number of points: </span><span class="si">{</span><span class="n">pcd_lowres_npts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;Converted &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>src<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; to &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>dst<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;, using voxelsize &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>vxs<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;  - Original number of points: </span><span style="color: #A45A77; font-weight: bold">{</span>pcd_npts<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;  - Resized number of points: </span><span style="color: #A45A77; font-weight: bold">{</span>pcd_lowres_npts<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
 
-    <span class="k">return</span> <span class="n">dst</span>
+    <span style="color: #008000; font-weight: bold">return</span> dst
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2552,7 +2552,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_cached_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__pointcloud_cached_path(db, scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__pointcloud_cached_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2676,63 +2676,63 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get The path to the cached pointcloud.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">423</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">424</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">425</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">427</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">428</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">429</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">430</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">431</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">432</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">435</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">436</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">441</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">442</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__pointcloud_cached_path</span>(db, scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get The path to the cached pointcloud.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;preview&#39;} or float</span>
-<span class="sd">        The requested size of the point cloud.</span>
-<span class="sd">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
-<span class="sd">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
-<span class="sd">        A float will resize the point cloud to given voxel size.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;preview&#39;} or float</span>
+<span style="color: #BA2121; font-style: italic">        The requested size of the point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
+<span style="color: #BA2121; font-style: italic">        A float will resize the point cloud to given voxel size.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the cached pointcloud.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span>
-    <span class="n">pcd_path</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">pcd_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-        <span class="n">__pointcloud_cache</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pcd_path</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the cached pointcloud.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    cache_dir <span style="color: #666666">=</span> __webcache_path(db, scan_id)
+    pcd_path <span style="color: #666666">=</span> cache_dir <span style="color: #666666">/</span> __pointcloud_hash(scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> pcd_path<span style="color: #666666">.</span>is_file():
+        __pointcloud_cache(db, scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">return</span> pcd_path
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2745,7 +2745,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_hash" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__pointcloud_hash(scan_id, fileset_id, file_id, size)</code>
 
 <a href="#plantdb.webcache.__pointcloud_hash" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2852,45 +2852,45 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__pointcloud_hash</span><span class="p">(</span><span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a hash for a pointcloud resource.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">329</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">330</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">334</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">335</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">336</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">337</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">338</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">339</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">340</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__pointcloud_hash</span>(scan_id, fileset_id, file_id, size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a hash for a pointcloud resource.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;preview&#39;}</span>
-<span class="sd">        The requested size (&#39;orig&#39; or &#39;preview&#39;).</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;preview&#39;}</span>
+<span style="color: #BA2121; font-style: italic">        The requested size (&#39;orig&#39; or &#39;preview&#39;).</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        The hash of the pointcloud resource.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">__hash</span><span class="p">(</span><span class="s2">&quot;pointcloud&quot;</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.ply&quot;</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    str</span>
+<span style="color: #BA2121; font-style: italic">        The hash of the pointcloud resource.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> __hash(<span style="color: #BA2121">&quot;pointcloud&quot;</span>, scan_id, fileset_id, file_id, size) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.ply&quot;</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2903,7 +2903,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__pointcloud_resize" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__pointcloud_resize</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span></code>
+          <code class="highlight language-python">__pointcloud_resize(pointcloud, voxel_size)</code>
 
 <a href="#plantdb.webcache.__pointcloud_resize" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -2982,37 +2982,37 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__pointcloud_resize</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resize a pointcloud to given voxelsize.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__pointcloud_resize</span>(pointcloud, voxel_size):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Resize a pointcloud to given voxelsize.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    pointcloud : open3d.geometry.PointCloud</span>
-<span class="sd">        A pointcloud to resize to given voxelsize.</span>
-<span class="sd">    voxel_size : float</span>
-<span class="sd">        The voxelsize to use for resampling.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    pointcloud : open3d.geometry.PointCloud</span>
+<span style="color: #BA2121; font-style: italic">        A pointcloud to resize to given voxelsize.</span>
+<span style="color: #BA2121; font-style: italic">    voxel_size : float</span>
+<span style="color: #BA2121; font-style: italic">        The voxelsize to use for resampling.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    open3d.geometry.PointCloud</span>
-<span class="sd">        The resized pointcloud.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pointcloud</span><span class="o">.</span><span class="n">voxel_down_sample</span><span class="p">(</span><span class="n">voxel_size</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    open3d.geometry.PointCloud</span>
+<span style="color: #BA2121; font-style: italic">        The resized pointcloud.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> pointcloud<span style="color: #666666">.</span>voxel_down_sample(voxel_size)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3025,7 +3025,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.__webcache_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">)</span></code>
+          <code class="highlight language-python">__webcache_path(db, scan_id)</code>
 
 <a href="#plantdb.webcache.__webcache_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3104,41 +3104,41 @@ A float will resize the point cloud to given voxel size.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__webcache_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a &#39;webcache&#39; directory in the scan directory.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">74</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">75</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">80</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__webcache_path</span>(db, scan_id):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Creates a &#39;webcache&#39; directory in the scan directory.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the &#39;webcache&#39; directory for the given scan.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">directory</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">basedir</span> <span class="o">/</span> <span class="n">scan_id</span> <span class="o">/</span> <span class="s2">&quot;webcache&quot;</span>
-    <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">directory</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the &#39;webcache&#39; directory for the given scan.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    directory <span style="color: #666666">=</span> db<span style="color: #666666">.</span>basedir <span style="color: #666666">/</span> scan_id <span style="color: #666666">/</span> <span style="color: #BA2121">&quot;webcache&quot;</span>
+    directory<span style="color: #666666">.</span>mkdir(exist_ok<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+    <span style="color: #008000; font-weight: bold">return</span> directory
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3151,7 +3151,7 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <h2 id="plantdb.webcache.image_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">image_path(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)</code>
 
 <a href="#plantdb.webcache.image_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3277,122 +3277,122 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">image_path</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original image:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="s1">&#39;00000_rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;orig&#39;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Get a thumbnail of the image:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="s1">&#39;00000_rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;thumb&#39;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.webcache</span> <span style="color: #008000; font-weight: bold">import</span> image_path
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.test_database</span> <span style="color: #008000; font-weight: bold">import</span> test_database
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> test_database(<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 1: Get the original image:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>image_path(db, <span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, <span style="color: #BA2121">&#39;images&#39;</span>, <span style="color: #BA2121">&#39;00000_rgb&#39;</span>, <span style="color: #BA2121">&#39;orig&#39;</span>)
+<span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg&#39;)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 2: Get a thumbnail of the image:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>image_path(db, <span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, <span style="color: #BA2121">&#39;images&#39;</span>, <span style="color: #BA2121">&#39;00000_rgb&#39;</span>, <span style="color: #BA2121">&#39;thumb&#39;</span>)
+<span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg&#39;)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">image_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the path to an image file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">265</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">266</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">267</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">273</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">300</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">305</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">306</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">312</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">image_path</span>(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to an image file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
-<span class="sd">        If an integer, use  it as the size of the cached image to create and return.</span>
-<span class="sd">        Else, should be a string, defaulting to `&#39;orig&#39;`, and it works as follows:</span>
-<span class="sd">           * `&#39;thumb&#39;`: image max width and height to `150`.</span>
-<span class="sd">           * `&#39;large&#39;`: image max width and height to `1500`;</span>
-<span class="sd">           * `&#39;orig&#39;`: original image, no chache;</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;large&#39;, &#39;thumb&#39;} or int, optional</span>
+<span style="color: #BA2121; font-style: italic">        If an integer, use  it as the size of the cached image to create and return.</span>
+<span style="color: #BA2121; font-style: italic">        Else, should be a string, defaulting to `&#39;orig&#39;`, and it works as follows:</span>
+<span style="color: #BA2121; font-style: italic">           * `&#39;thumb&#39;`: image max width and height to `150`.</span>
+<span style="color: #BA2121; font-style: italic">           * `&#39;large&#39;`: image max width and height to `1500`;</span>
+<span style="color: #BA2121; font-style: italic">           * `&#39;orig&#39;`: original image, no chache;</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the original or cached image.</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the original or cached image.</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.webcache import image_path</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
-<span class="sd">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.connect()</span>
-<span class="sd">    &gt;&gt;&gt; # Example 1: Get the original image:</span>
-<span class="sd">    &gt;&gt;&gt; image_path(db, &#39;real_plant_analyzed&#39;, &#39;images&#39;, &#39;00000_rgb&#39;, &#39;orig&#39;)</span>
-<span class="sd">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; # Example 2: Get a thumbnail of the image:</span>
-<span class="sd">    &gt;&gt;&gt; image_path(db, &#39;real_plant_analyzed&#39;, &#39;images&#39;, &#39;00000_rgb&#39;, &#39;thumb&#39;)</span>
-<span class="sd">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested &#39;</span><span class="si">{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">&#39; with size &#39;</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&#39; (as &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;)&quot;</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.webcache import image_path</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 1: Get the original image:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; image_path(db, &#39;real_plant_analyzed&#39;, &#39;images&#39;, &#39;00000_rgb&#39;, &#39;orig&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 2: Get a thumbnail of the image:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; image_path(db, &#39;real_plant_analyzed&#39;, &#39;images&#39;, &#39;00000_rgb&#39;, &#39;thumb&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">try</span>:
+        size <span style="color: #666666">=</span> <span style="color: #008000">int</span>(size)
+    <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">ValueError</span>:
+        <span style="color: #008000; font-weight: bold">pass</span>
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;Requested &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>file_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; with size &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>size<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; (as &#39;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">type</span>(size)<span style="color: #666666">.</span><span style="color: #19177C">__name__</span><span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;)&quot;</span>)
 
-    <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;orig&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;large&quot;</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;thumb&quot;</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">__image_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown image size specification: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span style="color: #008000; font-weight: bold">if</span> size <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;orig&quot;</span>:
+        <span style="color: #008000; font-weight: bold">return</span> __file_path(db, scan_id, fileset_id, file_id)
+    <span style="color: #008000; font-weight: bold">elif</span> size <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;large&quot;</span> <span style="color: #AA22FF; font-weight: bold">or</span> size <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;thumb&quot;</span> <span style="color: #AA22FF; font-weight: bold">or</span> <span style="color: #008000">isinstance</span>(size, <span style="color: #008000">int</span>):
+        <span style="color: #008000; font-weight: bold">return</span> __image_cached_path(db, scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">else</span>:
+        <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">ValueError</span>(<span style="color: #BA2121">f&quot;Unknown image size specification: </span><span style="color: #A45A77; font-weight: bold">{</span>size<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3405,7 +3405,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <h2 id="plantdb.webcache.mesh_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">mesh_path(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)</code>
 
 <a href="#plantdb.webcache.mesh_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3527,85 +3527,85 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">mesh_path</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original pointcloud:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="s1">&#39;TriangleMesh_9_most_connected_t_open3d_00e095c359&#39;</span><span class="p">,</span> <span class="s1">&#39;TriangleMesh&#39;</span><span class="p">,</span> <span class="s1">&#39;orig&#39;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.webcache</span> <span style="color: #008000; font-weight: bold">import</span> mesh_path
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.test_database</span> <span style="color: #008000; font-weight: bold">import</span> test_database
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> test_database(<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 1: Get the original pointcloud:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>mesh_path(db, <span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, <span style="color: #BA2121">&#39;TriangleMesh_9_most_connected_t_open3d_00e095c359&#39;</span>, <span style="color: #BA2121">&#39;TriangleMesh&#39;</span>, <span style="color: #BA2121">&#39;orig&#39;</span>)
+<span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply&#39;)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span>
-<span class="normal">506</span>
-<span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span>
-<span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">mesh_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the path to a mesh file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">502</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">503</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">504</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">505</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">510</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">511</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">512</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">515</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">516</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">517</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">518</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">519</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">520</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">521</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">522</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">523</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">524</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">525</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">528</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">mesh_path</span>(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to a mesh file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : any, optional</span>
-<span class="sd">        UNUSED.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : any, optional</span>
+<span style="color: #BA2121; font-style: italic">        UNUSED.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the original mesh.</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the original mesh.</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.webcache import mesh_path</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
-<span class="sd">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.connect()</span>
-<span class="sd">    &gt;&gt;&gt; # Example 1: Get the original pointcloud:</span>
-<span class="sd">    &gt;&gt;&gt; mesh_path(db, &#39;real_plant_analyzed&#39;, &#39;TriangleMesh_9_most_connected_t_open3d_00e095c359&#39;, &#39;TriangleMesh&#39;, &#39;orig&#39;)</span>
-<span class="sd">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using original mesh file&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.webcache import mesh_path</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 1: Get the original pointcloud:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; mesh_path(db, &#39;real_plant_analyzed&#39;, &#39;TriangleMesh_9_most_connected_t_open3d_00e095c359&#39;, &#39;TriangleMesh&#39;, &#39;orig&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Using original mesh file&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> __file_path(db, scan_id, fileset_id, file_id)
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3618,7 +3618,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
 
 <h2 id="plantdb.webcache.pointcloud_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">)</span></code>
+          <code class="highlight language-python">pointcloud_path(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)</code>
 
 <a href="#plantdb.webcache.pointcloud_path" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -3744,124 +3744,124 @@ Default to 'orig'.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.webcache</span> <span class="kn">import</span> <span class="n">pointcloud_path</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">plantdb.test_database</span> <span class="kn">import</span> <span class="n">test_database</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">test_database</span><span class="p">(</span><span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Get the original pointcloud:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="s1">&#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;</span><span class="p">,</span> <span class="s1">&#39;PointCloud&#39;</span><span class="p">,</span> <span class="s1">&#39;orig&#39;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Get a down-sampled version of the pointcloud:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;real_plant_analyzed&#39;</span><span class="p">,</span> <span class="s1">&#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;</span><span class="p">,</span> <span class="s1">&#39;PointCloud&#39;</span><span class="p">,</span> <span class="s1">&#39;preview&#39;</span><span class="p">)</span>
-<span class="go">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.webcache</span> <span style="color: #008000; font-weight: bold">import</span> pointcloud_path
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.test_database</span> <span style="color: #008000; font-weight: bold">import</span> test_database
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> test_database(<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 1: Get the original pointcloud:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>pointcloud_path(db, <span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, <span style="color: #BA2121">&#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;</span>, <span style="color: #BA2121">&#39;PointCloud&#39;</span>, <span style="color: #BA2121">&#39;orig&#39;</span>)
+<span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply&#39;)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 2: Get a down-sampled version of the pointcloud:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>pointcloud_path(db, <span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, <span style="color: #BA2121">&#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;</span>, <span style="color: #BA2121">&#39;PointCloud&#39;</span>, <span style="color: #BA2121">&#39;preview&#39;</span>)
+<span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply&#39;)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/webcache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span>
-<span class="normal">454</span>
-<span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
-<span class="normal">476</span>
-<span class="normal">477</span>
-<span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
-<span class="normal">482</span>
-<span class="normal">483</span>
-<span class="normal">484</span>
-<span class="normal">485</span>
-<span class="normal">486</span>
-<span class="normal">487</span>
-<span class="normal">488</span>
-<span class="normal">489</span>
-<span class="normal">490</span>
-<span class="normal">491</span>
-<span class="normal">492</span>
-<span class="normal">493</span>
-<span class="normal">494</span>
-<span class="normal">495</span>
-<span class="normal">496</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">pointcloud_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;orig&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the path to a point cloud file.</span>
+            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">453</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">454</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">455</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">456</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">457</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">458</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">459</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">460</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">462</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">463</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">464</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">465</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">466</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">467</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">468</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">469</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">470</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">471</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">472</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">473</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">474</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">476</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">477</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">479</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">480</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">484</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">pointcloud_path</span>(db, scan_id, fileset_id, file_id, size<span style="color: #666666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>):
+<span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to a point cloud file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    db : plantdb.fsdb.FSDB</span>
-<span class="sd">        The database object.</span>
-<span class="sd">    scan_id : str</span>
-<span class="sd">        The ID of the scan in the database.</span>
-<span class="sd">    fileset_id : str</span>
-<span class="sd">        The ID of the fileset in the scan.</span>
-<span class="sd">    file_id : str</span>
-<span class="sd">        The ID of the file in the fileset.</span>
-<span class="sd">    size : {&#39;orig&#39;, &#39;preview&#39;} or float, optional</span>
-<span class="sd">        The requested size of the point cloud.</span>
-<span class="sd">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
-<span class="sd">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
-<span class="sd">        A float will resize the point cloud to given voxel size.</span>
-<span class="sd">        Default to &#39;orig&#39;.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    db : plantdb.fsdb.FSDB</span>
+<span style="color: #BA2121; font-style: italic">        The database object.</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the scan in the database.</span>
+<span style="color: #BA2121; font-style: italic">    fileset_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the fileset in the scan.</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the fileset.</span>
+<span style="color: #BA2121; font-style: italic">    size : {&#39;orig&#39;, &#39;preview&#39;} or float, optional</span>
+<span style="color: #BA2121; font-style: italic">        The requested size of the point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        Obviously &#39;orig&#39; preserve the original point cloud.</span>
+<span style="color: #BA2121; font-style: italic">        &#39;preview&#39; will resize the point cloud to a `1.8` voxel size.</span>
+<span style="color: #BA2121; font-style: italic">        A float will resize the point cloud to given voxel size.</span>
+<span style="color: #BA2121; font-style: italic">        Default to &#39;orig&#39;.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pathlib.Path</span>
-<span class="sd">        The path to the original or cached pointcloud.</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the original or cached pointcloud.</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.webcache import pointcloud_path</span>
-<span class="sd">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
-<span class="sd">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.connect()</span>
-<span class="sd">    &gt;&gt;&gt; # Example 1: Get the original pointcloud:</span>
-<span class="sd">    &gt;&gt;&gt; pointcloud_path(db, &#39;real_plant_analyzed&#39;, &#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;, &#39;PointCloud&#39;, &#39;orig&#39;)</span>
-<span class="sd">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; # Example 2: Get a down-sampled version of the pointcloud:</span>
-<span class="sd">    &gt;&gt;&gt; pointcloud_path(db, &#39;real_plant_analyzed&#39;, &#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;, &#39;PointCloud&#39;, &#39;preview&#39;)</span>
-<span class="sd">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; db.disconnect()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;orig&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using original pointcloud file&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">__file_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;preview&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using cached pointcloud file&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">__pointcloud_cached_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">scan_id</span><span class="p">,</span> <span class="n">fileset_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown pointcloud size specification: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">path</span>
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.webcache import pointcloud_path</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.test_database import test_database</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = test_database(&#39;real_plant_analyzed&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 1: Get the original pointcloud:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; pointcloud_path(db, &#39;real_plant_analyzed&#39;, &#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;, &#39;PointCloud&#39;, &#39;orig&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 2: Get a down-sampled version of the pointcloud:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; pointcloud_path(db, &#39;real_plant_analyzed&#39;, &#39;PointCloud_1_0_1_0_10_0_7ee836e5a9&#39;, &#39;PointCloud&#39;, &#39;preview&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">if</span> size <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;orig&quot;</span>:
+        <span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Using original pointcloud file&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> __file_path(db, scan_id, fileset_id, file_id)
+    <span style="color: #008000; font-weight: bold">elif</span> size <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;preview&quot;</span>:
+        <span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Using cached pointcloud file&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size)
+    <span style="color: #008000; font-weight: bold">else</span>:
+        <span style="color: #008000; font-weight: bold">try</span>:
+            path <span style="color: #666666">=</span> __pointcloud_cached_path(db, scan_id, fileset_id, file_id, <span style="color: #008000">float</span>(size))
+        <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">ValueError</span>:
+            <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">ValueError</span>(<span style="color: #BA2121">f&quot;Unknown pointcloud size specification: </span><span style="color: #A45A77; font-weight: bold">{</span>size<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+        <span style="color: #008000; font-weight: bold">else</span>:
+            <span style="color: #008000; font-weight: bold">return</span> path
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
