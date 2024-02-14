@@ -29,12 +29,14 @@ theme:
 extra:
   homepage: https://romi.github.io/plantdb/
   social:
-    - icon: fontawesome/brands/twitter
+    - icon: fontawesome/brands/x-twitter
       link: 'https://twitter.com/ROMI_EU_PROJECT'
     - icon: fontawesome/brands/facebook
       link: 'https://www.facebook.com/ROMIEUProject'
     - icon: fontawesome/brands/github
       link: 'https://github.com/romi/plantdb'
+    - icon: fontawesome/brands/docker
+      link: 'https://hub.docker.com/repository/docker/roboticsmicrofarms/plantimager/general'
   project: 'The ROMI project has received funding from the European Community’s H2020 Programme under Grant Agreement No. 773875.'
   footer_logo: '/assets/images/eu-flag.png'
   repo_name: plantdb
