@@ -2,7 +2,7 @@ site_name: PlantDB
 site_description: PlantDB documentation.
 site_author: ROMI Team
 site_url: https://romi.github.io/plantdb/
-copyright: 'CC Attribution-NonCommercial-ShareAlike 4.0 International'
+copyright: 'The ROMI project has received funding from the European Community’s H2020 Programme under Grant Agreement No. 773875.'
 repo_url: https://github.com/romi/plantdb
 
 nav:
@@ -37,8 +37,6 @@ extra:
       link: 'https://github.com/romi/plantdb'
     - icon: fontawesome/brands/docker
       link: 'https://hub.docker.com/repository/docker/roboticsmicrofarms/plantimager/general'
-  project: 'The ROMI project has received funding from the European Community’s H2020 Programme under Grant Agreement No. 773875.'
-  footer_logo: '/assets/images/eu-flag.png'
   repo_name: plantdb
   repo_url: https://github.com/romi/plantdb
 
