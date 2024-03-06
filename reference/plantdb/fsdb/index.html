@@ -1875,70 +1875,65 @@
   <div class="doc doc-contents first">
   
       <p>This module implement a database as a <strong>local file structure</strong>.</p>
-<p>Assuming that the <code>FSDB</code> root database directory is <code>dbroot/</code>, there is a <code>Scan</code> with <code>'myscan_001'</code> as <code>Scan.id</code> and there are some metadata (see below), you should have the following file structure:</p>
-<p>.. code-block::</p>
-<div class="codehilite"><pre><span></span><code><span class="n">dbroot</span><span class="o">/</span><span class="w">                            </span><span class="c1"># base directory of the database</span>
-<span class="n">├──</span><span class="w"> </span><span class="n">myscan_001</span><span class="o">/</span><span class="w">                    </span><span class="c1"># scan dataset directory, id=`myscan_001`</span>
-<span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">files</span><span class="p">.</span><span class="kt">json</span><span class="w">                 </span><span class="c1"># JSON file referencing the all files for the dataset</span>
-<span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">images</span><span class="o">/</span><span class="w">                    </span><span class="c1"># `Fileset` gathering the &#39;images&#39;</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">scan_img_01</span><span class="p">.</span><span class="n">jpg</span><span class="w">        </span><span class="c1"># &#39;image&#39; `File` 01</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">scan_img_02</span><span class="p">.</span><span class="n">jpg</span><span class="w">        </span><span class="c1"># &#39;image&#39; `File` 02</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="err">[</span><span class="p">...</span><span class="err">]</span><span class="w">                  </span><span class="c1">#</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="n">scan_img_99</span><span class="p">.</span><span class="n">jpg</span><span class="w">        </span><span class="c1"># &#39;image&#39; `File` 99</span>
-<span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">metadata</span><span class="o">/</span><span class="w">                  </span><span class="c1"># metadata directory</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">images</span><span class="w">                 </span><span class="c1"># &#39;images&#39; metadata directory</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">scan_img_01</span><span class="p">.</span><span class="kt">json</span><span class="w">   </span><span class="c1"># JSON metadata attached to this file</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">scan_img_02</span><span class="p">.</span><span class="kt">json</span><span class="w">   </span><span class="c1">#</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="err">[</span><span class="p">...</span><span class="err">]</span><span class="w">                  </span><span class="c1">#</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="n">scan_img_99</span><span class="p">.</span><span class="kt">json</span><span class="w">   </span><span class="c1">#</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">Task_A</span><span class="o">/</span><span class="w">                </span><span class="c1"># optional, only present if metadata attached to one of the outputs from `Task_A`</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="k">outfile</span><span class="p">.</span><span class="kt">json</span><span class="w">       </span><span class="c1"># optional metadata attached to the output file from `Task_A`</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="kt">json</span><span class="p">)</span><span class="w">        </span><span class="c1"># optional metadata attached to the dataset</span>
-<span class="n">│</span><span class="w">   </span><span class="n">├──</span><span class="w"> </span><span class="n">task_A</span><span class="o">/</span><span class="w">                    </span><span class="c1"># `Fileset` gathering the outputs of `Task_A`</span>
-<span class="n">│</span><span class="w">   </span><span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="k">outfile</span><span class="p">.</span><span class="n">ext</span><span class="w">            </span><span class="c1"># output file from `Task_A`</span>
-<span class="n">│</span><span class="w">   </span><span class="n">└──</span><span class="w"> </span><span class="p">(</span><span class="n">measures</span><span class="p">.</span><span class="kt">json</span><span class="p">)</span><span class="w">            </span><span class="c1"># optional manual measurements file</span>
-<span class="n">├──</span><span class="w"> </span><span class="n">myscan_002</span><span class="o">/</span><span class="w">                    </span><span class="c1"># scan dataset directory, id=`myscan_002`</span>
-<span class="o">:</span>
-<span class="n">├──</span><span class="w"> </span><span class="p">(</span><span class="n">LOCK_FILE_NAME</span><span class="p">)</span><span class="w">               </span><span class="c1"># &quot;lock file&quot;, present if DB is connected</span>
-<span class="n">└──</span><span class="w"> </span><span class="n">MARKER_FILE_NAME</span><span class="w">               </span><span class="c1"># ROMI DB marker file</span>
-</code></pre></div>
-
-<p>The <code>myscan_001/files.json</code> file then contains the following structure:</p>
-<p>.. code-block:: json</p>
-<div class="codehilite"><pre><span></span><code>{
-    &quot;filesets&quot;: [
-        {
-            &quot;id&quot;: &quot;images&quot;,
-            &quot;files&quot;: [
-                {
-                    &quot;id&quot;: &quot;scan_img_01&quot;,
-                    &quot;file&quot;: &quot;scan_img_01.jpg&quot;
-                },
-                {
-                    &quot;id&quot;: &quot;scan_img_02&quot;,
-                    &quot;file&quot;: &quot;scan_img_02.jpg&quot;
-                },
-                [...]
-                {
-                    &quot;id&quot;: &quot;scan_img_99&quot;,
-                    &quot;file&quot;: &quot;scan_img_99.jpg&quot;
-                }
-            ]
-        }
-    ]
+<p>Assuming that the <code>FSDB</code> root database directory is <code>dbroot/</code>, there is a <code>Scan</code> with <code>'myscan_001'</code> as <code>Scan.id</code> and there are some metadata (see below), you should have the following file structure:
+<div class="language-text highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>    dbroot/                            # base directory of the database
+    ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
+    │   ├── files.json                 # JSON file referencing the all files for the dataset
+    │   ├── images/                    # `Fileset` gathering the &#39;images&#39;
+    │   │   ├── scan_img_01.jpg        # &#39;image&#39; `File` 01
+    │   │   ├── scan_img_02.jpg        # &#39;image&#39; `File` 02
+    │   │   ├── [...]                  #
+    │   │   └── scan_img_99.jpg        # &#39;image&#39; `File` 99
+    │   ├── metadata/                  # metadata directory
+    │   │   ├── images                 # &#39;images&#39; metadata directory
+    │   │   │   ├── scan_img_01.json   # JSON metadata attached to this file
+    │   │   │   ├── scan_img_02.json   #
+    │   │   │   [...]                  #
+    │   │   │   └── scan_img_99.json   #
+    │   │   ├── Task_A/                # optional, only present if metadata attached to one of the outputs from `Task_A`
+    │   │   │   └── outfile.json       # optional metadata attached to the output file from `Task_A`
+    │   │   └── (metadata.json)        # optional metadata attached to the dataset
+    │   ├── task_A/                    # `Fileset` gathering the outputs of `Task_A`
+    │   │   └── outfile.ext            # output file from `Task_A`
+    │   └── (measures.json)            # optional manual measurements file
+    ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
+    :
+    ├── (LOCK_FILE_NAME)               # &quot;lock file&quot;, present if DB is connected
+    └── MARKER_FILE_NAME               # ROMI DB marker file
+</code></pre></div></p>
+<p>The <code>myscan_001/files.json</code> file then contains the following structure:
+<div class="language-json highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>{
+<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">&quot;filesets&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">        </span>{
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;images&quot;</span>,
+<span style="color: #bbbbbb">            </span><span style="color: #008000; font-weight: bold">&quot;files&quot;</span>:<span style="color: #bbbbbb"> </span>[
+<span style="color: #bbbbbb">                </span>{
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_01&quot;</span>,
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;file&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_01.jpg&quot;</span>
+<span style="color: #bbbbbb">                </span>},
+<span style="color: #bbbbbb">                </span>{
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_02&quot;</span>,
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;file&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_02.jpg&quot;</span>
+<span style="color: #bbbbbb">                </span>},
+<span style="color: #bbbbbb">                </span>[<span style="border: 1px solid #FF0000">...</span>]
+<span style="color: #bbbbbb">                </span>{
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;id&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_99&quot;</span>,
+<span style="color: #bbbbbb">                    </span><span style="color: #008000; font-weight: bold">&quot;file&quot;</span>:<span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;scan_img_99.jpg&quot;</span>
+<span style="color: #bbbbbb">                </span>}
+<span style="color: #bbbbbb">            </span>]
+<span style="color: #bbbbbb">        </span>}
+<span style="color: #bbbbbb">    </span>]
 }
-</code></pre></div>
-
-<p>The metadata of the scan (<code>metadata.json</code>), of the set of 'images' files (<code>&lt;Fileset.id&gt;.json</code>) and of each 'image' files (<code>&lt;File.id&gt;.json</code>) are all stored as JSON files in a separate directory:</p>
-<p>.. code-block::</p>
-<div class="codehilite"><pre><span></span><code>myscan_001/metadata/
+</code></pre></div></p>
+<p>The metadata of the scan (<code>metadata.json</code>), of the set of 'images' files (<code>&lt;Fileset.id&gt;.json</code>) and of each 'image' files (<code>&lt;File.id&gt;.json</code>) are all stored as JSON files in a separate directory:
+<div class="language-text highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>myscan_001/metadata/
 myscan_001/metadata/metadata.json
 myscan_001/metadata/images.json
 myscan_001/metadata/images/scan_img_01.json
 myscan_001/metadata/images/scan_img_02.json
 [...]
 myscan_001/metadata/images/scan_img_99.json
-</code></pre></div>
+</code></pre></div></p>
 
   
 
@@ -2160,7 +2155,11 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
@@ -2196,11 +2195,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, basedir, required_filesets<span style="color: #666666">=</span>[<span style="color: #BA2121">&#39;metadata&#39;</span>]):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, basedir, required_filesets<span style="color: #666666">=</span>[<span style="color: #BA2121">&#39;metadata&#39;</span>]):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Database constructor.</span>
 
 <span style="color: #BA2121; font-style: italic">    Check given ``basedir`` directory exists and load accessible ``Scan`` objects.</span>
@@ -2360,7 +2355,11 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
@@ -2404,11 +2403,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">connect</span>(<span style="color: #008000">self</span>, login_data<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, unsafe<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">connect</span>(<span style="color: #008000">self</span>, login_data<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, unsafe<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Connect to the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Handle DB &quot;locking&quot; system by adding a `LOCK_FILE_NAME` file in the DB.</span>
@@ -2576,7 +2571,11 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
@@ -2614,11 +2613,7 @@ plantdb.fsdb._make_scan</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">524</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">525</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">528</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new `Scan` instance in the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2761,7 +2756,11 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
@@ -2797,11 +2796,7 @@ plantdb.fsdb._make_scan</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">566</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">567</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">568</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">569</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">570</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">571</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">572</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">573</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">569</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete an existing `Scan` from the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2905,7 +2900,11 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
@@ -2937,11 +2936,7 @@ plantdb.fsdb._make_scan</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">401</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">403</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">disconnect</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">disconnect</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Disconnect from the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Handle DB &quot;locking&quot; system by removing the `LOCK_FILE_NAME` file from the DB.</span>
@@ -3070,7 +3065,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
@@ -3105,11 +3104,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">480</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">484</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scan</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get or create a `Scan` instance in the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3241,7 +3236,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
@@ -3264,11 +3263,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">439</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">440</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">441</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">442</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">443</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">442</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3330,7 +3325,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">590</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">592</span>
@@ -3339,11 +3338,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">595</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of scans in the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -3390,7 +3385,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">571</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">572</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">573</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">574</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
@@ -3398,11 +3397,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to the local database root directory.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -3438,14 +3433,14 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">reload</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">reload</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reload the database by scanning datasets.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">self</span><span style="color: #666666">.</span>is_connected:
         logger<span style="color: #666666">.</span>error(<span style="color: #BA2121">&quot;Reloading the database...&quot;</span>)
@@ -3567,9 +3562,9 @@ Else they are just referenced in the database!</p>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1325</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1326</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1327</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs):
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1321</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1322</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1323</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs):
     <span style="color: #008000">super</span>()<span style="color: #666666">.</span><span style="color: #0000FF">__init__</span>(fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs)
     <span style="color: #008000">self</span><span style="color: #666666">.</span>metadata <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">None</span>
 </code></pre></div></td></tr></table></div>
@@ -3689,7 +3684,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1334</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1330</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1331</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1332</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1333</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1334</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1335</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1336</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1337</span>
@@ -3716,11 +3715,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1358</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1359</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1360</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1361</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1362</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1363</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1364</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1365</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1361</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the metadata associated to a file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3822,7 +3817,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1403</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1399</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1400</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1401</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1403</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1404</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1405</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1406</span>
@@ -3849,11 +3848,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1427</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1428</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1429</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1430</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1431</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1432</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1433</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1434</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">import_file</span>(<span style="color: #008000">self</span>, path):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1430</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">import_file</span>(<span style="color: #008000">self</span>, path):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Import the file from its local path to the current fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3923,7 +3918,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1584</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1580</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1581</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1582</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1583</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1584</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1585</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1586</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1587</span>
@@ -3936,11 +3935,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1594</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1595</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1596</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1597</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1598</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1600</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1601</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1597</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to the local file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -4029,7 +4024,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1510</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1510</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1511</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1512</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1513</span>
@@ -4058,11 +4057,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1536</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1537</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1538</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1539</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1540</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1541</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1542</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1543</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1539</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Read the file and return its contents.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -4168,7 +4163,11 @@ db.disconnect()</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1441</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1441</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1442</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1443</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1444</span>
@@ -4194,11 +4193,7 @@ db.disconnect()</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1464</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1465</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1466</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1467</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1468</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1469</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1470</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1471</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read_raw</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1467</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">read_raw</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Read the file and return its contents.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -4317,7 +4312,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1367</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1367</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1368</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1369</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1370</span>
@@ -4347,11 +4346,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1394</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1395</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1396</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1397</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1398</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1399</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1400</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1401</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1397</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Add a new metadata to the file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4409,10 +4404,10 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1436</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1437</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1438</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1439</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1432</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1435</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Save changes to the scan main JSON FILE (files.json).&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666666">.</span>fileset<span style="color: #666666">.</span>store()
     <span style="color: #008000; font-weight: bold">return</span>
@@ -4506,7 +4501,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1545</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1541</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1542</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1543</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1544</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1545</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1546</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1547</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1548</span>
@@ -4539,11 +4538,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1575</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1576</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1577</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1578</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1579</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1580</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1581</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1582</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write</span>(<span style="color: #008000">self</span>, data, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1578</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write</span>(<span style="color: #008000">self</span>, data, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Write a file from data.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4669,7 +4664,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1473</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1469</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1470</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1471</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1472</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1473</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1474</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1475</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1476</span>
@@ -4700,11 +4699,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1501</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1502</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1503</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1504</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1505</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1506</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1507</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1508</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write_raw</span>(<span style="color: #008000">self</span>, data, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1504</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">write_raw</span>(<span style="color: #008000">self</span>, data, ext<span style="color: #666666">=</span><span style="color: #BA2121">&quot;&quot;</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Write a file from raw byte data.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4946,7 +4941,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1012</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1008</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1009</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1010</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1011</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1012</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1013</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1014</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1015</span>
@@ -4954,11 +4953,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1017</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1018</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1019</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1020</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1021</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1022</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1023</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1024</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, scan, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1020</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, scan, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Constructor.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5081,7 +5076,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1177</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1173</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1174</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1175</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1176</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1177</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1178</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1179</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1180</span>
@@ -5116,11 +5115,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1209</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1210</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1211</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1212</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1213</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1214</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1215</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1216</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1212</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new `File` instance in the local database attached to the current `Fileset` instance.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5233,7 +5228,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1218</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1218</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1219</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1220</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1221</span>
@@ -5262,11 +5261,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1244</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1245</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1246</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1247</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1248</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1249</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1250</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1251</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_file</span>(<span style="color: #008000">self</span>, file_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1247</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_file</span>(<span style="color: #008000">self</span>, file_id):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete a given file from the current fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5407,7 +5402,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1067</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1063</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1064</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1065</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1066</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1067</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1068</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1069</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1070</span>
@@ -5438,11 +5437,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1095</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1096</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1097</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1098</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1099</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1100</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1101</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1102</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1098</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_file</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get or create a `File` instance, of given `id`, in the current fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5574,7 +5569,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1034</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1030</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1031</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1032</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1033</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1034</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1035</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1036</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1037</span>
@@ -5601,11 +5600,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1058</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1059</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1060</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1061</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1062</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1063</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1064</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1065</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_files</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1061</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_files</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5750,7 +5745,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1104</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1103</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1104</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1105</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1106</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1107</span>
@@ -5782,11 +5781,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1133</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1134</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1135</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1136</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1137</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1138</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1139</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1140</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1136</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the metadata associated to a fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5859,7 +5854,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1279</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1275</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1276</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1277</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1278</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1279</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1280</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1281</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1282</span>
@@ -5870,11 +5869,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1287</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1288</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1289</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1290</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1291</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1292</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1293</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1294</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_files</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1290</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_files</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of files in the fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -5930,7 +5925,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1258</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1254</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1255</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1256</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1258</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1259</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1260</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1261</span>
@@ -5945,11 +5944,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1270</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1271</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1272</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1273</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1274</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1275</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1276</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1277</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1273</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to the local fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -6056,7 +6051,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1142</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1142</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1143</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1144</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1145</span>
@@ -6085,11 +6084,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1168</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1169</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1170</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1171</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1172</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1173</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1174</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1175</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1171</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Add a new metadata to the fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6146,10 +6141,10 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1253</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1254</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1255</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1256</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1249</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1250</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1251</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1252</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Save changes to the scan main JSON FILE (files.json).&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666666">.</span>scan<span style="color: #666666">.</span>store()
     <span style="color: #008000; font-weight: bold">return</span>
@@ -6408,7 +6403,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">684</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">685</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">686</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">687</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">689</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">690</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">691</span>
@@ -6419,11 +6418,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">696</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">697</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">698</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">699</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">700</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">701</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">702</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">703</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, db, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">699</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, db, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Scan dataset constructor.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6572,7 +6567,11 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">866</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">862</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">863</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">864</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">865</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">866</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">867</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">868</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">869</span>
@@ -6616,11 +6615,7 @@ plantdb.fsdb._make_fileset</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">907</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">908</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">909</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">910</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">911</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">912</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">913</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">914</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">910</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">create_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new `Fileset` instance in the local database attached to the current `Scan` instance.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6737,7 +6732,11 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">922</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">918</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">919</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">920</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">921</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">922</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">923</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">924</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">925</span>
@@ -6762,11 +6761,7 @@ plantdb.fsdb._make_fileset</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">944</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">945</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">946</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">947</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">948</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">949</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">950</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">951</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_fileset</span>(<span style="color: #008000">self</span>, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">947</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">delete_fileset</span>(<span style="color: #008000">self</span>, fileset_id):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete a given fileset from the scan dataset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6913,7 +6908,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">739</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">740</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">741</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">742</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">744</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">745</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">746</span>
@@ -6954,11 +6953,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">781</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">782</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">783</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">784</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">785</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">786</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">787</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">788</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">784</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_fileset</span>(<span style="color: #008000">self</span>, <span style="color: #008000">id</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get or create a `Fileset` instance, of given `id`, in the current scan dataset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7097,7 +7092,11 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">713</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">709</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">710</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">711</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">712</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">713</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">714</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">715</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">716</span>
@@ -7121,11 +7120,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">734</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">735</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">736</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">737</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">738</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">739</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">740</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">741</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_filesets</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">737</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_filesets</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7237,7 +7232,11 @@ It is located at the root folder of the scan dataset.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">810</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">806</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">807</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">808</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">809</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">810</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">811</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">812</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">813</span>
@@ -7253,11 +7252,7 @@ It is located at the root folder of the scan dataset.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">823</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">824</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">825</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">826</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">827</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">828</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">829</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">830</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_measures</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">826</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_measures</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the manual measurements associated to a scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7371,7 +7366,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">790</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">786</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">787</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">788</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">789</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">790</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">791</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">792</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">793</span>
@@ -7385,11 +7384,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">801</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">802</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">803</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">804</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">805</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">806</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">807</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">808</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">804</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">get_metadata</span>(<span style="color: #008000">self</span>, key<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, default<span style="color: #666666">=</span>{}):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the metadata associated to a scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7443,7 +7438,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">968</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">964</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">965</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">966</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">967</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">968</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">969</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">970</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">971</span>
@@ -7453,11 +7452,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">975</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">976</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">977</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">978</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">979</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">980</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">981</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">982</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_filesets</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">978</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">list_filesets</span>(<span style="color: #008000">self</span>, query<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666666">-&gt;</span> <span style="color: #008000">list</span>:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of filesets in the scan dataset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -7506,7 +7501,11 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">953</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">949</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">950</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">951</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">952</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">953</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">954</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">955</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">956</span>
@@ -7515,11 +7514,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">959</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">960</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">961</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">962</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">963</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">964</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">965</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">966</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">962</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">path</span>(<span style="color: #008000">self</span>) <span style="color: #666666">-&gt;</span> pathlib<span style="color: #666666">.</span>Path:
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to the local scan dataset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -7619,7 +7614,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">832</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">828</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">829</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">830</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">831</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">832</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">833</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">834</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">835</span>
@@ -7647,11 +7646,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">857</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">858</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">859</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">860</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">861</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">862</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">863</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">864</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">860</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">set_metadata</span>(<span style="color: #008000">self</span>, data, value<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Add a new metadata to the scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7707,11 +7702,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">917</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">918</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">919</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">920</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">912</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">913</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">914</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">915</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Save changes to the scan main JSON FILE (files.json).&quot;&quot;&quot;</span>
     _store_scan(<span style="color: #008000">self</span>)
     logger<span style="color: #666666">.</span>debug(<span style="color: #BA2121">f&quot;The `files.json` file for scan &#39;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">self</span><span style="color: #666666">.</span>id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; has been updated!&quot;</span>)
@@ -7853,7 +7848,11 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
@@ -7939,11 +7938,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">207</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">dummy_db</span>(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_fileset<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">dummy_db</span>(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_fileset<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a dummy temporary database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>

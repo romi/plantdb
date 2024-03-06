@@ -1079,10 +1079,12 @@
 
   
       <p>Class for sync between two FSDB databases.</p>
-<p>It checks for validity of both source and target by checking:
-    * That there is a marker file in the DB path root
-    * That the DB is not busy by checking for the lock file in the DB path root.
-It locks the two databases during the sync. The sync is done using rsync as a subprocess</p>
+<p>It checks for validity of both source and target by checking that:</p>
+<ul>
+<li>there is a marker file in the DB path root</li>
+<li>the DB is not busy by checking for the lock file in the DB path root.</li>
+</ul>
+<p>It locks the two databases during the sync. The sync is done using rsync as a subprocess</p>
 
 
 
@@ -1191,8 +1193,7 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/sync.py</code></summary>
-                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
@@ -1204,7 +1205,8 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">75</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">76</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, source, target):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, source, target):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Class constructor.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -1250,13 +1252,13 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">90</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">91</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">92</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">93</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">lock</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">95</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">lock</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Lock the source and target DB before sync.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">for</span> x <span style="color: #AA22FF; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666666">.</span>source, <span style="color: #008000">self</span><span style="color: #666666">.</span>target]:
         <span style="color: #008000; font-weight: bold">if</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
@@ -1286,11 +1288,11 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">sync</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">sync</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sync the two DBs.&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666666">.</span>lock()
     subprocess<span style="color: #666666">.</span>run([<span style="color: #BA2121">&quot;rsync&quot;</span>, <span style="color: #BA2121">&quot;-av&quot;</span>, <span style="color: #008000">self</span><span style="color: #666666">.</span>source_str, <span style="color: #008000">self</span><span style="color: #666666">.</span>target_str])
@@ -1318,13 +1320,13 @@ It locks the two databases during the sync. The sync is done using rsync as a su
 
           <details class="quote">
             <summary>Source code in <code>plantdb/sync.py</code></summary>
-            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">80</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">unlock</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">unlock</span>(<span style="color: #008000">self</span>):
 <span style="color: #bbbbbb">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Unlock the source and target DB after sync.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">for</span> x <span style="color: #AA22FF; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666666">.</span>source, <span style="color: #008000">self</span><span style="color: #666666">.</span>target]:
         <span style="color: #008000; font-weight: bold">if</span> x[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:

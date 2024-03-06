@@ -1307,26 +1307,30 @@ The Python implementation is done in the <code>plantdb.rest_api</code> module an
 <h3 id="scans"><code>/scans</code><a class="headerlink" href="#scans" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/scans</code> URL:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.ScanList</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.ScanList"><code>plantdb.rest_api.ScanList</code></a></li>
 <li>Arguments: <code>filterQuery</code></li>
 <li>Returns: a JSON compliant list of dictionaries.</li>
-<li>Example:</li>
+<li>Example:<ul>
 <li>Get all scans:
-  <a href="http://127.0.0.1:5000/scans">http://127.0.0.1:5000/scans</a></li>
+<a href="http://127.0.0.1:5000/scans">http://127.0.0.1:5000/scans</a></li>
 <li>Search for "arabidopsis" in metadata:
-  <a href="http://127.0.0.1:5000/scans?filterQuery=arabidopsis">http://127.0.0.1:5000/scans?filterQuery=arabidopsis</a></li>
+<a href="http://127.0.0.1:5000/scans?filterQuery=arabidopsis">http://127.0.0.1:5000/scans?filterQuery=arabidopsis</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="scansscan_id"><code>/scans/&lt;scan_id&gt;</code><a class="headerlink" href="#scansscan_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/scans/&lt;scan_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Scan</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Scan"><code>plantdb.rest_api.Scan</code></a></li>
 <li>Arguments: none</li>
 <li>Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset</li>
-<li>Examples with the test database:</li>
+<li>Examples with the test database:<ul>
 <li>Get scan info for the <code>"real_plant_analyzed"</code> dataset:
-  <a href="http://127.0.0.1:5000/scans/real_plant_analyzed">http://127.0.0.1:5000/scans/real_plant_analyzed</a></li>
+<a href="http://127.0.0.1:5000/scans/real_plant_analyzed">http://127.0.0.1:5000/scans/real_plant_analyzed</a></li>
 <li>Get scan info for the <code>"virtual_plant_analyzed"</code> dataset:
-  <a href="http://127.0.0.1:5000/scans/virtual_plant_analyzed">http://127.0.0.1:5000/scans/virtual_plant_analyzed</a></li>
+<a href="http://127.0.0.1:5000/scans/virtual_plant_analyzed">http://127.0.0.1:5000/scans/virtual_plant_analyzed</a></li>
+</ul>
+</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1336,79 +1340,88 @@ In other words it will fail (response <code>500</code>) if this task is missing 
 <h3 id="filespath"><code>/files/&lt;path&gt;</code><a class="headerlink" href="#filespath" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/files/&lt;path&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.File</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.File"><code>plantdb.rest_api.File</code></a></li>
 <li>Arguments: none</li>
 <li>Returns: The content of the file.</li>
-<li>Examples  <code>real_plant_analyzed</code> dataset (from the test database):</li>
+<li>Examples  <code>real_plant_analyzed</code> dataset (from the test database):<ul>
 <li>Get the first image of the scan (<code>00000_rgb</code>):
-  <a href="http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg">http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg</a></li>
+<a href="http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg">http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg</a></li>
 <li>Get the first mask image of the scan (<code>00000_rgb</code>):
-  <a href="http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png">http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0<strong><em>_channel</em></strong>_rgb_5619aa428d/00000_rgb.png</a></li>
+<a href="http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png">http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0<strong><em>_channel</em></strong>_rgb_5619aa428d/00000_rgb.png</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="archivescan_id"><code>/archive/&lt;scan_id&gt;</code><a class="headerlink" href="#archivescan_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/archive/&lt;scan_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Archive</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Archive"><code>plantdb.rest_api.Archive</code></a></li>
 <li>Arguments: none</li>
 <li>Returns: A zip file containing the dataset.</li>
-<li>Examples:</li>
+<li>Examples:<ul>
 <li>Get <code>real_plant_analyzed</code> archive:
-  <a href="http://127.0.0.1:5000/archive/real_plant_analyzed/">http://127.0.0.1:5000/archive/real_plant_analyzed/</a></li>
+<a href="http://127.0.0.1:5000/archive/real_plant_analyzed/">http://127.0.0.1:5000/archive/real_plant_analyzed/</a></li>
 <li>Get <code>virtual_plant_analyzed</code> archive:
-  <a href="http://127.0.0.1:5000/archive/virtual_plant_analyzed/">http://127.0.0.1:5000/archive/virtual_plant_analyzed/</a></li>
+<a href="http://127.0.0.1:5000/archive/virtual_plant_analyzed/">http://127.0.0.1:5000/archive/virtual_plant_analyzed/</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="imagescan_idfileset_idfile_id"><code>/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#imagescan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/image/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Image</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Image"><code>plantdb.rest_api.Image</code></a></li>
 <li>Arguments: <code>size</code> in {<code>orig</code>, <code>large</code>, <code>thumb</code>} to control the max size (width or height) of the image to return.</li>
 <li>Returns: The image file, resized by default.</li>
-<li>Examples with the <code>real_plant_analyzed</code> dataset (from the test database) and the first image of the scan (<code>00000_rgb</code>):</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset (from the test database) and the first image of the scan (<code>00000_rgb</code>):<ul>
 <li>Get the preview image:
-  <a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb</a></li>
+<a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb</a></li>
 <li>Get the original image:
-  <a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig</a></li>
+<a href="http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig">http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="pointcloudscan_idfileset_idfile_id"><code>/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#pointcloudscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/pointcloud/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.PointCloud</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.PointCloud"><code>plantdb.rest_api.PointCloud</code></a></li>
 <li>Arguments: <code>size</code> in {<code>orig</code>, <code>preview</code>} or a <code>float</code> to control the voxel-size of the pointcloud to returns.</li>
 <li>Returns: The point cloud file, preview size by default.</li>
-<li>Examples with the <code>real_plant_analyzed</code> dataset:</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset:<ul>
 <li>Get the preview point cloud:
-  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud</a></li>
+<a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud</a></li>
 <li>Get the original point cloud:
-  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig</a></li>
+<a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig</a></li>
 <li>Get the point cloud with a voxel size of <code>2.3</code>:
-  <a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3</a></li>
+<a href="http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3">http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="pcgroundtruthscan_idfileset_idfile_id"><code>/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#pcgroundtruthscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/pcGroundTruth/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.PointCloudGroundTruth</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.PointCloudGroundTruth"><code>plantdb.rest_api.PointCloudGroundTruth</code></a></li>
 <li>Arguments: <code>size</code> in {<code>orig</code>, <code>preview</code>} or a <code>float</code> to control the voxel-size of the pointcloud to returns.</li>
 <li>Returns: The ground-truth pointcloud file, original size by default.</li>
 </ul>
 <h3 id="meshscan_idfileset_idfile_id"><code>/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code><a class="headerlink" href="#meshscan_idfileset_idfile_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;</code> URLs:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Mesh</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Mesh"><code>plantdb.rest_api.Mesh</code></a></li>
 <li>Arguments: <code>size</code> in {<code>orig</code>}, no control of the size of the mesh to returns.</li>
 <li>Returns: The mesh file, original size by default.</li>
-<li>Examples with the <code>real_plant_analyzed</code> dataset:</li>
+<li>Examples with the <code>real_plant_analyzed</code> dataset:<ul>
 <li>Get the original mesh:
-  <a href="http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh">http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh</a></li>
+<a href="http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh">http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh</a></li>
+</ul>
+</li>
 </ul>
 <h3 id="refresh"><code>/refresh</code><a class="headerlink" href="#refresh" title="Permanent link">Link</a></h3>
 <p>Refresh the list of scans in the <code>plantdb.fsdb.FSDB</code> database.</p>
 <p>Here are the specifications for the <code>/refresh</code> URL:</p>
 <ul>
-<li>Resource: <a href="reference/rest_api.md#classes"><code>plantdb.rest_api.Refresh</code></a></li>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Refresh"><code>plantdb.rest_api.Refresh</code></a></li>
 <li>Arguments: none</li>
 <li>Returns: <code>200</code> on completion.</li>
-<li>Example:
-<a href="http://127.0.0.1:5000/refresh">http://127.0.0.1:5000/refresh</a></li>
+<li>Example: <a href="http://127.0.0.1:5000/refresh">http://127.0.0.1:5000/refresh</a></li>
 </ul>
 <h2 id="scan-summary">Scan summary<a class="headerlink" href="#scan-summary" title="Permanent link">Link</a></h2>
 <p>Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
