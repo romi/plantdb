@@ -906,6 +906,8 @@ def _write_graph(fname, data, **kwargs):
     import pickle
     if 'protocol' not in kwargs:
         kwargs['protocol'] = pickle.HIGHEST_PROTOCOL
+    if isinstance(fname, str):
+        fname = Path(fname)
     with fname.open(mode='wb') as f:
         pickle.dump(data, f, **kwargs)
     return
