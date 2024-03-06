@@ -26,15 +26,16 @@ SHELL ["/bin/bash", "-c"]
 # Update package manager & install requirements:
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
-    git ca-certificates rsync \
-    python3 python3-pip \
-    # Install Open3D system dependencies
-    libegl1 libgl1 libgomp1 && \
+        git ca-certificates rsync \
+        # Install python3.10 & pip
+        python3 python3-pip \
+        # Install Open3D system dependencies
+        libegl1 libgl1 libgomp1 && \
     # Clean package manager:
     apt-get clean -y && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* && \
-    # Create a non-root user named romi' and create a "home" folder wih proper rights:
+    # Create a non-root user and create a "home" folder for it:
     adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
     # Create the folder used to mount the database:
