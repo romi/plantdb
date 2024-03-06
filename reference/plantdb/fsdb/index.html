@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.13">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.f2e4d321.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e359304.min.css">
       
       
 
@@ -2031,7 +2031,7 @@ myscan_001/metadata/images/scan_img_99.json
     </tbody>
   </table>
 
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p>Requires the marker file <code>MARKER_FILE_NAME</code> at the given <code>basedir</code>.
 Lock file <code>LOCK_FILE_NAME</code> is found only when connecting an FSBD instance to the given <code>basedir</code>.</p>
@@ -2045,7 +2045,7 @@ plantdb.fsdb.LOCK_FILE_NAME</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1: Use a temporary dummy local database:</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1: Use a temporary dummy local database:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(<span style="color: #008000">type</span>(db))
@@ -2060,7 +2060,7 @@ plantdb.fsdb.LOCK_FILE_NAME</p>
 <span style="color: #717171">&lt;class &#39;plantdb.fsdb.Scan&#39;&gt;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2: Use a local database:</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2: Use a local database:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> FSDB(os<span style="color: #666666">.</span>environ<span style="color: #666666">.</span>get(<span style="color: #BA2121">&#39;ROMI_DB&#39;</span>, <span style="color: #BA2121">&quot;/data/ROMI/DB/&quot;</span>))
@@ -2160,7 +2160,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
@@ -2347,7 +2347,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666666">.</span>is_connected)
@@ -2360,7 +2360,7 @@ Defaults to <code>['metadata']</code> to limit scans to the <code>basedir</code>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
@@ -2565,7 +2565,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>create_scan(<span style="color: #BA2121">&#39;007&#39;</span>)
@@ -2576,7 +2576,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
@@ -2743,7 +2743,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
@@ -2761,7 +2761,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
@@ -2891,7 +2891,7 @@ plantdb.fsdb._make_scan</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666666">.</span>is_connected)
 <span style="color: #717171">False</span>
@@ -2905,7 +2905,7 @@ plantdb.fsdb._make_scan</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
@@ -3045,14 +3045,14 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
     </tbody>
   </table>
 
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p>If the <code>id</code> do not exist in the local database and <code>create</code> is <code>False</code>, <code>None</code> is returned.</p>
 </details>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>list_scans()
@@ -3070,7 +3070,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
@@ -3231,7 +3231,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>get_scans()
@@ -3241,7 +3241,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
@@ -3320,7 +3320,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>list_scans()
@@ -3330,7 +3330,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">590</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">592</span>
@@ -3381,7 +3381,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>path()
@@ -3390,7 +3390,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
@@ -3438,7 +3438,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
@@ -3559,7 +3559,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
   <summary>See Also</summary>
   <p>plantdb.db.File</p>
 </details>
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p><code>File</code> must be writen using <code>write_raw</code> or <code>write</code> methods to exist on disk.
 Else they are just referenced in the database!</p>
@@ -3567,7 +3567,7 @@ Else they are just referenced in the database!</p>
 </details>
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1325</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1325</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1326</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1327</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">__init__</span>(<span style="color: #008000">self</span>, fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs):
     <span style="color: #008000">super</span>()<span style="color: #666666">.</span><span style="color: #0000FF">__init__</span>(fileset, <span style="color: #008000">id</span>, <span style="color: #666666">**</span>kwargs)
@@ -3675,7 +3675,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> _file_metadata_path
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
@@ -3689,7 +3689,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1334</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1334</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1335</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1336</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1337</span>
@@ -3806,7 +3806,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> _file_metadata_path
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
@@ -3822,7 +3822,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1403</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1403</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1404</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1405</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1406</span>
@@ -3909,7 +3909,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -3923,7 +3923,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1584</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1584</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1585</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1586</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1587</span>
@@ -4006,7 +4006,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4029,7 +4029,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1510</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1510</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1511</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1512</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1513</span>
@@ -4168,7 +4168,7 @@ db.disconnect()</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1441</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1441</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1442</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1443</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1444</span>
@@ -4298,7 +4298,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> _file_metadata_path
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
@@ -4317,7 +4317,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1367</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1367</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1368</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1369</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1370</span>
@@ -4409,7 +4409,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1436</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1436</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1437</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1438</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1439</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
@@ -4484,7 +4484,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4506,7 +4506,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1545</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1545</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1546</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1547</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1548</span>
@@ -4649,7 +4649,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4669,7 +4669,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1473</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1473</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1474</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1475</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1476</span>
@@ -4946,7 +4946,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1012</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1012</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1013</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1014</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1015</span>
@@ -5058,7 +5058,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -5081,7 +5081,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1177</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1177</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1178</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1179</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1180</span>
@@ -5214,7 +5214,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -5233,7 +5233,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1218</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1218</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1219</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1220</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1221</span>
@@ -5393,7 +5393,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -5407,7 +5407,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1067</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1067</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1068</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1069</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1070</span>
@@ -5560,7 +5560,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -5574,7 +5574,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1034</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1034</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1035</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1036</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1037</span>
@@ -5731,7 +5731,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
@@ -5750,7 +5750,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1104</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1104</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1105</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1106</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1107</span>
@@ -5847,7 +5847,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -5859,7 +5859,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1279</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1279</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1280</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1281</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1282</span>
@@ -5914,7 +5914,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_scan<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>[scan<span style="color: #666666">.</span>id <span style="color: #008000; font-weight: bold">for</span> scan <span style="color: #AA22FF; font-weight: bold">in</span> db<span style="color: #666666">.</span>get_scans()]  <span style="color: #3D7B7B; font-style: italic"># list scan ids found in database</span>
@@ -5930,7 +5930,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1258</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1258</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1259</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1260</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1261</span>
@@ -6038,7 +6038,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> _fileset_metadata_json_path
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
@@ -6056,7 +6056,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1142</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1142</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1143</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1144</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1145</span>
@@ -6146,7 +6146,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1253</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1253</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1254</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1255</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1256</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">store</span>(<span style="color: #008000">self</span>):
@@ -6296,7 +6296,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
     </tbody>
   </table>
 
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p>Optional directory <code>metadata</code> &amp; JSON file <code>metadata.json</code> are found when using method <code>set_metadata()</code>.</p>
 </details>
@@ -6307,7 +6307,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> Scan
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
@@ -6334,7 +6334,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(os<span style="color: #666666">.</span>listdir(os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>join(db<span style="color: #666666">.</span>path(), scan<span style="color: #666666">.</span>id, <span style="color: #BA2121">&quot;metadata&quot;</span>)))  <span style="color: #3D7B7B; font-style: italic"># Same goes for the metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>disconnect()
 </code></pre></div>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example #2: Get it from an `FSDB` object:</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example #2: Get it from an `FSDB` object:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;007&#39;</span>, create<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(<span style="color: #008000">type</span>(scan))
@@ -6351,7 +6351,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;007&#39;</span>))
 <span style="color: #717171">None</span>
 </code></pre></div>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example #3: Use an existing database:</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example #3: Use an existing database:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">os</span> <span style="color: #008000; font-weight: bold">import</span> environ
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> FSDB(environ<span style="color: #666666">.</span>get(<span style="color: #BA2121">&#39;ROMI_DB&#39;</span>, <span style="color: #BA2121">&quot;/data/ROMI/DB/&quot;</span>))
@@ -6408,7 +6408,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
                 <details class="quote">
                   <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-                  <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
+                  <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">689</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">690</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">691</span>
@@ -6556,7 +6556,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -6572,7 +6572,7 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">866</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">866</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">867</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">868</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">869</span>
@@ -6723,7 +6723,7 @@ plantdb.fsdb._make_fileset</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -6737,7 +6737,7 @@ plantdb.fsdb._make_fileset</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">922</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">922</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">923</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">924</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">925</span>
@@ -6887,14 +6887,14 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
     </tbody>
   </table>
 
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p>If the <code>id</code> do not exist in the local database and <code>create</code> is <code>False</code>, <code>None</code> is returned.</p>
 </details>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -6913,7 +6913,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">744</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">745</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">746</span>
@@ -7086,7 +7086,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&#39;myscan_001&#39;</span>)
@@ -7097,7 +7097,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">713</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">713</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">714</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">715</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">716</span>
@@ -7230,14 +7230,14 @@ Else, returns the value attached to this key.</p>
     </tbody>
   </table>
 
-<details class="notes" open>
+<details class="note" open>
   <summary>Notes</summary>
   <p>These manual measurements should be a JSON file named <code>measures.json</code>.
 It is located at the root folder of the scan dataset.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">810</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">810</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">811</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">812</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">813</span>
@@ -7371,7 +7371,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">790</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">790</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">791</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">792</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">793</span>
@@ -7432,7 +7432,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -7443,7 +7443,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">968</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">968</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">969</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">970</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">971</span>
@@ -7496,7 +7496,7 @@ Else, returns the value attached to this key.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666666">=</span> db<span style="color: #666666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -7506,7 +7506,7 @@ Else, returns the value attached to this key.</p>
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">953</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">953</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">954</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">955</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">956</span>
@@ -7602,7 +7602,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">json</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> _scan_metadata_path
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
@@ -7619,7 +7619,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">832</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">832</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">833</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">834</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">835</span>
@@ -7707,7 +7707,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">917</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">918</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">919</span>
@@ -7832,7 +7832,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">plantdb.fsdb</span> <span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666666">=</span> dummy_db(with_file<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666666">.</span>connect()
@@ -7853,7 +7853,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 
           <details class="quote">
             <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-            <div class="highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+            <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
@@ -8148,7 +8148,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.c8d2eff1.min.js"></script>
       
         <script src="../../../assets/_markdown_exec_pyodide.js"></script>
       
