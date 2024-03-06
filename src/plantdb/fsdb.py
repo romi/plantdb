@@ -26,10 +26,8 @@
 """
 This module implement a database as a **local file structure**.
 
-Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``Scan`` with ``'myscan_001'`` as ``Scan.id`` and there are some metadata (see below), you should have the following file structure:
-
-.. code-block::
-
+Assuming that the `FSDB` root database directory is `dbroot/`, there is a `Scan` with `'myscan_001'` as `Scan.id` and there are some metadata (see below), you should have the following file structure:
+```
     dbroot/                            # base directory of the database
     ├── myscan_001/                    # scan dataset directory, id=`myscan_001`
     │   ├── files.json                 # JSON file referencing the all files for the dataset
@@ -54,46 +52,44 @@ Assuming that the ``FSDB`` root database directory is ``dbroot/``, there is a ``
     :
     ├── (LOCK_FILE_NAME)               # "lock file", present if DB is connected
     └── MARKER_FILE_NAME               # ROMI DB marker file
+```
 
-The ``myscan_001/files.json`` file then contains the following structure:
+The `myscan_001/files.json` file then contains the following structure:
+```json
+{
+    "filesets": [
+        {
+            "id": "images",
+            "files": [
+                {
+                    "id": "scan_img_01",
+                    "file": "scan_img_01.jpg"
+                },
+                {
+                    "id": "scan_img_02",
+                    "file": "scan_img_02.jpg"
+                },
+                [...]
+                {
+                    "id": "scan_img_99",
+                    "file": "scan_img_99.jpg"
+                }
+            ]
+        }
+    ]
+}
+```
 
-.. code-block:: json
-
-    {
-        "filesets": [
-            {
-                "id": "images",
-                "files": [
-                    {
-                        "id": "scan_img_01",
-                        "file": "scan_img_01.jpg"
-                    },
-                    {
-                        "id": "scan_img_02",
-                        "file": "scan_img_02.jpg"
-                    },
-                    [...]
-                    {
-                        "id": "scan_img_99",
-                        "file": "scan_img_99.jpg"
-                    }
-                ]
-            }
-        ]
-    }
-
-The metadata of the scan (``metadata.json``), of the set of 'images' files (``<Fileset.id>.json``) and of each 'image' files (``<File.id>.json``) are all stored as JSON files in a separate directory:
-
-.. code-block::
-
-    myscan_001/metadata/
-    myscan_001/metadata/metadata.json
-    myscan_001/metadata/images.json
-    myscan_001/metadata/images/scan_img_01.json
-    myscan_001/metadata/images/scan_img_02.json
-    [...]
-    myscan_001/metadata/images/scan_img_99.json
-
+The metadata of the scan (`metadata.json`), of the set of 'images' files (`<Fileset.id>.json`) and of each 'image' files (`<File.id>.json`) are all stored as JSON files in a separate directory:
+```
+myscan_001/metadata/
+myscan_001/metadata/metadata.json
+myscan_001/metadata/images.json
+myscan_001/metadata/images/scan_img_01.json
+myscan_001/metadata/images/scan_img_02.json
+[...]
+myscan_001/metadata/images/scan_img_99.json
+```
 """
 
 import atexit

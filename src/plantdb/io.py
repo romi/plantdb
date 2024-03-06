@@ -28,84 +28,62 @@ The ``io`` module of the ROMI ``plantdb`` library contains all functions for rea
 
 Hereafter we detail the formats and their associated Python types and meanings.
 
-File formats
-------------
-
-json
-****
-
+## json
 Dictionaries or lists, read and written using ``json``.
 
 * Python objects: ``dict``, ``list``
 * File extensions: 'json'
 
-toml
-****
-
+## toml
 Dictionaries or lists, read and written using ``toml``.
 
 * Python objects: ``dict``, ``list``
 * File extensions: 'toml'
 
-2D image
-********
+## 2D image
 
 RGB or RGBA image data, read and written using ``imageio``.
 
 * Python objects: ``numpy.ndarray``
 * File extensions: 'jpg', 'png'
 
-3D volume
-*********
-
+## 3D volume
 Grayscale or binary volume image data, read and written using ``imageio``.
 
 * Python objects: ``numpy.ndarray``
 * File extensions: 'tiff'
 
-Labelled 3D volume
-******************
-
+## Labelled 3D volume
 Labelled volume image data, converted to dictionary of 3D (binary) numpy arrays, read and written using ``numpy``.
 
 * Python objects: ``dict`` of 3D ``numpy.ndarray``
 * File extensions: 'npz'
 
-Point cloud
-***********
-
+## Point cloud
 Point clouds, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.PointCloud``
 * File extensions: 'ply'
 
-Triangle mesh
-*************
-
+## Triangle mesh
 Triangular meshes, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.TriangleMesh``
 * File extensions: 'ply'
 
-Voxel grid
-**********
-
+## Voxel grid
 Voxel grids, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.VoxelGrid``
 * File extensions: 'ply'
 
-Tree graph
-**********
-
+## Tree graph
 Tree graphs, read and written using ``networkx``.
 
 * Python object: ``networkx.Graph``
 * File extensions: 'p'
 
-Pytorch tensor
-**************
-
+## Pytorch tensor
 Trained tensor, read and written using ``torch``.
 
 * Python object: ``torch.tensor``
@@ -203,8 +181,8 @@ def read_json(file, **kwargs):
     dict
         The deserialized JSON file.
 
-    Example
-    -------
+    Examples
+    --------
     >>> from plantdb.io import read_json, write_json
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -260,8 +238,8 @@ def write_json(file, data, ext="json", **kwargs):
     ext : str, optional
         File extension, defaults to "json".
 
-    Example
-    -------
+    Examples
+    --------
     >>> from plantdb.io import write_json
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -290,8 +268,8 @@ def read_toml(file, **kwargs):
     dict
         The deserialized TOML file.
 
-    Example
-    -------
+    Examples
+    --------
     >>> from plantdb.io import read_toml, write_toml
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -345,8 +323,8 @@ def write_toml(file, data, ext="toml", **kwargs):
     ext : str, optional
         File extension, defaults to "toml".
 
-    Example
-    -------
+    Examples
+    --------
     >>> from plantdb.io import write_toml
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -375,8 +353,8 @@ def read_image(file, **kwargs):
     numpy.ndarray
         The image as an RGB(A) array.
 
-    Example
-    -------
+    Examples
+    --------
     >>> import numpy as np
     >>> from plantdb.io import read_image, write_image
     >>> from plantdb.fsdb import dummy_db
@@ -410,8 +388,8 @@ def _write_image(fname, data, **kwargs):
     data : array like
         The 2D image, RGB(A) array to save.
 
-    Example
-    -------
+    Examples
+    --------
     >>> import numpy as np
     >>> from plantdb.io import write_image
     >>> from plantdb.fsdb import dummy_db
@@ -451,8 +429,8 @@ def write_image(file, data, ext="png", **kwargs):
     ext : {'png', 'jpeg', 'tiff'}, optional
         File extension, defaults to "png".
 
-    Example
-    -------
+    Examples
+    --------
     >>> import numpy as np
     >>> from plantdb.io import write_image
     >>> from plantdb.fsdb import dummy_db
@@ -886,8 +864,8 @@ def read_graph(file, **kwargs):
     networkx.Graph
         The loaded (tree) graph object.
 
-    Example
-    -------
+    Examples
+    --------
     >>> import networkx as nx
     >>> from plantdb.io import read_graph, write_graph
     >>> from plantdb.fsdb import dummy_db
@@ -946,8 +924,8 @@ def write_graph(file, data, ext="p", **kwargs):
     ext : str, optional
         File extension, defaults to "p".
 
-    Example
-    -------
+    Examples
+    --------
     >>> import networkx as nx
     >>> from plantdb.io import write_graph
     >>> from plantdb.fsdb import dummy_db

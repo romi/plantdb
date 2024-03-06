@@ -38,11 +38,12 @@ from plantdb.fsdb import _is_fsdb
 class FSDBSync():
     """Class for sync between two FSDB databases.
 
-    It checks for validity of both source and target by checking:
-        * That there is a marker file in the DB path root
-        * That the DB is not busy by checking for the lock file in the DB path root.
-    It locks the two databases during the sync. The sync is done using rsync as a subprocess
+    It checks for validity of both source and target by checking that:
 
+      * there is a marker file in the DB path root
+      * the DB is not busy by checking for the lock file in the DB path root.
+
+    It locks the two databases during the sync. The sync is done using rsync as a subprocess
 
     Attributes
     ----------

@@ -26,21 +26,22 @@
 API for the database module in the ROMI project.
 
 The following classes are defined:
-  * A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.
-  * A ``Scan`` can be made of several list of files ``Fileset``.
-  * A ``Fileset`` is made of a list of files ``Files``.
-  * A ``File`` can be an image, text of bytes.
+
+  * A database `DB` contains a list of scans `Scan` distinguishable by their id.
+  * A `Scan` can be made of several list of files `Fileset`.
+  * A `Fileset` is made of a list of files `Files`.
+  * A `File` can be an image, text of bytes.
 
 It should be subclassed to implement an actual database interface.
 """
+
 from copy import deepcopy
 
 
 class DB(object):
     """Class defining the database object ``DB``.
 
-    Abstract class defining the API used to communicate with a database in the
-    ROMI project.
+    Abstract class defining the API used to communicate with a database in the ROMI project.
     """
 
     def __init__(self):

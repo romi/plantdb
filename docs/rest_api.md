@@ -9,27 +9,27 @@ The Python implementation is done in the `plantdb.rest_api` module and the CLI t
 
 Here are the specifications for the `/scans` URL:
 
-* Resource: [`plantdb.rest_api.ScanList`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.ScanList`](reference/plantdb/rest_api.md#plantdb.rest_api.ScanList)
 * Arguments: `filterQuery`
 * Returns: a JSON compliant list of dictionaries.
 * Example:
-  * Get all scans:
-  [http://127.0.0.1:5000/scans](http://127.0.0.1:5000/scans)
-  * Search for "arabidopsis" in metadata:
-  [http://127.0.0.1:5000/scans?filterQuery=arabidopsis](http://127.0.0.1:5000/scans?filterQuery=arabidopsis)
+    * Get all scans:
+    [http://127.0.0.1:5000/scans](http://127.0.0.1:5000/scans)
+    * Search for "arabidopsis" in metadata:
+    [http://127.0.0.1:5000/scans?filterQuery=arabidopsis](http://127.0.0.1:5000/scans?filterQuery=arabidopsis)
 
 ### `/scans/<scan_id>`
 
 Here are the specifications for the `/scans/<scan_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Scan`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.Scan`](reference/plantdb/rest_api.md#plantdb.rest_api.Scan)
 * Arguments: none
 * Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset
 * Examples with the test database:
-  * Get scan info for the `"real_plant_analyzed"` dataset:
-  [http://127.0.0.1:5000/scans/real_plant_analyzed](http://127.0.0.1:5000/scans/real_plant_analyzed)
-  * Get scan info for the `"virtual_plant_analyzed"` dataset:
-  [http://127.0.0.1:5000/scans/virtual_plant_analyzed](http://127.0.0.1:5000/scans/virtual_plant_analyzed)
+    * Get scan info for the `"real_plant_analyzed"` dataset:
+    [http://127.0.0.1:5000/scans/real_plant_analyzed](http://127.0.0.1:5000/scans/real_plant_analyzed)
+    * Get scan info for the `"virtual_plant_analyzed"` dataset:
+    [http://127.0.0.1:5000/scans/virtual_plant_analyzed](http://127.0.0.1:5000/scans/virtual_plant_analyzed)
 
 !!! warning
     This requires the `Colmap` task!
@@ -40,61 +40,61 @@ Here are the specifications for the `/scans/<scan_id>` URLs:
 
 Here are the specifications for the `/files/<path>` URLs:
 
-* Resource: [`plantdb.rest_api.File`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.File`](reference/plantdb/rest_api.md#plantdb.rest_api.File)
 * Arguments: none
 * Returns: The content of the file.
 * Examples  `real_plant_analyzed` dataset (from the test database):
-  * Get the first image of the scan (`00000_rgb`):
-  [http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg](http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg)
-  * Get the first mask image of the scan (`00000_rgb`):
-  [http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png](http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png)
+    * Get the first image of the scan (`00000_rgb`):
+    [http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg](http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg)
+    * Get the first mask image of the scan (`00000_rgb`):
+    [http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png](http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png)
 
 ### `/archive/<scan_id>`
 
 Here are the specifications for the `/archive/<scan_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Archive`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.Archive`](reference/plantdb/rest_api.md#plantdb.rest_api.Archive)
 * Arguments: none
 * Returns: A zip file containing the dataset.
 * Examples:
-  * Get `real_plant_analyzed` archive:
-  [http://127.0.0.1:5000/archive/real_plant_analyzed/](http://127.0.0.1:5000/archive/real_plant_analyzed/)
-  * Get `virtual_plant_analyzed` archive:
-  [http://127.0.0.1:5000/archive/virtual_plant_analyzed/](http://127.0.0.1:5000/archive/virtual_plant_analyzed/)
+    * Get `real_plant_analyzed` archive:
+    [http://127.0.0.1:5000/archive/real_plant_analyzed/](http://127.0.0.1:5000/archive/real_plant_analyzed/)
+    * Get `virtual_plant_analyzed` archive:
+    [http://127.0.0.1:5000/archive/virtual_plant_analyzed/](http://127.0.0.1:5000/archive/virtual_plant_analyzed/)
 
 ### `/image/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Image`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.Image`](reference/plantdb/rest_api.md#plantdb.rest_api.Image)
 * Arguments: `size` in {`orig`, `large`, `thumb`} to control the max size (width or height) of the image to return.
 * Returns: The image file, resized by default.
 * Examples with the `real_plant_analyzed` dataset (from the test database) and the first image of the scan (`00000_rgb`):
-  * Get the preview image:
-  [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb)
-  * Get the original image:
-  [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig)
+    * Get the preview image:
+    [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb)
+    * Get the original image:
+    [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig)
 
 ### `/pointcloud/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.PointCloud`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.PointCloud`](reference/plantdb/rest_api.md#plantdb.rest_api.PointCloud)
 * Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
 * Returns: The point cloud file, preview size by default.
 * Examples with the `real_plant_analyzed` dataset:
-  * Get the preview point cloud:
-  [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud)
-  * Get the original point cloud:
-  [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig)
-  * Get the point cloud with a voxel size of `2.3`:
-  [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3)
+    * Get the preview point cloud:
+    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud)
+    * Get the original point cloud:
+    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig)
+    * Get the point cloud with a voxel size of `2.3`:
+    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3)
 
 ### `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>`
 
 Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.PointCloudGroundTruth`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.PointCloudGroundTruth`](reference/plantdb/rest_api.md#plantdb.rest_api.PointCloudGroundTruth)
 * Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
 * Returns: The ground-truth pointcloud file, original size by default.
 
@@ -102,23 +102,22 @@ Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file
 
 Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Mesh`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.Mesh`](reference/plantdb/rest_api.md#plantdb.rest_api.Mesh)
 * Arguments: `size` in {`orig`}, no control of the size of the mesh to returns.
 * Returns: The mesh file, original size by default.
 * Examples with the `real_plant_analyzed` dataset:
-  * Get the original mesh:
-  [http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh](http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh)
+    * Get the original mesh:
+    [http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh](http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh)
 
 ### `/refresh`
 Refresh the list of scans in the `plantdb.fsdb.FSDB` database.
 
 Here are the specifications for the `/refresh` URL:
 
-* Resource: [`plantdb.rest_api.Refresh`](reference/rest_api.md#classes)
+* Resource: [`plantdb.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.rest_api.Refresh)
 * Arguments: none
 * Returns: `200` on completion.
-* Example:
-[http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
+* Example: [http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
 
 
 ## Scan summary
