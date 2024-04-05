@@ -8,6 +8,10 @@ LABEL repository="https://github.com/romi/plantdb"
 LABEL license="LGPL-3.0-or-later"
 LABEL description="A minimal REST API serving the PlantDB."
 
+# Set user name and id variables:
+ENV USER_NAME="romi"
+ENV USER_ID=2020
+
 # Variables required by Python:
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
@@ -16,10 +20,6 @@ ENV PATH="${PATH}:/home/${USER_NAME}/.local/bin"
 # Fix pip problem when installed by Ubuntu22.04 (Jammy).
 # See: https://github.com/pypa/setuptools/issues/3269#issuecomment-1254507377
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
-
-# Set user name and id variables:
-ENV USER_NAME="romi"
-ENV USER_ID=2020
 
 # Required by `romi_run_task`:
 ENV ROMI_DB="/myapp/db"
@@ -56,7 +56,7 @@ COPY --chown=${USER_NAME} ./ ./plantdb/
 
 RUN cd plantdb/ && \
     # Install `plantdb` dependencies and sources:
-    python3 -m pip install --user . && \
+    python3 -m pip install --no-cache-dir . && \
     # Clean pip cache:
     python3 -m pip cache purge
 
