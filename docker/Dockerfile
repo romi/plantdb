@@ -6,17 +6,21 @@ LABEL project="Robotics for microfarms"
 LABEL homepage="https://docs.romi-project.eu/documentation/"
 LABEL repository="https://github.com/romi/plantdb"
 LABEL license="LGPL-3.0-or-later"
-LABEL description="A minimal REST API serving JSON information from the Plant DB."
+LABEL description="A minimal REST API serving the PlantDB."
 
+# Variables required by Python:
 ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
-ENV USER_NAME=romi
-ENV USER_ID=1010
-# Required by `pip`:
-ENV PATH=$PATH:"/home/${USER_NAME}/.local/bin"
+# Variables required by `pip`:
+ENV PATH="${PATH}:/home/${USER_NAME}/.local/bin"
 # Fix pip problem when installed by Ubuntu22.04 (Jammy).
 # See: https://github.com/pypa/setuptools/issues/3269#issuecomment-1254507377
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
+
+# Set user name and id variables:
+ENV USER_NAME="romi"
+ENV USER_ID=2020
+
 # Required by `romi_run_task`:
 ENV ROMI_DB="/myapp/db"
 
