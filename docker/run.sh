@@ -131,24 +131,27 @@ fi
 
 # Check if we have a TTY or not
 if [ -t 1 ]; then
-  USE_TTY="-it"
+  USE_TTY="-t"
 else
   USE_TTY=""
 fi
 
 if [ "${cmd}" = "" ]; then
-  # Start in interactive mode:
+  # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
   docker run --rm -p ${port}:5000 ${mount_option} \
     --user romi:${gid} \
-    ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} # try to keep the `-it` to be able to kill the process/container!
+    -i ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
+    "fsdb_rest_api --port ${port}"
 else
+  echo -e "${INFO}Running: '${cmd}'."
+  echo -e "${INFO}Bind mount: '${mount_option}'."
   # Get the date to estimate command execution time:
   start_time=$(date +%s)
-  # Start in non-interactive mode (run the command):
+  # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
   docker run --rm -p ${port}:5000 ${mount_option} \
     --user romi:${gid} \
-    ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
-    bash -c "${cmd}" # try to keep the `-it` to be able to kill the process/container!
+    -i ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
+    "${cmd}"
   # Get command exit code:
   cmd_status=$?
   # Print build time if successful (code 0), else print command exit code

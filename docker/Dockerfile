@@ -60,5 +60,5 @@ RUN cd plantdb/ && \
     # Clean pip cache:
     python3 -m pip cache purge
 
-# By default, start the `fsdb_rest_api` CLI at container startup:
-CMD ["/bin/bash", "-c", "fsdb_rest_api"]
+COPY --chown=${USER_NAME} docker/entrypoint.sh .
+ENTRYPOINT ["./entrypoint.sh"]
