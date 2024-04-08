@@ -31,15 +31,15 @@ from plantdb.test_database import test_database
 def parsing():
     parser = argparse.ArgumentParser(description='Serve a local plantdb database (FSDB) through a REST API.')
     parser.add_argument('-db', '--db_location', type=str, default=os.environ.get("ROMI_DB", "/none"),
-                        help='location of the database to serve')
+                        help='location of the database to serve.')
 
     app_args = parser.add_argument_group("webserver arguments")
     app_args.add_argument('--host', type=str, default="0.0.0.0",
-                          help="the hostname to listen on")
+                          help="the hostname to listen on, defaults to '0.0.0.0'.")
     app_args.add_argument('--port', type=int, default=5000,
-                          help="the port of the webserver")
+                          help="the port of the webserver, defaults to '5000'.")
     app_args.add_argument('--debug', action='store_true',
-                          help="enable debug mode")
+                          help="enable debug mode.")
 
     misc_args = parser.add_argument_group("other arguments")
     misc_args.add_argument("--test", action='store_true',
