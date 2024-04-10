@@ -30,7 +30,7 @@ This module regroup the classes and methods used to serve a REST API using ``fsd
 import datetime
 import json
 import os
-from math import degrees
+from math import radians
 from pathlib import Path
 from tempfile import gettempdir
 from zipfile import ZipFile
@@ -372,16 +372,18 @@ def get_scan_data(scan):
         scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
     ## Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
-        scan_data["data"]["angles"] = {}
         fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
         measures = read_json(fs.get_file('AnglesAndInternodes'))
         # scan_data["data"]["angles"] = measures.get("angles", {})
         # scan_data["data"]["internodes"] = measures.get("internodes", {})
-        if is_radians(measures["angles"]):
-            measures["angles"] = list(map(degrees, measures["angles"]))
-        scan_data["data"]["angles"] = measures
+        # Make sure we get angles in radians as the plant-3d-explorer always tries to convert to degrees:
+        if not is_radians(measures["angles"]):
+            measures["angles"] = list(map(radians, measures["angles"]))
+        scan_data["data"]["angles"].update(measures)
 
     # Load the reconstruction bounding-box and camera parameters (intrinsic and extrinsic)
+    scan_data["workspace"] = None
+    scan_data["camera"] = {}
     if scan_data['hasColmap']:
         ## Load the workspace, aka bounding-box:
         try:
@@ -391,7 +393,6 @@ def get_scan_data(scan):
             # new version: get it from Colmap fileset metadata 'bounding-box'
             fs = scan.get_fileset(task_fs_map['Colmap'])
             scan_data["workspace"] = fs.get_metadata("bounding_box")
-            scan_data["camera"] = {}
         ## Load the camera model (intrinsic parameters):
         try:
             # old version
@@ -405,6 +406,25 @@ def get_scan_data(scan):
         img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
         for img_idx, img_f in enumerate(img_fs.get_files()):
             camera_md = img_f.get_metadata("colmap_camera")
+            scan_data["camera"]["poses"].append({
+                "id": img_idx + 1,
+                "tvec": camera_md['tvec'],
+                "rotmat": camera_md['rotmat'],
+                "photoUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'orig')),
+                "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
+                "isMatched": True
+            })
+    else:
+        img_fs = scan.get_fileset(task_fs_map['images'])
+        ## Load the workspace, aka bounding-box:
+        scan_data["workspace"] = img_fs.get_metadata("bounding_box", None)
+        ## Load the camera model (intrinsic parameters):
+        img_f = img_fs.get_files()[0]  # from the first image of the 'images' fileset
+        scan_data["camera"]["model"] = img_f.get_metadata("camera")["camera_model"]
+        ## Load the camera poses (extrinsic parameters) from the images metadata:
+        scan_data["camera"]["poses"] = []  # initialize list of poses to gather
+        for img_idx, img_f in enumerate(img_fs.get_files(query={"channel": "rgb"})):
+            camera_md = img_f.get_metadata("camera")
             scan_data["camera"]["poses"].append({
                 "id": img_idx + 1,
                 "tvec": camera_md['tvec'],
