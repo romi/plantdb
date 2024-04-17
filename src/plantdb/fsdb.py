@@ -823,7 +823,7 @@ class Scan(db.Scan):
         It is located at the root folder of the scan dataset.
 
         """
-        return _get_metadata(self.measures, key)
+        return _get_metadata(self.measures, key, default={})
 
     def set_metadata(self, data, value=None):
         """Add a new metadata to the scan.
