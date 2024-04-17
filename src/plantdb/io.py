@@ -88,7 +88,6 @@ Trained tensor, read and written using ``torch``.
 
 * Python object: ``torch.tensor``
 * File extensions: 'pt'
-
 """
 
 import tempfile
@@ -195,7 +194,6 @@ def read_json(file, **kwargs):
     >>> f = fs.get_file("test_json")
     >>> read_json(f)
     {'test': False, 'ROMI': 'RObotics for MIcrofarms'}
-
     """
     import json
     # Get path to file if in a database:
@@ -249,7 +247,6 @@ def write_json(file, data, ext="json", **kwargs):
     >>> f = fs.create_file("test_json")
     >>> data = {"test": False, 'ROMI': 'RObotics for MIcrofarms'}
     >>> write_json(f, data)
-
     """
     _writer(file, data, ext, _write_json, **kwargs)
     return
@@ -282,7 +279,6 @@ def read_toml(file, **kwargs):
     >>> f = fs.get_file("test_json")
     >>> read_toml(f)
     {'test': True}
-
     """
     import toml
     # Get path to file if in a database:
@@ -334,7 +330,6 @@ def write_toml(file, data, ext="toml", **kwargs):
     >>> f = fs.create_file("test_json")
     >>> data = {"test": True, 'ROMI': 'RObotics for MIcrofarms'}
     >>> write_toml(f, data)
-
     """
     _writer(file, data, ext, _write_toml, **kwargs)
     return
@@ -369,7 +364,6 @@ def read_image(file, **kwargs):
     >>> f = fs.get_file("test_image")
     >>> img2 = read_image(f)
     >>> np.testing.assert_array_equal(img, img2)  # raise an exception if not equal!
-
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
@@ -401,7 +395,6 @@ def _write_image(fname, data, **kwargs):
     >>> rng = np.random.default_rng()
     >>> img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
     >>> write_image(f, img)
-
     """
     import imageio.v3 as iio
     fname = Path(fname)
@@ -442,7 +435,6 @@ def write_image(file, data, ext="png", **kwargs):
     >>> rng = np.random.default_rng()
     >>> img = np.array(rng.random((5, 5, 3))*255, dtype='uint8')  # an 8bit 5x5 RGB image
     >>> write_image(f, img)
-
     """
     _writer(file, data, ext, _write_image, **kwargs)
     return
@@ -479,7 +471,6 @@ def read_volume(file, ext="tiff", **kwargs):
     >>> f = fs.get_file("test_volume")
     >>> vol2 = read_volume(f)
     >>> np.testing.assert_array_equal(vol, vol2)  # raise an exception if not equal!
-
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
@@ -563,7 +554,6 @@ def write_volume(file, data, ext="tiff", **kwargs):
     15283
     >>> print(f.path().stat().st_size)
     48994
-
     """
     _writer(file, data, ext, _write_volume, **kwargs)
     return
@@ -598,7 +588,6 @@ def read_npz(file, **kwargs):
     >>> f = fs.get_file("test_npz")
     >>> npz2 = read_npz(f)
     >>> np.testing.assert_array_equal(npz["0"], npz2["0"])  # raise an exception if not equal!
-
     """
     import numpy as np
     # Get path to file if in a database:
@@ -684,7 +673,6 @@ def read_point_cloud(file, **kwargs):
     <class 'open3d.cuda.pybind.geometry.PointCloud'>
     >>> print(np.asarray(pcd.points))
     [[1. 2. 3.]]
-
     """
     from open3d import io
     # Get path to file if in a database:
@@ -735,7 +723,6 @@ def write_point_cloud(file, data, ext="ply", **kwargs):
     >>> pcd = o3d.geometry.PointCloud()
     >>> pcd.points = o3d.utility.Vector3dVector(np.array([[1, 2, 3]]))
     >>> write_point_cloud(f,pcd)
-
     """
     _writer(file, data, ext, _write_point_cloud, **kwargs)
     return
@@ -938,7 +925,6 @@ def write_graph(file, data, ext="p", **kwargs):
     >>> f = fs.create_file("test_nx_graph")
     >>> g = nx.path_graph(4)
     >>> write_graph(f, g)
-
     """
     _writer(file, data, ext, _write_graph, **kwargs)
     return

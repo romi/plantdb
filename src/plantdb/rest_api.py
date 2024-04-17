@@ -236,7 +236,6 @@ def get_scan_info(scan):
     >>> print(scan_info)
     {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
-
     """
     # Initialize the scan information template:
     scan_info = get_scan_template(scan.id)

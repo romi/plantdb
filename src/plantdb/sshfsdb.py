@@ -54,8 +54,7 @@ class SSHFSDB(fsdb.FSDB):
     scans : list
         The list of ``Scan`` objects found in the database
     is_connected : bool
-        ``True`` if the DB is connected (locked the directory), else ``False``
-
+        ``True`` if the DB is connected (locked the directory), else ``False``.
     """
 
     def __init__(self, basedir, remotedir=None):
@@ -110,7 +109,6 @@ class SSHFSDB(fsdb.FSDB):
         >>> db.connect()
         >>> print(db.is_connected)
         True
-
         """
         if not self.path().is_dir():
             self.path().mkdir(exist_ok=True)
@@ -138,7 +136,6 @@ class SSHFSDB(fsdb.FSDB):
         >>> db.disconnect()
         >>> print(db.is_connected)
         False
-
         """
         super().disconnect()
         p = subprocess.run(["fusermount", "-u", self.path()])

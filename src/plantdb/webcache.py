@@ -53,7 +53,6 @@ Examples
 >>> # Get the path to a downsampled pointcloud (resized and cached):
 >>> webcache.pointcloud_path(db,'sango_90_300_36','PointCloud_1_0_0_0_10_0_ca07eb2790','PointCloud','2.3')
 >>> db.disconnect()
-
 """
 import hashlib
 

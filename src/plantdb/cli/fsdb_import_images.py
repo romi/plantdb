@@ -52,7 +52,6 @@ def list_image_files(images_path):
     -------
     list
         The list of image files, selected by their extensions.
-
     """
     return [f for f in images_path.iterdir() if f.suffix in IMG_EXT]
 

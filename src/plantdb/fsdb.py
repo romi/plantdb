@@ -152,7 +152,6 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> f = fs.get_file("test_image")
     >>> print(f.path())
     /tmp/romidb_********/myscan_001/fileset_001/test_image.png
-
     """
     from tempfile import mkdtemp
     from plantdb import io
@@ -270,7 +269,6 @@ class FSDB(db.DB):
     >>> scan = db.get_scans()[1]
     >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
     >>> db.disconnect()
-
     """
 
     def __init__(self, basedir, required_filesets=['metadata']):
@@ -347,7 +345,6 @@ class FSDB(db.DB):
         >>> print(db.is_connected)
         True
         >>> db.disconnect()
-
         """
         if not self.is_connected:
             if unsafe:
@@ -387,7 +384,6 @@ class FSDB(db.DB):
         >>> db.disconnect()
         >>> print(db.is_connected)
         False
-
         """
         if self.is_connected:
             for s in self.scans:
@@ -437,7 +433,6 @@ class FSDB(db.DB):
         >>> db.get_scans()
         [<plantdb.fsdb.Scan at *x************>]
         >>> db.disconnect()
-
         """
         return _filter_query(self.scans, query)
 
@@ -473,7 +468,6 @@ class FSDB(db.DB):
         >>> print(unknown_scan)
         None
         >>> db.disconnect()
-
         """
         ids = [f.id for f in self.scans]
         if id not in ids:
@@ -515,7 +509,6 @@ class FSDB(db.DB):
         >>> scan = db.create_scan('007')
         OSError: Duplicate scan name: 007
         >>> db.disconnect()
-
         """
         if not _is_valid_id(id):
             raise IOError("Invalid id")
@@ -559,7 +552,6 @@ class FSDB(db.DB):
         >>> db.delete_scan('008')
         OSError: Invalid id
         >>> db.disconnect()
-
         """
         scan = self.get_scan(id)
         if scan is None:
@@ -578,7 +570,6 @@ class FSDB(db.DB):
         >>> db.connect()
         >>> db.path()
         >>> db.disconnect()
-
         """
         return copy.deepcopy(self.basedir)
 
@@ -593,7 +584,6 @@ class FSDB(db.DB):
         >>> db.list_scans()
         ['myscan_001']
         >>> db.disconnect()
-
         """
         return [f.id for f in self.get_scans(query)]
 
@@ -678,7 +668,6 @@ class Scan(db.Scan):
     >>> db.connect(unsafe=True)
     >>> scan = db.get_scan('sango_90_300_36')
     >>> scan.get_metadata()
-
     """
 
     def __init__(self, db, id):
@@ -732,7 +721,6 @@ class Scan(db.Scan):
         >>> scan.get_filesets()
         [<plantdb.fsdb.Fileset at *x************>]
         >>> db.disconnect()
-
         """
         return _filter_query(self.filesets, query)
 
@@ -774,7 +762,6 @@ class Scan(db.Scan):
         >>> print(unknown_fs)
         None
         >>> db.disconnect()
-
         """
         ids = [f.id for f in self.filesets]
         if id not in ids:
@@ -799,7 +786,6 @@ class Scan(db.Scan):
         any
             If `key` is ``None``, returns a dictionary.
             Else, returns the value attached to this key.
-
         """
         return _get_metadata(self.metadata, key, default)
 
@@ -821,7 +807,6 @@ class Scan(db.Scan):
         -----
         These manual measurements should be a JSON file named `measures.json`.
         It is located at the root folder of the scan dataset.
-
         """
         return _get_metadata(self.measures, key, default={})
 
@@ -851,7 +836,6 @@ class Scan(db.Scan):
         >>> print(json.load(p.open(mode='r')))
         {'test': 'value'}
         >>> db.disconnect()
-
         """
         if self.metadata == None:
             self.metadata = {}
@@ -897,7 +881,6 @@ class Scan(db.Scan):
         >>> wrong_fs = scan.create_fileset('fileset_001')
         OSError: Duplicate scan name: fileset_001
         >>> db.disconnect()
-
         """
         if not _is_valid_id(id):
             raise IOError(f"Invalid fileset id: {id}")
@@ -935,7 +918,6 @@ class Scan(db.Scan):
         >>> scan.list_filesets()
         []
         >>> db.disconnect()
-
         """
         fs = self.get_fileset(fileset_id)
         if fs is None:
@@ -957,7 +939,6 @@ class Scan(db.Scan):
         >>> scan = db.get_scan("myscan_001")
         >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
         >>> db.disconnect()
-
         """
         return _scan_path(self)
 
@@ -973,7 +954,6 @@ class Scan(db.Scan):
         >>> scan.list_filesets()
         ['fileset_001']
         >>> db.disconnect()
-
         """
         return [f.id for f in self.get_filesets(query)]
 
@@ -1002,7 +982,6 @@ class Fileset(db.Fileset):
     See Also
     --------
     plantdb.db.Fileset
-
     """
 
     def __init__(self, scan, id):
@@ -1056,7 +1035,6 @@ class Fileset(db.Fileset):
          <plantdb.fsdb.File at *x************>,
          <plantdb.fsdb.File at *x************>]
         >>> db.disconnect()
-
         """
         return _filter_query(self.files, query)
 
@@ -1088,7 +1066,6 @@ class Fileset(db.Fileset):
         >>> from plantdb.io import read_image
         >>> img = read_image(f)
         >>> db.disconnect()
-
         """
         ids = [f.id for f in self.files]
         if id not in ids:
@@ -1131,7 +1108,6 @@ class Fileset(db.Fileset):
         >>> fs = scan.get_fileset('fileset_001')
         >>> print(fs.get_metadata("test"))
         'value'
-
         """
         return _get_metadata(self.metadata, key, default)
 
@@ -1162,7 +1138,6 @@ class Fileset(db.Fileset):
         >>> print(json.load(p.open(mode='r')))
         {'test': 'value'}
         >>> db.disconnect()
-
         """
         if self.metadata == None:
             self.metadata = {}
@@ -1204,7 +1179,6 @@ class Fileset(db.Fileset):
         >>> os.listdir(fs.path())
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()
-
         """
         file = File(self, id)
         self.files.append(file)
@@ -1236,7 +1210,6 @@ class Fileset(db.Fileset):
         >>> list(fs.path().iterdir())  # the file has been removed from the drive and the database
         ['test_image.png', 'test_json.json']
         >>> db.disconnect()
-
         """
         x = self.get_file(file_id, create=False)
         if x is None:
@@ -1268,7 +1241,6 @@ class Fileset(db.Fileset):
         >>> fs = scan.get_fileset("fileset_001")
         >>> print(fs.path())  # should be '/tmp/romidb_********/myscan_001/fileset_001'
         >>> db.disconnect()
-
         """
         return _fileset_path(self)
 
@@ -1285,7 +1257,6 @@ class Fileset(db.Fileset):
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json']
         >>> db.disconnect()
-
         """
         return [f.id for f in self.get_files(query)]
 
@@ -1356,7 +1327,6 @@ class File(db.File):
         >>> print(f.get_metadata())
         {'random json': True}
         >>> db.disconnect()
-
         """
         return _get_metadata(self.metadata, key, default)
 
@@ -1388,7 +1358,6 @@ class File(db.File):
         >>> print(json.load(p.open(mode='r')))
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()
-
         """
         if self.metadata == None:
             self.metadata = {}
@@ -1418,7 +1387,6 @@ class File(db.File):
         >>> print(new_file.path().exists())
         True
         >>> db.disconnect()
-
         """
         if isinstance(path, str):
             path = Path(path)
@@ -1460,7 +1428,6 @@ class File(db.File):
         >>> print(type(js_dict))
         <class 'dict'>
         >>> db.disconnect()
-
         """
         path = _file_path(self)
         with path.open(mode="rb") as f:
@@ -1494,7 +1461,6 @@ class File(db.File):
         >>> os.listdir(fs.path())
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()
-
         """
         self.filename = _get_filename(self, ext)
         path = _file_path(self)
@@ -1532,7 +1498,6 @@ class File(db.File):
         >>> print(type(js_dict))
         <class 'dict'>
         >>> db.disconnect()
-
         """
         path = _file_path(self)
         with path.open(mode="r") as f:
@@ -1568,7 +1533,6 @@ class File(db.File):
         >>> os.listdir(fs.path())
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()
-
         """
         self.filename = _get_filename(self, ext)
         path = _file_path(self)
@@ -1592,7 +1556,6 @@ class File(db.File):
         >>> f = fs.get_file('dummy_image')
         >>> f.path()  # should be '/tmp/romidb_********/myscan_001/fileset_001/dummy_image.png'
         >>> db.disconnect()
-
         """
         return _file_path(self)
 
@@ -1643,7 +1606,6 @@ def _load_scans(db):
     >>> scans = _load_scans(db)
     >>> print(scans)
     [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
-
     """
     scans = []
     names = os.listdir(db.path())
@@ -1700,7 +1662,6 @@ def _load_scan_filesets(scan):
     >>> fs = _load_scan_filesets(scan)
     >>> print(fs)
     [<plantdb.fsdb.Fileset object at 0x7fa0122232d0>]
-
     """
     filesets = []
     # Get the path to the `files.json` associated to the `scan`:
@@ -1758,7 +1719,6 @@ def _load_fileset(scan, fileset_info):
     fileset_001
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
-
     """
     fileset = _parse_fileset(scan, fileset_info)
     fileset.files = _load_fileset_files(fileset, fileset_info)
@@ -1790,7 +1750,6 @@ def _parse_fileset(scan, fileset_info):
     -------
     plantdb.fsdb.Fileset
         The ``Fileset`` instance from parsed JSON.
-
     """
     fsid = fileset_info.get("id", None)
     if fsid is None:
@@ -1844,7 +1803,6 @@ def _load_fileset_files(fileset, fileset_info):
     >>> files = _load_fileset_files(fileset, filesets_info[0])
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
-
     """
     scan_id = fileset.scan.id
     files = []
@@ -2165,7 +2123,7 @@ def _get_metadata(metadata=None, key=None, default={}):
         By default, return a copy of the whole metadata dictionary.
     default : Any, optional
         The default value to return if the key do not exist in the metadata.
-        Default is an empty dictionary``{}``.
+        Default is an empty dictionary ``{}``.
 
     Returns
     -------
@@ -2199,7 +2157,6 @@ def _set_metadata(metadata, data, value):
     IOError
         If `value` is `None` when `data` is a string.
         If `data` is not of the right type.
-
     """
     if isinstance(data, str):
         if value is None:
@@ -2768,7 +2725,6 @@ def _filter_query(l, query=None):
     >>> print(len(files))  # should be `1` as only one file has this metadata
     1
     >>> db.disconnect()
-
     """
     if query is None or query == {}:
         # If there is no `query` return the unfiltered list of instances
