@@ -39,6 +39,33 @@ REST_API_PORT = 5000
 BASE_URL = f"http://{REST_API_URL}:{REST_API_PORT}"
 
 
+def test_db_availability(host=REST_API_URL, port=REST_API_PORT):
+    """Test the REST API server availability.
+
+    Parameters
+    ----------
+    host : str, optional
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    bool
+        The scans information dictionary.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import test_db_availability
+    >>> test_db_availability()
+    """
+    try:
+        requests.get(url=f"http://{host}:{port}/scans")
+    except requests.exceptions.ConnectionError:
+        return False
+    else:
+        return True
+
 def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
     """Retrieve the information dictionary for all scans from the PlantDB REST API.
 
