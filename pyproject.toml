@@ -16,6 +16,7 @@ dependencies = [
     "numpy",
     "open3d >=0.9.0.0",
     "pillow",
+    "plyfile",
     "toml",
     "tqdm",
 ]

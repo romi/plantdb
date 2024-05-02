@@ -26,20 +26,20 @@
 """
 This module regroup the client-side methods of the REST API.
 """
+from io import BytesIO
+from pathlib import Path
 
+import numpy as np
 import requests
 from PIL import Image
-from pathlib import Path
 from plyfile import PlyData
-
-from io import BytesIO
 
 REST_API_URL = "127.0.0.1"
 REST_API_PORT = 5000
 BASE_URL = f"http://{REST_API_URL}:{REST_API_PORT}"
 
 
-def get_scans_info(host="127.0.0.1", port=5000):
+def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
     """Retrieve the information dictionary for all scans from the PlantDB REST API.
 
     Parameters
@@ -63,7 +63,7 @@ def get_scans_info(host="127.0.0.1", port=5000):
     return requests.get(url=f"http://{host}:{port}/scans").json()
 
 
-def parse_scans_info(host="127.0.0.1", port=5000):
+def parse_scans_info(host=REST_API_URL, port=REST_API_PORT):
     """Parse the information dictionary for all scans served by the PlantDB REST API.
 
     Parameters
@@ -94,7 +94,7 @@ def parse_scans_info(host="127.0.0.1", port=5000):
     return scan_dict
 
 
-def get_scan_data(scan_id, host="127.0.0.1", port=5000):
+def get_scan_data(scan_id, host=REST_API_URL, port=REST_API_PORT):
     """Retrieve the data dictionary for a given scan dataset from the PlantDB REST API.
 
     Parameters
@@ -124,7 +124,7 @@ def get_scan_data(scan_id, host="127.0.0.1", port=5000):
     return requests.get(url=f"http://{host}:{port}/scans/{scan_id}").json()
 
 
-def list_scan_names(host="127.0.0.1", port=5000):
+def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
     """List the names of the scan datasets served by the PlantDB REST API.
 
     Parameters
@@ -149,7 +149,7 @@ def list_scan_names(host="127.0.0.1", port=5000):
     return sorted(parse_scans_info(host, port).keys())
 
 
-def scan_preview_image_url(scan_id, host="127.0.0.1", port=5000, size="thumb"):
+def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size="thumb"):
     """Get the URL to the preview image for a scan dataset served by the PlantDB REST API.
 
     Parameters
@@ -178,7 +178,7 @@ def scan_preview_image_url(scan_id, host="127.0.0.1", port=5000, size="thumb"):
     return f"http://{host}:{port}{thumb_uri}"
 
 
-def scan_image_url(scan_id, fileset_id, file_id, size='orig', host="127.0.0.1", port=5000):
+def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
     """Get the URL to the image for a scan dataset and task fileset served by the PlantDB REST API.
 
     Parameters
@@ -208,7 +208,7 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', host="127.0.0.1", 
     return f"http://{host}:{port}/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
 
 
-def get_scan_image(scan_id, fileset_id, file_id, size='orig', host="127.0.0.1", port=5000):
+def get_scan_image(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
     """Get the image for a scan dataset and task fileset served by the PlantDB REST API.
 
     Parameters
@@ -338,6 +338,22 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **api_kw
     for img_uri in list_task_images_uri(dataset_name, task_name, size, **api_kwargs):
         images.append(Image.open(BytesIO(requests.get(img_uri).content)))
     return images
+
+
+def _ply_pcd_to_array(ply_pcd):
+    """Convert the `PlyData` into an XYZ array of vertex coordinates.
+
+    Parameters
+    ----------
+    ply_pcd : PlyData
+        The `PlyData` object to be converted as numpy array.
+
+    Returns
+    -------
+    numpy.ndarray
+        The XYZ array of vertex coordinates.
+    """
+    return np.array([ply_pcd['vertex']['x'], ply_pcd['vertex']['y'], ply_pcd['vertex']['z']]).T
 
 
 def get_dataset_data(dataset_name):
