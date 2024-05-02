@@ -1,16 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from io import BytesIO
-from pathlib import Path
+#
+# plantdb - Data handling tools for the ROMI project
+#
+# Copyright (C) 2018-2019 Sony Computer Science Laboratories
+# Authors: D. Colliaux, T. Wintz, P. Hanappe
+#
+# This file is part of plantdb.
+#
+# plantdb is free software: you can redistribute it
+# and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# plantdb is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with plantdb.  If not, see
+# <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+"""
+This module regroup the client-side methods of the REST API.
+"""
 
 import requests
 from PIL import Image
+from pathlib import Path
 from plyfile import PlyData
 
-from plant_dashboard import BASE_URL
-from plant_dashboard import REST_API_PORT
-from plant_dashboard import REST_API_URL
-from plant_dashboard.utils import _ply_pcd_to_array
+from io import BytesIO
+
+REST_API_URL = "127.0.0.1"
+REST_API_PORT = 5000
+BASE_URL = f"http://{REST_API_URL}:{REST_API_PORT}"
 
 
 def get_scans_info(host="127.0.0.1", port=5000):
