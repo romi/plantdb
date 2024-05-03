@@ -34,9 +34,10 @@ import requests
 from PIL import Image
 from plyfile import PlyData
 
+#: Default URL to REST API is 'localhost':
 REST_API_URL = "127.0.0.1"
+# Default port to REST API:
 REST_API_PORT = 5000
-BASE_URL = f"http://{REST_API_URL}:{REST_API_PORT}"
 
 
 def test_db_availability(host=REST_API_URL, port=REST_API_PORT):
@@ -265,16 +266,13 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL,
     return requests.get(url=scan_image_url(scan_id, fileset_id, file_id, size, host, port))
 
 
-def get_tasks_fileset_from_api(dataset_name, **api_kwargs):
+def get_tasks_fileset_from_api(dataset_name, host=REST_API_URL, port=REST_API_PORT):
     """Get the task name to fileset name mapping dictionary from the REST API.
 
     Parameters
     ----------
     dataset_name : str
         The name of the dataset to retrieve the mapping for.
-
-    Other Parameters
-    ----------------
     host : str
         The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
     port : str or int
@@ -285,7 +283,7 @@ def get_tasks_fileset_from_api(dataset_name, **api_kwargs):
     dict
         The mapping of the task name to fileset name.
     """
-    return get_scan_data(dataset_name, **api_kwargs).get('tasks_fileset', dict())
+    return get_scan_data(dataset_name, host, port).get('tasks_fileset', dict())
 
 
 def list_task_images_uri(dataset_name, task_name='images', size='orig', **api_kwargs):
@@ -319,7 +317,8 @@ def list_task_images_uri(dataset_name, task_name='images', size='orig', **api_kw
     scan_info = get_scan_data(dataset_name, **api_kwargs)
     tasks_fileset = scan_info["tasks_fileset"]
     images = scan_info["images"]
-    return [BASE_URL + f"/image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}" for img in
+    base_url = f"http://{api_kwargs['host']}:{api_kwargs['port']}"
+    return [base_url + f"/image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}" for img in
             images]
 
 
@@ -383,16 +382,17 @@ def _ply_pcd_to_array(ply_pcd):
     return np.array([ply_pcd['vertex']['x'], ply_pcd['vertex']['y'], ply_pcd['vertex']['z']]).T
 
 
-def get_dataset_data(dataset_name):
+def get_dataset_data(dataset_name, **api_kwargs):
     """"""
-    scan_info = get_scan_data(dataset_name, REST_API_URL, REST_API_PORT)
+    base_url = f"http://{api_kwargs['host']}:{api_kwargs['port']}"
+    scan_info = get_scan_data(dataset_name, **api_kwargs)
 
     # Get pointcloud data from RET API:
     ## Use the file URI to get the fileset id & file id:
     pcd_fileset_id = scan_info["tasks_fileset"].get('PointCloud', None)
     pcd_file_id = "PointCloud"
     ## Use the REST API to stream the pointcloud:
-    pcd_file = requests.get(BASE_URL + f"/pointcloud/{dataset_name}/{pcd_fileset_id}/{pcd_file_id}").content
+    pcd_file = requests.get(base_url + f"/pointcloud/{dataset_name}/{pcd_fileset_id}/{pcd_file_id}").content
     ## Read the PLY as a `PlyData`:
     ply_pcd = PlyData.read(BytesIO(pcd_file))
     ## Convert the `PlyData` into an XYZ array of vertex coordinates:
@@ -404,7 +404,7 @@ def get_dataset_data(dataset_name):
     mesh_fileset_id, mesh_file_id = Path(mesh_uri).parts[-2:]
     mesh_file_id = Path(mesh_file_id).stem
     ## Use the REST API to stream the pointcloud:
-    mesh_file = requests.get(BASE_URL + f"/mesh/{dataset_name}/{mesh_fileset_id}/{mesh_file_id}").content
+    mesh_file = requests.get(base_url + f"/mesh/{dataset_name}/{mesh_fileset_id}/{mesh_file_id}").content
     mesh_data = PlyData.read(BytesIO(mesh_file))
     mesh_data = None
 
@@ -412,7 +412,7 @@ def get_dataset_data(dataset_name):
     ## Use the file URI to get the fileset id & file id:
     tree_uri = scan_info["filesUri"]["tree"]
     ## Use the REST API to stream the pointcloud:
-    tree_file = requests.get(BASE_URL + tree_uri).content
+    tree_file = requests.get(base_url + tree_uri).content
     tree_data = None  # tree files are NetworkX graphs!
 
     fruit_dir = None
