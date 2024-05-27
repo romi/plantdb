@@ -155,6 +155,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "thumbnailUri": "",
         "images": None,  # list of original image filenames
         "tasks_fileset": None,  # dict mapping task names to fileset names
+        "isVirtual": False,
         "hasColmap": False,
         "hasPointCloud": False,
         "hasMesh": False,
@@ -282,6 +283,9 @@ def get_scan_info(scan):
             # Test if `file` is found in `task` ``Fileset``:
             return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
 
+    # Define is the scan is a virtual plant dataset:
+    scan_info["isVirtual"] = "VirtualPlant" in scan_info["tasks_fileset"]
+
     # Set boolean information about tasks presence/absence for given dataset:
     scan_info["hasColmap"] = _try_has_file('Colmap', 'cameras')
     scan_info["hasPointCloud"] = _try_has_file('PointCloud', 'PointCloud')
@@ -332,6 +336,7 @@ def get_scan_data(scan):
     """
     task_fs_map = compute_fileset_matches(scan)
     scan_data = get_scan_info(scan)
+    img_fs = scan.get_fileset(task_fs_map['images'])
 
     def _get_file_uri(scan, fileset, file):
         return f"/files/{scan.id}/{fileset.id}/{file.path().name}"
@@ -380,9 +385,8 @@ def get_scan_data(scan):
             measures["angles"] = list(map(radians, measures["angles"]))
         scan_data["data"]["angles"].update(measures)
 
-    # Load the reconstruction bounding-box and camera parameters (intrinsic and extrinsic)
-    scan_data["workspace"] = None
-    scan_data["camera"] = {}
+    # Load the reconstruction bounding-box:
+    scan_data["workspace"] = img_fs.get_metadata("bounding_box", None)
     if scan_data['hasColmap']:
         ## Load the workspace, aka bounding-box:
         try:
@@ -392,6 +396,10 @@ def get_scan_data(scan):
             # new version: get it from Colmap fileset metadata 'bounding-box'
             fs = scan.get_fileset(task_fs_map['Colmap'])
             scan_data["workspace"] = fs.get_metadata("bounding_box")
+
+    # Load the camera parameters (intrinsic and extrinsic)
+    scan_data["camera"] = {}
+    if scan_data['hasColmap']:
         ## Load the camera model (intrinsic parameters):
         try:
             # old version
@@ -402,7 +410,6 @@ def get_scan_data(scan):
             scan_data["camera"]["model"] = json.loads(fs.get_file("cameras").read())['1']
         ## Load the camera poses (extrinsic parameters) from the images metadata:
         scan_data["camera"]["poses"] = []  # initialize list of poses to gather
-        img_fs = scan.get_fileset(task_fs_map['images'])  # get the 'images' fileset
         for img_idx, img_f in enumerate(img_fs.get_files()):
             camera_md = img_f.get_metadata("colmap_camera")
             scan_data["camera"]["poses"].append({
@@ -413,10 +420,7 @@ def get_scan_data(scan):
                 "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
                 "isMatched": True
             })
-    else:
-        img_fs = scan.get_fileset(task_fs_map['images'])
-        ## Load the workspace, aka bounding-box:
-        scan_data["workspace"] = img_fs.get_metadata("bounding_box", None)
+    elif scan_data["isVirtual"]:
         ## Load the camera model (intrinsic parameters):
         img_f = img_fs.get_files()[0]  # from the first image of the 'images' fileset
         scan_data["camera"]["model"] = img_f.get_metadata("camera")["camera_model"]
@@ -432,7 +436,8 @@ def get_scan_data(scan):
                 "thumbnailUri": str(webcache.image_path(scan.db, scan.id, img_fs.id, img_f.id, 'thumb')),
                 "isMatched": True
             })
-
+    else:
+        pass
     return scan_data
 
 
