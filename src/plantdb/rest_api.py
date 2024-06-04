@@ -30,6 +30,7 @@ This module regroup the classes and methods used to serve a REST API using ``fsd
 import datetime
 import json
 import os
+from io import BytesIO
 from math import radians
 from pathlib import Path
 from tempfile import gettempdir
@@ -685,3 +686,21 @@ class Archive(Resource):
                         os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
                     )
         return send_file(zpath, mimetype='application/zip')
+
+    def post(self, scan_id):
+        # Get the zip file from the request
+        zip_file = request.files.get('zip_file')
+        # Check if a file was provided
+        if not zip_file:
+            return {'error': 'No zip file provided'}, 400
+        # Read the zip file data into a BytesIO object
+        zip_data = BytesIO(zip_file.read())
+        scan_path = self.db.get_scan(scan_id).path()
+        # Open the zip file
+        with ZipFile(zip_data, 'r') as zip_obj:
+            # TODO: only extract "new" files:
+            zip_obj.extractall(scan_path)
+            file_names = zip_obj.namelist()
+
+        # Return a success response
+        return {'message': 'Zip file processed successfully', 'files': file_names}, 200

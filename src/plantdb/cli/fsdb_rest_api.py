@@ -95,6 +95,8 @@ def main():
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db]))
+    api.add_resource(Archive, '/archive_upload',
+                     resource_class_args=tuple([db]))
 
     # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
