@@ -695,12 +695,17 @@ class Archive(Resource):
             return {'error': 'No zip file provided'}, 400
         # Read the zip file data into a BytesIO object
         zip_data = BytesIO(zip_file.read())
-        scan_path = self.db.get_scan(scan_id).path()
-        # Open the zip file
+        print(f"REST API path to fsdb is {self.db.path()}...")
+        scan_path = Path(self.db.get_scan(scan_id).path())
+        print(f"Exporting archive contents to {scan_path}...")
+        # Open the zip file and extract non-existing files:
+        extracted_files = []
         with ZipFile(zip_data, 'r') as zip_obj:
-            # TODO: only extract "new" files:
-            zip_obj.extractall(scan_path)
-            file_names = zip_obj.namelist()
+            for file in zip_obj.namelist():
+                file_path = scan_path / file
+                if not file_path.exists():
+                    zip_obj.extract(file, path=scan_path)
+                    extracted_files.append(file)
 
         # Return a success response
-        return {'message': 'Zip file processed successfully', 'files': file_names}, 200
+        return {'message': 'Zip file processed successfully', 'files': extracted_files}, 200
