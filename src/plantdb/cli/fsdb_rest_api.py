@@ -78,9 +78,9 @@ def main():
 
     # Initialize RESTful resources to serve:
     api.add_resource(ScanList, '/scans',
-                     resource_class_args=tuple([db]))
+                     resource_class_args=tuple([db, logger]))
     api.add_resource(Scan, '/scans/<string:scan_id>',
-                     resource_class_args=tuple([db]))
+                     resource_class_args=tuple([db, logger]))
     api.add_resource(File, '/files/<path:path>',
                      resource_class_args=tuple([db]))
     api.add_resource(Refresh, '/refresh',
@@ -94,7 +94,7 @@ def main():
     api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
-                     resource_class_args=tuple([db]))
+                     resource_class_args=tuple([db, logger]))
 
     # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
