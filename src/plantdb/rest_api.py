@@ -40,9 +40,9 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
-
 from plantdb import webcache
 from plantdb.io import read_json
+from plantdb.log import configure_logger
 from plantdb.utils import is_radians
 
 
@@ -174,7 +174,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
     }
 
 
-def list_scans_info(scans, query=None):
+def list_scans_info(scans, query=None, **kwargs):
     """List scans information.
 
     Parameters
@@ -183,6 +183,11 @@ def list_scans_info(scans, query=None):
         The list of scan instances to get information from.
     query : str, optional
         A scan filtering query, to be matched in the scan metadata.
+
+    Other Parameters
+    ----------------
+    logger : logging.Logger
+        A logger to use with this method, default to a logger created on the fly with a `module.function` name.
 
     Returns
     -------
@@ -200,6 +205,8 @@ def list_scans_info(scans, query=None):
     [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]
     >>> db.disconnect()
     """
+    logger = kwargs.get("logger", configure_logger(__name__))
+
     res = []
     for scan in scans:
         metadata = scan.get_metadata()
@@ -208,19 +215,24 @@ def list_scans_info(scans, query=None):
         try:
             scan_info = get_scan_info(scan)
         except:
-            # logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
+            logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
             scan_info = get_scan_template(scan.id, error=True)
         res.append(scan_info)
     return res
 
 
-def get_scan_info(scan):
+def get_scan_info(scan, **kwargs):
     """Get the information related to a single scan dataset.
 
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
         The scan instance to get information from.
+
+    Other Parameters
+    ----------------
+    logger : logging.Logger
+        A logger to use with this method, default to a logger created on the fly with a `module.function` name.
 
     Returns
     -------
@@ -239,6 +251,9 @@ def get_scan_info(scan):
     {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
     """
+    logger = kwargs.get("logger", configure_logger(__name__))
+    logger.info(f"Accessing scan info for `{scan.id}` dataset.")
+
     # Initialize the scan information template:
     scan_info = get_scan_template(scan.id)
 
@@ -306,13 +321,18 @@ def get_scan_info(scan):
     return scan_info
 
 
-def get_scan_data(scan):
+def get_scan_data(scan, **kwargs):
     """Get the scan information and data.
 
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
         The scan instance to get the information and data from.
+
+    Other Parameters
+    ----------------
+    logger : logging.Logger
+        A logger to use with this method, default to a logger created on the fly with a `module.function` name.
 
     Returns
     -------
@@ -335,6 +355,8 @@ def get_scan_data(scan):
     SIMPLE_RADIAL
     >>> db.disconnect()
     """
+    logger = kwargs.get("logger", configure_logger(__name__))
+
     task_fs_map = compute_fileset_matches(scan)
     scan_data = get_scan_info(scan)
     img_fs = scan.get_fileset(task_fs_map['images'])
@@ -363,28 +385,32 @@ def get_scan_data(scan):
 
     # Load some of the data:
     scan_data["data"] = {}
-    ## Load the manually measured angles and internodes:
+    ## Load the skeleton data:
+    if scan_data["hasSkeleton"]:
+        fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
+        scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
+    ## Load the angles and internodes data:
+    scan_data["data"]["angles"] = {}
+    ### Load the manually measured angles and internodes:
     if scan_data["hasManualMeasures"]:
-        scan_data["data"]["angles"] = {}
         measures = scan.get_measures()
         if measures is None:
             measures = dict([])
         scan_data["data"]["angles"]["measured_angles"] = measures.get('angles', [])
         scan_data["data"]["angles"]["measured_internodes"] = measures.get("internodes", [])
-    ## Load the skeleton data:
-    if scan_data["hasSkeleton"]:
-        fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
-    ## Load the measured angles and internodes:
+    ### Load the measured angles and internodes:
     if scan_data["hasAngleData"]:
         fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
+        # Load the JSON file, this should return a dict with at least 'angles' & 'internodes' keys:
         measures = read_json(fs.get_file('AnglesAndInternodes'))
-        # scan_data["data"]["angles"] = measures.get("angles", {})
-        # scan_data["data"]["internodes"] = measures.get("internodes", {})
-        # Make sure we get angles in radians as the plant-3d-explorer always tries to convert to degrees:
-        if not is_radians(measures["angles"]):
-            measures["angles"] = list(map(radians, measures["angles"]))
-        scan_data["data"]["angles"].update(measures)
+        if 'angles' not in measures and 'internodes' not in measures:
+            missing = [key not in measures.keys() for key in ['angles', 'internodes']]
+            logger.error(f"Missing {', '.join(missing)} entries in AnglesAndInternodes JSON output!")
+        else:
+            # Make sure we get angles in radians as the plant-3d-explorer always tries to convert to degrees:
+            if not is_radians(measures["angles"]):
+                measures["angles"] = list(map(radians, measures["angles"]))
+            scan_data["data"]["angles"].update(measures)
 
     # Load the reconstruction bounding-box:
     scan_data["workspace"] = img_fs.get_metadata("bounding_box", None)
@@ -393,6 +419,7 @@ def get_scan_data(scan):
         try:
             # old version: get scanner workspace
             scan_data["workspace"] = scan.get_metadata("scanner")["workspace"]
+            logger.warning(f"You are using a DEPRECATED version of the PlantDB API.")
         except KeyError:
             # new version: get it from Colmap fileset metadata 'bounding-box'
             fs = scan.get_fileset(task_fs_map['Colmap'])
@@ -405,6 +432,7 @@ def get_scan_data(scan):
         try:
             # old version
             scan_data["camera"]["model"] = scan.get_metadata("computed")["camera_model"]
+            logger.warning(f"You are using a DEPRECATED version of the PlantDB API.")
         except KeyError:
             # new version: get it from Colmap 'cameras.json':
             fs = scan.get_fileset(task_fs_map['Colmap'])
@@ -445,8 +473,9 @@ def get_scan_data(scan):
 class ScanList(Resource):
     """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         self.db = db
+        self.logger = logger
 
     def get(self):
         """Returns a list of scan dataset information.
@@ -456,14 +485,15 @@ class ScanList(Resource):
         list of dict
             The list of dictionaries to serve (as JSON)
         """
-        return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'))
+        return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'), logger=self.logger)
 
 
 class Scan(Resource):
     """Concrete RESTful resource to serve a scan dataset upon request (GET method)."""
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         self.db = db
+        self.logger = logger
 
     def get(self, scan_id):
         """Returns the scan dataset information.
@@ -478,7 +508,7 @@ class Scan(Resource):
         dict
             The dictionary to serve (as JSON)
         """
-        return get_scan_data(self.db.get_scan(scan_id))
+        return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
 
 
 class File(Resource):
@@ -658,8 +688,9 @@ class Mesh(Resource):
 class Archive(Resource):
     """Concrete RESTful resource to serve an archive of the dataset upon request (GET method)."""
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         self.db = db
+        self.logger = logger
 
     def get(self, scan_id):
         """Send the requested scan dataset archive.
@@ -677,6 +708,7 @@ class Archive(Resource):
         scan = self.db.get_scan(scan_id)
         tmp_dir = Path(gettempdir())
         zpath = tmp_dir / f'{scan_id}.zip'
+        self.logger.info(f"Creating archive for `{scan_id}` dataset.")
         with ZipFile(zpath, 'w') as zf:
             path = str(scan.path())
             for root, _dirs, files in os.walk(path):
@@ -695,9 +727,9 @@ class Archive(Resource):
             return {'error': 'No zip file provided'}, 400
         # Read the zip file data into a BytesIO object
         zip_data = BytesIO(zip_file.read())
-        print(f"REST API path to fsdb is {self.db.path()}...")
+        self.logger.debug(f"REST API path to fsdb is {self.db.path()}...")
         scan_path = Path(self.db.get_scan(scan_id).path())
-        print(f"Exporting archive contents to {scan_path}...")
+        self.logger.debug(f"Exporting archive contents to {scan_path}...")
         # Open the zip file and extract non-existing files:
         extracted_files = []
         with ZipFile(zip_data, 'r') as zip_obj:
