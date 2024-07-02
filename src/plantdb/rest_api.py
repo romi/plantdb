@@ -320,6 +320,37 @@ def get_scan_info(scan, **kwargs):
 
     return scan_info
 
+def get_file_uri(scan, fileset, file):
+    """Return the URI for the corresponding `scan/fileset/file` tree.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan or str
+        A ``Scan`` instance or the name of the scan dataset.
+    fileset : plantdb.fsdb.Fileset or str
+        A ``Fileset`` instance or the name of the fileset.
+    file : plantdb.fsdb.File or str
+        A ``File`` instance or the name of the file.
+
+    Returns
+    -------
+    str
+        The URI for the corresponding `scan/fileset/file` tree.
+    """
+    from plantdb.fsdb import Scan
+    from plantdb.fsdb import Fileset
+    from plantdb.fsdb import File
+    scan_id = scan.id if isinstance(scan, Scan) else scan
+    fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
+    file_name = file.path().name if isinstance(file, File) else file
+    return f"/files/{scan_id}/{fileset_id}/{file_name}"
+
+filesUri_task_mapping = {
+    "PointCloud": "pointCloud",
+    "TriangleMesh": "mesh",
+    "CurveSkeleton": "skeleton",
+    "TreeGraph": "tree",
+}
 
 def get_scan_data(scan, **kwargs):
     """Get the scan information and data.
@@ -361,27 +392,13 @@ def get_scan_data(scan, **kwargs):
     scan_data = get_scan_info(scan)
     img_fs = scan.get_fileset(task_fs_map['images'])
 
-    def _get_file_uri(scan, fileset, file):
-        return f"/files/{scan.id}/{fileset.id}/{file.path().name}"
-
     # Get the paths to data files:
     scan_data["filesUri"] = {}
     ## Get the URI (file path) to the output of the `PointCloud` task:
-    if scan_data["hasPointCloud"]:
-        fs = scan.get_fileset(task_fs_map['PointCloud'])
-        scan_data["filesUri"]["pointCloud"] = _get_file_uri(scan, fs, fs.get_file('PointCloud'))
-    ## Get the URI (file path) to the output of the `TriangleMesh` task:
-    if scan_data["hasMesh"]:
-        fs = scan.get_fileset(task_fs_map['TriangleMesh'])
-        scan_data["filesUri"]["mesh"] = _get_file_uri(scan, fs, fs.get_file('TriangleMesh'))
-    ## Get the URI (file path) to the output of the `CurveSkeleton` task:
-    if scan_data["hasSkeleton"]:
-        fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        scan_data["filesUri"]["skeleton"] = _get_file_uri(scan, fs, fs.get_file('CurveSkeleton'))
-    ## Get the URI (file path) to the output of the `TreeGraph` task:
-    if scan_data["hasTreeGraph"]:
-        fs = scan.get_fileset(task_fs_map['TreeGraph'])
-        scan_data["filesUri"]["tree"] = _get_file_uri(scan, fs, fs.get_file('TreeGraph'))
+    for task, uri_key in filesUri_task_mapping.items():
+        if scan_data[f"has{task}"]:
+            fs = scan.get_fileset(task_fs_map[task])
+            scan_data["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
 
     # Load some of the data:
     scan_data["data"] = {}
