@@ -533,16 +533,49 @@ def parse_task_requests_data(task, data, extension=None):
     return data_parser(data)
 
 
-def get_task_data(dataset_name, task, filename=None, **api_kwargs):
-    url = base_url(**api_kwargs)
-    scan_info = get_scan_data(dataset_name, **api_kwargs)
+def get_task_data(dataset_name, task, filename=None, api_data=None, **api_kwargs):
+    """Get the data corresponding to a `dataset/task/filename`.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    task : str
+        The name of the task.
+    filename : str, optional
+        The name of the file to load.
+        If not specified defaults to the main file returned by the task as defined in `filesUri_task_mapping`.
+    api_data : dict, optional
+        The dictionary of information for the dataset as returned by the REST API.
+        If not specified, fetch it from the REST API.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    any
+        The parsed data.
+
+    See Also
+    --------
+    plantdb.rest_api.filesUri_task_mapping
+    plantdb.rest_api_client.parse_task_requests_data
+    """
+    if api_data is None:
+        api_data = get_scan_data(dataset_name, **api_kwargs)
     # Get data from `File` resource of REST API:
     ext = None
     if filename is None:
-        file_uri = scan_info["filesUri"][filesUri_task_mapping[task]]
+        file_uri = api_data["filesUri"][filesUri_task_mapping[task]]
     else:
         _, ext = Path(filename).suffix.split('.')
-        file_uri = get_file_uri(dataset_name, scan_info["tasks_fileset"][task], filename)
-    data = requests.get(url + file_uri).content
+        file_uri = get_file_uri(dataset_name, api_data["tasks_fileset"][task], filename)
 
+    url = base_url(**api_kwargs)
+    data = requests.get(url + file_uri).content
     return parse_task_requests_data(task, data, ext)
