@@ -389,7 +389,7 @@ def get_scan_data(scan, **kwargs):
     logger = kwargs.get("logger", configure_logger(__name__))
 
     task_fs_map = compute_fileset_matches(scan)
-    scan_data = get_scan_info(scan)
+    scan_data = get_scan_info(scan, logger=logger)
     img_fs = scan.get_fileset(task_fs_map['images'])
 
     # Get the paths to data files:
