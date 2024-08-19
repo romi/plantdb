@@ -493,7 +493,13 @@ def parse_requests_tree(data):
         The loaded (tree) graph object.
     """
     import pickle
-    return pickle.load(BytesIO(data))
+    tree = pickle.load(BytesIO(data))
+    # FIXME: it would be better to return something that is JSON serializable...
+    #  but the tree is not directed, so the `json_graph.tree_data` fails!
+    # from networkx.readwrite import json_graph
+    # data = json_graph.tree_data(tree, root=0)
+    # return json.dumps(data)
+    return tree
 
 
 def parse_requests_json(data):
