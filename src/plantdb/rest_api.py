@@ -798,6 +798,52 @@ class Mesh(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 
+class Sequence(Resource):
+    """Concrete RESTful resource to serve an angle and internode sequences upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id):
+        """Send the requested angle and internode sequences.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import json
+        >>> # Get the whole dict with 'angles', 'internodes' & 'fruit_points' lists of values:
+        >>> res = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed")
+        >>> json.loads(res.content.decode('utf-8'))
+        >>> # Get the list of 'angles' values, could also append '?type=angles' to the URI:
+        >>> res = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed", params={'type': 'angles'})
+        >>> json.loads(res.content.decode('utf-8'))
+
+        """
+        type = request.args.get('type', default='all', type=str)
+        # Get the `File` corresponding to the sequence resource:
+        scan = self.db.get_scan(scan_id)
+        task_fs_map = compute_fileset_matches(scan)
+        fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
+        # Load the JSON file:
+        measures = read_json(fs.get_file('AnglesAndInternodes'))
+        # Make sure that the 'type' argument we got is a valid option, else default to 'all':
+        if type in ['angles', 'internodes', 'fruit_points']:
+            return measures[type]
+        else:
+            return measures
+
+
 class Archive(Resource):
     """Concrete RESTful resource to serve an archive of the dataset upon request (GET method)."""
 

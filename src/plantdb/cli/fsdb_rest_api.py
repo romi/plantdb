@@ -24,6 +24,7 @@ from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
 from plantdb.rest_api import Scan
 from plantdb.rest_api import ScanList
+from plantdb.rest_api import Sequence
 from plantdb.test_database import DATASET
 from plantdb.test_database import test_database
 
@@ -92,6 +93,8 @@ def main():
     api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Sequence, '/sequence/<string:scan_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
