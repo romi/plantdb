@@ -159,10 +159,10 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "isVirtual": False,
         "hasColmap": False,
         "hasPointCloud": False,
-        "hasMesh": False,
-        "hasSkeleton": False,
+        "hasTriangleMesh": False,
+        "hasCurveSkeleton": False,
         "hasTreeGraph": False,
-        "hasAngleData": False,
+        "hasAnglesAndInternodes": False,
         "hasAutomatedMeasures": False,
         "hasManualMeasures": False,
         "hasSegmentation2D": False,
@@ -202,7 +202,7 @@ def list_scans_info(scans, query=None, **kwargs):
     >>> db.connect()
     >>> scans_info = list_scans_info(db.get_scans())
     >>> print(scans_info)
-    [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]
+    [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]
     >>> db.disconnect()
     """
     logger = kwargs.get("logger", configure_logger(__name__))
@@ -248,7 +248,7 @@ def get_scan_info(scan, **kwargs):
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_info = get_scan_info(scan)
     >>> print(scan_info)
-    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasSkeleton': True, 'hasAngleData': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
+    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
     """
     logger = kwargs.get("logger", configure_logger(__name__))
@@ -305,10 +305,10 @@ def get_scan_info(scan, **kwargs):
     # Set boolean information about tasks presence/absence for given dataset:
     scan_info["hasColmap"] = _try_has_file('Colmap', 'cameras')
     scan_info["hasPointCloud"] = _try_has_file('PointCloud', 'PointCloud')
-    scan_info["hasMesh"] = _try_has_file('TriangleMesh', 'TriangleMesh')
-    scan_info["hasSkeleton"] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
+    scan_info["hasTriangleMesh"] = _try_has_file('TriangleMesh', 'TriangleMesh')
+    scan_info["hasCurveSkeleton"] = _try_has_file('CurveSkeleton', 'CurveSkeleton')
     scan_info["hasTreeGraph"] = _try_has_file('TreeGraph', 'TreeGraph')
-    scan_info["hasAngleData"] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
+    scan_info["hasAnglesAndInternodes"] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
     scan_info["hasAutomatedMeasures"] = _try_has_file('AnglesAndInternodes', 'AnglesAndInternodes')
     scan_info["hasManualMeasures"] = "measures.json" in [f.name for f in scan.path().iterdir()]
     scan_info["hasSegmentation2D"] = _try_has_file('Segmentation2D', '')
@@ -336,6 +336,20 @@ def get_file_uri(scan, fileset, file):
     -------
     str
         The URI for the corresponding `scan/fileset/file` tree.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api import get_file_uri
+    >>> from plantdb.test_database import test_database
+    >>> from plantdb.rest_api import compute_fileset_matches
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
+    >>> fs_match = compute_fileset_matches(scan)
+    >>> fs = scan.get_fileset(fs_match['PointCloud'])
+    >>> f = fs.get_file("PointCloud")
+    >>> get_file_uri(scan, fs, f)
+    '/files/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'
     """
     from plantdb.fsdb import Scan
     from plantdb.fsdb import Fileset
@@ -345,7 +359,7 @@ def get_file_uri(scan, fileset, file):
     file_name = file.path().name if isinstance(file, File) else file
     return f"/files/{scan_id}/{fileset_id}/{file_name}"
 
-filesUri_task_mapping = {
+task_filesUri_mapping = {
     "PointCloud": "pointCloud",
     "TriangleMesh": "mesh",
     "CurveSkeleton": "skeleton",
@@ -395,7 +409,7 @@ def get_scan_data(scan, **kwargs):
     # Get the paths to data files:
     scan_data["filesUri"] = {}
     ## Get the URI (file path) to the output of the `PointCloud` task:
-    for task, uri_key in filesUri_task_mapping.items():
+    for task, uri_key in task_filesUri_mapping.items():
         if scan_data[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
             scan_data["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
@@ -403,7 +417,7 @@ def get_scan_data(scan, **kwargs):
     # Load some of the data:
     scan_data["data"] = {}
     ## Load the skeleton data:
-    if scan_data["hasSkeleton"]:
+    if scan_data["hasCurveSkeleton"]:
         fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
         scan_data["data"]["skeleton"] = read_json(fs.get_file('CurveSkeleton'))
     ## Load the angles and internodes data:
@@ -416,7 +430,7 @@ def get_scan_data(scan, **kwargs):
         scan_data["data"]["angles"]["measured_angles"] = measures.get('angles', [])
         scan_data["data"]["angles"]["measured_internodes"] = measures.get("internodes", [])
     ### Load the measured angles and internodes:
-    if scan_data["hasAngleData"]:
+    if scan_data["hasAnglesAndInternodes"]:
         fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
         # Load the JSON file, this should return a dict with at least 'angles' & 'internodes' keys:
         measures = read_json(fs.get_file('AnglesAndInternodes'))
@@ -501,6 +515,19 @@ class ScanList(Resource):
         -------
         list of dict
             The list of dictionaries to serve (as JSON)
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import json
+        >>> # Get an info dict about all dataset:
+        >>> res = requests.get("http://127.0.0.1:5000/scans")
+        >>> scans = json.loads(res.content)
+        >>> # List the known dataset id:
+        >>> print([scan['id'] for scan in scans])
+        ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
+
         """
         return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'), logger=self.logger)
 
@@ -524,6 +551,19 @@ class Scan(Resource):
         -------
         dict
             The dictionary to serve (as JSON)
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import json
+        >>> # Get a detailed info dict about a specific dataset:
+        >>> res = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
+        >>> scan = json.loads(res.content)
+        >>> # Get the date from the metadata:
+        >>> print(scan['metadata']['date'])
+        2024-08-19 11:12:25
+
         """
         return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
 
@@ -558,7 +598,18 @@ class Refresh(Resource):
         self.db = db
 
     def get(self):
-        """Force the plant database to reload."""
+        """Force the plant database to reload.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> # Refresh the database:
+        >>> res = requests.get("http://127.0.0.1:5000/refresh")
+        >>> res.ok
+        True
+
+        """
         self.db.reload()
         return 200
 
@@ -585,6 +636,25 @@ class Image(Resource):
         -------
         flask.Response
             The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import numpy as np
+        >>> import requests
+        >>> from io import BytesIO
+        >>> from PIL import Image
+        >>> # Get the first image as a thumbnail (default):
+        >>> res = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True)
+        >>> img = Image.open(BytesIO(res.content))
+        >>> np.asarray(img).shape
+        (113, 150, 3)
+        >>> # Get the first image in original size:
+        >>> res = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig"})
+        >>> img = Image.open(BytesIO(res.content))
+        >>> np.asarray(img).shape
+        (1080, 1440, 3)
+
         """
         size = request.args.get('size', default='thumb', type=str)
         # Get the path to the image resource:
@@ -614,6 +684,19 @@ class PointCloud(Resource):
         -------
         flask.Response
             The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> from plyfile import PlyData
+        >>> from io import BytesIO
+        >>> # Get the triangular mesh:
+        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud")
+        >>> pcd_data = PlyData.read(BytesIO(res.content))
+        >>> # Access point X-coordinates:
+        >>> list(pcd_data['vertex']['x'])
+
         """
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
@@ -623,7 +706,7 @@ class PointCloud(Resource):
             pass
         else:
             size = vxs
-        # If a string, make sure that the 'size' argument we got is a valid option:
+        # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
         # Get the path to the pointcloud resource:
@@ -662,7 +745,7 @@ class PointCloudGroundTruth(Resource):
             pass
         else:
             size = vxs
-        # If a string, make sure that the 'size' argument we got is a valid option:
+        # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
         # Get the path to the pointcloud resource:
@@ -692,9 +775,22 @@ class Mesh(Resource):
         -------
         flask.Response
             The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> from plyfile import PlyData
+        >>> from io import BytesIO
+        >>> # Get the triangular mesh:
+        >>> res = requests.get("http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh")
+        >>> mesh_data = PlyData.read(BytesIO(res.content))
+        >>> # Access vertices X-coordinates:
+        >>> list(mesh_data['vertex']['x'])
+
         """
         size = request.args.get('size', default='orig', type=str)
-        # Make sure that the 'size' argument we got is a valid option:
+        # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
         if not size in ['orig']:
             size = 'orig'
         # Get the path to the mesh resource:
@@ -710,7 +806,7 @@ class Archive(Resource):
         self.logger = logger
 
     def get(self, scan_id):
-        """Send the requested scan dataset archive.
+        """Send the requested scan dataset archive, excluding the webcache if any.
 
         Parameters
         ----------
@@ -721,6 +817,32 @@ class Archive(Resource):
         -------
         flask.Response
             The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import tempfile
+        >>> from io import BytesIO
+        >>> from pathlib import Path
+        >>> from zipfile import ZipFile
+        >>> # Get the archive for the 'real_plant_analyzed' dataset with:
+        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant_analyzed", stream=True)
+        >>> # - Extract the archive:
+        >>> # Read the zip file data into a BytesIO object
+        >>> zip_data = BytesIO(zip_file.content)
+        >>> # Create a temporary path to extract the archived data:
+        >>> tmp_dir = Path(tempfile.mkdtemp())
+        >>> # Open the zip file and extract non-existing files:
+        >>> extracted_files = []
+        >>> with ZipFile(zip_data, 'r') as zip_obj:
+        >>>     for file in zip_obj.namelist():
+        >>>         file_path = tmp_dir / file
+        >>>         zip_obj.extract(file, path=tmp_dir)
+        >>>         extracted_files.append(file)
+        >>> # Print the list of extracted files:
+        >>> extracted_files
+
         """
         scan = self.db.get_scan(scan_id)
         tmp_dir = Path(gettempdir())

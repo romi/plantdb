@@ -35,7 +35,7 @@ import requests
 from PIL import Image
 from plyfile import PlyData
 
-from plantdb.rest_api import filesUri_task_mapping
+from plantdb.rest_api import task_filesUri_mapping
 from plantdb.rest_api import get_file_uri
 
 #: Default URL to REST API is 'localhost':
@@ -404,10 +404,10 @@ def _ply_vertex_to_array(data):
 
     Returns
     -------
-    numpy.ndarray
-        The XYZ array of vertex coordinates.
+    list
+        The XYZ array of vertex coordinates, returned as a list to be JSON serializable.
     """
-    return np.array([data['vertex']['x'], data['vertex']['y'], data['vertex']['z']]).T
+    return [list(data['vertex']['x']), list(data['vertex']['y']), list(data['vertex']['z'])]
 
 def _ply_face_to_array(data):
     """Convert the `PlyData` 'face' data into an XYZ array of triangle coordinates.
@@ -419,10 +419,10 @@ def _ply_face_to_array(data):
 
     Returns
     -------
-    numpy.ndarray
-        The XYZ array of triangle coordinates.
+    list
+        The XYZ array of triangle coordinates, returned as a list to be JSON serializable.
     """
-    return np.array([d for d in data['face'].data['vertex_indices']]).T
+    return [list(d) for d in data['face'].data['vertex_indices']]
 
 def parse_requests_pcd(data):
     """Parse a requests content, should be from a PointCloud task source.
@@ -571,7 +571,7 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **api_kwargs
     # Get data from `File` resource of REST API:
     ext = None
     if filename is None:
-        file_uri = api_data["filesUri"][filesUri_task_mapping[task]]
+        file_uri = api_data["filesUri"][task_filesUri_mapping[task]]
     else:
         _, ext = Path(filename).suffix.split('.')
         file_uri = get_file_uri(dataset_name, api_data["tasks_fileset"][task], filename)

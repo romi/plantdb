@@ -304,7 +304,6 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         size = int(size)
     except ValueError:
         pass
-    print(f"Requested '{file_id}' with size '{size}' (as '{type(size).__name__}')")
 
     if size == "orig":
         return __file_path(db, scan_id, fileset_id, file_id)
