@@ -851,6 +851,9 @@ class Archive(Resource):
         with ZipFile(zpath, 'w') as zf:
             path = str(scan.path())
             for root, _dirs, files in os.walk(path):
+                # Exclude 'webcache' from the archive:
+                if 'webcache' in root:
+                    continue
                 for file in files:
                     zf.write(
                         os.path.join(root, file),
