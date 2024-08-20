@@ -585,3 +585,29 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **api_kwargs
     url = base_url(**api_kwargs)
     data = requests.get(url + file_uri).content
     return parse_task_requests_data(task, data, ext)
+
+
+def get_angles_and_internodes_data(dataset_name, **api_kwargs):
+    """Return a dictionary with 'angles' and 'internodes' data for selected dataset.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    dict
+        A dictionary with 'angles' and 'internodes' data.
+    """
+    url = base_url(**api_kwargs)
+    res = requests.get(url + f"/sequence/{dataset_name}")
+    data = json.loads(res.content.decode('utf-8'))
+    return {seq: data[seq] for seq in ['angles', 'internodes']}
