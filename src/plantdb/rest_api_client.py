@@ -609,5 +609,9 @@ def get_angles_and_internodes_data(dataset_name, **api_kwargs):
     """
     url = base_url(**api_kwargs)
     res = requests.get(url + f"/sequence/{dataset_name}")
-    data = json.loads(res.content.decode('utf-8'))
-    return {seq: data[seq] for seq in ['angles', 'internodes']}
+    if res.ok:
+        data = json.loads(res.content.decode('utf-8'))
+        return {seq: data[seq] for seq in ['angles', 'internodes']}
+    else:
+        return None
+
