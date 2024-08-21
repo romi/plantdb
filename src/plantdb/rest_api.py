@@ -587,6 +587,18 @@ class File(Resource):
         -------
         flask.Response
             The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import toml
+        >>> # Load the configuration file 'pipeline.toml':
+        >>> res = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
+        >>> cfg = toml.loads(res.content.decode())
+        >>> print(cfg['Undistorted'])
+        {'upstream_task': 'ImagesFilesetExists'}
+
         """
         return send_from_directory(self.db.path(), path)
 

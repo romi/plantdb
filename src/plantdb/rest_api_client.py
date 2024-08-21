@@ -30,13 +30,12 @@ import json
 from io import BytesIO
 from pathlib import Path
 
-import numpy as np
 import requests
 from PIL import Image
 from plyfile import PlyData
 
-from plantdb.rest_api import task_filesUri_mapping
 from plantdb.rest_api import get_file_uri
+from plantdb.rest_api import task_filesUri_mapping
 
 #: Default URL to REST API is 'localhost':
 REST_API_URL = "127.0.0.1"
@@ -409,6 +408,7 @@ def _ply_vertex_to_array(data):
     """
     return [list(data['vertex']['x']), list(data['vertex']['y']), list(data['vertex']['z'])]
 
+
 def _ply_face_to_array(data):
     """Convert the `PlyData` 'face' data into an XYZ array of triangle coordinates.
 
@@ -423,6 +423,7 @@ def _ply_face_to_array(data):
         The XYZ array of triangle coordinates, returned as a list to be JSON serializable.
     """
     return [list(d) for d in data['face'].data['vertex_indices']]
+
 
 def parse_requests_pcd(data):
     """Parse a requests content, should be from a PointCloud task source.
@@ -530,6 +531,7 @@ EXT_PARSER_DICT = {
     "json": parse_requests_json,
 }
 
+
 def parse_task_requests_data(task, data, extension=None):
     """The task data parser, behave according to the source and default to JSON parser."""
     if extension is not None:
@@ -587,8 +589,90 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **api_kwargs
     return parse_task_requests_data(task, data, ext)
 
 
+def get_toml_file(dataset_name, file_path, **api_kwargs):
+    """Return a loaded TOML file for selected dataset, if it exists.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    file_path : str
+        The path to the TOML file.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    dict
+        The configuration dictionary.
+    """
+    import toml
+    url = base_url(**api_kwargs)
+    res = requests.get(url + f"/files/{dataset_name}/{file_path}")
+    if res.ok:
+        data = toml.loads(res.content.decode('utf-8'))
+        return data
+    else:
+        return None
+
+
+def get_scan_config(dataset_name, cfg_fname='scan.toml', **api_kwargs):
+    """Return the scan configuration for selected dataset, if it exists.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the configuration file.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    dict
+        The configuration dictionary.
+    """
+    return get_toml_file(dataset_name, cfg_fname, **api_kwargs)
+
+
+def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **api_kwargs):
+    """Return the reconstruction configuration for selected dataset, if it exists.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the configuration file.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    dict
+        The configuration dictionary.
+    """
+    return get_toml_file(dataset_name, cfg_fname, **api_kwargs)
+
+
 def get_angles_and_internodes_data(dataset_name, **api_kwargs):
-    """Return a dictionary with 'angles' and 'internodes' data for selected dataset.
+    """Return a dictionary with 'angles' and 'internodes' data for selected dataset, if it exists.
 
     Parameters
     ----------
@@ -614,4 +698,3 @@ def get_angles_and_internodes_data(dataset_name, **api_kwargs):
         return {seq: data[seq] for seq in ['angles', 'internodes']}
     else:
         return None
-
