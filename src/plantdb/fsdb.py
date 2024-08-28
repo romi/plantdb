@@ -575,8 +575,15 @@ class FSDB(db.DB):
         """
         return copy.deepcopy(self.basedir)
 
-    def list_scans(self, query=None) -> list:
+    def list_scans(self, query=None, fuzzy=False) -> list:
         """Get the list of scans in the local database.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of scans.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Examples
         --------
@@ -587,7 +594,7 @@ class FSDB(db.DB):
         ['myscan_001']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_scans(query)]
+        return [f.id for f in self.get_scans(query, fuzzy)]
 
 
 class Scan(db.Scan):
@@ -946,8 +953,15 @@ class Scan(db.Scan):
         """
         return _scan_path(self)
 
-    def list_filesets(self, query=None) -> list:
+    def list_filesets(self, query=None, fuzzy=False) -> list:
         """Get the list of filesets in the scan dataset.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of files.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Examples
         --------
@@ -959,7 +973,7 @@ class Scan(db.Scan):
         ['fileset_001']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_filesets(query)]
+        return [f.id for f in self.get_filesets(query, fuzzy)]
 
 
 class Fileset(db.Fileset):
@@ -1250,8 +1264,15 @@ class Fileset(db.Fileset):
         """
         return _fileset_path(self)
 
-    def list_files(self, query=None) -> list:
+    def list_files(self, query=None, fuzzy=False) -> list:
         """Get the list of files in the fileset.
+
+        Parameters
+        ----------
+        query : dict, optional
+            Query to use to get a list of files.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Examples
         --------
@@ -1264,7 +1285,7 @@ class Fileset(db.Fileset):
         ['dummy_image', 'test_image', 'test_json']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_files(query)]
+        return [f.id for f in self.get_files(query, fuzzy)]
 
 
 class File(db.File):
