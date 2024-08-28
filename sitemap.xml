@@ -2,17 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://romi.github.io/plantdb/</loc>
-         <lastmod>2024-08-21</lastmod>
+         <lastmod>2024-08-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://romi.github.io/plantdb/rest_api/</loc>
-         <lastmod>2024-08-21</lastmod>
+         <lastmod>2024-08-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://romi.github.io/plantdb/reference/SUMMARY/</loc>
-         <lastmod>2024-08-21</lastmod>
+         <lastmod>2024-08-28</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
