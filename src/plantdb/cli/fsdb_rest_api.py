@@ -23,7 +23,7 @@ from plantdb.rest_api import PointCloud
 from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
 from plantdb.rest_api import Scan
-from plantdb.rest_api import ScanList
+from plantdb.rest_api import ScansList
 from plantdb.rest_api import Sequence
 from plantdb.test_database import DATASET
 from plantdb.test_database import test_database
@@ -78,8 +78,8 @@ def main():
     logger.info(f"Found {len(db.list_scans())} scans dataset to serve in local plant database.")
 
     # Initialize RESTful resources to serve:
-    api.add_resource(ScanList, '/scans',
-                     resource_class_args=tuple([db, logger]))
+    api.add_resource(ScansList, '/scans',
+                     resource_class_args=tuple([db]))
     api.add_resource(Scan, '/scans/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(File, '/files/<path:path>',

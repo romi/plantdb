@@ -95,6 +95,31 @@ def test_db_availability(host=REST_API_URL, port=REST_API_PORT):
         return True
 
 
+def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
+    """List the names of the scan datasets served by the PlantDB REST API.
+
+    Parameters
+    ----------
+    host : str, optional
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    list
+        The list of scan dataset names served by the PlantDB REST API.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import list_scan_names
+    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
+    >>> print(list_scan_names())
+    ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
+    """
+    return sorted(requests.get(url=f"{base_url(host, port)}/scans").json())
+
+
 def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
     """Retrieve the information dictionary for all scans from the PlantDB REST API.
 
@@ -116,7 +141,8 @@ def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
     >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> get_scans_info()
     """
-    return requests.get(url=f"{base_url(host, port)}/scans").json()
+    scan_list = list_scan_names(host, port)
+    return [requests.get(url=f"{base_url(host, port)}/scans/{scan}").json() for scan in scan_list]
 
 
 def parse_scans_info(host=REST_API_URL, port=REST_API_PORT):
@@ -178,31 +204,6 @@ def get_scan_data(scan_id, host=REST_API_URL, port=REST_API_PORT):
     False
     """
     return requests.get(url=f"{base_url(host, port)}/scans/{scan_id}").json()
-
-
-def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
-    """List the names of the scan datasets served by the PlantDB REST API.
-
-    Parameters
-    ----------
-    host : str, optional
-        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port of the PlantDB REST API. Defaults to ``5000``.
-
-    Returns
-    -------
-    list
-        The list of scan dataset names served by the PlantDB REST API.
-
-    Examples
-    --------
-    >>> from plantdb.rest_api_client import list_scan_names
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
-    >>> print(list_scan_names())
-    ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
-    """
-    return sorted(parse_scans_info(host, port).keys())
 
 
 def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size="thumb"):

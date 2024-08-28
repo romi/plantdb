@@ -40,6 +40,8 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
+from jinja2.sandbox import unsafe
+
 from plantdb import webcache
 from plantdb.io import read_json
 from plantdb.log import configure_logger
@@ -172,53 +174,6 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "hasSegmentedPcdEvaluation": False,
         "error": error,
     }
-
-
-def list_scans_info(scans, query=None, **kwargs):
-    """List scans information.
-
-    Parameters
-    ----------
-    scans : list of plantdb.fsdb.Scan
-        The list of scan instances to get information from.
-    query : str, optional
-        A scan filtering query, to be matched in the scan metadata.
-
-    Other Parameters
-    ----------------
-    logger : logging.Logger
-        A logger to use with this method, default to a logger created on the fly with a `module.function` name.
-
-    Returns
-    -------
-    list of dict
-        The list of scans information dictionaries.
-
-    Examples
-    --------
-    >>> from plantdb.rest_api import list_scans_info
-    >>> from plantdb.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
-    >>> db.connect()
-    >>> scans_info = list_scans_info(db.get_scans())
-    >>> print(scans_info)
-    [{'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}]
-    >>> db.disconnect()
-    """
-    logger = kwargs.get("logger", configure_logger(__name__))
-
-    res = []
-    for scan in scans:
-        metadata = scan.get_metadata()
-        if query is not None and not (query.lower() in json.dumps(metadata).lower()):
-            continue  # filter scans info list by matching the query with metadata keys
-        try:
-            scan_info = get_scan_info(scan)
-        except:
-            logger.error(f"Could not obtain information from scan dataset '{scan.id}'...")
-            scan_info = get_scan_template(scan.id, error=True)
-        res.append(scan_info)
-    return res
 
 
 def get_scan_info(scan, **kwargs):
@@ -501,12 +456,11 @@ def get_scan_data(scan, **kwargs):
     return scan_data
 
 
-class ScanList(Resource):
+class ScansList(Resource):
     """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
 
-    def __init__(self, db, logger):
+    def __init__(self, db):
         self.db = db
-        self.logger = logger
 
     def get(self):
         """Returns a list of scan dataset information.
@@ -523,13 +477,19 @@ class ScanList(Resource):
         >>> import json
         >>> # Get an info dict about all dataset:
         >>> res = requests.get("http://127.0.0.1:5000/scans")
-        >>> scans = json.loads(res.content)
+        >>> scans_list = json.loads(res.content)
         >>> # List the known dataset id:
-        >>> print([scan['id'] for scan in scans])
+        >>> print(scans_list)
         ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
+        >>> res = requests.get('http://127.0.0.1:5000/scans?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
+        >>> res.content.decode()
 
         """
-        return list_scans_info(self.db.get_scans(), query=request.args.get('filterQuery'), logger=self.logger)
+        query = request.args.get('filterQuery', None)
+        fuzzy = request.args.get('fuzzy', False, type=bool)
+        if query is not None:
+            query = json.loads(query)
+        return self.db.list_scans(query=query, fuzzy=fuzzy)
 
 
 class Scan(Resource):
@@ -565,7 +525,8 @@ class Scan(Resource):
         2024-08-19 11:12:25
 
         """
-        return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
+        #return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
+        return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
 
 
 class File(Resource):
