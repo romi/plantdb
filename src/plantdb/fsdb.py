@@ -408,13 +408,15 @@ class FSDB(db.DB):
         else:
             logger.error(f"You are not connected to the database!")
 
-    def get_scans(self, query=None):
+    def get_scans(self, query=None, fuzzy=False):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
         ----------
         query : dict, optional
             Query to use to get a list of scans.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Returns
         -------
@@ -434,7 +436,7 @@ class FSDB(db.DB):
         [<plantdb.fsdb.Scan at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.scans, query)
+        return _filter_query(self.scans, query, fuzzy)
 
     def get_scan(self, id, create=False):
         """Get or create a `Scan` instance in the local database.
@@ -695,13 +697,15 @@ class Scan(db.Scan):
         del self.filesets
         return
 
-    def get_filesets(self, query=None):
+    def get_filesets(self, query=None, fuzzy=False):
         """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
 
         Parameters
         ----------
         query : dict, optional
             Query to use to get a list of filesets.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Returns
         -------
@@ -722,7 +726,7 @@ class Scan(db.Scan):
         [<plantdb.fsdb.Fileset at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.filesets, query)
+        return _filter_query(self.filesets, query, fuzzy)
 
     def get_fileset(self, id, create=False):
         """Get or create a `Fileset` instance, of given `id`, in the current scan dataset.
@@ -1006,13 +1010,15 @@ class Fileset(db.Fileset):
         self.files = None
         return
 
-    def get_files(self, query=None):
+    def get_files(self, query=None, fuzzy=False):
         """Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.
 
         Parameters
         ----------
         query : dict, optional
             Query to use to get a list of files.
+        fuzzy : bool
+            Whether to use fuzzy matching or not, that is the use of regular expressions.
 
         Returns
         -------
@@ -1036,7 +1042,7 @@ class Fileset(db.Fileset):
          <plantdb.fsdb.File at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.files, query)
+        return _filter_query(self.files, query, fuzzy)
 
     def get_file(self, id, create=False):
         """Get or create a `File` instance, of given `id`, in the current fileset.
@@ -2689,7 +2695,7 @@ def _delete_scan(scan):
     return
 
 
-def _filter_query(l, query=None):
+def _filter_query(l, query=None, fuzzy=False):
     """Filter a list of `Scan`s, `Fileset`s or `File`s using a `query` on their metadata.
 
     Parameters
@@ -2699,11 +2705,17 @@ def _filter_query(l, query=None):
     query : dict, optional
         Filtering query in the form of a dictionary.
         The list of instances must have metadata matching ``key`` and ``value`` from the `query`.
+    fuzzy : bool
+        Whether to use fuzzy matching or not, that is the use of regular expressions.
 
     Returns
     -------
     list
         List of `Scan`s, `Fileset`s or `File`s filtered by the query, if any.
+
+    See Also
+    --------
+    plantdb.utils.partial_match
 
     Examples
     --------
@@ -2724,8 +2736,19 @@ def _filter_query(l, query=None):
     >>> files = _filter_query(fs.get_files(), query={"random image": True})
     >>> print(len(files))  # should be `1` as only one file has this metadata
     1
+    >>> # Let's create some metadata for the Scan instance:
+    >>> scan.set_metadata("object", {"env":"virtual", "test": "ok"})
+    >>> # Now try to filter the list of Scan instances using a partial metadata dictionary:
+    >>> scans = _filter_query(db.get_scans(), query={"object": {"env":"virtual"}})
+    >>> print([scan.id for scan in scans])
+    ['myscan_001']
+    >>> # You may use regular expression using `fuzzy=True`:
+    >>> scans = _filter_query(db.get_scans(), query={"object": {"env":"virt.*"}}, fuzzy=True)
+    >>> print([scan.id for scan in scans])
+    ['myscan_001']
     >>> db.disconnect()
     """
+    from plantdb.utils import partial_match
     if query is None or query == {}:
         # If there is no `query` return the unfiltered list of instances
         query_result = [f for f in l]
@@ -2736,7 +2759,8 @@ def _filter_query(l, query=None):
             f_query = []  # boolean list gathering the "filter test results"
             for q in query.keys():
                 try:
-                    assert f.get_metadata(q) == query[q]
+                    #assert f.get_metadata(q) == query[q]
+                    assert partial_match(query[q], f.get_metadata(q), fuzzy)
                 except AssertionError:
                     f_query.append(False)
                 else:

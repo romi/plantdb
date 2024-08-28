@@ -9,7 +9,7 @@ The Python implementation is done in the `plantdb.rest_api` module and the CLI t
 
 Here are the specifications for the `/scans` URL:
 
-* Resource: [`plantdb.rest_api.ScanList`](reference/plantdb/rest_api.md#plantdb.rest_api.ScanList)
+* Resource: [`plantdb.rest_api.ScansList`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansList)
 * Arguments: `filterQuery`
 * Returns: a JSON compliant list of dictionaries.
 * Example:

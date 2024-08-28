@@ -203,3 +203,52 @@ def tmpdir_from_fileset(fileset):
         filepath = Path(tmpdir.name) / f.filename
         to_file(f, filepath)
     return tmpdir
+
+
+def partial_match(reference, target, fuzzy=False):
+    """Partial matching of a reference dictionary against a target, potentially using regexp.
+
+    Parameters
+    ----------
+    reference : dict
+        The reference dictionary with partial information to test against the target.
+    target : dict
+        The target dictionary.
+    fuzzy : bool
+        Whether to use fuzzy matching or not, that is the use of regular expressions.
+
+    Returns
+    -------
+    bool
+        Whether the partial match is found or not.
+
+    Examples
+    --------
+    >>> from plantdb.utils import partial_match
+    >>> ref = {"object": {"environment":"virtual"}}
+    >>> target = {'object': {'environment': 'virtual', 'plant_id': 'arabidopsis000', 'species': 'Arabidopsis Thaliana'}, 'scanner': {'workspace': {'x': [-200, 200], 'y': [-200, 200], 'z': [10, 1000]}}}
+    >>> partial_match(ref, target)
+    True
+    >>> ref = {"object": {"species":"Arabidopsis.*"}}
+    >>> partial_match(ref, target, fuzzy=True)
+    True
+    >>> ref = {"species":"Arabidopsis.*"}
+    >>> partial_match(ref, target, fuzzy=True)
+    False
+
+    """
+    from re import match
+    if isinstance(reference, dict) and isinstance(target, dict):
+        return all(
+            key in target and partial_match(value, target[key], fuzzy)
+            for key, value in reference.items()
+        )
+    elif isinstance(reference, list) and isinstance(target, list):
+        return len(reference) <= len(target) and all(
+            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)
+            for ref_item in reference
+        )
+    elif fuzzy and isinstance(reference, str) and isinstance(target, str):
+        return bool(match(reference, target))
+    else:
+        return reference == target
