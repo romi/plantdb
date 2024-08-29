@@ -36,6 +36,8 @@ from pathlib import Path
 from tempfile import gettempdir
 from zipfile import ZipFile
 
+from flask import jsonify
+from flask import make_response
 from flask import request
 from flask import send_file
 from flask import send_from_directory
@@ -158,6 +160,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "thumbnailUri": "",
         "images": None,  # list of original image filenames
         "tasks_fileset": None,  # dict mapping task names to fileset names
+        "filesUri": {},    # dict mapping task names to task file URI
         "isVirtual": False,
         "hasColmap": False,
         "hasPointCloud": False,
@@ -272,6 +275,12 @@ def get_scan_info(scan, **kwargs):
     scan_info["hasSegmentedPointCloud"] = _try_has_file('SegmentedPointCloud', 'SegmentedPointCloud')
     scan_info["hasSegmentedPcdEvaluation"] = _try_has_file('SegmentedPointCloudEvaluation',
                                                            'SegmentedPointCloudEvaluation')
+
+    ## Get the URI (file path) to the output of the `PointCloud` task:
+    for task, uri_key in task_filesUri_mapping.items():
+        if scan_info[f"has{task}"]:
+            fs = scan.get_fileset(task_fs_map[task])
+            scan_info["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
 
     return scan_info
 
@@ -564,6 +573,85 @@ class File(Resource):
         return send_from_directory(self.db.path(), path)
 
 
+class DatasetFile(Resource):
+    """Concrete RESTful resource to serve a file upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def post(self, scan_id):
+        # Check the header used to pass the filename, or return '400' for "bad request":
+        if 'Content-Disposition' not in request.headers:
+            return make_response(jsonify({"error": "No 'Content-Disposition' header!"}), 400)
+        if 'Content-Length' not in request.headers:
+            return make_response(jsonify({"error": "No 'Content-Length' header!"}), 400)
+        if 'X-File-Path' not in request.headers:
+            return make_response(jsonify({"error": "No 'X-File-Path' header!"}), 400)
+
+        # Get the filename:
+        rel_filename = request.headers['X-File-Path']
+        # Check the received filename, or return '400' for "bad request":
+        if not rel_filename:
+            return make_response(jsonify({"error": "No valid filename provided!"}), 400)
+
+        # Get the chuk size:
+        content_length = int(request.headers.get('Content-Length', 0))
+        # Check the received chuk size, or return '400' for "bad request":
+        if content_length == 0:
+            return make_response(jsonify({"error": "No valid 'Content-Length' provided!"}), 400)
+
+        # Get the chuk size:
+        chunk_size = int(request.headers.get('X-Chunk-Size', 0))
+
+        # Check the dataset exists, or return '400' for "bad request":
+        try:
+            scan = self.db.get_scan(scan_id)
+        except Exception as e:
+            return make_response(jsonify({"error": str(e)}), 400)
+        else:
+            # Root path to write the data:
+            root_path = scan.path()
+
+        # Create the full file path:
+        file_path = os.path.join(root_path, rel_filename)
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        def write_stream(file_path, content_length, chunk_size):
+            bytes_received = 0
+            with open(file_path, 'wb') as file:
+                print(f"Received: {bytes_received}")
+                while bytes_received < content_length:
+                    chunk = request.stream.read(min(chunk_size, content_length - bytes_received))
+                    if not chunk:
+                        break  # Stream ended prematurely
+                    file.write(chunk)
+                    bytes_received += len(chunk)
+            return bytes_received
+
+        def write_data(file_path):
+            with open(file_path, 'wb') as file:
+                file.write(request.data)
+            return os.path.getsize(file_path)
+
+        # Write streamed file:
+        try:
+            if chunk_size == 0:
+                bytes_received = write_data(file_path)
+            else:
+                bytes_received = write_stream(file_path, content_length, chunk_size)
+            if bytes_received != content_length:
+                # If something went wrong, remove the file and raise a ValueError:
+                os.remove(file_path)
+                raise ValueError(f"Received {bytes_received} bytes, expected {content_length} bytes")
+        except Exception as e:
+            # Return '500' for "server error" if anything went wrong:
+            return make_response(jsonify({"error": f"Error saving file: {str(e)}"}), 500)
+        else:
+            # Return '201' for "created" if it went fine:
+            return make_response(jsonify({"message": f"File {rel_filename} received and saved"}), 201)
+
+
 class Refresh(Resource):
     """Concrete RESTful resource to reload the database upon request (GET method)."""
 
@@ -581,9 +669,11 @@ class Refresh(Resource):
         >>> res = requests.get("http://127.0.0.1:5000/refresh")
         >>> res.ok
         True
+        >>> res = requests.get("http://127.0.0.1:5000/refresh?scan_id=real_plant")
 
         """
-        self.db.reload()
+        scan_id = request.args.get('scan_id', default=None, type=str)
+        self.db.reload(scan_id)
         return 200
 
 

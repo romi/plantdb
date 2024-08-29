@@ -16,6 +16,7 @@ from flask_restful import Api
 from plantdb.fsdb import FSDB
 from plantdb.log import configure_logger
 from plantdb.rest_api import Archive
+from plantdb.rest_api import DatasetFile
 from plantdb.rest_api import File
 from plantdb.rest_api import Image
 from plantdb.rest_api import Mesh
@@ -83,6 +84,8 @@ def main():
     api.add_resource(Scan, '/scans/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(File, '/files/<path:path>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(DatasetFile, '/files/<string:scan_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Refresh, '/refresh',
                      resource_class_args=tuple([db]))
