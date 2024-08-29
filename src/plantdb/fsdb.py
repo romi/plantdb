@@ -98,6 +98,7 @@ import json
 import logging
 import os
 import pathlib
+from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
 from shutil import rmtree
@@ -309,7 +310,7 @@ class FSDB(db.DB):
         # Initialize attributes:
         self.basedir = Path(basedir).resolve()
         self.lock_path = self.basedir / LOCK_FILE_NAME
-        self.scans = []
+        self.scans = {}
         self.is_connected = False
         self.required_filesets = required_filesets
 
@@ -386,24 +387,38 @@ class FSDB(db.DB):
         False
         """
         if self.is_connected:
-            for s in self.scans:
-                s._erase()
+            for s_id, scan in self.scans.items():
+                scan._erase()
             if _is_safe_to_delete(self.lock_path):
                 self.lock_path.unlink(missing_ok=True)
                 atexit.unregister(self.disconnect)
             else:
                 raise IOError("Could not remove lock, maybe you messed with the `lock_path` attribute?")
-            self.scans = []
+            self.scans = {}
             self.is_connected = False
         else:
             logger.info(f"Not connected!")
         return
 
-    def reload(self):
-        """Reload the database by scanning datasets."""
+    def reload(self, scan_id=None):
+        """Reload the database by scanning datasets.
+
+        Parameters
+        ----------
+        scan_id : str or list of str, optional
+            The name of the scan(s) to reload.
+        """
         if self.is_connected:
-            logger.error("Reloading the database...")
-            self.scans = _load_scans(self)
+            if scan_id is None:
+                logger.info("Reloading the database...")
+                self.scans = _load_scans(self)
+            elif isinstance(scan_id, str):
+                logger.info(f"Reloading scan '{scan_id}'...")
+                self.scans[scan_id] = _load_scan(self, scan_id)
+            elif isinstance(scan_id, Iterable):
+                [self.reload(scan_i) for scan_i in scan_id]
+            else:
+                logger.error(f"Wrong parameter `scan_name`, expected a string or list of string but got '{scan_id}'!")
             logger.info("Done!")
         else:
             logger.error(f"You are not connected to the database!")
@@ -436,7 +451,7 @@ class FSDB(db.DB):
         [<plantdb.fsdb.Scan at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.scans, query, fuzzy)
+        return _filter_query(list(self.scans.values()), query, fuzzy)
 
     def get_scan(self, id, create=False):
         """Get or create a `Scan` instance in the local database.
@@ -471,12 +486,11 @@ class FSDB(db.DB):
         None
         >>> db.disconnect()
         """
-        ids = [f.id for f in self.scans]
-        if id not in ids:
+        if id not in self.scans.keys():
             if create:
                 return self.create_scan(id)
             return None
-        return self.scans[ids.index(id)]
+        return self.scans[id]
 
     def create_scan(self, id):
         """Create a new `Scan` instance in the local database.
@@ -518,7 +532,7 @@ class FSDB(db.DB):
             raise IOError(f"Duplicate scan name: {id}")
         scan = Scan(self, id)
         _make_scan(scan)
-        self.scans.append(scan)
+        self.scans[id] = scan
         return scan
 
     def delete_scan(self, id):
@@ -559,7 +573,7 @@ class FSDB(db.DB):
         if scan is None:
             raise IOError("Invalid id")
         _delete_scan(scan)
-        self.scans.remove(scan)
+        self.scans.pop(id)
         return
 
     def path(self) -> pathlib.Path:
@@ -1594,6 +1608,70 @@ class File(db.File):
 
 # load the database
 
+def _load_scan(db, scan_id):
+    """Load ``Scan`` from given database.
+
+    List subdirectories of ``db.basedir`` as ``Scan`` instances.
+    May be restrited to the presense of subdirectories in .
+
+    Parameters
+    ----------
+    db : plantdb.fsdb.FSDB
+        The database instance to use to list the ``Scan``.
+    scan_id : str
+        The name of the scan to load.
+
+    Returns
+    -------
+    list of plantdb.fsdb.Scan
+         The list of ``fsdb.Scan`` found in the database.
+
+    See Also
+    --------
+    plantdb.fsdb._scan_path
+    plantdb.fsdb._scan_files_json
+    plantdb.fsdb._load_scan_filesets
+    plantdb.fsdb._load_scan_metadata
+
+    Examples
+    --------
+    >>> from plantdb.fsdb import FSDB
+    >>> from plantdb.fsdb import dummy_db, _load_scans
+    >>> db = dummy_db()
+    >>> db.connect()
+    >>> db.create_scan("007")
+    >>> db.create_scan("111")
+    >>> scans = _load_scans(db)
+    >>> print(scans)
+    []
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scans = _load_scans(db)
+    >>> print(scans)
+    [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
+    """
+    required_fs = db.required_filesets
+    scan = Scan(db, scan_id)
+    scan_path = _scan_path(scan)
+    # If specific filesets are required, test if they exist as subdirectories:
+    if required_fs is not None:
+        req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
+    else:
+        req_subdir = True
+
+    # Parse the filset, metadata and measure if:
+    #  - path to scan directory exists
+    #  - required subdirectories exists
+    #  - `files.json` associated to the scan is found, parse it:
+    if scan_path.is_dir() and req_subdir and _scan_json_file(scan).is_file():
+        scan.filesets = _load_scan_filesets(scan)
+        scan.metadata = _load_scan_metadata(scan)
+        scan.measures = _load_scan_measures(scan)
+    else:
+        scan = None
+    return scan
+
+
 def _load_scans(db):
     """Load list of ``Scan`` from given database.
 
@@ -1634,24 +1712,12 @@ def _load_scans(db):
     >>> print(scans)
     [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
     """
-    scans = []
-    names = os.listdir(db.path())
-    required_fs = db.required_filesets
-    for name in tqdm(names, unit="scan"):
-        scan = Scan(db, name)
-        scan_path = _scan_path(scan)
-        # If specific filesets are required, test if they exist as subdirectories:
-        if required_fs is not None:
-            req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
-        else:
-            req_subdir = True
-        if scan_path.is_dir() and req_subdir:
-            # If the `files.json` associated to the scan is found, parse it:
-            if _scan_json_file(scan).is_file():
-                scan.filesets = _load_scan_filesets(scan)
-                scan.metadata = _load_scan_metadata(scan)
-                scan.measures = _load_scan_measures(scan)
-            scans.append(scan)
+    scans = {}
+    dir_names = os.listdir(db.path())
+    for scan_name in tqdm(dir_names, unit="scan"):
+        scan = _load_scan(db, scan_name)
+        if scan is not None:
+            scans[scan_name] = scan
     return scans
 
 
@@ -2780,7 +2846,7 @@ def _filter_query(l, query=None, fuzzy=False):
             f_query = []  # boolean list gathering the "filter test results"
             for q in query.keys():
                 try:
-                    #assert f.get_metadata(q) == query[q]
+                    # assert f.get_metadata(q) == query[q]
                     assert partial_match(query[q], f.get_metadata(q), fuzzy)
                 except AssertionError:
                     f_query.append(False)
