@@ -861,7 +861,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
         return {"error": str(e)}
 
 
-def download_scan_archive(dataset_name, path=None, **kwargs):
+def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     """Downloads a scan archive file from a defined dataset based on the specified API parameters.
 
     This function fetches a scan archive in stream mode from a remote API. The archive
@@ -872,7 +872,7 @@ def download_scan_archive(dataset_name, path=None, **kwargs):
     ----------
     dataset_name : str
         The name of the dataset from which the scan archive file is to be downloaded.
-    path : str or pathlib.Path, optional
+    out_dir : str or pathlib.Path, optional
         A path to the directory where to save the archive.
 
     Other Parameters
@@ -884,25 +884,32 @@ def download_scan_archive(dataset_name, path=None, **kwargs):
 
     Returns
     -------
-    BytesIO or None
-        A `BytesIO` object containing the binary content of the downloaded scan archive,
-        ``None`` if the request is unsuccessful.
+    BytesIO or str
+        A `BytesIO` object containing the binary content of the downloaded scan archive.
+        A path to the downloaded file, if a directory path is specified.
 
     Examples
     --------
     >>> from plantdb.rest_api_client import download_scan_archive
-    >>> download_scan_archive("Pois2_cylindre_D14",path='/tmp',host="127.0.0.1",port="5000")
+    >>> download_scan_archive("Pois2_cylindre_D14", out_dir='/tmp', host="127.0.0.1", port="5000")
     """
+    import time
     url = archive_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None))
+
+    start_time = time.time()  # Start timing
     res = requests.get(url, stream=True, timeout=10)
+    end_time = time.time()  # End timing
+    duration = end_time - start_time
+    msg = f"Download completed in {duration:.2f} seconds."
+
     if res.ok:
-        if path is not None:
-            path = Path(path) / f"{dataset_name}.zip"
-            with open(path, "wb") as archive_file:
+        if out_dir is not None:
+            out_dir = Path(out_dir) / f"{dataset_name}.zip"
+            with open(out_dir, "wb") as archive_file:
                 archive_file.write(res.content)
-            return f"{path}"
+            return f"{out_dir}", msg
         else:
-            return BytesIO(res.content)
+            return BytesIO(res.content), msg
     else:
         res.raise_for_status()  # Raise an error if the request failed
 
