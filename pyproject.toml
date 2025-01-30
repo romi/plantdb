@@ -52,6 +52,7 @@ fsdb_import_folder = "plantdb.cli.fsdb_import_folder:main"
 fsdb_import_images = "plantdb.cli.fsdb_import_images:main"
 fsdb_rest_api = "plantdb.cli.fsdb_rest_api:main"
 fsdb_sync = "plantdb.cli.fsdb_sync:main"
+fsdb_rest_api_sync = "plantdb.cli.fsdb_rest_api_sync:main"
 shared_fsdb = "plantdb.cli.shared_fsdb:main"
 
 [project.urls]
