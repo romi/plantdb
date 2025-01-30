@@ -29,6 +29,7 @@ This module regroup the client-side methods of the REST API.
 import json
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
 from PIL import Image
@@ -48,9 +49,9 @@ def base_url(host=REST_API_URL, port=REST_API_PORT):
 
     Parameters
     ----------
-    host : str
+    host : str, optional
         The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str
+    port : str, optional
         The port number of the PlantDB REST API server. Defaults to ``5000``.
 
     Returns
@@ -65,6 +66,77 @@ def base_url(host=REST_API_URL, port=REST_API_PORT):
     'http://127.0.0.1:5000'
     """
     return f"http://{host}:{port}"
+
+
+def sanitize_name(name):
+    """Sanitizes and validates the provided name.
+
+    The function ensures that the input string adheres to predefined naming rules by:
+
+    - stripping leading/trailing spaces,
+    - isolating the last segment after splitting by slashes,
+    - validating the name against an alphanumeric pattern
+      with optional underscores (`_`), dashes (`-`), or periods (`.`).
+
+    Parameters
+    ----------
+    name : str
+        The name to sanitize and validate.
+
+    Returns
+    -------
+    str
+        Sanitized name that conforms to the rules.
+
+    Raises
+    ------
+    ValueError
+        If the provided name contains invalid characters or does not meet the naming rules.
+    """
+    import re
+    sanitized_name = name.strip()  # Remove leading/trailing spaces
+    sanitized_name = sanitized_name.split('/')[-1]  # isolate the last segment after splitting by slashes
+    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
+        raise ValueError(
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
+    return sanitized_name
+
+
+def archive_url(dataset_name, host=REST_API_URL, port=REST_API_PORT):
+    """Constructs the URL for accessing the archive of a specific dataset.
+
+    This function generates a fully qualified URL for accessing a dataset's archive
+    by joining the base URL of the REST API with the provided dataset name. It uses
+    a default host and port unless otherwise specified. The constructed URL follows
+    a predictable pattern based on the path and dataset name.
+
+    Parameters
+    ----------
+    dataset_name : str
+        Name of the dataset to access in the archive.
+    host : str, optional
+        Base URL or host of the REST API. Defaults to REST_API_URL.
+    port : int, optional
+        Port on which the REST API is hosted. Defaults to REST_API_PORT.
+
+    Returns
+    -------
+    str
+        Fully constructed URL for accessing the specified dataset archive.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import archive_url
+    >>> archive_url('arabidopsis000')
+    'http://127.0.0.1:5000/archive/arabidopsis000'
+    >>> archive_url('../arabidopsis000')
+    'http://127.0.0.1:5000/archive/arabidopsis000'
+    >>> archive_url('arabidopsis+000')
+    ValueError: Invalid dataset name: 'arabidopsis+000'. Dataset names must be alphanumeric and can include underscores or dashes.
+    """
+    dataset_name = sanitize_name(dataset_name)
+    return urljoin(base_url(host, port), f"/archive/{dataset_name}")
 
 
 def test_db_availability(host=REST_API_URL, port=REST_API_PORT):
@@ -203,6 +275,7 @@ def get_scan_data(scan_id, host=REST_API_URL, port=REST_API_PORT):
     >>> print(scan_data['hasColmap'])
     False
     """
+    scan_id = sanitize_name(scan_id)
     return requests.get(url=f"{base_url(host, port)}/scans/{scan_id}").json()
 
 
@@ -229,6 +302,7 @@ def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size=
     str
         The URL to the preview image for a scan dataset.
     """
+    scan_id = sanitize_name(scan_id)
     thumb_uri = get_scan_data(scan_id, host, port)["thumbnailUri"]
     if size != "thumb":
         thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
@@ -262,6 +336,9 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL,
     str
         The URL to an image of a scan dataset and task fileset.
     """
+    scan_id = sanitize_name(scan_id)
+    fileset_id = sanitize_name(fileset_id)
+    file_id = sanitize_name(file_id)
     return f"{base_url(host, port)}/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
 
 
@@ -343,6 +420,8 @@ def list_task_images_uri(dataset_name, task_name='images', size='orig', **api_kw
     list of str
         The list of image URI strings for the PlantDB REST API.
     """
+    dataset_name = sanitize_name(dataset_name)
+    task_name = sanitize_name(task_name)
     scan_info = get_scan_data(dataset_name, **api_kwargs)
     tasks_fileset = scan_info["tasks_fileset"]
     images = scan_info["images"]
@@ -699,3 +778,208 @@ def get_angles_and_internodes_data(dataset_name, **api_kwargs):
         return {seq: data[seq] for seq in ['angles', 'internodes']}
     else:
         return None
+
+
+def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
+    """Uploads a file to the server using the DatasetFile POST endpoint.
+
+    Parameters
+    ----------
+    server_url : str
+        The base URL of the server hosting the REST API.
+    scan_id : str
+        The unique identifier of the scan associated with the file upload.
+    file_path : str
+        The path to the file to be uploaded.
+    chunk_size : int, optional
+        The size of chunks (in bytes) to read and send, by default 0 (no chunking).
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the server's response.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import upload_dataset_file
+    >>> upload_dataset_file('Pois2_cylindre_D14', '/path/to/local/file.txt')
+    """
+    from os.path import basename
+    from os.path import getsize
+    # Prepare the URL and headers
+    scan_id = sanitize_name(scan_id)
+    url = urljoin(
+        base_url(host=kwargs.get("host", None), port=kwargs.get("port", None)),
+        f"/files/{scan_id}"
+    )
+
+    filename = basename(file_path)
+    file_size = getsize(file_path)
+    # Create the request header
+    headers = {
+        "Content-Disposition": f"attachment; filename={filename}",
+        "Content-Length": str(file_size),
+        "X-File-Path": filename,
+    }
+
+    try:
+        # Open the file for reading
+        with open(file_path, 'rb') as f:
+            if chunk_size > 0:
+                # Upload in chunks
+                headers["X-Chunk-Size"] = str(chunk_size)
+                bytes_sent = 0
+                while bytes_sent < file_size:
+                    chunk = f.read(chunk_size)
+                    response = requests.post(
+                        url,
+                        headers=headers,
+                        data=chunk,
+                    )
+                    bytes_sent += len(chunk)
+                    # Check if the request was successful
+                    if response.status_code not in (200, 201):
+                        return {"error": "File upload failed", "status_code": response.status_code,
+                                "response": response.json()}
+            else:
+                # Upload the entire file
+                response = requests.post(url, headers=headers, data=f)
+
+        # Return the server's response
+        if response.status_code in (200, 201):
+            return response.json()
+        else:
+            return {"error": "File upload failed", "status_code": response.status_code, "response": response.json()}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def download_scan_archive(dataset_name, path=None, **kwargs):
+    """Downloads a scan archive file from a defined dataset based on the specified API parameters.
+
+    This function fetches a scan archive in stream mode from a remote API. The archive
+    is expected to be in the form of a binary content stream. The success of the
+    operation is determined by the HTTP response received from the API.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset from which the scan archive file is to be downloaded.
+    path : str or pathlib.Path, optional
+        A path to the directory where to save the archive.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    BytesIO or None
+        A `BytesIO` object containing the binary content of the downloaded scan archive,
+        ``None`` if the request is unsuccessful.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import download_scan_archive
+    >>> download_scan_archive("Pois2_cylindre_D14",path='/tmp',host="127.0.0.1",port="5000")
+    """
+    url = archive_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None))
+    res = requests.get(url, stream=True, timeout=10)
+    if res.ok:
+        if path is not None:
+            path = Path(path) / f"{dataset_name}.zip"
+            with open(path, "wb") as archive_file:
+                archive_file.write(res.content)
+            return f"{path}"
+        else:
+            return BytesIO(res.content)
+    else:
+        res.raise_for_status()  # Raise an error if the request failed
+
+
+def upload_scan_archive(dataset_name, path, **kwargs):
+    """Upload a scan archive file to a specified dataset on a server.
+
+    This function sends a POST request to upload a scan archive file to a
+    particular dataset, utilizing the archive URL and optionally specified
+    additional API-related request parameters. Ensures proper handling of
+    file opening/closing procedures and response status checks.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the target dataset for the archive upload.
+    path : str
+        The local file system path to the archive to be uploaded.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+    timeout : int, optional
+        A timeout, in seconds, to suceed the upload request. Defaults to ``120``.
+
+    Returns
+    -------
+    str
+        The time it took to upload the archive.
+
+    Raises
+    ------
+    requests.exceptions.RequestException
+        If the HTTP request fails for any reason.
+    requests.exceptions.HTTPError
+        If the request returns an unsuccessful HTTP status code.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import upload_scan_archive
+    >>> upload_scan_archive("Pois2_cylindre_D14_bis", path='/tmp/Pois2_cylindre_D14.zip', host="127.0.0.1", port="5000")
+    """
+    import time
+    from zipfile import ZipFile
+
+    path = Path(path)
+    # Verify path existence
+    if not path.is_file():
+        raise FileNotFoundError(f"The file at path '{path}' does not exist!")
+    # Verify the integrity of the ZIP file
+    try:
+        with ZipFile(path, 'r') as zip_file:
+            zip_file.testzip()
+    except Exception as e:
+        print(e)
+        raise IOError(f"Invalid ZIP file '{path}!'")
+
+    # Construct the URL for the archive upload:
+    url = archive_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None))
+
+    start_time = time.time()  # Start timing
+    with open(path, "rb") as f:
+        timeout = kwargs.get("timeout", 120)
+        try:
+            res = requests.post(url, files={"zip_file": (path.name, f, "application/zip")}, stream=True,
+                                timeout=timeout)
+        except requests.exceptions.Timeout:
+            raise RuntimeError(f"The upload request timed out after {timeout} seconds.")
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"An error occurred during the upload: {e}")
+    end_time = time.time()  # End timing
+
+    if res.ok:
+        duration = end_time - start_time
+        return f"Upload completed in {duration:.2f} seconds."
+    else:
+        res.raise_for_status()  # Raise an error if the request failed
