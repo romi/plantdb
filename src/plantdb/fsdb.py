@@ -160,7 +160,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     mydb = Path(mkdtemp(prefix='romidb_'))
     marker_file = mydb / MARKER_FILE_NAME
     marker_file.open(mode='w').close()
-    db = FSDB(mydb, required_filesets=None)
+    db = FSDB(mydb, required_filesets=None, required_files_json=False)
 
     if with_file:
         # To create a `File`, existing `Scan` & `Fileset` are required
@@ -203,9 +203,6 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
         io.write_json(f, md, "json")
         f.set_metadata("random json", True)
 
-    if with_scan or with_fileset or with_file:
-        db.disconnect()
-
     return db
 
 
@@ -225,11 +222,11 @@ class FSDB(db.DB):
     Attributes
     ----------
     basedir : pathlib.Path
-        Absolute path to the base directory hosting the database.
+        The absolute path to the base directory hosting the database.
     lock_path : pathlib.Path
-        Absolute path to the lock file.
-    scans : list
-        The list of ``Scan`` objects found in the database.
+        The absolute path to the lock file.
+    scans : dict[str, plantdb.fsdb.Scan]
+        The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
 
@@ -272,7 +269,7 @@ class FSDB(db.DB):
     >>> db.disconnect()
     """
 
-    def __init__(self, basedir, required_filesets=['metadata']):
+    def __init__(self, basedir, required_filesets=['metadata'], required_files_json=True, dummy=False):
         """Database constructor.
 
         Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
@@ -285,6 +282,11 @@ class FSDB(db.DB):
             A list of required filesets to consider a scan valid.
             Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
             Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
+        required_files_json : bool, optional
+            Require the `files.json` file to exist in the `Scan` directory to consider it valid.
+            Defaults to ``True``.
+        dummy : bool, optional
+            If ``True``, deactivate any requirements `required_filesets` & `required_files_json`.
 
         Raises
         ------
@@ -312,7 +314,9 @@ class FSDB(db.DB):
         self.lock_path = self.basedir / LOCK_FILE_NAME
         self.scans = {}
         self.is_connected = False
-        self.required_filesets = required_filesets
+        self.dummy = dummy
+        self.required_filesets = required_filesets if not dummy else None
+        self.required_files_json = required_files_json if not dummy else False
 
     def connect(self, login_data=None, unsafe=False):
         """Connect to the local database.
@@ -423,13 +427,39 @@ class FSDB(db.DB):
         else:
             logger.error(f"You are not connected to the database!")
 
+    def scan_exists(self, scan_id: str) -> bool:
+        """Check if a given scan ID exists in the database.
+
+        Parameters
+        ----------
+        scan_id : str
+            The ID of the scan to check.
+
+        Returns
+        -------
+        bool
+            ``True`` if the scan exists, ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True)
+        >>> db.scan_exists("myscan_001")
+        True
+        >>> db.scan_exists("nonexistent_id")
+        False
+        >>> db.disconnect()
+        """
+        return scan_id in self.scans
+
     def get_scans(self, query=None, fuzzy=False):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
         ----------
         query : dict, optional
-            Query to use to get a list of scans.
+            A query to use to filter the returned list of scans.
+            The metadata must match given ``key`` and ``value`` from the `query` dictionary.
         fuzzy : bool
             Whether to use fuzzy matching or not, that is the use of regular expressions.
 
@@ -453,52 +483,57 @@ class FSDB(db.DB):
         """
         return _filter_query(list(self.scans.values()), query, fuzzy)
 
-    def get_scan(self, id, create=False):
+    def get_scan(self, scan_id, create=False):
         """Get or create a `Scan` instance in the local database.
 
         Parameters
         ----------
-        id : str
+        scan_id : str
             The name of the scan dataset to get/create.
             It should exist if `create` is `False`.
         create : bool, optional
             If ``False`` (default), the given `id` should exist in the local database.
             Else the given `id` should NOT exist as they are unique.
 
-        Notes
-        -----
-        If the `id` do not exist in the local database and `create` is `False`, `None` is returned.
+        Raises
+        ------
+        plantdb.fsdb.ScanNotFoundError
+            If the `scan_id` do not exist in the local database and `create` is ``False``.
 
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_file=True)
+        >>> db = dummy_db()
         >>> db.connect()
         >>> db.list_scans()
-        ['myscan_001']
+        []
         >>> new_scan = db.get_scan('007', create=True)
         >>> print(new_scan)
         <plantdb.fsdb.Scan object at **************>
         >>> db.list_scans()
-        ['myscan_001', '007']
+        ['007']
         >>> unknown_scan = db.get_scan('unknown')
-        >>> print(unknown_scan)
-        None
+        plantdb.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
         >>> db.disconnect()
         """
-        if id not in self.scans.keys():
+        if self.scan_exists(scan_id):
+            return self.scans[scan_id]
+        else:
             if create:
-                return self.create_scan(id)
-            return None
-        return self.scans[id]
+                return self.create_scan(scan_id)
+            else:
+                raise ScanNotFoundError(scan_id)
 
-    def create_scan(self, id):
+    def create_scan(self, scan_id):
         """Create a new `Scan` instance in the local database.
 
         Parameters
         ----------
-        id : str
-            The name of the scan to create. It should not exist in the local database.
+        scan_id : str
+            The identifier of the scan to create.
+            It should contain only alphanumeric characters, underscores, dashes and dots.
+            It should be non-empty and not longer than 255 characters
+            It should not exist in the local database
 
         Returns
         -------
@@ -507,9 +542,8 @@ class FSDB(db.DB):
 
         Raises
         ------
-        IOError
-            If the `id` already exists in the local database.
-            If the `id` is not valid.
+        OSError
+            If the `scan_id` is not valid or already exists in the local database.
 
         See Also
         --------
@@ -521,26 +555,31 @@ class FSDB(db.DB):
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.connect()
-        >>> new_scan = db.create_scan('007')
-        >>> scan = db.create_scan('007')
-        OSError: Duplicate scan name: 007
+        >>> new_scan = db.create_scan('007')  # create a new scan dataset
+        >>> scan = db.create_scan('007')  # attempt to create an existing scan dataset
+        OSError: Given scan identifier '007' already exists!
+        >>> scan = db.create_scan('0/07')  # attempt to create a scan dataset using invalid characters
+        OSError: Invalid scan identifier '0/07'!
         >>> db.disconnect()
         """
-        if not _is_valid_id(id):
-            raise IOError("Invalid id")
-        if self.get_scan(id) != None:
-            raise IOError(f"Duplicate scan name: {id}")
-        scan = Scan(self, id)
+        # Verify if the given `scan_id` is valid
+        if not _is_valid_id(scan_id):
+            raise IOError(f"Invalid scan identifier '{scan_id}'!")
+        # Verify if the given `scan_id` already exists in the local database
+        if self.scan_exists(scan_id):
+            raise IOError(f"Given scan identifier '{scan_id}' already exists!")
+
+        scan = Scan(self, scan_id)
         _make_scan(scan)
-        self.scans[id] = scan
+        self.scans[scan_id] = scan
         return scan
 
-    def delete_scan(self, id):
+    def delete_scan(self, scan_id):
         """Delete an existing `Scan` from the local database.
 
         Parameters
         ----------
-        id : str
+        scan_id : str
             The name of the scan to create. It should exist in the local database.
 
         Raises
@@ -569,11 +608,13 @@ class FSDB(db.DB):
         OSError: Invalid id
         >>> db.disconnect()
         """
-        scan = self.get_scan(id)
-        if scan is None:
-            raise IOError("Invalid id")
-        _delete_scan(scan)
-        self.scans.pop(id)
+        # Verify if the given `scan_id` exists in the local database
+        if not self.scan_exists(scan_id):
+            logging.warning(f"Given scan identifier '{scan_id}' does NOT exists!")
+            return
+
+        _delete_scan(self.get_scan(scan_id))  # delete the Scan instance
+        self.scans.pop(scan_id)  # remove the scan from the local database
         return
 
     def path(self) -> pathlib.Path:
@@ -590,14 +631,24 @@ class FSDB(db.DB):
         return copy.deepcopy(self.basedir)
 
     def list_scans(self, query=None, fuzzy=False) -> list:
-        """Get the list of scans in the local database.
+        """Get the list of scans in identifiers the local database.
 
         Parameters
         ----------
         query : dict, optional
-            Query to use to get a list of scans.
+            A query to use to filter the returned list of scans.
+            The metadata must match given ``key`` and ``value`` from the `query` dictionary.
         fuzzy : bool
             Whether to use fuzzy matching or not, that is the use of regular expressions.
+
+        Returns
+        -------
+        list[str]
+            The list of scan identifiers in the local database.
+
+        See Also
+        --------
+        plantdb.fsdb._filter_query
 
         Examples
         --------
@@ -608,7 +659,10 @@ class FSDB(db.DB):
         ['myscan_001']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_scans(query, fuzzy)]
+        if query is None:
+            return list(self.scans.keys())
+        else:
+            return [scan.id for scan in self.get_scans(query, fuzzy)]
 
 
 class Scan(db.Scan):
@@ -622,13 +676,13 @@ class Scan(db.Scan):
     Attributes
     ----------
     db : plantdb.fsdb.FSDB
-        Database where to find the scan.
+        A local database instance hosting this ``Scan`` instance.
     id : str
-        The scan unique name in the local database.
+        The identifier of this ``Scan`` instance in the local database `db`.
     metadata : dict
-        Dictionary of metadata attached to the scan.
-    filesets : list of plantdb.fsdb.Fileset
-        List of ``Fileset`` objects.
+        A metadata dictionary.
+    filesets : dict[str, plantdb.fsdb.Fileset]
+        A dictionary of `Fileset` instances, indexed by their identifier.
 
     Notes
     -----
@@ -693,30 +747,59 @@ class Scan(db.Scan):
     >>> scan.get_metadata()
     """
 
-    def __init__(self, db, id):
+    def __init__(self, db, scan_id):
         """Scan dataset constructor.
 
         Parameters
         ----------
         db : plantdb.fsdb.FSDB
             The database to put/find the scan dataset.
-        id : str
+        scan_id : str
             The scan dataset name, should be unique in the `db`.
         """
-        super().__init__(db, id)
+        super().__init__(db, scan_id)
         # Defines attributes:
         self.metadata = None
+        self.filesets = {}
         self.measures = None
-        self.filesets = []
         return
 
     def _erase(self):
         """Erase the filesets and metadata associated to this scan."""
-        for f in self.filesets:
-            f._erase()
-        del self.metadata
-        del self.filesets
+        for fs_id, fs in self.filesets.items():
+            fs._erase()
+        self.metadata = None
+        self.filesets = {}
+        self.measures = None
         return
+
+    def fileset_exists(self, fileset_id: str) -> bool:
+        """Check if a given fileset ID exists in the database.
+
+        Parameters
+        ----------
+        fileset_id : str
+            The ID of the fileset to check.
+
+        Returns
+        -------
+        bool
+            ``True`` if the fileset exists, ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.fileset_exists("myfileset_001")
+        False
+        >>> scan.create_fileset("myfileset_001")
+        >>> scan.fileset_exists("myfileset_001")
+        True
+        >>> db.disconnect()
+        """
+        return fileset_id in self.filesets
 
     def get_filesets(self, query=None, fuzzy=False):
         """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
@@ -724,7 +807,8 @@ class Scan(db.Scan):
         Parameters
         ----------
         query : dict, optional
-            Query to use to get a list of filesets.
+            A query to use to filter the returned list of files.
+            The metadata must match given ``key`` and ``value`` from the `query` dictionary.
         fuzzy : bool
             Whether to use fuzzy matching or not, that is the use of regular expressions.
 
@@ -740,21 +824,21 @@ class Scan(db.Scan):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_file=True)
+        >>> db = dummy_db(with_fileset=True)
         >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.get_filesets()
         [<plantdb.fsdb.Fileset at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.filesets, query, fuzzy)
+        return _filter_query(list(self.filesets.values()), query, fuzzy)
 
-    def get_fileset(self, id, create=False):
+    def get_fileset(self, fs_id, create=False):
         """Get or create a `Fileset` instance, of given `id`, in the current scan dataset.
 
         Parameters
         ----------
-        id : str
+        fs_id : str
             The name of the fileset to get/create.
             It should exist if `create` is `False`.
         create : bool, optional
@@ -773,7 +857,7 @@ class Scan(db.Scan):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_file=True)
+        >>> db = dummy_db(with_fileset=True)
         >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -784,16 +868,18 @@ class Scan(db.Scan):
         >>> scan.list_filesets()
         ['fileset_001', '007']
         >>> unknown_fs = scan.get_fileset('unknown')
+        plantdb.fsdb.FilesetNotFoundError: Unknown fileset id 'unknown'!
         >>> print(unknown_fs)
         None
         >>> db.disconnect()
         """
-        ids = [f.id for f in self.filesets]
-        if id not in ids:
+        if self.fileset_exists(fs_id):
+            return self.filesets[fs_id]
+        else:
             if create:
-                return self.create_fileset(id)
-            return None
-        return self.filesets[ids.index(id)]
+                return self.create_fileset(fs_id)
+            else:
+                raise FilesetNotFoundError(fs_id)
 
     def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a scan.
@@ -868,12 +954,12 @@ class Scan(db.Scan):
         _store_scan_metadata(self)
         return
 
-    def create_fileset(self, id):
+    def create_fileset(self, fs_id):
         """Create a new `Fileset` instance in the local database attached to the current `Scan` instance.
 
         Parameters
         ----------
-        id : str
+        fs_id : str
             The name of the fileset to create. It should not exist in the current `Scan` instance.
 
         Returns
@@ -895,7 +981,7 @@ class Scan(db.Scan):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_file=True)
+        >>> db = dummy_db(with_fileset=True)
         >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -904,31 +990,35 @@ class Scan(db.Scan):
         >>> scan.list_filesets()
         ['fileset_001', 'fs_007']
         >>> wrong_fs = scan.create_fileset('fileset_001')
-        OSError: Duplicate scan name: fileset_001
+        OSError: Given fileset identifier 'fileset_001' already exists!
+        >>> wrong_fs = scan.create_fileset('fileset/001')
+        OSError: Invalid fileset identifier 'fileset/001'!
         >>> db.disconnect()
         """
-        if not _is_valid_id(id):
-            raise IOError(f"Invalid fileset id: {id}")
-        if self.get_fileset(id) != None:
-            raise IOError(f"Duplicate fileset name: {id}")
-        fileset = Fileset(self, id)
+        # Verify if the given `fs_id` is valid
+        if not _is_valid_id(fs_id):
+            raise IOError(f"Invalid fileset identifier '{fs_id}'!")
+        # Verify if the given `fs_id` already exists in the local database
+        if self.fileset_exists(fs_id):
+            raise IOError(f"Given fileset identifier '{fs_id}' already exists!")
+
+        fileset = Fileset(self, fs_id)
         _make_fileset(fileset)
-        self.filesets.append(fileset)
+        self.filesets.update({fs_id: fileset})
         self.store()
         return fileset
 
     def store(self):
         """Save changes to the scan main JSON FILE (files.json)."""
         _store_scan(self)
-        logger.debug(f"The `files.json` file for scan '{self.id}' has been updated!")
         return
 
-    def delete_fileset(self, fileset_id):
+    def delete_fileset(self, fs_id):
         """Delete a given fileset from the scan dataset.
 
         Parameters
         ----------
-        fileset_id : str
+        fs_id : str
             Name of the fileset to delete.
 
         Examples
@@ -944,13 +1034,14 @@ class Scan(db.Scan):
         []
         >>> db.disconnect()
         """
-        fs = self.get_fileset(fileset_id)
-        if fs is None:
-            logging.warning(f"Could not get the Fileset to delete: '{fileset_id}'!")
+        # Verify if the given `fs_id` exists in the local database
+        if not self.fileset_exists(fs_id):
+            logging.warning(f"Given fileset identifier '{fs_id}' does NOT exists!")
             return
-        _delete_fileset(fs)
-        self.filesets.remove(fs)
-        self.store()
+
+        _delete_fileset(self.get_fileset(fs_id, create=False))  # delete the fileset
+        self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
+        self.store()  # save the changes to the scan main JSON FILE (files.json)
         return
 
     def path(self) -> pathlib.Path:
@@ -968,14 +1059,24 @@ class Scan(db.Scan):
         return _scan_path(self)
 
     def list_filesets(self, query=None, fuzzy=False) -> list:
-        """Get the list of filesets in the scan dataset.
+        """Get the list of filesets identifiers in the scan dataset.
 
         Parameters
         ----------
         query : dict, optional
-            Query to use to get a list of files.
+            A query to use to filter the returned list of filesets.
+            The metadata must match given ``key`` and ``value`` from the `query` dictionary.
         fuzzy : bool
             Whether to use fuzzy matching or not, that is the use of regular expressions.
+
+        Returns
+        -------
+        list[str]
+            The list of filesets identifiers in the scan dataset.
+
+        See Also
+        --------
+        plantdb.fsdb._filter_query
 
         Examples
         --------
@@ -987,7 +1088,10 @@ class Scan(db.Scan):
         ['fileset_001']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_filesets(query, fuzzy)]
+        if query == None:
+            return list(self.filesets.keys())
+        else:
+            return [fs.id for fs in self.get_filesets(query, fuzzy)]
 
 
 class Fileset(db.Fileset):
@@ -1001,42 +1105,72 @@ class Fileset(db.Fileset):
     Attributes
     ----------
     db : plantdb.fsdb.FSDB
-        Database where to find the `scan`.
-    id : str
-        Name of the scan in the database `db`.
+        A local database instance hosting the ``Scan`` instance.
     scan : plantdb.fsdb.Scan
-        Scan containing the set of files of interest.
+        A scan instance hosting this ``Fileset`` instance.
+    id : str
+        The identifier of this ``Fileset`` instance in the `scan`.
     metadata : dict
-        Dictionary of metadata attached to the fileset.
-    files : list of plantdb.fsdb.File
-        List of `File` objects.
+        A metadata dictionary.
+    files : dict[str, plantdb.fsdb.File]
+        A dictionary of `File` instances attached to the fileset, indexed by their identifier.
 
     See Also
     --------
     plantdb.db.Fileset
     """
 
-    def __init__(self, scan, id):
+    def __init__(self, scan, fs_id):
         """Constructor.
 
         Parameters
         ----------
         scan : plantdb.fsdb.Scan
-            Scan instance containing the fileset.
-        id : str
-            Id of the fileset instance.
+            A scan instance containing the fileset.
+        fs_id : str
+            The identifier of the fileset instance.
         """
-        super().__init__(scan, id)
+        super().__init__(scan, fs_id)
+        # Defines attributes:
         self.metadata = None
-        self.files = []
+        self.files = {}
 
     def _erase(self):
         """Erase the files and metadata associated to this fileset."""
-        for f in self.files:
+        for f_id, f in self.files.items():
             f._erase()
+        # Reinitialize the attributes
         self.metadata = None
-        self.files = None
+        self.files = {}
         return
+
+    def file_exists(self, file_id: str) -> bool:
+        """Check if a given file ID exists in the database.
+
+        Parameters
+        ----------
+        file_id : str
+            The ID of the file to check.
+
+        Returns
+        -------
+        bool
+            ``True`` if the file exists, ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db(with_scan=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('myscan_001')
+        >>> scan.file_exists("myfile_001")
+        False
+        >>> scan.create_file("myfile_001")
+        >>> scan.file_exists("myfile_001")
+        True
+        >>> db.disconnect()
+        """
+        return file_id in self.files
 
     def get_files(self, query=None, fuzzy=False):
         """Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.
@@ -1070,14 +1204,14 @@ class Fileset(db.Fileset):
          <plantdb.fsdb.File at *x************>]
         >>> db.disconnect()
         """
-        return _filter_query(self.files, query, fuzzy)
+        return _filter_query(list(self.files.values()), query, fuzzy)
 
-    def get_file(self, id, create=False):
+    def get_file(self, f_id, create=False):
         """Get or create a `File` instance, of given `id`, in the current fileset.
 
         Parameters
         ----------
-        id : str
+        f_id : str
             Name of the file to get/create.
         create : bool
             If ``False`` (default), the given `id` should exist in the local database.
@@ -1101,12 +1235,13 @@ class Fileset(db.Fileset):
         >>> img = read_image(f)
         >>> db.disconnect()
         """
-        ids = [f.id for f in self.files]
-        if id not in ids:
+        if self.file_exists(f_id):
+            return self.files[f_id]
+        else:
             if create:
-                return self.create_file(id)
-            return None
-        return self.files[ids.index(id)]
+                return self.create_file(f_id)
+            else:
+                raise FileNotFoundError(f_id)
 
     def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a fileset.
@@ -1179,12 +1314,12 @@ class Fileset(db.Fileset):
         _store_fileset_metadata(self)
         return
 
-    def create_file(self, id):
+    def create_file(self, f_id):
         """Create a new `File` instance in the local database attached to the current `Fileset` instance.
 
         Parameters
         ----------
-        id : str
+        f_id : str
             The name of the file to create.
 
         Returns
@@ -1214,12 +1349,19 @@ class Fileset(db.Fileset):
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()
         """
-        file = File(self, id)
-        self.files.append(file)
+        # Verify if the given `fs_id` is valid
+        if not _is_valid_id(f_id):
+            raise IOError(f"Invalid file identifier '{f_id}'!")
+        # Verify if the given `fs_id` already exists in the local database
+        if self.file_exists(f_id):
+            raise IOError(f"Given file identifier '{f_id}' already exists!")
+
+        file = File(self, f_id)
+        self.files.update({f_id: file})
         self.store()
         return file
 
-    def delete_file(self, file_id):
+    def delete_file(self, f_id):
         """Delete a given file from the current fileset.
 
         Parameters
@@ -1245,12 +1387,14 @@ class Fileset(db.Fileset):
         ['test_image.png', 'test_json.json']
         >>> db.disconnect()
         """
-        x = self.get_file(file_id, create=False)
-        if x is None:
-            raise IOError(f"Invalid file ID: {file_id}")
-        _delete_file(x)
-        self.files.remove(x)
-        self.store()
+        # Verify if the given `fs_id` exists in the local database
+        if not self.file_exists(f_id):
+            logging.warning(f"Given file identifier '{f_id}' does NOT exists!")
+            return
+
+        _delete_file(self.get_file(f_id, create=False))  # delete the file
+        self.files.pop(f_id)  # remove the File instance from the fileset
+        self.store()  # save the changes to the scan main JSON FILE (files.json)
         return
 
     def store(self):
@@ -1279,14 +1423,24 @@ class Fileset(db.Fileset):
         return _fileset_path(self)
 
     def list_files(self, query=None, fuzzy=False) -> list:
-        """Get the list of files in the fileset.
+        """Get the list of files identifiers in the fileset.
 
         Parameters
         ----------
         query : dict, optional
-            Query to use to get a list of files.
+            A query to use to filter the returned list of files.
+            The metadata must match given ``key`` and ``value`` from the `query` dictionary.
         fuzzy : bool
             Whether to use fuzzy matching or not, that is the use of regular expressions.
+
+        Returns
+        -------
+        list[str]
+            The list of file identifiers in the fileset.
+
+        See Also
+        --------
+        plantdb.fsdb._filter_query
 
         Examples
         --------
@@ -1299,7 +1453,10 @@ class Fileset(db.Fileset):
         ['dummy_image', 'test_image', 'test_json']
         >>> db.disconnect()
         """
-        return [f.id for f in self.get_files(query, fuzzy)]
+        if query is None:
+            return list(self.files.keys())
+        else:
+            return [f.id for f in self.get_files(query, fuzzy)]
 
 
 class File(db.File):
@@ -1330,8 +1487,8 @@ class File(db.File):
     Contrary to other classes (``Scan`` & ``Fileset``) the uniqueness is not checked!
     """
 
-    def __init__(self, fileset, id, **kwargs):
-        super().__init__(fileset, id, **kwargs)
+    def __init__(self, fileset, f_id, **kwargs):
+        super().__init__(fileset, f_id, **kwargs)
         self.metadata = None
 
     def _erase(self):
@@ -1651,19 +1808,30 @@ def _load_scan(db, scan_id):
     [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
     """
     required_fs = db.required_filesets
+    req_files_json = db.required_files_json
+
     scan = Scan(db, scan_id)
     scan_path = _scan_path(scan)
+
     # If specific filesets are required, test if they exist as subdirectories:
     if required_fs is not None:
         req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
     else:
         req_subdir = True
 
-    # Parse the filset, metadata and measure if:
-    #  - path to scan directory exists
-    #  - required subdirectories exists
-    #  - `files.json` associated to the scan is found, parse it:
-    if scan_path.is_dir() and req_subdir and _scan_json_file(scan).is_file():
+    # If the `files.json` associated to the scan is required, test if it exists:
+    if req_files_json:
+        req_file = _scan_json_file(scan).is_file()
+    else:
+        req_file = True
+
+    if db.dummy and scan_path.is_dir():
+        return scan
+    elif scan_path.is_dir() and req_subdir and req_file:
+        # Parse the fileset, metadata and measure if:
+        #  - path to scan directory exists
+        #  - required subdirectories exists, if any
+        #  - required files exists, if any
         scan.filesets = _load_scan_filesets(scan)
         scan.metadata = _load_scan_metadata(scan)
         scan.measures = _load_scan_measures(scan)
@@ -1720,9 +1888,28 @@ def _load_scans(db):
             scans[scan_name] = scan
     return scans
 
+def _load_dummy_fileset(scan):
+    """
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan
+        The instance to use to get the list of ``Fileset``.
+
+    Returns
+    -------
+
+    """
+    filesets = {}
+    for fs_id in scan.path().iterdir():
+        fs = Fileset(scan, fs_id)
+        fs.files = list(fs.path().iterdir())
+        filesets[fs_id] = fs
+
+    return filesets
 
 def _load_scan_filesets(scan):
-    """Load the list of ``Fileset`` from given `scan` dataset.
+    """Load the list of ``Fileset`` from given `scan` dataset and return them as a dict.
 
     Load the list of filesets using "filesets" top-level entry from ``files.json``.
 
@@ -1733,8 +1920,9 @@ def _load_scan_filesets(scan):
 
     Returns
     -------
-    list of plantdb.fsdb.Fileset
-         The list of ``Fileset`` found in the scan.
+    dict
+        A dictionary where keys are `fsid` (id of the filesets) and values are
+        the `Fileset` instances.
 
     See Also
     --------
@@ -1752,11 +1940,11 @@ def _load_scan_filesets(scan):
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> fs = _load_scan_filesets(scan)
-    >>> print(fs)
-    [<plantdb.fsdb.Fileset object at 0x7fa0122232d0>]
+    >>> filesets = _load_scan_filesets(scan)
+    >>> print(filesets)
+    {'fsid_001': <plantdb.fsdb.Fileset object at 0x7fa0122232d0>}
     """
-    filesets = []
+    filesets = {}
     # Get the path to the `files.json` associated to the `scan`:
     files_json = _scan_json_file(scan)
     # Load it:
@@ -1768,18 +1956,20 @@ def _load_scan_filesets(scan):
         for n, fileset_info in enumerate(filesets_info):
             try:
                 fileset = _load_fileset(scan, fileset_info)
+                fsid = fileset_info.get("id")
+                if fsid is None:
+                    raise FilesetNoIDError(f"Missing 'id' for the {n}-th 'filesets' entry.")
+                filesets[fsid] = fileset
             except FilesetNoIDError:
                 logger.error(f"Could not get an 'id' entry for the {n}-th 'filesets' entry from '{scan.id}'.")
                 logger.debug(f"Current `fileset_info`: {fileset_info}")
             except FilesetNotFoundError:
                 fsid = fileset_info.get("id", None)
                 logger.error(f"Fileset directory '{fsid}' not found for scan {scan.id}, skip it.")
-            else:
-                filesets.append(fileset)
     else:
         raise IOError(f"Could not find a list of filesets in '{files_json}'.")
-    return filesets
 
+    return filesets
 
 def _load_fileset(scan, fileset_info):
     """Load a fileset and set its attributes.
@@ -1825,6 +2015,14 @@ class FilesetNoIDError(Exception):
 
 class FilesetNotFoundError(Exception):
     """Could not find the fileset directory."""
+    def __init__(self, fs_id: str):
+        super().__init__(f"Unknown fileset id '{fs_id}'!")
+
+
+class ScanNotFoundError(Exception):
+    """Could not find the scan directory."""
+    def __init__(self, scan_id: str):
+        super().__init__(f"Unknown scan id '{scan_id}'!")
 
 
 def _parse_fileset(scan, fileset_info):
@@ -1832,8 +2030,6 @@ def _parse_fileset(scan, fileset_info):
 
     Parameters
     ----------
-    db : plantdb.fsdb.FSDB
-        The database instance to associate the returned ``Fileset`` to.
     scan : plantdb.fsdb.Scan
         The scan instance to associate the returned ``Fileset`` to.
     fileset_info : dict
@@ -1898,18 +2094,19 @@ def _load_fileset_files(fileset, fileset_info):
     ['dummy_image', 'test_image', 'test_json']
     """
     scan_id = fileset.scan.id
-    files = []
+    files = {}
     files_info = fileset_info.get("files", None)
     if isinstance(files_info, list):
         for n, file_info in enumerate(files_info):
             try:
                 file = _load_file(fileset, file_info)
+                fid = file_info.get("id")
+                if fid is None:
+                    raise FileNotFoundError(f"Missing 'id' for the {n}-th 'files' entry.")
             except FileNoIDError:
                 logger.error(f"Could not get an 'id' entry for the {n}-th 'files' entry from '{scan_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
             except FileNoFileNameError:
-                fs_id = fileset.id
-                fid = file_info.get("id")
                 logger.error(f"Could not get a 'file' entry for file id '{fid}' from '{scan_id}/{fs_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
             except FileNotFoundError:
@@ -1918,7 +2115,7 @@ def _load_fileset_files(fileset, fileset_info):
                 logger.error(f"Could not find file '{fname}' for '{scan_id}/{fs_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
             else:
-                files.append(file)
+                files[fid] = file
     else:
         raise IOError(f"Expected a list of files in `files.json` from dataset '{fileset.scan.id}'!")
     return files
@@ -2338,7 +2535,7 @@ def _scan_path(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan to get the path from.
+        A scan to get the path from.
 
     Returns
     -------
@@ -2354,12 +2551,12 @@ def _scan_json_file(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan to get the files JSON file path from.
+        A scan to get the files JSON file path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the scan's "files.json" file.
+        The path to the scan's "files.json" file.
     """
     return _scan_path(scan) / "files.json"
 
@@ -2370,12 +2567,12 @@ def _scan_metadata_path(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan to get the metadata JSON file path from.
+        A scan to get the metadata JSON file path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the scan's "metadata.json" file.
+        The path to the scan's "metadata.json" file.
     """
     return _scan_path(scan) / "metadata" / "metadata.json"
 
@@ -2386,12 +2583,12 @@ def _scan_measures_path(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan to get the measures JSON file path from.
+        A scan to get the measures JSON file path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the scan's "measures.json" file.
+        The path to the scan's "measures.json" file.
     """
     return _scan_path(scan) / "measures.json"
 
@@ -2402,7 +2599,7 @@ def _fileset_path(fileset):
     Parameters
     ----------
     fileset : plantdb.fsdb.Fileset
-        The fileset to get the path from.
+        A fileset to get the path from.
 
     Returns
     -------
@@ -2418,12 +2615,12 @@ def _fileset_metadata_path(fileset):
     Parameters
     ----------
     fileset : plantdb.fsdb.Fileset
-        The fileset to get the metadata directory path from.
+        A fileset to get the metadata directory path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the fileset metadata directory.
+        The path to the fileset metadata directory.
     """
     return _scan_path(fileset.scan) / "metadata" / fileset.id
 
@@ -2434,12 +2631,12 @@ def _fileset_metadata_json_path(fileset):
     Parameters
     ----------
     fileset : plantdb.fsdb.Fileset
-        Fileset to get the JSON file path from.
+        A fileset to get the JSON file path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the f`fileset.id` metadata JSON file.
+        The path to the f`fileset.id` metadata JSON file.
     """
     return _scan_path(fileset.scan) / "metadata" / f"{fileset.id}.json"
 
@@ -2450,7 +2647,7 @@ def _file_path(file):
     Parameters
     ----------
     file : plantdb.fsdb.File
-        The file to get the path from.
+        A file to get the path from.
 
     Returns
     -------
@@ -2466,12 +2663,12 @@ def _file_metadata_path(file):
     Parameters
     ----------
     file : plantdb.fsdb.File
-        File to get the metadata JSON path from.
+        A file to get the metadata JSON path from.
 
     Returns
     -------
     pathlib.Path
-        Path to the "<File.id>.json" file.
+        The path to the "<File.id>.json" file.
     """
     return _scan_path(file.fileset.scan) / "metadata" / file.fileset.id / f"{file.id}.json"
 
@@ -2486,7 +2683,7 @@ def _file_to_dict(file):
     Parameters
     ----------
     file : plantdb.fsdb.File
-        File to get "id" and "filename" from.
+        A file to get "id" and "filename" from.
 
     Returns
     -------
@@ -2502,7 +2699,7 @@ def _fileset_to_dict(fileset):
     Parameters
     ----------
     fileset : plantdb.fsdb.Fileset
-        Fileset to get "id" and "files" dictionary from.
+        A fileset to get "id" and "files" dictionary from.
 
     Returns
     -------
@@ -2525,7 +2722,7 @@ def _scan_to_dict(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        Scan instance to get underlying filesets and files structure from.
+        A scan instance to get underlying filesets and files structure from.
 
     Returns
     -------
@@ -2549,7 +2746,7 @@ def _store_scan(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        Scan instance to save by dumping its underlying structure in its "files.json".
+        A scan instance to save by dumping its underlying structure in its "files.json".
 
     See Also
     --------
@@ -2560,11 +2757,46 @@ def _store_scan(scan):
     files_json = _scan_json_file(scan)
     with files_json.open(mode="w") as f:
         json.dump(structure, f, sort_keys=True, indent=4, separators=(',', ': '))
+    logger.debug(f"The `files.json` file for scan '{scan.id}' has been updated!")
     return
 
 
-def _is_valid_id(id):
-    return True  # haha  (FIXME!)
+def _is_valid_id(name):
+    """Checks the validity of a given identifier name based on specified conditions.
+
+    This function validates whether the provided name is a valid identifier by ensuring it 
+    is a string, non-empty, not longer than 255 characters, and contains only allowable
+    characters. It logs errors for invalid input.
+
+    Parameters
+    ----------
+    name : str
+        The identifier name to be validated.
+
+    Returns
+    -------
+    bool
+        ``True`` if the name is valid, otherwise ``False``.
+    """
+    import re
+    # Check if the name is a string
+    if not isinstance(name, str):
+        logger.error(f"Given name is not a string: '{name}'")
+        return False
+
+    # Check if the string is empty or too long (e.g., limit to 255 characters)
+    if not name or len(name) > 255:
+        logger.error(f"Given name is empty or too long: '{name}'")
+        return False
+
+    # Check for invalid characters (disallow slashes, backslashes, etc.)
+    # Here we use a regex to allow alphanumeric, underscores, dashes and dots only
+    if not re.match(r'^[\w\-\.]+$', name):
+        logger.error(f"Given name contains invalid characters: '{name}'.")
+        logger.info("Only alphanumeric characters, underscores, dashes and dots are allowed.")
+        return False
+
+    return True
 
 
 def _is_fsdb(path):
@@ -2624,7 +2856,7 @@ def _delete_file(file):
     Parameters
     ----------
     file : plantdb.fsdb.File
-        The file instance to delete.
+        A file instance to delete.
 
     Raises
     ------
@@ -2686,7 +2918,7 @@ def _delete_fileset(fileset):
     Parameters
     ----------
     fileset : plantdb.fsdb.Fileset
-        The fileset instance to delete.
+        A fileset instance to delete.
 
     Raises
     ------
@@ -2714,8 +2946,9 @@ def _delete_fileset(fileset):
         raise IOError("Cannot delete files or directories outside of a local DB.")
 
     # - Delete the `Files` (and their metadata) belonging to the `Fileset` instance:
-    for f in fileset.files:
-        fileset.delete_file(f.id)
+    files_list = fileset.list_files()
+    for f_id in files_list:
+        fileset.delete_file(f_id)
 
     # - Delete the JSON metadata file associated to the `Fileset` instance:
     json_md = _fileset_metadata_json_path(fileset)
@@ -2754,7 +2987,7 @@ def _delete_scan(scan):
     Parameters
     ----------
     scan : plantdb.fsdb.Scan
-        The scan instance to delete.
+        A scan instance to delete.
 
     Raises
     ------
@@ -2788,9 +3021,9 @@ def _filter_query(l, query=None, fuzzy=False):
     Parameters
     ----------
     l : list
-        List of `Scan`s, `Fileset`s or `File`s to filter.
+        A list of `Scan`s, `Fileset`s or `File`s to filter.
     query : dict, optional
-        Filtering query in the form of a dictionary.
+        A filtering query in the form of a dictionary.
         The list of instances must have metadata matching ``key`` and ``value`` from the `query`.
     fuzzy : bool
         Whether to use fuzzy matching or not, that is the use of regular expressions.
@@ -2798,7 +3031,7 @@ def _filter_query(l, query=None, fuzzy=False):
     Returns
     -------
     list
-        List of `Scan`s, `Fileset`s or `File`s filtered by the query, if any.
+        The list of `Scan`s, `Fileset`s or `File`s filtered by the query, if any.
 
     See Also
     --------

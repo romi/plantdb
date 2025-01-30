@@ -6,7 +6,9 @@ import unittest
 from plantdb import FSDB
 from plantdb.fsdb import File
 from plantdb.fsdb import Fileset
+from plantdb.fsdb import FilesetNotFoundError
 from plantdb.fsdb import Scan
+from plantdb.fsdb import ScanNotFoundError
 from plantdb.testing import DummyDBTestCase
 
 
@@ -23,8 +25,8 @@ class TestFSDBDummy(DummyDBTestCase):
         db = self.get_test_db()
         scan = db.get_scan("myscan_001")  # exists
         self.assertIsInstance(scan, Scan)
-        scan = db.get_scan("myscan_002")  # does not exist
-        self.assertIsNone(scan)
+        with self.assertRaises(ScanNotFoundError):
+            db.get_scan("myscan_002")  # does not exist
 
     def test_create_scan(self):
         db = self.get_test_db()
@@ -54,14 +56,16 @@ class TestFSDBDummy(DummyDBTestCase):
         db.delete_scan("myscan_001")
 
         self.assertTrue(db.path().is_dir())
+        with self.assertRaises(ScanNotFoundError):
+            db.get_scan("myscan_001")
         self.assertFalse(scan_path.is_dir())
 
     def test_get_fileset(self):
         scan = self.get_test_scan()
         fileset = scan.get_fileset("fileset_001")  # exists
         self.assertIsInstance(fileset, Fileset)
-        fileset = scan.get_fileset("fileset_002")  # does not exist
-        self.assertIsNone(fileset)
+        with self.assertRaises(FilesetNotFoundError):
+            scan.get_fileset("fileset_002")  # does not exist
 
     def test_create_fileset(self):
         scan = self.get_test_scan()
@@ -92,7 +96,8 @@ class TestFSDBDummy(DummyDBTestCase):
         scan.delete_fileset("fileset_001")
 
         self.assertTrue(scan.path().is_dir())
-        self.assertIsNone(scan.get_fileset("fileset_001"))
+        with self.assertRaises(FilesetNotFoundError):
+            scan.get_fileset("fileset_001")
         self.assertFalse(fs_path.is_dir())
 
     def test_get_file(self):
@@ -172,7 +177,8 @@ class TestFSDBDummy(DummyDBTestCase):
         fs.delete_file("test_image")
 
         self.assertTrue(fs.path().is_dir())
-        self.assertIsNone(fs.get_file("test_image"))
+        with self.assertRaises(FileNotFoundError):
+            fs.get_file("test_image")
         self.assertFalse(f_path.is_file())
 
     def test_import_file(self):

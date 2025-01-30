@@ -179,7 +179,7 @@ def fsdb_file_from_local_file(path):
         # Initialize a `Fileset` instance:
         fileset = Fileset(scan, dirname)
         # Initialize a `File` instance & return it:
-        f = File(db=db, fileset=fileset, id=id)
+        f = File(db=db, fileset=fileset, f_id=id)
         f.filename = fname
         f.metadata = None
     return f
