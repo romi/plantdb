@@ -12,13 +12,13 @@
         <meta name="author" content="ROMI Team">
       
       
-        <link rel="canonical" href="https://romi.github.io/plantdb/reference/plantdb/cli/fsdb_rest_api/">
+        <link rel="canonical" href="https://romi.github.io/plantdb/reference/plantdb/plantdbapp/serializers/">
       
       
-        <link rel="prev" href="../fsdb_import_images/">
+        <link rel="prev" href="../models/">
       
       
-        <link rel="next" href="../fsdb_sync/">
+        <link rel="next" href="../settings/">
       
       
       <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>fsdb_rest_api - PlantDB</title>
+        <title>serializers - PlantDB</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#plantdb.cli.fsdb_rest_api" class="md-skip">
+        <a href="#plantdb.plantdbapp.serializers" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              fsdb_rest_api
+              serializers
             
           </span>
         </div>
@@ -420,8 +420,6 @@
                 
   
   
-    
-  
   
   
     
@@ -431,16 +429,16 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_1" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../cli/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -457,7 +455,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_1_1">
             <span class="md-nav__icon md-icon"></span>
             cli
@@ -471,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_check/" class="md-nav__link">
+      <a href="../../cli/fsdb_check/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -492,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_import_file/" class="md-nav__link">
+      <a href="../../cli/fsdb_import_file/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -513,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_import_folder/" class="md-nav__link">
+      <a href="../../cli/fsdb_import_folder/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -534,7 +532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_import_images/" class="md-nav__link">
+      <a href="../../cli/fsdb_import_images/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -552,28 +550,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    fsdb_rest_api
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../cli/fsdb_rest_api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -582,33 +562,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#plantdb.cli.fsdb_rest_api" class="md-nav__link">
-    <span class="md-ellipsis">
-      fsdb_rest_api
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -621,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_sync/" class="md-nav__link">
+      <a href="../../cli/fsdb_sync/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -642,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../shared_fsdb/" class="md-nav__link">
+      <a href="../../cli/shared_fsdb/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -773,6 +726,8 @@
                 
   
   
+    
+  
   
   
     
@@ -782,16 +737,16 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_7" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../plantdbapp/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -808,7 +763,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_1_7">
             <span class="md-nav__icon md-icon"></span>
             plantdbapp
@@ -822,7 +777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/admin/" class="md-nav__link">
+      <a href="../admin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -843,7 +798,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/asgi/" class="md-nav__link">
+      <a href="../asgi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -864,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/models/" class="md-nav__link">
+      <a href="../models/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -882,10 +837,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../plantdbapp/serializers/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    serializers
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -894,6 +867,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.plantdbapp.serializers" class="md-nav__link">
+    <span class="md-ellipsis">
+      serializers
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -906,7 +906,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/settings/" class="md-nav__link">
+      <a href="../settings/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -927,7 +927,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/urls/" class="md-nav__link">
+      <a href="../urls/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -948,7 +948,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/views/" class="md-nav__link">
+      <a href="../views/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -969,7 +969,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plantdbapp/wsgi/" class="md-nav__link">
+      <a href="../wsgi/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1199,9 +1199,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#plantdb.cli.fsdb_rest_api" class="md-nav__link">
+  <a href="#plantdb.plantdbapp.serializers" class="md-nav__link">
     <span class="md-ellipsis">
-      fsdb_rest_api
+      serializers
     </span>
   </a>
   
@@ -1225,16 +1225,14 @@
   
 
 
-  <h1>fsdb_rest_api</h1>
+  <h1>serializers</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<a id="plantdb.cli.fsdb_rest_api"></a>
+<a id="plantdb.plantdbapp.serializers"></a>
     <div class="doc doc-contents first">
-
-        <p>Serve the plant database through a REST API.</p>
 
 
 
