@@ -33,18 +33,20 @@ import os
 from io import BytesIO
 from math import radians
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from tempfile import gettempdir
 from zipfile import ZipFile
 
+from flask import after_this_request
 from flask import jsonify
 from flask import make_response
 from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
-from jinja2.sandbox import unsafe
 
 from plantdb import webcache
+from plantdb.fsdb import ScanNotFoundError
 from plantdb.io import read_json
 from plantdb.log import configure_logger
 from plantdb.utils import is_radians
@@ -160,7 +162,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
         "thumbnailUri": "",
         "images": None,  # list of original image filenames
         "tasks_fileset": None,  # dict mapping task names to fileset names
-        "filesUri": {},    # dict mapping task names to task file URI
+        "filesUri": {},  # dict mapping task names to task file URI
         "isVirtual": False,
         "hasColmap": False,
         "hasPointCloud": False,
@@ -284,6 +286,7 @@ def get_scan_info(scan, **kwargs):
 
     return scan_info
 
+
 def get_file_uri(scan, fileset, file):
     """Return the URI for the corresponding `scan/fileset/file` tree.
 
@@ -323,12 +326,14 @@ def get_file_uri(scan, fileset, file):
     file_name = file.path().name if isinstance(file, File) else file
     return f"/files/{scan_id}/{fileset_id}/{file_name}"
 
+
 task_filesUri_mapping = {
     "PointCloud": "pointCloud",
     "TriangleMesh": "mesh",
     "CurveSkeleton": "skeleton",
     "TreeGraph": "tree",
 }
+
 
 def get_scan_data(scan, **kwargs):
     """Get the scan information and data.
@@ -465,6 +470,41 @@ def get_scan_data(scan, **kwargs):
     return scan_data
 
 
+def sanitize_name(name):
+    """Sanitizes and validates the provided name.
+
+    The function ensures that the input string adheres to predefined naming rules by:
+
+    - stripping leading/trailing spaces,
+    - isolating the last segment after splitting by slashes,
+    - validating the name against an alphanumeric pattern
+      with optional underscores (`_`), dashes (`-`), or periods (`.`).
+
+    Parameters
+    ----------
+    name : str
+        The name to sanitize and validate.
+
+    Returns
+    -------
+    str
+        Sanitized name that conforms to the rules.
+
+    Raises
+    ------
+    ValueError
+        If the provided name contains invalid characters or does not meet the naming rules.
+    """
+    import re
+    sanitized_name = name.strip()  # Remove leading/trailing spaces
+    sanitized_name = sanitized_name.split('/')[-1]  # isolate the last segment after splitting by slashes
+    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
+        raise ValueError(
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
+    return sanitized_name
+
+
 class ScansList(Resource):
     """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
 
@@ -534,8 +574,9 @@ class Scan(Resource):
         2024-08-19 11:12:25
 
         """
-        #return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
-        return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+        scan_id = sanitize_name(scan_id)
+        # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
+        return get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger)
 
 
 class File(Resource):
@@ -580,6 +621,34 @@ class DatasetFile(Resource):
         self.db = db
 
     def post(self, scan_id):
+        """Handles a POST request to upload and save a file to the server.
+
+        The method validates the required HTTP headers, processes the uploaded file either as a whole or in
+        chunks, and ensures the file is saved correctly to the desired location.
+        The method responds with appropriate HTTP status codes based on the success or failure of the operation.
+
+        Parameters
+        ----------
+        scan_id : str
+            Unique identifier of the scan associated with the file upload.
+            Used to retrieve the base path for the file being saved.
+
+        Returns
+        -------
+        flask.Response
+            A Flask response object with an appropriate HTTP status code and JSON
+            message. Status code '201' is returned for successful file upload, while
+            error codes ('400', '500') are returned for various error conditions.
+
+        Notes
+        -----
+        - The `Content-Disposition`, `Content-Length`, and `X-File-Path` headers are
+          mandatory for this endpoint to function correctly.
+        - If a `X-Chunk-Size` value is provided, the file is uploaded in chunks;
+          otherwise, the file is written in one step.
+        - If the number of received bytes differs from the expected number, the
+          partially uploaded file is removed.
+        """
         # Check the header used to pass the filename, or return '400' for "bad request":
         if 'Content-Disposition' not in request.headers:
             return make_response(jsonify({"error": "No 'Content-Disposition' header!"}), 400)
@@ -719,6 +788,11 @@ class Image(Resource):
         (1080, 1440, 3)
 
         """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+        fileset_id = sanitize_name(fileset_id)
+        file_id = sanitize_name(file_id)
+
         size = request.args.get('size', default='thumb', type=str)
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
@@ -761,6 +835,11 @@ class PointCloud(Resource):
         >>> list(pcd_data['vertex']['x'])
 
         """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+        fileset_id = sanitize_name(fileset_id)
+        file_id = sanitize_name(file_id)
+
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -800,6 +879,11 @@ class PointCloudGroundTruth(Resource):
         flask.Response
             The HTTP response from the flask server.
         """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+        fileset_id = sanitize_name(fileset_id)
+        file_id = sanitize_name(file_id)
+
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -852,6 +936,11 @@ class Mesh(Resource):
         >>> list(mesh_data['vertex']['x'])
 
         """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+        fileset_id = sanitize_name(fileset_id)
+        file_id = sanitize_name(file_id)
+
         size = request.args.get('size', default='orig', type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
         if not size in ['orig']:
@@ -893,6 +982,9 @@ class Sequence(Resource):
         >>> json.loads(res.content.decode('utf-8'))
 
         """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+
         type = request.args.get('type', default='all', type=str)
         # Get the `File` corresponding to the sequence resource:
         scan = self.db.get_scan(scan_id)
@@ -907,6 +999,30 @@ class Sequence(Resource):
             return measures
 
 
+def is_within_directory(directory, target):
+    """Check if a target path is within a directory.
+
+    This function determines if the absolute path of the target is located
+    within the absolute path of the directory. It uses `os.path.commonpath`
+    to perform the comparison.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory to check against.
+    target : str
+        The path to the target to check if it resides within the directory.
+
+    Returns
+    -------
+    bool
+        ``True`` if the target path is within the directory, ``False`` otherwise.
+    """
+    abs_directory = os.path.abspath(directory)
+    abs_target = os.path.abspath(target)
+    return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
+
+
 class Archive(Resource):
     """Concrete RESTful resource to serve an archive of the dataset upon request (GET method)."""
 
@@ -915,17 +1031,26 @@ class Archive(Resource):
         self.logger = logger
 
     def get(self, scan_id):
-        """Send the requested scan dataset archive, excluding the webcache if any.
+        """Creates a ZIP archive for the specified scan dataset and serves it as adownloadable file.
+        
+        The archive is created as a temporary file and is scheduled for cleanup after the HTTP request is processed.
+        Any parts of the dataset directory named 'webcache' are excluded from the archive.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            The unique identifier for the scan dataset to be archived and
+            served. This identifier is used to locate the relevant scan
+            directory.
 
         Returns
         -------
+        tuple
+            If the scan is not found, returns a tuple containing an error message
+            and an HTTP status code (400).
         flask.Response
-            The HTTP response from the flask server.
+            If the scan is found, returns a Flask response object to send the
+            ZIP archive as a downloadable file.
 
         Examples
         --------
@@ -953,42 +1078,140 @@ class Archive(Resource):
         >>> extracted_files
 
         """
-        scan = self.db.get_scan(scan_id)
+        scan_id = sanitize_name(scan_id)
+
+        try:
+            scan = self.db.get_scan(scan_id)
+        except ScanNotFoundError:
+            return {'error': f'Could not find a scan named `{scan_id}`!'}, 400
+
         tmp_dir = Path(gettempdir())
         zpath = tmp_dir / f'{scan_id}.zip'
+
         self.logger.info(f"Creating archive for `{scan_id}` dataset.")
-        with ZipFile(zpath, 'w') as zf:
-            path = str(scan.path())
-            for root, _dirs, files in os.walk(path):
-                # Exclude 'webcache' from the archive:
-                if 'webcache' in root:
-                    continue
-                for file in files:
-                    zf.write(
-                        os.path.join(root, file),
-                        os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
-                    )
+        try:
+            with ZipFile(zpath, 'w') as zf:
+                path = str(scan.path())
+                for root, _dirs, files in os.walk(path):
+                    # Exclude 'webcache' from the archive:
+                    if 'webcache' in root:
+                        continue
+                    for file in files:
+                        zf.write(
+                            os.path.join(root, file),
+                            os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
+                        )
+        except Exception as e:
+            self.logger.error(f"Failed to create archive for `{scan_id}` dataset: {e}")
+            return {'error': f'Failed to create archive for `{scan_id}` dataset: {e}'}, 500
+
+        # Schedule the temporary file for cleanup after request completion
+        @after_this_request
+        def cleanup_temp_file(response):
+            try:
+                if zpath.exists():
+                    zpath.unlink()
+                    self.logger.info(f"Temporary archive `{zpath}` deleted.")
+            except Exception as e:
+                self.logger.error(f"Failed to delete temporary file `{zpath}`: {e}")
+            return response
+
         return send_file(zpath, mimetype='application/zip')
 
     def post(self, scan_id):
+        """Handles the HTTP POST request for uploading and processing a ZIP file.
+
+        Validates the uploaded file's MIME type, extension, and integrity before
+        extracting its content into a specific file system path. Only ensures the
+        extracted files do not overwrite existing files and remain within the
+        designated directory structure.
+
+        Parameters
+        ----------
+        scan_id : any
+            The identifier for the scan, used to map and associate the upload
+            with the corresponding scan entry in the database.
+
+        Returns
+        -------
+        dict
+            A dictionary containing a success message and a list of the extracted
+            files if the operation completes successfully.
+            In case of failure, an error message and HTTP status code are returned.
+        """
         # Get the zip file from the request
         zip_file = request.files.get('zip_file')
         # Check if a file was provided
         if not zip_file:
-            return {'error': 'No zip file provided'}, 400
-        # Read the zip file data into a BytesIO object
-        zip_data = BytesIO(zip_file.read())
-        self.logger.debug(f"REST API path to fsdb is {self.db.path()}...")
-        scan_path = Path(self.db.get_scan(scan_id).path())
-        self.logger.debug(f"Exporting archive contents to {scan_path}...")
+            return {'error': 'No ZIP file provided!'}, 400
+
+        # Validate the file MIME type
+        if zip_file.mimetype != 'application/zip':
+            self.logger.error(f"Invalid MIME type: '{zip_file.mimetype}'. Expected 'application/zip'.")
+            return {'error': 'Invalid file type. Only ZIP files are allowed.'}, 400
+
+        # Validate the file extension
+        if not zip_file.filename.lower().endswith('.zip'):
+            self.logger.error(f"Invalid file extension for file: '{zip_file.filename}'.")
+            return {'error': 'Invalid file extension. Only ZIP files are allowed.'}, 400
+
+        # Create a temporary file to save the uploaded ZIP file to disk
+        try:
+            with NamedTemporaryFile(delete=False, suffix='.zip') as tmp_file:
+                temp_path = tmp_file.name
+                tmp_file.write(zip_file)  # Save the file directly to the temp file on disk
+        except Exception as e:
+            self.logger.error(f"Error saving file to temporary location: {e}")
+            return {'error': 'Failed to save file to disk.'}, 500
+
+        # Verify the file is a valid ZIP archive before proceeding
+        from zipfile import BadZipFile
+        try:
+            with ZipFile(temp_path, 'r') as zip_obj:
+                # Test the ZIP file to ensure it's valid (raises an exception if corrupt)
+                zip_obj.testzip()
+        except BadZipFile:
+            self.logger.error("The provided file is not a valid ZIP archive.")
+            # Cleanup temporary file before returning
+            Path(temp_path).unlink(missing_ok=True)
+            return {'error': 'Invalid ZIP file provided.'}, 400
+
+        # Proceed with processing the valid ZIP file
+        self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
+        scan_path = Path(self.db.get_scan(scan_id, create=True).path())
+        self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
+
         # Open the zip file and extract non-existing files:
         extracted_files = []
-        with ZipFile(zip_data, 'r') as zip_obj:
-            for file in zip_obj.namelist():
-                file_path = scan_path / file
-                if not file_path.exists():
-                    zip_obj.extract(file, path=scan_path)
-                    extracted_files.append(file)
+        try:
+            with ZipFile(temp_path, 'r') as zip_obj:
+                for file in zip_obj.namelist():
+                    # Ensure that filenames are properly encoded
+                    try:
+                        file = file.encode('utf-8').decode('utf-8')
+                    except UnicodeDecodeError:
+                        self.logger.error(f"Filename encoding issue detected in ZIP: '{file}'")
+                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                        return {'error': 'Filename encoding error in zip archive'}, 400
+
+                    file_path = scan_path / file
+                    # Ensure the extracted files remain within the target directory
+                    if not is_within_directory(scan_path, file_path):
+                        self.logger.error(f"Invalid file path detected in ZIP: '{file}'")
+                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                        return {'error': 'Invalid file paths in zip archive'}, 400
+
+                    # Extract only if the file does not already exist
+                    if not file_path.exists():
+                        zip_obj.extract(file, path=scan_path)
+                        extracted_files.append(file)
+        except Exception as e:
+            self.logger.error(f"Failed to extract ZIP archive: {e}")
+            Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+            return {'error': f'Failed to extract ZIP archive: {e}'}, 500
+        finally:
+            # Always clean up the temporary ZIP file after processing
+            Path(temp_path).unlink(missing_ok=True)
 
         # Return a success response
         return {'message': 'Zip file processed successfully', 'files': extracted_files}, 200
