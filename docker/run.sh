@@ -14,7 +14,7 @@ ERROR="${RED}$(bold ERROR)${NC}   "
 # Image tag to use, 'latest' by default:
 vtag="latest"
 # Command to use to run unit tests:
-unittest="python3 -m pip install nose2 && nose2 -s plantdb/tests/"
+unittest="python3 -m pip install plantdb/.[test] && nose2 -s plantdb/tests/"
 # Command to execute after starting the docker container:
 cmd=''
 # Volume mounting options:
