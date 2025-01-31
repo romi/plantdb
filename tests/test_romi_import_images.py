@@ -14,6 +14,21 @@ TESTS_ROOT = Path(__file__).parent  # path to the 'plantdb/tests/' directory
 class TestFSDBDummy(DummyDBTestCase):
 
     def test_import(self):
+        """
+        Tests the successful import of images and associated metadata into a test database.
+
+        This function exercises various components of the system involved in importing image
+        data, validating that the operation is performed correctly. This includes checks on
+        the database connectivity, the presence and structure of the imported files, as well as
+        the correctness of metadata associated with these files.
+
+        The following specific steps are tested:
+        - Disconnecting and reconnecting to the test database
+        - Importing image files and metadata from a specified path using an external command
+        - Validating the database directory and the existence of the imported scan
+        - Ensuring that the fileset and a test file exist after import
+        - Confirming that metadata associated with the imported files matches the original data
+        """
         db = self.get_test_db()
         db.disconnect()
         copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
