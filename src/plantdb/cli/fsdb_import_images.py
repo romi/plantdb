@@ -92,7 +92,7 @@ def main():
     # - Defines the scan dataset name to create
     default_scan_name = folder_path.name
     if args.name != "":
-        ds_name = Path(args.name)
+        ds_name = Path(args.name).stem
     else:
         ds_name = default_scan_name
 
