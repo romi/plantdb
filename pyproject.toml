@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb"
-version = "0.13.01"
+version = "0.13.2"
 dependencies = [
     "appdirs",
     "colorlog",
@@ -17,6 +17,7 @@ dependencies = [
     "open3d >=0.9.0.0",
     "pillow",
     "plyfile",
+    "requests",
     "toml",
     "tqdm",
 ]
@@ -75,4 +76,6 @@ doc = [
 test = [
     "nose2[coverage]",
     "coverage[toml]",
+    "networkx",
+    "tifffile",
 ]
