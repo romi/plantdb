@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from pathlib import Path
 
 import numpy as np
 import open3d as o3d
@@ -19,6 +20,8 @@ class TestIODummy(DummyDBTestCase):
     def _test_write_file(self, obj, ext, **kwargs):
         fs = self.get_test_fileset()
         fname = f"test_{ext}"
+        if fs.file_exists(fname):
+            fs.delete_file(fname)
         f = fs.create_file(fname)
         if ext == "json":
             io.write_json(f, obj, ext)
