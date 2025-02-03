@@ -809,7 +809,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
     Examples
     --------
     >>> from plantdb.rest_api_client import upload_dataset_file
-    >>> upload_dataset_file('Pois2_cylindre_D14', '/path/to/local/file.txt')
+    >>> upload_dataset_file('arabidopsis000', '/path/to/local/file.txt')
     """
     from os.path import basename
     from os.path import getsize
@@ -891,7 +891,7 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     Examples
     --------
     >>> from plantdb.rest_api_client import download_scan_archive
-    >>> download_scan_archive("Pois2_cylindre_D14", out_dir='/tmp', host="127.0.0.1", port="5000")
+    >>> download_scan_archive("arabidopsis000", out_dir='/tmp', host="127.0.0.1", port="5000")
     """
     import time
     url = archive_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None))
@@ -953,7 +953,7 @@ def upload_scan_archive(dataset_name, path, **kwargs):
     Examples
     --------
     >>> from plantdb.rest_api_client import upload_scan_archive
-    >>> upload_scan_archive("Pois2_cylindre_D14_bis", path='/tmp/Pois2_cylindre_D14.zip', host="127.0.0.1", port="5000")
+    >>> upload_scan_archive("arabidopsis000", path='/tmp/arabidopsis000.zip', host="127.0.0.1", port="5002")
     """
     import time
     from zipfile import ZipFile
