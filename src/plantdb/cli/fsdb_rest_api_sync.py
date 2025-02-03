@@ -2,11 +2,65 @@
 # -*- coding: utf-8 -*-
 
 """
-Synchronize two ``FSDB`` databases using REST API.
+FSDB Synchronization via REST API
+
+This module provides functionality to synchronize scan archives between two FSDB
+(Plant Database) instances using REST API. It ensures data consistency and aids in
+migrating or backing up scan data efficiently between different database instances.
+
+Key Features
+------------
+- **Command-line Interface (CLI)**: Includes an argument parser for easy configuration of source and target databases.
+- **URL Validation**: Verifies the format and accessibility of the provided database URLs.
+- **Scan Synchronization**: Retrieves scan archives from the source database and uploads them to the target database.
+- **REST API Integration**: Utilizes REST API calls for secure and efficient data transfer.
+- **Progress Tracking**: Displays a progress bar with `tqdm` to show transfer status for each scan.
+- **Logging**: Offers informational and error logging to provide feedback during the synchronization process.
+- **Error Handling**: Handles common errors such as invalid URLs, inaccessible ports, and connectivity issues.
+
+Usage Examples
+--------------
+To synchronize two FSDB databases, run the script from the command line with the
+`origin` and `target` arguments in the format `host:port`.
+Temporary files are stored in the `/tmp` directory during the transfer process.
+
+```bash
+python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000
+```
+
+This command connects the origin database at `192.168.1.1:5000` to the target database
+at `192.168.1.2:5000` and transfers all scan archives.
+
+Testing
+-------
+To test this script, you can set up two test FSDB REST API instances locally, with each instance running on a different port.
+One instance should start with sample data, while the other should be empty.
+You can then use this script to transfer data from the first instance to the second.
+
+For example:
+
+1. In the first terminal, run the following command:
+    ```shell
+    fsdb_rest_api --port 5001 --test
+    ```
+    This will create a database with sample data that listens on port 5001.
+2. In the second terminal, run:
+    ```shell
+    fsdb_rest_api --port 5002 --test --empty
+    ```
+    This will create an empty database that listens on port 5002.
+3. Finally, in the third terminal, run the sync script:
+    ```shell
+    fsdb_rest_api_sync 127.0.0.1:5001 127.0.0.1:5002
+    ```
+    This command transfers the data from the instance running on port 5001 to the instance running on port 5002.
+
 """
+
 import argparse
 import logging
 import socket
+from pathlib import Path
 
 from tqdm import tqdm
 
@@ -35,6 +89,26 @@ def parsing():
 
 
 def check_url(url):
+    """Verifies the connectivity to a given host and port from a URL-like string.
+
+    This function parses a URL string into host and port components, attempts to establish a
+    socket connection to check its availability, and raises appropriate exceptions on failure.
+
+    Parameters
+    ----------
+    url : str
+        A string specifying the host and port in the format 'host:port'.
+
+    Raises
+    ------
+    ValueError
+        If the input URL is not in the correct format 'host:port'.
+    ConnectionError
+        If the specified host and port cannot be connected, indicating that the port might
+        be closed or unavailable.
+    RuntimeError
+        If an unexpected error occurs during the verification process.
+    """
     try:
         host, port = url.split(':')
         port = int(port)  # Ensure port is an integer
@@ -84,15 +158,15 @@ def sync_scan_archives(origin_url, target_url):
     logger.info(f"Found {len(scan_list)} scans in origin database.")
 
     for scan_id in tqdm(scan_list, desc="Transfer:", unit="scan"):
-        logger.info(f"Transferring scan '{scan_id}'...")
+        logger.debug(f"Transferring scan '{scan_id}'...")
         # Download from origin DB via REST API
         f_path, msg = download_scan_archive(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
-        logger.info(msg)
+        logger.debug(msg)
         # Upload to target DB via REST API
         msg = upload_scan_archive(scan_id, f_path, host=target_host, port=target_port)
-        logger.info(msg)
+        logger.debug(msg)
         # Delete the temporary file
-        f_path.unlink()
+        Path(f_path).unlink()
 
     return
 
@@ -103,9 +177,6 @@ def main():
     This function orchestrates the parsing of command-line arguments, validation of the
     provided database URLs, and the synchronization of scan archives between the origin
     and target databases.
-
-    It ensures the input parameters are formatted correctly before invoking the
-    synchronization process.
     """
     # Parse command-line arguments using the parsing function
     parser = parsing()
