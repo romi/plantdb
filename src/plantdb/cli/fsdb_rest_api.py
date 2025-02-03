@@ -66,8 +66,10 @@ python fsdb_rest_api.py --help
 """
 
 import argparse
+import atexit
 import logging
 import os
+import shutil
 import sys
 from time import sleep
 
@@ -158,7 +160,17 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
         if empty:
             db_location = test_database(None).path()
         else:
-            db_location = test_database(DATASET, with_configs=True, with_models=True).path()
+            db_location = test_database(DATASET, with_configs=True, with_models=models).path()
+        # Register cleanup if a temporary database was created
+        def cleanup():
+            logger.info(f"Cleaning up temporary database directory at '{db_location}'...")
+            try:
+                shutil.rmtree(db_location)
+                logger.info(f"Successfully removed temporary directory at '{db_location}'.")
+            except OSError as e:
+                logger.error(f"Error removing temporary directory: {e}.")
+
+        atexit.register(cleanup)
 
     if db_location == "/none":
         logger.error("Can't serve a local PlantDB as no path to the database was specified!")
