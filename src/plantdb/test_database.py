@@ -63,6 +63,7 @@ Archive ``'models.zip'`` contains a preconfigured directory structure with the t
 import hashlib
 from pathlib import Path
 from tempfile import gettempdir
+from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import requests
@@ -95,19 +96,47 @@ ZIP_MD5S = {
 ROOT = Path(__file__).absolute().parent.parent.parent
 #: Path to `plantdb` module "tests/testdata" directory:
 TEST_DIR = ROOT / "tests" / "testdata"
-#: Path to the temporary test database directory.
-TMP_TEST_DIR = Path(gettempdir()) / 'ROMI_DB'
 
 logger = configure_logger(__name__)
 
 
 def _tmp_fpath_from_url(url) -> Path:
+    """Generate a temporary file path for a file from a given URL.
+
+    Parameters
+    ----------
+    url : str
+        The URL of the file to download.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the temporary file generated from the URL.
+    """
     temp_dir = Path(gettempdir())  # get the location of the temporary directory
     tmp_fname = Path(url).name  # get the name of the file to download from the URL
     return temp_dir / tmp_fname
 
 
-def _save_file_from_url(url):
+def _mkdtemp_romidb() -> Path:
+    """Creates a temporary directory with a specific prefix.
+
+    The created directory has the prefix `'ROMI_DB'` to make it identifiable.
+
+    Returns
+    -------
+    pathlib.Path
+        The path object pointing to the newly created temporary directory.
+
+    Examples
+    --------
+    >>> from plantdb.test_database import _mkdtemp_romidb
+    >>> _mkdtemp_romidb()
+    PosixPath('/tmp/ROMI_DB_********')
+    """
+    return Path(mkdtemp(prefix='ROMI_DB_'))
+
+def _save_file_from_url(url) -> Path:
     """Save URL to a temporary file.
 
     Parameters
@@ -328,6 +357,57 @@ def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
     return out_path
 
 
+def setup_empty_database(out_path=None):
+    """Sets up an empty ROMI database.
+
+    Sets up necessary marker file and ensures the absence of a lock file.
+
+    Parameters
+    ----------
+    out_path : str or Path, optional
+        The directory path where the database should be set up.
+        Defaults to ``None``.
+
+    Returns
+    -------
+    pathlib.Path
+        The directory path where the database was set up.
+
+    Examples
+    --------
+    >>> from plantdb.test_database import setup_empty_database
+    >>> path = setup_empty_database()
+    >>> print(path)  # initialize a `ROMI_DB` directory in the temporary directory by default
+    /tmp/ROMI_DB_********
+    >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
+    ['romidb']
+    """
+    from plantdb.fsdb import MARKER_FILE_NAME
+    from plantdb.fsdb import LOCK_FILE_NAME
+
+    if isinstance(out_path, str):
+        out_path = Path(out_path)
+    elif out_path is None:
+        out_path = _mkdtemp_romidb()
+    else:
+        try:
+            assert isinstance(out_path, Path)
+        except AssertionError:
+            logger.critical(f"Invalid pth to set up the database: '{out_path}'.")
+            logger.critical("Please provide a valid path to set up the database or leave it to None to use a temporary directory.")
+            raise TypeError(f"Invalid type for 'out_path': {type(out_path)}.")
+
+    # Make sure the path to the database exists:
+    out_path.mkdir(parents=True, exist_ok=True)
+    # Make sure the marker file exists:
+    marker_path = out_path / MARKER_FILE_NAME
+    marker_path.touch(exist_ok=True)
+    # Make sure the locking file do NOT exist:
+    lock_path = out_path / LOCK_FILE_NAME
+    lock_path.unlink(missing_ok=True)
+
+    return out_path
+
 def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=False, with_models=False, force=False):
     """Download and extract the test database from ZENODO.
 
@@ -364,26 +444,17 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
 
     Examples
     --------
-    >>> from plantdb.test_database import setup_test_database, TMP_TEST_DIR
+    >>> from plantdb.test_database import setup_test_database
     >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
     >>> setup_test_database('real_plant')
     PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
     >>> # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':
-    >>> setup_test_database(['real_plant', 'virtual_plant'], TMP_TEST_DIR, with_configs=True)
-    PosixPath('/tmp/ROMI_DB')
+    >>> setup_test_database(['real_plant', 'virtual_plant'], None, with_configs=True)
+    PosixPath('/tmp/ROMI_DB_********')
     """
-    from plantdb.fsdb import MARKER_FILE_NAME
-    from plantdb.fsdb import LOCK_FILE_NAME
-    if isinstance(out_path, str):
-        out_path = Path(out_path)
-    # Make sure the path to the database exists:
-    out_path.mkdir(parents=True, exist_ok=True)
-    # Make sure the marker file exists:
-    marker_path = out_path / MARKER_FILE_NAME
-    marker_path.touch(exist_ok=True)
-    # Make sure the locking file do NOT exist:
-    lock_path = out_path / LOCK_FILE_NAME
-    lock_path.unlink(missing_ok=True)
+    # Initialize an empty ROMI database
+    out_path = setup_empty_database(out_path)
+
     # Get the list of all test dataset if required:
     if isinstance(dataset, str) and dataset.lower() == "all":
         dataset = DATASET
@@ -404,13 +475,14 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     return out_path
 
 
-def test_database(dataset='real_plant_analyzed', out_path=TMP_TEST_DIR, **kwargs):
+def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     """Create and return an FSDB test database.
 
     Parameters
     ----------
-    dataset : str or list of str, optional
+    dataset : str or list[str] or None, optional
         The (list of) test dataset to use, by default 'real_plant_analyzed'.
+        If ``None``, only set up an empty database.
     out_path : str or pathlib.Path, optional
         The path where to set up the database.
         Defaults to the temporary directory under 'ROMI_DB', as defined by ``TMP_TEST_DIR``.
@@ -439,8 +511,11 @@ def test_database(dataset='real_plant_analyzed', out_path=TMP_TEST_DIR, **kwargs
     >>> db.list_scans()
     ['real_plant_analyzed']
     >>> db.path()
-    PosixPath('/tmp/ROMI_DB')
+    PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
     from plantdb.fsdb import FSDB
-    return FSDB(setup_test_database(dataset, out_path=out_path, **kwargs))
+    if dataset is None:
+        return FSDB(setup_empty_database(out_path=out_path))
+    else:
+        return FSDB(setup_test_database(dataset, out_path=out_path, **kwargs))
