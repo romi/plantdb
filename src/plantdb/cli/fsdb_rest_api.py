@@ -1,7 +1,69 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# FSDB REST API - Data handling tools for the ROMI project
+#
+# Copyright (C) 2018-2019 Sony Computer Science Laboratories
+# Authors: J. Legrand
+#
+# This file is part of plantdb.
+#
+# plantdb is free software: you can redistribute it
+# and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# plantdb is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with plantdb.  If not, see
+# <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
 
-"""Serve the plant database through a REST API."""
+"""
+FSDB REST API - Serve Plant Database through RESTful Endpoints
+
+This module provides a RESTful API server for interacting with a local plant database (FSDB).
+It is designed for the ROMI project and facilitates efficient data handling and retrieval of plant-related datasets.
+The server enables users to query and manage plant scans, images, point clouds, and other related data files.
+
+Key Features
+------------
+- Serve a local plant database (FSDB) through RESTful API endpoints.
+- Manage plant scans and related data, including images, point clouds, and meshes.
+- Retrieve and manage dataset files with various configurations.
+- Run in test mode with optional preconfigured datasets or an empty test database.
+- Lightweight server setup using Flask, with options for debugging and CORS support.
+
+Usage Examples
+--------------
+To start the REST API server for a local plant database:
+
+```shell
+python fsdb_rest_api.py --db_location /path/to/your/database --host 127.0.0.1 --port 8080 --debug
+```
+
+To run the server with a temporary test database in debug mode:
+
+```shell
+python fsdb_rest_api.py --test --debug
+```
+
+RESTful endpoints include:
+- `/scans`: List all scans available in the database.
+- `/files/<path:path>`: Retrieve files from the database.
+- `/image/<scan_id>/<fileset_id>/<file_id>`: Access specific images.
+- `/pointcloud/<scan_id>/<fileset_id>/<file_id>`: Access specific point clouds.
+- `/mesh/<scan_id>/<fileset_id>/<file_id>`: Retrieve related meshes.
+
+For detailed command-line parameters, use the `--help` flag:
+```shell
+python fsdb_rest_api.py --help
+```
+"""
 
 import argparse
 import logging
@@ -46,14 +108,44 @@ def parsing():
     misc_args = parser.add_argument_group("other arguments")
     misc_args.add_argument("--test", action='store_true',
                            help="set up a temporary test database prior to starting the REST API.")
+    misc_args.add_argument("--empty", action='store_true',
+                           help="the test database will not be populated with toy dataset.")
 
     return parser
 
 
-def main():
-    parser = parsing()
-    args = parser.parse_args()
+def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False):
+    """Initialize and configure a RESTful API server for Plant Database querying.
 
+    This function sets up a Flask application with various RESTful endpoints to enable interaction with a
+    local Plant Database (FSDB).
+    RESTful routes are added for managing and retrieving various datasets and configurations, providing
+    an interface for working with plant scans and related files. The application can be run in test
+    mode with optional configurations for using sample datasets.
+
+    Parameters
+    ----------
+    db_location : str
+        The path to the local plant database to be served. If set to "/none", the server will raise
+        an error and terminate unless the path is appropriately overridden in test mode.
+    host : str, optional
+        The hostname or IP address on which the Flask application will listen for incoming requests.
+         Defaults to ``"0.0.0.0"``.
+    port : int, optional
+        The port number to bind the Flask application for incoming HTTP requests.
+         Defaults to ``5000``.
+    debug : bool, optional
+        A boolean flag indicating whether Flask debugging mode should be enabled.
+        Useful for debugging during development. Defaults to ``False``.
+    test : bool, optional
+        A boolean flag to specify if the application should run in test mode. When enabled, a test
+        database will be instantiated with sample datasets or an empty configuration if specified.
+         Defaults to ``False``.
+    empty : bool, optional
+        A boolean flag to specify whether the test database should be instantiated without any
+        datasets or configurations. Defaults to ``False``.
+
+    """
     # Instantiate the Flask application:
     app = Flask(__name__)
     CORS(app)
@@ -62,10 +154,13 @@ def main():
     wlogger = logging.getLogger('werkzeug')
     logger = configure_logger('fsdb_rest_api')
 
-    if args.test:
-        args.db_location = test_database(DATASET, with_configs=True, with_models=True).path()
+    if test:
+        if empty:
+            db_location = test_database(None).path()
+        else:
+            db_location = test_database(DATASET, with_configs=True, with_models=True).path()
 
-    if args.db_location == "/none":
+    if db_location == "/none":
         logger.error("Can't serve a local PlantDB as no path to the database was specified!")
         logger.info(
             "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
@@ -73,7 +168,7 @@ def main():
         sys.exit("Wrong database location!")
 
     # Connect to the database:
-    db = FSDB(args.db_location)
+    db = FSDB(db_location)
     logger.info(f"Connecting to local plant database located at '{db.path()}'...")
     db.connect(unsafe=True)  # to avoid locking the database
     logger.info(f"Found {len(db.list_scans())} scans dataset to serve in local plant database.")
@@ -103,7 +198,18 @@ def main():
                      resource_class_args=tuple([db, logger]))
 
     # Start the Flask application:
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    app.run(host=host, port=port, debug=debug)
+
+
+def main():
+    """Main function to initialize and execute the REST API server.
+
+    This function utilizes argument parsing to extract user-provided input values
+    for configuring and running the REST API server.
+    """
+    parser = parsing()
+    args = parser.parse_args()
+    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty)
 
 
 if __name__ == '__main__':
