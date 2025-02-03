@@ -31,6 +31,12 @@ python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000
 This command connects the origin database at `192.168.1.1:5000` to the target database
 at `192.168.1.2:5000` and transfers all scan archives.
 
+To filter the transferred scans based on a regular expression, use the `--filter` optional argument.
+For example, to transfer only scans with names starting with 'virtual_':
+```shell
+python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000 --filter 'virtual_*'
+```
+
 Testing
 -------
 To test this script, you can set up two test FSDB REST API instances locally, with each instance running on a different port.
@@ -59,6 +65,7 @@ For example:
 
 import argparse
 import logging
+import re
 import socket
 from pathlib import Path
 
@@ -85,6 +92,9 @@ def parsing():
                         help='source database URL, as "host:port".')
     parser.add_argument('target', type=str,
                         help='target database URL, as "host:port".')
+
+    parser.add_argument('--filter', type=str, default=None,
+                        help='optional regular expression to filter scan names.')
     return parser
 
 
@@ -122,14 +132,38 @@ def check_url(url):
         raise RuntimeError(f"Error verifying the URL '{url}': {e}")
 
 
-def sync_scan_archives(origin_url, target_url):
+def filter_scan(scan_list, filter_pattern):
+    """Filters a list of scan identifiers based on a regular expression pattern.
+
+    Parameters
+    ----------
+    scan_list : list of str
+        A list of scan identifiers to be filtered.
+    filter_pattern : str
+        A regular expression pattern used to filter the scan identifiers.
+
+    Returns
+    -------
+    list of str or None
+        A list containing only the scan identifiers that match the
+        regular expression pattern, or None if the pattern is invalid.
+    """
+    try:
+        regex = re.compile(filter_pattern)
+        scan_list = [scan_id for scan_id in scan_list if regex.search(scan_id)]
+        return scan_list
+    except re.error as e:
+        logger.error(f"Invalid regular expression '{filter_pattern}': {e}")
+    return
+
+
+def sync_scan_archives(origin_url, target_url, filter_pattern=None):
     """Synchronizes scan archives between an origin and a target database.
 
     This function retrieves a list of scan archives from an origin database and transfers each
-    scan to a target database. It relies on REST API calls to download the scan archives from
-    the origin and upload them to the target. Logging messages are generated to provide
-    feedback about the status of each operation, including details about the origin and 
-    target databases, as well as the transfer status of each scan.
+    scan to a target database.
+    It relies on REST API calls to download the scan archives from the origin and upload them to the target.
+    Optionally filters the list of scans using a regular expression.
 
     Parameters
     ----------
@@ -137,6 +171,8 @@ def sync_scan_archives(origin_url, target_url):
         A 'host:port' URL pointing to the origin plantDB database with a REST API enabled.
     target_url : str
         A 'host:port' URL pointing to the target plantDB database with a REST API enabled.
+    filter_pattern : str, optional
+        A regular expression to filter scan names.
 
     Raises
     ------
@@ -155,7 +191,11 @@ def sync_scan_archives(origin_url, target_url):
     logger.info(f"Target URL is '{target_host}' on port '{target_port}'.")
 
     scan_list = list_scan_names(host=origin_host, port=origin_port)
-    logger.info(f"Found {len(scan_list)} scans in origin database.")
+    if filter_pattern:
+        scan_list = filter_scan(scan_list, filter_pattern)
+        logger.info(f"{len(scan_list)} scans match the filter pattern '{filter_pattern}'.")
+    else:
+        logger.info(f"Found {len(scan_list)} scans in origin database.")
 
     for scan_id in tqdm(scan_list, desc="Transfer:", unit="scan"):
         logger.debug(f"Transferring scan '{scan_id}'...")
@@ -188,7 +228,7 @@ def main():
     check_url(args.target)  # Ensure the `target` URL is formatted correctly
 
     # Synchronize scan archives between the origin and target databases
-    sync_scan_archives(args.origin, args.target)  # Perform synchronization
+    sync_scan_archives(args.origin, args.target, args.filter)  # Perform synchronization
 
 
 if __name__ == '__main__':
