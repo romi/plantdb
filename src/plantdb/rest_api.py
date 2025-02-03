@@ -33,8 +33,8 @@ import os
 from io import BytesIO
 from math import radians
 from pathlib import Path
-from tempfile import NamedTemporaryFile
-from tempfile import gettempdir
+from tempfile import mkdtemp
+from tempfile import mkstemp
 from zipfile import ZipFile
 
 from flask import after_this_request
@@ -1085,7 +1085,7 @@ class Archive(Resource):
         except ScanNotFoundError:
             return {'error': f'Could not find a scan named `{scan_id}`!'}, 400
 
-        tmp_dir = Path(gettempdir())
+        tmp_dir = Path(mkdtemp(prefix='fsdb_rest_api_'))
         zpath = tmp_dir / f'{scan_id}.zip'
 
         self.logger.info(f"Creating archive for `{scan_id}` dataset.")
@@ -1157,9 +1157,10 @@ class Archive(Resource):
 
         # Create a temporary file to save the uploaded ZIP file to disk
         try:
-            with NamedTemporaryFile(delete=False, suffix='.zip') as tmp_file:
-                temp_path = tmp_file.name
-                tmp_file.write(zip_file)  # Save the file directly to the temp file on disk
+            _, temp_path = mkstemp(prefix='tmp_file.name', suffix='.zip')
+            temp_path = Path(temp_path)
+            self.logger.debug(f"Saving uploaded ZIP temporary file to: '{temp_path}'")
+            zip_file.save(temp_path)
         except Exception as e:
             self.logger.error(f"Error saving file to temporary location: {e}")
             return {'error': 'Failed to save file to disk.'}, 500
