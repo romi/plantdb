@@ -112,11 +112,13 @@ def parsing():
                            help="set up a temporary test database prior to starting the REST API.")
     misc_args.add_argument("--empty", action='store_true',
                            help="the test database will not be populated with toy dataset.")
+    misc_args.add_argument("--models", action='store_true',
+                           help="the test database will contain the trained CNN model.")
 
     return parser
 
 
-def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False):
+def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False,):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -146,6 +148,9 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     empty : bool, optional
         A boolean flag to specify whether the test database should be instantiated without any
         datasets or configurations. Defaults to ``False``.
+    models : bool, optional
+        A boolean flag to specify whether the test database should be populated with trained CNN models.
+        Defaults to ``False``.
 
     """
     # Instantiate the Flask application:
@@ -221,7 +226,7 @@ def main():
     """
     parser = parsing()
     args = parser.parse_args()
-    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty)
+    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty, args.models)
 
 
 if __name__ == '__main__':
