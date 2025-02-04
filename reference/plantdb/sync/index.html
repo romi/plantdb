@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.50">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.2">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.a40c8224.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.d7758b05.min.css">
       
       
 
@@ -297,6 +297,7 @@
   
   <span class="md-ellipsis">
     Home
+    
   </span>
   
 
@@ -317,6 +318,7 @@
   
   <span class="md-ellipsis">
     REST API
+    
   </span>
   
 
@@ -355,6 +357,7 @@
   
   <span class="md-ellipsis">
     Reference API
+    
   </span>
   
 
@@ -397,6 +400,7 @@
   
   <span class="md-ellipsis">
     plantdb
+    
   </span>
   
 
@@ -443,6 +447,7 @@
   
   <span class="md-ellipsis">
     cli
+    
   </span>
   
 
@@ -474,6 +479,7 @@
   
   <span class="md-ellipsis">
     fsdb_check
+    
   </span>
   
 
@@ -495,6 +501,7 @@
   
   <span class="md-ellipsis">
     fsdb_import_file
+    
   </span>
   
 
@@ -516,6 +523,7 @@
   
   <span class="md-ellipsis">
     fsdb_import_folder
+    
   </span>
   
 
@@ -537,6 +545,7 @@
   
   <span class="md-ellipsis">
     fsdb_import_images
+    
   </span>
   
 
@@ -558,6 +567,7 @@
   
   <span class="md-ellipsis">
     fsdb_rest_api
+    
   </span>
   
 
@@ -579,6 +589,7 @@
   
   <span class="md-ellipsis">
     fsdb_rest_api_sync
+    
   </span>
   
 
@@ -600,6 +611,7 @@
   
   <span class="md-ellipsis">
     fsdb_sync
+    
   </span>
   
 
@@ -621,6 +633,7 @@
   
   <span class="md-ellipsis">
     shared_fsdb
+    
   </span>
   
 
@@ -650,6 +663,7 @@
   
   <span class="md-ellipsis">
     db
+    
   </span>
   
 
@@ -671,6 +685,7 @@
   
   <span class="md-ellipsis">
     fsdb
+    
   </span>
   
 
@@ -692,6 +707,7 @@
   
   <span class="md-ellipsis">
     io
+    
   </span>
   
 
@@ -713,6 +729,7 @@
   
   <span class="md-ellipsis">
     log
+    
   </span>
   
 
@@ -734,6 +751,7 @@
   
   <span class="md-ellipsis">
     rest_api
+    
   </span>
   
 
@@ -755,6 +773,7 @@
   
   <span class="md-ellipsis">
     rest_api_client
+    
   </span>
   
 
@@ -776,6 +795,7 @@
   
   <span class="md-ellipsis">
     sshfsdb
+    
   </span>
   
 
@@ -804,6 +824,7 @@
   
   <span class="md-ellipsis">
     sync
+    
   </span>
   
 
@@ -815,6 +836,7 @@
   
   <span class="md-ellipsis">
     sync
+    
   </span>
   
 
@@ -884,6 +906,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#plantdb.sync._fmt_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      _fmt_path
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -905,6 +936,7 @@
   
   <span class="md-ellipsis">
     test_database
+    
   </span>
   
 
@@ -926,6 +958,7 @@
   
   <span class="md-ellipsis">
     testing
+    
   </span>
   
 
@@ -947,6 +980,7 @@
   
   <span class="md-ellipsis">
     utils
+    
   </span>
   
 
@@ -968,6 +1002,7 @@
   
   <span class="md-ellipsis">
     webcache
+    
   </span>
   
 
@@ -1067,6 +1102,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#plantdb.sync._fmt_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      _fmt_path
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1080,6 +1124,7 @@
               <article class="md-content__inner md-typeset">
                 
                   
+
 
   
   
@@ -1396,6 +1441,152 @@
 </div>
 
 
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plantdb.sync._fmt_path" class="doc doc-heading">
+            <code class="highlight language-python">_fmt_path(path)</code>
+
+<a href="#plantdb.sync._fmt_path" class="headerlink" title="Permanent link">Link</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Parses path by checking for a ':' sign.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to format.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary describing the parsed path.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/sync.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">115</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">127</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">128</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_fmt_path</span>(path):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Parses path by checking for a &#39;:&#39; sign.</span>
+
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    path : str or pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to format.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    dict</span>
+<span style="color: #BA2121; font-style: italic">        A dictionary describing the parsed path.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;:&#39;</span> <span style="color: #A2F; font-weight: bold">in</span> <span style="color: #008000">str</span>(path):  <span style="color: #3D7B7B; font-style: italic"># This is a remote path</span>
+        path_split <span style="color: #666">=</span> path<span style="color: #666">.</span>split(<span style="color: #BA2121">&#39;:&#39;</span>)
+        host <span style="color: #666">=</span> path_split[<span style="color: #666">0</span>]
+        path <span style="color: #666">=</span> Path(path_split[<span style="color: #666">1</span>])
+        <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">len</span>(path_split) <span style="color: #666">!=</span> <span style="color: #666">2</span>:
+            <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">OSError</span>(<span style="color: #BA2121">f&quot;Invalid remote path format: </span><span style="color: #A45A77; font-weight: bold">{</span>path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> {
+            <span style="color: #BA2121">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;remote&quot;</span>,
+            <span style="color: #BA2121">&quot;host&quot;</span>: host,
+            <span style="color: #BA2121">&quot;path&quot;</span>: path,
+            <span style="color: #BA2121">&quot;lock_path&quot;</span>: path <span style="color: #666">/</span> LOCK_FILE_NAME,
+            <span style="color: #BA2121">&quot;marker_path&quot;</span>: path <span style="color: #666">/</span> MARKER_FILE_NAME,
+        }
+    <span style="color: #008000; font-weight: bold">else</span>:  <span style="color: #3D7B7B; font-style: italic"># This is a local path</span>
+        path <span style="color: #666">=</span> Path(path)<span style="color: #666">.</span>resolve()
+        <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> _is_fsdb(path):
+            <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">OSError</span>(<span style="color: #BA2121">f&quot;Source is not a valid FSDB path: </span><span style="color: #A45A77; font-weight: bold">{</span>path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> {
+            <span style="color: #BA2121">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;local&quot;</span>,
+            <span style="color: #BA2121">&quot;path&quot;</span>: path,
+            <span style="color: #BA2121">&quot;lock_path&quot;</span>: Path(path) <span style="color: #666">/</span> LOCK_FILE_NAME,
+            <span style="color: #BA2121">&quot;marker_path&quot;</span>: Path(path) <span style="color: #666">/</span> MARKER_FILE_NAME,
+        }
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
 
 
   </div>
@@ -1504,7 +1695,7 @@
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.60a45f97.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.f13b1293.min.js"></script>
       
         <script src="../../../assets/_markdown_exec_pyodide.js"></script>
       
