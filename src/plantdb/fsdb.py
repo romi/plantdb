@@ -123,16 +123,25 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     Parameters
     ----------
     with_scan : bool, optional
-        Add a dummy ``Scan`` to the dummy database.
+        If ``True`` (default to ``False``), add a ``Scan``, named ``"myscan_001"``, to the database.
     with_fileset : bool, optional
-        Add a dummy ``Fileset`` to the dummy database.
+        If ``True`` (default to ``False``), add a ``Fileset``, named ``"fileset_001"``, to the scan ``"myscan_001"``.
     with_file : bool, optional
-        Add a dummy ``File`` to the dummy database.
+        If ``True`` (default to ``False``), add three ``File``, to the fileset ``"fileset_001"``:
+
+        - a dummy PNG array, named ``"dummy_image"``;
+        - a dummy RGB image, named ``"test_image"``;
+        - a dummy JSON file, named ``"test_json"``;
 
     Returns
     -------
     plantdb.fsdb.FSDB
         The dummy database.
+
+    Notes
+    -----
+    - Returns a 'connected' database, no need to call the `connect()` method.
+    - Uses the 'anonymous' user to login.
 
     Examples
     --------
