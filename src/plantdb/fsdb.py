@@ -211,6 +211,32 @@ class NotAnFSDBError(Exception):
         self.message = message
 
 
+class ScanNotFoundError(Exception):
+    """Could not find the scan directory."""
+
+    def __init__(self, scan_id: str):
+        super().__init__(f"Unknown scan id '{scan_id}'!")
+
+
+class FilesetNotFoundError(Exception):
+    """Could not find the fileset directory."""
+
+    def __init__(self, fs_id: str):
+        super().__init__(f"Unknown fileset id '{fs_id}'!")
+
+
+class FilesetNoIDError(Exception):
+    """No 'id' entry could be found for this fileset."""
+
+
+class FileNoIDError(Exception):
+    """No 'id' entry could be found for this file."""
+
+
+class FileNoFileNameError(Exception):
+    """No 'file' entry could be found for this file."""
+
+
 class FSDB(db.DB):
     """Implement a local *File System DataBase* version of abstract class ``db.DB``.
 
@@ -1888,6 +1914,7 @@ def _load_scans(db):
             scans[scan_name] = scan
     return scans
 
+
 def _load_dummy_fileset(scan):
     """
 
@@ -1907,6 +1934,7 @@ def _load_dummy_fileset(scan):
         filesets[fs_id] = fs
 
     return filesets
+
 
 def _load_scan_filesets(scan):
     """Load the list of ``Fileset`` from given `scan` dataset and return them as a dict.
@@ -1971,6 +1999,7 @@ def _load_scan_filesets(scan):
 
     return filesets
 
+
 def _load_fileset(scan, fileset_info):
     """Load a fileset and set its attributes.
 
@@ -2007,22 +2036,6 @@ def _load_fileset(scan, fileset_info):
     fileset.files = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
     return fileset
-
-
-class FilesetNoIDError(Exception):
-    """No 'id' entry could be found for this fileset."""
-
-
-class FilesetNotFoundError(Exception):
-    """Could not find the fileset directory."""
-    def __init__(self, fs_id: str):
-        super().__init__(f"Unknown fileset id '{fs_id}'!")
-
-
-class ScanNotFoundError(Exception):
-    """Could not find the scan directory."""
-    def __init__(self, scan_id: str):
-        super().__init__(f"Unknown scan id '{scan_id}'!")
 
 
 def _parse_fileset(scan, fileset_info):
@@ -2135,14 +2148,6 @@ def _load_fileset_metadata(fileset):
         The metadata dictionary.
     """
     return _load_metadata(_fileset_metadata_json_path(fileset))
-
-
-class FileNoIDError(Exception):
-    """No 'id' entry could be found for this file."""
-
-
-class FileNoFileNameError(Exception):
-    """No 'file' entry could be found for this file."""
 
 
 def _load_file(fileset, file_info):
