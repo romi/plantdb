@@ -78,7 +78,9 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from plantdb.fsdb import FSDB
-from plantdb.log import configure_logger
+from plantdb.log import DEFAULT_LOG_LEVEL
+from plantdb.log import LOG_LEVELS
+from plantdb.log import get_logger
 from plantdb.rest_api import Archive
 from plantdb.rest_api import DatasetFile
 from plantdb.rest_api import File
@@ -115,10 +117,14 @@ def parsing():
     misc_args.add_argument("--models", action='store_true',
                            help="the test database will contain the trained CNN model.")
 
+    log_opt = parser.add_argument_group("Logging options")
+    log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
+                         help="Level of message logging, defaults to 'INFO'.")
+
     return parser
 
 
-def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False,):
+def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False, log_level=DEFAULT_LOG_LEVEL):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -151,6 +157,8 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     models : bool, optional
         A boolean flag to specify whether the test database should be populated with trained CNN models.
         Defaults to ``False``.
+    log_level : str, optional
+        The logging level to use for the application. Defaults to ``DEFAULT_LOG_LEVEL``.
 
     """
     # Instantiate the Flask application:
@@ -159,7 +167,7 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     api = Api(app)
     # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
-    logger = configure_logger('fsdb_rest_api')
+    logger = get_logger('fsdb_rest_api', log_level=log_level)
 
     if test:
         if empty:
@@ -226,7 +234,7 @@ def main():
     """
     parser = parsing()
     args = parser.parse_args()
-    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty, args.models)
+    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty, args.models, args.log_level)
 
 
 if __name__ == '__main__':

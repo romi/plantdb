@@ -109,9 +109,9 @@ from tqdm import tqdm
 
 from plantdb import db
 from plantdb.db import DBBusyError
-from plantdb.log import configure_logger
+from plantdb.log import get_logger
 
-logger = configure_logger(__name__)
+logger = get_logger(__name__)
 
 #: This file must exist in the root of a folder for it to be considered a valid DB
 MARKER_FILE_NAME = "romidb"

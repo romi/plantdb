@@ -11,8 +11,9 @@ from tqdm import tqdm
 
 from plantdb import FSDB
 from plantdb.fsdb import _scan_json_file
-from plantdb.log import LOGLEV
-from plantdb.log import configure_logger
+from plantdb.log import LOG_LEVELS
+
+from plantdb.log import get_logger
 
 
 def parsing():
@@ -20,7 +21,8 @@ def parsing():
     parser.add_argument('database', type=str,
                         help='Local database to check.')
 
-    parser.add_argument('--log-level', dest='log_level', type=str, default='INFO', choices=LOGLEV,
+    parser.add_argument('--log-level', dest='log_level', type=str, default='INFO', choices=LOG_LEVELS
+,
                         help="Level of message logging, defaults to 'INFO'.")
 
     fix_opt = parser.add_argument_group("fix options")
@@ -90,7 +92,7 @@ def main():
 
     # - Configure a logger from this application:
     global logger
-    logger = configure_logger('fsdb_check', log_level=args.log_level)
+    logger = get_logger('fsdb_check', log_level=args.log_level)
 
     db = FSDB(args.database)
     db.connect()

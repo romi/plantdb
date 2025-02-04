@@ -31,12 +31,12 @@ import subprocess
 
 from plantdb import db
 from plantdb import fsdb
-from plantdb.log import configure_logger
+from plantdb.log import get_logger
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in the root folder of a DB
 
-logger = configure_logger(__name__)
+logger = get_logger(__name__)
 
 
 class SSHFSDB(fsdb.FSDB):

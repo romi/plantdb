@@ -69,7 +69,7 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
-from plantdb.log import configure_logger
+from plantdb.log import get_logger
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -97,7 +97,7 @@ ROOT = Path(__file__).absolute().parent.parent.parent
 #: Path to `plantdb` module "tests/testdata" directory:
 TEST_DIR = ROOT / "tests" / "testdata"
 
-logger = configure_logger(__name__)
+logger = get_logger(__name__)
 
 
 def _tmp_fpath_from_url(url) -> Path:

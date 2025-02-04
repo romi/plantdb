@@ -94,9 +94,9 @@ import tempfile
 from pathlib import Path
 
 import plantdb.db
-from plantdb.log import configure_logger
+from plantdb.log import get_logger
 
-logger = configure_logger(__name__)
+logger = get_logger(__name__)
 
 
 def _reader(file, reader, **kwargs):

@@ -6,11 +6,13 @@ Import the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` data
 """
 import argparse
 import json
+import shutil
 from pathlib import Path
 
 from plantdb.fsdb import FSDB
-from plantdb.log import LOGLEV
-from plantdb.log import configure_logger
+from plantdb.log import DEFAULT_LOG_LEVEL
+from plantdb.log import LOG_LEVELS
+from plantdb.log import get_logger
 
 DESC = """
 Import the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` dataset.
@@ -34,7 +36,7 @@ def parsing():
                              "Defaults to `metadata.json`")
 
     log_opt = parser.add_argument_group("Logging options")
-    log_opt.add_argument("--log-level", dest="log_level", type=str, default="INFO", choices=LOGLEV,
+    log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
                          help="Level of message logging, defaults to 'INFO'.")
 
     return parser
@@ -68,8 +70,7 @@ def main():
     args = parser.parse_args()
 
     # - Configure a logger from this application:
-    global logger
-    logger = configure_logger('fsdb_import_folder', log_level=args.log_level)
+    logger = get_logger('fsdb_import_folder', log_level=args.log_level)
     folder_path = Path(args.folder).resolve()
     if not folder_path.exists():
         raise FileNotFoundError(f"{folder_path} do not exist!")
@@ -122,6 +123,7 @@ def main():
         fileset.set_metadata(metadata)
 
     db.disconnect()
+
 
 if __name__ == '__main__':
     main()

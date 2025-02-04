@@ -48,7 +48,7 @@ from flask_restful import Resource
 from plantdb import webcache
 from plantdb.fsdb import ScanNotFoundError
 from plantdb.io import read_json
-from plantdb.log import configure_logger
+from plantdb.log import get_logger
 from plantdb.utils import is_radians
 
 
@@ -210,7 +210,7 @@ def get_scan_info(scan, **kwargs):
     {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
     """
-    logger = kwargs.get("logger", configure_logger(__name__))
+    logger = kwargs.get("logger", get_logger(__name__))
     logger.info(f"Accessing scan info for `{scan.id}` dataset.")
 
     # Initialize the scan information template:
@@ -368,7 +368,7 @@ def get_scan_data(scan, **kwargs):
     SIMPLE_RADIAL
     >>> db.disconnect()
     """
-    logger = kwargs.get("logger", configure_logger(__name__))
+    logger = kwargs.get("logger", get_logger(__name__))
 
     task_fs_map = compute_fileset_matches(scan)
     scan_data = get_scan_info(scan, logger=logger)

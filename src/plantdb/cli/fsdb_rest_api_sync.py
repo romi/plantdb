@@ -64,19 +64,18 @@ For example:
 """
 
 import argparse
-import logging
 import re
 import socket
 from pathlib import Path
 
 from tqdm import tqdm
 
+from plantdb.log import DEFAULT_LOG_LEVEL
+from plantdb.log import LOG_LEVELS
+from plantdb.log import get_logger
 from plantdb.rest_api_client import download_scan_archive
 from plantdb.rest_api_client import list_scan_names
 from plantdb.rest_api_client import upload_scan_archive
-
-logger = logging.getLogger("API_FSDBSync")
-logging.basicConfig(level=logging.INFO)
 
 
 def parsing():
@@ -87,7 +86,7 @@ def parsing():
     argparse.ArgumentParser
         An argument parser configured for FSDB synchronization.
     """
-    parser = argparse.ArgumentParser(description='Synchronize two FSDB databases.')
+    parser = argparse.ArgumentParser(description='Transfer dataset from an origin FSDB database towards a target using REST API.')
     parser.add_argument('origin', type=str,
                         help='source database URL, as "host:port".')
     parser.add_argument('target', type=str,
@@ -95,6 +94,11 @@ def parsing():
 
     parser.add_argument('--filter', type=str, default=None,
                         help='optional regular expression to filter scan names.')
+
+    log_opt = parser.add_argument_group("Logging options")
+    log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
+                         help="Level of message logging, defaults to 'INFO'.")
+
     return parser
 
 
@@ -132,7 +136,7 @@ def check_url(url):
         raise RuntimeError(f"Error verifying the URL '{url}': {e}")
 
 
-def filter_scan(scan_list, filter_pattern):
+def filter_scan(scan_list, filter_pattern, logger):
     """Filters a list of scan identifiers based on a regular expression pattern.
 
     Parameters
@@ -141,6 +145,8 @@ def filter_scan(scan_list, filter_pattern):
         A list of scan identifiers to be filtered.
     filter_pattern : str
         A regular expression pattern used to filter the scan identifiers.
+    logger : logging.Logger
+        A logger instance for logging messages.
 
     Returns
     -------
@@ -157,7 +163,7 @@ def filter_scan(scan_list, filter_pattern):
     return
 
 
-def sync_scan_archives(origin_url, target_url, filter_pattern=None):
+def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DEFAULT_LOG_LEVEL):
     """Synchronizes scan archives between an origin and a target database.
 
     This function retrieves a list of scan archives from an origin database and transfers each
@@ -185,6 +191,8 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None):
       provided as command-line arguments in the format `host:port`.
     - Temporary files are stored in the `/tmp` directory during the transfer process.
     """
+    logger = get_logger('fsdb_rest_api_sync', log_level=log_level)
+
     origin_host, origin_port = origin_url.split(':')
     target_host, target_port = target_url.split(':')
     logger.info(f"Origin URL is '{origin_host}' on port '{origin_port}'.")
@@ -192,7 +200,7 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None):
 
     scan_list = list_scan_names(host=origin_host, port=origin_port)
     if filter_pattern:
-        scan_list = filter_scan(scan_list, filter_pattern)
+        scan_list = filter_scan(scan_list, filter_pattern, logger)
         logger.info(f"{len(scan_list)} scans match the filter pattern '{filter_pattern}'.")
     else:
         logger.info(f"Found {len(scan_list)} scans in origin database.")
@@ -228,7 +236,7 @@ def main():
     check_url(args.target)  # Ensure the `target` URL is formatted correctly
 
     # Synchronize scan archives between the origin and target databases
-    sync_scan_archives(args.origin, args.target, args.filter)  # Perform synchronization
+    sync_scan_archives(args.origin, args.target, args.filter, args.log_level)  # Perform synchronization
 
 
 if __name__ == '__main__':

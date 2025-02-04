@@ -21,8 +21,6 @@ class TestSyncDummy(DummyDBTestCase):
                 x = FSDBSync(db.path(), tmpdir)
                 x.sync()
     # How to test remote sync?
-        db.dummy = True
-        db.disconnect()
 
 
 if __name__ == "__main__":
