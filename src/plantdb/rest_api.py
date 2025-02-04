@@ -111,11 +111,10 @@ def compute_fileset_matches(scan):
     >>> from plantdb.rest_api import compute_fileset_matches
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
-    >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
     {'fileset': 'fileset_001'}
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     filesets_matches = {}
     for fs in scan.get_filesets():
