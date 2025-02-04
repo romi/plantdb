@@ -20,6 +20,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertTrue(db.path().is_dir())
         self.assertTrue(db.lock_path.exists())
         self.assertTrue(db.is_connected)
+        db.disconnect()
 
     def test_get_scan(self):
         db = self.get_test_db()
@@ -27,6 +28,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertIsInstance(scan, Scan)
         with self.assertRaises(ScanNotFoundError):
             db.get_scan("myscan_002")  # does not exist
+        db.disconnect()
 
     def test_create_scan(self):
         db = self.get_test_db()
@@ -34,6 +36,7 @@ class TestFSDBDummy(DummyDBTestCase):
         scan = db.create_scan(scan_id)
         self.assertTrue(scan.id == scan_id)
         self.assertTrue(scan.path().is_dir())
+        db.disconnect()
 
     def test_set_scan_metadata(self):
         scan = self.get_test_scan()
@@ -41,10 +44,12 @@ class TestFSDBDummy(DummyDBTestCase):
         scan.set_metadata(md)
         db = scan.get_db()
         scan_id = scan.id
+        db.dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         scan = db.get_scan(scan_id)
         self.assertTrue(scan.get_metadata('test') == md['test'])
+        db.disconnect()
 
     def test_list_scan(self):
         db = self.get_test_db()
@@ -59,6 +64,7 @@ class TestFSDBDummy(DummyDBTestCase):
         with self.assertRaises(ScanNotFoundError):
             db.get_scan("myscan_001")
         self.assertFalse(scan_path.is_dir())
+        db.disconnect()
 
     def test_get_fileset(self):
         scan = self.get_test_scan()
@@ -66,6 +72,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertIsInstance(fileset, Fileset)
         with self.assertRaises(FilesetNotFoundError):
             scan.get_fileset("fileset_002")  # does not exist
+        scan.db.disconnect()
 
     def test_create_fileset(self):
         scan = self.get_test_scan()
@@ -73,6 +80,7 @@ class TestFSDBDummy(DummyDBTestCase):
         fileset = scan.create_fileset(fs_id)
         self.assertTrue(fileset.id == fs_id)
         self.assertTrue(fileset.path().is_dir())
+        scan.db.disconnect()
 
     def test_set_fileset_metadata(self):
         fileset = self.get_test_fileset()
@@ -81,10 +89,12 @@ class TestFSDBDummy(DummyDBTestCase):
         db = fileset.get_db()
         scan_id = fileset.get_scan().id
         fs_id = fileset.id
+        db.dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         fileset = db.get_scan(scan_id).get_fileset(fs_id)
         self.assertTrue(fileset.get_metadata('test') == md['test'])
+        db.disconnect()
 
     def test_list_fileset(self):
         scan = self.get_test_scan()
@@ -99,11 +109,13 @@ class TestFSDBDummy(DummyDBTestCase):
         with self.assertRaises(FilesetNotFoundError):
             scan.get_fileset("fileset_001")
         self.assertFalse(fs_path.is_dir())
+        scan.db.disconnect()
 
     def test_get_file(self):
         fileset = self.get_test_fileset()
         file = fileset.get_file("test_image")  # exists
         self.assertIsInstance(file, File)
+        fileset.db.disconnect()
 
     def test_create_file(self):
         from plantdb.io import write_json
@@ -115,6 +127,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertIsNone(file.filename)  # Do not exist on drive before `io.write_*`
         write_json(file, {"test": "value"})
         self.assertTrue(file.path().is_file())
+        scan.db.disconnect()
 
     def test_set_file_metadata(self):
         file = self.get_test_image_file()
@@ -124,14 +137,18 @@ class TestFSDBDummy(DummyDBTestCase):
         scan_id = file.get_scan().id
         fs_id = file.get_fileset().id
         f_id = file.id
+        db.dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         file = db.get_scan(scan_id).get_fileset(fs_id).get_file(f_id)
         self.assertTrue(file.get_metadata('test') == md['test'])
+        db.dummy = True
+        db.disconnect()
 
     def test_list_file(self):
         fs = self.get_test_fileset()
         self.assertListEqual(fs.list_files(), ['dummy_image', 'test_image', 'test_json'])
+        fs.db.disconnect()
 
     def test_write_raw_file(self):
         fs = self.get_test_fileset()
@@ -141,6 +158,7 @@ class TestFSDBDummy(DummyDBTestCase):
         data = json.dumps(md).encode()
         new_f.write_raw(data, 'json')
         self.assertTrue(new_f.path().is_file())
+        fs.db.disconnect()
 
     def test_read_raw_file(self):
         fs = self.get_test_fileset()
@@ -151,6 +169,7 @@ class TestFSDBDummy(DummyDBTestCase):
         new_f.write_raw(data, 'json')
         file = fs.get_file('file_007')
         self.assertTrue(file.read_raw() == data)
+        fs.db.disconnect()
 
     def test_write_file(self):
         fs = self.get_test_fileset()
@@ -160,6 +179,7 @@ class TestFSDBDummy(DummyDBTestCase):
         data = json.dumps(md)
         new_f.write(data, 'json')
         self.assertTrue(new_f.path().is_file())
+        fs.db.disconnect()
 
     def test_read_file(self):
         fs = self.get_test_fileset()
@@ -170,6 +190,7 @@ class TestFSDBDummy(DummyDBTestCase):
         new_f.write(data, 'json')
         file = fs.get_file('file_007')
         self.assertTrue(file.read() == data)
+        fs.db.disconnect()
 
     def test_delete_file(self):
         fs = self.get_test_fileset()
@@ -180,6 +201,7 @@ class TestFSDBDummy(DummyDBTestCase):
         with self.assertRaises(FileNotFoundError):
             fs.get_file("test_image")
         self.assertFalse(f_path.is_file())
+        fs.db.disconnect()
 
     def test_import_file(self):
         fs = self.get_test_fileset()
@@ -191,6 +213,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertTrue(new_file.path().is_file())
         self.assertFalse(file.path() == new_file.path())
         self.assertFalse(file.path().stat == new_file.path().stat)
+        fs.db.disconnect()
 
 
 if __name__ == "__main__":
