@@ -50,6 +50,7 @@ Assuming that the `FSDB` root database directory is `dbroot/`, there is a `Scan`
     │   └── (measures.json)            # optional manual measurements file
     ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
     :
+    ├── users.json                     # user registry
     ├── (LOCK_FILE_NAME)               # "lock file", present if DB is connected
     └── MARKER_FILE_NAME               # ROMI DB marker file
 ```
@@ -98,6 +99,7 @@ import json
 import logging
 import os
 import pathlib
+import shutil
 from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
@@ -285,13 +287,11 @@ class FSDB(db.DB):
     <class 'plantdb.fsdb.FSDB'>
     >>> print(db.path())
     /tmp/romidb_********
-    >>> # Now connecting to this dummy local database...
-    >>> db.connect()
-    >>> # ...allows creating new `Scan` in it:
+    >>> # Create a new `Scan`:
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
     <class 'plantdb.fsdb.Scan'>
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # EXAMPLE 2: Use a local database:
     >>> import os
@@ -301,7 +301,7 @@ class FSDB(db.DB):
     >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
     >>> scan = db.get_scans()[1]
     >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
 
     def __init__(self, basedir, required_filesets=['metadata'], required_files_json=True, dummy=False):
@@ -344,6 +344,20 @@ class FSDB(db.DB):
         if not _is_fsdb(basedir):
             raise NotAnFSDBError(f"Not an FSDB! Check that there is a file named {MARKER_FILE_NAME} in {basedir}")
 
+        # Create or load the users database
+        users_file = basedir / 'users.json'
+        if not users_file.is_file():
+            # Create the users database as a JSON file
+            users_file.touch()
+            self.users = {}
+            logger.info(f"Initialized the new database at '{basedir}'!")
+        else:
+            # Load the users database
+            with open(users_file, "r") as f:
+                self.users = json.load(f)
+            logger.debug(f"Loaded {len(self.users)} users from '{users_file}'.")
+        self.user = None
+
         # Initialize attributes:
         self.basedir = Path(basedir).resolve()
         self.lock_path = self.basedir / LOCK_FILE_NAME
@@ -353,22 +367,71 @@ class FSDB(db.DB):
         self.required_filesets = required_filesets if not dummy else None
         self.required_files_json = required_files_json if not dummy else False
 
-    def connect(self, login_data=None, unsafe=False):
+    def create_user(self, username, fullname):
+        """Create a new user and store the user information in a file.
+
+        Parameters
+        ----------
+        username : str
+            The username of the user to be created.
+            This will be converted to lowercase.
+        fullname : str
+            The full name of the user to be created.
+
+        Examples
+        --------
+        >>> from plantdb.fsdb import FSDB
+        >>> from plantdb.fsdb import dummy_db
+        >>> db = dummy_db()
+        >>> db.create_user('batman', "Bruce Wayne")
+        >>> db.connect('batman')
+        >>> print(db.user)
+        batman
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
+        """
+        from datetime import datetime
+        username = username.lower()  # Convert the username to lowercase to maintain uniformity.
+        now = datetime.now()  # Get the current timestamp for tracking user creation time.
+        timestamp = now.strftime("%y%m%d_%H%M%S")  # Format the timestamp as 'YYMMDD_HHMMSS'.
+
+        # Verify if the login is available
+        try:
+            assert username not in self.users
+        except AssertionError:
+            logger.error(f"User '{username}' already exists!")
+            return
+
+        # Add the new user's data to the `self.users` dictionary.
+        self.users[username] = {
+            'fullname': fullname,  # Store the provided full name of the user.
+            'created': timestamp  # Store the formatted timestamp to record when the user was created.
+        }
+
+        # Save all user data (including the newly created user) to 'users.json' file.
+        with open(self.basedir / 'users.json', "w") as f:
+            json.dump(self.users, f)
+        logger.info(f"Created user '{username}' with fullname '{fullname}'.")
+
+        return f"Welcome {self.users[username]['fullname']}!'"
+
+    def connect(self, login=None, unsafe=False):
         """Connect to the local database.
 
         Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
 
         Parameters
         ----------
-        login_data : bool
-            UNUSED
-        unsafe : bool
+        login : str, optional
+            The user login, if not defined, use the ``'anonymous'`` user.
+            If defined, it should match a known user.
+        unsafe : bool, optional
             If ``True`` do not use the `LOCK_FILE_NAME` file.
 
         Raises
         ------
-        DBBusyError
-            If the `LOCK_FILE_NAME` lock fil is found in the `basedir`.
+        plantdb.db.DBBusyError
+            If the database is already used by another process.
+            This is achieved by searching for a `LOCK_FILE_NAME` lock file in the `basedir`.
 
         See Also
         --------
@@ -376,16 +439,37 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
-        False
-        >>> db.connect()
+        True
+        >>> db.create_user("batman", "Bruce Wayne")
+        >>> db.connect('batman')
         >>> print(db.is_connected)
         True
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
+        >>> print(db.is_connected)
+        False
         """
+        prev_user = copy.copy(self.user)
+        # Try to log in as a user:
+        if login is not None:
+            try:
+                assert login in self.users
+            except AssertionError:
+                logger.error(f"Unknown user '{login}', cannot connect to the database!")
+                logger.info(f"Create a new user '{login}' with the `create_user` method.")
+                return
+            else:
+                self.user = login
+        else:
+            self.create_user("anonymous", "Ano Nymous")
+            self.user = "anonymous"
+            # Raise warning about anonymous user only if not a dummy database
+            if not self.dummy:
+                logger.warning("Using anonymous user is discouraged!")
+                logger.info("Use `connect(login='username')` to login as a user.")
+
         if not self.is_connected:
             if unsafe:
                 self.scans = _load_scans(self)
@@ -399,7 +483,10 @@ class FSDB(db.DB):
                 except FileExistsError:
                     raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
         else:
-            logger.info(f"Already connected to the database '{self.path()}'")
+            if self.user != prev_user:
+                logger.info(f"Connected as '{self.user}' to the database '{self.path()}'.")
+            else:
+                logger.info(f"Already connected as '{self.user}' to the database '{self.path()}'!")
         return
 
     def disconnect(self):
@@ -417,14 +504,18 @@ class FSDB(db.DB):
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
-        False
-        >>> db.connect()
-        >>> print(db.is_connected)
         True
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         >>> print(db.is_connected)
         False
         """
+        if self.dummy:
+            logger.info(f"Cleaning up the temporary dummy database at '{self.basedir}'...")
+            shutil.rmtree(self.basedir)
+            self.scans = {}
+            self.is_connected = False
+            return
+
         if self.is_connected:
             for s_id, scan in self.scans.items():
                 scan._erase()
@@ -483,7 +574,7 @@ class FSDB(db.DB):
         True
         >>> db.scan_exists("nonexistent_id")
         False
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return scan_id in self.scans
 
@@ -511,10 +602,9 @@ class FSDB(db.DB):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> db.get_scans()
         [<plantdb.fsdb.Scan at *x************>]
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.scans.values()), query, fuzzy)
 
@@ -539,7 +629,6 @@ class FSDB(db.DB):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
-        >>> db.connect()
         >>> db.list_scans()
         []
         >>> new_scan = db.get_scan('007', create=True)
@@ -549,7 +638,7 @@ class FSDB(db.DB):
         ['007']
         >>> unknown_scan = db.get_scan('unknown')
         plantdb.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.scan_exists(scan_id):
             return self.scans[scan_id]
@@ -559,8 +648,8 @@ class FSDB(db.DB):
             else:
                 raise ScanNotFoundError(scan_id)
 
-    def create_scan(self, scan_id):
-        """Create a new `Scan` instance in the local database.
+    def create_scan(self, scan_id, metadata=None):
+        """Create a new ``Scan`` instance in the local database.
 
         Parameters
         ----------
@@ -569,11 +658,15 @@ class FSDB(db.DB):
             It should contain only alphanumeric characters, underscores, dashes and dots.
             It should be non-empty and not longer than 255 characters
             It should not exist in the local database
+        metadata : dict, optional
+            A dictionary of metadata to append to the new ``Scan`` instance.
+            The key 'owner' will be added/updated using the currently connected user.
+            Default is ``None``.
 
         Returns
         -------
         plantdb.fsdb.Scan
-            The `Scan` instance created in the local database.
+            The ``Scan`` instance created in the local database.
 
         Raises
         ------
@@ -589,13 +682,16 @@ class FSDB(db.DB):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
-        >>> db.connect()
-        >>> new_scan = db.create_scan('007')  # create a new scan dataset
+        >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
+        >>> print(new_scan.get_metadata('owner'))  # default user 'anonymous' for dummy database
+        anonymous
+        >>> print(new_scan.get_metadata('project'))
+        GoldenEye
         >>> scan = db.create_scan('007')  # attempt to create an existing scan dataset
         OSError: Given scan identifier '007' already exists!
         >>> scan = db.create_scan('0/07')  # attempt to create a scan dataset using invalid characters
         OSError: Invalid scan identifier '0/07'!
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `scan_id` is valid
         if not _is_valid_id(scan_id):
@@ -607,6 +703,11 @@ class FSDB(db.DB):
         scan = Scan(self, scan_id)
         _make_scan(scan)
         self.scans[scan_id] = scan
+
+        if metadata is None:
+            metadata = {}
+        metadata.update({'owner': self.user})  # add/update 'owner' metadata to the new scan
+        scan.set_metadata(metadata)  # add metadata dictionary to the new scan
         return scan
 
     def delete_scan(self, scan_id):
@@ -615,7 +716,7 @@ class FSDB(db.DB):
         Parameters
         ----------
         scan_id : str
-            The name of the scan to create. It should exist in the local database.
+            The name of the scan to delete from the local database.
 
         Raises
         ------
@@ -631,7 +732,6 @@ class FSDB(db.DB):
         >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
-        >>> db.connect()
         >>> new_scan = db.create_scan('007')
         >>> print(new_scan)
         <plantdb.fsdb.Scan object at 0x7f0730b1e390>
@@ -641,7 +741,7 @@ class FSDB(db.DB):
         None
         >>> db.delete_scan('008')
         OSError: Invalid id
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `scan_id` exists in the local database
         if not self.scan_exists(scan_id):
@@ -658,10 +758,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_scan=True, with_file=True)
-        >>> db.connect()
-        >>> db.path()
-        >>> db.disconnect()
+        >>> db = dummy_db()
+        >>> print(db.path())
+        /tmp/romidb_********
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return copy.deepcopy(self.basedir)
 
@@ -688,11 +788,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.fsdb import dummy_db
-        >>> db = dummy_db(with_scan=True, with_file=True)
-        >>> db.connect()
+        >>> db = dummy_db(with_scan=True)
         >>> db.list_scans()
         ['myscan_001']
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if query is None:
             return list(self.scans.keys())
@@ -754,7 +853,7 @@ class Scan(db.Scan):
     >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
     ['metadata']
     >>> print(os.listdir(os.path.join(db.path(), scan.id, "metadata")))  # Same goes for the metadata
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # Example #2: Get it from an `FSDB` object:
     >>> db = dummy_db()
@@ -767,11 +866,14 @@ class Scan(db.Scan):
     ['007', 'romidb']
     >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
     ['metadata']
+    >>> db.dummy = False  # to avoid cleaning up the
     >>> db.disconnect()
     >>> # When reconnecting to db, if created scan is EMPTY (no Fileset & File) it is not found!
     >>> db.connect()
     >>> print(db.get_scan('007'))
     None
+    >>> db.dummy = True  # to clean up the temporary dummy database
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # Example #3: Use an existing database:
     >>> from os import environ
@@ -825,14 +927,13 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.fileset_exists("myfileset_001")
         False
         >>> scan.create_fileset("myfileset_001")
         >>> scan.fileset_exists("myfileset_001")
         True
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return fileset_id in self.filesets
 
@@ -860,11 +961,10 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.get_filesets()
         [<plantdb.fsdb.Fileset at *x************>]
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.filesets.values()), query, fuzzy)
 
@@ -893,7 +993,6 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
         ['fileset_001']
@@ -906,7 +1005,7 @@ class Scan(db.Scan):
         plantdb.fsdb.FilesetNotFoundError: Unknown fileset id 'unknown'!
         >>> print(unknown_fs)
         None
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.fileset_exists(fs_id):
             return self.filesets[fs_id]
@@ -973,7 +1072,6 @@ class Scan(db.Scan):
         >>> from plantdb.fsdb import dummy_db
         >>> from plantdb.fsdb import _scan_metadata_path
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> scan.set_metadata("test", "value")
         >>> p = _scan_metadata_path(scan)
@@ -981,7 +1079,7 @@ class Scan(db.Scan):
         True
         >>> print(json.load(p.open(mode='r')))
         {'test': 'value'}
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.metadata == None:
             self.metadata = {}
@@ -1017,7 +1115,6 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
         ['fileset_001']
@@ -1028,7 +1125,7 @@ class Scan(db.Scan):
         OSError: Given fileset identifier 'fileset_001' already exists!
         >>> wrong_fs = scan.create_fileset('fileset/001')
         OSError: Invalid fileset identifier 'fileset/001'!
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(fs_id):
@@ -1044,7 +1141,7 @@ class Scan(db.Scan):
         return fileset
 
     def store(self):
-        """Save changes to the scan main JSON FILE (files.json)."""
+        """Save changes to the scan main JSON FILE (``files.json``)."""
         _store_scan(self)
         return
 
@@ -1060,14 +1157,13 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
         ['fileset_001']
         >>> scan.delete_fileset('fileset_001')
         >>> scan.list_filesets()
         []
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `fs_id` exists in the local database
         if not self.fileset_exists(fs_id):
@@ -1076,7 +1172,7 @@ class Scan(db.Scan):
 
         _delete_fileset(self.get_fileset(fs_id, create=False))  # delete the fileset
         self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
-        self.store()  # save the changes to the scan main JSON FILE (files.json)
+        self.store()  # save the changes to the scan main JSON FILE (``files.json``)
         return
 
     def path(self) -> pathlib.Path:
@@ -1086,10 +1182,9 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _scan_path(self)
 
@@ -1117,11 +1212,10 @@ class Scan(db.Scan):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> scan.list_filesets()
         ['fileset_001']
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if query == None:
             return list(self.filesets.keys())
@@ -1196,14 +1290,13 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> scan.file_exists("myfile_001")
         False
         >>> scan.create_file("myfile_001")
         >>> scan.file_exists("myfile_001")
         True
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return file_id in self.files
 
@@ -1230,14 +1323,13 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.get_files()
         [<plantdb.fsdb.File at *x************>,
          <plantdb.fsdb.File at *x************>,
          <plantdb.fsdb.File at *x************>]
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.files.values()), query, fuzzy)
 
@@ -1261,14 +1353,13 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
         >>> # To read the file you need to load the right reader from plantdb.io
         >>> from plantdb.io import read_image
         >>> img = read_image(f)
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.file_exists(f_id):
             return self.files[f_id]
@@ -1300,18 +1391,20 @@ class Fileset(db.Fileset):
         >>> import json
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.set_metadata("test", "value")
         >>> print(fs.get_metadata("test"))
         'value'
+        >>> db.dummy=False  # to avoid cleaning up the temporary dummy database
         >>> db.disconnect()
-        >>> db.connect()
+        >>> db.connect('anonymous')
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> print(fs.get_metadata("test"))
         'value'
+        >>> db.dummy=True
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _get_metadata(self.metadata, key, default)
 
@@ -1332,7 +1425,6 @@ class Fileset(db.Fileset):
         >>> from plantdb.fsdb import dummy_db
         >>> from plantdb.fsdb import _fileset_metadata_json_path
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.set_metadata("test", "value")
@@ -1341,7 +1433,7 @@ class Fileset(db.Fileset):
         True
         >>> print(json.load(p.open(mode='r')))
         {'test': 'value'}
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.metadata == None:
             self.metadata = {}
@@ -1366,7 +1458,6 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.list_files()
@@ -1374,15 +1465,14 @@ class Fileset(db.Fileset):
         >>> new_f = fs.create_file('file_007')
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json', 'file_007']
-        >>> import os
-        >>> os.listdir(fs.path())  # the file only exist in the database, not on drive!
-        ['test_image.png', 'test_json.json', 'dummy_image.png']
+        >>> print([f.name for f in fs.path().iterdir()])  # the file only exist in the database, not on drive!
+        ['dummy_image.png', 'test_json.json', 'test_image.png']
         >>> md = {"Name": "Bond, James Bond"}  # Create an example dictionary to save as JSON
         >>> from plantdb import io
         >>> io.write_json(new_f, md, "json")  # write the file on drive
-        >>> os.listdir(fs.path())
+        >>> print([f.name for f in fs.path().iterdir()])
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(f_id):
@@ -1408,19 +1498,18 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json']
         >>> fs.delete_file('dummy_image')
-        delete /tmp/romidb_********/myscan_001/fileset_001/dummy_image.png
+        INFO     [plantdb.fsdb] Deleted JSON metadata file for file 'dummy_image' from 'myscan_001/fileset_001'.
+        INFO     [plantdb.fsdb] Deleted file 'dummy_image' from 'myscan_001/fileset_001'.
         >>> fs.list_files()
         ['test_image', 'test_json']
-        >>> import os
-        >>> list(fs.path().iterdir())  # the file has been removed from the drive and the database
-        ['test_image.png', 'test_json.json']
-        >>> db.disconnect()
+        >>> print([f.name for f in fs.path().iterdir()])  # the file has been removed from the drive and the database
+        ['test_json.json', 'test_image.png']
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Verify if the given `fs_id` exists in the local database
         if not self.file_exists(f_id):
@@ -1429,11 +1518,11 @@ class Fileset(db.Fileset):
 
         _delete_file(self.get_file(f_id, create=False))  # delete the file
         self.files.pop(f_id)  # remove the File instance from the fileset
-        self.store()  # save the changes to the scan main JSON FILE (files.json)
+        self.store()  # save the changes to the scan main JSON FILE (``files.json``)
         return
 
     def store(self):
-        """Save changes to the scan main JSON FILE (files.json)."""
+        """Save changes to the scan main JSON FILE (``files.json``)."""
         self.scan.store()
         return
 
@@ -1444,16 +1533,17 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
-        >>> db.connect()
         >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
         ['myscan_001']
         >>> scan = db.get_scan("myscan_001")
-        >>> print(scan.path())  # should be '/tmp/romidb_********/myscan_001'
+        >>> print(scan.path())
+        /tmp/romidb_********/myscan_001
         >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
         ['fileset_001']
         >>> fs = scan.get_fileset("fileset_001")
-        >>> print(fs.path())  # should be '/tmp/romidb_********/myscan_001/fileset_001'
-        >>> db.disconnect()
+        >>> print(fs.path())
+        /tmp/romidb_********/myscan_001/fileset_001
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _fileset_path(self)
 
@@ -1481,12 +1571,11 @@ class Fileset(db.Fileset):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json']
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if query is None:
             return list(self.files.keys())
@@ -1553,13 +1642,12 @@ class File(db.File):
         >>> from plantdb.fsdb import dummy_db
         >>> from plantdb.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> f = fs.get_file("test_json")
         >>> print(f.get_metadata())
         {'random json': True}
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _get_metadata(self.metadata, key, default)
 
@@ -1580,7 +1668,6 @@ class File(db.File):
         >>> from plantdb.fsdb import dummy_db
         >>> from plantdb.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> file = fs.get_file("test_json")
@@ -1590,7 +1677,7 @@ class File(db.File):
         True
         >>> print(json.load(p.open(mode='r')))
         {'random json': True, 'test': 'value'}
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.metadata == None:
             self.metadata = {}
@@ -1611,7 +1698,6 @@ class File(db.File):
         >>> from plantdb.fsdb import dummy_db
         >>> from plantdb.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> file = fs.get_file("test_json")
@@ -1619,7 +1705,7 @@ class File(db.File):
         >>> new_file.import_file(file.path())
         >>> print(new_file.path().exists())
         True
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if isinstance(path, str):
             path = Path(path)
@@ -1631,7 +1717,7 @@ class File(db.File):
         return
 
     def store(self):
-        """Save changes to the scan main JSON FILE (files.json)."""
+        """Save changes to the scan main JSON FILE (``files.json``)."""
         self.fileset.store()
         return
 
@@ -1647,7 +1733,6 @@ class File(db.File):
         -------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_json")
@@ -1660,7 +1745,7 @@ class File(db.File):
         {'Who you gonna call?': 'Ghostbuster'}
         >>> print(type(js_dict))
         <class 'dict'>
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         path = _file_path(self)
         with path.open(mode="rb") as f:
@@ -1680,7 +1765,6 @@ class File(db.File):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> new_f = fs.create_file('file_007')
@@ -1690,10 +1774,9 @@ class File(db.File):
         >>> print(data)
         b'{"Name": "Bond, James Bond"}'
         >>> new_f.write_raw(data, 'json')
-        >>> import os
-        >>> os.listdir(fs.path())
-        ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
-        >>> db.disconnect()
+        >>> print([f.name for f in fs.path().iterdir()])
+        ['dummy_image.png', 'test_json.json', 'test_image.png', 'file_007.json']
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         self.filename = _get_filename(self, ext)
         path = _file_path(self)
@@ -1714,7 +1797,6 @@ class File(db.File):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_json")
@@ -1730,7 +1812,7 @@ class File(db.File):
         {'Who you gonna call?': 'Ghostbuster'}
         >>> print(type(js_dict))
         <class 'dict'>
-        >>> db.disconnect()
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         path = _file_path(self)
         with path.open(mode="r") as f:
@@ -1750,7 +1832,6 @@ class File(db.File):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> new_f = fs.create_file('file_007')
@@ -1762,10 +1843,9 @@ class File(db.File):
         >>> print(type(data))
         <class 'str'>
         >>> new_f.write(data, 'json')
-        >>> import os
-        >>> os.listdir(fs.path())
-        ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
-        >>> db.disconnect()
+        >>> print([f.name for f in fs.path().iterdir()])
+        ['dummy_image.png', 'test_json.json', 'test_image.png', 'file_007.json']
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         self.filename = _get_filename(self, ext)
         path = _file_path(self)
@@ -1781,14 +1861,14 @@ class File(db.File):
         --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
-        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json']
         >>> f = fs.get_file('dummy_image')
-        >>> f.path()  # should be '/tmp/romidb_********/myscan_001/fileset_001/dummy_image.png'
-        >>> db.disconnect()
+        >>> f.path()
+        /tmp/romidb_********/myscan_001/fileset_001/dummy_image.png
+        >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _file_path(self)
 
@@ -2031,7 +2111,7 @@ def _load_fileset(scan, fileset_info):
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     >>> json_path = _scan_json_file(scan)
     >>> with json_path.open(mode="r") as f: structure = json.load(f)
     >>> filesets_info = structure["filesets"]
@@ -2106,7 +2186,7 @@ def _load_fileset_files(fileset, fileset_info):
     >>> db = dummy_db(with_fileset=True, with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     >>> json_path = _scan_json_file(scan)
     >>> with json_path.open(mode="r") as f: structure = json.load(f)
     >>> filesets_info = structure["filesets"]
@@ -3080,7 +3160,7 @@ def _filter_query(l, query=None, fuzzy=False):
     >>> scans = _filter_query(db.get_scans(), query={"object": {"env":"virt.*"}}, fuzzy=True)
     >>> print([scan.id for scan in scans])
     ['myscan_001']
-    >>> db.disconnect()
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     from plantdb.utils import partial_match
     if query is None or query == {}:
