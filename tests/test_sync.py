@@ -13,6 +13,7 @@ from plantdb.testing import DummyDBTestCase
 class TestSyncDummy(DummyDBTestCase):
     def test_sync_local_local(self):
         db = self.get_test_db()
+        db.dummy = False
         db.disconnect()
         with tempfile.TemporaryDirectory() as tmpdir:
             lock_path = Path(tmpdir) / MARKER_FILE_NAME
@@ -20,6 +21,8 @@ class TestSyncDummy(DummyDBTestCase):
                 x = FSDBSync(db.path(), tmpdir)
                 x.sync()
     # How to test remote sync?
+        db.dummy = True
+        db.disconnect()
 
 
 if __name__ == "__main__":
