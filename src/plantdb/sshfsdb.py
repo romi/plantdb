@@ -90,14 +90,14 @@ class SSHFSDB(fsdb.FSDB):
         super().__init__(basedir)
         self.remotedir = remotedir
 
-    def connect(self, login_data=None):
+    def connect(self, login=None, unsafe=False):
         """Connect to the remote database.
 
         Handle DB "locking" system by adding a ``LOCK_FILE_NAME`` file in the DB.
 
         Parameters
         ----------
-        login_data : bool
+        login : bool
             UNUSED
 
         Examples
