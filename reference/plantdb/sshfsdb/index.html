@@ -1356,7 +1356,7 @@ Should be in the format <code>user@server:path</code></p>
 
 
 <h3 id="plantdb.sshfsdb.SSHFSDB.connect" class="doc doc-heading">
-            <code class="highlight language-python">connect(login_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
+            <code class="highlight language-python">connect(login<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, unsafe<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)</code>
 
 <a href="#plantdb.sshfsdb.SSHFSDB.connect" class="headerlink" title="Permanent link">Link</a></h3>
 
@@ -1380,7 +1380,7 @@ Should be in the format <code>user@server:path</code></p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>login_data</code>
+                <code>login</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
@@ -1437,14 +1437,14 @@ Should be in the format <code>user@server:path</code></p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">connect</span>(<span style="color: #008000">self</span>, login_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">connect</span>(<span style="color: #008000">self</span>, login<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, unsafe<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Connect to the remote database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Handle DB &quot;locking&quot; system by adding a ``LOCK_FILE_NAME`` file in the DB.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
-<span style="color: #BA2121; font-style: italic">    login_data : bool</span>
+<span style="color: #BA2121; font-style: italic">    login : bool</span>
 <span style="color: #BA2121; font-style: italic">        UNUSED</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>

@@ -1527,8 +1527,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_db</span>(<span style="color: #008000">self</span>, db_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_db</span>(<span style="color: #008000">self</span>, db_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the test ``FSDB`` database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -1546,7 +1545,6 @@ Else, should be the location of the source database to clone in the temporary fo
         <span style="color: #008000">self</span><span style="color: #666">.</span>tmpclone <span style="color: #666">=</span> TemporaryCloneDB(db_path)
         <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> FSDB(<span style="color: #008000">self</span><span style="color: #666">.</span>tmpclone<span style="color: #666">.</span>tmpdir<span style="color: #666">.</span>name)
 
-    <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>connect()
     <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1592,7 +1590,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">123</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
@@ -1601,8 +1600,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_fileset</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_fileset</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -1657,7 +1655,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
@@ -1666,8 +1665,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_image_file</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_image_file</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``File`` object named &#39;test_image&#39;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -1722,7 +1720,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
@@ -1731,8 +1730,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_scan</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;myscan_001&#39;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -1951,7 +1949,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
@@ -1964,8 +1963,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_fileset</span>(<span style="color: #008000">self</span>, task_name):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_fileset</span>(<span style="color: #008000">self</span>, task_name):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the fileset for the corresponding task.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2055,7 +2053,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
@@ -2068,8 +2067,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_fileset_id</span>(<span style="color: #008000">self</span>, task_name):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_fileset_id</span>(<span style="color: #008000">self</span>, task_name):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the fileset id for the corresponding task.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2105,10 +2103,10 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_db</span>(<span style="color: #008000">self</span>) <span style="color: #666">-&gt;</span> FSDB:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_db</span>(<span style="color: #008000">self</span>) <span style="color: #666">-&gt;</span> FSDB:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the test ``FSDB`` database.&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>connect()
     <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db
@@ -2156,7 +2154,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">187</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">186</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">187</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">188</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
@@ -2165,8 +2164,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_fileset</span>(<span style="color: #008000">self</span>, fs_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_fileset</span>(<span style="color: #008000">self</span>, fs_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Fileset`` object named &#39;fileset_001&#39;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -2221,7 +2219,8 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
@@ -2230,8 +2229,7 @@ Else, should be the location of the source database to clone in the temporary fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">185</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_scan</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_scan</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the default test ``Scan`` object named &#39;real_plant_analyzed&#39;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -2263,9 +2261,9 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setUp</span>(<span style="color: #008000">self</span>):
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setUp</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Set up a test database with the &#39;real_plant_analyzed&#39; dataset.&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> test_database(<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>)
 </code></pre></div></td></tr></table></div>
@@ -2289,14 +2287,14 @@ Else, should be the location of the source database to clone in the temporary fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/testing.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">tearDown</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">tearDown</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Clean up after test.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>disconnect()
