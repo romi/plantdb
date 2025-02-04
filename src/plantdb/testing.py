@@ -105,7 +105,6 @@ class DummyDBTestCase(unittest.TestCase):
             self.tmpclone = TemporaryCloneDB(db_path)
             self.db = FSDB(self.tmpclone.tmpdir.name)
 
-        self.db.connect()
         return self.db
 
     def get_test_scan(self):
