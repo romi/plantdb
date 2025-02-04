@@ -160,7 +160,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     mydb = Path(mkdtemp(prefix='romidb_'))
     marker_file = mydb / MARKER_FILE_NAME
     marker_file.open(mode='w').close()
-    db = FSDB(mydb, required_filesets=None, required_files_json=False)
+    db = FSDB(mydb, dummy=True)
+    db.connect()
 
     if with_file:
         # To create a `File`, existing `Scan` & `Fileset` are required
