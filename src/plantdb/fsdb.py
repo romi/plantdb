@@ -136,10 +136,10 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Examples
     --------
-    >>> import os
     >>> from plantdb.fsdb import dummy_db
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
+    INFO     [plantdb.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
     >>> print(db.path())  # the database directory
     /tmp/romidb_********
     >>> print(db.list_scans())
@@ -153,6 +153,9 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     >>> f = fs.get_file("test_image")
     >>> print(f.path())
     /tmp/romidb_********/myscan_001/fileset_001/test_image.png
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
+    >>> print(db.path().exists())
+    False
     """
     from tempfile import mkdtemp
     from plantdb import io
@@ -169,10 +172,6 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     if with_fileset:
         # To create a `Fileset`, an existing `Scan` is required
         with_scan = True
-
-    # Initialize an `FSDB` to add required objects:
-    if with_scan or with_fileset or with_file:
-        db.connect()
 
     # Create a `Scan` object if required:
     if with_scan:
