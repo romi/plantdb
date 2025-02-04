@@ -777,18 +777,45 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#plantdb.log.configure_logger" class="md-nav__link">
+  <a href="#plantdb.log._get_logger" class="md-nav__link">
     <span class="md-ellipsis">
-      configure_logger
+      _get_logger
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#plantdb.log.get_logging_config" class="md-nav__link">
+  <a href="#plantdb.log.get_console_handler" class="md-nav__link">
     <span class="md-ellipsis">
-      get_logging_config
+      get_console_handler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_dummy_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_dummy_logger
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_file_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_file_handler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_logger
     </span>
   </a>
   
@@ -1028,18 +1055,45 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#plantdb.log.configure_logger" class="md-nav__link">
+  <a href="#plantdb.log._get_logger" class="md-nav__link">
     <span class="md-ellipsis">
-      configure_logger
+      _get_logger
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#plantdb.log.get_logging_config" class="md-nav__link">
+  <a href="#plantdb.log.get_console_handler" class="md-nav__link">
     <span class="md-ellipsis">
-      get_logging_config
+      get_console_handler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_dummy_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_dummy_logger
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_file_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_file_handler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.log.get_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_logger
     </span>
   </a>
   
@@ -1093,15 +1147,19 @@
 <div class="doc doc-object doc-function">
 
 
-<h2 id="plantdb.log.configure_logger" class="doc doc-heading">
-            <code class="highlight language-python">configure_logger(name, log_path<span style="color: #666">=</span><span style="color: #BA2121">&#39;&#39;</span>, log_level<span style="color: #666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>)</code>
+<h2 id="plantdb.log._get_logger" class="doc doc-heading">
+            <code class="highlight language-python">_get_logger(logger_name, log_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL)</code>
 
-<a href="#plantdb.log.configure_logger" class="headerlink" title="Permanent link">Link</a></h2>
+<a href="#plantdb.log._get_logger" class="headerlink" title="Permanent link">Link</a></h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Return a configured logger.</p>
+        <p>Creates and configures a logger instance with specified settings.</p>
+<p>This function sets up a logger with a given name, associates it with a console
+handler, and optionally with a file handler. It sets the desired log level and
+ensures the logger does not propagate messages to its parent logger. The logger
+is returned to the caller for usage.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1117,14 +1175,14 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>name</code>
+                <code>logger_name</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the logger.</p>
+                <p>A name to use for the logger.</p>
               </div>
             </td>
             <td>
@@ -1133,19 +1191,19 @@
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>log_path</code>
+                <code>log_file</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A file path to save the log.
-Defaults to <code>''</code>.</p>
+                <p>A path to the file where log messages should be written.
+Defaults to <code>None</code>, in which case no file handler is added.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1153,16 +1211,38 @@ Defaults to <code>''</code>.</p>
                 <code>log_level</code>
             </td>
             <td>
-                  <code>(CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET)</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A valid logging level.
-Defaults to <code>'INFO'</code>.</p>
+                <p>A logging level to set for the logger. Defaults to <code>DEFAULT_LOG_LEVEL</code>.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;CRITICAL&#39;</code>
+                  <code><span title="plantdb.log.DEFAULT_LOG_LEVEL">DEFAULT_LOG_LEVEL</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>logger</code></td>            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configured logger instance ready to log messages with the specified settings.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1170,30 +1250,236 @@ Defaults to <code>'INFO'</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/log.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 76</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 77</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 78</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 79</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 80</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 81</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 82</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 83</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 84</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 85</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 86</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 87</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 88</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 89</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 90</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 91</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 92</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 93</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 94</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 95</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">179</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">180</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_get_logger</span>(logger_name, log_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Creates and configures a logger instance with specified settings.</span>
+
+<span style="color: #BA2121; font-style: italic">    This function sets up a logger with a given name, associates it with a console</span>
+<span style="color: #BA2121; font-style: italic">    handler, and optionally with a file handler. It sets the desired log level and</span>
+<span style="color: #BA2121; font-style: italic">    ensures the logger does not propagate messages to its parent logger. The logger</span>
+<span style="color: #BA2121; font-style: italic">    is returned to the caller for usage.</span>
+
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    logger_name : str</span>
+<span style="color: #BA2121; font-style: italic">        A name to use for the logger.</span>
+<span style="color: #BA2121; font-style: italic">    log_file : str or pathlib.Path, optional</span>
+<span style="color: #BA2121; font-style: italic">        A path to the file where log messages should be written.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to ``None``, in which case no file handler is added.</span>
+<span style="color: #BA2121; font-style: italic">    log_level : int or str, optional</span>
+<span style="color: #BA2121; font-style: italic">        A logging level to set for the logger. Defaults to ``DEFAULT_LOG_LEVEL``.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    logger : logging.Logger</span>
+<span style="color: #BA2121; font-style: italic">        The configured logger instance ready to log messages with the specified settings.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    logger <span style="color: #666">=</span> logging<span style="color: #666">.</span>getLogger(logger_name)
+    logger<span style="color: #666">.</span>setLevel(log_level)
+    logger<span style="color: #666">.</span>addHandler(get_console_handler())
+    <span style="color: #008000; font-weight: bold">if</span> log_file <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
+        logger<span style="color: #666">.</span>addHandler(get_file_handler(log_file))
+
+    <span style="color: #3D7B7B; font-style: italic"># with this pattern, it&#39;s rarely necessary to propagate the error up to parent</span>
+    logger<span style="color: #666">.</span>propagate <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>
+
+    <span style="color: #008000; font-weight: bold">return</span> logger
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plantdb.log.get_console_handler" class="doc doc-heading">
+            <code class="highlight language-python">get_console_handler()</code>
+
+<a href="#plantdb.log.get_console_handler" class="headerlink" title="Permanent link">Link</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates and configures a console handler for logging that outputs to the standard output stream.</p>
+<p>This handler uses a specific formatter for colored log messages.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.StreamHandler" href="https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler">StreamHandler</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configured console logging handler with a colored formatter.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/log.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">62</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">70</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">74</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_console_handler</span>():
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Creates and configures a console handler for logging that outputs to the standard output stream.</span>
+
+<span style="color: #BA2121; font-style: italic">    This handler uses a specific formatter for colored log messages.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    logging.StreamHandler</span>
+<span style="color: #BA2121; font-style: italic">        The configured console logging handler with a colored formatter.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    console_handler <span style="color: #666">=</span> logging<span style="color: #666">.</span>StreamHandler(sys<span style="color: #666">.</span>stdout)
+    console_handler<span style="color: #666">.</span>setFormatter(COLORED_FORMATTER)
+    <span style="color: #008000; font-weight: bold">return</span> console_handler
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plantdb.log.get_dummy_logger" class="doc doc-heading">
+            <code class="highlight language-python">get_dummy_logger(logger_name, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL)</code>
+
+<a href="#plantdb.log.get_dummy_logger" class="headerlink" title="Permanent link">Link</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates and configures a dummy logger with a console handler.</p>
+<p>This function generates a logger instance associated with the specified name and log level.
+The logger is configured with a console handler to allow output of log statements to the console.
+It is typically used for basic logging setups where no file-based or external configurations are required.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>logger_name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A name to use for the logger.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_level</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A logging level to set for the logger. Defaults to <code>DEFAULT_LOG_LEVEL</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="plantdb.log.DEFAULT_LOG_LEVEL">DEFAULT_LOG_LEVEL</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configured logger instance with a console handler attached.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/log.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
@@ -1206,42 +1492,37 @@ Defaults to <code>'INFO'</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">configure_logger</span>(name, log_path<span style="color: #666">=</span><span style="color: #BA2121">&quot;&quot;</span>, log_level<span style="color: #666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>):
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return a configured logger.</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">115</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_dummy_logger</span>(logger_name, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Creates and configures a dummy logger with a console handler.</span>
+
+<span style="color: #BA2121; font-style: italic">    This function generates a logger instance associated with the specified name and log level.</span>
+<span style="color: #BA2121; font-style: italic">    The logger is configured with a console handler to allow output of log statements to the console.</span>
+<span style="color: #BA2121; font-style: italic">    It is typically used for basic logging setups where no file-based or external configurations are required.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
-<span style="color: #BA2121; font-style: italic">    name : str</span>
-<span style="color: #BA2121; font-style: italic">        The name of the logger.</span>
-<span style="color: #BA2121; font-style: italic">    log_path : str</span>
-<span style="color: #BA2121; font-style: italic">        A file path to save the log.</span>
-<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;&#39;`.</span>
-<span style="color: #BA2121; font-style: italic">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
-<span style="color: #BA2121; font-style: italic">        A valid logging level.</span>
-<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;INFO&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">    logger_name : str</span>
+<span style="color: #BA2121; font-style: italic">        A name to use for the logger.</span>
+<span style="color: #BA2121; font-style: italic">    log_level : int or str, optional</span>
+<span style="color: #BA2121; font-style: italic">        A logging level to set for the logger. Defaults to ``DEFAULT_LOG_LEVEL``.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    logging.Logger</span>
+<span style="color: #BA2121; font-style: italic">        The configured logger instance with a console handler attached.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    colored_formatter <span style="color: #666">=</span> ColoredFormatter(
-        <span style="color: #BA2121">&quot;</span><span style="color: #A45A77; font-weight: bold">%(log_color)s%(levelname)-8s%(reset)s</span><span style="color: #BA2121"> </span><span style="color: #A45A77; font-weight: bold">%(bg_blue)s</span><span style="color: #BA2121">[</span><span style="color: #A45A77; font-weight: bold">%(name)s</span><span style="color: #BA2121">]</span><span style="color: #A45A77; font-weight: bold">%(reset)s</span><span style="color: #BA2121"> </span><span style="color: #A45A77; font-weight: bold">%(message)s</span><span style="color: #BA2121">&quot;</span>,
-        datefmt<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>,
-        reset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,
-        style<span style="color: #666">=</span><span style="color: #BA2121">&#39;%&#39;</span>,
-    )
-    simple_formatter <span style="color: #666">=</span> logging<span style="color: #666">.</span>Formatter(<span style="color: #BA2121">&quot;</span><span style="color: #A45A77; font-weight: bold">%(asctime)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(levelname)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(name)s</span><span style="color: #BA2121"> - </span><span style="color: #A45A77; font-weight: bold">%(lineno)d</span><span style="color: #BA2121">: </span><span style="color: #A45A77; font-weight: bold">%(message)s</span><span style="color: #BA2121">&quot;</span>)
-
-    <span style="color: #3D7B7B; font-style: italic"># create console handler:</span>
-    console <span style="color: #666">=</span> logging<span style="color: #666">.</span>StreamHandler()
-    console<span style="color: #666">.</span>setFormatter(colored_formatter)
-
-    logger <span style="color: #666">=</span> logging<span style="color: #666">.</span>getLogger(name)
-    logger<span style="color: #666">.</span>addHandler(console)
-    logger<span style="color: #666">.</span>setLevel(<span style="color: #008000">getattr</span>(logging, log_level))
-
-    <span style="color: #008000; font-weight: bold">if</span> log_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #A2F; font-weight: bold">and</span> log_path <span style="color: #666">!=</span> <span style="color: #BA2121">&quot;&quot;</span>:
-        <span style="color: #3D7B7B; font-style: italic"># create file handler:</span>
-        fh <span style="color: #666">=</span> logging<span style="color: #666">.</span>FileHandler(Path(log_path) <span style="color: #666">/</span> <span style="color: #BA2121">f&#39;</span><span style="color: #A45A77; font-weight: bold">{</span>name<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.log&#39;</span>, mode<span style="color: #666">=</span><span style="color: #BA2121">&#39;w&#39;</span>)
-        fh<span style="color: #666">.</span>setFormatter(simple_formatter)
-        logger<span style="color: #666">.</span>addHandler(fh)
-
+    logger <span style="color: #666">=</span> logging<span style="color: #666">.</span>getLogger(logger_name)
+    logger<span style="color: #666">.</span>setLevel(log_level)
+    logger<span style="color: #666">.</span>addHandler(get_console_handler())
     <span style="color: #008000; font-weight: bold">return</span> logger
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1252,15 +1533,133 @@ Defaults to <code>'INFO'</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="plantdb.log.get_logging_config" class="doc doc-heading">
-            <code class="highlight language-python">get_logging_config(name<span style="color: #666">=</span><span style="color: #BA2121">&#39;root&#39;</span>, log_level<span style="color: #666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>)</code>
+<h2 id="plantdb.log.get_file_handler" class="doc doc-heading">
+            <code class="highlight language-python">get_file_handler(log_file)</code>
 
-<a href="#plantdb.log.get_logging_config" class="headerlink" title="Permanent link">Link</a></h2>
+<a href="#plantdb.log.get_file_handler" class="headerlink" title="Permanent link">Link</a></h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Return the logging configuration.</p>
+        <p>Creates and configures a file handler for logging.</p>
+<p>This function initializes a logging file handler, sets its level, and applies a predefined formatter to it.
+The file handler writes log messages to the specified file in write mode.
+The log level determines the severity of messages that are captured by the handler.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A path to the log file where log messages will be written.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.FileHandler" href="https://docs.python.org/3/library/logging.handlers.html#logging.FileHandler">FileHandler</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configured logging file handler for capturing log messages.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/log.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">77</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">78</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">79</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">80</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">95</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">96</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_file_handler</span>(log_file):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Creates and configures a file handler for logging.</span>
+
+<span style="color: #BA2121; font-style: italic">    This function initializes a logging file handler, sets its level, and applies a predefined formatter to it.</span>
+<span style="color: #BA2121; font-style: italic">    The file handler writes log messages to the specified file in write mode.</span>
+<span style="color: #BA2121; font-style: italic">    The log level determines the severity of messages that are captured by the handler.</span>
+
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    log_file : str or pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        A path to the log file where log messages will be written.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    logging.FileHandler</span>
+<span style="color: #BA2121; font-style: italic">        The configured logging file handler for capturing log messages.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    file_handler <span style="color: #666">=</span> logging<span style="color: #666">.</span>FileHandler(log_file, mode<span style="color: #666">=</span><span style="color: #BA2121">&#39;w&#39;</span>)
+    file_handler<span style="color: #666">.</span>setFormatter(FORMATTER)
+    <span style="color: #008000; font-weight: bold">return</span> file_handler
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="plantdb.log.get_logger" class="doc doc-heading">
+            <code class="highlight language-python">get_logger(logger_name, log_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL)</code>
+
+<a href="#plantdb.log.get_logger" class="headerlink" title="Permanent link">Link</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Get a logger with a specific name and log level for console output.</p>
+<p>This function retrieves an existing logger instance with the specified name, or creates a new one if none exists.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1283,12 +1682,29 @@ Defaults to <code>'INFO'</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the logger.
-Defaults to <code>'root'</code>.</p>
+                <p>A name to use for the logger.
+Typically derived from the module or component that generates the logs.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;root&#39;</code>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A path to the file where log messages should be written.
+Defaults to <code>None</code>, in which case no file handler is added.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1296,16 +1712,38 @@ Defaults to <code>'root'</code>.</p>
                 <code>log_level</code>
             </td>
             <td>
-                  <code>(CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET)</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A valid logging level.
-Defaults to <code>'INFO'</code>.</p>
+                <p>A logging level to set for the logger. Defaults to <code>DEFAULT_LOG_LEVEL</code>.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;CRITICAL&#39;</code>
+                  <code><span title="plantdb.log.DEFAULT_LOG_LEVEL">DEFAULT_LOG_LEVEL</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configured logger instance ready to log messages with the specified settings.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1313,31 +1751,55 @@ Defaults to <code>'INFO'</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/log.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">61</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">62</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">67</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">68</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">69</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">70</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_logging_config</span>(name<span style="color: #666">=</span><span style="color: #BA2121">&#39;root&#39;</span>, log_level<span style="color: #666">=</span><span style="color: #BA2121">&#39;INFO&#39;</span>):
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the logging configuration.</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">124</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">125</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">126</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">127</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">128</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">146</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_logger</span>(logger_name, log_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get a logger with a specific name and log level for console output.</span>
+
+<span style="color: #BA2121; font-style: italic">    This function retrieves an existing logger instance with the specified name, or creates a new one if none exists.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    name : str</span>
-<span style="color: #BA2121; font-style: italic">        The name of the logger.</span>
-<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;root&#39;`.</span>
-<span style="color: #BA2121; font-style: italic">    log_level : {&#39;CRITICAL&#39;, &#39;ERROR&#39;, &#39;WARNING&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;NOTSET&#39;}</span>
-<span style="color: #BA2121; font-style: italic">        A valid logging level.</span>
-<span style="color: #BA2121; font-style: italic">        Defaults to `&#39;INFO&#39;`.</span>
+<span style="color: #BA2121; font-style: italic">        A name to use for the logger.</span>
+<span style="color: #BA2121; font-style: italic">        Typically derived from the module or component that generates the logs.</span>
+<span style="color: #BA2121; font-style: italic">    log_file : str or pathlib.Path, optional</span>
+<span style="color: #BA2121; font-style: italic">        A path to the file where log messages should be written.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to ``None``, in which case no file handler is added.</span>
+<span style="color: #BA2121; font-style: italic">    log_level : int or str, optional</span>
+<span style="color: #BA2121; font-style: italic">        A logging level to set for the logger. Defaults to ``DEFAULT_LOG_LEVEL``.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    logging.Logger</span>
+<span style="color: #BA2121; font-style: italic">        The configured logger instance ready to log messages with the specified settings.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    <span style="color: #008000; font-weight: bold">return</span> LOGGING_CFG<span style="color: #666">.</span>format(name, log_level)
+    logger_name <span style="color: #666">=</span> logger_name<span style="color: #666">.</span>split(<span style="color: #BA2121">&quot;.&quot;</span>)[<span style="color: #666">-1</span>]
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> logging<span style="color: #666">.</span>getLogger(logger_name)<span style="color: #666">.</span>hasHandlers():
+        <span style="color: #008000; font-weight: bold">return</span> _get_logger(logger_name, log_file<span style="color: #666">=</span>log_file, log_level<span style="color: #666">=</span>log_level)
+    <span style="color: #008000; font-weight: bold">return</span> logging<span style="color: #666">.</span>getLogger(logger_name)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

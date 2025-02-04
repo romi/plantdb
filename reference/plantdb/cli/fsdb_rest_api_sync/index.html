@@ -1293,11 +1293,7 @@ be closed or unavailable.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
@@ -1324,7 +1320,11 @@ be closed or unavailable.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">check_url</span>(url):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">check_url</span>(url):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Verifies the connectivity to a given host and port from a URL-like string.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function parses a URL string into host and port components, attempts to establish a</span>
@@ -1366,7 +1366,7 @@ be closed or unavailable.</p>
 
 
 <h2 id="plantdb.cli.fsdb_rest_api_sync.filter_scan" class="doc doc-heading">
-            <code class="highlight language-python">filter_scan(scan_list, filter_pattern)</code>
+            <code class="highlight language-python">filter_scan(scan_list, filter_pattern, logger)</code>
 
 <a href="#plantdb.cli.fsdb_rest_api_sync.filter_scan" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1419,6 +1419,22 @@ be closed or unavailable.</p>
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>logger</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A logger instance for logging messages.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1448,11 +1464,7 @@ regular expression pattern, or None if the pattern is invalid.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
@@ -1470,7 +1482,13 @@ regular expression pattern, or None if the pattern is invalid.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">filter_scan</span>(scan_list, filter_pattern):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">filter_scan</span>(scan_list, filter_pattern, logger):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Filters a list of scan identifiers based on a regular expression pattern.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -1479,6 +1497,8 @@ regular expression pattern, or None if the pattern is invalid.</p>
 <span style="color: #BA2121; font-style: italic">        A list of scan identifiers to be filtered.</span>
 <span style="color: #BA2121; font-style: italic">    filter_pattern : str</span>
 <span style="color: #BA2121; font-style: italic">        A regular expression pattern used to filter the scan identifiers.</span>
+<span style="color: #BA2121; font-style: italic">    logger : logging.Logger</span>
+<span style="color: #BA2121; font-style: italic">        A logger instance for logging messages.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -1517,15 +1537,7 @@ and target databases.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
@@ -1534,7 +1546,15 @@ and target databases.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">232</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main execution function.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function orchestrates the parsing of command-line arguments, validation of the</span>
@@ -1551,7 +1571,7 @@ and target databases.</p>
     check_url(args<span style="color: #666">.</span>target)  <span style="color: #3D7B7B; font-style: italic"># Ensure the `target` URL is formatted correctly</span>
 
     <span style="color: #3D7B7B; font-style: italic"># Synchronize scan archives between the origin and target databases</span>
-    sync_scan_archives(args<span style="color: #666">.</span>origin, args<span style="color: #666">.</span>target, args<span style="color: #666">.</span>filter)  <span style="color: #3D7B7B; font-style: italic"># Perform synchronization</span>
+    sync_scan_archives(args<span style="color: #666">.</span>origin, args<span style="color: #666">.</span>target, args<span style="color: #666">.</span>filter, args<span style="color: #666">.</span>log_level)  <span style="color: #3D7B7B; font-style: italic"># Perform synchronization</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1596,23 +1616,28 @@ and target databases.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">82</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">83</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">84</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">85</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">86</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">87</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">88</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">89</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">90</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">91</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">92</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">93</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">94</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">95</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">96</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">97</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">98</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>():
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 81</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 82</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 83</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 84</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 85</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 86</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 87</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 88</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 89</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 90</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 91</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 92</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 93</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 94</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 95</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 96</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 97</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 98</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 99</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Parses command line arguments for database synchronization.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -1620,7 +1645,7 @@ and target databases.</p>
 <span style="color: #BA2121; font-style: italic">    argparse.ArgumentParser</span>
 <span style="color: #BA2121; font-style: italic">        An argument parser configured for FSDB synchronization.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    parser <span style="color: #666">=</span> argparse<span style="color: #666">.</span>ArgumentParser(description<span style="color: #666">=</span><span style="color: #BA2121">&#39;Synchronize two FSDB databases.&#39;</span>)
+    parser <span style="color: #666">=</span> argparse<span style="color: #666">.</span>ArgumentParser(description<span style="color: #666">=</span><span style="color: #BA2121">&#39;Transfer dataset from an origin FSDB database towards a target using REST API.&#39;</span>)
     parser<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;origin&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>,
                         help<span style="color: #666">=</span><span style="color: #BA2121">&#39;source database URL, as &quot;host:port&quot;.&#39;</span>)
     parser<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;target&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>,
@@ -1628,6 +1653,11 @@ and target databases.</p>
 
     parser<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;--filter&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>, default<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>,
                         help<span style="color: #666">=</span><span style="color: #BA2121">&#39;optional regular expression to filter scan names.&#39;</span>)
+
+    log_opt <span style="color: #666">=</span> parser<span style="color: #666">.</span>add_argument_group(<span style="color: #BA2121">&quot;Logging options&quot;</span>)
+    log_opt<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&quot;--log-level&quot;</span>, dest<span style="color: #666">=</span><span style="color: #BA2121">&quot;log_level&quot;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>, default<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, choices<span style="color: #666">=</span>LOG_LEVELS,
+                         help<span style="color: #666">=</span><span style="color: #BA2121">&quot;Level of message logging, defaults to &#39;INFO&#39;.&quot;</span>)
+
     <span style="color: #008000; font-weight: bold">return</span> parser
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1639,7 +1669,7 @@ and target databases.</p>
 
 
 <h2 id="plantdb.cli.fsdb_rest_api_sync.sync_scan_archives" class="doc doc-heading">
-            <code class="highlight language-python">sync_scan_archives(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)</code>
+            <code class="highlight language-python">sync_scan_archives(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL)</code>
 
 <a href="#plantdb.cli.fsdb_rest_api_sync.sync_scan_archives" class="headerlink" title="Permanent link">Link</a></h2>
 
@@ -1749,13 +1779,7 @@ Optionally filters the list of scans using a regular expression.</p>
 </details>
             <details class="quote">
               <summary>Source code in <code>plantdb/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
@@ -1800,7 +1824,15 @@ Optionally filters the list of scans using a regular expression.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync_scan_archives</span>(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync_scan_archives</span>(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Synchronizes scan archives between an origin and a target database.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function retrieves a list of scan archives from an origin database and transfers each</span>
@@ -1828,6 +1860,8 @@ Optionally filters the list of scans using a regular expression.</p>
 <span style="color: #BA2121; font-style: italic">      provided as command-line arguments in the format `host:port`.</span>
 <span style="color: #BA2121; font-style: italic">    - Temporary files are stored in the `/tmp` directory during the transfer process.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    logger <span style="color: #666">=</span> get_logger(<span style="color: #BA2121">&#39;fsdb_rest_api_sync&#39;</span>, log_level<span style="color: #666">=</span>log_level)
+
     origin_host, origin_port <span style="color: #666">=</span> origin_url<span style="color: #666">.</span>split(<span style="color: #BA2121">&#39;:&#39;</span>)
     target_host, target_port <span style="color: #666">=</span> target_url<span style="color: #666">.</span>split(<span style="color: #BA2121">&#39;:&#39;</span>)
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Origin URL is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>origin_host<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; on port &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>origin_port<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
@@ -1835,7 +1869,7 @@ Optionally filters the list of scans using a regular expression.</p>
 
     scan_list <span style="color: #666">=</span> list_scan_names(host<span style="color: #666">=</span>origin_host, port<span style="color: #666">=</span>origin_port)
     <span style="color: #008000; font-weight: bold">if</span> filter_pattern:
-        scan_list <span style="color: #666">=</span> filter_scan(scan_list, filter_pattern)
+        scan_list <span style="color: #666">=</span> filter_scan(scan_list, filter_pattern, logger)
         logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(scan_list)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans match the filter pattern &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>filter_pattern<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
     <span style="color: #008000; font-weight: bold">else</span>:
         logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Found </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(scan_list)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans in origin database.&quot;</span>)

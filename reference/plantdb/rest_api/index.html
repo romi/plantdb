@@ -5363,7 +5363,7 @@ The global variable <code>db_location</code> is used to set the absolute path.</
 <span style="color: #BA2121; font-style: italic">    SIMPLE_RADIAL</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    logger <span style="color: #666">=</span> kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;logger&quot;</span>, configure_logger(<span style="color: #19177C">__name__</span>))
+    logger <span style="color: #666">=</span> kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;logger&quot;</span>, get_logger(<span style="color: #19177C">__name__</span>))
 
     task_fs_map <span style="color: #666">=</span> compute_fileset_matches(scan)
     scan_data <span style="color: #666">=</span> get_scan_info(scan, logger<span style="color: #666">=</span>logger)
@@ -5874,7 +5874,7 @@ The global variable <code>db_location</code> is used to set the absolute path.</
 <span style="color: #BA2121; font-style: italic">    {&#39;id&#39;: &#39;real_plant_analyzed&#39;, &#39;metadata&#39;: {&#39;date&#39;: &#39;2023-12-15 16:37:15&#39;, &#39;species&#39;: &#39;N/A&#39;, &#39;plant&#39;: &#39;N/A&#39;, &#39;environment&#39;: &#39;Lyon indoor&#39;, &#39;nbPhotos&#39;: 60, &#39;files&#39;: {&#39;metadatas&#39;: None, &#39;archive&#39;: None}}, &#39;thumbnailUri&#39;: &#39;&#39;, &#39;hasTriangleMesh&#39;: True, &#39;hasPointCloud&#39;: True, &#39;hasPcdGroundTruth&#39;: False, &#39;hasCurveSkeleton&#39;: True, &#39;hasAnglesAndInternodes&#39;: True, &#39;hasSegmentation2D&#39;: False, &#39;hasSegmentedPcdEvaluation&#39;: False, &#39;hasPointCloudEvaluation&#39;: False, &#39;hasManualMeasures&#39;: False, &#39;hasAutomatedMeasures&#39;: True, &#39;hasSegmentedPointCloud&#39;: False, &#39;error&#39;: False, &#39;hasTreeGraph&#39;: True}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    logger <span style="color: #666">=</span> kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;logger&quot;</span>, configure_logger(<span style="color: #19177C">__name__</span>))
+    logger <span style="color: #666">=</span> kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;logger&quot;</span>, get_logger(<span style="color: #19177C">__name__</span>))
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Accessing scan info for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan<span style="color: #666">.</span>id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset.&quot;</span>)
 
     <span style="color: #3D7B7B; font-style: italic"># Initialize the scan information template:</span>
