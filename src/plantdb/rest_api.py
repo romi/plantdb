@@ -1185,6 +1185,7 @@ class Archive(Resource):
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
         scan_path = Path(self.db.get_scan(scan_id, create=True).path())
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
+        db_path = scan_path.parent  # move up to db path as the archive contain the top level
 
         # Open the zip file and extract non-existing files:
         extracted_files = []
@@ -1199,16 +1200,16 @@ class Archive(Resource):
                         Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Filename encoding error in zip archive'}, 400
 
-                    file_path = scan_path / file
+                    file_path = db_path / file
                     # Ensure the extracted files remain within the target directory
-                    if not is_within_directory(scan_path, file_path):
+                    if not is_within_directory(db_path, file_path):
                         self.logger.error(f"Invalid file path detected in ZIP: '{file}'")
                         Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Invalid file paths in zip archive'}, 400
 
                     # Extract only if the file does not already exist
                     if not file_path.exists():
-                        zip_obj.extract(file, path=scan_path)
+                        zip_obj.extract(file, path=db_path)
                         extracted_files.append(file)
         except Exception as e:
             self.logger.error(f"Failed to extract ZIP archive: {e}")
