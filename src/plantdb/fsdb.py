@@ -453,7 +453,7 @@ class FSDB(db.DB):
         """
         prev_user = copy.copy(self.user)
         # Try to log in as a user:
-        if login is not None:
+        if login is not None and login != "anonymous":
             try:
                 assert login in self.users
             except AssertionError:
@@ -578,7 +578,7 @@ class FSDB(db.DB):
         """
         return scan_id in self.scans
 
-    def get_scans(self, query=None, fuzzy=False):
+    def get_scans(self, query=None, fuzzy=False, owner_only=True):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
@@ -586,8 +586,11 @@ class FSDB(db.DB):
         query : dict, optional
             A query to use to filter the returned list of scans.
             The metadata must match given ``key`` and ``value`` from the `query` dictionary.
-        fuzzy : bool
+        fuzzy : bool, optional
             Whether to use fuzzy matching or not, that is the use of regular expressions.
+        owner_only : bool, optional
+            Whether to filter the returned list of scans to only include scans owned by the current user.
+            Default is ``True``.
 
         Returns
         -------
@@ -606,6 +609,11 @@ class FSDB(db.DB):
         [<plantdb.fsdb.Scan at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        if owner_only:
+            if query is None:
+                query = {'owner': self.user}
+            else:
+                query.update({'owner': self.user})
         return _filter_query(list(self.scans.values()), query, fuzzy)
 
     def get_scan(self, scan_id, create=False):
@@ -765,7 +773,7 @@ class FSDB(db.DB):
         """
         return copy.deepcopy(self.basedir)
 
-    def list_scans(self, query=None, fuzzy=False) -> list:
+    def list_scans(self, query=None, fuzzy=False, owner_only=True) -> list:
         """Get the list of scans in identifiers the local database.
 
         Parameters
@@ -793,10 +801,16 @@ class FSDB(db.DB):
         ['myscan_001']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        if owner_only:
+            if query is None:
+                query = {'owner': self.user}
+            else:
+                query.update({'owner': self.user})
+
         if query is None:
             return list(self.scans.keys())
         else:
-            return [scan.id for scan in self.get_scans(query, fuzzy)]
+            return [scan.id for scan in self.get_scans(query, fuzzy, owner_only)]
 
 
 class Scan(db.Scan):
