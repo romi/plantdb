@@ -2292,7 +2292,8 @@ In case of failure, an error message and HTTP status code are returned.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1219</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1220</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1221</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1222</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1223</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Handles the HTTP POST request for uploading and processing a ZIP file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Validates the uploaded file&#39;s MIME type, extension, and integrity before</span>
@@ -2355,6 +2356,7 @@ In case of failure, an error message and HTTP status code are returned.</p>
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;REST API path to fsdb is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
     scan_path <span style="color: #666">=</span> Path(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)<span style="color: #666">.</span>path())
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Exporting archive contents to &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
+    db_path <span style="color: #666">=</span> scan_path<span style="color: #666">.</span>parent  <span style="color: #3D7B7B; font-style: italic"># move up to db path as the archive contain the top level</span>
 
     <span style="color: #3D7B7B; font-style: italic"># Open the zip file and extract non-existing files:</span>
     extracted_files <span style="color: #666">=</span> []
@@ -2369,16 +2371,16 @@ In case of failure, an error message and HTTP status code are returned.</p>
                     Path(temp_path)<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)  <span style="color: #3D7B7B; font-style: italic"># Cleanup temporary file</span>
                     <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">&#39;Filename encoding error in zip archive&#39;</span>}, <span style="color: #666">400</span>
 
-                file_path <span style="color: #666">=</span> scan_path <span style="color: #666">/</span> file
+                file_path <span style="color: #666">=</span> db_path <span style="color: #666">/</span> file
                 <span style="color: #3D7B7B; font-style: italic"># Ensure the extracted files remain within the target directory</span>
-                <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> is_within_directory(scan_path, file_path):
+                <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> is_within_directory(db_path, file_path):
                     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Invalid file path detected in ZIP: &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>file<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
                     Path(temp_path)<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)  <span style="color: #3D7B7B; font-style: italic"># Cleanup temporary file</span>
                     <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">&#39;Invalid file paths in zip archive&#39;</span>}, <span style="color: #666">400</span>
 
                 <span style="color: #3D7B7B; font-style: italic"># Extract only if the file does not already exist</span>
                 <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> file_path<span style="color: #666">.</span>exists():
-                    zip_obj<span style="color: #666">.</span>extract(file, path<span style="color: #666">=</span>scan_path)
+                    zip_obj<span style="color: #666">.</span>extract(file, path<span style="color: #666">=</span>db_path)
                     extracted_files<span style="color: #666">.</span>append(file)
     <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
         <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to extract ZIP archive: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
