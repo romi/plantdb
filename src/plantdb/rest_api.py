@@ -537,7 +537,7 @@ class ScansList(Resource):
         fuzzy = request.args.get('fuzzy', False, type=bool)
         if query is not None:
             query = json.loads(query)
-        return self.db.list_scans(query=query, fuzzy=fuzzy)
+        return self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
 
 
 class Scan(Resource):
