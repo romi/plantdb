@@ -4,7 +4,7 @@
 """
 Metadata Management for Database Scans
 
-This module provides functionality for adding metadata to scans in a database.
+This script provides functionality for adding metadata to scans in a database.
 
 Key Features:
 - Connects to a database using the `FSDB` module.
@@ -13,19 +13,41 @@ Key Features:
 - Provides an easy-to-use method for specifying metadata, such as ownership and project details, in bulk or customized workflows.
 """
 
-import os
-
 from plantdb.fsdb import FSDB
 from plantdb.fsdb_tools import add_metadata_to_scan
 
-path = os.environ.get('ROMI_DB', None)
+#path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E1"
+#path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E2"
+#path = "/data/ROMI/Romi_GG/analysis/Phyllotaxis_afb1_mutant"
+path = "/data/ROMI/test_owner"
 
-if path is None:
-    raise ValueError('Environment variable ROMI_DB not set.')
+owner_id = "geraldine"
+project_id = "afb1_mutant"
 
 db = FSDB(path)
-db.connect("anonymous")
+db.create_user('alexis', 'Alexis LACROIX')
+db.create_user('geraldine', 'Géraldine BRUNOUD')
+db.create_user('fabfab', 'Fabrice Besnard')
+db.connect(owner_id)
 
-for scan in db.get_scans():
-    new_md = {"owner": "test", "project": "test"}
-    add_metadata_to_scan(db, scan, metadata=new_md)
+db.list_scans()  # list scans owned by current user
+
+for scan in db.get_scans(owner_only=False):
+    new_md = {}
+    # Process the dataset owner
+    owner = scan.get_metadata("owner", None)
+    if owner is None:
+        new_md["owner"] = db.user
+    else:
+        print(f"Scan '{scan.id}' already has an owner: '{owner}'!")
+    # Process the project the dataset belongs to
+    project = scan.get_metadata("project", None)
+    if project is None:
+        project = [project_id]
+    else:
+        if project_id not in project:
+            project.append(project_id)
+    new_md["project"] = project
+    # Update the scan metadata
+    add_metadata_to_scan(db, scan.id, metadata=new_md)
+
