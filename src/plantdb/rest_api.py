@@ -256,7 +256,12 @@ def get_scan_info(scan, **kwargs):
             return False
         else:
             # Test if `file` is found in `task` ``Fileset``:
-            return scan.get_fileset(task_fs_map[task]).get_file(file) is not None
+            try:
+                file = scan.get_fileset(task_fs_map[task]).get_file(file)
+            except FileNotFoundError:
+                return False
+            else:
+                return file is not None
 
     # Define is the scan is a virtual plant dataset:
     scan_info["isVirtual"] = "VirtualPlant" in scan_info["tasks_fileset"]
