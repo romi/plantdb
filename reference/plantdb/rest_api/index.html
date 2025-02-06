@@ -4409,7 +4409,7 @@ The global variable <code>db_location</code> is used to set the absolute path.</
     fuzzy <span style="color: #666">=</span> request<span style="color: #666">.</span>args<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;fuzzy&#39;</span>, <span style="color: #008000; font-weight: bold">False</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">bool</span>)
     <span style="color: #008000; font-weight: bold">if</span> query <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
         query <span style="color: #666">=</span> json<span style="color: #666">.</span>loads(query)
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>list_scans(query<span style="color: #666">=</span>query, fuzzy<span style="color: #666">=</span>fuzzy)
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>list_scans(query<span style="color: #666">=</span>query, fuzzy<span style="color: #666">=</span>fuzzy, owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
