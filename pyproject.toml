@@ -24,7 +24,7 @@ dependencies = [
 description = "Database library for the ROMI project."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { file = "LICENSE" }
+license = { name = "GPL-3.0-or-later", file = "LICENSE" }
 authors = [
     { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
