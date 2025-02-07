@@ -30,6 +30,7 @@ import json
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import urljoin
+from urllib.parse import urlparse
 
 import requests
 from PIL import Image
@@ -45,19 +46,19 @@ REST_API_PORT = 5000
 
 
 def base_url(host=REST_API_URL, port=REST_API_PORT):
-    """Format the URL for the PlantDB REST API at given host and port.
+    """Generates the URL for the PlantDB REST API using the specified host and port.
 
     Parameters
     ----------
     host : str, optional
         The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str, optional
+    port : str or int, optional
         The port number of the PlantDB REST API server. Defaults to ``5000``.
 
     Returns
     -------
     str
-        The formatted URL.
+        A properly formatted URL of the PlantDB REST API.
 
     Examples
     --------
@@ -103,22 +104,53 @@ def sanitize_name(name):
     return sanitized_name
 
 
-def archive_url(dataset_name, host=REST_API_URL, port=REST_API_PORT):
-    """Constructs the URL for accessing the archive of a specific dataset.
+def refresh_url(dataset_name=None, **kwargs):
+    """Generates a formatted URL for refreshing a specific dataset or the entire database.
 
-    This function generates a fully qualified URL for accessing a dataset's archive
-    by joining the base URL of the REST API with the provided dataset name. It uses
-    a default host and port unless otherwise specified. The constructed URL follows
-    a predictable pattern based on the path and dataset name.
+    Parameters
+    ----------
+    dataset_name : str or None, optional
+        The name of the dataset for which the refresh URL needs to be generated.
+        If not provided, the refresh URL for the entire server is returned instead.
+        Defaults to ``None``.
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port number of the PlantDB REST API server. Defaults to ``5000``.
+
+    Returns
+    -------
+    str
+        A correctly formatted URL for refreshing the specified dataset or the entire PlantDB REST API server.
+    """
+    url = urljoin(
+        base_url(host=kwargs.get("host", None), port=kwargs.get("port", None)),
+        "/refresh"
+    )
+    if dataset_name is None:
+        return url
+    else:
+        dataset_name = sanitize_name(dataset_name)
+        return f"{url}?scan_id={dataset_name}"
+
+
+def archive_url(dataset_name, **kwargs):
+    """Generates a formatted URL for accessing the archive of a specific dataset.
 
     Parameters
     ----------
     dataset_name : str
         Name of the dataset to access in the archive.
-    host : str, optional
-        Base URL or host of the REST API. Defaults to REST_API_URL.
-    port : int, optional
-        Port on which the REST API is hosted. Defaults to REST_API_PORT.
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port number of the PlantDB REST API server. Defaults to ``5000``.
 
     Returns
     -------
@@ -136,35 +168,51 @@ def archive_url(dataset_name, host=REST_API_URL, port=REST_API_PORT):
     ValueError: Invalid dataset name: 'arabidopsis+000'. Dataset names must be alphanumeric and can include underscores or dashes.
     """
     dataset_name = sanitize_name(dataset_name)
-    return urljoin(base_url(host, port), f"/archive/{dataset_name}")
+    url = urljoin(
+        base_url(host=kwargs.get("host", None), port=kwargs.get("port", None)),
+        f"/archive/{dataset_name}"
+    )
+    return url
 
 
-def test_db_availability(host=REST_API_URL, port=REST_API_PORT):
-    """Test the REST API server availability.
+def test_host_port_availability(url):
+    """Verifies the connectivity to a given host and port from a URL-like string.
+
+    This function parses a URL string into host and port components, attempts to establish a
+    socket connection to check its availability, and raises appropriate exceptions on failure.
 
     Parameters
     ----------
-    host : str, optional
-        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port of the PlantDB REST API. Defaults to ``5000``.
+    url : str
+        A string specifying the host and port in the format 'host:port'.
 
-    Returns
-    -------
-    bool
-        The scans information dictionary.
+    Raises
+    ------
+    ValueError
+        If the input URL is not in the correct format 'host:port'.
+    ConnectionError
+        If the specified host and port cannot be connected, indicating that the port might
+        be closed or unavailable.
+    RuntimeError
+        If an unexpected error occurs during the verification process.
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import test_db_availability
-    >>> test_db_availability()
+    >>> from plantdb.rest_api_client import test_host_port_availability
+    >>> test_host_port_availability('127.0.0.1:5000')
     """
+    import socket
     try:
-        requests.get(url=f"{base_url(host, port)}/scans")
-    except requests.exceptions.ConnectionError:
-        return False
-    else:
-        return True
+        parsed_url = urlparse(url)
+        host, port = parsed_url.hostname, parsed_url.port
+        socket.setdefaulttimeout(2)  # Set a timeout for the connection check
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex((host, port)) != 0:
+                raise ConnectionError(f"Cannot connect to {host}:{port}. Port might be closed or unavailable.")
+    except ValueError:
+        raise ValueError(f"Database URL should be 'host:port', got '{url}' instead.")
+    except Exception as e:
+        raise RuntimeError(f"Error verifying the URL '{url}': {e}")
 
 
 def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
@@ -861,6 +909,49 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
         return {"error": str(e)}
 
 
+def refresh(dataset_name=None, **kwargs):
+    """Refreshes the database, potentialy only for a specified dataset.
+
+    Parameters
+    ----------
+    dataset_name : str or None
+        The name of the dataset to trigger a refresh.
+        If ``None``, the entire database is refreshed.
+
+    Other Parameters
+    ----------------
+    host : str
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int
+        The port of the PlantDB REST API. Defaults to ``5000``.
+    timeout : int, optional
+        A timeout, in seconds, to suceed the refresh request. Defaults to ``5``.
+
+    Returns
+    -------
+    dict
+        Parsed JSON response from the refresh API if the request is successful.
+
+    Raises
+    ------
+    HTTPError
+        If the request fails or the response status is not successful.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import refresh
+    >>> refresh("arabidopsis000", host="127.0.0.1", port="5000")
+    """
+    res = requests.post(
+        refresh_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None)),
+        timeout=kwargs.get("timeout", 5)
+    )
+    if res.ok:
+        return res.json()
+    else:
+        res.raise_for_status()  # Raise an error if the request failed
+
+
 def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     """Downloads a scan archive file from a defined dataset based on the specified API parameters.
 
@@ -881,6 +972,8 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
         The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
     port : str or int
         The port of the PlantDB REST API. Defaults to ``5000``.
+    timeout : int, optional
+        A timeout, in seconds, to suceed the download request. Defaults to ``10``.
 
     Returns
     -------
@@ -897,7 +990,7 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     url = archive_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None))
 
     start_time = time.time()  # Start timing
-    res = requests.get(url, stream=True, timeout=10)
+    res = requests.get(url, stream=True, timeout=kwargs.get("timeout", 10))
     end_time = time.time()  # End timing
     duration = end_time - start_time
     msg = f"Download completed in {duration:.2f} seconds."
