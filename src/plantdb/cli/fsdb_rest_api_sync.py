@@ -67,6 +67,8 @@ import argparse
 import re
 import socket
 from pathlib import Path
+from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from tqdm import tqdm
 
@@ -75,6 +77,8 @@ from plantdb.log import LOG_LEVELS
 from plantdb.log import get_logger
 from plantdb.rest_api_client import download_scan_archive
 from plantdb.rest_api_client import list_scan_names
+from plantdb.rest_api_client import refresh
+from plantdb.rest_api_client import test_host_port_availability
 from plantdb.rest_api_client import upload_scan_archive
 
 
@@ -100,40 +104,6 @@ def parsing():
                          help="Level of message logging, defaults to 'INFO'.")
 
     return parser
-
-
-def check_url(url):
-    """Verifies the connectivity to a given host and port from a URL-like string.
-
-    This function parses a URL string into host and port components, attempts to establish a
-    socket connection to check its availability, and raises appropriate exceptions on failure.
-
-    Parameters
-    ----------
-    url : str
-        A string specifying the host and port in the format 'host:port'.
-
-    Raises
-    ------
-    ValueError
-        If the input URL is not in the correct format 'host:port'.
-    ConnectionError
-        If the specified host and port cannot be connected, indicating that the port might
-        be closed or unavailable.
-    RuntimeError
-        If an unexpected error occurs during the verification process.
-    """
-    try:
-        host, port = url.split(':')
-        port = int(port)  # Ensure port is an integer
-        socket.setdefaulttimeout(2)  # Set a timeout for the connection check
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            if s.connect_ex((host, port)) != 0:
-                raise ConnectionError(f"Cannot connect to {host}:{port}. Port might be closed or unavailable.")
-    except ValueError:
-        raise ValueError(f"Database URL should be 'host:port', got '{url}' instead.")
-    except Exception as e:
-        raise RuntimeError(f"Error verifying the URL '{url}': {e}")
 
 
 def filter_scan(scan_list, filter_pattern, logger):
@@ -174,11 +144,15 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
     Parameters
     ----------
     origin_url : str
-        A 'host:port' URL pointing to the origin plantDB database with a REST API enabled.
+        A correctly formatted URL pointing to the origin plantDB database with a REST API enabled.
     target_url : str
-        A 'host:port' URL pointing to the target plantDB database with a REST API enabled.
+        A correctly formatted URL pointing to the target plantDB database with a REST API enabled.
     filter_pattern : str, optional
         A regular expression to filter scan names.
+        Defaults to ``None``, which means no filtering is applied.
+    log_level : str, optional
+        The log level for the logger.
+        Defaults to ``DEFAULT_LOG_LEVEL``, which is 'INFO'.
 
     Raises
     ------
@@ -187,14 +161,16 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
 
     Notes
     -----
-    - The script assumes that connection details for the origin and target databases are
-      provided as command-line arguments in the format `host:port`.
-    - Temporary files are stored in the `/tmp` directory during the transfer process.
+    - The method assumes that both databases are accessible and have a REST API enabled.
+    - The method refreshes the scan in the target database after each transfer.
+    - Temporary files are stored in the `/tmp` directory during the transfer process and deleted afterward.
     """
     logger = get_logger('fsdb_rest_api_sync', log_level=log_level)
 
-    origin_host, origin_port = origin_url.split(':')
-    target_host, target_port = target_url.split(':')
+    parsed_origin = urlparse(origin_url)
+    origin_host, origin_port = parsed_origin.hostname, parsed_origin.port
+    parsed_target = urlparse(target_url)
+    target_host, target_port = parsed_target.hostname, parsed_target.port
     logger.info(f"Origin URL is '{origin_host}' on port '{origin_port}'.")
     logger.info(f"Target URL is '{target_host}' on port '{target_port}'.")
 
@@ -215,6 +191,9 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
         logger.debug(msg)
         # Delete the temporary file
         Path(f_path).unlink()
+        # Refresh the scan in the target to load its infos:
+        msg = refresh(scan_id, host=target_host, port=target_port)
+        logger.debug(msg)
 
     return
 
@@ -231,9 +210,9 @@ def main():
     # Extract the parsed arguments
     args = parser.parse_args()
 
-    # Validate the origin and target database URLs
-    check_url(args.origin)  # Ensure the `origin` URL is formatted correctly
-    check_url(args.target)  # Ensure the `target` URL is formatted correctly
+    # Validate the availability of origin and target database URLs
+    test_host_port_availability(args.origin)
+    test_host_port_availability(args.target)
 
     # Synchronize scan archives between the origin and target databases
     sync_scan_archives(args.origin, args.target, args.filter, args.log_level)  # Perform synchronization
