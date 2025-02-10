@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb"
-version = "0.13.2"
+version = "0.13.3"
 dependencies = [
     "appdirs",
     "colorlog",
