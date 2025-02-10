@@ -380,6 +380,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#scans_info" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans_info
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#scansscan_id" class="md-nav__link">
     <span class="md-ellipsis">
       /scans/&lt;scan_id&gt;
@@ -392,6 +401,15 @@
   <a href="#filespath" class="md-nav__link">
     <span class="md-ellipsis">
       /files/&lt;path&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /file/&lt;scan_id&gt;
     </span>
   </a>
   
@@ -437,6 +455,24 @@
   <a href="#meshscan_idfileset_idfile_id" class="md-nav__link">
     <span class="md-ellipsis">
       /mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skeletonscan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /skeleton/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequencescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /sequence/&lt;scan_id&gt;
     </span>
   </a>
   
@@ -1212,6 +1248,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#scans_info" class="md-nav__link">
+    <span class="md-ellipsis">
+      /scans_info
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#scansscan_id" class="md-nav__link">
     <span class="md-ellipsis">
       /scans/&lt;scan_id&gt;
@@ -1224,6 +1269,15 @@
   <a href="#filespath" class="md-nav__link">
     <span class="md-ellipsis">
       /files/&lt;path&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /file/&lt;scan_id&gt;
     </span>
   </a>
   
@@ -1269,6 +1323,24 @@
   <a href="#meshscan_idfileset_idfile_id" class="md-nav__link">
     <span class="md-ellipsis">
       /mesh/&lt;scan_id&gt;/&lt;fileset_id&gt;/&lt;file_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skeletonscan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /skeleton/&lt;scan_id&gt;
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequencescan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      /sequence/&lt;scan_id&gt;
     </span>
   </a>
   
@@ -1409,6 +1481,18 @@ The Python implementation is done in the <code>plantdb.rest_api</code> module an
 </ul>
 </li>
 </ul>
+<h3 id="scans_info"><code>/scans_info</code><a class="headerlink" href="#scans_info" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/scans_info</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.ScansTable"><code>plantdb.rest_api.ScansTable</code></a></li>
+<li>Arguments: <code>filterQuery</code></li>
+<li>Returns: A JSON-compliant table structure containing detailed scan metadata.</li>
+<li>Example:<ul>
+<li>Get all scans in a tabular format:
+<a href="http://127.0.0.1:5000/scans_info">http://127.0.0.1:5000/scans_info</a></li>
+</ul>
+</li>
+</ul>
 <h3 id="scansscan_id"><code>/scans/&lt;scan_id&gt;</code><a class="headerlink" href="#scansscan_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/scans/&lt;scan_id&gt;</code> URLs:</p>
 <ul>
@@ -1439,6 +1523,22 @@ In other words it will fail (response <code>500</code>) if this task is missing 
 <a href="http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg">http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg</a></li>
 <li>Get the first mask image of the scan (<code>00000_rgb</code>):
 <a href="http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png">http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0<strong><em>_channel</em></strong>_rgb_5619aa428d/00000_rgb.png</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="filescan_id"><code>/file/&lt;scan_id&gt;</code><a class="headerlink" href="#filescan_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/datasetfile</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.DatasetFile"><code>plantdb.rest_api.DatasetFile</code></a></li>
+<li>Arguments: <ul>
+<li><code>file_upload</code> (POST request) - The file to be uploaded as part of the dataset.</li>
+</ul>
+</li>
+<li>Returns: A confirmation of the upload process (success or failure).</li>
+<li>Example:<ul>
+<li>Upload a new file to the dataset (example with curl):<br />
+<div class="language-bash highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>curl<span style="color: #BBB"> </span>-X<span style="color: #BBB"> </span>POST<span style="color: #BBB"> </span>http://127.0.0.1:5000/file/&lt;scan_id&gt;<span style="color: #BBB"> </span>-F<span style="color: #BBB"> </span><span style="color: #BA2121">&quot;file_upload=@example_file_name.txt&quot;</span>
+</code></pre></div></li>
 </ul>
 </li>
 </ul>
@@ -1505,6 +1605,30 @@ In other words it will fail (response <code>500</code>) if this task is missing 
 </ul>
 </li>
 </ul>
+<h3 id="skeletonscan_id"><code>/skeleton/&lt;scan_id&gt;</code><a class="headerlink" href="#skeletonscan_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/skeleton/&lt;scan_id&gt;</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.CurveSkeleton"><code>plantdb.rest_api.CurveSkeleton</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: Details about the curve skeleton related to the given scan.</li>
+<li>Example:<ul>
+<li>Get curve skeleton information for the <code>real_plant_analyzed</code> dataset:
+<a href="http://127.0.0.1:5000/skeleton/real_plant_analyzed">http://127.0.0.1:5000/keleton/real_plant_analyzed</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="sequencescan_id"><code>/sequence/&lt;scan_id&gt;</code><a class="headerlink" href="#sequencescan_id" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/sequence/&lt;scan_id&gt;</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Sequence"><code>plantdb.rest_api.Sequence</code></a></li>
+<li>Arguments: none</li>
+<li>Returns: Sequence-related information related to the given scan.</li>
+<li>Example:<ul>
+<li>Get sequence information for the <code>real_plant_analyzed</code> dataset:
+<a href="http://127.0.0.1:5000/sequence/real_plant_analyzed">http://127.0.0.1:5000/sequence/real_plant_analyzed</a></li>
+</ul>
+</li>
+</ul>
 <h3 id="refresh"><code>/refresh</code><a class="headerlink" href="#refresh" title="Permanent link">Link</a></h3>
 <p>Refresh the list of scans in the <code>plantdb.fsdb.FSDB</code> database.</p>
 <p>Here are the specifications for the <code>/refresh</code> URL:</p>
@@ -1527,7 +1651,7 @@ The template can be accessed here: <a href="reference/rest_api.md#methods"><code
 <span style="color: #BBB">    </span><span style="color: #008000; font-weight: bold">&quot;environment&quot;</span>:<span style="color: #BBB"> </span><span style="color: #BA2121">&quot;N/A&quot;</span>,
 <span style="color: #BBB">    </span><span style="color: #008000; font-weight: bold">&quot;nbPhotos&quot;</span>:<span style="color: #BBB"> </span><span style="color: #666">0</span>,
 <span style="color: #BBB">    </span><span style="color: #008000; font-weight: bold">&quot;files&quot;</span>:<span style="color: #BBB"> </span>{
-<span style="color: #BBB">      </span><span style="color: #008000; font-weight: bold">&quot;metadatas&quot;</span>:<span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">null</span>,
+<span style="color: #BBB">      </span><span style="color: #008000; font-weight: bold">&quot;metadata&quot;</span>:<span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">null</span>,
 <span style="color: #BBB">      </span><span style="color: #008000; font-weight: bold">&quot;archive&quot;</span>:<span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">null</span>
 <span style="color: #BBB">    </span>}
 <span style="color: #BBB">  </span>},
@@ -1558,7 +1682,7 @@ The template can be accessed here: <a href="reference/rest_api.md#methods"><code
 <li>"nbPhotos": Number</li>
 <li>"environment": String</li>
 <li>"files": Object<ul>
-<li>"files.metadatas": String, URL, example "/files/<scanid>/metadata/metadata.json"</li>
+<li>"files.metadata": String, URL, example "/files/<scanid>/metadata/metadata.json"</li>
 <li>"files.archive": String, URL, example "/files/<scanid>/Visualization/scan.zip"</li>
 </ul>
 </li>
