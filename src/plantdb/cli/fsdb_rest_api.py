@@ -82,6 +82,7 @@ from plantdb.log import DEFAULT_LOG_LEVEL
 from plantdb.log import LOG_LEVELS
 from plantdb.log import get_logger
 from plantdb.rest_api import Archive
+from plantdb.rest_api import CurveSkeleton
 from plantdb.rest_api import DatasetFile
 from plantdb.rest_api import File
 from plantdb.rest_api import Image
@@ -91,6 +92,7 @@ from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
 from plantdb.rest_api import Scan
 from plantdb.rest_api import ScansList
+from plantdb.rest_api import ScansTable
 from plantdb.rest_api import Sequence
 from plantdb.test_database import DATASET
 from plantdb.test_database import test_database
@@ -201,6 +203,8 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     # Initialize RESTful resources to serve:
     api.add_resource(ScansList, '/scans',
                      resource_class_args=tuple([db]))
+    api.add_resource(ScansTable, '/scans_info',
+                     resource_class_args=tuple([db, logger]))
     api.add_resource(Scan, '/scans/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(File, '/files/<path:path>',
@@ -216,6 +220,8 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
+                     resource_class_args=tuple([db]))
+    api.add_resource(CurveSkeleton, '/skeleton/<string:scan_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Sequence, '/sequence/<string:scan_id>',
                      resource_class_args=tuple([db]))
