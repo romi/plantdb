@@ -276,10 +276,11 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the file in the fileset.
     size : {'orig', 'large', 'thumb'} or int, optional
         If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string, defaulting to `'orig'`, and it works as follows:
-           * `'thumb'`: image max width and height to `150`.
-           * `'large'`: image max width and height to `1500`;
-           * `'orig'`: original image, no chache;
+        Otherwise, should be one of the following strings, default to `'orig'`:
+
+          - `'thumb'`: image max width and height to `150`.
+          - `'large'`: image max width and height to `1500`;
+          - `'orig'`: original image, no chache;
 
     Returns
     -------
