@@ -18,6 +18,17 @@ Here are the specifications for the `/scans` URL:
     * Search for "arabidopsis" in metadata:
     [http://127.0.0.1:5000/scans?filterQuery=arabidopsis](http://127.0.0.1:5000/scans?filterQuery=arabidopsis)
 
+### `/scans_info`
+
+Here are the specifications for the `/scans_info` URL:
+
+* Resource: [`plantdb.rest_api.ScansTable`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansTable)
+* Arguments: `filterQuery`
+* Returns: A JSON-compliant table structure containing detailed scan metadata.
+* Example:
+    * Get all scans in a tabular format:
+    [http://127.0.0.1:5000/scans_info](http://127.0.0.1:5000/scans_info)
+
 ### `/scans/<scan_id>`
 
 Here are the specifications for the `/scans/<scan_id>` URLs:
@@ -48,6 +59,20 @@ Here are the specifications for the `/files/<path>` URLs:
     [http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg](http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg)
     * Get the first mask image of the scan (`00000_rgb`):
     [http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png](http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png)
+
+### `/file/<scan_id>`
+
+Here are the specifications for the `/datasetfile` URL:
+
+* Resource: [`plantdb.rest_api.DatasetFile`](reference/plantdb/rest_api.md#plantdb.rest_api.DatasetFile)
+* Arguments: 
+    * `file_upload` (POST request) - The file to be uploaded as part of the dataset.
+* Returns: A confirmation of the upload process (success or failure).
+* Example:
+    * Upload a new file to the dataset (example with curl):  
+    ```bash
+    curl -X POST http://127.0.0.1:5000/file/<scan_id> -F "file_upload=@example_file_name.txt"
+    ```
 
 ### `/archive/<scan_id>`
 
@@ -108,6 +133,28 @@ Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URL
 * Examples with the `real_plant_analyzed` dataset:
     * Get the original mesh:
     [http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh](http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh)
+
+### `/skeleton/<scan_id>`
+
+Here are the specifications for the `/skeleton/<scan_id>` URL:
+
+* Resource: [`plantdb.rest_api.CurveSkeleton`](reference/plantdb/rest_api.md#plantdb.rest_api.CurveSkeleton)
+* Arguments: none
+* Returns: Details about the curve skeleton related to the given scan.
+* Example:
+    * Get curve skeleton information for the `real_plant_analyzed` dataset:
+    [http://127.0.0.1:5000/keleton/real_plant_analyzed](http://127.0.0.1:5000/skeleton/real_plant_analyzed)
+
+### `/sequence/<scan_id>`
+
+Here are the specifications for the `/sequence/<scan_id>` URL:
+
+* Resource: [`plantdb.rest_api.Sequence`](reference/plantdb/rest_api.md#plantdb.rest_api.Sequence)
+* Arguments: none
+* Returns: Sequence-related information related to the given scan.
+* Example:
+    * Get sequence information for the `real_plant_analyzed` dataset:
+    [http://127.0.0.1:5000/sequence/real_plant_analyzed](http://127.0.0.1:5000/sequence/real_plant_analyzed)
 
 ### `/refresh`
 Refresh the list of scans in the `plantdb.fsdb.FSDB` database.
