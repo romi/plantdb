@@ -46,6 +46,7 @@ from flask import send_from_directory
 from flask_restful import Resource
 
 from plantdb import webcache
+from plantdb.fsdb import FilesetNotFoundError
 from plantdb.fsdb import ScanNotFoundError
 from plantdb.io import read_json
 from plantdb.log import get_logger
@@ -154,7 +155,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
             "environment": "N/A",
             "nbPhotos": 0,
             "files": {
-                "metadatas": None,
+                "metadata": None,
                 "archive": None
             }
         },
@@ -207,7 +208,7 @@ def get_scan_info(scan, **kwargs):
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_info = get_scan_info(scan)
     >>> print(scan_info)
-    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadatas': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
+    {'id': 'real_plant_analyzed', 'metadata': {'date': '2023-12-15 16:37:15', 'species': 'N/A', 'plant': 'N/A', 'environment': 'Lyon indoor', 'nbPhotos': 60, 'files': {'metadata': None, 'archive': None}}, 'thumbnailUri': '', 'hasTriangleMesh': True, 'hasPointCloud': True, 'hasPcdGroundTruth': False, 'hasCurveSkeleton': True, 'hasAnglesAndInternodes': True, 'hasSegmentation2D': False, 'hasSegmentedPcdEvaluation': False, 'hasPointCloudEvaluation': False, 'hasManualMeasures': False, 'hasAutomatedMeasures': True, 'hasSegmentedPointCloud': False, 'error': False, 'hasTreeGraph': True}
     >>> db.disconnect()
     """
     logger = kwargs.get("logger", get_logger(__name__))
@@ -240,7 +241,7 @@ def get_scan_info(scan, **kwargs):
     scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
     ## Get the path to the JSON metadata file:
     metadata_json_path = os.path.join("/files/", scan.id, "metadata", "metadata.json")
-    scan_info["metadata"]["files"]["metadatas"] = metadata_json_path
+    scan_info["metadata"]["files"]["metadata"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
@@ -288,6 +289,25 @@ def get_scan_info(scan, **kwargs):
             fs = scan.get_fileset(task_fs_map[task])
             scan_info["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
 
+    print(f"Bounding-box: {img_fs.get_metadata('workspace')}")
+    scan_info["workspace"] = img_fs.get_metadata("workspace")
+
+    scan_info["camera"] = {}
+
+    print(f"Camera model: {img_f.get_metadata('colmap_camera')}")
+    scan_info["camera"]["model"] = img_f.get_metadata("colmap_camera")['camera_model']
+
+    scan_info["camera"]["poses"] = []
+    for img_f in img_fs.get_files(query={"channel": 'rgb'}):
+        camera_md = img_f.get_metadata("colmap_camera")
+        scan_info["camera"]["poses"].append({
+            "id": img_f.id,
+            "tvec": camera_md['tvec'],
+            "rotmat": camera_md['rotmat'],
+            "photoUri": get_image_uri(scan.id, img_fs.id, img_f, size="orig"),
+            "thumbnailUri": get_image_uri(scan.id, img_fs.id, img_f, size="thumb")
+        })
+
     return scan_info
 
 
@@ -329,6 +349,52 @@ def get_file_uri(scan, fileset, file):
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_name = file.path().name if isinstance(file, File) else file
     return f"/files/{scan_id}/{fileset_id}/{file_name}"
+
+
+def get_image_uri(scan, fileset, file, size="orig"):
+    """Return the URI for the corresponding `scan/fileset/file` tree.
+
+    Parameters
+    ----------
+    scan : plantdb.fsdb.Scan or str
+        A ``Scan`` instance or the name of the scan dataset.
+    fileset : plantdb.fsdb.Fileset or str
+        A ``Fileset`` instance or the name of the fileset.
+    file : plantdb.fsdb.File or str
+        A ``File`` instance or the name of the file.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Otherwise, should be one of the following strings, default to `'orig'`:
+
+          - `'thumb'`: image max width and height to `150`.
+          - `'large'`: image max width and height to `1500`;
+          - `'orig'`: original image, no chache;
+
+    Returns
+    -------
+    str
+        The URI for the corresponding `scan/fileset/file` tree.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api import get_image_uri
+    >>> from plantdb.test_database import test_database
+    >>> from plantdb.rest_api import compute_fileset_matches
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
+    >>> get_image_uri(scan, 'images', '00000_rgb.jpg', size='orig')
+    '/image/real_plant_analyzed/images/00000_rgb.jpg?size=orig'
+    >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb')
+    '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb'
+    """
+    from plantdb.fsdb import Scan
+    from plantdb.fsdb import Fileset
+    from plantdb.fsdb import File
+    scan_id = scan.id if isinstance(scan, Scan) else scan
+    fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
+    file_name = file.path().name if isinstance(file, File) else file
+    return f"/image/{scan_id}/{fileset_id}/{file_name}?size={size}"
 
 
 task_filesUri_mapping = {
@@ -510,13 +576,13 @@ def sanitize_name(name):
 
 
 class ScansList(Resource):
-    """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
+    """Concrete RESTful resource to serve the list of scan datasets."""
 
     def __init__(self, db):
         self.db = db
 
     def get(self):
-        """Returns a list of scan dataset information.
+        """Returns a list of scan dataset.
 
         Returns
         -------
@@ -543,6 +609,48 @@ class ScansList(Resource):
         if query is not None:
             query = json.loads(query)
         return self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+
+
+class ScansTable(Resource):
+    """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
+
+    def __init__(self, db, logger):
+        self.db = db
+        self.logger = logger
+
+    def get(self):
+        """Returns a list of scan dataset information.
+
+        Returns
+        -------
+        list of dict
+            The list of dictionaries to serve (as JSON)
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import json
+        >>> # Get an info dict about all dataset:
+        >>> res = requests.get("http://127.0.0.1:5000/scans_info")
+        >>> scans_list = json.loads(res.content)
+        >>> # List the known dataset id:
+        >>> print(scans_list)
+        ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
+        >>> res = requests.get('http://127.0.0.1:5000/scans_info?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
+        >>> res.content.decode()
+
+        """
+        query = request.args.get('filterQuery', None)
+        fuzzy = request.args.get('fuzzy', False, type=bool)
+        if query is not None:
+            query = json.loads(query)
+        scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+
+        scans_info = []
+        for scan_id in scans_list:
+            scans_info.append(get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger))
+        return scans_info
 
 
 class Scan(Resource):
@@ -608,12 +716,15 @@ class File(Resource):
         >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
         >>> import requests
         >>> import toml
+        >>> import json
         >>> # Load the configuration file 'pipeline.toml':
         >>> res = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
         >>> cfg = toml.loads(res.content.decode())
         >>> print(cfg['Undistorted'])
         {'upstream_task': 'ImagesFilesetExists'}
-
+        >>> # Load the configuration file 'pipeline.toml':
+        >>> res = requests.get("http://127.0.0.1:5000/files/Col-0_E1_1/files.json")
+        >>> json.loads(res.content.decode())
         """
         return send_from_directory(self.db.path(), path)
 
@@ -954,6 +1065,71 @@ class Mesh(Resource):
         return send_file(path, mimetype='application/octet-stream')
 
 
+class CurveSkeleton(Resource):
+    """Concrete RESTful resource to serve a CurveSkeleton upon request (GET method)."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def get(self, scan_id):
+        """Send the requested angle and internode sequences.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan id.
+
+        Returns
+        -------
+        flask.Response
+            The HTTP response from the flask server.
+
+        Examples
+        --------
+        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import requests
+        >>> import json
+        >>> # Get the skeleton dict:
+        >>> res = requests.get("http://127.0.0.1:5000/skeleton/real_plant_analyzed")
+        >>> json.loads(res.content.decode('utf-8'))
+        >>> # Get the skeleton dict:
+        >>> res = requests.get("http://127.0.0.1:5000/skeleton/Col-0_E1_1")
+        >>> skel = json.loads(res.content.decode('utf-8'))
+        >>> print(list(skel.keys()))
+
+        """
+        # Sanitize identifiers
+        scan_id = sanitize_name(scan_id)
+
+        # Get the corresponding `Scan` instance
+        try:
+            scan = self.db.get_scan(scan_id)
+        except ScanNotFoundError:
+            return {"error": f"Scan '{scan_id}' not found!"}, 400
+        task_fs_map = compute_fileset_matches(scan)
+        # Get the corresponding `Fileset` instance
+        try:
+            fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
+        except KeyError:
+            return {'error': "No 'CurveSkeleton' fileset mapped!"}, 400
+        except FilesetNotFoundError:
+            return {'error': "No 'CurveSkeleton' fileset found!"}, 400
+        # Get the `File` corresponding to the CurveSkeleton resource
+        try:
+            file = fs.get_file('CurveSkeleton')
+        except FileNotFoundError:
+            return {'error': "No 'CurveSkeleton' file found!"}, 400
+        except Exception as e:
+            return json.dumps({'error': str(e)}), 400
+        # Load the JSON file:
+        try:
+            skeleton = read_json(file.path())
+        except Exception as e:
+            return json.dumps({'error': str(e)}), 400
+        else:
+            return skeleton
+
+
 class Sequence(Resource):
     """Concrete RESTful resource to serve an angle and internode sequences upon request (GET method)."""
 
@@ -988,14 +1164,33 @@ class Sequence(Resource):
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
-
         type = request.args.get('type', default='all', type=str)
-        # Get the `File` corresponding to the sequence resource:
-        scan = self.db.get_scan(scan_id)
+        # Get the corresponding `Scan` instance
+        try:
+            scan = self.db.get_scan(scan_id)
+        except ScanNotFoundError:
+            return {"error": f"Scan '{scan_id}' not found!"}, 400
         task_fs_map = compute_fileset_matches(scan)
-        fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
+        # Get the corresponding `Fileset` instance
+        try:
+            fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
+        except KeyError:
+            return {'error': "No 'AnglesAndInternodes' fileset mapped!"}, 400
+        except FilesetNotFoundError:
+            return {'error': "No 'AnglesAndInternodes' fileset found!"}, 400
+        # Get the `File` corresponding to the AnglesAndInternodes resource
+        try:
+            file = fs.get_file('AnglesAndInternodes')
+        except FileNotFoundError:
+            return {'error': "No 'AnglesAndInternodes' file found!"}, 400
+        except Exception as e:
+            return json.dumps({'error': str(e)}), 400
         # Load the JSON file:
-        measures = read_json(fs.get_file('AnglesAndInternodes'))
+        try:
+            measures = read_json(file.path())
+        except Exception as e:
+            return json.dumps({'error': str(e)}), 400
+
         # Make sure that the 'type' argument we got is a valid option, else default to 'all':
         if type in ['angles', 'internodes', 'fruit_points']:
             return measures[type]
@@ -1107,7 +1302,7 @@ class Archive(Resource):
                         )
         except Exception as e:
             self.logger.error(f"Failed to create archive for `{scan_id}` dataset: {e}")
-            return {'error': f'Failed to create archive for `{scan_id}` dataset: {e}'}, 500
+            return {'error': f'Failed to create archive for `{scan_id}` dataset: {e}'}, 400
 
         # Schedule the temporary file for cleanup after request completion
         @after_this_request
