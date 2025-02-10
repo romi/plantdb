@@ -136,7 +136,7 @@ It is organized as follows:
     "environment": "N/A",
     "nbPhotos": 0,
     "files": {
-      "metadatas": null,
+      "metadata": null,
       "archive": null
     }
   },
@@ -170,7 +170,7 @@ JSON dictionary with fields:
   * "nbPhotos": Number
   * "environment": String
   * "files": Object
-      * "files.metadatas": String, URL, example "/files/<scanid>/metadata/metadata.json"
+      * "files.metadata": String, URL, example "/files/<scanid>/metadata/metadata.json"
       * "files.archive": String, URL, example "/files/<scanid>/Visualization/scan.zip"
 
 ### thumbnailUri
