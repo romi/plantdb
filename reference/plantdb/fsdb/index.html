@@ -14919,12 +14919,12 @@ plantdb.fsdb._load_scan_metadata</p>
     fid <span style="color: #666">=</span> file_info<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;id&quot;</span>, <span style="color: #008000; font-weight: bold">None</span>)
     <span style="color: #008000; font-weight: bold">if</span> fid <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:
         logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Input `file_info`: </span><span style="color: #A45A77; font-weight: bold">{</span>file_info<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-        <span style="color: #008000; font-weight: bold">raise</span> FileNoIDError(<span style="color: #BA2121">&quot;File: No ID&quot;</span>)
+        <span style="color: #008000; font-weight: bold">raise</span> FileNoIDError(<span style="color: #BA2121">f&quot;File: No ID for file &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>file_info<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
 
     filename <span style="color: #666">=</span> file_info<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;file&quot;</span>, <span style="color: #008000; font-weight: bold">None</span>)
     <span style="color: #008000; font-weight: bold">if</span> filename <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:
         logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Input `file_info`: </span><span style="color: #A45A77; font-weight: bold">{</span>file_info<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-        <span style="color: #008000; font-weight: bold">raise</span> FileNoFileNameError(<span style="color: #BA2121">&quot;File: No filename&quot;</span>)
+        <span style="color: #008000; font-weight: bold">raise</span> FileNoFileNameError(<span style="color: #BA2121">f&quot;File: No filename for file &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>file_info<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
 
     file <span style="color: #666">=</span> File(fileset, fid)
     file<span style="color: #666">.</span>filename <span style="color: #666">=</span> filename  <span style="color: #3D7B7B; font-style: italic"># set the filename attribute</span>
@@ -14932,7 +14932,7 @@ plantdb.fsdb._load_scan_metadata</p>
     path <span style="color: #666">=</span> _file_path(file)
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> path<span style="color: #666">.</span>is_file():
         logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Missing file: </span><span style="color: #A45A77; font-weight: bold">{</span>path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-        <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">FileNotFoundError</span>(<span style="color: #BA2121">&quot;File: Not found&quot;</span>)
+        <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">FileNotFoundError</span>(<span style="color: #BA2121">f&quot;File: Not found at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
     <span style="color: #008000; font-weight: bold">return</span> file
 </code></pre></div></td></tr></table></div>
             </details>
