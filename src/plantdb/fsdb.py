@@ -2302,12 +2302,12 @@ def _parse_file(fileset, file_info):
     fid = file_info.get("id", None)
     if fid is None:
         logger.debug(f"Input `file_info`: {file_info}")
-        raise FileNoIDError("File: No ID")
+        raise FileNoIDError(f"File: No ID for file '{file_info}'")
 
     filename = file_info.get("file", None)
     if filename is None:
         logger.debug(f"Input `file_info`: {file_info}")
-        raise FileNoFileNameError("File: No filename")
+        raise FileNoFileNameError(f"File: No filename for file '{file_info}'")
 
     file = File(fileset, fid)
     file.filename = filename  # set the filename attribute
@@ -2315,7 +2315,7 @@ def _parse_file(fileset, file_info):
     path = _file_path(file)
     if not path.is_file():
         logger.debug(f"Missing file: {path}")
-        raise FileNotFoundError("File: Not found")
+        raise FileNotFoundError(f"File: Not found at '{path}'")
     return file
 
 
