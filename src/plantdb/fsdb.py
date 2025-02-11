@@ -2222,9 +2222,6 @@ def _load_fileset_files(fileset, fileset_info):
             except FileNoIDError:
                 logger.error(f"Could not get an 'id' entry for the {n}-th 'files' entry from '{scan_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
-            except FileNoFileNameError:
-                logger.error(f"Could not get a 'file' entry for file id '{fid}' from '{scan_id}/{fs_id}'.")
-                logger.debug(f"Current `file_info`: {file_info}")
             except FileNotFoundError:
                 fs_id = fileset.id
                 fname = file_info.get("file")
