@@ -156,9 +156,9 @@ else
   cmd_status=$?
   # Print build time if successful (code 0), else print command exit code
   if [ ${cmd_status} == 0 ]; then
-    echo -e "\n${INFO}Command SUCCEEDED in $(expr $(date +%s) - ${start_time})s!"
+    echo -e "\n${INFO}Command SUCCEEDED in $(($(date +%s) - start_time))s!"
   else
-    echo -e "\n${ERROR}Command FAILED after $(expr $(date +%s) - ${start_time})s with code ${cmd_status}!"
+    echo -e "\n${ERROR}Command FAILED after $(($(date +%s) - start_time))s with code ${cmd_status}!"
   fi
   # Exit with status code:
   exit ${cmd_status}
