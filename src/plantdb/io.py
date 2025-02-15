@@ -953,6 +953,17 @@ def read_torch(file, ext="pt", **kwargs):
     -------
     Torch.Tensor
         The loaded tensor object.
+
+    Examples
+    --------
+    >>> from plantdb.io import read_torch
+    >>> from plantdb.test_database import test_database
+    >>> db = test_database(with_models=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("real_plant_analyzed")
+    >>> model_file = db.get_scan('models').get_fileset('models').get_file('Resnet_896_896_epoch50')
+    >>> model = read_torch(model_file)
+    >>> db.disconnect()
     """
     import torch
     # Get path to file if in a database:
