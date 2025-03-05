@@ -45,30 +45,6 @@ REST_API_URL = "127.0.0.1"
 REST_API_PORT = 5000
 
 
-def base_url(host=REST_API_URL, port=REST_API_PORT):
-    """Generates the URL for the PlantDB REST API using the specified host and port.
-
-    Parameters
-    ----------
-    host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
-
-    Returns
-    -------
-    str
-        A properly formatted URL of the PlantDB REST API.
-
-    Examples
-    --------
-    >>> from plantdb.rest_api_client import base_url
-    >>> base_url()
-    'http://127.0.0.1:5000'
-    """
-    return f"http://{host}:{port}"
-
-
 def sanitize_name(name):
     """Sanitizes and validates the provided name.
 
@@ -102,6 +78,119 @@ def sanitize_name(name):
         raise ValueError(
             f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
     return sanitized_name
+
+
+def base_url(host=REST_API_URL, port=REST_API_PORT):
+    """Generates the URL for the PlantDB REST API using the specified host and port.
+
+    Parameters
+    ----------
+    host : str, optional
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port number of the PlantDB REST API server. Defaults to ``5000``.
+
+    Returns
+    -------
+    str
+        A properly formatted URL of the PlantDB REST API.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import base_url
+    >>> base_url()
+    'http://127.0.0.1:5000'
+    """
+    return f"http://{host}:{port}"
+
+
+def scans_url(host=REST_API_URL, port=REST_API_PORT):
+    """Generates the URL listing the scans from the PlantDB REST API.
+
+    Parameters
+    ----------
+    host : str, optional
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port number of the PlantDB REST API server. Defaults to ``5000``.
+
+    Returns
+    -------
+    str
+        A properly formatted URL of the PlantDB REST API pointing to the scans list.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import scans_url
+    >>> scans_url()
+    'http://127.0.0.1:5000/scans'
+    """
+    return urljoin(base_url(host, port), "/scans")
+
+
+def scan_url(scan_id, host=REST_API_URL, port=REST_API_PORT):
+    """Generates the URL pointing to the scan JSON from the PlantDB REST API.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset to retrieve the JSON from.
+    host : str, optional
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port number of the PlantDB REST API server. Defaults to ``5000``.
+
+    Returns
+    -------
+    str
+        A properly formatted URL of the PlantDB REST API pointing to the scans list.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import scan_url
+    >>> scan_url("real_plant")
+    'http://127.0.0.1:5000/scans/real_plant'
+    """
+    return urljoin(base_url(host, port), f"/scans/{sanitize_name(scan_id)}")
+
+
+def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
+    """Get the URL to the image for a scan dataset and task fileset served by the PlantDB REST API.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset to be retrieved.
+    fileset_id : str
+        The name of the fileset containing the image to be retrieved.
+    file_id : str
+        The name of the image file to be retrieved.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string, defaulting to ``'orig'``, and it works as follows:
+           * ``'thumb'``: image max width and height to `150`.
+           * ``'large'``: image max width and height to `1500`;
+           * ``'orig'``: original image, no cache;
+    host : str, optional
+        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
+    port : str or int, optional
+        The port of the PlantDB REST API. Defaults to ``5000``.
+
+    Returns
+    -------
+    str
+        The URL to an image of a scan dataset and task fileset.
+
+    Examples
+    --------
+    >>> from plantdb.rest_api_client import scan_image_url
+    >>> scan_image_url("real_plant", "images", "00000_rgb")
+    'http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=orig'
+    """
+    scan_id = sanitize_name(scan_id)
+    fileset_id = sanitize_name(fileset_id)
+    file_id = sanitize_name(file_id)
+    return urljoin(base_url(host, port), f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}")
 
 
 def refresh_url(dataset_name=None, **kwargs):
@@ -237,7 +326,7 @@ def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
     >>> print(list_scan_names())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
-    return sorted(requests.get(url=f"{base_url(host, port)}/scans").json())
+    return sorted(requests.get(url=scans_url(host, port)).json())
 
 
 def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
@@ -262,7 +351,7 @@ def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
     >>> get_scans_info()
     """
     scan_list = list_scan_names(host, port)
-    return [requests.get(url=f"{base_url(host, port)}/scans/{scan}").json() for scan in scan_list]
+    return [requests.get(url=scan_url(scan, host, port)).json() for scan in scan_list]
 
 
 def parse_scans_info(host=REST_API_URL, port=REST_API_PORT):
@@ -323,8 +412,7 @@ def get_scan_data(scan_id, host=REST_API_URL, port=REST_API_PORT):
     >>> print(scan_data['hasColmap'])
     False
     """
-    scan_id = sanitize_name(scan_id)
-    return requests.get(url=f"{base_url(host, port)}/scans/{scan_id}").json()
+    return requests.get(url=scan_url(scan_id, host, port)).json()
 
 
 def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size="thumb"):
@@ -355,39 +443,6 @@ def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size=
     if size != "thumb":
         thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
     return f"{base_url(host, port)}{thumb_uri}"
-
-
-def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
-    """Get the URL to the image for a scan dataset and task fileset served by the PlantDB REST API.
-
-    Parameters
-    ----------
-    scan_id : str
-        The name of the scan dataset to be retrieved.
-    fileset_id : str
-        The name of the fileset containing the image to be retrieved.
-    file_id : str
-        The name of the image file to be retrieved.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string, defaulting to ``'orig'``, and it works as follows:
-           * ``'thumb'``: image max width and height to `150`.
-           * ``'large'``: image max width and height to `1500`;
-           * ``'orig'``: original image, no cache;
-    host : str, optional
-        The IP address of the PlantDB REST API. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port of the PlantDB REST API. Defaults to ``5000``.
-
-    Returns
-    -------
-    str
-        The URL to an image of a scan dataset and task fileset.
-    """
-    scan_id = sanitize_name(scan_id)
-    fileset_id = sanitize_name(fileset_id)
-    file_id = sanitize_name(file_id)
-    return f"{base_url(host, port)}/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
 
 
 def get_scan_image(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
