@@ -575,6 +575,66 @@ def sanitize_name(name):
     return sanitized_name
 
 
+class Register(Resource):
+    def __init__(self, db):
+        self.db = db
+
+    def post(self):
+        data = request.get_json()
+
+        # Check if all required fields are present
+        required_fields = ['username', 'fullname', 'password']
+        if not data or not all(field in data for field in required_fields):
+            return {
+                'success': False,
+                'message': 'Missing required fields. Please provide username, fullname, and password'
+            }, 400
+
+        try:
+            # Create the new user using the database method
+            self.db.create_user(
+                username=data['username'],
+                fullname=data['fullname'],
+                password=data['password']
+            )
+
+            return {
+                'success': True,
+                'message': 'User successfully created'
+            }, 201
+
+        except Exception as e:
+            # Handle any potential errors (like duplicate username)
+            return {
+                'success': False,
+                'message': f'Failed to create user: {str(e)}'
+            }, 400
+
+
+class Login(Resource):
+    def __init__(self, db):
+        self.db = db
+
+    def post(self):
+        data = request.get_json()
+
+        if not data or 'username' not in data or 'password' not in data:
+            return {'authenticated': False, 'message': 'Missing username or password'}, 400
+
+        username = data['username']
+        password = data['password']
+        is_authenticated = self.check_credentials(username, password)
+
+        if is_authenticated:
+            message = f"Login successful. Welcome, {self.db.user[username]['fullname']}!"
+        else:
+            message = f"Login failed. Please check your username and password!"
+        return {'authenticated': is_authenticated, 'message': message}, 200 if is_authenticated else 401
+
+    def check_credentials(self, username, password):
+        return self.db.validate_user(username, password)
+
+
 class ScansList(Resource):
     """Concrete RESTful resource to serve the list of scan datasets."""
 

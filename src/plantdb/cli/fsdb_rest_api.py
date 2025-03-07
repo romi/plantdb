@@ -86,10 +86,12 @@ from plantdb.rest_api import CurveSkeleton
 from plantdb.rest_api import DatasetFile
 from plantdb.rest_api import File
 from plantdb.rest_api import Image
+from plantdb.rest_api import Login
 from plantdb.rest_api import Mesh
 from plantdb.rest_api import PointCloud
 from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
+from plantdb.rest_api import Register
 from plantdb.rest_api import Scan
 from plantdb.rest_api import ScansList
 from plantdb.rest_api import ScansTable
@@ -126,7 +128,8 @@ def parsing():
     return parser
 
 
-def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False, log_level=DEFAULT_LOG_LEVEL):
+def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False,
+             log_level=DEFAULT_LOG_LEVEL):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -176,6 +179,7 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
             db_location = test_database(None).path()
         else:
             db_location = test_database(DATASET, with_configs=True, with_models=models).path()
+
         # Register cleanup if a temporary database was created
         def cleanup():
             logger.info(f"Cleaning up temporary database directory at '{db_location}'...")
@@ -227,6 +231,10 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
+    api.add_resource(Register, '/register',
+                     resource_class_args=tuple([db]))
+    api.add_resource(Login, '/login',
+                     resource_class_args=tuple([db]))
 
     # Start the Flask application:
     app.run(host=host, port=port, debug=debug)
