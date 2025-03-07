@@ -545,7 +545,7 @@ class FSDB(db.DB):
 
         # Verify password
         stored_hash = self.users[username]['password']
-        if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
             # Reset failed attempts on successful login
             self.failed_login_attempts[username] = 0
             self.users[username]['last_login'] = datetime.now()
@@ -554,6 +554,10 @@ class FSDB(db.DB):
         # Handle failed login attempt
         self._record_failed_attempt(username)
         return False
+
+    def user_exists(self, username: str) -> bool:
+        """Check if the user exists in the local database."""
+        return username in self.users
 
     def _is_account_locked(self, username: str) -> bool:
         """Verify if the account is locked.
