@@ -102,13 +102,12 @@ plugins:
             signature_crossrefs: true
             show_root_full_path: true
             show_root_heading: true
-            show_category_heading: true
+            show_category_heading: False
             show_bases: true
             separate_signature: true
-            show_symbol_type_heading: true
+            show_symbol_type_heading: False
             show_symbol_type_toc: true
             inherited_members: true
-            docstring_section_style: list
 
 extra_css:
   - assets/css/extra.css
