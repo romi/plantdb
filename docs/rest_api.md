@@ -1,18 +1,20 @@
 # PlantDB REST API
 
-Hereafter we introduce the URLS to use to communicate via the REST API.
+Hereafter we introduce the URLS to use to communicate via the PlantDB REST API.
+
 The Python implementation is done in the `plantdb.rest_api` module and the CLI to start a Flask server is in `fsdb_rest_api`.
 
-## REST URLs
+## Metadata and Files Endpoints
 
 ### `/scans`
 
 Here are the specifications for the `/scans` URL:
 
 * Resource: [`plantdb.rest_api.ScansList`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansList)
+* Methods: GET
 * Arguments: `filterQuery`
 * Returns: a JSON compliant list of dictionaries.
-* Example:
+* Examples:
     * Get all scans:
     [http://127.0.0.1:5000/scans](http://127.0.0.1:5000/scans)
     * Search for "arabidopsis" in metadata:
@@ -23,11 +25,19 @@ Here are the specifications for the `/scans` URL:
 Here are the specifications for the `/scans_info` URL:
 
 * Resource: [`plantdb.rest_api.ScansTable`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansTable)
+* Methods: GET
 * Arguments: `filterQuery`
-* Returns: A JSON-compliant table structure containing detailed scan metadata.
+* Returns: A JSON-compliant dictionary containing scan data in a tabular format, including:
+    * Basic scan metadata
+    * File counts per fileset
+    * Task status information
+    * Derived data availability
 * Example:
     * Get all scans in a tabular format:
-    [http://127.0.0.1:5000/scans_info](http://127.0.0.1:5000/scans_info)
+    [http://127.0.0.1:5000/scans_info/real_plant_analyzed](http://127.0.0.1:5000/scans_info/real_plant_analyzed)
+
+!!! note
+    The response includes information about all filesets and tasks associated with the scan, making it useful for getting a comprehensive overview of a specific scan's contents and processing status.
 
 ### `/scans/<scan_id>`
 
@@ -166,6 +176,51 @@ Here are the specifications for the `/refresh` URL:
 * Returns: `200` on completion.
 * Example: [http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
 
+
+## Authentication Endpoints
+
+### `/register`
+
+Here are the specifications for the `/register` URL:
+
+* Resource: [`plantdb.rest_api.Register`](reference/plantdb/rest_api.md#plantdb.rest_api.Register)
+* Method: POST
+* Arguments:
+    * `username`: The desired username
+    * `password`: The password for the account
+* Returns: Registration confirmation or error message.
+* Example:
+    ```bash
+    curl -X POST http://127.0.0.1:5000/register -H "Content-Type: application/json" -d '{"username":"user123", "password":"securepass"}'
+    ```
+
+### `/login`
+
+Here are the specifications for the `/login` URL:
+
+* Resource: [`plantdb.rest_api.Login`](reference/plantdb/rest_api.md#plantdb.rest_api.Login)
+* Methods: GET, POST
+* Arguments for POST:
+    * `username`: The username
+    * `password`: The password
+* Returns: Authentication token on successful login.
+* Example:
+    ```bash
+    curl -X POST http://127.0.0.1:5000/login -H "Content-Type: application/json" -d '{"username":"user123", "password":"securepass"}'
+    ```
+
+### `/refresh`
+
+Here are the specifications for the `/refresh` URL:
+
+* Resource: [`plantdb.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.rest_api.Refresh)
+* Method: GET
+* Arguments: none (requires valid authentication token in header)
+* Returns: A new authentication token.
+* Example:
+    ```bash
+    curl -X GET http://127.0.0.1:5000/refresh -H "Authorization: Bearer <your_current_token>"
+    ```
 
 ## Scan summary
 Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.

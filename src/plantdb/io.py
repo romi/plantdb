@@ -28,62 +28,71 @@ The ``io`` module of the ROMI ``plantdb`` library contains all functions for rea
 
 Hereafter we detail the formats and their associated Python types and meanings.
 
-## json
+json
+----
 Dictionaries or lists, read and written using ``json``.
 
 * Python objects: ``dict``, ``list``
 * File extensions: 'json'
 
-## toml
+toml
+----
 Dictionaries or lists, read and written using ``toml``.
 
 * Python objects: ``dict``, ``list``
 * File extensions: 'toml'
 
-## 2D image
-
+2D image
+--------
 RGB or RGBA image data, read and written using ``imageio``.
 
 * Python objects: ``numpy.ndarray``
 * File extensions: 'jpg', 'png'
 
-## 3D volume
+3D volume
+---------
 Grayscale or binary volume image data, read and written using ``imageio``.
 
 * Python objects: ``numpy.ndarray``
 * File extensions: 'tiff'
 
-## Labelled 3D volume
+Labelled 3D volume
+------------------
 Labelled volume image data, converted to dictionary of 3D (binary) numpy arrays, read and written using ``numpy``.
 
 * Python objects: ``dict`` of 3D ``numpy.ndarray``
 * File extensions: 'npz'
 
-## Point cloud
+Point cloud
+-----------
 Point clouds, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.PointCloud``
 * File extensions: 'ply'
 
-## Triangle mesh
+Triangle mesh
+-------------
 Triangular meshes, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.TriangleMesh``
 * File extensions: 'ply'
 
-## Voxel grid
+Voxel grid
+----------
 Voxel grids, read and written using ``open3d``.
 
 * Python object: ``open3d.geometry.VoxelGrid``
 * File extensions: 'ply'
 
-## Tree graph
+Tree graph
+----------
 Tree graphs, read and written using ``networkx``.
 
 * Python object: ``networkx.Graph``
 * File extensions: 'p'
 
-## Pytorch tensor
+Pytorch tensor
+--------------
 Trained tensor, read and written using ``torch``.
 
 * Python object: ``torch.tensor``

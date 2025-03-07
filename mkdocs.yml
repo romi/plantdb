@@ -83,15 +83,11 @@ plugins:
             - https://docs.python.org/3/objects.inv
             - https://numpy.org/doc/stable/objects.inv
             - https://flask.palletsprojects.com/en/latest/objects.inv
-            - https://pandas.pydata.org/docs/objects.inv
-            - https://matplotlib.org/stable/objects.inv
-            - https://scikit-learn.org/stable/objects.inv
-            - https://scipy.org/doc/scipy/objects.inv
-            - https://click.palletsprojects.com/en/latest/objects.inv
-            - https://jinja.palletsprojects.com/en/latest/objects.inv
+            - https://networkx.org/documentation/stable/objects.inv
             - https://werkzeug.palletsprojects.com/en/latest/objects.inv
             - https://flask-restful.readthedocs.io/en/latest/objects.inv
-            - https://plotly.com/python-api-reference/objects.inv
+            - https://pytorch.org/docs/stable/objects.inv
+            - http://www.open3d.org/docs/latest/objects.inv
           options:
             docstring_style: numpy
             docstring_section_style: table
