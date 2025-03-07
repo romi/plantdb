@@ -619,14 +619,57 @@ def rate_limit(max_requests=5, window_seconds=60):
 
 
 class Register(Resource):
+    """A RESTful resource to manage user registration via HTTP POST requests.
+
+    Responsible for handling the registration process by validating and creating user records in the database.
+    This class provides a structured way to interact with user data, ensuring error handling and
+    proper responses for client requests.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database instance used for storing and managing user records.
+    """
+
     def __init__(self, db):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database object for with user records.
+        """
         self.db = db
 
     @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
     def post(self):
+        """Handle HTTP POST request to register a new user.
+
+        Processes user registration by validating the input data and creating a new user in the database.
+        Expects a JSON payload in the request body with required user details.
+
+        Request Body
+        ------------
+        username : str
+            Unique identifier for the user.
+        fullname : str
+            User's full name.
+        password : str
+            User's password for authentication.
+
+        Returns
+        -------
+        dict
+            A dictionary with the following keys and values:
+                - 'success' (bool): Indicates if operation was successful
+                - 'message' (str): Description of the operation result
+        int
+            HTTP status code (``201`` for success, ``400`` for error)
+        """
+        # Parse JSON data from request body
         data = request.get_json()
 
-        # Check if all required fields are present
+        # Check if all required fields are present in the request
         required_fields = ['username', 'fullname', 'password']
         if not data or not all(field in data for field in required_fields):
             return {
@@ -635,20 +678,19 @@ class Register(Resource):
             }, 400
 
         try:
-            # Create the new user using the database method
+            # Attempt to create new user in database
             self.db.create_user(
                 username=data['username'],
                 fullname=data['fullname'],
                 password=data['password']
             )
-
+            # Return success response if user creation succeeds
             return {
                 'success': True,
                 'message': 'User successfully created'
             }, 201
-
         except Exception as e:
-            # Handle any potential errors (like duplicate username)
+            # Return error response if user creation fails (e.g., duplicate username)
             return {
                 'success': False,
                 'message': f'Failed to create user: {str(e)}'
@@ -656,10 +698,65 @@ class Register(Resource):
 
 
 class Login(Resource):
+    """A RESTful resource to handle user login and authentication processes.
+
+    This class processes HTTP requests for user authentication, including checking
+    if a username exists in the database and validating login credentials.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        A database object that provides access to user-related operations such as
+        checking if a user exists and validating user credentials.
+    """
+
     def __init__(self, db):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database object for accessing user data.
+        """
         self.db = db
 
+    def get(self, username):
+        """Checks if a given username exists in the database and returns the result.
+
+        Parameters
+        ----------
+        username : str
+            The username to check in the database. This must be a non-empty string.
+
+        Returns
+        -------
+        dict
+            A dictionary with the result and an HTTP status code.
+            If the `username` is missing, the dictionary will contain an error message.
+            Otherwise, the dictionary will contain the `username` and a boolean indicating whether it exists.
+        int
+            An HTTP status code. If the `username` is missing  the status code will be ``400``, otherwise ``200``.
+        """
+        if not username:
+            return {'error': 'Missing username parameter'}, 400
+
+        user_exists = self.db.user_exists(username)
+        return {'username': username, 'exists': user_exists}, 200
+
     def post(self):
+        """Handles user authentication by validating the provided username and password against stored credentials.
+
+        Returns
+        -------
+        dict
+            A dictionary with the following keys and values:
+                - 'authenticated' : bool
+                    The result of the authentication process (True if successful, False otherwise).
+                - 'message' : str
+                    A message describing the result of the authentication attempt.
+        int
+            The HTTP status code (``200`` for successful response, ``400`` for bad request).
+        """
         data = request.get_json()
 
         if not data or 'username' not in data or 'password' not in data:
@@ -670,69 +767,198 @@ class Login(Resource):
         is_authenticated = self.check_credentials(username, password)
 
         if is_authenticated:
-            message = f"Login successful. Welcome, {self.db.user[username]['fullname']}!"
+            message = f"Login successful. Welcome, {self.db.users[username]['fullname']}!"
         else:
             message = f"Login failed. Please check your username and password!"
-        return {'authenticated': is_authenticated, 'message': message}, 200 if is_authenticated else 401
+        return {'authenticated': is_authenticated, 'message': message}, 200
 
     def check_credentials(self, username, password):
+        """Validates user credentials against the database.
+
+        Parameters
+        ----------
+        username : str
+            The username provided by the user or client for authentication.
+        password : str
+            The password corresponding to the username for authentication.
+
+        Returns
+        -------
+        bool
+            ``True`` if the credentials are valid, ``False`` otherwise.
+        """
         return self.db.validate_user(username, password)
 
 
 class ScansList(Resource):
-    """Concrete RESTful resource to serve the list of scan datasets."""
+    """A RESTful resource for managing and retrieving scan datasets.
+
+    This class implements a REST API endpoint that provides access to scan datasets.
+    It supports filtered queries and fuzzy matching capabilities through HTTP GET
+    requests.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database connection object used to interact with the scan datasets.
+
+    See Also
+    --------
+    flask_restful.Resource : Base class for RESTful resources
+    """
 
     def __init__(self, db):
+        """Initialize the ScansList resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database connection object for accessing scan data.
+        """
         self.db = db
 
     def get(self):
-        """Returns a list of scan dataset.
+        """Retrieve a list of scan datasets with optional filtering.
+
+        This endpoint provides access to scan datasets stored in the database. It allows
+        filtering of results using a JSON-formatted query string and supports fuzzy
+        matching for string-based searches.
+
+        Parameters
+        ----------
+        filterQuery : str, optional
+            JSON-formatted string containing filter criteria for querying datasets.
+            Should be passed as a URL query parameter.
+            Example: ``{"object":{"species":"Arabidopsis.*"}}``
+        fuzzy : bool, optional
+            Whether to enable fuzzy matching for string fields in the filter query.
+            Should be passed as a URL query parameter.
+            Default is ``False``.
 
         Returns
         -------
-        list of dict
-            The list of dictionaries to serve (as JSON)
+        list
+            The List of scan datasets matching the filter criteria.
+            Each item is a dictionary containing dataset metadata.
+        int
+            HTTP status code (``200`` for success, ``400``/``500`` for errors).
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
         >>> # Get an info dict about all dataset:
-        >>> res = requests.get("http://127.0.0.1:5000/scans")
-        >>> scans_list = json.loads(res.content)
-        >>> # List the known dataset id:
-        >>> print(scans_list)
-        ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
-        >>> res = requests.get('http://127.0.0.1:5000/scans?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
-        >>> res.content.decode()
-
+        >>> response = requests.get("http://127.0.0.1:5000/scans")
+        >>> scans_list = response.json()
+        >>> print(scans_list)  # List the known dataset ids
+        ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant']
+        >>> # Get datasets with fuzzy filtering
+        >>> filter_query = {"object":{"species":"Arabidopsis.*"}}
+        >>> response = requests.get("http://127.0.0.1:5000/scans", params={"filterQuery": json.dumps(filter_query), "fuzzy": "true"})
+        >>> filtered_scans = response.json()
+        >>> print(filtered_scans)  # List the filtered dataset ids
         """
-        query = request.args.get('filterQuery', None)
-        fuzzy = request.args.get('fuzzy', False, type=bool)
-        if query is not None:
-            query = json.loads(query)
-        return self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+        try:
+            # Get filter query and fuzzy match parameters from request URL
+            query = request.args.get('filterQuery', None)
+            fuzzy = request.args.get('fuzzy', False, type=bool)
+            # Parse JSON filter query if provided
+            if query is not None:
+                try:
+                    query = json.loads(query)
+                except json.JSONDecodeError:
+                    return {'message': 'Invalid JSON format in filterQuery parameter.'}, 400
+            # Query database for matching scans, allowing access to all owners
+            scans = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+            return scans, 200
+        except Exception as e:
+            # Return error response if any exception occurs
+            return {'message': f'Error retrieving scan list: {str(e)}'}, 500
 
 
 class ScansTable(Resource):
-    """Concrete RESTful resource to serve the list of scan datasets and some info upon request (GET method)."""
+    """A RESTful resource for managing and retrieving scan dataset information.
+
+    This class provides a REST API endpoint to serve information about scan datasets.
+    It supports filtering datasets based on query parameters and returns detailed
+    information about each matching scan.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database connection object used to interact with the scan datasets.
+    logger : Logger
+        The logger instance for this resource.
+
+    See Also
+    --------
+    plantdb.rest_api.get_scan_info : Function used to extract information for each scan
+
+    Examples
+    --------
+    >>> # Start a test REST API server first:
+    >>> # $ fsdb_rest_api --test
+    >>> import requests
+    >>> import json
+    >>> # Get all scan datasets
+    >>> response = requests.get("http://127.0.0.1:5000/scans_info")
+    >>> scans = json.loads(response.content)
+    >>> print(scans[0]['id'])  # print the id of the first scan dataset
+    >>> print(scans[0]['metadata'])  # print the metadata of the first scan dataset
+    >>> # Get filtered results using query
+    >>> query = {"object": {"species": "Arabidopsis.*"}}
+    >>> response = requests.get("http://127.0.0.1:5000/scans_info", params={"filterQuery": json.dumps(query), "fuzzy": "true"})
+    >>> filtered_scans = json.loads(response.content)
+    >>> print(filtered_scans[0]['id'])  # print the id of the first scan dataset matching the query
+    """
 
     def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance providing access to scan data.
+        logger : loggin.Logger
+            A logger instance for recording operations and errors.
+        """
         self.db = db
         self.logger = logger
 
     def get(self):
-        """Returns a list of scan dataset information.
+        """Retrieve a list of scan dataset information.
+
+        This method handles GET requests to retrieve scan information. It supports
+        filtering through query parameters and returns detailed information about
+        matching scans.
+
+        Parameters
+        ----------
+        filterQuery : str, optional
+            JSON string containing filter criteria for scans.
+            Must be valid JSON that can be parsed into a query dict.
+        fuzzy : bool, optional
+            If ``True``, enables fuzzy matching in filter queries.
+            Defaults to ``False``.
 
         Returns
         -------
         list of dict
-            The list of dictionaries to serve (as JSON)
+            List of dictionaries containing scan information with:
+            - 'metadata' (dict): Scan metadata including acquisition date, object info
+            - 'tasks' (dict): Information about processing tasks
+            - 'files' (dict): File paths and URIs related to the scan
+
+        Raises
+        ------
+        JSONDecodeError
+            If the provided filterQuery parameter is not valid JSON.
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> import json
         >>> # Get an info dict about all dataset:
@@ -758,37 +984,82 @@ class ScansTable(Resource):
 
 
 class Scan(Resource):
-    """Concrete RESTful resource to serve a scan dataset upon request (GET method)."""
+    """A RESTful resource class for serving scan dataset information.
+
+    This class handles HTTP GET requests for scan datasets, providing detailed
+    information about the scan including metadata, file locations, and task status.
+
+    Attributes
+    ----------
+    db : Database
+        The database instance used to retrieve scan information.
+    logger : Logger
+        The logger instance for recording operations.
+
+    Notes
+    -----
+    The class sanitizes scan IDs before processing requests to ensure security.
+    All responses are returned as JSON-serializable dictionaries.
+
+    See Also
+    --------
+    plantdb.rest_api.get_scan_info : Function used to collect and format scan information
+    plantdb.rest_api.sanitize_name : Function used to validate and clean scan IDs
+    """
 
     def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance providing access to scan data.
+        logger : loggin.Logger
+            A logger instance for recording operations and errors.
+        """
         self.db = db
         self.logger = logger
 
     def get(self, scan_id):
-        """Returns the scan dataset information.
+        """Retrieve detailed information about a specific scan dataset.
 
         Parameters
         ----------
         scan_id : str
-            The name of the scan for which to serve the information.
+            Identifier for the scan dataset. Must contain only alphanumeric
+            characters, underscores, dashes, or periods.
 
         Returns
         -------
         dict
-            The dictionary to serve (as JSON)
+            A dictionary containing scan information with the following keys:
+            - 'metadata' (dict): Contains scan date, object information, and image count
+            - 'files' (dict): Contains paths to related files and archives
+            - 'tasks' (dict): Contains information about processing task status
+            - 'thumbnail' (str): URI to the scan's thumbnail image
+
+        Raises
+        ------
+        ValueError
+            If the scan_id contains invalid characters
+        NotFoundError
+            If the specified scan does not exist in the database
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> import json
-        >>> # Get a detailed info dict about a specific dataset:
-        >>> res = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
-        >>> scan = json.loads(res.content)
-        >>> # Get the date from the metadata:
-        >>> print(scan['metadata']['date'])
+        >>> # Get detailed information about a specific dataset
+        >>> response = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
+        >>> scan_data = json.loads(response.content)
+        >>> # Access metadata information
+        >>> print(scan_data['metadata']['date'])
         2024-08-19 11:12:25
-
+        >>> # Check if point cloud processing is complete
+        >>> print(scan_data['tasks']['point_cloud'])
+        True
         """
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
@@ -796,37 +1067,77 @@ class Scan(Resource):
 
 
 class File(Resource):
-    """Concrete RESTful resource to serve a file upon request (GET method)."""
+    """A RESTful resource class for serving files via HTTP GET requests.
+
+    This class implements a REST API endpoint that serves files from a specified
+    database location. It inherits from Flask-RESTful's Resource class and
+    provides file serving capabilities through GET requests.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        A Database instance containing the file path configuration.
+
+    Notes
+    -----
+    The class requires proper initialization with a database instance that
+    provides a valid path() method for file location resolution.
+    """
 
     def __init__(self, db):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance providing access to file locations.
+        """
         self.db = db
 
     def get(self, path):
-        """Returns a requested file.
+        """Serve a file from the database directory via HTTP.
+
+        This method handles GET requests by serving the requested file from
+        the configured database directory. It uses Flask's `send_from_directory`
+        to safely serve the file.
 
         Parameters
         ----------
         path : str
-            The relative path to the file to serve.
-            The global variable `db_location` is used to set the absolute path.
+            Relative path to the requested file within the database directory.
+            This path will be resolved against the database root path.
 
         Returns
         -------
         flask.Response
-            The HTTP response from the flask server.
+            A Flask response object containing the requested file or an
+            appropriate error response if the file is not found.
+
+        Raises
+        ------
+        werkzeug.exceptions.NotFound
+            If the requested file does not exist
+        werkzeug.exceptions.Forbidden
+            If the file access is forbidden
+
+        Notes
+        -----
+        The file serving is handled securely through Flask's `send_from_directory`,
+        which prevents directory traversal attacks and handles file access permissions.
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start the REST API server (in test mode)
+        >>> # fsdb_rest_api --test
+        >>> # Request a TOML configuration file
         >>> import requests
         >>> import toml
-        >>> import json
-        >>> # Load the configuration file 'pipeline.toml':
         >>> res = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
         >>> cfg = toml.loads(res.content.decode())
         >>> print(cfg['Undistorted'])
         {'upstream_task': 'ImagesFilesetExists'}
-        >>> # Load the configuration file 'pipeline.toml':
+        >>> # Request a JSON file
+        >>> import json
         >>> res = requests.get("http://127.0.0.1:5000/files/Col-0_E1_1/files.json")
         >>> json.loads(res.content.decode())
         """
@@ -834,39 +1145,101 @@ class File(Resource):
 
 
 class DatasetFile(Resource):
-    """Concrete RESTful resource to serve a file upon request (GET method)."""
+    """A RESTful resource handler for file upload operations in a plant database system.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database instance that provides access to scan data and file locations.
+        Used for validating scan IDs and determining file storage paths.
+
+    Notes
+    -----
+    File operations are performed with proper error handling and cleanup
+    of partial uploads in case of failures.
+
+    See Also
+    --------
+    plantdb.rest_api.ScansList : Resource for managing scan listings
+    plantdb.rest_api.File : Resource for file retrieval operations
+    """
 
     def __init__(self, db):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance providing access to file locations.
+        """
         self.db = db
 
     def post(self, scan_id):
-        """Handles a POST request to upload and save a file to the server.
+        """Handle POST request to upload and save a file to the server.
 
-        The method validates the required HTTP headers, processes the uploaded file either as a whole or in
-        chunks, and ensures the file is saved correctly to the desired location.
-        The method responds with appropriate HTTP status codes based on the success or failure of the operation.
+        This endpoint processes file uploads and saves them to the specified location. It supports
+        both full file uploads and chunked uploads based on the provided headers. The method
+        ensures data integrity by validating the received file size against the Content-Length.
 
         Parameters
         ----------
         scan_id : str
-            Unique identifier of the scan associated with the file upload.
-            Used to retrieve the base path for the file being saved.
+            Unique identifier for the scan associated with the file upload. Used to determine
+            the base storage path for the file.
 
         Returns
         -------
         flask.Response
-            A Flask response object with an appropriate HTTP status code and JSON
-            message. Status code '201' is returned for successful file upload, while
-            error codes ('400', '500') are returned for various error conditions.
+            JSON response with status code and message:
+            - 201: Successful upload with message confirming file save
+            - 400: Bad request (missing headers or invalid parameters)
+            - 500: Server error during file processing
 
         Notes
         -----
-        - The `Content-Disposition`, `Content-Length`, and `X-File-Path` headers are
-          mandatory for this endpoint to function correctly.
-        - If a `X-Chunk-Size` value is provided, the file is uploaded in chunks;
-          otherwise, the file is written in one step.
-        - If the number of received bytes differs from the expected number, the
-          partially uploaded file is removed.
+        Required HTTP headers:
+        - 'Content-Disposition': Contains file information
+        - 'Content-Length': Size of file in bytes
+        - 'X-File-Path': Relative path where file should be saved
+        - 'X-Chunk-Size' (optional): Size of chunks for streamed upload
+
+        The method will automatically create any necessary directories in the path.
+        Partial uploads are automatically cleaned up if they fail.
+
+        Raises
+        ------
+        Exception
+            When database access fails or file operations encounter errors.
+            All exceptions are caught and returned as HTTP 400 or 500 responses.
+
+        See Also
+        --------
+        write_stream : Helper function for chunked file uploads
+        write_data : Helper function for complete file uploads
+
+        Examples
+        --------
+        >>> # Start the REST API server (in test mode)
+        >>> # fsdb_rest_api --test
+        >>> # Request a TOML configuration file
+        >>> import requests
+        >>> import toml
+        >>> # Example POST request with required headers
+        >>> headers = {
+        ...     'Content-Disposition': 'attachment; filename=data.txt',
+        ...     'Content-Length': '1024',
+        ...     'X-File-Path': 'path/to/data.txt'
+        ... }
+        >>> response = requests.post(
+        ...     'http://api/scans/scan123/files',
+        ...     headers=headers,
+        ...     data=file_content
+        ... )
+        >>> response.status_code
+        201
+        >>> response.json()
+        {'message': 'File path/to/data.txt received and saved'}
+
         """
         # Check the header used to pass the filename, or return '400' for "bad request":
         if 'Content-Disposition' not in request.headers:
@@ -941,53 +1314,157 @@ class DatasetFile(Resource):
 
 
 class Refresh(Resource):
-    """Concrete RESTful resource to reload the database upon request (GET method)."""
+    """RESTful resource for reloading the database on demand.
+
+    A concrete implementation of Flask-RESTful Resource that provides an endpoint
+    to force reload the plant database. This is useful when the underlying data
+    has changed and needs to be refreshed in the running application.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        The database instance used for reloading data.
+    """
 
     def __init__(self, db):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance to reload.
+        """
         self.db = db
 
     @rate_limit(max_requests=1, window_seconds=60)  # maximum of 1 requests per minute
     def get(self):
         """Force the plant database to reload.
 
-        Examples
-        --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
-        >>> import requests
-        >>> # Refresh the database:
-        >>> res = requests.get("http://127.0.0.1:5000/refresh")
-        >>> res.ok
-        True
-        >>> res = requests.get("http://127.0.0.1:5000/refresh?scan_id=real_plant")
-
-        """
-        scan_id = request.args.get('scan_id', default=None, type=str)
-        self.db.reload(scan_id)
-        return 200
-
-
-class Image(Resource):
-    """Concrete RESTful resource to serve an image upon request (GET method)."""
-
-    def __init__(self, db):
-        self.db = db
-
-    def get(self, scan_id, fileset_id, file_id):
-        """Send the requested (cached) image, may resize it if necessary.
+        This endpoint triggers a reload of the plant database data. It can either reload the
+        entire database or selectively reload data for a specific plant scan.
 
         Parameters
         ----------
-        scan_id : str
-            The scan id.
-        fileset_id : str
-            The fileset id.
-        file_id : str
-            The file id.
+        scan_id : str, optional
+            Identifier for a specific plant scan to reload. If not provided,
+            reloads the entire database.
 
         Returns
         -------
         flask.Response
-            The HTTP response from the flask server.
+            A Response object with:
+            - Status code ``200`` and success message on successful reload
+            - Status code ``500`` and error message if reload fails
+
+        Raises
+        ------
+        FilesetNotFoundError
+            If the specified scan_id refers to a non-existent fileset
+        ScanNotFoundError
+            If the specified scan_id refers to a non-existent scan
+        Exception
+            For any other unexpected errors during reload
+
+        Notes
+        -----
+        This endpoint is rate-limited to ``1`` request per minute to prevent excessive
+        database reloads.
+
+        See Also
+        --------
+        plantdb.rest_api.rate_limit : Decorator that implements request rate limiting
+        plantsb.fsdb.FSDB.reload : The underlying database reload method
+
+        Examples
+        --------
+        >>> # Start the REST API server (in test mode)
+        >>> # fsdb_rest_api --test
+        >>> import requests
+        >>> # Refresh entire database
+        >>> response = requests.get("http://127.0.0.1:5000/refresh")
+        >>> response.status_code
+        200
+        >>>
+        >>> # Refresh specific scan
+        >>> response = requests.get("http://127.0.0.1:5000/refresh?scan_id=real_plant")
+        >>> response.status_code
+        200
+        """
+        try:
+            scan_id = request.args.get('scan_id', default=None, type=str)
+            self.db.reload(scan_id)
+            return {'message': f"Successfully reloaded {len(self.db.list_scans())} scans."}, 200
+        except Exception as e:
+            return {'message': f"Error during database reload: {str(e)}"}, 500
+
+
+class Image(Resource):
+    """RESTful resource for serving and resizing images on demand.
+
+    This class handles HTTP GET requests for images stored in the database,
+    with optional resizing capabilities. It serves both original and
+    thumbnail versions of images based on the request parameters.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database instance containing the image data.
+
+    Notes
+    -----
+    The class sanitizes all input parameters to prevent path traversal
+    attacks and ensure valid file access.
+    """
+
+    def __init__(self, db):
+        """Initialize the Image resource with a database connection.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database instance for accessing stored images.
+        """
+        self.db = db
+
+    def get(self, scan_id, fileset_id, file_id):
+        """Retrieve and serve an image from the database.
+
+        Handles image retrieval requests, optionally resizing the image
+        based on the 'size' query parameter. Supports both original size
+        and thumbnail versions.
+
+        Parameters
+        ----------
+        scan_id : str
+            Identifier for the scan containing the image.
+        fileset_id : str
+            Identifier for the fileset within the scan.
+        file_id : str
+            Identifier for the specific image file.
+        size : {'orig', 'large', 'thumb'} or int, optional
+            If an integer, use  it as the size of the cached image to create and return.
+            Otherwise, should be one of the valid string.
+            Should be passed as a URL query parameter.
+            Default to `'thumb'`
+
+        Returns
+        -------
+        flask.Response
+            HTTP response containing the image data with 'image/jpeg' mimetype.
+
+        Notes
+        -----
+        - All input parameters are sanitized before use.
+        - The 'size' parameter defaults to 'thumb' if not specified.
+        - Supported string size values are:
+            * `'thumb'`: image max width and height to `150`;
+            * `'large'`: image max width and height to `1500`;
+            * `'orig'`: original image, no chache;
+
+        See Also
+        --------
+        plantdb.rest_api.sanitize_name : Input sanitization & validation function.
+        plantdb.webcache.image_path : Image path resolution function with caching and resizing options.
 
         Examples
         --------
@@ -1020,27 +1497,73 @@ class Image(Resource):
 
 
 class PointCloud(Resource):
-    """Concrete RESTful resource to serve a point-cloud upon request (GET method)."""
+    """RESTful resource for serving and optionally downsampling point cloud data.
+
+    This class handles HTTP GET requests for point cloud data stored in PLY format,
+    with support for different sampling densities. It can serve both original and
+    preview versions of point clouds, or custom downsampling based on voxel size.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database instance containing the point cloud data.
+
+    Notes
+    -----
+    The class sanitizes all input parameters to prevent path traversal attacks
+    and ensures valid file access. Point clouds are served in PLY format with
+    'application/octet-stream' mimetype.
+    """
 
     def __init__(self, db):
+        """Initialize the PointCloud resource with a database connection.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database instance for accessing stored point cloud data.
+        """
         self.db = db
 
     def get(self, scan_id, fileset_id, file_id):
-        """Send the requested (cached) point-cloud, may down-sample it if necessary.
+        """Retrieve and serve a point cloud from the database.
+
+        Handles point cloud retrieval requests with optional downsampling based on
+        the 'size' query parameter. Supports original size, preview, and custom
+        voxel-based downsampling.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            Identifier for the scan containing the point cloud.
         fileset_id : str
-            The fileset id.
+            Identifier for the fileset within the scan.
         file_id : str
-            The file id.
+            Identifier for the specific point cloud file.
+        size : {'orig', 'preview'} or float, optional
+            If a float, use it to downsample the pointcloud and return.
+            Otherwise, should be one of the valid string.
+            Should be passed as a URL query parameter.
+            Default to `'orig'`
 
         Returns
         -------
         flask.Response
-            The HTTP response from the flask server.
+            HTTP response containing the PLY data with 'application/octet-stream' mimetype.
+
+        Notes
+        -----
+        - The 'size' parameter can be:
+            * 'orig': original point cloud
+            * 'preview': downsampled preview version
+            * float value: custom voxel size for downsampling
+        - Defaults to 'preview' if size parameter is invalid
+        - All input parameters are sanitized before use
+
+        See Also
+        --------
+        plantdb.rest_api.sanitize_name : Input sanitization & validation function.
+        plantdb.webcache.pointcloud_path : Point cloud path resolution function with caching and downsampling options.
 
         Examples
         --------
@@ -1048,11 +1571,15 @@ class PointCloud(Resource):
         >>> import requests
         >>> from plyfile import PlyData
         >>> from io import BytesIO
-        >>> # Get the triangular mesh:
+        >>> # Get original point cloud:
         >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud")
         >>> pcd_data = PlyData.read(BytesIO(res.content))
         >>> # Access point X-coordinates:
         >>> list(pcd_data['vertex']['x'])
+        >>> # Get preview (downsampled) version
+        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview"})
+        >>> # Get custom downsampled version (voxel size 0.01)
+        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "0.01"})
 
         """
         # Sanitize identifiers
@@ -1077,28 +1604,88 @@ class PointCloud(Resource):
 
 
 class PointCloudGroundTruth(Resource):
-    """Concrete RESTful resource to serve a ground-truth point-cloud upon request (GET method)."""
+    """A RESTful resource for serving ground-truth point-cloud data.
+
+    This class handles HTTP GET requests for point-cloud data, with optional
+    downsampling capabilities based on the requested size parameter.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        The database instance used to retrieve point-cloud data.
+
+    Notes
+    -----
+    The class inherits from Flask-RESTful's Resource class and implements
+    the GET method for retrieving point-cloud data.
+
+    See Also
+    --------
+    flask_restful.Resource : Base RESTful resource class
+    """
 
     def __init__(self, db):
+        """Initialize the PointCloudGroundTruth resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database instance providing access to the point-cloud data.
+        """
         self.db = db
 
     def get(self, scan_id, fileset_id, file_id):
-        """Send the requested (cached) ground-truth point-cloud, may down-sample it if necessary.
+        """Retrieve and serve a ground-truth point-cloud file.
+
+        Fetches the requested point-cloud data from the cache, potentially
+        downsampling it based on the size parameter provided in the query string.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            Identifier for the scan to retrieve.
         fileset_id : str
-            The fileset id.
+            Identifier for the fileset within the scan.
         file_id : str
-            The file id.
+            Identifier for the specific point-cloud file.
+        size : {'orig', 'preview'} or float, optional
+            If a float, use it to downsample the pointcloud and return.
+            Otherwise, should be one of the valid string.
+            Should be passed as a URL query parameter.
+            Default to `'orig'`
 
         Returns
         -------
         flask.Response
-            The HTTP response from the flask server.
+            HTTP response containing the point-cloud data as an octet-stream.
+
+        Raises
+        ------
+        werkzeug.exceptions.NotFound
+            If the requested point-cloud file doesn't exist.
+
+        Notes
+        -----
+        - The 'size' parameter can be specified in the query string as:
+            * 'orig': Original size
+            * 'preview': Preview size (default)
+            * A float value: Custom voxel size for downsampling
+        - All identifiers are sanitized before use
+        - Invalid size parameters default to 'preview'
+        - Response mimetype is 'application/octet-stream'
+
+        Examples
+        --------
+        >>> # Request original size point-cloud
+        >>> response = get('/api/scan123/fileset1/cloud1?size=orig')
+        >>>
+        >>> # Request preview size
+        >>> response = get('/api/scan123/fileset1/cloud1?size=preview')
+        >>>
+        >>> # Request custom voxel size
+        >>> response = get('/api/scan123/fileset1/cloud1?size=0.01')
         """
+
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
         fileset_id = sanitize_name(fileset_id)
@@ -1121,27 +1708,68 @@ class PointCloudGroundTruth(Resource):
 
 
 class Mesh(Resource):
-    """Concrete RESTful resource to serve a triangular mesh upon request (GET method)."""
+    """RESTful resource for serving triangular mesh data via HTTP.
+
+    This class implements a REST endpoint that provides access to triangular mesh data
+    stored in a database. It supports GET requests and can optionally handle mesh
+    size parameters.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Reference to the database instance.
+
+    Notes
+    -----
+    The mesh data is served in PLY format as an octet-stream.
+    """
 
     def __init__(self, db):
+        """Initialize the Mesh resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            The database instance containing the mesh data.
+        """
         self.db = db
 
     def get(self, scan_id, fileset_id, file_id):
-        """Send the requested (cached) triangular mesh, may down-sample it if necessary.
+        """Retrieve and serve a triangular mesh file.
+
+        This method handles GET requests for mesh data, supporting optional size
+        parameters. It sanitizes input parameters and serves the mesh file from
+        the cache.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            Identifier for the scan containing the mesh.
         fileset_id : str
-            The fileset id.
+            Identifier for the fileset within the scan.
         file_id : str
-            The file id.
+            Identifier for the specific mesh file.
 
         Returns
         -------
         flask.Response
-            The HTTP response from the flask server.
+            HTTP response containing the mesh data as an octet-stream.
+
+        Raises
+        ------
+        werkzeug.exceptions.NotFound
+            If the requested mesh file doesn't exist
+
+        Notes
+        -----
+        - The 'size' parameter currently only supports 'orig' value
+        - All identifiers are sanitized before use
+        - The mesh is served as a binary PLY file
+
+        See Also
+        --------
+        plantdb.rest_api.sanitize_name : Function used to validate input parameters
+        plantdb.webcache.mesh_path : Function to retrieve mesh file path
 
         Examples
         --------
@@ -1149,11 +1777,14 @@ class Mesh(Resource):
         >>> import requests
         >>> from plyfile import PlyData
         >>> from io import BytesIO
-        >>> # Get the triangular mesh:
-        >>> res = requests.get("http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh")
-        >>> mesh_data = PlyData.read(BytesIO(res.content))
-        >>> # Access vertices X-coordinates:
-        >>> list(mesh_data['vertex']['x'])
+        >>> # Request a mesh file
+        >>> url = "http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh"
+        >>> response = requests.get(url)
+        >>> # Parse the PLY data
+        >>> mesh_data = PlyData.read(BytesIO(response.content))
+        >>> # Access vertex coordinates
+        >>> vertices = mesh_data['vertex']
+        >>> x_coords = list(vertices['x'])
 
         """
         # Sanitize identifiers
@@ -1171,38 +1802,82 @@ class Mesh(Resource):
 
 
 class CurveSkeleton(Resource):
-    """Concrete RESTful resource to serve a CurveSkeleton upon request (GET method)."""
+    """A RESTful resource that provides access to curve skeleton data for plant scans.
+
+    This class implements a REST API endpoint that serves curve skeleton data stored in JSON
+    format. It handles GET requests to retrieve skeleton data for a specific scan ID.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        Database instance containing plant scan data and associated filesets.
+    """
 
     def __init__(self, db):
+        """Initialize the CurveSkeleton resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            Database instance providing access to plant scan data.
+        """
         self.db = db
 
     def get(self, scan_id):
-        """Send the requested angle and internode sequences.
+        """Retrieve the curve skeleton data for a specific scan.
+
+        This method handles GET requests to fetch curve skeleton data. It performs
+        validation of the scan ID, retrieves the appropriate fileset, and returns
+        the skeleton data in JSON format.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            Identifier for the plant scan to retrieve skeleton data for.
+            Must contain only alphanumeric characters, underscores, dashes, or periods.
 
         Returns
         -------
-        flask.Response
-            The HTTP response from the flask server.
+        Union[dict, Tuple[dict, int]]
+            On success: Dictionary containing the curve skeleton data
+            On failure: Tuple of (error_dict, http_status_code)
+
+        Raises
+        ------
+        ScanNotFoundError
+            If the requested scan ID doesn't exist in the database
+        FilesetNotFoundError
+            If the CurveSkeleton fileset is not found for the scan
+        FileNotFoundError
+            If the CurveSkeleton file is missing from the fileset
+
+        Notes
+        -----
+        - The scan_id is sanitized before processing to ensure security
+        - Returns HTTP 400 status code for all error conditions with appropriate error messages
+        - The skeleton data is expected to be in JSON format in the database
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start the REST API server
+        >>> # Then in a Python console:
         >>> import requests
         >>> import json
-        >>> # Get the skeleton dict:
-        >>> res = requests.get("http://127.0.0.1:5000/skeleton/real_plant_analyzed")
-        >>> json.loads(res.content.decode('utf-8'))
-        >>> # Get the skeleton dict:
-        >>> res = requests.get("http://127.0.0.1:5000/skeleton/Col-0_E1_1")
-        >>> skel = json.loads(res.content.decode('utf-8'))
-        >>> print(list(skel.keys()))
-
+        >>>
+        >>> # Fetch skeleton data for a valid scan
+        >>> response = requests.get("http://127.0.0.1:5000/skeleton/Col-0_E1_1")
+        >>> skeleton_data = json.loads(response.content)
+        >>> print(list(skeleton_data.keys()))
+        ['angles', 'internodes', 'metadata']
+        >>>
+        >>> # Example with invalid scan ID
+        >>> response = requests.get("http://127.0.0.1:5000/skeleton/invalid_id")
+        >>> print(response.status_code)
+        400
+        >>> print(json.loads(response.content))
+        {'error': "Scan 'invalid_id' not found!"}
         """
+
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
 
@@ -1236,36 +1911,89 @@ class CurveSkeleton(Resource):
 
 
 class Sequence(Resource):
-    """Concrete RESTful resource to serve an angle and internode sequences upon request (GET method)."""
+    """A RESTful resource class that serves angle and internode sequences data.
+
+    This class provides a REST API endpoint to retrieve angle and internode sequence data
+    for plant scans. It handles data retrieval from a database and supports filtering
+    by sequence type (angles, internodes, or fruit_points).
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        The database instance used for retrieving scan data.
+    """
 
     def __init__(self, db):
+        """Initialize the Sequence resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance containing plant scan data and related measurements.
+        """
         self.db = db
 
     def get(self, scan_id):
-        """Send the requested angle and internode sequences.
+        """Retrieve angle and internode sequences data for a given scan.
+
+        This method serves as a REST API endpoint to fetch angle, internode, and fruit point
+        sequence data from plant scans. It can return either all sequence data or specific
+        sequence types based on the query parameter 'type'.
 
         Parameters
         ----------
         scan_id : str
-            The scan id.
+            Unique identifier for the plant scan. Must contain only alphanumeric
+            characters, underscores, dashes, or periods.
 
         Returns
         -------
-        flask.Response
-            The HTTP response from the flask server.
+        Union[dict, list, tuple[dict, int]]
+            If successful and type='all' (default):
+                Dictionary containing all sequence data with keys 'angles', 'internodes',
+                and 'fruit_points'
+            If successful and type in ['angles', 'internodes', 'fruit_points']:
+                List of sequence values for the specified type
+            If error:
+                Tuple of (error_dict, HTTP_status_code)
+
+        Raises
+        ------
+        ScanNotFoundError
+            If the specified scan_id does not exist in the database
+        FilesetNotFoundError
+            If the AnglesAndInternodes fileset is not found
+        FileNotFoundError
+            If the AnglesAndInternodes file is not found within the fileset
+
+        Notes
+        -----
+        - The 'type' query parameter accepts 'angles', 'internodes', or 'fruit_points'
+        - Invalid 'type' parameters will return the complete data dictionary
+        - All responses are JSON-encoded
+        - Input scan_id is sanitized before processing
+
+        See Also
+        --------
+        plantdb.rest_api.sanitize_name : Function used to validate and clean scan_id
+        plantdb.rest_api.compute_fileset_matches : Function to match filesets with tasks
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Get all sequence data
         >>> import requests
         >>> import json
-        >>> # Get the whole dict with 'angles', 'internodes' & 'fruit_points' lists of values:
-        >>> res = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed")
-        >>> json.loads(res.content.decode('utf-8'))
-        >>> # Get the list of 'angles' values, could also append '?type=angles' to the URI:
-        >>> res = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed", params={'type': 'angles'})
-        >>> json.loads(res.content.decode('utf-8'))
+        >>> response = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed")
+        >>> data = json.loads(response.content.decode('utf-8'))
+        >>> # Expected output: {'angles': [...], 'internodes': [...], 'fruit_points': [...]}
 
+        >>> # Get only angles data
+        >>> response = requests.get(
+        ...     "http://127.0.0.1:5000/sequence/real_plant_analyzed",
+        ...     params={'type': 'angles'}
+        ... )
+        >>> angles = json.loads(response.content.decode('utf-8'))
+        >>> # Expected output: [angle1, angle2, ...]
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
@@ -1328,33 +2056,57 @@ def is_within_directory(directory, target):
 
 
 class Archive(Resource):
-    """Concrete RESTful resource to serve an archive of the dataset upon request (GET method)."""
+    """A RESTful resource class for managing dataset archives.
+
+    This class provides functionality to serve and upload dataset archives through HTTP GET and POST methods.
+    It handles ZIP file creation, validation, and extraction while maintaining security and proper cleanup
+    of temporary files.
+
+    Attributes
+    ----------
+    db : plantdb.fsdb.FSDB
+        A database instance for accessing and managing scan data.
+    logger : logging.Logger
+        A logger instance for recording operations and errors.
+    """
 
     def __init__(self, db, logger):
+        """Initialize the Archive resource.
+
+        Parameters
+        ----------
+        db : plantdb.fsdb.FSDB
+            A database instance for accessing and managing scan data.
+        logger : loggin.Logger
+            A logger instance for recording operations and errors.
+        """
         self.db = db
         self.logger = logger
 
     def get(self, scan_id):
-        """Creates a ZIP archive for the specified scan dataset and serves it as adownloadable file.
-        
-        The archive is created as a temporary file and is scheduled for cleanup after the HTTP request is processed.
-        Any parts of the dataset directory named 'webcache' are excluded from the archive.
+        """Create and serve a ZIP archive for the specified scan dataset.
+
+        This method creates a temporary ZIP archive containing all files from the specified
+        scan directory (excluding 'webcache' directories) and serves it as a downloadable file.
 
         Parameters
         ----------
         scan_id : str
-            The unique identifier for the scan dataset to be archived and
-            served. This identifier is used to locate the relevant scan
-            directory.
+            Unique identifier for the scan dataset to be archived.
 
         Returns
         -------
-        tuple
-            If the scan is not found, returns a tuple containing an error message
-            and an HTTP status code (400).
-        flask.Response
-            If the scan is found, returns a Flask response object to send the
-            ZIP archive as a downloadable file.
+        flask.Response or tuple
+            If successful, returns a Flask response object with the ZIP file for download.
+            If unsuccessful, returns a tuple (dict, int) containing an error message and
+            HTTP status code ``400``.
+
+        Notes
+        -----
+        - The scan_id is sanitized before processing
+        - 'webcache' directories are automatically excluded from the archive
+        - Temporary files are created with 'fsdb_rest_api_' prefix
+        - Clean-up is handled automatically after the request
 
         Examples
         --------
@@ -1423,25 +2175,44 @@ class Archive(Resource):
         return send_file(zpath, mimetype='application/zip')
 
     def post(self, scan_id):
-        """Handles the HTTP POST request for uploading and processing a ZIP file.
+        """Handle ZIP file upload and extraction for a scan dataset.
 
-        Validates the uploaded file's MIME type, extension, and integrity before
-        extracting its content into a specific file system path. Only ensures the
-        extracted files do not overwrite existing files and remain within the
-        designated directory structure.
+        This method processes an uploaded ZIP file, validates its contents and structure,
+        and extracts it to the appropriate location in the database. It includes various
+        security checks and ensures safe extraction of files.
 
         Parameters
         ----------
-        scan_id : any
-            The identifier for the scan, used to map and associate the upload
-            with the corresponding scan entry in the database.
+        scan_id : str
+            Unique identifier for the scan dataset where the ZIP contents will be extracted.
 
         Returns
         -------
-        dict
-            A dictionary containing a success message and a list of the extracted
-            files if the operation completes successfully.
-            In case of failure, an error message and HTTP status code are returned.
+        tuple
+            A tuple containing (dict, int) where the dict contains either:
+            - On success: {'success': message, 'files': list_of_extracted_files}
+            - On failure: {'error': error_message}
+            The integer represents the HTTP status code (``200`` for success, ``400`` or ``500`` for errors)
+
+        Notes
+        -----
+        - Performs the following validations:
+            * Checks for ZIP file presence
+            * Validates MIME type (must be 'application/zip')
+            * Verifies file extension (.zip)
+            * Tests ZIP file integrity
+            * Validates filename encodings
+            * Prevents path traversal attacks
+        - Only extracts files that don't already exist
+        - Automatically cleans up temporary files
+
+        Examples
+        --------
+        >>> # Using requests to upload a ZIP file:
+        >>> import requests
+        >>> files = {'zip_file': open('dataset.zip', 'rb')}
+        >>> response = requests.post("http://127.0.0.1:5000/archive/my_scan", files=files)
+        >>> print(response.json())
         """
         # Get the zip file from the request
         zip_file = request.files.get('zip_file')
