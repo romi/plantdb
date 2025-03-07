@@ -82,6 +82,16 @@ plugins:
           import:
             - https://docs.python.org/3/objects.inv
             - https://numpy.org/doc/stable/objects.inv
+            - https://flask.palletsprojects.com/en/latest/objects.inv
+            - https://pandas.pydata.org/docs/objects.inv
+            - https://matplotlib.org/stable/objects.inv
+            - https://scikit-learn.org/stable/objects.inv
+            - https://scipy.org/doc/scipy/objects.inv
+            - https://click.palletsprojects.com/en/latest/objects.inv
+            - https://jinja.palletsprojects.com/en/latest/objects.inv
+            - https://werkzeug.palletsprojects.com/en/latest/objects.inv
+            - https://flask-restful.readthedocs.io/en/latest/objects.inv
+            - https://plotly.com/python-api-reference/objects.inv
           options:
             docstring_style: numpy
             docstring_section_style: table
@@ -90,7 +100,15 @@ plugins:
             show_docstring_examples: true
             show_docstring_raises: true
             signature_crossrefs: true
-
+            show_root_full_path: true
+            show_root_heading: true
+            show_category_heading: true
+            show_bases: true
+            separate_signature: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            inherited_members: true
+            docstring_section_style: list
 
 extra_css:
   - assets/css/extra.css

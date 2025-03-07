@@ -991,9 +991,9 @@ class Scan(Resource):
 
     Attributes
     ----------
-    db : Database
+    db : plantdb.fsdb.FSDB
         The database instance used to retrieve scan information.
-    logger : Logger
+    logger : logging.Logger
         The logger instance for recording operations.
 
     Notes
@@ -1214,8 +1214,8 @@ class DatasetFile(Resource):
 
         See Also
         --------
-        write_stream : Helper function for chunked file uploads
-        write_data : Helper function for complete file uploads
+        plantdb.io.write_stream : Helper function for chunked file uploads
+        plantdb.io.write_data : Helper function for complete file uploads
 
         Examples
         --------
@@ -2077,7 +2077,7 @@ class Archive(Resource):
         ----------
         db : plantdb.fsdb.FSDB
             A database instance for accessing and managing scan data.
-        logger : loggin.Logger
+        logger : logging.Logger
             A logger instance for recording operations and errors.
         """
         self.db = db

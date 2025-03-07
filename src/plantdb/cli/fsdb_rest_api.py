@@ -231,6 +231,7 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
+    # User oriented endpoints
     api.add_resource(Register, '/register',
                      resource_class_args=tuple([db]))
     api.add_resource(Login, '/login',
