@@ -563,7 +563,7 @@ def sanitize_name(name):
     Returns
     -------
     str
-        Sanitized name that conforms to the rules.
+        A sanitized name that conforms to the rules.
 
     Raises
     ------
@@ -581,11 +581,40 @@ def sanitize_name(name):
 
 
 def rate_limit(max_requests=5, window_seconds=60):
-    """
-    Rate limiting decorator
-    Parameters:
-    - max_requests: Maximum number of allowed requests within the time window
-    - window_seconds: Time window in seconds
+    """Limits the number of requests a client can make within a specified time window.
+
+    This function is a decorator that enforces rate limiting based on the maximum
+    number of allowed requests (`max_requests`) and the time window size in seconds
+    (`window_seconds`). It tracks incoming requests from clients using their IP
+    addresses and ensures that they do not exceed the specified limit within the
+    time window. If the limit is exceeded, it returns an HTTP ``429`` response.
+
+    Parameters
+    ----------
+    max_requests : int, optional
+        The maximum number of requests permitted within the time window (default is 5).
+    window_seconds : int, optional
+        The duration of the rate-limiting window in seconds
+        (default is 60 seconds).
+
+    Returns
+    -------
+    decorator : Callable
+        A decorator that can wrap any function or endpoint to enforce rate limiting.
+
+    Raises
+    ------
+    HTTPException
+        If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests")
+        response to the client.
+
+    Notes
+    -----
+    This implementation uses a thread lock to ensure thread safety when handling
+    requests, making it suitable for multi-threaded environments. The requests
+    data structure is a `defaultdict` that maps client IPs to a list of their
+    request timestamps. Old requests outside the rate-limiting window are removed
+    to maintain efficient memory usage.
     """
     requests = defaultdict(list)
     lock = threading.Lock()
@@ -648,14 +677,17 @@ class Register(Resource):
         Processes user registration by validating the input data and creating a new user in the database.
         Expects a JSON payload in the request body with required user details.
 
-        Request Body
-        ------------
+        Parameters
+        ----------
         username : str
             Unique identifier for the user.
+            Should originate from the JSON payload and be a non-empty string.
         fullname : str
             User's full name.
+            Should originate from the JSON payload and be a non-empty string.
         password : str
             User's password for authentication.
+            Should originate from the JSON payload and be a non-empty string.
 
         Returns
         -------
@@ -665,6 +697,21 @@ class Register(Resource):
                 - 'message' (str): Description of the operation result
         int
             HTTP status code (``201`` for success, ``400`` for error)
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> import json
+        >>> # Create a new user:
+        >>> new_user = {"username":"batman", "fullname":"Bruce Wayne", "password":"Alfred"}
+        >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user)
+        >>> res_dict = response.json()
+        >>> res_dict["success"]
+        True
+        >>> res_dict["message"]
+        'User successfully created'
         """
         # Parse JSON data from request body
         data = request.get_json()
@@ -720,56 +767,117 @@ class Login(Resource):
         """
         self.db = db
 
-    def get(self, username):
+    @rate_limit(max_requests=10, window_seconds=60)
+    def get(self):
         """Checks if a given username exists in the database and returns the result.
 
         Parameters
         ----------
         username : str
-            The username to check in the database. This must be a non-empty string.
+            The username to check in the database.
+            This must be a non-empty string and served as a query parameter.
 
         Returns
         -------
         dict
             A dictionary with the result and an HTTP status code.
             If the `username` is missing, the dictionary will contain an error message.
-            Otherwise, the dictionary will contain the `username` and a boolean indicating whether it exists.
+            Otherwise, the dictionary will contain the `username` and a boolean indicating whether it exist or not.
         int
             An HTTP status code. If the `username` is missing  the status code will be ``400``, otherwise ``200``.
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> import json
+        >>> # Check if user exists (valid username):
+        >>> response = requests.get("http://127.0.0.1:5000/login?username=anonymous")
+        >>> print(response.json())
+        {'username': 'anonymous', 'exists': True}
+        >>> # Check if user exists (invalid username):
+        >>> response = requests.get("http://127.0.0.1:5000/login?username=superman")
+        >>> print(response.json())
+        {'username': 'superman', 'exists': False}
         """
+        # Extract username from query parameters
+        username = request.args.get('username', None)
+        # Return error if username parameter is missing
         if not username:
             return {'error': 'Missing username parameter'}, 400
-
+        # Query database to check if user exists
         user_exists = self.db.user_exists(username)
         return {'username': username, 'exists': user_exists}, 200
 
+    @rate_limit(max_requests=20, window_seconds=60)
     def post(self):
-        """Handles user authentication by validating the provided username and password against stored credentials.
+        """Handle user authentication via POST request with username and password.
+
+        This method processes a POST request containing user credentials (username and password)
+        and validates them against stored user data. It returns authentication status and
+        a descriptive message.
 
         Returns
         -------
         dict
             A dictionary with the following keys and values:
                 - 'authenticated' : bool
-                    The result of the authentication process (True if successful, False otherwise).
+                    The result of the authentication process (``True`` if successful, ``False`` otherwise).
                 - 'message' : str
                     A message describing the result of the authentication attempt.
         int
             The HTTP status code (``200`` for successful response, ``400`` for bad request).
-        """
-        data = request.get_json()
 
+        Raises
+        ------
+        BadRequest
+            If the request doesn't contain valid JSON data (handled by Flask)
+
+        Notes
+        -----
+        The method expects a JSON payload with 'username' and 'password' fields.
+        The authentication process uses the ``check_credentials`` method to validate
+        the provided credentials against the database.
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Valid login request
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous', 'password': 'AlanMoore'})
+        >>> print(response.json())
+        {'authenticated': True, 'message': 'Login successful. Welcome, Guy Fawkes!'}
+        >>> print(response.status_code)
+        200
+        >>> # Invalid request (missing credentials)
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous'})
+        >>> print(response.json())
+        {'authenticated': False, 'message': 'Missing username or password'}
+        >>> print(response.status_code)
+        400
+        """
+        # Get JSON data from the request body
+        data = request.get_json()
+        # Validate that required fields are present in the request
         if not data or 'username' not in data or 'password' not in data:
             return {'authenticated': False, 'message': 'Missing username or password'}, 400
 
+        # Extract credentials from request data
         username = data['username']
         password = data['password']
+        # Attempt to authenticate user with provided credentials
         is_authenticated = self.check_credentials(username, password)
 
+        # Prepare response based on authentication result
         if is_authenticated:
+            # Get user's full name from database for welcome message
             message = f"Login successful. Welcome, {self.db.users[username]['fullname']}!"
         else:
             message = f"Login failed. Please check your username and password!"
+
+        # Return authentication result and appropriate message with 200 status code
         return {'authenticated': is_authenticated, 'message': message}, 200
 
     def check_credentials(self, username, password):
@@ -1065,22 +1173,73 @@ class Scan(Resource):
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
         return get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger)
 
+    @rate_limit(max_requests=5, window_seconds=60)
+    def post(self, scan_id):
+        """Create a new scan dataset.
+
+        Parameters
+        ----------
+        scan_id : str
+            Identifier for the new scan dataset.
+            Must contain only alphanumeric characters, underscores, dashes, or periods.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the response with following possible structures:
+                - On success: {'message': 'Scan created successfully', 'scan_id': scan_id}
+                - On error: {'error': error_message}
+
+        Notes
+        -----
+        HTTP status codes:
+            - 201 : Created successfully
+            - 400 : Bad request (invalid scan_id)
+            - 409 : Conflict (scan already exists)
+            - 500 : Internal server error
+        """
+        # Sanitize and validate the scan_id
+        scan_id = sanitize_name(scan_id)
+        try:
+            # Attempt to create a new scan in the database with the given scan_id
+            scan = self.db.get_scan(scan_id, create=True)
+            # Check if scan creation was successful
+            if scan is None:
+                self.logger.error(f"Failed to create scan: {scan_id}")
+                return {'error': 'Failed to create scan'}, 500
+            self.logger.info(f"Successfully created scan: {scan_id}")
+            # Return success response with HTTP 201 (Created) status code
+            return {
+                'message': 'Scan created successfully',
+                'scan_id': scan_id
+            }, 201
+        except ValueError as e:
+            # Handle case where scan_id format is invalid (e.g., wrong characters or length)
+            self.logger.warning(f"Invalid scan_id format: {scan_id}")
+            return {'error': str(e)}, 400  # HTTP 400 Bad Request
+        except Exception as e:
+            # Handle all other exceptions including duplicate scans
+            self.logger.error(f"Error creating scan {scan_id}: {str(e)}")
+            # Check if error is due to duplicate scan_id
+            if "already exists" in str(e).lower():
+                return {'error': f"Scan '{scan_id}' already exists"}, 409  # HTTP 409 Conflict
+            # Return generic server error for all other exceptions
+            return {'error': 'Internal server error'}, 500  # HTTP 500 Internal Server Error
+
 
 class File(Resource):
     """A RESTful resource class for serving files via HTTP GET requests.
 
-    This class implements a REST API endpoint that serves files from a specified
-    database location. It inherits from Flask-RESTful's Resource class and
-    provides file serving capabilities through GET requests.
+    This class implements a REST API endpoint that serves files from a specified database location.
 
     Attributes
     ----------
     db : plantdb.fsdb.FSDB
-        A Database instance containing the file path configuration.
+        A database instance containing the file path configuration.
 
     Notes
     -----
-    The class requires proper initialization with a database instance that
+    The class requires proper initialization with A database instance that
     provides a valid path() method for file location resolution.
     """
 
@@ -1613,15 +1772,6 @@ class PointCloudGroundTruth(Resource):
     ----------
     db : plantdb.fsdb.FSDB
         The database instance used to retrieve point-cloud data.
-
-    Notes
-    -----
-    The class inherits from Flask-RESTful's Resource class and implements
-    the GET method for retrieving point-cloud data.
-
-    See Also
-    --------
-    flask_restful.Resource : Base RESTful resource class
     """
 
     def __init__(self, db):
@@ -1749,6 +1899,10 @@ class Mesh(Resource):
             Identifier for the fileset within the scan.
         file_id : str
             Identifier for the specific mesh file.
+        size : {'orig'}, optional
+            A string value specifying the size of the mesh to return.
+            Should be passed as a URL query parameter.
+            Default to `'orig'` (currently the only valid options).
 
         Returns
         -------
@@ -1785,7 +1939,6 @@ class Mesh(Resource):
         >>> # Access vertex coordinates
         >>> vertices = mesh_data['vertex']
         >>> x_coords = list(vertices['x'])
-
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
