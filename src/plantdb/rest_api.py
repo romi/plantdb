@@ -30,6 +30,10 @@ This module regroup the classes and methods used to serve a REST API using ``fsd
 import datetime
 import json
 import os
+import threading
+import time
+from collections import defaultdict
+from functools import wraps
 from io import BytesIO
 from math import radians
 from pathlib import Path
@@ -37,6 +41,7 @@ from tempfile import mkdtemp
 from tempfile import mkstemp
 from zipfile import ZipFile
 
+from flask import Response
 from flask import after_this_request
 from flask import jsonify
 from flask import make_response
@@ -575,10 +580,49 @@ def sanitize_name(name):
     return sanitized_name
 
 
+def rate_limit(max_requests=5, window_seconds=60):
+    """
+    Rate limiting decorator
+    Parameters:
+    - max_requests: Maximum number of allowed requests within the time window
+    - window_seconds: Time window in seconds
+    """
+    requests = defaultdict(list)
+    lock = threading.Lock()
+
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            client_ip = request.remote_addr
+            current_time = time.time()
+
+            with lock:
+                # Remove old requests outside the window
+                requests[client_ip] = [req_time for req_time in requests[client_ip]
+                                       if current_time - req_time < window_seconds]
+
+                # Check if rate limit is exceeded
+                if len(requests[client_ip]) >= max_requests:
+                    return Response(
+                        "Rate limit exceeded. Please try again later.",
+                        status=429
+                    )
+
+                # Add current request
+                requests[client_ip].append(current_time)
+
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
+
+
 class Register(Resource):
     def __init__(self, db):
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
     def post(self):
         data = request.get_json()
 
@@ -902,6 +946,7 @@ class Refresh(Resource):
     def __init__(self, db):
         self.db = db
 
+    @rate_limit(max_requests=1, window_seconds=60)  # maximum of 1 requests per minute
     def get(self):
         """Force the plant database to reload.
 
