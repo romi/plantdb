@@ -974,16 +974,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#plantdb.webcache-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Functions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#plantdb.webcache.__file_path" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;__file_path
@@ -1106,11 +1096,6 @@
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;pointcloud_path
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1178,16 +1163,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#plantdb.webcache-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Functions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#plantdb.webcache.__file_path" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;__file_path
@@ -1317,11 +1292,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
     </ul>
   
@@ -1349,7 +1319,7 @@
 
 
 <h2 id="plantdb.webcache" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">plantdb.webcache</span>
+            <span class="doc doc-object-name doc-module-name">plantdb.webcache</span>
 
 
 <a href="#plantdb.webcache" class="headerlink" title="Permanent link">Link</a></h2>
@@ -1402,16 +1372,16 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 
-<h3 id="plantdb.webcache-functions">Functions<a href="#plantdb.webcache-functions" class="headerlink" title="Permanent link">Link</a></h3>
+
 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__file_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__file_path</span>
+<h3 id="plantdb.webcache.__file_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__file_path</span>
 
 
-<a href="#plantdb.webcache.__file_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__file_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__file_path(db, scan_id, fileset_id, file_id)
 </code></pre></div>
 
@@ -1421,52 +1391,105 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the file.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the file.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -1524,11 +1547,11 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__hash" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__hash</span>
+<h3 id="plantdb.webcache.__hash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__hash</span>
 
 
-<a href="#plantdb.webcache.__hash" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__hash" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__hash(resource_type, scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -1538,60 +1561,121 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>resource_type</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The name of the resource type, <em>e.g.</em> "image" or "pointcloud".</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The requested size.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>resource_type</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the resource type, <em>e.g.</em> "image" or "pointcloud".</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested size.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The hash of the resource.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The hash of the resource.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -1653,11 +1737,11 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__image_cache" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__image_cache</span>
+<h3 id="plantdb.webcache.__image_cache" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__image_cache</span>
 
 
-<a href="#plantdb.webcache.__image_cache" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__image_cache" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__image_cache(db, scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -1667,63 +1751,122 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>If an integer, use  it as the size of the cached image to create and return.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an integer, use  it as the size of the cached image to create and return.
 Else, should be a string in the given list.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the cached image.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the cached image.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -1827,11 +1970,11 @@ Else, should be a string in the given list.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__image_cached_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__image_cached_path</span>
+<h3 id="plantdb.webcache.__image_cached_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__image_cached_path</span>
 
 
-<a href="#plantdb.webcache.__image_cached_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__image_cached_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__image_cached_path(db, scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -1841,63 +1984,122 @@ Else, should be a string in the given list.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>If an integer, use  it as the size of the cached image to create and return.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an integer, use  it as the size of the cached image to create and return.
 Else, should be a string in the given list.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the cached image.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the cached image.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -1963,11 +2165,11 @@ Else, should be a string in the given list.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__image_hash" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__image_hash</span>
+<h3 id="plantdb.webcache.__image_hash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__image_hash</span>
 
 
-<a href="#plantdb.webcache.__image_hash" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__image_hash" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__image_hash(scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -1977,55 +2179,106 @@ Else, should be a string in the given list.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>If an integer, use  it as the size of the cached image to create and return.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an integer, use  it as the size of the cached image to create and return.
 Else, should be a string in the given list.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The image resource file name.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The image resource file name.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2079,11 +2332,11 @@ Else, should be a string in the given list.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__image_resize" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__image_resize</span>
+<h3 id="plantdb.webcache.__image_resize" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__image_resize</span>
 
 
-<a href="#plantdb.webcache.__image_resize" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__image_resize" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__image_resize(img, max_size)
 </code></pre></div>
 
@@ -2093,36 +2346,73 @@ Else, should be a string in the given list.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>img</code></b>
-              (<code><span title="PIL.Image.Image">Image</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>Pillow</code> image to resize.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>max_size</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The requested max width or height size, in pixels.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>img</code>
+            </td>
+            <td>
+                  <code><span title="PIL.Image.Image">Image</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>Pillow</code> image to resize.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_size</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested max width or height size, in pixels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="PIL.Image.Image">Image</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The resized image.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="PIL.Image.Image">Image</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The resized image.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2168,11 +2458,11 @@ Else, should be a string in the given list.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__pointcloud_cache" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__pointcloud_cache</span>
+<h3 id="plantdb.webcache.__pointcloud_cache" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__pointcloud_cache</span>
 
 
-<a href="#plantdb.webcache.__pointcloud_cache" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__pointcloud_cache" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__pointcloud_cache(db, scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -2182,53 +2472,101 @@ Else, should be a string in the given list.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The requested size of the point cloud.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested size of the point cloud.
 Obviously 'orig' preserve the original point cloud.
 'preview' will resize the point cloud to a <code>1.8</code> voxel size.
 A float will resize the point cloud to given voxel size.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <details class="see-also" open>
@@ -2236,16 +2574,27 @@ A float will resize the point cloud to given voxel size.</p>
   <p>__pointcloud_resize</p>
 </details>
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the cached pointcloud.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the cached pointcloud.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2359,11 +2708,11 @@ A float will resize the point cloud to given voxel size.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__pointcloud_cached_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__pointcloud_cached_path</span>
+<h3 id="plantdb.webcache.__pointcloud_cached_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__pointcloud_cached_path</span>
 
 
-<a href="#plantdb.webcache.__pointcloud_cached_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__pointcloud_cached_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__pointcloud_cached_path(db, scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -2373,65 +2722,124 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The requested size of the point cloud.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested size of the point cloud.
 Obviously 'orig' preserve the original point cloud.
 'preview' will resize the point cloud to a <code>1.8</code> voxel size.
 A float will resize the point cloud to given voxel size.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the cached pointcloud.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the cached pointcloud.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2501,11 +2909,11 @@ A float will resize the point cloud to given voxel size.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__pointcloud_hash" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__pointcloud_hash</span>
+<h3 id="plantdb.webcache.__pointcloud_hash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__pointcloud_hash</span>
 
 
-<a href="#plantdb.webcache.__pointcloud_hash" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__pointcloud_hash" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__pointcloud_hash(scan_id, fileset_id, file_id, size)
 </code></pre></div>
 
@@ -2515,54 +2923,105 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested size ('orig' or 'preview').</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The requested size ('orig' or 'preview').</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The hash of the pointcloud resource.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The hash of the pointcloud resource.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2614,11 +3073,11 @@ A float will resize the point cloud to given voxel size.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__pointcloud_resize" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__pointcloud_resize</span>
+<h3 id="plantdb.webcache.__pointcloud_resize" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__pointcloud_resize</span>
 
 
-<a href="#plantdb.webcache.__pointcloud_resize" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__pointcloud_resize" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__pointcloud_resize(pointcloud, voxel_size)
 </code></pre></div>
 
@@ -2628,36 +3087,73 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>pointcloud</code></b>
-              (<code><span title="open3d.geometry.PointCloud">PointCloud</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>A pointcloud to resize to given voxelsize.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>voxel_size</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The voxelsize to use for resampling.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>pointcloud</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A pointcloud to resize to given voxelsize.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>voxel_size</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The voxelsize to use for resampling.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The resized pointcloud.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The resized pointcloud.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2701,11 +3197,11 @@ A float will resize the point cloud to given voxel size.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.__webcache_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__webcache_path</span>
+<h3 id="plantdb.webcache.__webcache_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__webcache_path</span>
 
 
-<a href="#plantdb.webcache.__webcache_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.__webcache_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>__webcache_path(db, scan_id)
 </code></pre></div>
 
@@ -2715,36 +3211,73 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the 'webcache' directory for the given scan.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the 'webcache' directory for the given scan.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/webcache.py</code></summary>
@@ -2792,11 +3325,11 @@ A float will resize the point cloud to given voxel size.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.image_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">image_path</span>
+<h3 id="plantdb.webcache.image_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">image_path</span>
 
 
-<a href="#plantdb.webcache.image_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.image_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>image_path(db, scan_id, fileset_id, file_id, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)
 </code></pre></div>
 
@@ -2806,68 +3339,127 @@ A float will resize the point cloud to given voxel size.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>If an integer, use  it as the size of the cached image to create and return.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="large">large</span>, <span title="thumb">thumb</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an integer, use  it as the size of the cached image to create and return.
 Otherwise, should be one of the following strings, default to <code>'orig'</code>:</p>
 <ul>
 <li><code>'thumb'</code>: image max width and height to <code>150</code>.</li>
 <li><code>'large'</code>: image max width and height to <code>1500</code>;</li>
 <li><code>'orig'</code>: original image, no chache;</li>
 </ul>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the original or cached image.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the original or cached image.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2996,11 +3588,11 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.mesh_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">mesh_path</span>
+<h3 id="plantdb.webcache.mesh_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">mesh_path</span>
 
 
-<a href="#plantdb.webcache.mesh_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.mesh_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>mesh_path(db, scan_id, fileset_id, file_id, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)
 </code></pre></div>
 
@@ -3010,62 +3602,121 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#any">any</a></code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#any">any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>UNUSED.</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>UNUSED.</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the original mesh.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the original mesh.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3157,11 +3808,11 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.webcache.pointcloud_path" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">pointcloud_path</span>
+<h3 id="plantdb.webcache.pointcloud_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pointcloud_path</span>
 
 
-<a href="#plantdb.webcache.pointcloud_path" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.webcache.pointcloud_path" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>pointcloud_path(db, scan_id, fileset_id, file_id, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>)
 </code></pre></div>
 
@@ -3171,66 +3822,125 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>db</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The database object.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>scan_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the scan in the database.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fileset_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the fileset in the scan.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>file_id</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The ID of the file in the fileset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>size</code></b>
-              (<code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>, default:
-                  <code>&#39;orig&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The requested size of the point cloud.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>db</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The database object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the scan in the database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fileset_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the fileset in the scan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the file in the fileset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code>(<span title="orig">orig</span>, <span title="preview">preview</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The requested size of the point cloud.
 Obviously 'orig' preserve the original point cloud.
 'preview' will resize the point cloud to a <code>1.8</code> voxel size.
 A float will resize the point cloud to given voxel size.
 Default to 'orig'.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;orig&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The path to the original or cached pointcloud.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the original or cached pointcloud.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

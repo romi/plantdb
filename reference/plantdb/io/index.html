@@ -868,16 +868,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#plantdb.io-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Functions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#plantdb.io._reader" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;_reader
@@ -1171,11 +1161,6 @@
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;write_voxel_grid
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1531,16 +1516,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#plantdb.io-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Functions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#plantdb.io._reader" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;_reader
@@ -1841,11 +1816,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
     </ul>
   
@@ -1873,7 +1843,7 @@
 
 
 <h2 id="plantdb.io" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">plantdb.io</span>
+            <span class="doc doc-object-name doc-module-name">plantdb.io</span>
 
 
 <a href="#plantdb.io" class="headerlink" title="Permanent link">Link</a></h2>
@@ -1958,16 +1928,16 @@
 
 
 
-<h3 id="plantdb.io-functions">Functions<a href="#plantdb.io-functions" class="headerlink" title="Permanent link">Link</a></h3>
+
 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._reader" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_reader</span>
+<h3 id="plantdb.io._reader" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_reader</span>
 
 
-<a href="#plantdb.io._reader" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._reader" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_reader(file, reader, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -1977,36 +1947,73 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>reader</code></b>
-              (<code><span title="function">function</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The function to use to read the data.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>reader</code>
+            </td>
+            <td>
+                  <code><span title="function">function</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to use to read the data.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="Any">Any</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded data.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded data.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2062,11 +2069,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_db_file" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_db_file</span>
+<h3 id="plantdb.io._write_db_file" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_db_file</span>
 
 
-<a href="#plantdb.io._write_db_file" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_db_file" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_db_file(dbfile, data, ext, writer, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2076,40 +2083,82 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>dbfile</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The <code>File</code> instance to save the data to.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file extension to use.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>writer</code></b>
-              (<code><span title="function">function</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The function to use to write the <code>data</code>.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>dbfile</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>File</code> instance to save the data to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file extension to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>writer</code>
+            </td>
+            <td>
+                  <code><span title="function">function</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to use to write the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2161,11 +2210,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_graph" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_graph</span>
+<h3 id="plantdb.io._write_graph" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_graph</span>
 
 
-<a href="#plantdb.io._write_graph" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_graph" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_graph(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2175,24 +2224,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="networkx.Graph">Graph</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The (tree) graph object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="networkx.Graph">Graph</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The (tree) graph object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2240,11 +2315,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_image" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_image</span>
+<h3 id="plantdb.io._write_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_image</span>
 
 
-<a href="#plantdb.io._write_image" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_image" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_image(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2254,24 +2329,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code>array like</code>)
-          –
-          <div class="doc-md-description">
-            <p>The 2D image, RGB(A) array to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code>array like</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The 2D image, RGB(A) array to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2368,11 +2469,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_json" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_json</span>
+<h3 id="plantdb.io._write_json" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_json</span>
 
 
-<a href="#plantdb.io._write_json" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_json" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_json(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2382,24 +2483,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2443,11 +2570,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_npz" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_npz</span>
+<h3 id="plantdb.io._write_npz" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_npz</span>
 
 
-<a href="#plantdb.io._write_npz" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_npz" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_npz(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2457,24 +2584,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2512,11 +2665,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_point_cloud" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_point_cloud</span>
+<h3 id="plantdb.io._write_point_cloud" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_point_cloud</span>
 
 
-<a href="#plantdb.io._write_point_cloud" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_point_cloud" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_point_cloud(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2526,24 +2679,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.PointCloud">PointCloud</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The point cloud object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The point cloud object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2581,11 +2760,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_toml" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_toml</span>
+<h3 id="plantdb.io._write_toml" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_toml</span>
 
 
-<a href="#plantdb.io._write_toml" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_toml" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_toml(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2595,24 +2774,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2652,11 +2857,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_torch" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_torch</span>
+<h3 id="plantdb.io._write_torch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_torch</span>
 
 
-<a href="#plantdb.io._write_torch" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_torch" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_torch(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2666,24 +2871,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="TorchTensor">TorchTensor</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The torch tensor object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="TorchTensor">TorchTensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The torch tensor object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2721,11 +2952,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_triangle_mesh" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_triangle_mesh</span>
+<h3 id="plantdb.io._write_triangle_mesh" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_triangle_mesh</span>
 
 
-<a href="#plantdb.io._write_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_triangle_mesh(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2735,24 +2966,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The triangular mesh object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The triangular mesh object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2790,11 +3047,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_volume" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_volume</span>
+<h3 id="plantdb.io._write_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_volume</span>
 
 
-<a href="#plantdb.io._write_volume" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_volume" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_volume(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2804,24 +3061,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>fname</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fname</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2903,11 +3186,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._write_voxel_grid" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_write_voxel_grid</span>
+<h3 id="plantdb.io._write_voxel_grid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_write_voxel_grid</span>
 
 
-<a href="#plantdb.io._write_voxel_grid" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._write_voxel_grid" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_write_voxel_grid(fname, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2917,24 +3200,50 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file path to use to save the <code>data</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The voxel grid object to save.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file path to use to save the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The voxel grid object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -2972,11 +3281,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io._writer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">_writer</span>
+<h3 id="plantdb.io._writer" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">_writer</span>
 
 
-<a href="#plantdb.io._writer" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io._writer" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>_writer(file, data, ext, writer, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -2986,41 +3295,83 @@
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the point cloud data to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The data to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The file extension to use.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>writer</code></b>
-              (<code><span title="function">function</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The function to use to write the <code>data</code>.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file extension to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>writer</code>
+            </td>
+            <td>
+                  <code><span title="function">function</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to use to write the <code>data</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -3072,11 +3423,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_graph" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_graph</span>
+<h3 id="plantdb.io.read_graph" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_graph</span>
 
 
-<a href="#plantdb.io.read_graph" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_graph" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_graph(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3086,36 +3437,73 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "p".</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "p".</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="networkx.Graph">Graph</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded (tree) graph object.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="networkx.Graph">Graph</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded (tree) graph object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3231,11 +3619,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_image" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_image</span>
+<h3 id="plantdb.io.read_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_image</span>
 
 
-<a href="#plantdb.io.read_image" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_image" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_image(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3245,28 +3633,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The image as an RGB(A) array.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The image as an RGB(A) array.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3366,11 +3783,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_json" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_json</span>
+<h3 id="plantdb.io.read_json" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_json</span>
 
 
-<a href="#plantdb.io.read_json" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_json" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_json(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3380,28 +3797,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The deserialized JSON file.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The deserialized JSON file.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3501,11 +3947,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_npz" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_npz</span>
+<h3 id="plantdb.io.read_npz" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_npz</span>
 
 
-<a href="#plantdb.io.read_npz" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_npz" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_npz(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3515,28 +3961,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code>dict of numpy.ndarray</code>
-          –
-          <div class="doc-md-description">
-            <p>The dictionary of numpy arrays.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict of numpy.ndarray</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary of numpy arrays.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3636,11 +4111,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_point_cloud" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_point_cloud</span>
+<h3 id="plantdb.io.read_point_cloud" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_point_cloud</span>
 
 
-<a href="#plantdb.io.read_point_cloud" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_point_cloud" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_point_cloud(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3650,28 +4125,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded point cloud object.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded point cloud object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3783,11 +4287,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_toml" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_toml</span>
+<h3 id="plantdb.io.read_toml" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_toml</span>
 
 
-<a href="#plantdb.io.read_toml" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_toml" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_toml(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3797,28 +4301,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The deserialized TOML file.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The deserialized TOML file.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -3918,11 +4451,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_torch" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_torch</span>
+<h3 id="plantdb.io.read_torch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_torch</span>
 
 
-<a href="#plantdb.io.read_torch" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_torch" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_torch(file, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;pt&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -3932,38 +4465,73 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "pt".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;pt&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "pt".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="Torch.Tensor">Tensor</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded tensor object.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="Torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded tensor object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -4015,11 +4583,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_triangle_mesh" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_triangle_mesh</span>
+<h3 id="plantdb.io.read_triangle_mesh" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_triangle_mesh</span>
 
 
-<a href="#plantdb.io.read_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_triangle_mesh(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4029,28 +4597,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded triangular mesh object.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded triangular mesh object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -4098,11 +4695,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_volume" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_volume</span>
+<h3 id="plantdb.io.read_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_volume</span>
 
 
-<a href="#plantdb.io.read_volume" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_volume" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_volume(file, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;tiff&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4112,38 +4709,73 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "tiff".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;tiff&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "tiff".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The volume as a 3D array.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The volume as a 3D array.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4247,11 +4879,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.read_voxel_grid" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">read_voxel_grid</span>
+<h3 id="plantdb.io.read_voxel_grid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_voxel_grid</span>
 
 
-<a href="#plantdb.io.read_voxel_grid" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.read_voxel_grid" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>read_voxel_grid(file, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4261,28 +4893,57 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>A <code>File</code> instance or file path, to read from.</p>
-          </div>
-        </li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>File</code> instance or file path, to read from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>
-          –
-          <div class="doc-md-description">
-            <p>The loaded point cloud object.</p>
-          </div>
-        </li>
-    </ul>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The loaded point cloud object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -4330,11 +4991,11 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_graph" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_graph</span>
+<h3 id="plantdb.io.write_graph" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_graph</span>
 
 
-<a href="#plantdb.io.write_graph" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_graph" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_graph(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;p&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4344,35 +5005,67 @@ Else, write the point cloud data to the given file path, ignoring the extension 
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="networkx.Graph">Graph</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The (tree) graph object to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="networkx.Graph">Graph</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The (tree) graph object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "p".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;p&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "p".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4454,11 +5147,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_image" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_image</span>
+<h3 id="plantdb.io.write_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_image</span>
 
 
-<a href="#plantdb.io.write_image" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_image" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_image(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;png&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4468,35 +5161,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code>array like</code>)
-          –
-          <div class="doc-md-description">
-            <p>The 2D image (RGB array) to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code>(<span title="png">png</span>, <span title="jpeg">jpeg</span>, <span title="tiff">tiff</span>)</code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code>array like</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The 2D image (RGB array) to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code>(<span title="png">png</span>, <span title="jpeg">jpeg</span>, <span title="tiff">tiff</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "png".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;png&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "png".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4581,11 +5306,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_json" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_json</span>
+<h3 id="plantdb.io.write_json" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_json</span>
 
 
-<a href="#plantdb.io.write_json" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_json" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_json(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;json&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4595,35 +5320,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The dictionary to save as a JSON file.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary to save as a JSON file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "json".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;json&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "json".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4702,11 +5459,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_npz" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_npz</span>
+<h3 id="plantdb.io.write_npz" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_npz</span>
 
 
-<a href="#plantdb.io.write_npz" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_npz" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_npz(file, data, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4716,25 +5473,51 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>dbfile</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>dbfile</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code>dict of numpy.ndarray</code>)
-          –
-          <div class="doc-md-description">
-            <p>A dictionary of arrays to save as a single compressed '.npz' file.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code>dict of numpy.ndarray</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary of arrays to save as a single compressed '.npz' file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4815,11 +5598,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_point_cloud" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_point_cloud</span>
+<h3 id="plantdb.io.write_point_cloud" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_point_cloud</span>
 
 
-<a href="#plantdb.io.write_point_cloud" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_point_cloud" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_point_cloud(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;ply&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4829,35 +5612,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.PointCloud">PointCloud</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The point cloud object to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.PointCloud">PointCloud</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The point cloud object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "ply".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;ply&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "ply".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4945,11 +5760,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_toml" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_toml</span>
+<h3 id="plantdb.io.write_toml" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_toml</span>
 
 
-<a href="#plantdb.io.write_toml" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_toml" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_toml(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;toml&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -4959,35 +5774,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The dictionary to save as a TOML file.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary to save as a TOML file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "toml".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;toml&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "toml".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5066,11 +5913,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_torch" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_torch</span>
+<h3 id="plantdb.io.write_torch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_torch</span>
 
 
-<a href="#plantdb.io.write_torch" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_torch" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_torch(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;pt&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -5080,35 +5927,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="TorchTensor">TorchTensor</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The torch tensor object to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="TorchTensor">TorchTensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The torch tensor object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "pt".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;pt&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "pt".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -5150,11 +6029,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_triangle_mesh" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_triangle_mesh</span>
+<h3 id="plantdb.io.write_triangle_mesh" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_triangle_mesh</span>
 
 
-<a href="#plantdb.io.write_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_triangle_mesh" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_triangle_mesh(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;ply&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -5164,35 +6043,67 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a <code>File</code> instance, the file will be saved to the associated database/scan/fileset.
 Else, write the <code>data</code> to the given file path, ignoring the extension parameter <code>ext</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The triangular mesh object to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.TriangleMesh">TriangleMesh</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The triangular mesh object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "ply".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;ply&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "ply".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/io.py</code></summary>
@@ -5234,11 +6145,11 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_volume" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_volume</span>
+<h3 id="plantdb.io.write_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_volume</span>
 
 
-<a href="#plantdb.io.write_volume" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_volume" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_volume(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;tiff&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -5248,48 +6159,92 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The <code>File</code> object used to write the associated file.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code>array like</code>)
-          –
-          <div class="doc-md-description">
-            <p>The 3D array to save as volume image.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>File</code> object used to write the associated file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code>array like</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The 3D array to save as volume image.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "tiff".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;tiff&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "tiff".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Other Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-          <b><code>compress</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>Indicate if the volume file should be compressed.
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>compress</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indicate if the volume file should be compressed.
 Defaults to <code>True</code>.</p>
-          </div>
-        </li>
-    </ul>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5405,11 +6360,11 @@ Defaults to <code>True</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="plantdb.io.write_voxel_grid" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">write_voxel_grid</span>
+<h3 id="plantdb.io.write_voxel_grid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">write_voxel_grid</span>
 
 
-<a href="#plantdb.io.write_voxel_grid" class="headerlink" title="Permanent link">Link</a></h4>
+<a href="#plantdb.io.write_voxel_grid" class="headerlink" title="Permanent link">Link</a></h3>
 <div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>write_voxel_grid(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;ply&#39;</span>, <span style="color: #666">**</span>kwargs)
 </code></pre></div>
 
@@ -5419,34 +6374,66 @@ Defaults to <code>True</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>file</code></b>
-              (<code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The <code>File</code> object used to write the associated file.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>data</code></b>
-              (<code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The voxel grid object to save.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>ext</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>file</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="plantdb.db.File" href="../db/#plantdb.db.File">File</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>File</code> object used to write the associated file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="open3d.geometry.VoxelGrid">VoxelGrid</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The voxel grid object to save.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ext</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extension, defaults to "ply".</p>
+              </div>
+            </td>
+            <td>
                   <code>&#39;ply&#39;</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>File extension, defaults to "ply".</p>
-          </div>
-        </li>
-    </ul>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <details class="see-also" open>
