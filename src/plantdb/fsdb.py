@@ -101,10 +101,13 @@ import os
 import pathlib
 import shutil
 from collections.abc import Iterable
+from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 from shutil import copyfile
 from shutil import rmtree
 
+import bcrypt
 from tqdm import tqdm
 
 from plantdb import db
@@ -357,6 +360,9 @@ class FSDB(db.DB):
                 self.users = json.load(f)
             logger.debug(f"Loaded {len(self.users)} users from '{users_file}'.")
         self.user = None
+        self.failed_login_attempts = {}
+        self.max_login_attempts = 5
+        self.lockout_duration = timedelta(minutes=15)
 
         # Initialize attributes:
         self.basedir = Path(basedir).resolve()
@@ -367,7 +373,7 @@ class FSDB(db.DB):
         self.required_filesets = required_filesets if not dummy else None
         self.required_files_json = required_files_json if not dummy else False
 
-    def create_user(self, username, fullname):
+    def create_user(self, username, fullname, password):
         """Create a new user and store the user information in a file.
 
         Parameters
@@ -377,14 +383,16 @@ class FSDB(db.DB):
             This will be converted to lowercase.
         fullname : str
             The full name of the user to be created.
+        password : str
+            The password of the user to be created.
 
         Examples
         --------
         >>> from plantdb.fsdb import FSDB
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db()
-        >>> db.create_user('batman', "Bruce Wayne")
-        >>> db.connect('batman')
+        >>> db.create_user('batman', "Bruce Wayne", "joker")
+        >>> db.connect('batman', 'joker')
         >>> print(db.user)
         batman
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
@@ -401,10 +409,17 @@ class FSDB(db.DB):
             logger.error(f"User '{username}' already exists!")
             return
 
+        # Generate salt and hash password
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+
         # Add the new user's data to the `self.users` dictionary.
         self.users[username] = {
+            'password': hashed.decode('utf-8'),  # Store the hashed password as a string.
             'fullname': fullname,  # Store the provided full name of the user.
-            'created': timestamp  # Store the formatted timestamp to record when the user was created.
+            'created': timestamp,  # Store the formatted timestamp to record when the user was created.
+            'last_login': None,  # Store the timestamp of the last login.
+            'failed_attempts': 0,  # Store the number of failed login attempts.
         }
 
         # Save all user data (including the newly created user) to 'users.json' file.
@@ -414,7 +429,7 @@ class FSDB(db.DB):
 
         return f"Welcome {self.users[username]['fullname']}!'"
 
-    def connect(self, login=None, unsafe=False):
+    def connect(self, login=None, password="", unsafe=False):
         """Connect to the local database.
 
         Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
@@ -444,50 +459,137 @@ class FSDB(db.DB):
         >>> print(db.is_connected)
         True
         >>> db.create_user("batman", "Bruce Wayne")
-        >>> db.connect('batman')
+        >>> db.connect('batman', 'joker')
         >>> print(db.is_connected)
         True
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         >>> print(db.is_connected)
         False
         """
+        # Store current user before attempting connection
         prev_user = copy.copy(self.user)
-        # Try to log in as a user:
+
+        # Handle user authentication
         if login is not None and login != "anonymous":
             try:
-                assert login in self.users
+                # Validate user credentials
+                self.validate_user(login, password)
             except AssertionError:
+                # User doesn't exist - log error and suggest creating new user
                 logger.error(f"Unknown user '{login}', cannot connect to the database!")
                 logger.info(f"Create a new user '{login}' with the `create_user` method.")
                 return
             else:
                 self.user = login
         else:
-            self.create_user("anonymous", "Ano Nymous")
+            # Create and use anonymous user if no login provided
+            self.create_user("anonymous", "Guy Fawkes", "alanmoore")
             self.user = "anonymous"
-            # Raise warning about anonymous user only if not a dummy database
+            # Warn about anonymous user usage except for dummy databases
             if not self.dummy:
                 logger.warning("Using anonymous user is discouraged!")
                 logger.info("Use `connect(login='username')` to login as a user.")
 
+        # Handle database connection
         if not self.is_connected:
             if unsafe:
+                # Skip lock file in unsafe mode
                 self.scans = _load_scans(self)
                 self.is_connected = True
             else:
                 try:
+                    # Create lock file to prevent concurrent access
                     with self.lock_path.open(mode="x") as _:
                         self.scans = _load_scans(self)
                         self.is_connected = True
+                    # Register disconnect function to run at program exit
                     atexit.register(self.disconnect)
                 except FileExistsError:
+                    # Database is already locked by another process
                     raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
         else:
+            # Already connected - log appropriate message based on user change
             if self.user != prev_user:
                 logger.info(f"Connected as '{self.user}' to the database '{self.path()}'.")
             else:
                 logger.info(f"Already connected as '{self.user}' to the database '{self.path()}'!")
         return
+
+    def validate_user(self, username: str, password: str) -> bool:
+        """Validate the user login.
+
+        Parameters
+        ----------
+        username : str
+            The username provided by the user attempting to log in.
+        password : str
+            The password provided by the user attempting to log in.
+
+        Returns
+        -------
+        bool
+            ``True`` if the login attempt is successful, ``False`` otherwise.
+
+        Raises
+        ------
+        KeyError
+            If there is an issue accessing necessary user data.
+        """
+        if self._is_account_locked(username):
+            logger.warning(f"Account locked: {username}")
+            return False
+
+        if username not in self.users:
+            logger.warning(f"Login attempt for non-existent user: {username}")
+            return False
+
+        # Verify password
+        stored_hash = self.users[username]['password']
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
+            # Reset failed attempts on successful login
+            self.failed_login_attempts[username] = 0
+            self.users[username]['last_login'] = datetime.now()
+            return True
+
+        # Handle failed login attempt
+        self._record_failed_attempt(username)
+        return False
+
+    def _is_account_locked(self, username: str) -> bool:
+        """Verify if the account is locked.
+
+        Parameters
+        ----------
+        username : str
+            The username of the account to check for lock status.
+
+        Returns
+        -------
+        bool
+            ``True`` if the account is locked, otherwise ``False``.
+        """
+        if username not in self.failed_login_attempts:
+            return False
+
+        attempts = self.failed_login_attempts.get(username, 0)
+        if attempts >= self.max_login_attempts:
+            last_attempt = self.users[username].get('last_failed_attempt')
+            if last_attempt and datetime.now() - last_attempt < self.lockout_duration:
+                return True
+        return False
+
+    def _record_failed_attempt(self, username: str) -> None:
+        """Record failed login attempt.
+
+        Parameters
+        ----------
+        username : str
+            The username for which the failed login attempt is being recorded.
+        """
+        current = self.failed_login_attempts.get(username, 0)
+        self.failed_login_attempts[username] = current + 1
+        self.users[username]['last_failed_attempt'] = datetime.now()
+        logger.warning(f"Failed login attempt (n={self.failed_login_attempts[username]}) for user: {username}")
 
     def disconnect(self):
         """Disconnect from the local database.
