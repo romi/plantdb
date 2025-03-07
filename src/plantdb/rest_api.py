@@ -767,7 +767,7 @@ class Login(Resource):
         """
         self.db = db
 
-    @rate_limit(max_requests=10, window_seconds=60)
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
         """Checks if a given username exists in the database and returns the result.
 
@@ -873,12 +873,14 @@ class Login(Resource):
         # Prepare response based on authentication result
         if is_authenticated:
             # Get user's full name from database for welcome message
+            fullname = self.db.users[username]['fullname']
             message = f"Login successful. Welcome, {self.db.users[username]['fullname']}!"
         else:
+            fullname = "None"
             message = f"Login failed. Please check your username and password!"
 
         # Return authentication result and appropriate message with 200 status code
-        return {'authenticated': is_authenticated, 'message': message}, 200
+        return {'authenticated': is_authenticated, 'fullname': fullname, 'message': message}, 200
 
     def check_credentials(self, username, password):
         """Validates user credentials against the database.
@@ -925,6 +927,7 @@ class ScansList(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=30, window_seconds=60)
     def get(self):
         """Retrieve a list of scan datasets with optional filtering.
 
@@ -1253,6 +1256,7 @@ class File(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self, path):
         """Serve a file from the database directory via HTTP.
 
@@ -1333,6 +1337,7 @@ class DatasetFile(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=30, window_seconds=60)
     def post(self, scan_id):
         """Handle POST request to upload and save a file to the server.
 
@@ -1585,6 +1590,7 @@ class Image(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve an image from the database.
 
@@ -1684,6 +1690,7 @@ class PointCloud(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve a point cloud from the database.
 
@@ -1784,6 +1791,7 @@ class PointCloudGroundTruth(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve a ground-truth point-cloud file.
 
@@ -1884,6 +1892,7 @@ class Mesh(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve a triangular mesh file.
 
@@ -1976,6 +1985,7 @@ class CurveSkeleton(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id):
         """Retrieve the curve skeleton data for a specific scan.
 
@@ -2086,6 +2096,7 @@ class Sequence(Resource):
         """
         self.db = db
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id):
         """Retrieve angle and internode sequences data for a given scan.
 
@@ -2236,6 +2247,7 @@ class Archive(Resource):
         self.db = db
         self.logger = logger
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def get(self, scan_id):
         """Create and serve a ZIP archive for the specified scan dataset.
 
@@ -2327,6 +2339,7 @@ class Archive(Resource):
 
         return send_file(zpath, mimetype='application/zip')
 
+    @rate_limit(max_requests=5, window_seconds=60)
     def post(self, scan_id):
         """Handle ZIP file upload and extraction for a scan dataset.
 
