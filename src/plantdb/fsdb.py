@@ -548,7 +548,7 @@ class FSDB(db.DB):
         if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
             # Reset failed attempts on successful login
             self.failed_login_attempts[username] = 0
-            self.users[username]['last_login'] = datetime.now()
+            self.users[username]['last_login'] = datetime.now().strftime("%y%m%d_%H%M%S")
             return True
 
         # Handle failed login attempt
@@ -577,7 +577,8 @@ class FSDB(db.DB):
 
         attempts = self.failed_login_attempts.get(username, 0)
         if attempts >= self.max_login_attempts:
-            last_attempt = self.users[username].get('last_failed_attempt')
+            last_attempt_str = self.users[username].get('last_failed_attempt')
+            last_attempt = datetime.strptime(last_attempt_str, "%y%m%d_%H%M%S")
             if last_attempt and datetime.now() - last_attempt < self.lockout_duration:
                 return True
         return False
