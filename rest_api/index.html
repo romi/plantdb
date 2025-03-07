@@ -361,13 +361,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rest-urls" class="md-nav__link">
+  <a href="#metadata-and-files-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      REST URLs
+      Metadata and Files Endpoints
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="REST URLs">
+    <nav class="md-nav" aria-label="Metadata and Files Endpoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -480,6 +480,48 @@
         
           <li class="md-nav__item">
   <a href="#refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      /refresh
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication Endpoints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#register" class="md-nav__link">
+    <span class="md-ellipsis">
+      /register
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login" class="md-nav__link">
+    <span class="md-ellipsis">
+      /login
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh_1" class="md-nav__link">
     <span class="md-ellipsis">
       /refresh
     </span>
@@ -1229,13 +1271,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rest-urls" class="md-nav__link">
+  <a href="#metadata-and-files-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      REST URLs
+      Metadata and Files Endpoints
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="REST URLs">
+    <nav class="md-nav" aria-label="Metadata and Files Endpoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1361,6 +1403,48 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#authentication-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication Endpoints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#register" class="md-nav__link">
+    <span class="md-ellipsis">
+      /register
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login" class="md-nav__link">
+    <span class="md-ellipsis">
+      /login
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      /refresh
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#scan-summary" class="md-nav__link">
     <span class="md-ellipsis">
       Scan summary
@@ -1464,16 +1548,17 @@
 
 
 <h1 id="plantdb-rest-api">PlantDB REST API<a class="headerlink" href="#plantdb-rest-api" title="Permanent link">Link</a></h1>
-<p>Hereafter we introduce the URLS to use to communicate via the REST API.
-The Python implementation is done in the <code>plantdb.rest_api</code> module and the CLI to start a Flask server is in <code>fsdb_rest_api</code>.</p>
-<h2 id="rest-urls">REST URLs<a class="headerlink" href="#rest-urls" title="Permanent link">Link</a></h2>
+<p>Hereafter we introduce the URLS to use to communicate via the PlantDB REST API.</p>
+<p>The Python implementation is done in the <code>plantdb.rest_api</code> module and the CLI to start a Flask server is in <code>fsdb_rest_api</code>.</p>
+<h2 id="metadata-and-files-endpoints">Metadata and Files Endpoints<a class="headerlink" href="#metadata-and-files-endpoints" title="Permanent link">Link</a></h2>
 <h3 id="scans"><code>/scans</code><a class="headerlink" href="#scans" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/scans</code> URL:</p>
 <ul>
 <li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.ScansList"><code>plantdb.rest_api.ScansList</code></a></li>
+<li>Methods: GET</li>
 <li>Arguments: <code>filterQuery</code></li>
 <li>Returns: a JSON compliant list of dictionaries.</li>
-<li>Example:<ul>
+<li>Examples:<ul>
 <li>Get all scans:
 <a href="http://127.0.0.1:5000/scans">http://127.0.0.1:5000/scans</a></li>
 <li>Search for "arabidopsis" in metadata:
@@ -1485,14 +1570,25 @@ The Python implementation is done in the <code>plantdb.rest_api</code> module an
 <p>Here are the specifications for the <code>/scans_info</code> URL:</p>
 <ul>
 <li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.ScansTable"><code>plantdb.rest_api.ScansTable</code></a></li>
+<li>Methods: GET</li>
 <li>Arguments: <code>filterQuery</code></li>
-<li>Returns: A JSON-compliant table structure containing detailed scan metadata.</li>
+<li>Returns: A JSON-compliant dictionary containing scan data in a tabular format, including:<ul>
+<li>Basic scan metadata</li>
+<li>File counts per fileset</li>
+<li>Task status information</li>
+<li>Derived data availability</li>
+</ul>
+</li>
 <li>Example:<ul>
 <li>Get all scans in a tabular format:
-<a href="http://127.0.0.1:5000/scans_info">http://127.0.0.1:5000/scans_info</a></li>
+<a href="http://127.0.0.1:5000/scans_info/real_plant_analyzed">http://127.0.0.1:5000/scans_info/real_plant_analyzed</a></li>
 </ul>
 </li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The response includes information about all filesets and tasks associated with the scan, making it useful for getting a comprehensive overview of a specific scan's contents and processing status.</p>
+</div>
 <h3 id="scansscan_id"><code>/scans/&lt;scan_id&gt;</code><a class="headerlink" href="#scansscan_id" title="Permanent link">Link</a></h3>
 <p>Here are the specifications for the <code>/scans/&lt;scan_id&gt;</code> URLs:</p>
 <ul>
@@ -1637,6 +1733,48 @@ In other words it will fail (response <code>500</code>) if this task is missing 
 <li>Arguments: none</li>
 <li>Returns: <code>200</code> on completion.</li>
 <li>Example: <a href="http://127.0.0.1:5000/refresh">http://127.0.0.1:5000/refresh</a></li>
+</ul>
+<h2 id="authentication-endpoints">Authentication Endpoints<a class="headerlink" href="#authentication-endpoints" title="Permanent link">Link</a></h2>
+<h3 id="register"><code>/register</code><a class="headerlink" href="#register" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/register</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Register"><code>plantdb.rest_api.Register</code></a></li>
+<li>Method: POST</li>
+<li>Arguments:<ul>
+<li><code>username</code>: The desired username</li>
+<li><code>password</code>: The password for the account</li>
+</ul>
+</li>
+<li>Returns: Registration confirmation or error message.</li>
+<li>Example:
+    <div class="language-bash highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>curl<span style="color: #BBB"> </span>-X<span style="color: #BBB"> </span>POST<span style="color: #BBB"> </span>http://127.0.0.1:5000/register<span style="color: #BBB"> </span>-H<span style="color: #BBB"> </span><span style="color: #BA2121">&quot;Content-Type: application/json&quot;</span><span style="color: #BBB"> </span>-d<span style="color: #BBB"> </span><span style="color: #BA2121">&#39;{&quot;username&quot;:&quot;user123&quot;, &quot;password&quot;:&quot;securepass&quot;}&#39;</span>
+</code></pre></div></li>
+</ul>
+<h3 id="login"><code>/login</code><a class="headerlink" href="#login" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/login</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Login"><code>plantdb.rest_api.Login</code></a></li>
+<li>Methods: GET, POST</li>
+<li>Arguments for POST:<ul>
+<li><code>username</code>: The username</li>
+<li><code>password</code>: The password</li>
+</ul>
+</li>
+<li>Returns: Authentication token on successful login.</li>
+<li>Example:
+    <div class="language-bash highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>curl<span style="color: #BBB"> </span>-X<span style="color: #BBB"> </span>POST<span style="color: #BBB"> </span>http://127.0.0.1:5000/login<span style="color: #BBB"> </span>-H<span style="color: #BBB"> </span><span style="color: #BA2121">&quot;Content-Type: application/json&quot;</span><span style="color: #BBB"> </span>-d<span style="color: #BBB"> </span><span style="color: #BA2121">&#39;{&quot;username&quot;:&quot;user123&quot;, &quot;password&quot;:&quot;securepass&quot;}&#39;</span>
+</code></pre></div></li>
+</ul>
+<h3 id="refresh_1"><code>/refresh</code><a class="headerlink" href="#refresh_1" title="Permanent link">Link</a></h3>
+<p>Here are the specifications for the <code>/refresh</code> URL:</p>
+<ul>
+<li>Resource: <a href="../reference/plantdb/rest_api/#plantdb.rest_api.Refresh"><code>plantdb.rest_api.Refresh</code></a></li>
+<li>Method: GET</li>
+<li>Arguments: none (requires valid authentication token in header)</li>
+<li>Returns: A new authentication token.</li>
+<li>Example:
+    <div class="language-bash highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>curl<span style="color: #BBB"> </span>-X<span style="color: #BBB"> </span>GET<span style="color: #BBB"> </span>http://127.0.0.1:5000/refresh<span style="color: #BBB"> </span>-H<span style="color: #BBB"> </span><span style="color: #BA2121">&quot;Authorization: Bearer &lt;your_current_token&gt;&quot;</span>
+</code></pre></div></li>
 </ul>
 <h2 id="scan-summary">Scan summary<a class="headerlink" href="#scan-summary" title="Permanent link">Link</a></h2>
 <p>Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
