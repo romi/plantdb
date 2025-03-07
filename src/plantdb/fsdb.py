@@ -424,7 +424,7 @@ class FSDB(db.DB):
 
         # Save all user data (including the newly created user) to 'users.json' file.
         with open(self.basedir / 'users.json', "w") as f:
-            json.dump(self.users, f)
+            json.dump(self.users, f, indent=2)
         logger.info(f"Created user '{username}' with fullname '{fullname}'.")
 
         return f"Welcome {self.users[username]['fullname']}!'"
@@ -483,7 +483,7 @@ class FSDB(db.DB):
                 self.user = login
         else:
             # Create and use anonymous user if no login provided
-            self.create_user("anonymous", "Guy Fawkes", "alanmoore")
+            self.create_user("anonymous", "Guy Fawkes", "AlanMoore")
             self.user = "anonymous"
             # Warn about anonymous user usage except for dummy databases
             if not self.dummy:
@@ -1849,8 +1849,8 @@ class File(db.File):
         bytes
             The contents of the file.
 
-        Example
-        -------
+        Examples
+        --------
         >>> from plantdb.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
