@@ -1719,7 +1719,8 @@ Should be in the format <code>user@server:path</code></p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_is_account_locked</span>(<span style="color: #008000">self</span>, username: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">bool</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_is_account_locked</span>(<span style="color: #008000">self</span>, username: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">bool</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Verify if the account is locked.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -1737,7 +1738,8 @@ Should be in the format <code>user@server:path</code></p>
 
     attempts <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>failed_login_attempts<span style="color: #666">.</span>get(username, <span style="color: #666">0</span>)
     <span style="color: #008000; font-weight: bold">if</span> attempts <span style="color: #666">&gt;=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>max_login_attempts:
-        last_attempt <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>users[username]<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;last_failed_attempt&#39;</span>)
+        last_attempt_str <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>users[username]<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;last_failed_attempt&#39;</span>)
+        last_attempt <span style="color: #666">=</span> datetime<span style="color: #666">.</span>strptime(last_attempt_str, <span style="color: #BA2121">&quot;%y%m</span><span style="color: #A45A77; font-weight: bold">%d</span><span style="color: #BA2121">_%H%M%S&quot;</span>)
         <span style="color: #008000; font-weight: bold">if</span> last_attempt <span style="color: #A2F; font-weight: bold">and</span> datetime<span style="color: #666">.</span>now() <span style="color: #666">-</span> last_attempt <span style="color: #666">&lt;</span> <span style="color: #008000">self</span><span style="color: #666">.</span>lockout_duration:
             <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">True</span>
     <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">False</span>
@@ -1795,8 +1797,7 @@ Should be in the format <code>user@server:path</code></p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
@@ -1806,7 +1807,8 @@ Should be in the format <code>user@server:path</code></p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">593</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">594</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">595</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_record_failed_attempt</span>(<span style="color: #008000">self</span>, username: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000; font-weight: bold">None</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_record_failed_attempt</span>(<span style="color: #008000">self</span>, username: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000; font-weight: bold">None</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Record failed login attempt.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2082,8 +2084,7 @@ plantdb.fsdb._make_scan</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">765</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">766</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">766</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">767</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">768</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">769</span>
@@ -2142,7 +2143,8 @@ plantdb.fsdb._make_scan</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">822</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">823</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">824</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">825</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_scan</span>(<span style="color: #008000">self</span>, scan_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">825</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">826</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_scan</span>(<span style="color: #008000">self</span>, scan_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new ``Scan`` instance in the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2510,8 +2512,7 @@ This will be converted to lowercase.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">827</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">828</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">828</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">829</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">830</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">831</span>
@@ -2550,7 +2551,8 @@ This will be converted to lowercase.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">864</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">865</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">866</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">867</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">delete_scan</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">867</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">868</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">delete_scan</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Delete an existing `Scan` from the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2781,8 +2783,7 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">725</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">726</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">726</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">727</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">728</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">729</span>
@@ -2819,7 +2820,8 @@ Else the given <code>id</code> should NOT exist as they are unique.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">760</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">761</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">762</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">763</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan</span>(<span style="color: #008000">self</span>, scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">763</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">764</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan</span>(<span style="color: #008000">self</span>, scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get or create a `Scan` instance in the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2983,8 +2985,7 @@ Default is <code>True</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">687</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">688</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">689</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">690</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">691</span>
@@ -3019,7 +3020,8 @@ Default is <code>True</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">720</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">721</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">722</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">723</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">723</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">724</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3164,8 +3166,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">882</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">883</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">883</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">884</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">885</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">886</span>
@@ -3201,7 +3202,8 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">917</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">918</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">919</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">list</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">919</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">920</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">list</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of scans in identifiers the local database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3271,8 +3273,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">869</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">870</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">870</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">871</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">872</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">873</span>
@@ -3282,7 +3283,8 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">877</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">878</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">879</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">880</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">path</span>(<span style="color: #008000">self</span>) <span style="color: #666">-&gt;</span> pathlib<span style="color: #666">.</span>Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">880</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">881</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">path</span>(<span style="color: #008000">self</span>) <span style="color: #666">-&gt;</span> pathlib<span style="color: #666">.</span>Path:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the path to the local database root directory.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -3348,8 +3350,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">639</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">640</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">640</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">641</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">642</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">643</span>
@@ -3369,7 +3370,8 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">657</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">658</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">659</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">660</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">reload</span>(<span style="color: #008000">self</span>, scan_id<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">660</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">661</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">reload</span>(<span style="color: #008000">self</span>, scan_id<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reload the database by scanning datasets.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3479,8 +3481,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 
             <details class="quote">
               <summary>Source code in <code>plantdb/fsdb.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">662</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">663</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">663</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">664</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">665</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">666</span>
@@ -3502,7 +3503,8 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">682</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">683</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">684</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">685</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_exists</span>(<span style="color: #008000">self</span>, scan_id: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">bool</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">685</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">686</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_exists</span>(<span style="color: #008000">self</span>, scan_id: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">bool</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Check if a given scan ID exists in the database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3741,7 +3743,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
     <span style="color: #008000; font-weight: bold">if</span> bcrypt<span style="color: #666">.</span>checkpw(password<span style="color: #666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>), stored_hash<span style="color: #666">.</span>encode(<span style="color: #BA2121">&#39;utf-8&#39;</span>)):
         <span style="color: #3D7B7B; font-style: italic"># Reset failed attempts on successful login</span>
         <span style="color: #008000">self</span><span style="color: #666">.</span>failed_login_attempts[username] <span style="color: #666">=</span> <span style="color: #666">0</span>
-        <span style="color: #008000">self</span><span style="color: #666">.</span>users[username][<span style="color: #BA2121">&#39;last_login&#39;</span>] <span style="color: #666">=</span> datetime<span style="color: #666">.</span>now()
+        <span style="color: #008000">self</span><span style="color: #666">.</span>users[username][<span style="color: #BA2121">&#39;last_login&#39;</span>] <span style="color: #666">=</span> datetime<span style="color: #666">.</span>now()<span style="color: #666">.</span>strftime(<span style="color: #BA2121">&quot;%y%m</span><span style="color: #A45A77; font-weight: bold">%d</span><span style="color: #BA2121">_%H%M%S&quot;</span>)
         <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">True</span>
 
     <span style="color: #3D7B7B; font-style: italic"># Handle failed login attempt</span>
