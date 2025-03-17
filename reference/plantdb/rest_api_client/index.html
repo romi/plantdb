@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -751,6 +751,28 @@
   
   <span class="md-ellipsis">
     log
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plantdb_client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    plantdb_client
     
   </span>
   
@@ -1697,6 +1719,7 @@
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1775,6 +1798,7 @@
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -1879,6 +1903,7 @@
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -2030,6 +2055,7 @@
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>archive_url(<span style="color: #BA2121">&#39;arabidopsis+000&#39;</span>)
 <span style="color: #717171">ValueError: Invalid dataset name: &#39;arabidopsis+000&#39;. Dataset names must be alphanumeric and can include underscores or dashes.</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -2201,6 +2227,7 @@
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>base_url()
 <span style="color: #717171">&#39;http://127.0.0.1:5000&#39;</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -2394,6 +2421,7 @@ A path to the downloaded file, if a directory path is specified.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.rest_api_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> download_scan_archive
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>download_scan_archive(<span style="color: #BA2121">&quot;arabidopsis000&quot;</span>, out_dir<span style="color: #666">=</span><span style="color: #BA2121">&#39;/tmp&#39;</span>, host<span style="color: #666">=</span><span style="color: #BA2121">&quot;127.0.0.1&quot;</span>, port<span style="color: #666">=</span><span style="color: #BA2121">&quot;5000&quot;</span>)
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -2613,6 +2641,7 @@ A path to the downloaded file, if a directory path is specified.</p>
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">857</span>
@@ -2826,6 +2855,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: #717171">(1440, 1080)</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
@@ -3038,6 +3068,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">832</span>
@@ -3212,6 +3243,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">807</span>
@@ -3376,6 +3408,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scan_data[<span style="color: #BA2121">&#39;hasColmap&#39;</span>])
 <span style="color: #717171">False</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -3593,6 +3626,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
@@ -3747,6 +3781,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_scans_info()
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -3962,6 +3997,7 @@ If not specified, fetch it from the REST API.</p>
   <p>plantdb.rest_api.filesUri_task_mapping
 plantdb.rest_api_client.parse_task_requests_data</p>
 </details>
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">727</span>
@@ -4162,6 +4198,7 @@ plantdb.rest_api_client.parse_task_requests_data</p>
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
@@ -4326,6 +4363,7 @@ plantdb.rest_api_client.parse_task_requests_data</p>
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">775</span>
@@ -4485,6 +4523,7 @@ plantdb.rest_api_client.parse_task_requests_data</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(list_scan_names())
 <span style="color: #717171">[&#39;arabidopsis000&#39;, &#39;real_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;virtual_plant&#39;, &#39;virtual_plant_analyzed&#39;]</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -4680,6 +4719,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
@@ -4826,6 +4866,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">689</span>
@@ -4929,6 +4970,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -5042,6 +5084,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">611</span>
@@ -5152,6 +5195,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
@@ -5255,6 +5299,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -5399,6 +5444,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: #717171">[&#39;arabidopsis000&#39;, &#39;real_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;virtual_plant&#39;, &#39;virtual_plant_analyzed&#39;]</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
@@ -5478,6 +5524,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
     <div class="doc doc-contents ">
 
         <p>The task data parser, behave according to the source and default to JSON parser.</p>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -5645,6 +5692,7 @@ If <code>None</code>, the entire database is refreshed.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.rest_api_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> refresh
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>refresh(<span style="color: #BA2121">&quot;arabidopsis000&quot;</span>, host<span style="color: #666">=</span><span style="color: #BA2121">&quot;127.0.0.1&quot;</span>, port<span style="color: #666">=</span><span style="color: #BA2121">&quot;5000&quot;</span>)
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -5842,6 +5890,7 @@ Defaults to <code>None</code>.</p>
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
@@ -6009,6 +6058,7 @@ Defaults to <code>None</code>.</p>
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -6243,6 +6293,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: #717171">&#39;http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=orig&#39;</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
@@ -6445,6 +6496,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
@@ -6616,6 +6668,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: #717171">&#39;http://127.0.0.1:5000/scans/real_plant&#39;</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
@@ -6762,6 +6815,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scans_url()
 <span style="color: #717171">&#39;http://127.0.0.1:5000/scans&#39;</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -6911,6 +6965,7 @@ be closed or unavailable.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.rest_api_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> test_host_port_availability
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>test_host_port_availability(<span style="color: #BA2121">&#39;127.0.0.1:5000&#39;</span>)
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -7153,6 +7208,7 @@ be closed or unavailable.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.rest_api_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> upload_dataset_file
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>upload_dataset_file(<span style="color: #BA2121">&#39;arabidopsis000&#39;</span>, <span style="color: #BA2121">&#39;/path/to/local/file.txt&#39;</span>)
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>
@@ -7493,6 +7549,7 @@ file opening/closing procedures and response status checks.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.rest_api_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> upload_scan_archive
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>upload_scan_archive(<span style="color: #BA2121">&quot;arabidopsis000&quot;</span>, path<span style="color: #666">=</span><span style="color: #BA2121">&#39;/tmp/arabidopsis000.zip&#39;</span>, host<span style="color: #666">=</span><span style="color: #BA2121">&quot;127.0.0.1&quot;</span>, port<span style="color: #666">=</span><span style="color: #BA2121">&quot;5002&quot;</span>)
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/rest_api_client.py</code></summary>

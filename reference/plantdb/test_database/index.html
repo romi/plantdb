@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -768,6 +768,28 @@
   
   
     <li class="md-nav__item">
+      <a href="../plantdb_client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    plantdb_client
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../rest_api/" class="md-nav__link">
         
   
@@ -1315,6 +1337,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1447,6 +1470,7 @@ However, it will still be checked against the corresponding known hash value.</p
           </tr>
       </tbody>
     </table>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
@@ -1585,6 +1609,7 @@ However, it will still be checked against the corresponding known hash value.</p
 <span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB_********&#39;)</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">121</span>
@@ -1706,6 +1731,7 @@ However, it will still be checked against the corresponding known hash value.</p
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>zip_fname
 <span style="color: #717171">PosixPath(&#39;/tmp/real_plant_analyzed.zip&#39;)</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
@@ -1891,6 +1917,7 @@ However, it will still be checked against the corresponding known hash value.</p
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>_test_hash(zip_fname, ZIP_MD5S[<span style="color: #BA2121">&#39;real_plant&#39;</span>], <span style="color: #BA2121">&quot;md5&quot;</span>)
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">186</span>
@@ -2039,6 +2066,7 @@ However, it will still be checked against the corresponding known hash value.</p
       </tbody>
     </table>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
@@ -2184,6 +2212,7 @@ However, it will still be checked against the corresponding known hash value.</p
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> get_configs
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_configs()  <span style="color: #3D7B7B; font-style: italic"># download and extract the pipeline configurations to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
@@ -2354,6 +2383,7 @@ However, it will still be checked against the corresponding known hash value.</p
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> get_models_dataset
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_models_dataset()  <span style="color: #3D7B7B; font-style: italic"># download and extract the trained CNN models to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
@@ -2541,6 +2571,7 @@ However, it will still be checked against the corresponding known hash value.</p
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_test_dataset()  <span style="color: #3D7B7B; font-style: italic"># download and extract the test dataset to `plantdb/tests/testdata` directory</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
@@ -2688,6 +2719,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>([path<span style="color: #666">.</span>name <span style="color: #008000; font-weight: bold">for</span> path <span style="color: #A2F; font-weight: bold">in</span> path<span style="color: #666">.</span>iterdir()])  <span style="color: #3D7B7B; font-style: italic"># only the &#39;marker&#39; file is created</span>
 <span style="color: #717171">[&#39;romidb&#39;]</span>
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
@@ -2968,6 +3000,7 @@ See notes below for a list of dataset names and their meanings.</p>
 <span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB_********&#39;)</span>
 </code></pre></div>
 
+
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
               <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
@@ -3239,7 +3272,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="plantdb.fsdb.FSDB" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
+                  <code><a class="autorefs autorefs-internal" title="FSDB (plantdb.fsdb.FSDB)" href="../fsdb/#plantdb.fsdb.FSDB">FSDB</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3261,6 +3294,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: #717171">PosixPath(&#39;/tmp/ROMI_DB_********&#39;)</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()
 </code></pre></div>
+
 
             <details class="quote">
               <summary>Source code in <code>plantdb/test_database.py</code></summary>
