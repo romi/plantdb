@@ -85,6 +85,11 @@ from plantdb.rest_api import Archive
 from plantdb.rest_api import CurveSkeleton
 from plantdb.rest_api import DatasetFile
 from plantdb.rest_api import File
+from plantdb.rest_api import FileCreate
+from plantdb.rest_api import FileMetadata
+from plantdb.rest_api import FilesetCreate
+from plantdb.rest_api import FilesetFiles
+from plantdb.rest_api import FilesetMetadata
 from plantdb.rest_api import Image
 from plantdb.rest_api import Login
 from plantdb.rest_api import Mesh
@@ -93,6 +98,9 @@ from plantdb.rest_api import PointCloudGroundTruth
 from plantdb.rest_api import Refresh
 from plantdb.rest_api import Register
 from plantdb.rest_api import Scan
+from plantdb.rest_api import ScanCreate
+from plantdb.rest_api import ScanFilesets
+from plantdb.rest_api import ScanMetadata
 from plantdb.rest_api import ScansList
 from plantdb.rest_api import ScansTable
 from plantdb.rest_api import Sequence
@@ -236,6 +244,25 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
                      resource_class_args=tuple([db]))
     api.add_resource(Login, '/login',
                      resource_class_args=tuple([db]))
+    # API endpoints for `plantdb.fsdb.Scan`:
+    api.add_resource(ScanCreate, '/api/scan',
+                     resource_class_args=tuple([db, logger]))
+    api.add_resource(ScanMetadata, '/api/scan/<string:scan_id>/metadata',
+                     resource_class_args=tuple([db, logger]))
+    api.add_resource(ScanFilesets, '/api/scan/<string:scan_id>/filesets',
+                     resource_class_args=tuple([db, logger]))
+    # API endpoints for `plantdb.fsdb.Fileset`:
+    api.add_resource(FilesetCreate, '/api/fileset',
+                     resource_class_args=tuple([db, logger]))
+    api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_name>/metadata',
+                     resource_class_args=tuple([db, logger]))
+    api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_name>/files',
+                     resource_class_args=tuple([db, logger]))
+    # API endpoints for `plantdb.fsdb.File`:
+    api.add_resource(FileCreate, '/api/file',
+                     resource_class_args=tuple([db, logger]))
+    api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_name>/<string:file_name>/metadata',
+                     resource_class_args=tuple([db, logger]))
 
     # Start the Flask application:
     app.run(host=host, port=port, debug=debug)
