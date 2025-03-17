@@ -353,6 +353,8 @@ class FSDB(db.DB):
             # Create the users database as a JSON file
             users_file.touch()
             self.users = {}
+            with open(users_file, "w") as f:
+                json.dump(self.users, f, indent=2)
             logger.info(f"Initialized the new database at '{basedir}'!")
         else:
             # Load the users database
