@@ -3,13 +3,13 @@
 
 import unittest
 
-from plantdb import FSDB
-from plantdb.fsdb import File
-from plantdb.fsdb import Fileset
-from plantdb.fsdb import FilesetNotFoundError
-from plantdb.fsdb import Scan
-from plantdb.fsdb import ScanNotFoundError
-from plantdb.testing import DummyDBTestCase
+from plantdb.server.fsdb import FSDB
+from plantdb.server.fsdb import File
+from plantdb.server.fsdb import Fileset
+from plantdb.server.fsdb import FilesetNotFoundError
+from plantdb.server.fsdb import Scan
+from plantdb.server.fsdb import ScanNotFoundError
+from plantdb.server.testing import DummyDBTestCase
 
 
 class TestFSDBDummy(DummyDBTestCase):
@@ -108,7 +108,7 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertIsInstance(file, File)
 
     def test_create_file(self):
-        from plantdb.io import write_json
+        from plantdb.server.io import write_json
         scan = self.get_test_scan()
         fileset = scan.get_fileset("fileset_001")
         f_id = "test_file_md"

@@ -3,11 +3,11 @@
 
 import unittest
 
-from plantdb.testing import FSDBTestCase
-from plantdb.utils import read_image_from_file
-from plantdb.webcache import IMG_RESOLUTIONS
-from plantdb.webcache import image_path
-from plantdb.webcache import pointcloud_path
+from plantdb.server.testing import FSDBTestCase
+from plantdb.server.utils import read_image_from_file
+from plantdb.server.webcache import IMG_RESOLUTIONS
+from plantdb.server.webcache import image_path
+from plantdb.server.webcache import pointcloud_path
 
 
 class TestWebCache(FSDBTestCase):

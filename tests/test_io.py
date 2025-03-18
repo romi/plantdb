@@ -7,9 +7,9 @@ from pathlib import Path
 import numpy as np
 import open3d as o3d
 
-from plantdb import io
-from plantdb.testing import DummyDBTestCase
-from plantdb.testing import FSDBTestCase
+from plantdb.server import io
+from plantdb.server.testing import DummyDBTestCase
+from plantdb.server.testing import FSDBTestCase
 
 rng = np.random.default_rng()
 

@@ -6,7 +6,7 @@ import subprocess
 import unittest
 from pathlib import Path
 
-from plantdb.testing import DummyDBTestCase
+from plantdb.server.testing import DummyDBTestCase
 
 TESTS_ROOT = Path(__file__).parent  # path to the 'plantdb/tests/' directory
 
