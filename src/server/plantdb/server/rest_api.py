@@ -53,9 +53,9 @@ from flask_restful import Resource
 from plantdb.server import webcache
 from plantdb.commons.fsdb import FilesetNotFoundError
 from plantdb.commons.fsdb import ScanNotFoundError
-from plantdb.server.io import read_json
+from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
-from plantdb.server.utils import is_radians
+from plantdb.commons.utils import is_radians
 
 
 def get_scan_date(scan):
@@ -1378,8 +1378,8 @@ class DatasetFile(Resource):
 
         See Also
         --------
-        plantdb.server.io.write_stream : Helper function for chunked file uploads
-        plantdb.server.io.write_data : Helper function for complete file uploads
+        plantdb.commons.io.write_stream : Helper function for chunked file uploads
+        plantdb.commons.io.write_data : Helper function for complete file uploads
 
         Examples
         --------

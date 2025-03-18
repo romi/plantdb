@@ -102,7 +102,8 @@ Trained tensor, read and written using ``torch``.
 import tempfile
 from pathlib import Path
 
-import plantdb.server.db
+from plantdb.commons import db
+from plantdb.commons import fsdb
 from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)
@@ -124,7 +125,7 @@ def _reader(file, reader, **kwargs):
         The loaded data.
     """
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     # Load the file with selected reader:
     with open(file, 'r') as f:
@@ -169,7 +170,7 @@ def _writer(file, data, ext, writer, **kwargs):
     writer : function
         The function to use to write the `data`.
     """
-    if isinstance(file, plantdb.server.db.File):
+    if isinstance(file, db.File):
         _write_db_file(file, data, ext, writer, **kwargs)
     else:
         writer(file, data, **kwargs)
@@ -191,7 +192,7 @@ def read_json(file, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.server.io import read_json, write_json
+    >>> from plantdb.commons.io import read_json, write_json
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -206,7 +207,7 @@ def read_json(file, **kwargs):
     """
     import json
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     # Load the file:
     with open(file, mode='r') as f:
@@ -247,7 +248,7 @@ def write_json(file, data, ext="json", **kwargs):
 
     Examples
     --------
-    >>> from plantdb.server.io import write_json
+    >>> from plantdb.commons.io import write_json
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -276,7 +277,7 @@ def read_toml(file, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.server.io import read_toml, write_toml
+    >>> from plantdb.commons.io import read_toml, write_toml
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -291,7 +292,7 @@ def read_toml(file, **kwargs):
     """
     import toml
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     # Load the file:
     with open(file, mode='r') as f:
@@ -330,7 +331,7 @@ def write_toml(file, data, ext="toml", **kwargs):
 
     Examples
     --------
-    >>> from plantdb.server.io import write_toml
+    >>> from plantdb.commons.io import write_toml
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -360,7 +361,7 @@ def read_image(file, **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import read_image, write_image
+    >>> from plantdb.commons.io import read_image, write_image
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -376,7 +377,7 @@ def read_image(file, **kwargs):
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return iio.imread(file, **kwargs)
 
@@ -394,7 +395,7 @@ def _write_image(fname, data, **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import write_image
+    >>> from plantdb.commons.io import write_image
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -434,7 +435,7 @@ def write_image(file, data, ext="png", **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import write_image
+    >>> from plantdb.commons.io import write_image
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -467,7 +468,7 @@ def read_volume(file, ext="tiff", **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import read_volume, write_volume
+    >>> from plantdb.commons.io import read_volume, write_volume
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -483,7 +484,7 @@ def read_volume(file, ext="tiff", **kwargs):
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return iio.imread(file, **kwargs)
 
@@ -547,7 +548,7 @@ def write_volume(file, data, ext="tiff", **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.server.io import write_volume
+    >>> from plantdb.commons.io import write_volume
     >>> from plantdb.commons.fsdb import Scan, Fileset, File
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
@@ -584,7 +585,7 @@ def read_npz(file, **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import read_npz, write_npz
+    >>> from plantdb.commons.io import read_npz, write_npz
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -600,7 +601,7 @@ def read_npz(file, **kwargs):
     """
     import numpy as np
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return dict(np.load(file, **kwargs))
 
@@ -634,7 +635,7 @@ def write_npz(file, data, **kwargs):
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.server.io import read_npz, write_npz
+    >>> from plantdb.commons.io import read_npz, write_npz
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -666,7 +667,7 @@ def read_point_cloud(file, **kwargs):
     --------
     >>> import open3d as o3d
     >>> import numpy as np
-    >>> from plantdb.server.io import read_point_cloud, write_point_cloud
+    >>> from plantdb.commons.io import read_point_cloud, write_point_cloud
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -685,7 +686,7 @@ def read_point_cloud(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return io.read_point_cloud(str(file), **kwargs)
 
@@ -722,7 +723,7 @@ def write_point_cloud(file, data, ext="ply", **kwargs):
     --------
     >>> import open3d as o3d
     >>> import numpy as np
-    >>> from plantdb.server.io import write_point_cloud
+    >>> from plantdb.commons.io import write_point_cloud
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -752,7 +753,7 @@ def read_triangle_mesh(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return io.read_triangle_mesh(str(file), **kwargs)
 
@@ -804,7 +805,7 @@ def read_voxel_grid(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return io.read_voxel_grid(str(file), **kwargs)
 
@@ -838,7 +839,7 @@ def write_voxel_grid(file, data, ext="ply", **kwargs):
 
     See Also
     --------
-    plantdb.server.io._write_voxel_grid
+    plantdb.commons.io._write_voxel_grid
     open3d.cuda.pybind.io.write_voxel_grid
     """
     _writer(file, data, ext, _write_voxel_grid, **kwargs)
@@ -863,7 +864,7 @@ def read_graph(file, **kwargs):
     Examples
     --------
     >>> import networkx as nx
-    >>> from plantdb.server.io import read_graph, write_graph
+    >>> from plantdb.commons.io import read_graph, write_graph
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -881,7 +882,7 @@ def read_graph(file, **kwargs):
     """
     import pickle
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     # Load the pickled file:
     with open(file, mode='rb') as f:
@@ -925,7 +926,7 @@ def write_graph(file, data, ext="p", **kwargs):
     Examples
     --------
     >>> import networkx as nx
-    >>> from plantdb.server.io import write_graph
+    >>> from plantdb.commons.io import write_graph
     >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -956,8 +957,8 @@ def read_torch(file, ext="pt", **kwargs):
 
     Examples
     --------
-    >>> from plantdb.server.io import read_torch
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.io import read_torch
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database(with_models=True)
     >>> db.connect()
     >>> scan = db.get_scan("real_plant_analyzed")
@@ -967,7 +968,7 @@ def read_torch(file, ext="pt", **kwargs):
     """
     import torch
     # Get path to file if in a database:
-    if isinstance(file, plantdb.commons.fsdb.File):
+    if isinstance(file, fsdb.File):
         file = file.path()
     return torch.load(file, **kwargs)
 

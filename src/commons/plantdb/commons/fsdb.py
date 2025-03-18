@@ -1479,8 +1479,8 @@ class Fileset(db.Fileset):
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
-        >>> # To read the file you need to load the right reader from plantdb.server.io
-        >>> from plantdb.server.io import read_image
+        >>> # To read the file you need to load the right reader from plantdb.commons.io
+        >>> from plantdb.commons.io import read_image
         >>> img = read_image(f)
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
@@ -3249,7 +3249,7 @@ def _filter_query(l, query=None, fuzzy=False):
 
     See Also
     --------
-    plantdb.server.utils.partial_match
+    plantdb.commons.utils.partial_match
 
     Examples
     --------
@@ -3282,7 +3282,7 @@ def _filter_query(l, query=None, fuzzy=False):
     ['myscan_001']
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
-    from plantdb.server.utils import partial_match
+    from plantdb.commons.utils import partial_match
     if query is None or query == {}:
         # If there is no `query` return the unfiltered list of instances
         query_result = [f for f in l]

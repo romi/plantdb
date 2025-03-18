@@ -34,7 +34,7 @@ import unittest
 from plantdb.commons.fsdb import FSDB
 from plantdb.commons.fsdb import dummy_db
 from plantdb.commons.test_database import test_database
-from plantdb.server.utils import locate_task_filesets
+from plantdb.commons.utils import locate_task_filesets
 
 
 class TemporaryCloneDB(object):

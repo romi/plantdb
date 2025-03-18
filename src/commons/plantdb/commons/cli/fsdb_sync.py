@@ -6,7 +6,7 @@ Synchronize two ``FSDB`` databases.
 """
 import argparse
 
-from plantdb.server.sync import FSDBSync
+from plantdb.commons.sync import FSDBSync
 
 
 def parsing():

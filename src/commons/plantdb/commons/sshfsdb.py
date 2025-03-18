@@ -29,8 +29,8 @@ This module implement a database as a **file structure on a remote server using 
 
 import subprocess
 
-from plantdb.server import db
-from plantdb.server import fsdb
+from plantdb.commons import db
+from plantdb.commons import fsdb
 from plantdb.commons.log import get_logger
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB

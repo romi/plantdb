@@ -47,7 +47,7 @@ def read_image_from_file(filename):
 
     Examples
     --------
-    >>> from plantdb.server.utils import read_image_from_file
+    >>> from plantdb.commons.utils import read_image_from_file
     >>> from plantdb.webcache import image_path
     >>> from plantdb.test_database import test_database
     >>> db = test_database('real_plant')
@@ -84,7 +84,7 @@ def locate_task_filesets(scan, tasks):
 
     Examples
     --------
-    >>> from plantdb.server.utils import locate_task_filesets
+    >>> from plantdb.commons.utils import locate_task_filesets
     >>> from plantdb.commons.fsdb import FSDB
     >>> from plantdb.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
@@ -224,7 +224,7 @@ def partial_match(reference, target, fuzzy=False):
 
     Examples
     --------
-    >>> from plantdb.server.utils import partial_match
+    >>> from plantdb.commons.utils import partial_match
     >>> ref = {"object": {"environment":"virtual"}}
     >>> target = {'object': {'environment': 'virtual', 'plant_id': 'arabidopsis000', 'species': 'Arabidopsis Thaliana'}, 'scanner': {'workspace': {'x': [-200, 200], 'y': [-200, 200], 'z': [10, 1000]}}}
     >>> partial_match(ref, target)
