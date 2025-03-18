@@ -69,7 +69,7 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
-from plantdb.log import get_logger
+from plantdb.commons.log import get_logger
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -382,8 +382,8 @@ def setup_empty_database(out_path=None):
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     """
-    from plantdb.fsdb import MARKER_FILE_NAME
-    from plantdb.fsdb import LOCK_FILE_NAME
+    from plantdb.server.fsdb import MARKER_FILE_NAME
+    from plantdb.server.fsdb import LOCK_FILE_NAME
 
     if isinstance(out_path, str):
         out_path = Path(out_path)
@@ -500,7 +500,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
 
     Returns
     -------
-    plantdb.fsdb.FSDB
+    plantdb.server.fsdb.FSDB
         The FSDB test database.
 
     Examples
@@ -514,7 +514,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
-    from plantdb.fsdb import FSDB
+    from plantdb.server.fsdb import FSDB
     if dataset is None:
         return FSDB(setup_empty_database(out_path=out_path))
     else:

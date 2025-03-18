@@ -29,9 +29,9 @@ This module implement a database as a **file structure on a remote server using 
 
 import subprocess
 
-from plantdb import db
-from plantdb import fsdb
-from plantdb.log import get_logger
+from plantdb.server import db
+from plantdb.server import fsdb
+from plantdb.commons.log import get_logger
 
 MARKER_FILE_NAME = "romidb"  # This file must exist in the root of a folder for it to be considered a valid DB
 LOCK_FILE_NAME = "lock"  # This file prevents opening the DB if it is present in the root folder of a DB
@@ -84,7 +84,7 @@ class SSHFSDB(fsdb.FSDB):
         >>> # ...allows to create new `Scan` in it:
         >>> new_scan = db.create_scan("007")
         >>> print(type(new_scan))
-        <class 'plantdb.fsdb.Scan'>
+        <class 'plantdb.server.fsdb.Scan'>
         >>> db.disconnect()
         """
         super().__init__(basedir)

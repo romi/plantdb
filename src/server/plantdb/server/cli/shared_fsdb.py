@@ -5,11 +5,11 @@
 
 import argparse
 
-from plantdb.log import DEFAULT_LOG_LEVEL
-from plantdb.log import LOG_LEVELS
-from plantdb.log import get_logger
-from plantdb.test_database import DATASET
-from plantdb.test_database import setup_test_database
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
+from plantdb.server.test_database import DATASET
+from plantdb.server.test_database import setup_test_database
 
 
 def parsing():

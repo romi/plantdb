@@ -65,21 +65,19 @@ For example:
 
 import argparse
 import re
-import socket
 from pathlib import Path
-from urllib.parse import urlparse
 from urllib.parse import urlparse
 
 from tqdm import tqdm
 
-from plantdb.log import DEFAULT_LOG_LEVEL
-from plantdb.log import LOG_LEVELS
-from plantdb.log import get_logger
-from plantdb.rest_api_client import download_scan_archive
-from plantdb.rest_api_client import list_scan_names
-from plantdb.rest_api_client import refresh
-from plantdb.rest_api_client import test_host_port_availability
-from plantdb.rest_api_client import upload_scan_archive
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
+from plantdb.client.rest_api_client import download_scan_archive
+from plantdb.client.rest_api_client import list_scan_names
+from plantdb.client.rest_api_client import refresh
+from plantdb.client.rest_api_client import test_host_port_availability
+from plantdb.client.rest_api_client import upload_scan_archive
 
 
 def parsing():

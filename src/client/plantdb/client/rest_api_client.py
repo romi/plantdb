@@ -36,8 +36,8 @@ import requests
 from PIL import Image
 from plyfile import PlyData
 
-from plantdb.rest_api import get_file_uri
-from plantdb.rest_api import task_filesUri_mapping
+from plantdb.server.rest_api import get_file_uri
+from plantdb.server.rest_api import task_filesUri_mapping
 
 #: Default URL to REST API is 'localhost':
 REST_API_URL = "127.0.0.1"
@@ -97,7 +97,7 @@ def base_url(host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import base_url
+    >>> from plantdb.server.rest_api_client import base_url
     >>> base_url()
     'http://127.0.0.1:5000'
     """
@@ -121,7 +121,7 @@ def scans_url(host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import scans_url
+    >>> from plantdb.server.rest_api_client import scans_url
     >>> scans_url()
     'http://127.0.0.1:5000/scans'
     """
@@ -147,7 +147,7 @@ def scan_url(scan_id, host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import scan_url
+    >>> from plantdb.server.rest_api_client import scan_url
     >>> scan_url("real_plant")
     'http://127.0.0.1:5000/scans/real_plant'
     """
@@ -183,7 +183,7 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL,
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import scan_image_url
+    >>> from plantdb.server.rest_api_client import scan_image_url
     >>> scan_image_url("real_plant", "images", "00000_rgb")
     'http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=orig'
     """
@@ -248,7 +248,7 @@ def archive_url(dataset_name, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import archive_url
+    >>> from plantdb.server.rest_api_client import archive_url
     >>> archive_url('arabidopsis000')
     'http://127.0.0.1:5000/archive/arabidopsis000'
     >>> archive_url('../arabidopsis000')
@@ -287,7 +287,7 @@ def test_host_port_availability(url):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import test_host_port_availability
+    >>> from plantdb.server.rest_api_client import test_host_port_availability
     >>> test_host_port_availability('127.0.0.1:5000')
     """
     import socket
@@ -321,7 +321,7 @@ def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import list_scan_names
+    >>> from plantdb.server.rest_api_client import list_scan_names
     >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> print(list_scan_names())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
@@ -346,7 +346,7 @@ def get_scans_info(host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import get_scans_info
+    >>> from plantdb.server.rest_api_client import get_scans_info
     >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> get_scans_info()
     """
@@ -371,7 +371,7 @@ def parse_scans_info(host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import parse_scans_info
+    >>> from plantdb.server.rest_api_client import parse_scans_info
     >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> scan_dict = parse_scans_info()
     >>> print(sorted(scan_dict.keys()))
@@ -404,7 +404,7 @@ def get_scan_data(scan_id, host=REST_API_URL, port=REST_API_PORT):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import get_scan_data
+    >>> from plantdb.server.rest_api_client import get_scan_data
     >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> scan_data = get_scan_data('real_plant')
     >>> print(scan_data['id'])
@@ -562,7 +562,7 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **api_kw
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import get_images_from_task
+    >>> from plantdb.server.rest_api_client import get_images_from_task
     >>> images = get_images_from_task('real_plant', host='127.0.0.1', port='5000')
     >>> print(len(images))
     60
@@ -754,8 +754,8 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **api_kwargs
 
     See Also
     --------
-    plantdb.rest_api.filesUri_task_mapping
-    plantdb.rest_api_client.parse_task_requests_data
+    plantdb.server.rest_api.filesUri_task_mapping
+    plantdb.server.rest_api_client.parse_task_requests_data
     """
     if api_data is None:
         api_data = get_scan_data(dataset_name, **api_kwargs)
@@ -911,7 +911,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import upload_dataset_file
+    >>> from plantdb.server.rest_api_client import upload_dataset_file
     >>> upload_dataset_file('arabidopsis000', '/path/to/local/file.txt')
     """
     from os.path import basename
@@ -994,7 +994,7 @@ def refresh(dataset_name=None, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import refresh
+    >>> from plantdb.server.rest_api_client import refresh
     >>> refresh("arabidopsis000", host="127.0.0.1", port="5000")
     """
     res = requests.post(
@@ -1038,7 +1038,7 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import download_scan_archive
+    >>> from plantdb.server.rest_api_client import download_scan_archive
     >>> download_scan_archive("arabidopsis000", out_dir='/tmp', host="127.0.0.1", port="5000")
     """
     import time
@@ -1100,7 +1100,7 @@ def upload_scan_archive(dataset_name, path, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.rest_api_client import upload_scan_archive
+    >>> from plantdb.server.rest_api_client import upload_scan_archive
     >>> upload_scan_archive("arabidopsis000", path='/tmp/arabidopsis000.zip', host="127.0.0.1", port="5002")
     """
     import time

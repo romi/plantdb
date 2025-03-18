@@ -6,13 +6,12 @@ Import the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` data
 """
 import argparse
 import json
-import shutil
 from pathlib import Path
 
-from plantdb.fsdb import FSDB
-from plantdb.log import DEFAULT_LOG_LEVEL
-from plantdb.log import LOG_LEVELS
-from plantdb.log import get_logger
+from plantdb.server.fsdb import FSDB
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
 
 DESC = """
 Import the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` dataset.

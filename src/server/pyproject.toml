@@ -3,8 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "plantdb"
-version = "0.13.3"
+name = "plantdb.server"
+version = "0.14.0"
 dependencies = [
     "appdirs",
     "bcrypt",
@@ -16,6 +16,7 @@ dependencies = [
     "imageio >=2.16.2",
     "numpy",
     "open3d >=0.9.0.0",
+    "plantdb.commons",
     "pillow",
     "plyfile",
     "requests",
@@ -48,14 +49,14 @@ classifiers = [
 ]
 
 [project.scripts]
-fsdb_check = "plantdb.cli.fsdb_check:main"
-fsdb_import_file = "plantdb.cli.fsdb_import_file:main"
-fsdb_import_folder = "plantdb.cli.fsdb_import_folder:main"
-fsdb_import_images = "plantdb.cli.fsdb_import_images:main"
-fsdb_rest_api = "plantdb.cli.fsdb_rest_api:main"
-fsdb_sync = "plantdb.cli.fsdb_sync:main"
-fsdb_rest_api_sync = "plantdb.cli.fsdb_rest_api_sync:main"
-shared_fsdb = "plantdb.cli.shared_fsdb:main"
+fsdb_check = "plantdb.server.cli.fsdb_check:main"
+fsdb_import_file = "plantdb.server.cli.fsdb_import_file:main"
+fsdb_import_folder = "plantdb.server.cli.fsdb_import_folder:main"
+fsdb_import_images = "plantdb.server.cli.fsdb_import_images:main"
+fsdb_rest_api = "plantdb.server.cli.fsdb_rest_api:main"
+fsdb_sync = "plantdb.server.cli.fsdb_sync:main"
+fsdb_rest_api_sync = "plantdb.server.cli.fsdb_rest_api_sync:main"
+shared_fsdb = "plantdb.server.cli.shared_fsdb:main"
 
 [project.urls]
 Homepage = "https://romi-project.eu/"

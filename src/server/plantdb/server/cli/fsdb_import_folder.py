@@ -9,7 +9,7 @@ import json
 import os
 from pathlib import Path
 
-from plantdb.fsdb import FSDB
+from plantdb.server.fsdb import FSDB
 
 
 def parsing():

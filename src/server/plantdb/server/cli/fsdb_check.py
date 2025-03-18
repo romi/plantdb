@@ -9,11 +9,11 @@ from shutil import copy
 
 from tqdm import tqdm
 
-from plantdb import FSDB
-from plantdb.fsdb import _scan_json_file
-from plantdb.log import LOG_LEVELS
+from plantdb.server.fsdb import FSDB
+from plantdb.server.fsdb import _scan_json_file
+from plantdb.commons.log import LOG_LEVELS
 
-from plantdb.log import get_logger
+from plantdb.commons.log import get_logger
 
 
 def parsing():

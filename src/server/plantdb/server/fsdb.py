@@ -110,9 +110,9 @@ from shutil import rmtree
 import bcrypt
 from tqdm import tqdm
 
-from plantdb import db
-from plantdb.db import DBBusyError
-from plantdb.log import get_logger
+from plantdb.server import db
+from plantdb.server.db import DBBusyError
+from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)
 
@@ -140,7 +140,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    plantdb.fsdb.FSDB
+    plantdb.server.fsdb.FSDB
         The dummy database.
 
     Notes
@@ -150,10 +150,10 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Examples
     --------
-    >>> from plantdb.fsdb import dummy_db
+    >>> from plantdb.server.fsdb import dummy_db
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
-    INFO     [plantdb.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
+    INFO     [plantdb.server.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
     >>> print(db.path())  # the database directory
     /tmp/romidb_********
     >>> print(db.list_scans())
@@ -172,7 +172,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     False
     """
     from tempfile import mkdtemp
-    from plantdb import io
+    from plantdb.server import io
 
     mydb = Path(mkdtemp(prefix='romidb_'))
     marker_file = mydb / MARKER_FILE_NAME
@@ -265,7 +265,7 @@ class FSDB(db.DB):
         The absolute path to the base directory hosting the database.
     lock_path : pathlib.Path
         The absolute path to the lock file.
-    scans : dict[str, plantdb.fsdb.Scan]
+    scans : dict[str, plantdb.server.fsdb.Scan]
         The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
@@ -278,27 +278,27 @@ class FSDB(db.DB):
     See Also
     --------
     plantdb.db.DB
-    plantdb.fsdb.MARKER_FILE_NAME
-    plantdb.fsdb.LOCK_FILE_NAME
+    plantdb.server.fsdb.MARKER_FILE_NAME
+    plantdb.server.fsdb.LOCK_FILE_NAME
 
     Examples
     --------
     >>> # EXAMPLE 1: Use a temporary dummy local database:
-    >>> from plantdb.fsdb import dummy_db
+    >>> from plantdb.server.fsdb import dummy_db
     >>> db = dummy_db()
     >>> print(type(db))
-    <class 'plantdb.fsdb.FSDB'>
+    <class 'plantdb.server.fsdb.FSDB'>
     >>> print(db.path())
     /tmp/romidb_********
     >>> # Create a new `Scan`:
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
-    <class 'plantdb.fsdb.Scan'>
+    <class 'plantdb.server.fsdb.Scan'>
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # EXAMPLE 2: Use a local database:
     >>> import os
-    >>> from plantdb.fsdb import FSDB
+    >>> from plantdb.server.fsdb import FSDB
     >>> db = FSDB(os.environ.get('ROMI_DB', "/data/ROMI/DB/"))
     >>> db.connect()
     >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
@@ -335,7 +335,7 @@ class FSDB(db.DB):
 
         See Also
         --------
-        plantdb.fsdb.MARKER_FILE_NAME
+        plantdb.server.fsdb.MARKER_FILE_NAME
         """
         super().__init__()
 
@@ -390,8 +390,8 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import FSDB
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.create_user('batman', "Bruce Wayne", "joker")
         >>> db.connect('batman', 'joker')
@@ -452,11 +452,11 @@ class FSDB(db.DB):
 
         See Also
         --------
-        plantdb.fsdb.LOCK_FILE_NAME
+        plantdb.server.fsdb.LOCK_FILE_NAME
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
         True
@@ -610,7 +610,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
         True
@@ -677,7 +677,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> db.scan_exists("myscan_001")
         True
@@ -703,19 +703,19 @@ class FSDB(db.DB):
 
         Returns
         -------
-        list of plantdb.fsdb.Scan
+        list of plantdb.server.fsdb.Scan
             List of `Scan`s, filtered by the `query` if any.
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> db.get_scans()
-        [<plantdb.fsdb.Scan at *x************>]
+        [<plantdb.server.fsdb.Scan at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if owner_only:
@@ -739,22 +739,22 @@ class FSDB(db.DB):
 
         Raises
         ------
-        plantdb.fsdb.ScanNotFoundError
+        plantdb.server.fsdb.ScanNotFoundError
             If the `scan_id` do not exist in the local database and `create` is ``False``.
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> db.list_scans()
         []
         >>> new_scan = db.get_scan('007', create=True)
         >>> print(new_scan)
-        <plantdb.fsdb.Scan object at **************>
+        <plantdb.server.fsdb.Scan object at **************>
         >>> db.list_scans()
         ['007']
         >>> unknown_scan = db.get_scan('unknown')
-        plantdb.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
+        plantdb.server.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if self.scan_exists(scan_id):
@@ -782,7 +782,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        plantdb.fsdb.Scan
+        plantdb.server.fsdb.Scan
             The ``Scan`` instance created in the local database.
 
         Raises
@@ -792,12 +792,12 @@ class FSDB(db.DB):
 
         See Also
         --------
-        plantdb.fsdb._is_valid_id
-        plantdb.fsdb._make_scan
+        plantdb.server.fsdb._is_valid_id
+        plantdb.server.fsdb._make_scan
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
         >>> print(new_scan.get_metadata('owner'))  # default user 'anonymous' for dummy database
@@ -842,16 +842,16 @@ class FSDB(db.DB):
 
         See Also
         --------
-        plantdb.fsdb._delete_scan
+        plantdb.server.fsdb._delete_scan
 
         Examples
         --------
-        >>> from plantdb.fsdb import FSDB
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import FSDB
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007')
         >>> print(new_scan)
-        <plantdb.fsdb.Scan object at 0x7f0730b1e390>
+        <plantdb.server.fsdb.Scan object at 0x7f0730b1e390>
         >>> db.delete_scan('007')
         >>> scan = db.get_scan('007')
         >>> print(scan)
@@ -874,7 +874,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db()
         >>> print(db.path())
         /tmp/romidb_********
@@ -900,11 +900,11 @@ class FSDB(db.DB):
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> db.list_scans()
         ['myscan_001']
@@ -932,13 +932,13 @@ class Scan(db.Scan):
 
     Attributes
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         A local database instance hosting this ``Scan`` instance.
     id : str
         The identifier of this ``Scan`` instance in the local database `db`.
     metadata : dict
         A metadata dictionary.
-    filesets : dict[str, plantdb.fsdb.Fileset]
+    filesets : dict[str, plantdb.server.fsdb.Fileset]
         A dictionary of `Fileset` instances, indexed by their identifier.
 
     Notes
@@ -952,13 +952,13 @@ class Scan(db.Scan):
     Examples
     --------
     >>> import os
-    >>> from plantdb.fsdb import Scan
-    >>> from plantdb.fsdb import dummy_db
+    >>> from plantdb.server.fsdb import Scan
+    >>> from plantdb.server.fsdb import dummy_db
     >>> db = dummy_db()
     >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
     >>> scan = Scan(db, '007')
     >>> print(type(scan))
-    <class 'plantdb.fsdb.Scan'>
+    <class 'plantdb.server.fsdb.Scan'>
     >>> print(scan.path())  # the obtained path should be different as the path to the created `dummy_db` change...
     /tmp/romidb_j0pbkoo0/007
     >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
@@ -982,9 +982,9 @@ class Scan(db.Scan):
     >>> db = dummy_db()
     >>> scan = db.get_scan('007', create=True)
     >>> print(type(scan))
-    <class 'plantdb.fsdb.Scan'>
+    <class 'plantdb.server.fsdb.Scan'>
     >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
-    <plantdb.fsdb.Scan object at 0x7f34fc860fd0>
+    <plantdb.server.fsdb.Scan object at 0x7f34fc860fd0>
     >>> print(os.listdir(db.path()))  # And it is found under the `basedir` directory
     ['007', 'romidb']
     >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
@@ -1000,7 +1000,7 @@ class Scan(db.Scan):
 
     >>> # Example #3: Use an existing database:
     >>> from os import environ
-    >>> from plantdb.fsdb import FSDB
+    >>> from plantdb.server.fsdb import FSDB
     >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
     >>> db.connect(unsafe=True)
     >>> scan = db.get_scan('sango_90_300_36')
@@ -1012,7 +1012,7 @@ class Scan(db.Scan):
 
         Parameters
         ----------
-        db : plantdb.fsdb.FSDB
+        db : plantdb.server.fsdb.FSDB
             The database to put/find the scan dataset.
         scan_id : str
             The scan dataset name, should be unique in the `db`.
@@ -1048,7 +1048,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.fileset_exists("myfileset_001")
@@ -1073,20 +1073,20 @@ class Scan(db.Scan):
 
         Returns
         -------
-        list of plantdb.fsdb.Fileset
+        list of plantdb.server.fsdb.Fileset
             List of `Fileset`s, filtered by the `query` if any.
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.get_filesets()
-        [<plantdb.fsdb.Fileset at *x************>]
+        [<plantdb.server.fsdb.Fileset at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.filesets.values()), query, fuzzy)
@@ -1114,18 +1114,18 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
         ['fileset_001']
         >>> new_fileset = scan.get_fileset('007', create=True)
         >>> print(new_fileset)
-        <plantdb.fsdb.Fileset object at **************>
+        <plantdb.server.fsdb.Fileset object at **************>
         >>> scan.list_filesets()
         ['fileset_001', '007']
         >>> unknown_fs = scan.get_fileset('unknown')
-        plantdb.fsdb.FilesetNotFoundError: Unknown fileset id 'unknown'!
+        plantdb.server.fsdb.FilesetNotFoundError: Unknown fileset id 'unknown'!
         >>> print(unknown_fs)
         None
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
@@ -1192,8 +1192,8 @@ class Scan(db.Scan):
         Examples
         --------
         >>> import json
-        >>> from plantdb.fsdb import dummy_db
-        >>> from plantdb.fsdb import _scan_metadata_path
+        >>> from plantdb.server.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import _scan_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> scan.set_metadata("test", "value")
@@ -1220,7 +1220,7 @@ class Scan(db.Scan):
 
         Returns
         -------
-        plantdb.fsdb.Fileset
+        plantdb.server.fsdb.Fileset
             The `Fileset` instance created in the current `Scan` instance.
 
         Raises
@@ -1231,12 +1231,12 @@ class Scan(db.Scan):
 
         See Also
         --------
-        plantdb.fsdb._is_valid_id
-        plantdb.fsdb._make_fileset
+        plantdb.server.fsdb._is_valid_id
+        plantdb.server.fsdb._make_fileset
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -1278,7 +1278,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -1303,7 +1303,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
@@ -1329,11 +1329,11 @@ class Scan(db.Scan):
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> scan.list_filesets()
@@ -1356,15 +1356,15 @@ class Fileset(db.Fileset):
 
     Attributes
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         A local database instance hosting the ``Scan`` instance.
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan instance hosting this ``Fileset`` instance.
     id : str
         The identifier of this ``Fileset`` instance in the `scan`.
     metadata : dict
         A metadata dictionary.
-    files : dict[str, plantdb.fsdb.File]
+    files : dict[str, plantdb.server.fsdb.File]
         A dictionary of `File` instances attached to the fileset, indexed by their identifier.
 
     See Also
@@ -1377,7 +1377,7 @@ class Fileset(db.Fileset):
 
         Parameters
         ----------
-        scan : plantdb.fsdb.Scan
+        scan : plantdb.server.fsdb.Scan
             A scan instance containing the fileset.
         fs_id : str
             The identifier of the fileset instance.
@@ -1411,7 +1411,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.file_exists("myfile_001")
@@ -1435,23 +1435,23 @@ class Fileset(db.Fileset):
 
         Returns
         -------
-        list of plantdb.fsdb.File
+        list of plantdb.server.fsdb.File
             List of `File`s, filtered by the query if any.
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.get_files()
-        [<plantdb.fsdb.File at *x************>,
-         <plantdb.fsdb.File at *x************>,
-         <plantdb.fsdb.File at *x************>]
+        [<plantdb.server.fsdb.File at *x************>,
+         <plantdb.server.fsdb.File at *x************>,
+         <plantdb.server.fsdb.File at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.files.values()), query, fuzzy)
@@ -1469,18 +1469,18 @@ class Fileset(db.Fileset):
 
         Returns
         -------
-        plantdb.fsdb.File
+        plantdb.server.fsdb.File
             The retrieved or created file.
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
         >>> f = fs.get_file("test_image")
-        >>> # To read the file you need to load the right reader from plantdb.io
-        >>> from plantdb.io import read_image
+        >>> # To read the file you need to load the right reader from plantdb.server.io
+        >>> from plantdb.server.io import read_image
         >>> img = read_image(f)
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
@@ -1512,7 +1512,7 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> import json
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1545,8 +1545,8 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> import json
-        >>> from plantdb.fsdb import dummy_db
-        >>> from plantdb.fsdb import _fileset_metadata_json_path
+        >>> from plantdb.server.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import _fileset_metadata_json_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1574,12 +1574,12 @@ class Fileset(db.Fileset):
 
         Returns
         -------
-        plantdb.fsdb.File
+        plantdb.server.fsdb.File
             The `File` instance created in the current `Fileset` instance.
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
@@ -1591,7 +1591,7 @@ class Fileset(db.Fileset):
         >>> print([f.name for f in fs.path().iterdir()])  # the file only exist in the database, not on drive!
         ['dummy_image.png', 'test_json.json', 'test_image.png']
         >>> md = {"Name": "Bond, James Bond"}  # Create an example dictionary to save as JSON
-        >>> from plantdb import io
+        >>> from plantdb.server import io
         >>> io.write_json(new_f, md, "json")  # write the file on drive
         >>> print([f.name for f in fs.path().iterdir()])
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
@@ -1619,15 +1619,15 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json']
         >>> fs.delete_file('dummy_image')
-        INFO     [plantdb.fsdb] Deleted JSON metadata file for file 'dummy_image' from 'myscan_001/fileset_001'.
-        INFO     [plantdb.fsdb] Deleted file 'dummy_image' from 'myscan_001/fileset_001'.
+        INFO     [plantdb.server.fsdb] Deleted JSON metadata file for file 'dummy_image' from 'myscan_001/fileset_001'.
+        INFO     [plantdb.server.fsdb] Deleted file 'dummy_image' from 'myscan_001/fileset_001'.
         >>> fs.list_files()
         ['test_image', 'test_json']
         >>> print([f.name for f in fs.path().iterdir()])  # the file has been removed from the drive and the database
@@ -1654,7 +1654,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
         ['myscan_001']
@@ -1688,11 +1688,11 @@ class Fileset(db.Fileset):
 
         See Also
         --------
-        plantdb.fsdb._filter_query
+        plantdb.server.fsdb._filter_query
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1711,9 +1711,9 @@ class File(db.File):
 
     Attributes
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         Database where to find the fileset.
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         Set of files containing the file.
     id : str
         Name of the file in the ``FSDB`` local database.
@@ -1762,8 +1762,8 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
-        >>> from plantdb.fsdb import _file_metadata_path
+        >>> from plantdb.server.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1788,8 +1788,8 @@ class File(db.File):
         Examples
         --------
         >>> import json
-        >>> from plantdb.fsdb import dummy_db
-        >>> from plantdb.fsdb import _file_metadata_path
+        >>> from plantdb.server.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1818,8 +1818,8 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
-        >>> from plantdb.fsdb import _file_metadata_path
+        >>> from plantdb.server.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1854,7 +1854,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1886,7 +1886,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1918,7 +1918,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1953,7 +1953,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1982,7 +1982,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.fsdb import dummy_db
+        >>> from plantdb.server.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2011,27 +2011,27 @@ def _load_scan(db, scan_id):
 
     Parameters
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         The database instance to use to list the ``Scan``.
     scan_id : str
         The name of the scan to load.
 
     Returns
     -------
-    list of plantdb.fsdb.Scan
+    list of plantdb.server.fsdb.Scan
          The list of ``fsdb.Scan`` found in the database.
 
     See Also
     --------
-    plantdb.fsdb._scan_path
-    plantdb.fsdb._scan_files_json
-    plantdb.fsdb._load_scan_filesets
-    plantdb.fsdb._load_scan_metadata
+    plantdb.server.fsdb._scan_path
+    plantdb.server.fsdb._scan_files_json
+    plantdb.server.fsdb._load_scan_filesets
+    plantdb.server.fsdb._load_scan_metadata
 
     Examples
     --------
-    >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.fsdb import dummy_db, _load_scans
+    >>> from plantdb.server.fsdb import FSDB
+    >>> from plantdb.server.fsdb import dummy_db, _load_scans
     >>> db = dummy_db()
     >>> db.connect()
     >>> db.create_scan("007")
@@ -2043,7 +2043,7 @@ def _load_scan(db, scan_id):
     >>> db.connect()
     >>> scans = _load_scans(db)
     >>> print(scans)
-    [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
+    [<plantdb.server.fsdb.Scan object at 0x7fa01220bd50>]
     """
     required_fs = db.required_filesets
     req_files_json = db.required_files_json
@@ -2086,25 +2086,25 @@ def _load_scans(db):
 
     Parameters
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         The database instance to use to list the ``Scan``.
 
     Returns
     -------
-    list of plantdb.fsdb.Scan
+    list of plantdb.server.fsdb.Scan
          The list of ``fsdb.Scan`` found in the database.
 
     See Also
     --------
-    plantdb.fsdb._scan_path
-    plantdb.fsdb._scan_files_json
-    plantdb.fsdb._load_scan_filesets
-    plantdb.fsdb._load_scan_metadata
+    plantdb.server.fsdb._scan_path
+    plantdb.server.fsdb._scan_files_json
+    plantdb.server.fsdb._load_scan_filesets
+    plantdb.server.fsdb._load_scan_metadata
 
     Examples
     --------
-    >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.fsdb import dummy_db, _load_scans
+    >>> from plantdb.server.fsdb import FSDB
+    >>> from plantdb.server.fsdb import dummy_db, _load_scans
     >>> db = dummy_db()
     >>> db.connect()
     >>> db.create_scan("007")
@@ -2116,7 +2116,7 @@ def _load_scans(db):
     >>> db.connect()
     >>> scans = _load_scans(db)
     >>> print(scans)
-    [<plantdb.fsdb.Scan object at 0x7fa01220bd50>]
+    [<plantdb.server.fsdb.Scan object at 0x7fa01220bd50>]
     """
     scans = {}
     dir_names = os.listdir(db.path())
@@ -2132,7 +2132,7 @@ def _load_dummy_fileset(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The instance to use to get the list of ``Fileset``.
 
     Returns
@@ -2155,7 +2155,7 @@ def _load_scan_filesets(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The instance to use to get the list of ``Fileset``.
 
     Returns
@@ -2166,8 +2166,8 @@ def _load_scan_filesets(scan):
 
     See Also
     --------
-    plantdb.fsdb._scan_files_json
-    plantdb.fsdb._load_scan_filesets
+    plantdb.server.fsdb._scan_files_json
+    plantdb.server.fsdb._load_scan_filesets
 
     Notes
     -----
@@ -2175,14 +2175,14 @@ def _load_scan_filesets(scan):
 
     Examples
     --------
-    >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.fsdb import dummy_db, _load_scan_filesets
+    >>> from plantdb.server.fsdb import FSDB
+    >>> from plantdb.server.fsdb import dummy_db, _load_scan_filesets
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> filesets = _load_scan_filesets(scan)
     >>> print(filesets)
-    {'fsid_001': <plantdb.fsdb.Fileset object at 0x7fa0122232d0>}
+    {'fsid_001': <plantdb.server.fsdb.Fileset object at 0x7fa0122232d0>}
     """
     filesets = {}
     # Get the path to the `files.json` associated to the `scan`:
@@ -2217,20 +2217,20 @@ def _load_fileset(scan, fileset_info):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The scan object to use to get the list of ``fsdb.Fileset``
     fileset_info: dict
         Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
 
     Returns
     -------
-    plantdb.fsdb.Fileset
+    plantdb.server.fsdb.Fileset
         A fileset with its ``files`` & ``metadata`` attributes restored.
 
     Examples
     --------
     >>> import json
-    >>> from plantdb.fsdb import dummy_db, _load_fileset, _scan_json_file
+    >>> from plantdb.server.fsdb import dummy_db, _load_fileset, _scan_json_file
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -2255,14 +2255,14 @@ def _parse_fileset(scan, fileset_info):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The scan instance to associate the returned ``Fileset`` to.
     fileset_info : dict
         The fileset dictionary with the fileset 'id' entry
 
     Returns
     -------
-    plantdb.fsdb.Fileset
+    plantdb.server.fsdb.Fileset
         The ``Fileset`` instance from parsed JSON.
     """
     fsid = fileset_info.get("id", None)
@@ -2283,19 +2283,19 @@ def _load_fileset_files(fileset, fileset_info):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The instance to use to get the list of ``File``.
     fileset_info : dict
         Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
 
     Returns
     -------
-    list of plantdb.fsdb.File
+    list of plantdb.server.fsdb.File
          The list of ``File`` found in the `fileset`.
 
     See Also
     --------
-    plantdb.fsdb._load_file
+    plantdb.server.fsdb._load_file
 
     Notes
     -----
@@ -2304,8 +2304,8 @@ def _load_fileset_files(fileset, fileset_info):
     Examples
     --------
     >>> import json
-    >>> from plantdb.fsdb import FSDB
-    >>> from plantdb.fsdb import dummy_db, _scan_json_file, _parse_fileset, _load_fileset_files
+    >>> from plantdb.server.fsdb import FSDB
+    >>> from plantdb.server.fsdb import dummy_db, _scan_json_file, _parse_fileset, _load_fileset_files
     >>> db = dummy_db(with_fileset=True, with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -2348,7 +2348,7 @@ def _load_fileset_metadata(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The fileset to load the metadata for.
 
     Returns
@@ -2364,20 +2364,20 @@ def _load_file(fileset, file_info):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The instance to associate the returned ``File`` to.
     file_info : dict
         Dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
 
     Returns
     -------
-    plantdb.fsdb.File
+    plantdb.server.fsdb.File
         The `File` instance with metadata.
 
     See Also
     --------
-    plantdb.fsdb._parse_file
-    plantdb.fsdb._load_file_metadata
+    plantdb.server.fsdb._parse_file
+    plantdb.server.fsdb._load_file_metadata
     """
     file = _parse_file(fileset, file_info)
     file.metadata = _load_file_metadata(file)
@@ -2389,14 +2389,14 @@ def _parse_file(fileset, file_info):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The fileset instance to associate the returned ``File`` to.
     file_info : dict
         The file dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
 
     Returns
     -------
-    plantdb.fsdb.File
+    plantdb.server.fsdb.File
         The ``File`` instance from parsed JSON.
 
     Raises
@@ -2491,7 +2491,7 @@ def _load_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The dataset to load the metadata for.
 
     Returns
@@ -2518,7 +2518,7 @@ def _load_scan_measures(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The dataset to load the measures for.
 
     Returns
@@ -2534,7 +2534,7 @@ def _load_file_metadata(file):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         The file to load the metadata for.
 
     Returns
@@ -2584,7 +2584,7 @@ def _store_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The dataset to save the metadata for.
     """
     _store_metadata(_scan_metadata_path(scan), scan.metadata)
@@ -2596,7 +2596,7 @@ def _store_fileset_metadata(fileset):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Fileset
+    scan : plantdb.server.fsdb.Fileset
         The fileset to save the metadata for.
     """
     _store_metadata(_fileset_metadata_json_path(fileset), fileset.metadata)
@@ -2608,7 +2608,7 @@ def _store_file_metadata(file):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.File
+    scan : plantdb.server.fsdb.File
         The file to save the metadata for.
     """
     _store_metadata(_file_metadata_path(file), file.metadata)
@@ -2680,7 +2680,7 @@ def _get_filename(file, ext):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         A File object.
     ext : str
         The file extension to use.
@@ -2705,12 +2705,12 @@ def _make_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The fileset to use for directory creation.
 
     See Also
     --------
-    plantdb.fsdb._fileset_path
+    plantdb.server.fsdb._fileset_path
     """
     path = _fileset_path(fileset)
     # Create the fileset directory if it does not exist:
@@ -2724,12 +2724,12 @@ def _make_scan(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         The scan to use for directory creation.
 
     See Also
     --------
-    plantdb.fsdb._scan_path
+    plantdb.server.fsdb._scan_path
     """
     path = _scan_path(scan)
     # Create the scan directory if it does not exist:
@@ -2748,7 +2748,7 @@ def _scan_path(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan to get the path from.
 
     Returns
@@ -2764,7 +2764,7 @@ def _scan_json_file(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan to get the files JSON file path from.
 
     Returns
@@ -2780,7 +2780,7 @@ def _scan_metadata_path(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan to get the metadata JSON file path from.
 
     Returns
@@ -2796,7 +2796,7 @@ def _scan_measures_path(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan to get the measures JSON file path from.
 
     Returns
@@ -2812,7 +2812,7 @@ def _fileset_path(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         A fileset to get the path from.
 
     Returns
@@ -2828,7 +2828,7 @@ def _fileset_metadata_path(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         A fileset to get the metadata directory path from.
 
     Returns
@@ -2844,7 +2844,7 @@ def _fileset_metadata_json_path(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         A fileset to get the JSON file path from.
 
     Returns
@@ -2860,7 +2860,7 @@ def _file_path(file):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         A file to get the path from.
 
     Returns
@@ -2876,7 +2876,7 @@ def _file_metadata_path(file):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         A file to get the metadata JSON path from.
 
     Returns
@@ -2896,7 +2896,7 @@ def _file_to_dict(file):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         A file to get "id" and "filename" from.
 
     Returns
@@ -2912,7 +2912,7 @@ def _fileset_to_dict(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         A fileset to get "id" and "files" dictionary from.
 
     Returns
@@ -2922,7 +2922,7 @@ def _fileset_to_dict(fileset):
 
     See Also
     --------
-    plantdb.fsdb._file_to_dict
+    plantdb.server.fsdb._file_to_dict
     """
     files = []
     for f in fileset.get_files():
@@ -2935,7 +2935,7 @@ def _scan_to_dict(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan instance to get underlying filesets and files structure from.
 
     Returns
@@ -2945,8 +2945,8 @@ def _scan_to_dict(scan):
 
     See Also
     --------
-    plantdb.fsdb._fileset_to_dict
-    plantdb.fsdb._file_to_dict
+    plantdb.server.fsdb._fileset_to_dict
+    plantdb.server.fsdb._file_to_dict
     """
     filesets = []
     for fileset in scan.get_filesets():
@@ -2959,13 +2959,13 @@ def _store_scan(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan instance to save by dumping its underlying structure in its "files.json".
 
     See Also
     --------
-    plantdb.fsdb._scan_to_dict
-    plantdb.fsdb._scan_files_json
+    plantdb.server.fsdb._scan_to_dict
+    plantdb.server.fsdb._scan_files_json
     """
     structure = _scan_to_dict(scan)
     files_json = _scan_json_file(scan)
@@ -3069,7 +3069,7 @@ def _delete_file(file):
 
     Parameters
     ----------
-    file : plantdb.fsdb.File
+    file : plantdb.server.fsdb.File
         A file instance to delete.
 
     Raises
@@ -3085,8 +3085,8 @@ def _delete_file(file):
 
     See Also
     --------
-    plantdb.fsdb._file_path
-    plantdb.fsdb._is_safe_to_delete
+    plantdb.server.fsdb._file_path
+    plantdb.server.fsdb._is_safe_to_delete
     """
     if file.filename is None:
         # The filename attribute is defined when the file is written!
@@ -3131,7 +3131,7 @@ def _delete_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         A fileset instance to delete.
 
     Raises
@@ -3149,9 +3149,9 @@ def _delete_fileset(fileset):
 
     See Also
     --------
-    plantdb.fsdb._scan_path
-    plantdb.fsdb._fileset_path
-    plantdb.fsdb._is_safe_to_delete
+    plantdb.server.fsdb._scan_path
+    plantdb.server.fsdb._fileset_path
+    plantdb.server.fsdb._is_safe_to_delete
     """
     fileset_path = _fileset_path(fileset)
     if not _is_safe_to_delete(fileset_path):
@@ -3200,7 +3200,7 @@ def _delete_scan(scan):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A scan instance to delete.
 
     Raises
@@ -3210,8 +3210,8 @@ def _delete_scan(scan):
 
     See Also
     --------
-    plantdb.fsdb._scan_path
-    plantdb.fsdb._is_safe_to_delete
+    plantdb.server.fsdb._scan_path
+    plantdb.server.fsdb._is_safe_to_delete
     """
     scan_path = _scan_path(scan)
     if not _is_safe_to_delete(scan_path):
@@ -3249,12 +3249,12 @@ def _filter_query(l, query=None, fuzzy=False):
 
     See Also
     --------
-    plantdb.utils.partial_match
+    plantdb.server.utils.partial_match
 
     Examples
     --------
-    >>> from plantdb.fsdb import dummy_db
-    >>> from plantdb.fsdb import _filter_query
+    >>> from plantdb.server.fsdb import dummy_db
+    >>> from plantdb.server.fsdb import _filter_query
     >>> db = dummy_db(with_scan=True, with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -3282,7 +3282,7 @@ def _filter_query(l, query=None, fuzzy=False):
     ['myscan_001']
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
-    from plantdb.utils import partial_match
+    from plantdb.server.utils import partial_match
     if query is None or query == {}:
         # If there is no `query` return the unfiltered list of instances
         query_result = [f for f in l]

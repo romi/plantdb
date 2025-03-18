@@ -77,35 +77,35 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 
-from plantdb.fsdb import FSDB
-from plantdb.log import DEFAULT_LOG_LEVEL
-from plantdb.log import LOG_LEVELS
-from plantdb.log import get_logger
-from plantdb.rest_api import Archive
-from plantdb.rest_api import CurveSkeleton
-from plantdb.rest_api import DatasetFile
-from plantdb.rest_api import File
-from plantdb.rest_api import FileCreate
-from plantdb.rest_api import FileMetadata
-from plantdb.rest_api import FilesetCreate
-from plantdb.rest_api import FilesetFiles
-from plantdb.rest_api import FilesetMetadata
-from plantdb.rest_api import Image
-from plantdb.rest_api import Login
-from plantdb.rest_api import Mesh
-from plantdb.rest_api import PointCloud
-from plantdb.rest_api import PointCloudGroundTruth
-from plantdb.rest_api import Refresh
-from plantdb.rest_api import Register
-from plantdb.rest_api import Scan
-from plantdb.rest_api import ScanCreate
-from plantdb.rest_api import ScanFilesets
-from plantdb.rest_api import ScanMetadata
-from plantdb.rest_api import ScansList
-from plantdb.rest_api import ScansTable
-from plantdb.rest_api import Sequence
-from plantdb.test_database import DATASET
-from plantdb.test_database import test_database
+from plantdb.server.fsdb import FSDB
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
+from plantdb.server.rest_api import Archive
+from plantdb.server.rest_api import CurveSkeleton
+from plantdb.server.rest_api import DatasetFile
+from plantdb.server.rest_api import File
+from plantdb.server.rest_api import FileCreate
+from plantdb.server.rest_api import FileMetadata
+from plantdb.server.rest_api import FilesetCreate
+from plantdb.server.rest_api import FilesetFiles
+from plantdb.server.rest_api import FilesetMetadata
+from plantdb.server.rest_api import Image
+from plantdb.server.rest_api import Login
+from plantdb.server.rest_api import Mesh
+from plantdb.server.rest_api import PointCloud
+from plantdb.server.rest_api import PointCloudGroundTruth
+from plantdb.server.rest_api import Refresh
+from plantdb.server.rest_api import Register
+from plantdb.server.rest_api import Scan
+from plantdb.server.rest_api import ScanCreate
+from plantdb.server.rest_api import ScanFilesets
+from plantdb.server.rest_api import ScanMetadata
+from plantdb.server.rest_api import ScansList
+from plantdb.server.rest_api import ScansTable
+from plantdb.server.rest_api import Sequence
+from plantdb.server.test_database import DATASET
+from plantdb.server.test_database import test_database
 
 
 def parsing():
@@ -244,21 +244,21 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
                      resource_class_args=tuple([db]))
     api.add_resource(Login, '/login',
                      resource_class_args=tuple([db]))
-    # API endpoints for `plantdb.fsdb.Scan`:
+    # API endpoints for `plantdb.server.fsdb.Scan`:
     api.add_resource(ScanCreate, '/api/scan',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(ScanMetadata, '/api/scan/<string:scan_id>/metadata',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(ScanFilesets, '/api/scan/<string:scan_id>/filesets',
                      resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.fsdb.Fileset`:
+    # API endpoints for `plantdb.server.fsdb.Fileset`:
     api.add_resource(FilesetCreate, '/api/fileset',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_name>/metadata',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_name>/files',
                      resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.fsdb.File`:
+    # API endpoints for `plantdb.server.fsdb.File`:
     api.add_resource(FileCreate, '/api/file',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_name>/<string:file_name>/metadata',

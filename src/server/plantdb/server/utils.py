@@ -47,7 +47,7 @@ def read_image_from_file(filename):
 
     Examples
     --------
-    >>> from plantdb.utils import read_image_from_file
+    >>> from plantdb.server.utils import read_image_from_file
     >>> from plantdb.webcache import image_path
     >>> from plantdb.test_database import test_database
     >>> db = test_database('real_plant')
@@ -68,7 +68,7 @@ def locate_task_filesets(scan, tasks):
 
     Parameters
     ----------
-    scan : plantdb.fsdb.Scan
+    scan : plantdb.server.fsdb.Scan
         A ``Scan`` instance from a local plant database (FSDB).
     tasks : list of str
         A list of task names to look up in the scan's list of filesets.
@@ -84,8 +84,8 @@ def locate_task_filesets(scan, tasks):
 
     Examples
     --------
-    >>> from plantdb.utils import locate_task_filesets
-    >>> from plantdb.fsdb import FSDB
+    >>> from plantdb.server.utils import locate_task_filesets
+    >>> from plantdb.server.fsdb import FSDB
     >>> from plantdb.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -137,7 +137,7 @@ def to_file(dbfile, path):
 
     Parameters
     ----------
-    dbfile : plantdb.fsdb.File
+    dbfile : plantdb.server.fsdb.File
         The ``File`` instance to save under given `path`.
     path : pathlib.Path or str
         The file path to use to save the `dbfile`.
@@ -159,14 +159,14 @@ def fsdb_file_from_local_file(path):
 
     Returns
     -------
-    plantdb.fsdb.File
+    plantdb.server.fsdb.File
         The temporary ``fsdb.File``.
     """
-    from plantdb.fsdb import FSDB
-    from plantdb.fsdb import Scan
-    from plantdb.fsdb import Fileset
-    from plantdb.fsdb import File
-    from plantdb.fsdb import MARKER_FILE_NAME
+    from plantdb.server.fsdb import FSDB
+    from plantdb.server.fsdb import Scan
+    from plantdb.server.fsdb import Fileset
+    from plantdb.server.fsdb import File
+    from plantdb.server.fsdb import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem
@@ -190,7 +190,7 @@ def tmpdir_from_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.fsdb.Fileset
+    fileset : plantdb.server.fsdb.Fileset
         The fileset to use to create the temporary local database.
 
     Returns
@@ -224,7 +224,7 @@ def partial_match(reference, target, fuzzy=False):
 
     Examples
     --------
-    >>> from plantdb.utils import partial_match
+    >>> from plantdb.server.utils import partial_match
     >>> ref = {"object": {"environment":"virtual"}}
     >>> target = {'object': {'environment': 'virtual', 'plant_id': 'arabidopsis000', 'species': 'Arabidopsis Thaliana'}, 'scanner': {'workspace': {'x': [-200, 200], 'y': [-200, 200], 'z': [10, 1000]}}}
     >>> partial_match(ref, target)

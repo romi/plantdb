@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from plantdb.log import get_logger
+from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)
 
@@ -12,7 +12,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Parameters
     ----------
-    db : plantdb.fsdb.FSDB
+    db : plantdb.server.fsdb.FSDB
         A local database instance hosting the ``Scan`` instance.
     scan_id : str
         The identifier of the ``Scan`` instance in the local database.
@@ -21,13 +21,13 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Returns
     -------
-    plantdb.fsdb.Scan
+    plantdb.server.fsdb.Scan
         The updated ``Scan`` instance with the new metadata.
 
     Examples
     --------
-    >>> from plantdb.fsdb import dummy_db
-    >>> from plantdb.fsdb_tools import add_metadata_to_scan
+    >>> from plantdb.server.fsdb import dummy_db
+    >>> from plantdb.server.fsdb_tools import add_metadata_to_scan
     >>> db = dummy_db(with_scan=True)
     >>> scan = db.get_scan("myscan_001")
     >>> print(scan.metadata)
