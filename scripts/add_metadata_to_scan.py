@@ -13,8 +13,8 @@ Key Features:
 - Provides an easy-to-use method for specifying metadata, such as ownership and project details, in bulk or customized workflows.
 """
 
-from plantdb.fsdb import FSDB
-from plantdb.fsdb_tools import add_metadata_to_scan
+from plantdb.server.fsdb import FSDB
+from plantdb.server.fsdb_tools import add_metadata_to_scan
 
 #path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E1"
 #path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E2"
