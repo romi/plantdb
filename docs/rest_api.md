@@ -2,7 +2,7 @@
 
 Hereafter we introduce the URLS to use to communicate via the PlantDB REST API.
 
-The Python implementation is done in the `plantdb.rest_api` module and the CLI to start a Flask server is in `fsdb_rest_api`.
+The Python implementation is done in the `plantdb.server.rest_api` module and the CLI to start a Flask server is in `fsdb_rest_api`.
 
 ## Metadata and Files Endpoints
 
@@ -10,7 +10,7 @@ The Python implementation is done in the `plantdb.rest_api` module and the CLI t
 
 Here are the specifications for the `/scans` URL:
 
-* Resource: [`plantdb.rest_api.ScansList`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansList)
+* Resource: [`plantdb.server.rest_api.ScansList`](reference/plantdb/rest_api.md#plantdb.server.rest_api.ScansList)
 * Methods: GET
 * Arguments: `filterQuery`
 * Returns: a JSON compliant list of dictionaries.
@@ -24,7 +24,7 @@ Here are the specifications for the `/scans` URL:
 
 Here are the specifications for the `/scans_info` URL:
 
-* Resource: [`plantdb.rest_api.ScansTable`](reference/plantdb/rest_api.md#plantdb.rest_api.ScansTable)
+* Resource: [`plantdb.server.rest_api.ScansTable`](reference/plantdb/rest_api.md#plantdb.server.rest_api.ScansTable)
 * Methods: GET
 * Arguments: `filterQuery`
 * Returns: A JSON-compliant dictionary containing scan data in a tabular format, including:
@@ -43,7 +43,7 @@ Here are the specifications for the `/scans_info` URL:
 
 Here are the specifications for the `/scans/<scan_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Scan`](reference/plantdb/rest_api.md#plantdb.rest_api.Scan)
+* Resource: [`plantdb.server.rest_api.Scan`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Scan)
 * Arguments: none
 * Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset
 * Examples with the test database:
@@ -61,7 +61,7 @@ Here are the specifications for the `/scans/<scan_id>` URLs:
 
 Here are the specifications for the `/files/<path>` URLs:
 
-* Resource: [`plantdb.rest_api.File`](reference/plantdb/rest_api.md#plantdb.rest_api.File)
+* Resource: [`plantdb.server.rest_api.File`](reference/plantdb/rest_api.md#plantdb.server.rest_api.File)
 * Arguments: none
 * Returns: The content of the file.
 * Examples  `real_plant_analyzed` dataset (from the test database):
@@ -74,7 +74,7 @@ Here are the specifications for the `/files/<path>` URLs:
 
 Here are the specifications for the `/datasetfile` URL:
 
-* Resource: [`plantdb.rest_api.DatasetFile`](reference/plantdb/rest_api.md#plantdb.rest_api.DatasetFile)
+* Resource: [`plantdb.server.rest_api.DatasetFile`](reference/plantdb/rest_api.md#plantdb.server.rest_api.DatasetFile)
 * Arguments: 
     * `file_upload` (POST request) - The file to be uploaded as part of the dataset.
 * Returns: A confirmation of the upload process (success or failure).
@@ -88,7 +88,7 @@ Here are the specifications for the `/datasetfile` URL:
 
 Here are the specifications for the `/archive/<scan_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Archive`](reference/plantdb/rest_api.md#plantdb.rest_api.Archive)
+* Resource: [`plantdb.server.rest_api.Archive`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Archive)
 * Arguments: none
 * Returns: A zip file containing the dataset.
 * Examples:
@@ -101,7 +101,7 @@ Here are the specifications for the `/archive/<scan_id>` URLs:
 
 Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Image`](reference/plantdb/rest_api.md#plantdb.rest_api.Image)
+* Resource: [`plantdb.server.rest_api.Image`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Image)
 * Arguments: `size` in {`orig`, `large`, `thumb`} to control the max size (width or height) of the image to return.
 * Returns: The image file, resized by default.
 * Examples with the `real_plant_analyzed` dataset (from the test database) and the first image of the scan (`00000_rgb`):
@@ -114,7 +114,7 @@ Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` UR
 
 Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.PointCloud`](reference/plantdb/rest_api.md#plantdb.rest_api.PointCloud)
+* Resource: [`plantdb.server.rest_api.PointCloud`](reference/plantdb/rest_api.md#plantdb.server.rest_api.PointCloud)
 * Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
 * Returns: The point cloud file, preview size by default.
 * Examples with the `real_plant_analyzed` dataset:
@@ -129,7 +129,7 @@ Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id
 
 Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.PointCloudGroundTruth`](reference/plantdb/rest_api.md#plantdb.rest_api.PointCloudGroundTruth)
+* Resource: [`plantdb.server.rest_api.PointCloudGroundTruth`](reference/plantdb/rest_api.md#plantdb.server.rest_api.PointCloudGroundTruth)
 * Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
 * Returns: The ground-truth pointcloud file, original size by default.
 
@@ -137,7 +137,7 @@ Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file
 
 Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URLs:
 
-* Resource: [`plantdb.rest_api.Mesh`](reference/plantdb/rest_api.md#plantdb.rest_api.Mesh)
+* Resource: [`plantdb.server.rest_api.Mesh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Mesh)
 * Arguments: `size` in {`orig`}, no control of the size of the mesh to returns.
 * Returns: The mesh file, original size by default.
 * Examples with the `real_plant_analyzed` dataset:
@@ -148,7 +148,7 @@ Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URL
 
 Here are the specifications for the `/skeleton/<scan_id>` URL:
 
-* Resource: [`plantdb.rest_api.CurveSkeleton`](reference/plantdb/rest_api.md#plantdb.rest_api.CurveSkeleton)
+* Resource: [`plantdb.server.rest_api.CurveSkeleton`](reference/plantdb/rest_api.md#plantdb.server.rest_api.CurveSkeleton)
 * Arguments: none
 * Returns: Details about the curve skeleton related to the given scan.
 * Example:
@@ -159,7 +159,7 @@ Here are the specifications for the `/skeleton/<scan_id>` URL:
 
 Here are the specifications for the `/sequence/<scan_id>` URL:
 
-* Resource: [`plantdb.rest_api.Sequence`](reference/plantdb/rest_api.md#plantdb.rest_api.Sequence)
+* Resource: [`plantdb.server.rest_api.Sequence`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Sequence)
 * Arguments: none
 * Returns: Sequence-related information related to the given scan.
 * Example:
@@ -167,11 +167,11 @@ Here are the specifications for the `/sequence/<scan_id>` URL:
     [http://127.0.0.1:5000/sequence/real_plant_analyzed](http://127.0.0.1:5000/sequence/real_plant_analyzed)
 
 ### `/refresh`
-Refresh the list of scans in the `plantdb.fsdb.FSDB` database.
+Refresh the list of scans in the `plantdb.server.fsdb.FSDB` database.
 
 Here are the specifications for the `/refresh` URL:
 
-* Resource: [`plantdb.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.rest_api.Refresh)
+* Resource: [`plantdb.server.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Refresh)
 * Arguments: none
 * Returns: `200` on completion.
 * Example: [http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
@@ -183,7 +183,7 @@ Here are the specifications for the `/refresh` URL:
 
 Here are the specifications for the `/register` URL:
 
-* Resource: [`plantdb.rest_api.Register`](reference/plantdb/rest_api.md#plantdb.rest_api.Register)
+* Resource: [`plantdb.server.rest_api.Register`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Register)
 * Method: POST
 * Arguments:
     * `username`: The desired username
@@ -198,7 +198,7 @@ Here are the specifications for the `/register` URL:
 
 Here are the specifications for the `/login` URL:
 
-* Resource: [`plantdb.rest_api.Login`](reference/plantdb/rest_api.md#plantdb.rest_api.Login)
+* Resource: [`plantdb.server.rest_api.Login`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Login)
 * Methods: GET, POST
 * Arguments for POST:
     * `username`: The username
@@ -213,7 +213,7 @@ Here are the specifications for the `/login` URL:
 
 Here are the specifications for the `/refresh` URL:
 
-* Resource: [`plantdb.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.rest_api.Refresh)
+* Resource: [`plantdb.server.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Refresh)
 * Method: GET
 * Arguments: none (requires valid authentication token in header)
 * Returns: A new authentication token.
@@ -224,7 +224,7 @@ Here are the specifications for the `/refresh` URL:
 
 ## Scan summary
 Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
-The template can be accessed here: [`plantdb.rest_api.get_scan_template`](reference/rest_api.md#methods)
+The template can be accessed here: [`plantdb.server.rest_api.get_scan_template`](reference/rest_api.md#methods)
 
 It is organized as follows:
 
