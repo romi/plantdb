@@ -40,13 +40,33 @@ conda create -n romi plantdb -c romi-eu
 To install this library, simply clone the repo and use `pip` to install it and the required dependencies.
 Again, we strongly advise to create a `conda` environment, here named `plantdb`.
 
+#### Create the Virtual Environment
 All this can be done as follows:
 ```shell
 git clone https://github.com/romi/plantdb.git -b dev  # git clone the 'dev' branch of plantdb
 cd plantdb
-conda create -n plantdb 'python =3.10'
+conda create -n plantdb 'python=3.10' ipython
+```
+
+#### Install the commons
+To install the client-side of PlantDB from source, simply run:
+```shell
 conda activate plantdb  # do not forget to activate your environment!
-python -m pip install -e .  # install the sources
+python -m pip install -e src/commons/.  # install the sources in editable mode
+```
+
+#### Install the client-side
+To install the client-side of PlantDB from source, simply run:
+```shell
+conda activate plantdb  # do not forget to activate your environment!
+python -m pip install -e src/client/.  # install the sources in editable mode
+```
+
+#### Install the server-side
+To install the server-side of PlantDB from source, simply run:
+```shell
+conda activate plantdb  # do not forget to activate your environment!
+python -m pip install -e src/server/.  # install the sources in editable mode
 ```
 
 Note that the `-e` option is to install the `plantdb` sources in "developer mode".
