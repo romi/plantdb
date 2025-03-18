@@ -8,3 +8,34 @@ version = "0.0.1"
 dependencies = [
     "requests"
 ]
+description = "Database library for the ROMI project. Common tools for server and client sides."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { name = "GPL-3.0-or-later", file = "LICENSE" }
+authors = [
+    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
+    { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
+    { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+    { name = "Arthur Luciani", email = "arthur.luciani@ens-lyon.fr" },
+]
+maintainers = [
+    { name = "Jonathan Legrand", email = "jonathan.legrand@ens-lyon.fr" }
+]
+keywords = [
+    "Robotics for Microfarms",
+    "ROMI",
+    "Database",
+    "REST API",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+]
+
+[project.urls]
+Homepage = "https://romi-project.eu/"
+Documentation = "https://docs.romi-project.eu/plant_imager/"
+Repository = "https://github.com/romi/plantdb"
+Issues = "https://github.com/romi/plantdb/issues"

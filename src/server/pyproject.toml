@@ -23,7 +23,16 @@ dependencies = [
     "toml",
     "tqdm",
 ]
-description = "Database library for the ROMI project."
+description = """
+Server-side component of the ROMI (Robotics for Microfarms) plant database system.
+Provides a robust REST API server implementation for managing plant phenotyping data,
+with features including:
+- File system database management
+- Data synchronization services
+- Command-line tools for database management
+
+Built for agricultural research facilities and robotics labs requiring reliable plant data management infrastructure.
+"""
 readme = "README.md"
 requires-python = ">=3.8"
 license = { name = "GPL-3.0-or-later", file = "LICENSE" }
@@ -31,6 +40,7 @@ authors = [
     { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+    { name = "Arthur Luciani", email = "arthur.luciani@ens-lyon.fr" },
 ]
 maintainers = [
     { name = "Jonathan Legrand", email = "jonathan.legrand@ens-lyon.fr" }
@@ -40,12 +50,21 @@ keywords = [
     "ROMI",
     "Database",
     "REST API",
+    "Plant Phenotyping",
+    "Scientific Database",
+    "Data Management",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
+    "Topic :: Database",
+    "Topic :: System :: Networking",
+    "Framework :: Flask",
+    "Operating System :: OS Independent"
 ]
 
 [project.scripts]
