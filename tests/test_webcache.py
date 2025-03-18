@@ -3,8 +3,8 @@
 
 import unittest
 
-from plantdb.server.testing import FSDBTestCase
-from plantdb.server.utils import read_image_from_file
+from plantdb.commons.testing import FSDBTestCase
+from plantdb.commons.utils import read_image_from_file
 from plantdb.server.webcache import IMG_RESOLUTIONS
 from plantdb.server.webcache import image_path
 from plantdb.server.webcache import pointcloud_path

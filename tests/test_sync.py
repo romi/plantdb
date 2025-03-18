@@ -5,9 +5,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from plantdb.server.fsdb import MARKER_FILE_NAME
-from plantdb.server.sync import FSDBSync
-from plantdb.server.testing import DummyDBTestCase
+from plantdb.commons.fsdb import MARKER_FILE_NAME
+from plantdb.commons.sync import FSDBSync
+from plantdb.commons.testing import DummyDBTestCase
 
 
 class TestSyncDummy(DummyDBTestCase):
