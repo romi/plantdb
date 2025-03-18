@@ -1,4 +1,4 @@
-name: Build and Publish plantdb.commons to PyPI
+name: Build and Publish plantdb.server to PyPI
 
 # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 
@@ -25,13 +25,13 @@ jobs:
         pip install build twine
 
     - name: Build package
-      run: python -m build src/commons/.
+      run: python -m build src/server/.
 
     - name: Store the distribution packages
       uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions
-        path: src/commons/dist/
+        path: src/server/dist/
 
   pypi-publish:
     name: upload release to PyPI
@@ -47,9 +47,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
-          path: src/commons/dist/
+          path: src/server/dist/
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: src/commons/dist/
+          packages-dir: src/server/dist/
