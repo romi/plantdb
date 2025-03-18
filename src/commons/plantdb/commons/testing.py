@@ -31,9 +31,9 @@ import shutil
 import tempfile
 import unittest
 
-from plantdb.server.fsdb import FSDB
-from plantdb.server.fsdb import dummy_db
-from plantdb.server.test_database import test_database
+from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb import dummy_db
+from plantdb.commons.test_database import test_database
 from plantdb.server.utils import locate_task_filesets
 
 
@@ -67,7 +67,7 @@ class DummyDBTestCase(unittest.TestCase):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The temporary directory.
     tmpclone : plantdb.testing.TemporaryCloneDB
         A local temporary copy of a dummy test database.
@@ -149,7 +149,7 @@ class FSDBTestCase(unittest.TestCase):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The temporary test database with the 'real_plant_analyzed' dataset.
     """
 
@@ -176,7 +176,7 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.server.fsdb.Scan
+        plantdb.commons.fsdb.Scan
             The default ``Scan`` instance to test.
         """
         db = self.get_test_db()
@@ -221,7 +221,7 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.server.fsdb.Fileset
+        plantdb.commons.fsdb.Fileset
             The ``Fileset`` corresponding to the given task.
         """
         scan = self.get_test_scan()

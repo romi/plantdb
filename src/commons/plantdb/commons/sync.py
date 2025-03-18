@@ -30,9 +30,9 @@ This module provides a synchronization mechanism for PlantDB.
 import subprocess
 from pathlib import Path
 
-from plantdb.server.fsdb import LOCK_FILE_NAME
-from plantdb.server.fsdb import MARKER_FILE_NAME
-from plantdb.server.fsdb import _is_fsdb
+from plantdb.commons.fsdb import LOCK_FILE_NAME
+from plantdb.commons.fsdb import MARKER_FILE_NAME
+from plantdb.commons.fsdb import _is_fsdb
 
 
 class FSDBSync():

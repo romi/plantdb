@@ -12,7 +12,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A local database instance hosting the ``Scan`` instance.
     scan_id : str
         The identifier of the ``Scan`` instance in the local database.
@@ -21,13 +21,13 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Returns
     -------
-    plantdb.server.fsdb.Scan
+    plantdb.commons.fsdb.Scan
         The updated ``Scan`` instance with the new metadata.
 
     Examples
     --------
-    >>> from plantdb.server.fsdb import dummy_db
-    >>> from plantdb.server.fsdb_tools import add_metadata_to_scan
+    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb_tools import add_metadata_to_scan
     >>> db = dummy_db(with_scan=True)
     >>> scan = db.get_scan("myscan_001")
     >>> print(scan.metadata)

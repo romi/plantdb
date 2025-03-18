@@ -73,11 +73,11 @@ from tqdm import tqdm
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
-from plantdb.client.rest_api_client import download_scan_archive
-from plantdb.client.rest_api_client import list_scan_names
-from plantdb.client.rest_api_client import refresh
-from plantdb.client.rest_api_client import test_host_port_availability
-from plantdb.client.rest_api_client import upload_scan_archive
+from plantdb.client.rest_api import download_scan_archive
+from plantdb.client.rest_api import list_scan_names
+from plantdb.client.rest_api import refresh
+from plantdb.client.rest_api import test_host_port_availability
+from plantdb.client.rest_api import upload_scan_archive
 
 
 def parsing():

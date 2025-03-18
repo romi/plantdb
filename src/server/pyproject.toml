@@ -6,22 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "plantdb.server"
 version = "0.14.0"
 dependencies = [
-    "appdirs",
     "bcrypt",
-    "colorlog",
     "flask",
     "flask-cors",
     "flask-restful",
-    "imagecodecs",
-    "imageio >=2.16.2",
-    "numpy",
-    "open3d >=0.9.0.0",
     "plantdb.commons",
-    "pillow",
-    "plyfile",
     "requests",
     "toml",
-    "tqdm",
 ]
 description = """
 Server-side component of the ROMI (Robotics for Microfarms) plant database system.
@@ -68,14 +59,7 @@ classifiers = [
 ]
 
 [project.scripts]
-fsdb_check = "plantdb.server.cli.fsdb_check:main"
-fsdb_import_file = "plantdb.server.cli.fsdb_import_file:main"
-fsdb_import_folder = "plantdb.server.cli.fsdb_import_folder:main"
-fsdb_import_images = "plantdb.server.cli.fsdb_import_images:main"
 fsdb_rest_api = "plantdb.server.cli.fsdb_rest_api:main"
-fsdb_sync = "plantdb.server.cli.fsdb_sync:main"
-fsdb_rest_api_sync = "plantdb.server.cli.fsdb_rest_api_sync:main"
-shared_fsdb = "plantdb.server.cli.shared_fsdb:main"
 
 [project.urls]
 Homepage = "https://romi-project.eu/"

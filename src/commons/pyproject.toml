@@ -4,11 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.commons"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
-    "requests"
+    "appdirs",
+    "colorlog",
+    "imagecodecs",
+    "imageio >=2.16.2",
+    "numpy",
+    "plantdb.commons",
+    "pillow",
+    "plyfile",
+    "toml",
+    "tqdm",
 ]
-description = "Database library for the ROMI project. Common tools for server and client sides."
+description = """
+Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+This package provides common utilities and base functionality used by both server and client components, including:
+- Data management
+- Common data models and schemas
+- File system operations and validation
+- Logging and debugging tools
+- Data format specifications and validators
+
+Essential foundation package for ROMI's plant phenotyping and database infrastructure.
+"""
 readme = "README.md"
 requires-python = ">=3.8"
 license = { name = "GPL-3.0-or-later", file = "LICENSE" }
@@ -25,13 +44,25 @@ keywords = [
     "Robotics for Microfarms",
     "ROMI",
     "Database",
-    "REST API",
+    "Image Processing",
+    "3D Data",
+    "Plant Phenotyping",
+    "Scientific Computing",
+    "Data Models",
+    "Shared Library",
+    "Core Utilities"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "Operating System :: OS Independent",
+    "Natural Language :: English"
 ]
 
 [project.urls]
@@ -39,3 +70,30 @@ Homepage = "https://romi-project.eu/"
 Documentation = "https://docs.romi-project.eu/plant_imager/"
 Repository = "https://github.com/romi/plantdb"
 Issues = "https://github.com/romi/plantdb/issues"
+
+[project.scripts]
+fsdb_check = "plantdb.server.cli.fsdb_check:main"
+fsdb_import_file = "plantdb.server.cli.fsdb_import_file:main"
+fsdb_import_folder = "plantdb.server.cli.fsdb_import_folder:main"
+fsdb_import_images = "plantdb.server.cli.fsdb_import_images:main"
+fsdb_sync = "plantdb.server.cli.fsdb_sync:main"
+shared_fsdb = "plantdb.server.cli.shared_fsdb:main"
+
+[project.optional-dependencies]
+doc = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pymdown-extensions",
+    "markdown-exec[ansi]",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
+]
+test = [
+    "nose2[coverage]",
+    "coverage[toml]",
+    "networkx",
+    "tifffile",
+    "open3d >=0.9.0.0",
+]

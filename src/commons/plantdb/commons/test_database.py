@@ -382,8 +382,8 @@ def setup_empty_database(out_path=None):
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     """
-    from plantdb.server.fsdb import MARKER_FILE_NAME
-    from plantdb.server.fsdb import LOCK_FILE_NAME
+    from plantdb.commons.fsdb import MARKER_FILE_NAME
+    from plantdb.commons.fsdb import LOCK_FILE_NAME
 
     if isinstance(out_path, str):
         out_path = Path(out_path)
@@ -500,7 +500,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
 
     Returns
     -------
-    plantdb.server.fsdb.FSDB
+    plantdb.commons.fsdb.FSDB
         The FSDB test database.
 
     Examples
@@ -514,7 +514,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
-    from plantdb.server.fsdb import FSDB
+    from plantdb.commons.fsdb import FSDB
     if dataset is None:
         return FSDB(setup_empty_database(out_path=out_path))
     else:

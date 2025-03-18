@@ -37,8 +37,9 @@ The following **size specifications** are available:
 
 Examples
 --------
->>> from plantdb.server import webcache>>>  from os import environ
->>> from plantdb.server.fsdb import FSDB
+>>> from plantdb.server import webcache
+>>> from os import environ
+>>> from plantdb.commons.fsdb import FSDB
 >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
 >>> db.connect()
 >>> # Get the path to the original image:
@@ -71,7 +72,7 @@ def __webcache_path(db, scan_id):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -91,7 +92,7 @@ def __file_path(db, scan_id, fileset_id, file_id):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -188,7 +189,7 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -236,7 +237,7 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -265,7 +266,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -289,7 +290,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
     Examples
     --------
     >>> from plantdb.webcache import image_path
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> # Example 1: Get the original image:
@@ -361,7 +362,7 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -414,7 +415,7 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -445,7 +446,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -468,7 +469,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
     Examples
     --------
     >>> from plantdb.webcache import pointcloud_path
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> # Example 1: Get the original pointcloud:
@@ -502,7 +503,7 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Parameters
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -521,7 +522,7 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
     Examples
     --------
     >>> from plantdb.webcache import mesh_path
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> # Example 1: Get the original pointcloud:

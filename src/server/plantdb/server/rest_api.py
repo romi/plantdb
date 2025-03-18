@@ -51,8 +51,8 @@ from flask import send_from_directory
 from flask_restful import Resource
 
 from plantdb.server import webcache
-from plantdb.server.fsdb import FilesetNotFoundError
-from plantdb.server.fsdb import ScanNotFoundError
+from plantdb.commons.fsdb import FilesetNotFoundError
+from plantdb.commons.fsdb import ScanNotFoundError
 from plantdb.server.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.server.utils import is_radians
@@ -65,7 +65,7 @@ def get_scan_date(scan):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan
+    scan : plantdb.commons.fsdb.Scan
         The scan instance to get the date & time from.
 
     Returns
@@ -76,7 +76,7 @@ def get_scan_date(scan):
     Examples
     --------
     >>> from plantdb.server.rest_api import get_scan_date
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database(['real_plant_analyzed', 'virtual_plant_analyzed'])
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
@@ -104,7 +104,7 @@ def compute_fileset_matches(scan):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan
+    scan : plantdb.commons.fsdb.Scan
         The scan instance to list the filesets from.
 
     Returns
@@ -115,7 +115,7 @@ def compute_fileset_matches(scan):
     Examples
     --------
     >>> from plantdb.server.rest_api import compute_fileset_matches
-    >>> from plantdb.server.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
@@ -191,7 +191,7 @@ def get_scan_info(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan
+    scan : plantdb.commons.fsdb.Scan
         The scan instance to get information from.
 
     Other Parameters
@@ -207,7 +207,7 @@ def get_scan_info(scan, **kwargs):
     Examples
     --------
     >>> from plantdb.server.rest_api import get_scan_info
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
@@ -321,11 +321,11 @@ def get_file_uri(scan, fileset, file):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.server.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.server.fsdb.File or str
+    file : plantdb.commons.fsdb.File or str
         A ``File`` instance or the name of the file.
 
     Returns
@@ -336,7 +336,7 @@ def get_file_uri(scan, fileset, file):
     Examples
     --------
     >>> from plantdb.server.rest_api import get_file_uri
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> from plantdb.server.rest_api import compute_fileset_matches
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -347,9 +347,9 @@ def get_file_uri(scan, fileset, file):
     >>> get_file_uri(scan, fs, f)
     '/files/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'
     """
-    from plantdb.server.fsdb import Scan
-    from plantdb.server.fsdb import Fileset
-    from plantdb.server.fsdb import File
+    from plantdb.commons.fsdb import Scan
+    from plantdb.commons.fsdb import Fileset
+    from plantdb.commons.fsdb import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_name = file.path().name if isinstance(file, File) else file
@@ -361,11 +361,11 @@ def get_image_uri(scan, fileset, file, size="orig"):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.server.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.server.fsdb.File or str
+    file : plantdb.commons.fsdb.File or str
         A ``File`` instance or the name of the file.
     size : {'orig', 'large', 'thumb'} or int, optional
         If an integer, use  it as the size of the cached image to create and return.
@@ -383,7 +383,7 @@ def get_image_uri(scan, fileset, file, size="orig"):
     Examples
     --------
     >>> from plantdb.server.rest_api import get_image_uri
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> from plantdb.server.rest_api import compute_fileset_matches
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -393,9 +393,9 @@ def get_image_uri(scan, fileset, file, size="orig"):
     >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb')
     '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb'
     """
-    from plantdb.server.fsdb import Scan
-    from plantdb.server.fsdb import Fileset
-    from plantdb.server.fsdb import File
+    from plantdb.commons.fsdb import Scan
+    from plantdb.commons.fsdb import Fileset
+    from plantdb.commons.fsdb import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_name = file.path().name if isinstance(file, File) else file
@@ -415,7 +415,7 @@ def get_scan_data(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan
+    scan : plantdb.commons.fsdb.Scan
         The scan instance to get the information and data from.
 
     Other Parameters
@@ -431,7 +431,7 @@ def get_scan_data(scan, **kwargs):
     Examples
     --------
     >>> from plantdb.server.rest_api import get_scan_data
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
@@ -656,7 +656,7 @@ class Register(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance used for storing and managing user records.
     """
 
@@ -665,7 +665,7 @@ class Register(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database object for with user records.
         """
         self.db = db
@@ -752,7 +752,7 @@ class Login(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database object that provides access to user-related operations such as
         checking if a user exists and validating user credentials.
     """
@@ -762,7 +762,7 @@ class Login(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database object for accessing user data.
         """
         self.db = db
@@ -909,7 +909,7 @@ class ScansList(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database connection object used to interact with the scan datasets.
 
     See Also
@@ -922,7 +922,7 @@ class ScansList(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database connection object for accessing scan data.
         """
         self.db = db
@@ -997,7 +997,7 @@ class ScansTable(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database connection object used to interact with the scan datasets.
     logger : Logger
         The logger instance for this resource.
@@ -1029,7 +1029,7 @@ class ScansTable(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance providing access to scan data.
         logger : loggin.Logger
             A logger instance for recording operations and errors.
@@ -1102,7 +1102,7 @@ class Scan(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database instance used to retrieve scan information.
     logger : logging.Logger
         The logger instance for recording operations.
@@ -1123,7 +1123,7 @@ class Scan(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance providing access to scan data.
         logger : loggin.Logger
             A logger instance for recording operations and errors.
@@ -1237,7 +1237,7 @@ class File(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database instance containing the file path configuration.
 
     Notes
@@ -1251,7 +1251,7 @@ class File(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance providing access to file locations.
         """
         self.db = db
@@ -1312,7 +1312,7 @@ class DatasetFile(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance that provides access to scan data and file locations.
         Used for validating scan IDs and determining file storage paths.
 
@@ -1332,7 +1332,7 @@ class DatasetFile(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance providing access to file locations.
         """
         self.db = db
@@ -1486,7 +1486,7 @@ class Refresh(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database instance used for reloading data.
     """
 
@@ -1495,7 +1495,7 @@ class Refresh(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance to reload.
         """
         self.db = db
@@ -1571,7 +1571,7 @@ class Image(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance containing the image data.
 
     Notes
@@ -1585,7 +1585,7 @@ class Image(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database instance for accessing stored images.
         """
         self.db = db
@@ -1670,7 +1670,7 @@ class PointCloud(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance containing the point cloud data.
 
     Notes
@@ -1685,7 +1685,7 @@ class PointCloud(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database instance for accessing stored point cloud data.
         """
         self.db = db
@@ -1777,7 +1777,7 @@ class PointCloudGroundTruth(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database instance used to retrieve point-cloud data.
     """
 
@@ -1786,7 +1786,7 @@ class PointCloudGroundTruth(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database instance providing access to the point-cloud data.
         """
         self.db = db
@@ -1874,7 +1874,7 @@ class Mesh(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Reference to the database instance.
 
     Notes
@@ -1887,7 +1887,7 @@ class Mesh(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             The database instance containing the mesh data.
         """
         self.db = db
@@ -1971,7 +1971,7 @@ class CurveSkeleton(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance containing plant scan data and associated filesets.
     """
 
@@ -1980,7 +1980,7 @@ class CurveSkeleton(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             Database instance providing access to plant scan data.
         """
         self.db = db
@@ -2082,7 +2082,7 @@ class Sequence(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database instance used for retrieving scan data.
     """
 
@@ -2091,7 +2091,7 @@ class Sequence(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance containing plant scan data and related measurements.
         """
         self.db = db
@@ -2228,7 +2228,7 @@ class Archive(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database instance for accessing and managing scan data.
     logger : logging.Logger
         A logger instance for recording operations and errors.
@@ -2239,7 +2239,7 @@ class Archive(Resource):
 
         Parameters
         ----------
-        db : plantdb.server.fsdb.FSDB
+        db : plantdb.commons.fsdb.FSDB
             A database instance for accessing and managing scan data.
         logger : logging.Logger
             A logger instance for recording operations and errors.
@@ -2467,7 +2467,7 @@ class ScanCreate(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database instance used to create scans.
     logger : logging.Logger
         A logger instance for recording operations.
@@ -2503,7 +2503,7 @@ class ScanCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
         >>> url = f"{base_url()}/api/scan"
@@ -2545,7 +2545,7 @@ class ScanMetadata(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance for accessing and managing scan data.
     logger : logging.Logger
         Logger instance for recording operations and errors.
@@ -2586,7 +2586,7 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
         >>> url = f"{base_url()}/api/scan"
@@ -2647,7 +2647,7 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
         >>> url = f"{base_url()}/api/scan"
@@ -2705,7 +2705,7 @@ class ScanFilesets(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database instance for accessing scan and create fileset.
     logger : logging.Logger
         A logger instance for recording operations.
@@ -2719,7 +2719,7 @@ class ScanFilesets(Resource):
         """List all filesets in a specified scan.
 
         This method retrieves the list of filesets contained in a scan using the
-        `list_filesets()` method from `plantdb.server.fsdb.Scan`.
+        `list_filesets()` method from `plantdb.commons.fsdb.Scan`.
 
         Parameters
         ----------
@@ -2740,7 +2740,7 @@ class ScanFilesets(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # List filesets in a scan:
         >>> url = f"{base_url()}/api/scan/real_plant/filesets"
         >>> response = requests.get(url)
@@ -2774,7 +2774,7 @@ class FilesetCreate(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A dDatabase instance for accessing scan and create fileset.
     logger : logging.Logger
         A logger instance for recording operations.
@@ -2811,7 +2811,7 @@ class FilesetCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
         >>> url = f"{base_url()}/api/fileset"
@@ -2866,7 +2866,7 @@ class FilesetMetadata(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         A database instance for accessing scan and fileset metadata.
     logger : logging.Logger
         A logger instance for error tracking and debugging.
@@ -2914,7 +2914,7 @@ class FilesetMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
         >>> url = f"{base_url()}/api/fileset"
@@ -2986,7 +2986,7 @@ class FilesetMetadata(Resource):
         Examples
         --------
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
         >>> url = f"{base_url()}/api/fileset"
@@ -3062,7 +3062,7 @@ class FilesetFiles(Resource):
         """List all files in a specified fileset.
 
         This method retrieves the list of files contained in a fileset using the
-        `list_files()` method from `plantdb.server.fsdb.Fileset`.
+        `list_files()` method from `plantdb.commons.fsdb.Fileset`.
 
         Parameters
         ----------
@@ -3085,7 +3085,7 @@ class FilesetFiles(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # List files in a fileset:
         >>> url = f"{base_url()}/api/fileset/real_plant/images/files"
         >>> response = requests.get(url)
@@ -3126,7 +3126,7 @@ class FileCreate(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         The database instance used to create files.
     logger : logging.Logger
         The logger instance for recording operations.
@@ -3166,7 +3166,7 @@ class FileCreate(Resource):
         >>> import requests
         >>> import json
         >>> from tempfile import NamedTemporaryFile
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
@@ -3262,7 +3262,7 @@ class FileMetadata(Resource):
 
     Attributes
     ----------
-    db : plantdb.server.fsdb.FSDB
+    db : plantdb.commons.fsdb.FSDB
         Database instance for accessing file storage.
     logger : Logger
         The logger instance for this resource.
@@ -3301,7 +3301,7 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> # Get all metadata:
         >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
@@ -3368,7 +3368,7 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.server.rest_api_client import base_url
+        >>> from plantdb.client.rest_api import base_url
         >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)

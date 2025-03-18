@@ -68,7 +68,7 @@ def locate_task_filesets(scan, tasks):
 
     Parameters
     ----------
-    scan : plantdb.server.fsdb.Scan
+    scan : plantdb.commons.fsdb.Scan
         A ``Scan`` instance from a local plant database (FSDB).
     tasks : list of str
         A list of task names to look up in the scan's list of filesets.
@@ -85,7 +85,7 @@ def locate_task_filesets(scan, tasks):
     Examples
     --------
     >>> from plantdb.server.utils import locate_task_filesets
-    >>> from plantdb.server.fsdb import FSDB
+    >>> from plantdb.commons.fsdb import FSDB
     >>> from plantdb.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -137,7 +137,7 @@ def to_file(dbfile, path):
 
     Parameters
     ----------
-    dbfile : plantdb.server.fsdb.File
+    dbfile : plantdb.commons.fsdb.File
         The ``File`` instance to save under given `path`.
     path : pathlib.Path or str
         The file path to use to save the `dbfile`.
@@ -159,14 +159,14 @@ def fsdb_file_from_local_file(path):
 
     Returns
     -------
-    plantdb.server.fsdb.File
+    plantdb.commons.fsdb.File
         The temporary ``fsdb.File``.
     """
-    from plantdb.server.fsdb import FSDB
-    from plantdb.server.fsdb import Scan
-    from plantdb.server.fsdb import Fileset
-    from plantdb.server.fsdb import File
-    from plantdb.server.fsdb import MARKER_FILE_NAME
+    from plantdb.commons.fsdb import FSDB
+    from plantdb.commons.fsdb import Scan
+    from plantdb.commons.fsdb import Fileset
+    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem
@@ -190,7 +190,7 @@ def tmpdir_from_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.server.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.Fileset
         The fileset to use to create the temporary local database.
 
     Returns
