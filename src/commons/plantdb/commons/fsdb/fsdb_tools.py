@@ -27,7 +27,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
     Examples
     --------
     >>> from plantdb.commons.fsdb import dummy_db
-    >>> from plantdb.commons.fsdb_tools import add_metadata_to_scan
+    >>> from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
     >>> db = dummy_db(with_scan=True)
     >>> scan = db.get_scan("myscan_001")
     >>> print(scan.metadata)
