@@ -4,33 +4,34 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.server"
-version = "0.14.1"
+version = "0.14.2"
 dependencies = [
+    "plantdb",
     "bcrypt",
     "flask",
     "flask-cors",
     "flask-restful",
-    "plantdb.commons",
     "requests",
     "toml",
 ]
 description = """
 Server-side component of the ROMI (Robotics for Microfarms) plant database system.
+
 Provides a robust REST API server implementation for managing plant phenotyping data,
 with features including:
 - File system database management
 - Data synchronization services
 - Command-line tools for database management
 
-Built for agricultural research facilities and robotics labs requiring reliable plant data management infrastructure.
+Built for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
 """
 readme = "README.md"
 requires-python = ">=3.8"
 license = { name = "GPL-3.0-or-later", file = "LICENSE" }
 authors = [
-    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Arthur Luciani", email = "arthur.luciani@ens-lyon.fr" },
 ]
 maintainers = [
@@ -39,23 +40,24 @@ maintainers = [
 keywords = [
     "Robotics for Microfarms",
     "ROMI",
-    "Database",
-    "REST API",
     "Plant Phenotyping",
     "Scientific Database",
     "Data Management",
+    "REST API",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
-    "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
     "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
     "Topic :: System :: Networking",
     "Framework :: Flask",
-    "Operating System :: OS Independent"
+    "Operating System :: OS Independent",
+    "Natural Language :: English",
 ]
 
 [project.scripts]

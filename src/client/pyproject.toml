@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.client"
-version = "0.0.2"
+version = "0.14.2"
 dependencies = [
     "plantdb.commons",
     "requests",
@@ -12,18 +12,20 @@ dependencies = [
 ]
 description = """
 Client-side database library for the ROMI (Robotics for Microfarms) project.
+
 This package provides a Python interface for interacting with ROMI's plant database system,
 enabling efficient storage, retrieval, and management of plant-related data.
 Features include REST API integration, data validation, and streamlined access to plant phenotyping data.
-Designed for researchers and developers working with automated agricultural systems and plant science data collection.
+
+Built for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
 """
 readme = "README.md"
 requires-python = ">=3.8"
 license = { name = "GPL-3.0-or-later", file = "LICENSE" }
 authors = [
-    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Arthur Luciani", email = "arthur.luciani@ens-lyon.fr" },
 ]
 maintainers = [
@@ -32,14 +34,21 @@ maintainers = [
 keywords = [
     "Robotics for Microfarms",
     "ROMI",
-    "Database",
+    "Plant Phenotyping",
+    "Scientific Database",
+    "Data Management",
     "REST API",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: OS Independent",
+    "Natural Language :: English",
 ]
 
 [project.urls]

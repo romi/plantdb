@@ -4,14 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.commons"
-version = "0.0.2"
+version = "0.14.2"
 dependencies = [
     "appdirs",
     "colorlog",
     "imagecodecs",
     "imageio >=2.16.2",
     "numpy",
-    "plantdb.commons",
     "pillow",
     "plyfile",
     "toml",
@@ -19,6 +18,7 @@ dependencies = [
 ]
 description = """
 Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+
 This package provides common utilities and base functionality used by both server and client components, including:
 - Data management
 - Common data models and schemas
@@ -27,14 +27,15 @@ This package provides common utilities and base functionality used by both serve
 - Data format specifications and validators
 
 Essential foundation package for ROMI's plant phenotyping and database infrastructure.
+Built for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
 """
 readme = "README.md"
 requires-python = ">=3.8"
 license = { name = "GPL-3.0-or-later", file = "LICENSE" }
 authors = [
-    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
+    { name = "Nabil Ait Taleb", email = "mohamednabil.aittaleb@sony.com" },
     { name = "Arthur Luciani", email = "arthur.luciani@ens-lyon.fr" },
 ]
 maintainers = [
@@ -43,24 +44,18 @@ maintainers = [
 keywords = [
     "Robotics for Microfarms",
     "ROMI",
-    "Database",
-    "Image Processing",
-    "3D Data",
     "Plant Phenotyping",
-    "Scientific Computing",
-    "Data Models",
-    "Shared Library",
-    "Core Utilities"
+    "Scientific Database",
+    "Data Management",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Topic :: Database",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Multimedia :: Graphics :: 3D Modeling",
-    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
     "Operating System :: OS Independent",
     "Natural Language :: English"
 ]
