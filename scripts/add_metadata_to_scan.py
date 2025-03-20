@@ -14,7 +14,7 @@ Key Features:
 """
 
 from plantdb.commons.fsdb import FSDB
-from plantdb.commons.fsdb_tools import add_metadata_to_scan
+from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
 
 #path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E1"
 #path = "/data/ROMI/Romi_Alexis/analyse/Arabidopsis/ahp6_E2"
