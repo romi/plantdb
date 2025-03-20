@@ -6,9 +6,9 @@ import unittest
 from plantdb.commons.fsdb import FSDB
 from plantdb.commons.fsdb import File
 from plantdb.commons.fsdb import Fileset
-from plantdb.commons.fsdb import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb import Scan
-from plantdb.commons.fsdb import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.testing import DummyDBTestCase
 
 
