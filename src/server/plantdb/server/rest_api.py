@@ -51,8 +51,8 @@ from flask import send_from_directory
 from flask_restful import Resource
 
 from plantdb.server import webcache
-from plantdb.commons.fsdb import FilesetNotFoundError
-from plantdb.commons.fsdb import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import is_radians
