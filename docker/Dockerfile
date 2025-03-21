@@ -56,7 +56,9 @@ COPY --chown=${USER_NAME} ./ ./plantdb/
 
 RUN cd plantdb/ && \
     # Install `plantdb` dependencies and sources:
-    python3 -m pip install --no-cache-dir . && \
+    python3 -m pip install --no-cache-dir src/commons/.[io] && \
+    python3 -m pip install --no-cache-dir src/server/. && \
+    python3 -m pip install --no-cache-dir src/client/. && \
     # Clean pip cache:
     python3 -m pip cache purge
 
