@@ -29,7 +29,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
 Examples
 --------
->>> from plantdb.test_database import setup_test_database
+>>> from plantdb.commons.test_database import setup_test_database
 >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
 >>> db_path = setup_test_database('real_plant')
 INFO     [plantdb.test_database] File 'real_plant.zip' exists locally. Skipping download.
@@ -130,7 +130,7 @@ def _mkdtemp_romidb() -> Path:
 
     Examples
     --------
-    >>> from plantdb.test_database import _mkdtemp_romidb
+    >>> from plantdb.commons.test_database import _mkdtemp_romidb
     >>> _mkdtemp_romidb()
     PosixPath('/tmp/ROMI_DB_********')
     """
@@ -151,8 +151,8 @@ def _save_file_from_url(url) -> Path:
 
     Examples
     --------
-    >>> from plantdb.test_database import ZIP_URLS
-    >>> from plantdb.test_database import _save_file_from_url
+    >>> from plantdb.commons.test_database import ZIP_URLS
+    >>> from plantdb.commons.test_database import _save_file_from_url
     >>> zip_fname = _save_file_from_url(ZIP_URLS['real_plant'])
     >>> zip_fname
     PosixPath('/tmp/real_plant.zip')
@@ -197,9 +197,9 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
 
     Examples
     --------
-    >>> from plantdb.test_database import ZIP_URLS, ZIP_MD5S
-    >>> from plantdb.test_database import _test_hash
-    >>> from plantdb.test_database import _save_file_from_url
+    >>> from plantdb.commons.test_database import ZIP_URLS, ZIP_MD5S
+    >>> from plantdb.commons.test_database import _test_hash
+    >>> from plantdb.commons.test_database import _save_file_from_url
     >>> zip_fname = _save_file_from_url(ZIP_URLS['real_plant'])
     >>> _test_hash(zip_fname, ZIP_MD5S['real_plant'], "md5")
     """
@@ -286,7 +286,7 @@ def get_test_dataset(dataset, out_path=TEST_DIR, keep_tmp=False, force=False):
 
     Examples
     --------
-    >>> from plantdb.test_database import get_test_dataset
+    >>> from plantdb.commons.test_database import get_test_dataset
     >>> get_test_dataset()  # download and extract the test dataset to `plantdb/tests/testdata` directory
     """
     ds_path = out_path / dataset
@@ -316,7 +316,7 @@ def get_models_dataset(out_path=TEST_DIR, keep_tmp=False, force=False):
 
     Examples
     --------
-    >>> from plantdb.test_database import get_models_dataset
+    >>> from plantdb.commons.test_database import get_models_dataset
     >>> get_models_dataset()  # download and extract the trained CNN models to `plantdb/tests/testdata` directory
     """
     ds_path = out_path / "models"
@@ -346,7 +346,7 @@ def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
 
     Examples
     --------
-    >>> from plantdb.test_database import get_configs
+    >>> from plantdb.commons.test_database import get_configs
     >>> get_configs()  # download and extract the pipeline configurations to `plantdb/tests/testdata` directory
     """
     ds_path = out_path / "configs"
@@ -375,15 +375,15 @@ def setup_empty_database(out_path=None):
 
     Examples
     --------
-    >>> from plantdb.test_database import setup_empty_database
+    >>> from plantdb.commons.test_database import setup_empty_database
     >>> path = setup_empty_database()
     >>> print(path)  # initialize a `ROMI_DB` directory in the temporary directory by default
     /tmp/ROMI_DB_********
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     """
-    from plantdb.commons.fsdb import MARKER_FILE_NAME
-    from plantdb.commons.fsdb import LOCK_FILE_NAME
+    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+    from plantdb.commons.fsdb.core import LOCK_FILE_NAME
 
     if isinstance(out_path, str):
         out_path = Path(out_path)
@@ -444,7 +444,7 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
 
     Examples
     --------
-    >>> from plantdb.test_database import setup_test_database
+    >>> from plantdb.commons.test_database import setup_test_database
     >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
     >>> setup_test_database('real_plant')
     PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
@@ -505,7 +505,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database()
     >>> db.connect()
     >>> db.list_scans()

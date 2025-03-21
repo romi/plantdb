@@ -73,7 +73,7 @@ class SSHFSDB(fsdb.FSDB):
         Examples
         --------
         >>> # EXAMPLE 1: Use a temporary dummy database:
-        >>> from plantdb import SSHFSDB
+        >>> from plantdb.commons.sshfsdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.basedir)
         db
@@ -102,7 +102,7 @@ class SSHFSDB(fsdb.FSDB):
 
         Examples
         --------
-        >>> from plantdb import SSHFSDB
+        >>> from plantdb.commons.sshfsdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.is_connected)
         False
@@ -126,7 +126,7 @@ class SSHFSDB(fsdb.FSDB):
 
         Examples
         --------
-        >>> from plantdb import SSHFSDB
+        >>> from plantdb.commons.sshfsdb import SSHFSDB
         >>> db = SSHFSDB("db", "someone@example.com:/data")
         >>> print(db.is_connected)
         False

@@ -10,7 +10,7 @@ from shutil import copy
 from tqdm import tqdm
 
 from plantdb.commons.fsdb import FSDB
-from plantdb.commons.fsdb import _scan_json_file
+from plantdb.commons.fsdb.path_helpers import _scan_json_file
 from plantdb.commons.log import LOG_LEVELS
 
 from plantdb.commons.log import get_logger

@@ -48,11 +48,12 @@ def read_image_from_file(filename):
     Examples
     --------
     >>> from plantdb.commons.utils import read_image_from_file
-    >>> from plantdb.webcache import image_path
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant')
     >>> db.connect()
-    >>> img_path = image_path(db, 'real_plant', 'images', '00000_rgb', 'orig')
+    >>> scan = db.get_scan('real_plant')
+    >>> fileset = scan.get_fileset('images')
+    >>> img_path = fileset.get_file('00000_rgb').path()
     >>> image = read_image_from_file(img_path)
     >>> print(image.size)
     (1440, 1080)
@@ -86,7 +87,7 @@ def locate_task_filesets(scan, tasks):
     --------
     >>> from plantdb.commons.utils import locate_task_filesets
     >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.test_database import test_database
+    >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
@@ -166,7 +167,7 @@ def fsdb_file_from_local_file(path):
     from plantdb.commons.fsdb import Scan
     from plantdb.commons.fsdb import Fileset
     from plantdb.commons.fsdb import File
-    from plantdb.commons.fsdb import MARKER_FILE_NAME
+    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem

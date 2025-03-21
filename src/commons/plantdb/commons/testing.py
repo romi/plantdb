@@ -69,7 +69,7 @@ class DummyDBTestCase(unittest.TestCase):
     ----------
     db : plantdb.commons.fsdb.FSDB
         The temporary directory.
-    tmpclone : plantdb.testing.TemporaryCloneDB
+    tmpclone : plantdb.commons.testing.TemporaryCloneDB
         A local temporary copy of a dummy test database.
     """
 

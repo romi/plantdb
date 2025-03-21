@@ -289,7 +289,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Examples
     --------
-    >>> from plantdb.webcache import image_path
+    >>> from plantdb.server.webcache import image_path
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -468,7 +468,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Examples
     --------
-    >>> from plantdb.webcache import pointcloud_path
+    >>> from plantdb.server.webcache import pointcloud_path
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -521,7 +521,7 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
 
     Examples
     --------
-    >>> from plantdb.webcache import mesh_path
+    >>> from plantdb.server.webcache import mesh_path
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
