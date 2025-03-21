@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.commons"
-version = "0.14.3"
+version = "0.14.4"
 dependencies = [
     "appdirs",
     "colorlog",
@@ -54,12 +54,12 @@ Repository = "https://github.com/romi/plantdb"
 Issues = "https://github.com/romi/plantdb/issues"
 
 [project.scripts]
-fsdb_check = "plantdb.server.cli.fsdb_check:main"
-fsdb_import_file = "plantdb.server.cli.fsdb_import_file:main"
-fsdb_import_folder = "plantdb.server.cli.fsdb_import_folder:main"
-fsdb_import_images = "plantdb.server.cli.fsdb_import_images:main"
-fsdb_sync = "plantdb.server.cli.fsdb_sync:main"
-shared_fsdb = "plantdb.server.cli.shared_fsdb:main"
+fsdb_check = "plantdb.commons.cli.fsdb_check:main"
+fsdb_import_file = "plantdb.commons.cli.fsdb_import_file:main"
+fsdb_import_folder = "plantdb.commons.cli.fsdb_import_folder:main"
+fsdb_import_images = "plantdb.commons.cli.fsdb_import_images:main"
+fsdb_sync = "plantdb.commons.cli.fsdb_sync:main"
+shared_fsdb = "plantdb.commons.cli.shared_fsdb:main"
 
 [project.optional-dependencies]
 doc = [
