@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.server"
-version = "0.14.2"
+version = "0.14.3"
 dependencies = [
     "plantdb",
     "bcrypt",
@@ -14,20 +14,10 @@ dependencies = [
     "requests",
     "toml",
 ]
-description = """
-Server-side component of the ROMI (Robotics for Microfarms) plant database system.
-
-Provides a robust REST API server implementation for managing plant phenotyping data,
-with features including:
-- File system database management
-- Data synchronization services
-- Command-line tools for database management
-
-Built for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
-"""
+description = "Server-side component of the ROMI (Robotics for Microfarms) plant database system."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { name = "GPL-3.0-or-later", file = "LICENSE" }
+license = "GPL-3.0-or-later"
 authors = [
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
@@ -49,7 +39,6 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
     "Topic :: Database",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
     "Topic :: Software Development :: Libraries :: Python Modules",
