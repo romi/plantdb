@@ -17,9 +17,9 @@ Features include:
 
 ## Overview
 
-PlantDB is a library designed for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
+PlantDB is a library designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
 
-It has three components:
+It consists of three components:
 
 1. `plantdb.commons`: provides a **Python API** for interacting with plant data
 2. `plantdb.server`: provides the _server-side_ REST API to interact with plant data
