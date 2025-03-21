@@ -1,19 +1,61 @@
 # PlantDB
 
-[![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/version.svg)](https://anaconda.org/romi-eu/plantdb)
-[![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/platforms.svg)](https://anaconda.org/romi-eu/plantdb)
-[![Anaconda-Server Badge](https://anaconda.org/romi-eu/plantdb/badges/license.svg)](https://anaconda.org/romi-eu/plantdb)
+[![Licence](https://img.shields.io/badge/license-LGPL3-black)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/plantdb.commons?logo=python&logoColor=white)](https://pypi.org/project/plantdb.commons/)
+
+| Package         | PyPI                                                                                                                                     | Conda                                                                                                                                                                                                     |
+|-----------------|------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| plantdb.commons | [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.commons?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.commons/) | [![Conda - Version](https://img.shields.io/conda/vn/mosaic/plantdb.commons?logo=anaconda&logoColor=white&label=romi-eu%2Fplantdb.commons&color=%2344A833)](https://anaconda.org/romi-eu/plantdb.commons)  |
+| plantdb.server  | [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.server?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.server/)    | [![Conda - Version](https://img.shields.io/conda/vn/mosaic/plantdb.server?logo=anaconda&logoColor=white&label=romi-eu%2Fplantdb.server&color=%2344A833)](https://anaconda.org/romi-eu/plantdb.server)     |
+| plantdb.client  | [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.client?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.client/)    | [![Conda - Version](https://img.shields.io/conda/vn/mosaic/plantdb.client?logo=anaconda&logoColor=white&label=romi-eu%2Fplantdb.client&color=%2344A833)](https://anaconda.org/romi-eu/plantdb.client)     |
 
 ## Overview
 
-PlantDB is a library designed to:
+PlantDB is a library designed for plant and agricultural research facilities and robotics labs requiring lightweight plant data management infrastructure.
 
-1. Provide a **Python API** for interacting with plant data, supporting the `plant-3d-vision` library
-2. Operate as a background **REST API** that serves JSON information from the database, supporting the `plant-3d-explorer` library
+It has three components:
+
+1. `plantdb.commons`: provides a **Python API** for interacting with plant data
+2. `plantdb.server`: provides the _server-side_ REST API to interact with plant data
+3. `plantdb.client`: provides the _client-side_ REST API to interact with plant data
 
 For comprehensive documentation of the _PlantImager_ project, visit: [https://docs.romi-project.eu/plant_imager/](https://docs.romi-project.eu/plant_imager/)
 
 API documentation for the `plantdb` library is available at: [https://romi.github.io/plantdb/](https://romi.github.io/plantdb/)
+
+### `plantdb.commons`
+Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+
+This package provides common utilities and base functionality used by both server and client components.
+
+Features include:
+- Data management
+- Common data models and schemas
+- File system operations and validation
+- Logging and debugging tools
+- Data format specifications and validators
+
+### `plantdb.server`
+Server-side component of the ROMI (Robotics for Microfarms) plant database system.
+
+Provides a robust REST API server implementation for managing plant phenotyping data.
+
+Features include:
+- File system database management
+- Data synchronization services
+- Command-line tools for database management
+
+### `plantdb.client`
+Client-side database library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+
+This package provides a Python interface for interacting with ROMI's plant database system,
+enabling efficient storage, retrieval, and management of plant-related data.
+
+Features include:
+- REST API integration
+- Data validation
+- Streamlined access to plant phenotyping data.
+
 
 ## Environment Setup
 
