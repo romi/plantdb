@@ -1,6 +1,6 @@
 # This workflow will build the Docker image, run python unit tests & clean-up
 
-name: CI
+name: CI UnitTests
 
 on: pull_request
 
