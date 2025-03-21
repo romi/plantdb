@@ -190,7 +190,7 @@ import os
 
 db_path = os.environ['ROMI_DB']
 # Use it to connect to DB:
-from plantdb import FSDB
+from plantdb.commons.fsdb import FSDB
 
 db = FSDB(db_path)
 db.connect()
