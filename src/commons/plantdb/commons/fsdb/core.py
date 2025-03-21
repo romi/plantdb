@@ -611,7 +611,9 @@ class FSDB(db.DB):
         """
         if self.dummy:
             logger.info(f"Cleaning up the temporary dummy database at '{self.basedir}'...")
-            shutil.rmtree(self.basedir)
+            # Check if directory exists before deleting it
+            if os.path.exists(self.basedir):
+                shutil.rmtree(self.basedir)
             self.scans = {}
             self.is_connected = False
             return
