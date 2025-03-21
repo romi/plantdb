@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "plantdb.server"
 version = "0.14.4"
 dependencies = [
-    "plantdb",
+    "plantdb.commons",
     "bcrypt",
     "flask",
     "flask-cors",
