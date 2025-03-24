@@ -258,12 +258,47 @@ conda install -n base conda-build anaconda-client
 
 #### Build a conda package
 
-To build the `romitask` conda package, from the root directory of the repository and the `base` conda environment, run:
+To build the `plantdb` conda packages, from the root directory of the repository and the `base` conda environment, run:
 
+1. Build the packages locally without uploading
+    ```shell
+    for pkg in commons server client; do
+      echo "Building plantdb-$pkg package..."
+      export PLANTDB_SUBPACKAGE=$pkg
+      conda build conda/recipe/ --no-anaconda-upload
+    done
+    ```
+
+2. Test installing the built packages
+    After building, conda will show the path to the built package. You can install it to verify it works:
+    ```shell
+    # Create a test environment
+    conda create -n plantdb_test python=3.10 -y
+    conda activate plantdb_test
+    
+    # Install the locally built package
+    # Replace with actual path from conda build output
+    conda install --use-local plantdb-commons
+    conda install --use-local plantdb-server
+    conda install --use-local plantdb-client
+    
+    # Test importing the packages
+    python -c "import plantdb.commons; print('Successfully imported plantdb.commons')"
+    python -c "import plantdb.server; print('Successfully imported plantdb.server')"
+    python -c "import plantdb.client; print('Successfully imported plantdb.client')"
+    
+    # Clean up
+    conda deactivate
+    conda env remove -n plantdb_test
+    ```
+
+**Note:**
+If you encounter issues, you can use the --debug flag for more verbose output when building the package.
 ```shell
-conda build conda/recipe/ -c conda-forge --user romi-eu
+conda build conda/recipe/commons --debug --no-anaconda-upload
 ```
 
+#### Render the recipe
 If you are struggling with some of the modifications you made to the recipe,
 notably when using environment variables or Jinja2 stuffs, you can always render the recipe with:
 

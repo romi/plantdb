@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools >=75"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -19,7 +19,7 @@ dependencies = [
 description = "Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem."
 readme = "README.md"
 requires-python = ">=3.8"
-license = "GPL-3.0-or-later"
+license = { 'text' = "LGPL-3.0-or-later" }   # to replace by "LGPL-3.0-or-later" only in next release, pending deprecation
 authors = [
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
     { name = "Timothée Wintz", email = "timothee@timwin.fr" },
@@ -48,10 +48,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://romi-project.eu/"
-Documentation = "https://docs.romi-project.eu/plant_imager/"
-Repository = "https://github.com/romi/plantdb"
-Issues = "https://github.com/romi/plantdb/issues"
+homepage = "https://romi-project.eu/"
+documentation = "https://docs.romi-project.eu/plant_imager/"
+source = "https://github.com/romi/plantdb"
+issues = "https://github.com/romi/plantdb/issues"
 
 [project.scripts]
 fsdb_check = "plantdb.commons.cli.fsdb_check:main"
