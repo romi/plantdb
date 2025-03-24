@@ -1,4 +1,4 @@
-# This workflow will build the Docker image and publish it to Docker Hub in the 'roboticsmicrofarms' repo.
+# GitHub workflow that build the Docker image and publish it to Docker Hub in the 'roboticsmicrofarms' repo.
 
 # Github context:
 #   https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
@@ -9,7 +9,7 @@
 # -- Build & push job configuration here:
 #  https://github.com/marketplace/actions/build-and-push-docker-images
 
-name: Docker image
+name: Build & Publish Docker image
 
 on:
   # Automatic trigger on release
@@ -20,59 +20,66 @@ on:
 
 jobs:
   docker:
-    name: Build & Push Docker image to Docker Hub
+    name: Build & Push Docker image to Docker Hub  # Descriptive name of the job
     runs-on: ubuntu-latest
-    environment: docker-hub
+    environment: docker-hub  # Sets the required deployment environment (for secrets)
     steps:
-
+      # Step 1: Get the repository code
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Step 2: Set up Docker Buildx for multi-platform builds and build caching
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 3: Extract metadata to generate Docker tags and labels
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
+        id: meta  # Set ID to reference this step's outputs later
         uses: docker/metadata-action@v4
         with:
-          images: roboticsmicrofarms/plantdb
-          tags: type=sha,format=short,prefix=
+          images: roboticsmicrofarms/plantdb  # Target Docker image name
+          tags: type=sha,format=short,prefix=  # Create tags from git SHA (short format)
 
+      # Step 4: Build the Docker image and save to local tar file
       - name: Build and Cache docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: docker/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          outputs: type=docker,dest=/tmp/myimage.tar
+          context: .  # Build context is repository root
+          file: docker/Dockerfile  # Path to Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}  # Use tags from metadata step
+          outputs: type=docker,dest=/tmp/myimage.tar  # Save as tar for later use
 
+      # Step 5: Save the built image as a workflow artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: myimage
           path: /tmp/myimage.tar
-          retention-days: 2
-          overwrite: true
+          retention-days: 2  # Artifact will be kept for 2 days
+          overwrite: true  # Replace existing artifacts with same name
 
+      # Step 6: Test the built image with a simple command
       - name: Test image
         run: |
-          docker load --input /tmp/myimage.tar
-          docker image ls -a
+          docker load --input /tmp/myimage.tar  # Load image from tar file
+          docker image ls -a  # List all images for debugging
           docker run --rm ${{ steps.meta.outputs.tags }} \
-            /bin/bash -c 'shared_fsdb $ROMI_DB -d all'
+            /bin/bash -c 'shared_fsdb $ROMI_DB -d all'  # Run test command
 
+      # Step 7: Authenticate with Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  # Use stored credentials
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Step 8: Push the image to Docker Hub with both SHA tag and "latest" tag
       - name: Push as latest
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: true  # Actually push to registry
           file: docker/Dockerfile
           tags: |
-            ${{ steps.meta.outputs.tags }}
-            roboticsmicrofarms/plantdb:latest
+            ${{ steps.meta.outputs.tags }}  # Push with SHA tag
+            roboticsmicrofarms/plantdb:latest  # Also tag as latest
