@@ -24,7 +24,10 @@ jobs:
       # Step 3: Install the package with documentation dependencies
       - name: Install core library & documentation requirements
         # Use .[doc] syntax for extras
-        run: python3 -m pip install src/commons/.[doc]
+        run: |
+          python3 -m pip install src/commons/.[doc]
+          python3 -m pip install src/server/.
+          python3 -m pip install src/client/.
 
       # Step 4:  Generate static site from markdown docs
       - name: Build documentation with mkdocs
