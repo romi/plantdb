@@ -4,7 +4,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.commons?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.commons/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/plantdb.commons?logo=python&logoColor=white)](https://pypi.org/project/plantdb.commons/)
 
-Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+Core shared library for the ROMI plant database ecosystem.
 
 This package provides common utilities and base functionality used by both server and client components.
 
@@ -17,7 +17,8 @@ Features include:
 
 ## Overview
 
-PlantDB is a library designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
+PlantDB is a library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+It is designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
 
 It consists of three components:
 

@@ -4,7 +4,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.client?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.client/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/plantdb.client?logo=python&logoColor=white)](https://pypi.org/project/plantdb.client/)
 
-Client-side database library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+Client-side database library for the ROMI plant database ecosystem.
 
 This package provides a Python interface for interacting with ROMI's plant database system,
 enabling efficient storage, retrieval, and management of plant-related data.
@@ -16,7 +16,8 @@ Features include:
 
 ## Overview
 
-PlantDB is a library designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
+PlantDB is a library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+It is designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
 
 It consists of three components:
 

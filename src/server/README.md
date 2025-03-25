@@ -4,7 +4,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.server?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.server/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/plantdb.server?logo=python&logoColor=white)](https://pypi.org/project/plantdb.server/)
 
-Server-side component of the ROMI (Robotics for Microfarms) plant database system.
+Server-side component of the ROMI plant database system.
 
 Provides a robust REST API server implementation for managing plant phenotyping data.
 
@@ -15,7 +15,8 @@ Features include:
 
 ## Overview
 
-PlantDB is a library designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
+PlantDB is a library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+It is designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
 
 It consists of three components:
 
