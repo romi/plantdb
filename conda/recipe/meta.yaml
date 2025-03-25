@@ -35,9 +35,9 @@ requirements:
   run:
     - python  {{ project.get('requires-python') }}  # Runtime Python dependency (using minimum version)
     {% for dep in deps %}
-    {% if not dep.startswith('open3d') %}  # Skip open3d dependencies
+    {% if not dep.startswith('open3d') %}  # Skip 'open3d' dependency (not available on anaconda.org)
     {% if dep.startswith('plantdb.') %}
-    - {{ dep.replace('.', '-') }}  # Convert 'plantdb.commons' to 'plantdb-commons'
+    - {{ dep.replace('.', '-') }}  # Convert 'plantdb.xxx' to 'plantdb-xxx'
     {% else %}
     - {{ dep }}  # Add all other dependencies
     {% endif %}
@@ -49,7 +49,7 @@ test:
     - plantdb.{{ subpackage }}  # Basic import test
 
 about:
-  home: {{ urls.get('Homepage', '') }}  # Project homepage
-  license: LGPL-3.0-or-later  # License type
+  home: {{ urls.get('homepage', '') }}  # Project homepage
   summary: {{ project.get('description', '') }}  # Package description
-  dev_url: {{ urls.get('Repository', '') }}  # Repository URL
+  dev_url: {{ urls.get('source', '') }}  # Repository URL
+  license: LGPL-3.0-or-later  # License type
