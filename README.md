@@ -9,6 +9,8 @@
 | plantdb.server  | [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.server?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.server/)    | [![Conda - Version](https://img.shields.io/conda/vn/mosaic/plantdb.server?logo=anaconda&logoColor=white&label=romi-eu%2Fplantdb.server&color=%2344A833)](https://anaconda.org/romi-eu/plantdb.server)     |
 | plantdb.client  | [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.client?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.client/)    | [![Conda - Version](https://img.shields.io/conda/vn/mosaic/plantdb.client?logo=anaconda&logoColor=white&label=romi-eu%2Fplantdb.client&color=%2344A833)](https://anaconda.org/romi-eu/plantdb.client)     |
 
+![ROMI_ICON2_greenB.png](assets/images/ROMI_ICON2_greenB.png)
+
 ## Overview
 
 PlantDB is a library for the ROMI (Robotics for Microfarms) plant database ecosystem.
