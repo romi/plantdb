@@ -45,4 +45,4 @@ jobs:
           # Build package from recipe directory and upload to Anaconda.org
           # Uses conda-forge channel for dependencies
           # Specifies the user account and uses the token stored in GitHub secrets
-          conda build conda/recipe/${{ matrix.package }} -c conda-forge --user romi-eu --token ${{ secrets.ANACONDA_TOKEN }}
+          conda build conda/recipe/meta.yaml -c conda-forge --user romi-eu --token ${{ secrets.ANACONDA_TOKEN }}
