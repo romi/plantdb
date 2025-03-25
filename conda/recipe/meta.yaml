@@ -36,6 +36,9 @@ requirements:
     - python  {{ project.get('requires-python') }}  # Runtime Python dependency (using minimum version)
     {% for dep in deps %}
     {% if not dep.startswith('open3d') %}  # Skip open3d dependencies
+    {% if dep.startswith('plantdb.') %}
+    - {{ dep.replace('.', '-') }}  # Convert 'plantdb.commons' to 'plantdb-commons'
+    {% else %}
     - {{ dep }}  # Add all other dependencies
     {% endif %}
     {% endfor %}
