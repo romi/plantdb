@@ -41,6 +41,7 @@ requirements:
     {% else %}
     - {{ dep }}  # Add all other dependencies
     {% endif %}
+    {% endif %}
     {% endfor %}
 
 test:
