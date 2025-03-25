@@ -131,7 +131,7 @@ class Scan(object):
 
     Attributes
     ----------
-    db : plantdb.db.DB
+    db : plantdb.commons.db.DB
         Database instance where to find the scan.
     id : int
         Id of the scan instance.
@@ -142,7 +142,7 @@ class Scan(object):
 
         Parameters
         ----------
-        db : plantdb.db.DB
+        db : plantdb.commons.db.DB
             Database instance where to find the scan.
         id : str
             Id of the scan instance.
@@ -165,7 +165,7 @@ class Scan(object):
 
         Returns
         -------
-        plantdb.db.DB
+        plantdb.commons.db.DB
             Database instance where to find the scan.
         """
         return self.db
@@ -272,9 +272,9 @@ class Fileset(object):
 
     Attributes
     ----------
-    db : plantdb.db.DB
+    db : plantdb.commons.db.DB
         Database instance where to find the scan and fileset.
-    scan : plantdb.db.Scan
+    scan : plantdb.commons.db.Scan
         Scan instance containing the fileset.
     id : int
         Id of the fileset instance.
@@ -285,7 +285,7 @@ class Fileset(object):
 
         Parameters
         ----------
-        scan : plantdb.db.Scan
+        scan : plantdb.commons.db.Scan
             Scan instance containing the fileset.
         id : str
             Id of the fileset instance.
@@ -309,7 +309,7 @@ class Fileset(object):
 
         Returns
         -------
-        plantdb.db.DB
+        plantdb.commons.db.DB
             The parent database instance.
         """
         return self.db
@@ -319,7 +319,7 @@ class Fileset(object):
 
         Returns
         -------
-        plantdb.db.Scan
+        plantdb.commons.db.Scan
             The parent scan instance.
         """
         return self.scan
@@ -421,11 +421,11 @@ class File(object):
 
     Attributes
     ----------
-    db : plantdb.db.DB
+    db : plantdb.commons.db.DB
         Database instance where to find the scan, fileset and file.
-    scan : plantdb.db.Scan
+    scan : plantdb.commons.db.Scan
         Scan instance containing the fileset and file.
-    fileset : plantdb.db.Fileset
+    fileset : plantdb.commons.db.Fileset
         Fileset instance containing the file.
     id : str
         Id of the file instance.
@@ -436,7 +436,7 @@ class File(object):
 
         Parameters
         ----------
-        fileset : plantdb.db.Fileset
+        fileset : plantdb.commons.db.Fileset
             Instance containing the file.
         id : str
             Id of the file instance.
@@ -468,7 +468,7 @@ class File(object):
 
         Returns
         -------
-        plantdb.db.DB
+        plantdb.commons.db.DB
             The parent database instance.
         """
         return self.db
@@ -478,7 +478,7 @@ class File(object):
 
         Returns
         -------
-        plantdb.db.Scan
+        plantdb.commons.db.Scan
             The parent scan instance.
         """
         return self.scan
@@ -488,7 +488,7 @@ class File(object):
 
         Returns
         -------
-        plantdb.db.Fileset
+        plantdb.commons.db.Fileset
             The parent fileset instance.
         """
         return self.fileset

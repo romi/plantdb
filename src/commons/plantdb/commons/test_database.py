@@ -32,20 +32,20 @@ Examples
 >>> from plantdb.commons.test_database import setup_test_database
 >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
 >>> db_path = setup_test_database('real_plant')
-INFO     [plantdb.test_database] File 'real_plant.zip' exists locally. Skipping download.
-INFO     [plantdb.test_database] Verifying 'real_plant.zip' MD5 hash value...
-INFO     [plantdb.test_database] The test database is set up under '/home/jonathan/Projects/plantdb/tests/testdata'.
+INFO     [test_database] File 'real_plant.zip' exists locally. Skipping download.
+INFO     [test_database] Verifying 'real_plant.zip' MD5 hash value...
+INFO     [test_database] The test database is set up under '/home/jonathan/Projects/plantdb/tests/testdata'.
 >>> print(db_path)
 PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
 >>> # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':
 >>> db_path = setup_test_database(['real_plant', 'virtual_plant'], '/tmp/ROMI_DB', with_configs=True)
-INFO     [plantdb.test_database] File 'real_plant.zip' exists locally. Skipping download.
-INFO     [plantdb.test_database] Verifying 'real_plant.zip' MD5 hash value...
-INFO     [plantdb.test_database] File 'virtual_plant.zip' exists locally. Skipping download.
-INFO     [plantdb.test_database] Verifying 'virtual_plant.zip' MD5 hash value...
-INFO     [plantdb.test_database] File 'configs.zip' exists locally. Skipping download.
-INFO     [plantdb.test_database] Verifying 'configs.zip' MD5 hash value...
-INFO     [plantdb.test_database] The test database is set up under '/tmp/ROMI_DB'.
+INFO     [test_database] File 'real_plant.zip' exists locally. Skipping download.
+INFO     [test_database] Verifying 'real_plant.zip' MD5 hash value...
+INFO     [test_database] File 'virtual_plant.zip' exists locally. Skipping download.
+INFO     [test_database] Verifying 'virtual_plant.zip' MD5 hash value...
+INFO     [test_database] File 'configs.zip' exists locally. Skipping download.
+INFO     [test_database] Verifying 'configs.zip' MD5 hash value...
+INFO     [test_database] The test database is set up under '/tmp/ROMI_DB'.
 >>> print(db_path)
 PosixPath('/tmp/ROMI_DB')
 

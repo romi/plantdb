@@ -134,7 +134,7 @@ def get_path(f, db_prefix="/files/"):
 
     Parameters
     ----------
-    f : plantdb.FSDB.File
+    f : plantdb.commons.fsdb.File
         The file to get the path for.
     db_prefix : str, optional
         A prefix to use... ???
@@ -1629,7 +1629,7 @@ class Image(Resource):
         See Also
         --------
         plantdb.server.rest_api.sanitize_name : Input sanitization & validation function.
-        plantdb.webcache.image_path : Image path resolution function with caching and resizing options.
+        plantdb.server.webcache.image_path : Image path resolution function with caching and resizing options.
 
         Examples
         --------
@@ -1729,7 +1729,7 @@ class PointCloud(Resource):
         See Also
         --------
         plantdb.server.rest_api.sanitize_name : Input sanitization & validation function.
-        plantdb.webcache.pointcloud_path : Point cloud path resolution function with caching and downsampling options.
+        plantdb.server.webcache.pointcloud_path : Point cloud path resolution function with caching and downsampling options.
 
         Examples
         --------
@@ -1932,7 +1932,7 @@ class Mesh(Resource):
         See Also
         --------
         plantdb.server.rest_api.sanitize_name : Function used to validate input parameters
-        plantdb.webcache.mesh_path : Function to retrieve mesh file path
+        plantdb.server.webcache.mesh_path : Function to retrieve mesh file path
 
         Examples
         --------

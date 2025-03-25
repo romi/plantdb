@@ -98,7 +98,7 @@ class DummyDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.FSDB
+        plantdb.commons.FSDB
             The database to test.
         """
         if db_path is not None:
@@ -112,7 +112,7 @@ class DummyDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.Scan
+        plantdb.commons.Scan
             The default scan instance to test.
         """
         db = self.get_test_db()
@@ -124,7 +124,7 @@ class DummyDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.Scan
+        plantdb.commons.Scan
             The default fileset instance to test.
         """
         scan = self.get_test_scan()
@@ -136,7 +136,7 @@ class DummyDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.File
+        plantdb.commons.File
             The default image file instance to test.
         """
         fileset = self.get_test_fileset()
@@ -188,7 +188,7 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.Scan
+        plantdb.commons.Scan
             The default fileset instance to test.
         """
         scan = self.get_test_scan()

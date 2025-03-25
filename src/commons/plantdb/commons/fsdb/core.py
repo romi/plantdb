@@ -268,7 +268,7 @@ class FSDB(db.DB):
 
     See Also
     --------
-    plantdb.db.DB
+    plantdb.commons.db.DB
     plantdb.commons.fsdb.core.MARKER_FILE_NAME
     plantdb.commons.fsdb.core.LOCK_FILE_NAME
 
@@ -437,7 +437,7 @@ class FSDB(db.DB):
 
         Raises
         ------
-        plantdb.db.DBBusyError
+        plantdb.commons.db.DBBusyError
             If the database is already used by another process.
             This is achieved by searching for a `LOCK_FILE_NAME` lock file in the `basedir`.
 
@@ -940,7 +940,7 @@ class Scan(db.Scan):
 
     See Also
     --------
-    plantdb.db.Scan
+    plantdb.commons.db.Scan
 
     Examples
     --------
@@ -1362,7 +1362,7 @@ class Fileset(db.Fileset):
 
     See Also
     --------
-    plantdb.db.Fileset
+    plantdb.commons.db.Fileset
     """
 
     def __init__(self, scan, fs_id):
@@ -1719,7 +1719,7 @@ class File(db.File):
 
     See Also
     --------
-    plantdb.db.File
+    plantdb.commons.db.File
 
     Notes
     -----

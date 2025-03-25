@@ -18,7 +18,7 @@ Usage Examples
 
 >>> # Start a test REST API server first:
 >>> # $ fsdb_rest_api --test
->>> from plantdb.plantdb_client import PlantDBClient
+>>> from plantdb.client.plantdb_client import PlantDBClient
 >>> from plantdb.client.rest_api import base_url
 >>> client = PlantDBClient(base_url())
 >>> # Create a new scan
@@ -71,7 +71,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> metadata = {'description': 'Test plant scan'}
@@ -111,7 +111,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Get all metadata
@@ -156,7 +156,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> new_metadata = {'description': 'Updated scan description'}
@@ -199,7 +199,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> response = client.list_scan_filesets('real_plant')
@@ -242,7 +242,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> metadata = {'description': 'This is a test fileset'}
@@ -287,7 +287,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Get all metadata
@@ -334,7 +334,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Update metadata
@@ -380,7 +380,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> response = client.list_fileset_files('real_plant', 'images')
@@ -431,7 +431,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> metadata = {'description': 'Test document', 'author': 'John Doe'}
@@ -498,7 +498,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Get all metadata
@@ -547,7 +547,7 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
-        >>> from plantdb.plantdb_client import PlantDBClient
+        >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Update metadata
