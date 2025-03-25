@@ -11,7 +11,8 @@
 
 ## Overview
 
-PlantDB is a library designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
+PlantDB is a library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+It is designed for plant and agricultural research facilities and robotics labs that require lightweight plant data management infrastructure.
 
 It consists of three components:
 
@@ -24,7 +25,7 @@ For comprehensive documentation of the _PlantImager_ project, visit: [https://do
 API documentation for the `plantdb` library is available at: [https://romi.github.io/plantdb/](https://romi.github.io/plantdb/)
 
 ### `plantdb.commons`
-Core shared library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+Core shared library for the ROMI plant database ecosystem.
 
 This package provides common utilities and base functionality used by both server and client components.
 
@@ -36,7 +37,7 @@ Features include:
 - Data format specifications and validators
 
 ### `plantdb.server`
-Server-side component of the ROMI (Robotics for Microfarms) plant database system.
+Server-side component of the ROMI plant database system.
 
 Provides a robust REST API server implementation for managing plant phenotyping data.
 
@@ -46,7 +47,7 @@ Features include:
 - Command-line tools for database management
 
 ### `plantdb.client`
-Client-side database library for the ROMI (Robotics for Microfarms) plant database ecosystem.
+Client-side database library for the ROMI plant database ecosystem.
 
 This package provides a Python interface for interacting with ROMI's plant database system,
 enabling efficient storage, retrieval, and management of plant-related data.
