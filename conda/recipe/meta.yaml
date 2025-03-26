@@ -36,11 +36,7 @@ requirements:
     - python  {{ project.get('requires-python') }}  # Runtime Python dependency (using minimum version)
     {% for dep in deps %}
     {% if not dep.startswith('open3d') %}  # Skip 'open3d' dependency (not available on anaconda.org)
-    {% if dep.startswith('plantdb.') %}
-    - {{ dep.replace('.', '-') }}  # Convert 'plantdb.xxx' to 'plantdb-xxx'
-    {% else %}
     - {{ dep }}  # Add all other dependencies
-    {% endif %}
     {% endif %}
     {% endfor %}
 
