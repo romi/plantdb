@@ -1,4 +1,4 @@
-# PlantDB.commons
+# [![ROMI_logo](../../docs/assets/images/ROMI_logo_green_25.svg)](https://romi-project.eu) / PlantDB.commons
 
 [![Licence](https://img.shields.io/github/license/romi/plantdb?color=lightgray)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
 [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fromi%2Fplantdb%2Frefs%2Fheads%2Fdev%2Fsrc%2Fcommons%2Fpyproject.toml&logo=python&logoColor=white)]()
