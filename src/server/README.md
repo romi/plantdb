@@ -1,8 +1,9 @@
-# PlantDB
+# PlantDB.server
 
-[![Licence](https://img.shields.io/badge/license-LGPL3-black)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+[![Licence](https://img.shields.io/github/license/romi/plantdb?color=lightgray)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+[![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fromi%2Fplantdb%2Frefs%2Fheads%2Fdev%2Fsrc%2Fcommons%2Fpyproject.toml&logo=python&logoColor=white)]()
+[![GitHub branch check runs](https://img.shields.io/github/check-runs/romi/plantdb/dev)](https://github.com/romi/plantdb)
 [![PyPI - Version](https://img.shields.io/pypi/v/plantdb.server?logo=pypi&logoColor=white)](https://pypi.org/project/plantdb.server/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/plantdb.server?logo=python&logoColor=white)](https://pypi.org/project/plantdb.server/)
 
 Server-side component of the ROMI plant database system.
 
