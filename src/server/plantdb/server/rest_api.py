@@ -3237,7 +3237,10 @@ class FileCreate(Resource):
             file = fileset.create_file(file_id)
             try:
                 # Write the file data with the specified extension
-                file.write(file_data.read().decode(), ext=ext[1:])
+                if ext in ['.jpg', '.png', '.tif']:
+                    file.write_raw(file_data.read(), ext=ext[1:])  # Binary mode
+                else:
+                    file.write(file_data.read().decode(), ext=ext[1:])  # Text mode
             except Exception as e:
                 fileset.delete_file(file_id)
                 self.logger.error(f'Error writing file: {str(e)}')

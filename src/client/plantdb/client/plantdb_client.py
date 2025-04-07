@@ -34,10 +34,35 @@ Usage Examples
 ... )
 """
 
-import json
-import os
+import mimetypes
 
 import requests
+
+
+def get_mime_type(extension):
+    """Determine the MIME type from a file extension.
+
+    Parameters
+    ----------
+    extension : str
+        File extension (with or without leading dot)
+
+    Returns
+    -------
+    str
+        The MIME type string or 'application/octet-stream' if not found
+    """
+    # Ensure the extension starts with a dot
+    if not extension.startswith('.'):
+        extension = f'.{extension}'
+
+    mime_type, _ = mimetypes.guess_type(f'file{extension}')
+
+    # Return a default for unknown types
+    if mime_type is None:
+        return 'application/octet-stream'
+
+    return mime_type
 
 
 class PlantDBClient:
@@ -397,13 +422,13 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def create_file(self, file_path, name, ext, scan_id, fileset_name, metadata=None):
+    def create_file(self, file_data, name, ext, scan_id, fileset_name, metadata=None):
         """Create a new file in a fileset and upload its data.
 
         Parameters
         ----------
-        file_path : str or Path
-            Path to the file to upload
+        file_data : str, pathlib.Path, or BytesIO
+            Path to the file to upload or BytesIO object containing file data
         name : str
             Name to give the file in the database
         ext : str
@@ -434,6 +459,7 @@ class PlantDBClient:
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
+        >>> # Example 1 - Existing YAML file path as string
         >>> metadata = {'description': 'Test document', 'author': 'John Doe'}
         >>> response = client.create_file(
         ...     'path/to/file.yaml',
@@ -443,15 +469,35 @@ class PlantDBClient:
         ...     fileset_name='images',
         ...     metadata=metadata
         ... )
+        >>> # Example 2 - RGB Image with BytesIO
+        >>> import numpy as np
+        >>> from PIL import Image
+        >>> from io import BytesIO
+        >>> # Generate random RGB data (values from 0-255)
+        >>> rgb_data = np.random.randint(0, 256, (200, 150, 3), dtype=np.uint8)
+        >>> # Create PIL Image from NumPy array
+        >>> img = Image.fromarray(rgb_data, 'RGB')
+        >>> # Save image to BytesIO object
+        >>> image_data = BytesIO()
+        >>> img.save(image_data, format='PNG')
+        >>> image_data.seek(0)  # Move to the beginning of the BytesIO object
+        >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
+        >>> response = client.create_file(image_data, name='random_image', ext='png', scan_id='real_plant', fileset_name='images', metadata=metadata)
         >>> print(response)
-        {'message': "File 'new_file.yaml' created and written successfully in fileset 'images'."}
+
         """
+        import os
+        import json
+        from io import BytesIO
+        from pathlib import Path
+
         url = f"{self.base_url}/api/file"
 
+        ext = ext.lstrip('.').lower()  # Remove leading dot if present
         # Prepare form data
         data = {
             'name': name,
-            'ext': ext.lstrip('.'),  # Remove leading dot if present
+            'ext': ext,
             'scan_id': scan_id,
             'fileset_name': fileset_name
         }
@@ -460,12 +506,25 @@ class PlantDBClient:
         if metadata:
             data['metadata'] = json.dumps(metadata)
 
-        # Prepare file data
-        with open(file_path, 'rb') as file_handle:
+        # Prepare file data based on the type of file_data
+        if isinstance(file_data, BytesIO):
+            # If it's already a BytesIO object, use it directly
+            filename = f"{name}.{ext}"
             files = {
-                'file': (os.path.basename(file_path), file_handle, 'application/octet-stream')
+                'file': (filename, file_data, get_mime_type(ext))
             }
             response = self.session.post(url, files=files, data=data)
+        else:
+            # Convert to Path object if it's a string
+            file_path = Path(file_data) if isinstance(file_data, str) else file_data
+
+            # Handle file from path
+            with open(file_path, 'rb') as file_handle:
+                filename = os.path.basename(str(file_path))
+                files = {
+                    'file': (filename, file_handle, 'application/octet-stream')
+                }
+                response = self.session.post(url, files=files, data=data)
 
         response.raise_for_status()
         return response.json()
