@@ -6313,7 +6313,7 @@ If <code>None</code>, the entire database is refreshed.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import refresh</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; refresh(&quot;arabidopsis000&quot;, host=&quot;127.0.0.1&quot;, port=&quot;5000&quot;)</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    res <span style="color: #666">=</span> requests<span style="color: #666">.</span>post(
+    res <span style="color: #666">=</span> requests<span style="color: #666">.</span>get(
         refresh_url(dataset_name, host<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;host&quot;</span>, <span style="color: #008000; font-weight: bold">None</span>), port<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;port&quot;</span>, <span style="color: #008000; font-weight: bold">None</span>)),
         timeout<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;timeout&quot;</span>, <span style="color: #666">5</span>)
     )
