@@ -47,3 +47,6 @@ homepage = "https://romi-project.eu/"
 documentation = "https://docs.romi-project.eu/plant_imager/"
 source = "https://github.com/romi/plantdb"
 issues = "https://github.com/romi/plantdb/issues"
+
+[project.scripts]
+fsdb_rest_api_sync = "plantdb.client.cli.fsdb_rest_api_sync:main"
