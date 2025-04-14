@@ -173,14 +173,18 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
     logger.info(f"Origin URL is '{origin_host}' on port '{origin_port}'.")
     logger.info(f"Target URL is '{target_host}' on port '{target_port}'.")
 
-    scan_list = list_scan_names(host=origin_host, port=origin_port)
+    origin_scan_list = list_scan_names(host=origin_host, port=origin_port)
+    target_scan_list = list_scan_names(host=target_host, port=target_port)
     if filter_pattern:
-        scan_list = filter_scan(scan_list, filter_pattern, logger)
-        logger.info(f"{len(scan_list)} scans match the filter pattern '{filter_pattern}'.")
+        origin_scan_list = filter_scan(origin_scan_list, filter_pattern, logger)
+        logger.info(f"{len(origin_scan_list)} scans match the filter pattern '{filter_pattern}'.")
     else:
-        logger.info(f"Found {len(scan_list)} scans in origin database.")
+        logger.info(f"Found {len(origin_scan_list)} scans in origin database.")
 
-    for scan_id in tqdm(scan_list, desc="Transfer", unit="scan"):
+    for scan_id in tqdm(origin_scan_list, desc="Transfer", unit="scan"):
+        if scan_id in target_scan_list:
+            logger.debug(f"Scan '{scan_id}' already exists in target database. Skipping...")
+            continue
         logger.debug(f"Transferring scan '{scan_id}'...")
         # Download from origin DB via REST API
         f_path, msg = download_scan_archive(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
