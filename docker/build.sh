@@ -1,21 +1,48 @@
 #!/bin/bash
-# - Defines colors and message types:
-RED="\033[0;31m"
-YELLOW="\033[0;33m"
-GREEN="\033[0;32m"
-NC="\033[0m" # No Color
-INFO="${GREEN}INFO${NC}    "
-WARNING="${YELLOW}WARNING${NC} "
-ERROR="${RED}ERROR${NC}   "
-bold() { echo -e "\e[1m$*\e[0m"; }
 
-# - Default variables
-# Image tag to use, 'latest' by default:
-vtag="latest"
-# String aggregating the docker build options to use:
-docker_opts=""
+# --------------------------------
+# Functions for colors and messages
+# --------------------------------
+setup_colors() {
+  RED="\033[0;31m"
+  GREEN="\033[0;32m"
+  YELLOW="\033[0;33m"
+  NC="\033[0m" # No Color
+  INFO="${GREEN}INFO${NC}    "
+  WARNING="${YELLOW}WARNING${NC} "
+  ERROR="${RED}$(bold ERROR)${NC}   "
+}
 
-usage() {
+bold() {
+  echo -e "\e[1m$*\e[0m"
+}
+
+log_info() {
+  echo -e "${INFO}$1"
+}
+
+log_warning() {
+  echo -e "${WARNING}$1"
+}
+
+log_error() {
+  echo -e "${ERROR}$1"
+}
+
+# --------------------------------
+# Functions for script initialization
+# --------------------------------
+initialize_variables() {
+  # Image tag to use, 'latest' by default:
+  vtag="latest"
+  # String aggregating the docker build options to use:
+  docker_opts=""
+}
+
+# --------------------------------
+# Usage information function
+# --------------------------------
+show_usage() {
   echo -e "$(bold USAGE):"
   echo "  ./docker/build.sh [OPTIONS]"
   echo ""
@@ -40,48 +67,78 @@ usage() {
     Output a usage message and exit."
 }
 
-while [ "$1" != "" ]; do
-  case $1 in
-  -t | --tag)
+
+# --------------------------------
+# Command line parsing function
+# --------------------------------
+parse_arguments() {
+  while [ "$1" != "" ]; do
+    case $1 in
+    -t | --tag)
+      shift
+      vtag=$1
+      ;;
+    --no-cache)
+      docker_opts="${docker_opts} --no-cache"
+      ;;
+    --pull)
+      docker_opts="${docker_opts} --pull"
+      ;;
+    --plain)
+      docker_opts="${docker_opts} --progress=plain"
+      ;;
+    -h | --help)
+      usage
+      exit
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+    esac
     shift
-    vtag=$1
-    ;;
-  --no-cache)
-    docker_opts="${docker_opts} --no-cache"
-    ;;
-  --pull)
-    docker_opts="${docker_opts} --pull"
-    ;;
-  --plain)
-    docker_opts="${docker_opts} --progress=plain"
-    ;;
-  -h | --help)
-    usage
-    exit
-    ;;
-  *)
-    usage
-    exit 1
-    ;;
-  esac
-  shift
-done
+  done
+}
 
-# Get the date to estimate docker image build time:
-start_time=$(date +%s)
-# Start the docker image build:
-docker build -t roboticsmicrofarms/plantdb:${vtag} ${docker_opts} \
-  -f docker/Dockerfile .
-# Get docker build status:
-docker_build_status=$?
-# Get elapsed time:
-elapsed_time=$(($(date +%s) - start_time))
+# --------------------------------
+# Docker build function
+# --------------------------------
+build_docker(){
+  log_info "Starting Docker build for roboticsmicrofarms/plantdb:${vtag}"
 
-# Print build time if successful (code 0), else print exit code
-if [ ${docker_build_status} == 0 ]; then
-  echo -e "\n${INFO}Docker build SUCCEEDED in ${elapsed_time}s!"
-else
-  echo -e "\n${ERROR}Docker build FAILED after ${elapsed_time}s with code ${docker_build_status}!"
-fi
-# Exit with docker build exit code:
-exit ${docker_build_status}
+  # Get the date to estimate docker image build time:
+  start_time=$(date +%s)
+
+  # Start the docker image build:
+  docker build -t roboticsmicrofarms/plantdb:${vtag} ${docker_opts} \
+    -f docker/Dockerfile .
+
+  # Get docker build status:
+  docker_build_status=$?
+
+  # Get elapsed time:
+  elapsed_time=$(($(date +%s) - start_time))
+
+  # Print build time if successful (code 0), else print exit code
+  if [ ${docker_build_status} == 0 ]; then
+    log_info "Docker build SUCCEEDED in ${elapsed_time}s!"
+  else
+    log_error "Docker build FAILED after ${elapsed_time}s with code ${docker_build_status}!"
+  fi
+
+  # Exit with docker build exit code:
+  exit ${docker_build_status}
+}
+
+# --------------------------------
+# Main script execution
+# --------------------------------
+main() {
+  setup_colors
+  initialize_variables
+  parse_arguments "$@"
+  build_docker
+}
+
+# Execute main function with all arguments
+main "$@"
