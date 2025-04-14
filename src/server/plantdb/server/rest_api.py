@@ -1176,7 +1176,7 @@ class Scan(Resource):
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
         return get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger)
 
-    @rate_limit(max_requests=5, window_seconds=60)
+    @rate_limit(max_requests=15, window_seconds=60)
     def post(self, scan_id):
         """Create a new scan dataset.
 
