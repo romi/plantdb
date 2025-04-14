@@ -57,7 +57,7 @@ For example:
     This will create an empty database that listens on port 5002.
 3. Finally, in the third terminal, run the sync script:
     ```shell
-    fsdb_rest_api_sync 127.0.0.1:5001 127.0.0.1:5002
+    fsdb_rest_api_sync 'http://127.0.0.1:5001' 'http://127.0.0.1:5002'
     ```
     This command transfers the data from the instance running on port 5001 to the instance running on port 5002.
 
@@ -66,6 +66,7 @@ For example:
 import argparse
 import re
 from pathlib import Path
+from requests.exceptions import HTTPError
 from urllib.parse import urlparse
 
 from tqdm import tqdm
@@ -179,7 +180,7 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
     else:
         logger.info(f"Found {len(scan_list)} scans in origin database.")
 
-    for scan_id in tqdm(scan_list, desc="Transfer:", unit="scan"):
+    for scan_id in tqdm(scan_list, desc="Transfer", unit="scan"):
         logger.debug(f"Transferring scan '{scan_id}'...")
         # Download from origin DB via REST API
         f_path, msg = download_scan_archive(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
@@ -190,7 +191,11 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
         # Delete the temporary file
         Path(f_path).unlink()
         # Refresh the scan in the target to load its infos:
-        msg = refresh(scan_id, host=target_host, port=target_port)
+        try:
+            msg = refresh(scan_id, host=target_host, port=target_port)
+        except HTTPError as e:
+            logger.error(f"Error refreshing target database for scan '{scan_id}': {e}")
+            continue
         logger.debug(msg)
 
     return
