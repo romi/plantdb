@@ -1028,7 +1028,7 @@ def refresh(dataset_name=None, **kwargs):
     >>> from plantdb.client.rest_api import refresh
     >>> refresh("arabidopsis000", host="127.0.0.1", port="5000")
     """
-    res = requests.post(
+    res = requests.get(
         refresh_url(dataset_name, host=kwargs.get("host", None), port=kwargs.get("port", None)),
         timeout=kwargs.get("timeout", 5)
     )
