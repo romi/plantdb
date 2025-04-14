@@ -168,19 +168,44 @@ setup_user_group() {
 }
 
 # --------------------------------
-# Port handling function
+# Check if netstat is available
+# --------------------------------
+check_netstat_installed() {
+  if ! command -v netstat &> /dev/null; then
+    log_warning "netstat command not found. This is required to find available ports."
+    log_info "To install netstat, run: sudo apt-get update && sudo apt-get install -y net-tools"
+    log_info "Continuing with default port selection..."
+    return 1
+  fi
+  return 0
+}
+
+# --------------------------------
+# Port finder function
 # --------------------------------
 find_available_port() {
   if [ ${port_specified} -eq 0 ]; then
     log_info "Finding available port in range 5000-5100..."
-    for p in $(seq 5000 5100); do
-      # Check if the port is available
-      if ! netstat -tuln | grep -q ":$p "; then
-        port=$p
-        log_info "Using available port: ${port}"
-        break
-      fi
-    done
+
+    # Check if netstat is installed first
+    check_netstat_installed
+    netstat_available=$?
+
+    if [ ${netstat_available} -eq 0 ]; then
+      for p in $(seq 5000 5100); do
+        # Check if the port is available
+        if ! netstat -tuln | grep -q ":$p "; then
+          port=$p
+          log_info "Using available port: ${port}"
+          break
+        fi
+      done
+    else
+      # If netstat isn't available, default to port 5000
+      port=5000
+      log_warning "Defaulting to port ${port} without availability check."
+    fi
+
     # If no port was found, default to 5000 but warn the user
     if [ -z "${port}" ]; then
       port=5000
