@@ -1500,7 +1500,43 @@ class Refresh(Resource):
         """
         self.db = db
 
-    @rate_limit(max_requests=1, window_seconds=60)  # maximum of 1 requests per minute
+    @rate_limit(max_requests=60, window_seconds=60)
+    def get_specific_scan(self, scan_id):
+        """Reload data for a specific scan in the database.
+
+        Parameters
+        ----------
+        scan_id : str
+            Identifier for the specific plant scan to reload
+
+        Returns
+        -------
+        dict, int
+            A dictionary with a success message and HTTP status code 200,
+            or an error message and status code 500
+        """
+        try:
+            self.db.reload(scan_id)
+            return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
+        except Exception as e:
+            return {'message': f"Error during scan reload: {str(e)}"}, 500
+
+    @rate_limit(max_requests=1, window_seconds=60)
+    def get_full_database(self):
+        """Reload the entire plant database.
+
+        Returns
+        -------
+        dict, int
+            A dictionary with a success message and HTTP status code 200,
+            or an error message and status code 500
+        """
+        try:
+            self.db.reload(None)
+            return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
+        except Exception as e:
+            return {'message': f"Error during full database reload: {str(e)}"}, 500
+
     def get(self):
         """Force the plant database to reload.
 
@@ -1554,12 +1590,12 @@ class Refresh(Resource):
         >>> response.status_code
         200
         """
-        try:
-            scan_id = request.args.get('scan_id', default=None, type=str)
-            self.db.reload(scan_id)
-            return {'message': f"Successfully reloaded {len(self.db.list_scans())} scans."}, 200
-        except Exception as e:
-            return {'message': f"Error during database reload: {str(e)}"}, 500
+        scan_id = request.args.get('scan_id', default=None, type=str)
+
+        if scan_id:
+            return self.get_specific_scan(scan_id)
+        else:
+            return self.get_full_database()
 
 
 class Image(Resource):
