@@ -29,7 +29,7 @@ Usage Examples
 >>> # Create a fileset for the scan
 >>> fileset_id = client.create_fileset(
 ...     scan_id=scan_id,
-...     name="RGB Images",
+...     fileset_id="RGB Images",
 ...     description="Top view RGB images"
 ... )
 """
@@ -164,7 +164,7 @@ class PlantDBClient:
         metadata : dict
             The metadata to update/set
         replace : bool, optional
-            If True, replaces entire metadata. If False (default),
+            If ``True``, replaces entire metadata. If ``False`` (default),
             updates only specified keys.
 
         Returns
@@ -241,15 +241,15 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def create_fileset(self, name, scan_id, metadata=None):
+    def create_fileset(self, fileset_id, scan_id, metadata=None):
         """Create a new fileset associated with a scan.
 
         Parameters
         ----------
-        name : str
-            Name of the fileset to create
+        fileset_id : str
+            The ID of the fileset to create
         scan_id : str
-            ID of the scan to associate the fileset with
+            The ID of the scan to associate the fileset with
         metadata : dict, optional
             Additional metadata for the fileset
 
@@ -277,24 +277,54 @@ class PlantDBClient:
         """
         url = f"{self.base_url}/api/fileset"
         data = {
-            'name': name,
+            'fileset_id': fileset_id,
             'scan_id': scan_id
         }
         if metadata:
             data['metadata'] = metadata
         response = self.session.post(url, json=data)
-        response.raise_for_status()
-        return response.json()
 
-    def get_fileset_metadata(self, scan_id, fileset_name, key=None):
+        # Handle HTTP errors with explicit messages
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            # Get the error message from the response if available
+            error_detail = ""
+            try:
+                error_data = response.json()
+                if 'message' in error_data:
+                    error_detail = f": {error_data['message']}"
+            except:
+                pass
+
+            if response.status_code == 400:
+                raise ValueError(f"Invalid request data{error_detail}")
+            elif response.status_code == 404:
+                raise ValueError(f"Resource not found{error_detail}")
+            elif response.status_code == 500:
+                raise ValueError(f"Server error{error_detail}")
+            else:
+                # Re-raise the original exception if we can't provide a better message
+                raise
+
+        response_data = response.json()
+
+        # Check if the response contains an error message despite successful status code
+        if response.status_code >= 200 and response.status_code < 300:
+            return response_data
+        else:
+            error_message = response_data.get('message', 'Unknown error')
+            raise ValueError(f"Failed to create fileset: {error_message}")
+
+    def get_fileset_metadata(self, scan_id, fileset_id, key=None):
         """Retrieve metadata for a specified fileset.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset
-        fileset_name : str
-            The name of the fileset
+        fileset_id : str
+            The ID of the fileset
         key : str, optional
             If provided, returns only the value for this specific metadata key
 
@@ -324,25 +354,25 @@ class PlantDBClient:
         >>> print(value)
         {'metadata': 'This is a test fileset'}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_name}/metadata"
+        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
         params = {'key': key} if key else None
         response = self.session.get(url, params=params)
         response.raise_for_status()
         return response.json()
 
-    def update_fileset_metadata(self, scan_id, fileset_name, metadata, replace=False):
+    def update_fileset_metadata(self, scan_id, fileset_id, metadata, replace=False):
         """Update metadata for a specified fileset.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset
-        fileset_name : str
-            The name of the fileset
+        fileset_id : str
+            The ID of the fileset
         metadata : dict
             The metadata to update/set
         replace : bool, optional
-            If True, replaces entire metadata. If False (default),
+            If ``True``, replaces entire metadata. If ``False`` (default),
             updates only specified keys.
 
         Returns
@@ -368,7 +398,7 @@ class PlantDBClient:
         >>> print(response)
         {'metadata': {'description': 'Updated fileset description', 'author': 'John Doe'}}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_name}/metadata"
+        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
         data = {
             'metadata': metadata,
             'replace': replace
@@ -377,15 +407,15 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def list_fileset_files(self, scan_id, fileset_name, query=None, fuzzy=False):
+    def list_fileset_files(self, scan_id, fileset_id, query=None, fuzzy=False):
         """List all files in a specified fileset.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset
-        fileset_name : str
-            The name of the fileset
+        fileset_id : str
+            The ID of the fileset
         query : str, optional
             Query string to filter files
         fuzzy : bool, optional
@@ -412,7 +442,7 @@ class PlantDBClient:
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_name}/files"
+        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/files"
         params = {}
         if query is not None:
             params['query'] = query
@@ -422,7 +452,7 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def create_file(self, file_data, name, ext, scan_id, fileset_name, metadata=None):
+    def create_file(self, file_data, name, ext, scan_id, fileset_id, metadata=None):
         """Create a new file in a fileset and upload its data.
 
         Parameters
@@ -434,9 +464,9 @@ class PlantDBClient:
         ext : str
             File extension (must be one of the valid extensions)
         scan_id : str
-            ID of the scan containing the fileset
-        fileset_name : str
-            Name of the fileset to create the file in
+            The ID of the scan containing the fileset
+        fileset_id : str
+            The ID of the fileset to create the file in
         metadata : dict, optional
             Additional metadata for the file
 
@@ -466,7 +496,7 @@ class PlantDBClient:
         ...     name='new_file',
         ...     ext='yaml',
         ...     scan_id='real_plant',
-        ...     fileset_name='images',
+        ...     fileset_id='images',
         ...     metadata=metadata
         ... )
         >>> # Example 2 - RGB Image with BytesIO
@@ -482,7 +512,7 @@ class PlantDBClient:
         >>> img.save(image_data, format='PNG')
         >>> image_data.seek(0)  # Move to the beginning of the BytesIO object
         >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
-        >>> response = client.create_file(image_data, name='random_image', ext='png', scan_id='real_plant', fileset_name='images', metadata=metadata)
+        >>> response = client.create_file(image_data, name='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
         >>> print(response)
 
         """
@@ -499,7 +529,7 @@ class PlantDBClient:
             'name': name,
             'ext': ext,
             'scan_id': scan_id,
-            'fileset_name': fileset_name
+            'fileset_id': fileset_id
         }
 
         # Add metadata if provided
@@ -529,17 +559,17 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def get_file_metadata(self, scan_id, fileset_name, file_name, key=None):
+    def get_file_metadata(self, scan_id, fileset_id, file_id, key=None):
         """Retrieve metadata for a specified file.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset
-        fileset_name : str
-            The name of the fileset containing the file
-        file_name : str
-            The name of the file
+        fileset_id : str
+            The ID of the fileset containing the file
+        file_id : str
+            The ID of the file
         key : str, optional
             If provided, returns only the value for this specific metadata key
 
@@ -569,27 +599,27 @@ class PlantDBClient:
         >>> print(value)
         {'metadata': 'Test file'}
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_name}/{file_name}/metadata"
+        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
         params = {'key': key} if key else None
         response = self.session.get(url, params=params)
         response.raise_for_status()
         return response.json()
 
-    def update_file_metadata(self, scan_id, fileset_name, file_name, metadata, replace=False):
+    def update_file_metadata(self, scan_id, fileset_id, file_id, metadata, replace=False):
         """Update metadata for a specified file.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset
-        fileset_name : str
-            The name of the fileset containing the file
-        file_name : str
-            The name of the file
+        fileset_id : str
+            The ID of the fileset containing the file
+        file_id : str
+            The ID of the file
         metadata : dict
             The metadata to update/set
         replace : bool, optional
-            If True, replaces entire metadata. If False (default),
+            If ``True``, replaces entire metadata. If ``False`` (default),
             updates only specified keys.
 
         Returns
@@ -620,7 +650,7 @@ class PlantDBClient:
         >>> print(response)
         {'metadata': {'description': 'Updated description'}}
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_name}/{file_name}/metadata"
+        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
         data = {
             'metadata': metadata,
             'replace': replace
