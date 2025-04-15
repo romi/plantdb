@@ -49,13 +49,12 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
-
-from plantdb.server import webcache
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import is_radians
+from plantdb.server import webcache
 
 
 def get_scan_date(scan):
@@ -2653,7 +2652,6 @@ class ScanMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-
     def post(self, scan_id):
         """Update metadata for a specified scan.
 
@@ -2715,10 +2713,10 @@ class ScanMetadata(Resource):
             # Update the metadata
             scan.set_metadata(metadata)
             # TODO: make this works:
-            #if replace:
+            # if replace:
             #    # Replace entire metadata dictionary
             #    scan.set_metadata(metadata)
-            #else:
+            # else:
             #    # Update only specified keys
             #    current_metadata = scan.get_metadata()
             #    current_metadata.update(metadata)
@@ -2827,11 +2825,19 @@ class FilesetCreate(Resource):
         ensures required fields are present, creates the fileset with the specified name,
         and associates it with the given scan ID. Optional metadata can be attached to the fileset.
 
+        Returns
+        -------
+        dict
+            Response containing success message or error description.
+            If successful, also returns the created fileset ID under 'id' key, as sanitization may have happened.
+        int
+            HTTP status code (201, 400, 404, or 500)
+
         Notes
         -----
         The method expects a JSON request body with the following structure:
         {
-            'name': str,          # Required: Name of the fileset
+            'fileset_id': str,    # Required: ID of the fileset
             'scan_id': str,       # Required: ID of the associated scan
             'metadata': dict      # Optional: Additional metadata for the fileset
         }
@@ -2851,7 +2857,7 @@ class FilesetCreate(Resource):
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
         >>> url = f"{base_url()}/api/fileset"
-        >>> response = requests.post(url, json={'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
+        >>> response = requests.post(url, json={'fileset_id': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
         >>> print(response.json())
@@ -2867,7 +2873,7 @@ class FilesetCreate(Resource):
             return {'message': 'No input data provided'}, 400
 
         # Validate required fields
-        if 'name' not in data:
+        if 'fileset_id' not in data:
             return {'message': 'Name is required'}, 400
         if 'scan_id' not in data:
             return {'message': 'Scan ID is required'}, 400
@@ -2877,17 +2883,20 @@ class FilesetCreate(Resource):
 
         try:
             # Sanitize the name
-            fs_id = sanitize_name(data['name'])
+            fs_id = sanitize_name(data['fileset_id'])
             # Get the scan
             scan = self.db.get_scan(data['scan_id'], create=False)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Create the fileset
-            fileset = scan.create_fileset(fs_id)
+            fileset = scan.create_fileset(fs_id, )
             # Set metadata if provided
             if metadata:
                 fileset.set_metadata(metadata)
-            return {'message': f"Fileset '{fs_id}' created successfully in '{scan.id}'."}, 201
+            return {
+                'message': f"Fileset '{fs_id}' created successfully in '{scan.id}'.",
+                "id": fs_id
+            }, 201
 
         except Exception as e:
             return {'message': f'Error creating fileset: {str(e)}'}, 500
@@ -2917,7 +2926,7 @@ class FilesetMetadata(Resource):
         self.db = db
         self.logger = logger
 
-    def get(self, scan_id, fileset_name):
+    def get(self, scan_id, fileset_id):
         """Retrieve metadata for a specified fileset.
 
         This method retrieves the metadata dictionary for a fileset. Optionally, it can
@@ -2927,7 +2936,7 @@ class FilesetMetadata(Resource):
         ----------
         scan_id : str
             The ID of the scan containing the fileset.
-        fileset_name : str
+        fileset_id : str
             The name of the fileset.
         key : str, optional
             If provided, returns only the value for this specific metadata key.
@@ -2973,7 +2982,7 @@ class FilesetMetadata(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
             # Get the metadata
@@ -2984,7 +2993,7 @@ class FilesetMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    def post(self, scan_id, fileset_name):
+    def post(self, scan_id, fileset_id):
         """Update metadata for a specified fileset.
 
         This method handles updating metadata for a fileset within a scan. It supports both
@@ -2994,7 +3003,7 @@ class FilesetMetadata(Resource):
         ----------
         scan_id : str
             Unique identifier for the scan containing the fileset
-        fileset_name : str
+        fileset_id : str
             Name of the fileset to update metadata for
 
         Returns
@@ -3062,17 +3071,17 @@ class FilesetMetadata(Resource):
                 return {'message': 'Scan not found'}, 404
 
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
 
             # Update the metadata
             fileset.set_metadata(metadata)
             # TODO: make this works:
-            #if replace:
+            # if replace:
             #    # Replace entire metadata dictionary
             #    fileset.set_metadata(metadata)
-            #else:
+            # else:
             #    # Update only specified keys
             #    current_metadata = fileset.get_metadata()
             #    current_metadata.update(metadata)
@@ -3094,7 +3103,7 @@ class FilesetFiles(Resource):
         self.db = db
         self.logger = logger
 
-    def get(self, scan_id, fileset_name):
+    def get(self, scan_id, fileset_id):
         """List all files in a specified fileset.
 
         This method retrieves the list of files contained in a fileset using the
@@ -3104,7 +3113,7 @@ class FilesetFiles(Resource):
         ----------
         scan_id : str
             The ID of the scan containing the fileset.
-        fileset_name : str
+        fileset_id : str
             The name of the fileset.
 
         Returns
@@ -3139,7 +3148,7 @@ class FilesetFiles(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
             # Get the list of files
@@ -3182,16 +3191,17 @@ class FileCreate(Resource):
         -----
         The method expects the following form fields:
         - file: The actual file data
-        - name: str          # Required: Name of the file
+        - file_id: str       # Required: ID of the file
         - ext: str           # Required: File extension (must be one of VALID_FILE_EXT)
         - scan_id: str       # Required: ID of the scan
-        - fileset_name: str  # Required: Name of the fileset
+        - fileset_id: str    # Required: ID of the fileset
         - metadata: dict     # Optional: Additional metadata for the file (as JSON string)
 
         Returns
         -------
         dict
-            Response containing success message or error description
+            Response containing success message or error description.
+            If successful, also returns the created file ID under 'id' key, as sanitization may have happened.
         int
             HTTP status code (201, 400, 404, or 500)
 
@@ -3215,10 +3225,10 @@ class FileCreate(Resource):
         ...     }
         ...     metadata = json.dumps({'description': 'Test document', 'author': 'John Doe'})
         ...     data = {
-        ...         'name': 'new_file',
+        ...         'file_id': 'new_file',
         ...         'ext': 'yaml',
         ...         'scan_id': 'real_plant',
-        ...         'fileset_name': 'images',
+        ...         'fileset_id': 'images',
         ...         'metadata': metadata
         ...     }
         ...     response = requests.post(url, files=files, data=data)
@@ -3235,15 +3245,17 @@ class FileCreate(Resource):
         file_data = request.files['file']
 
         # Get form data
-        name = request.form.get('name', None)
+        file_id = request.form.get('file_id', None)
         ext = request.form.get('ext', None)
         scan_id = request.form.get('scan_id', None)
-        fileset_name = request.form.get('fileset_name', None)
+        fileset_id = request.form.get('fileset_id', None)
 
         # Validate required fields
-        if not all([name, ext, scan_id, fileset_name]):
-            missing_fields = [form_field.__name__ for form_field in [name, ext, scan_id, fileset_name] if form_field is None]
-            return {'message': f'name, ext, scan_id, and fileset_name fields are required, missing: {missing_fields}'}, 400
+        if not all([file_id, ext, scan_id, fileset_id]):
+            missing_fields = [form_field.__name__ for form_field in [file_id, ext, scan_id, fileset_id] if
+                              form_field is None]
+            return {
+                'message': f"'file_id', 'ext', 'scan_id', and 'fileset_id' fields are required, missing: {missing_fields}"}, 400
 
         # Validate file extension
         if not ext.startswith('.'):
@@ -3265,11 +3277,11 @@ class FileCreate(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
             # Create the file
-            file_id = sanitize_name(name)
+            file_id = sanitize_name(file_id)
             file = fileset.create_file(file_id)
             try:
                 # Write the file data with the specified extension
@@ -3285,7 +3297,8 @@ class FileCreate(Resource):
             if metadata:
                 file.set_metadata(metadata)
             return {
-                'message': f"File '{file_id}{ext}' created and written successfully in fileset '{fileset.id}'."
+                'message': f"File '{file_id}{ext}' created and written successfully in fileset '{fileset.id}'.",
+                'id': f"{file_id}",
             }, 201
 
         except Exception as e:
@@ -3315,16 +3328,16 @@ class FileMetadata(Resource):
         self.db = db
         self.logger = logger
 
-    def get(self, scan_id, fileset_name, file_name):
+    def get(self, scan_id, fileset_id, file_id):
         """Retrieve metadata for a specified file.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset.
-        fileset_name : str
+        fileset_id : str
             The name of the fileset containing the file.
-        file_name : str
+        file_id : str
             The name of the file.
         key : str, optional
             If provided, returns only the value for this specific metadata key.
@@ -3359,11 +3372,11 @@ class FileMetadata(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
             # Get the file
-            file = fileset.get_file(sanitize_name(file_name))
+            file = fileset.get_file(sanitize_name(file_id))
             if not file:
                 return {'message': 'File not found'}, 404
             # Get the metadata
@@ -3374,16 +3387,16 @@ class FileMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    def post(self, scan_id, fileset_name, file_name):
+    def post(self, scan_id, fileset_id, file_id):
         """Update metadata for a specified file.
 
         Parameters
         ----------
         scan_id : str
             The ID of the scan containing the fileset.
-        fileset_name : str
+        fileset_id : str
             The name of the fileset containing the file.
-        file_name : str
+        file_id : str
             The name of the file.
 
         Returns
@@ -3432,22 +3445,22 @@ class FileMetadata(Resource):
                 return {'message': 'Scan not found'}, 404
 
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_name))
+            fileset = scan.get_fileset(sanitize_name(fileset_id))
             if not fileset:
                 return {'message': 'Fileset not found'}, 404
 
             # Get the file
-            file = fileset.get_file(sanitize_name(file_name))
+            file = fileset.get_file(sanitize_name(file_id))
             if not file:
                 return {'message': 'File not found'}, 404
 
             # Update the metadata
             file.set_metadata(metadata)
             # TODO: make this works:
-            #if replace:
+            # if replace:
             #    # Replace entire metadata dictionary
             #    file.set_metadata(metadata)
-            #else:
+            # else:
             #    # Update only specified keys
             #    current_metadata = file.get_metadata()
             #    current_metadata.update(metadata)
