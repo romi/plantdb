@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2afb09e1.min.css">
       
       
 
@@ -2143,7 +2143,7 @@ client = PlantDBClient(base_url())</p>
 
 
 <a href="#plantdb.client.plantdb_client.PlantDBClient.create_file" class="headerlink" title="Permanent link">Link</a></h4>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>create_file(file_data, name, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>create_file(file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2180,14 +2180,14 @@ client = PlantDBClient(base_url())</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>name</code>
+                <code>file_id</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name to give the file in the database</p>
+                <p>The ID of the file in the database</p>
               </div>
             </td>
             <td>
@@ -2459,15 +2459,15 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">557</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">558</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">559</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">560</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, name, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">560</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new file in a fileset and upload its data.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    file_data : str, pathlib.Path, or BytesIO</span>
 <span style="color: #BA2121; font-style: italic">        Path to the file to upload or BytesIO object containing file data</span>
-<span style="color: #BA2121; font-style: italic">    name : str</span>
-<span style="color: #BA2121; font-style: italic">        Name to give the file in the database</span>
+<span style="color: #BA2121; font-style: italic">    file_id : str</span>
+<span style="color: #BA2121; font-style: italic">        The ID of the file in the database</span>
 <span style="color: #BA2121; font-style: italic">    ext : str</span>
 <span style="color: #BA2121; font-style: italic">        File extension (must be one of the valid extensions)</span>
 <span style="color: #BA2121; font-style: italic">    scan_id : str</span>
@@ -2533,7 +2533,7 @@ client = PlantDBClient(base_url())</p>
     ext <span style="color: #666">=</span> ext<span style="color: #666">.</span>lstrip(<span style="color: #BA2121">&#39;.&#39;</span>)<span style="color: #666">.</span>lower()  <span style="color: #3D7B7B; font-style: italic"># Remove leading dot if present</span>
     <span style="color: #3D7B7B; font-style: italic"># Prepare form data</span>
     data <span style="color: #666">=</span> {
-        <span style="color: #BA2121">&#39;name&#39;</span>: name,
+        <span style="color: #BA2121">&#39;file_id&#39;</span>: file_id,
         <span style="color: #BA2121">&#39;ext&#39;</span>: ext,
         <span style="color: #BA2121">&#39;scan_id&#39;</span>: scan_id,
         <span style="color: #BA2121">&#39;fileset_id&#39;</span>: fileset_id
@@ -2546,7 +2546,7 @@ client = PlantDBClient(base_url())</p>
     <span style="color: #3D7B7B; font-style: italic"># Prepare file data based on the type of file_data</span>
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(file_data, BytesIO):
         <span style="color: #3D7B7B; font-style: italic"># If it&#39;s already a BytesIO object, use it directly</span>
-        filename <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>name<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.</span><span style="color: #A45A77; font-weight: bold">{</span>ext<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
+        filename <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>file_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.</span><span style="color: #A45A77; font-weight: bold">{</span>ext<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
         files <span style="color: #666">=</span> {
             <span style="color: #BA2121">&#39;file&#39;</span>: (filename, file_data, get_mime_type(ext))
         }
