@@ -452,15 +452,15 @@ class PlantDBClient:
         response.raise_for_status()
         return response.json()
 
-    def create_file(self, file_data, name, ext, scan_id, fileset_id, metadata=None):
+    def create_file(self, file_data, file_id, ext, scan_id, fileset_id, metadata=None):
         """Create a new file in a fileset and upload its data.
 
         Parameters
         ----------
         file_data : str, pathlib.Path, or BytesIO
             Path to the file to upload or BytesIO object containing file data
-        name : str
-            Name to give the file in the database
+        file_id : str
+            The ID of the file in the database
         ext : str
             File extension (must be one of the valid extensions)
         scan_id : str
@@ -526,7 +526,7 @@ class PlantDBClient:
         ext = ext.lstrip('.').lower()  # Remove leading dot if present
         # Prepare form data
         data = {
-            'name': name,
+            'file_id': file_id,
             'ext': ext,
             'scan_id': scan_id,
             'fileset_id': fileset_id
@@ -539,7 +539,7 @@ class PlantDBClient:
         # Prepare file data based on the type of file_data
         if isinstance(file_data, BytesIO):
             # If it's already a BytesIO object, use it directly
-            filename = f"{name}.{ext}"
+            filename = f"{file_id}.{ext}"
             files = {
                 'file': (filename, file_data, get_mime_type(ext))
             }
