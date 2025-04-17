@@ -2133,9 +2133,9 @@ client = PlantDBClient(base_url())</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">71</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, base_url):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">72</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">73</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">74</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, base_url):
     <span style="color: #008000">self</span><span style="color: #666">.</span>base_url <span style="color: #666">=</span> base_url
     <span style="color: #008000">self</span><span style="color: #666">.</span>session <span style="color: #666">=</span> requests<span style="color: #666">.</span>Session()
 </code></pre></div></td></tr></table></div>
@@ -2371,8 +2371,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
@@ -2475,7 +2474,11 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new file in a fileset and upload its data.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2577,8 +2580,11 @@ client = PlantDBClient(base_url())</p>
                 <span style="color: #BA2121">&#39;file&#39;</span>: (filename, file_handle, <span style="color: #BA2121">&#39;application/octet-stream&#39;</span>)
             }
             response <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>session<span style="color: #666">.</span>post(url, files<span style="color: #666">=</span>files, data<span style="color: #666">=</span>data)
-
-    response<span style="color: #666">.</span>raise_for_status()
+    <span style="color: #008000; font-weight: bold">try</span>:
+        response<span style="color: #666">.</span>raise_for_status()
+    <span style="color: #008000; font-weight: bold">except</span> RequestException <span style="color: #008000; font-weight: bold">as</span> e:
+        response_data <span style="color: #666">=</span> response<span style="color: #666">.</span>json()[<span style="color: #BA2121">&quot;message&quot;</span>]
+        <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #008000">type</span>(e)(response_data) <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">e</span>
     <span style="color: #008000; font-weight: bold">return</span> response<span style="color: #666">.</span>json()
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2726,8 +2732,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
@@ -2799,7 +2804,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_fileset</span>(<span style="color: #008000">self</span>, fileset_id, scan_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_fileset</span>(<span style="color: #008000">self</span>, fileset_id, scan_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new fileset associated with a scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3003,8 +3009,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">116</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">117</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">118</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">119</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">120</span>
@@ -3041,7 +3046,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_scan</span>(<span style="color: #008000">self</span>, name, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_scan</span>(<span style="color: #008000">self</span>, name, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new scan in the database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3246,11 +3252,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">605</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">607</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">608</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">609</span>
@@ -3290,7 +3292,11 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">643</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">644</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">645</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">647</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3485,8 +3491,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
@@ -3527,7 +3532,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">399</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">400</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">401</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_fileset_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">403</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_fileset_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3704,8 +3710,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
@@ -3744,7 +3749,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan_metadata</span>(<span style="color: #008000">self</span>, scan_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan_metadata</span>(<span style="color: #008000">self</span>, scan_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3946,8 +3952,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">453</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">454</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">455</span>
@@ -3989,7 +3994,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_fileset_files</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_fileset_files</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all files in a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4178,8 +4184,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">242</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">244</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">245</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">246</span>
@@ -4219,7 +4224,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scan_filesets</span>(<span style="color: #008000">self</span>, scan_id, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scan_filesets</span>(<span style="color: #008000">self</span>, scan_id, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all filesets in a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4390,8 +4396,7 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 75</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 76</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 76</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 77</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 78</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 79</span>
@@ -4429,7 +4434,8 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">113</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">114</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">115</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_scans</span>(<span style="color: #008000">self</span>, query<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all scans in the database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4654,11 +4660,7 @@ updates only specified keys.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">651</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">652</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">652</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">653</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">654</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">655</span>
@@ -4706,7 +4708,11 @@ updates only specified keys.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">697</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">698</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">699</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">700</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">700</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">701</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">702</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">703</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">704</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4923,8 +4929,7 @@ updates only specified keys.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
@@ -4968,7 +4973,8 @@ updates only specified keys.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_fileset_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_fileset_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5161,8 +5167,7 @@ updates only specified keys.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
@@ -5203,7 +5208,8 @@ updates only specified keys.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_scan_metadata</span>(<span style="color: #008000">self</span>, scan_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">241</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_scan_metadata</span>(<span style="color: #008000">self</span>, scan_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5333,8 +5339,7 @@ updates only specified keys.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">42</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">43</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">43</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">44</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">45</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">46</span>
@@ -5356,7 +5361,8 @@ updates only specified keys.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">62</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">63</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">64</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_mime_type</span>(extension):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">65</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">66</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_mime_type</span>(extension):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Determine the MIME type from a file extension.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
