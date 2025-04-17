@@ -3161,7 +3161,7 @@ class FilesetFiles(Resource):
 
 
 # Define valid files extensions
-VALID_FILE_EXT = ['.jpg', '.png', '.tif', '.txt', '.json', '.ply', '.yaml', '.toml']
+VALID_FILE_EXT = ['.jpg', '.jpeg', '.png', '.tif', '.txt', '.json', '.ply', '.yaml', '.toml']
 
 
 class FileCreate(Resource):
@@ -3285,7 +3285,7 @@ class FileCreate(Resource):
             file = fileset.create_file(file_id)
             try:
                 # Write the file data with the specified extension
-                if ext in ['.jpg', '.png', '.tif']:
+                if ext in ['.jpg', '.jpeg', '.png', '.tif']:
                     file.write_raw(file_data.read(), ext=ext[1:])  # Binary mode
                 else:
                     file.write(file_data.read().decode(), ext=ext[1:])  # Text mode
