@@ -527,19 +527,18 @@ class PlantDBClient:
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
+        >>> import tempfile
+        >>> import yaml
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import base_url
         >>> client = PlantDBClient(base_url())
         >>> # Example 1 - Existing YAML file path as string
         >>> metadata = {'description': 'Test document', 'author': 'John Doe'}
-        >>> response = client.create_file(
-        ...     'path/to/file.yaml',
-        ...     name='new_file',
-        ...     ext='yaml',
-        ...     scan_id='real_plant',
-        ...     fileset_id='images',
-        ...     metadata=metadata
-        ... )
+        >>> dummy_data = {'name': 'Test Plant', 'species': 'Arabidopsis thaliana'}
+        >>> with tempfile.NamedTemporaryFile(suffix='.yaml', mode='w', delete=False) as f: temp_file_name = f.name; yaml.dump(dummy_data, f)
+        >>> response = client.create_file(temp_file_name, file_id='new_file',ext='yaml',scan_id='real_plant',fileset_id='images',metadata=metadata)
+        >>> print(response)
+        {'message': "File 'new_file.yaml' created and written successfully in fileset 'images'.", 'id': 'new_file'}
         >>> # Example 2 - RGB Image with BytesIO
         >>> import numpy as np
         >>> from PIL import Image
@@ -553,7 +552,7 @@ class PlantDBClient:
         >>> img.save(image_data, format='PNG')
         >>> image_data.seek(0)  # Move to the beginning of the BytesIO object
         >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
-        >>> response = client.create_file(image_data, name='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
+        >>> response = client.create_file(image_data, file_id='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
         >>> print(response)
 
         """
