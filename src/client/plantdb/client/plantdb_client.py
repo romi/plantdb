@@ -37,6 +37,7 @@ Usage Examples
 import mimetypes
 
 import requests
+from requests import RequestException
 
 
 def get_mime_type(extension):
@@ -595,8 +596,11 @@ class PlantDBClient:
                     'file': (filename, file_handle, 'application/octet-stream')
                 }
                 response = self.session.post(url, files=files, data=data)
-
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            response_data = response.json()["message"]
+            raise type(e)(response_data) from e
         return response.json()
 
     def get_file_metadata(self, scan_id, fileset_id, file_id, key=None):
