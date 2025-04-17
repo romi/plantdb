@@ -2339,19 +2339,18 @@ client = PlantDBClient(base_url())</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">tempfile</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">yaml</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 1 - Existing YAML file path as string</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Test document&#39;</span>, <span style="color: #BA2121">&#39;author&#39;</span>: <span style="color: #BA2121">&#39;John Doe&#39;</span>}
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_file(
-<span style="color: #000080; font-weight: bold">... </span>    <span style="color: #BA2121">&#39;path/to/file.yaml&#39;</span>,
-<span style="color: #000080; font-weight: bold">... </span>    name<span style="color: #666">=</span><span style="color: #BA2121">&#39;new_file&#39;</span>,
-<span style="color: #000080; font-weight: bold">... </span>    ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;yaml&#39;</span>,
-<span style="color: #000080; font-weight: bold">... </span>    scan_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant&#39;</span>,
-<span style="color: #000080; font-weight: bold">... </span>    fileset_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>,
-<span style="color: #000080; font-weight: bold">... </span>    metadata<span style="color: #666">=</span>metadata
-<span style="color: #000080; font-weight: bold">... </span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>dummy_data <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;name&#39;</span>: <span style="color: #BA2121">&#39;Test Plant&#39;</span>, <span style="color: #BA2121">&#39;species&#39;</span>: <span style="color: #BA2121">&#39;Arabidopsis thaliana&#39;</span>}
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">with</span> tempfile<span style="color: #666">.</span>NamedTemporaryFile(suffix<span style="color: #666">=</span><span style="color: #BA2121">&#39;.yaml&#39;</span>, mode<span style="color: #666">=</span><span style="color: #BA2121">&#39;w&#39;</span>, delete<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>) <span style="color: #008000; font-weight: bold">as</span> f: temp_file_name <span style="color: #666">=</span> f<span style="color: #666">.</span>name; yaml<span style="color: #666">.</span>dump(dummy_data, f)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_file(temp_file_name, file_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;new_file&#39;</span>,ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;yaml&#39;</span>,scan_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant&#39;</span>,fileset_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>,metadata<span style="color: #666">=</span>metadata)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
+<span style="color: #717171">{&#39;message&#39;: &quot;File &#39;new_file.yaml&#39; created and written successfully in fileset &#39;images&#39;.&quot;, &#39;id&#39;: &#39;new_file&#39;}</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 2 - RGB Image with BytesIO</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">PIL</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Image
@@ -2365,7 +2364,7 @@ client = PlantDBClient(base_url())</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>img<span style="color: #666">.</span>save(image_data, <span style="color: #008000">format</span><span style="color: #666">=</span><span style="color: #BA2121">&#39;PNG&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>image_data<span style="color: #666">.</span>seek(<span style="color: #666">0</span>)  <span style="color: #3D7B7B; font-style: italic"># Move to the beginning of the BytesIO object</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Random RGB test image&#39;</span>, <span style="color: #BA2121">&#39;author&#39;</span>: <span style="color: #BA2121">&#39;John Doe&#39;</span>}
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_file(image_data, name<span style="color: #666">=</span><span style="color: #BA2121">&#39;random_image&#39;</span>, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;png&#39;</span>, scan_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant&#39;</span>, fileset_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>, metadata<span style="color: #666">=</span>metadata)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_file(image_data, file_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;random_image&#39;</span>, ext<span style="color: #666">=</span><span style="color: #BA2121">&#39;png&#39;</span>, scan_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant&#39;</span>, fileset_id<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>, metadata<span style="color: #666">=</span>metadata)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
 </code></pre></div>
 
@@ -2476,8 +2475,7 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">create_file</span>(<span style="color: #008000">self</span>, file_data, file_id, ext, scan_id, fileset_id, metadata<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new file in a fileset and upload its data.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2511,19 +2509,18 @@ client = PlantDBClient(base_url())</p>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import tempfile</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import yaml</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 1 - Existing YAML file path as string</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = {&#39;description&#39;: &#39;Test document&#39;, &#39;author&#39;: &#39;John Doe&#39;}</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_file(</span>
-<span style="color: #BA2121; font-style: italic">    ...     &#39;path/to/file.yaml&#39;,</span>
-<span style="color: #BA2121; font-style: italic">    ...     name=&#39;new_file&#39;,</span>
-<span style="color: #BA2121; font-style: italic">    ...     ext=&#39;yaml&#39;,</span>
-<span style="color: #BA2121; font-style: italic">    ...     scan_id=&#39;real_plant&#39;,</span>
-<span style="color: #BA2121; font-style: italic">    ...     fileset_id=&#39;images&#39;,</span>
-<span style="color: #BA2121; font-style: italic">    ...     metadata=metadata</span>
-<span style="color: #BA2121; font-style: italic">    ... )</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; dummy_data = {&#39;name&#39;: &#39;Test Plant&#39;, &#39;species&#39;: &#39;Arabidopsis thaliana&#39;}</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; with tempfile.NamedTemporaryFile(suffix=&#39;.yaml&#39;, mode=&#39;w&#39;, delete=False) as f: temp_file_name = f.name; yaml.dump(dummy_data, f)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_file(temp_file_name, file_id=&#39;new_file&#39;,ext=&#39;yaml&#39;,scan_id=&#39;real_plant&#39;,fileset_id=&#39;images&#39;,metadata=metadata)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
+<span style="color: #BA2121; font-style: italic">    {&#39;message&#39;: &quot;File &#39;new_file.yaml&#39; created and written successfully in fileset &#39;images&#39;.&quot;, &#39;id&#39;: &#39;new_file&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 2 - RGB Image with BytesIO</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from PIL import Image</span>
@@ -2537,7 +2534,7 @@ client = PlantDBClient(base_url())</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; img.save(image_data, format=&#39;PNG&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; image_data.seek(0)  # Move to the beginning of the BytesIO object</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = {&#39;description&#39;: &#39;Random RGB test image&#39;, &#39;author&#39;: &#39;John Doe&#39;}</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_file(image_data, name=&#39;random_image&#39;, ext=&#39;png&#39;, scan_id=&#39;real_plant&#39;, fileset_id=&#39;images&#39;, metadata=metadata)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_file(image_data, file_id=&#39;random_image&#39;, ext=&#39;png&#39;, scan_id=&#39;real_plant&#39;, fileset_id=&#39;images&#39;, metadata=metadata)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
 
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
@@ -3249,7 +3246,8 @@ client = PlantDBClient(base_url())</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">605</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
@@ -3292,8 +3290,7 @@ client = PlantDBClient(base_url())</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">643</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">644</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">645</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">647</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, key<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4657,7 +4654,8 @@ updates only specified keys.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/plantdb_client.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">651</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">652</span>
@@ -4708,8 +4706,7 @@ updates only specified keys.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">697</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">698</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">699</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">700</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">701</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">700</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">update_file_metadata</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id, metadata, replace<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>

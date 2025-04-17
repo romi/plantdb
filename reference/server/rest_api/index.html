@@ -5799,7 +5799,7 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
         file <span style="color: #666">=</span> fileset<span style="color: #666">.</span>create_file(file_id)
         <span style="color: #008000; font-weight: bold">try</span>:
             <span style="color: #3D7B7B; font-style: italic"># Write the file data with the specified extension</span>
-            <span style="color: #008000; font-weight: bold">if</span> ext <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&#39;.jpg&#39;</span>, <span style="color: #BA2121">&#39;.png&#39;</span>, <span style="color: #BA2121">&#39;.tif&#39;</span>]:
+            <span style="color: #008000; font-weight: bold">if</span> ext <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&#39;.jpg&#39;</span>, <span style="color: #BA2121">&#39;.jpeg&#39;</span>, <span style="color: #BA2121">&#39;.png&#39;</span>, <span style="color: #BA2121">&#39;.tif&#39;</span>]:
                 file<span style="color: #666">.</span>write_raw(file_data<span style="color: #666">.</span>read(), ext<span style="color: #666">=</span>ext[<span style="color: #666">1</span>:])  <span style="color: #3D7B7B; font-style: italic"># Binary mode</span>
             <span style="color: #008000; font-weight: bold">else</span>:
                 file<span style="color: #666">.</span>write(file_data<span style="color: #666">.</span>read()<span style="color: #666">.</span>decode(), ext<span style="color: #666">=</span>ext[<span style="color: #666">1</span>:])  <span style="color: #3D7B7B; font-style: italic"># Text mode</span>
