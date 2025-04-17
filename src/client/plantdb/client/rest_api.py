@@ -283,8 +283,8 @@ def get_file_uri(scan, fileset, file):
     from plantdb.commons.fsdb import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
-    file_name = file.path().name if isinstance(file, File) else file
-    return f"/files/{scan_id}/{fileset_id}/{file_name}"
+    file_id = file.path().name if isinstance(file, File) else file
+    return f"/files/{scan_id}/{fileset_id}/{file_id}"
 
 
 def test_host_port_availability(url):

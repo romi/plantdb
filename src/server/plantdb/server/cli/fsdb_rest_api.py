@@ -254,14 +254,14 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     # API endpoints for `plantdb.commons.fsdb.Fileset`:
     api.add_resource(FilesetCreate, '/api/fileset',
                      resource_class_args=tuple([db, logger]))
-    api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_name>/metadata',
+    api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_id>/metadata',
                      resource_class_args=tuple([db, logger]))
-    api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_name>/files',
+    api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_id>/files',
                      resource_class_args=tuple([db, logger]))
     # API endpoints for `plantdb.commons.fsdb.File`:
     api.add_resource(FileCreate, '/api/file',
                      resource_class_args=tuple([db, logger]))
-    api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_name>/<string:file_name>/metadata',
+    api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata',
                      resource_class_args=tuple([db, logger]))
 
     # Start the Flask application:
