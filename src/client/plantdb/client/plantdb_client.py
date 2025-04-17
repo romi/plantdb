@@ -46,7 +46,7 @@ def get_mime_type(extension):
     Parameters
     ----------
     extension : str
-        File extension (with or without leading dot)
+        File extension (with or without a leading dot)
 
     Returns
     -------
@@ -67,11 +67,73 @@ def get_mime_type(extension):
 
 
 class PlantDBClient:
-    """Client for interacting with the PlantDB REST API."""
+    """Client for interacting with the PlantDB REST API.
+
+    This class provides methods to interact with a PlantDB REST API, allowing operations
+    on scans, filesets, and files. It handles authentication, error processing, and
+    provides a consistent interface for all API endpoints.
+
+    Parameters
+    ----------
+    base_url : str
+        The base URL of the PlantDB REST API.
+
+    Attributes
+    ----------
+    base_url : str
+        The base URL of the PlantDB REST API.
+    session : requests.Session
+        HTTP session that maintains cookies and connection pooling.
+
+    Notes
+    -----
+    This client automatically handles HTTP errors and extracts meaningful error messages
+    from the API responses. All methods will raise appropriate exceptions with
+    descriptive messages when API requests fail.
+
+    Examples
+    --------
+    >>> # Start a test REST API server first:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.plantdb_client import PlantDBClient
+    >>> from plantdb.client.rest_api import base_url
+    >>> client = PlantDBClient(base_url())
+    >>> scans = client.list_scans()
+    >>> print(scans)
+    ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+    """
 
     def __init__(self, base_url):
+        """Initialize the PlantDBClient with a base URL."""
         self.base_url = base_url
         self.session = requests.Session()
+
+    def _handle_http_errors(self, response):
+        """
+        Handles HTTP errors by raising a custom exception with an error message obtained
+        from the HTTP response. This function intercepts the original exception, extracts
+        the error message from the response JSON, and raises a new exception of the same
+        type with the extracted message.
+
+        Parameters
+        ----------
+        response : requests.Response
+            The HTTP response object from which the status and error message will be
+            assessed. The response object is expected to have a JSON body containing
+            a key "message" for error details.
+
+        Raises
+        ------
+        RequestException
+            If the HTTP response status code indicates an error. The raised exception is
+            of the same type as the original exception, with the message replaced by the
+            value of the "message" key from the response JSON body.
+        """
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            response_data = response.json()["message"]
+            raise type(e)(response_data) from e
 
     def list_scans(self, query=None, fuzzy=False):
         """List all scans in the database.
@@ -111,7 +173,9 @@ class PlantDBClient:
         if fuzzy:
             params['fuzzy'] = fuzzy
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def create_scan(self, name, metadata=None):
@@ -151,7 +215,9 @@ class PlantDBClient:
         if metadata:
             data['metadata'] = metadata
         response = self.session.post(url, json=data)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def get_scan_metadata(self, scan_id, key=None):
@@ -193,7 +259,9 @@ class PlantDBClient:
         url = f"{self.base_url}/api/scan/{scan_id}/metadata"
         params = {'key': key} if key else None
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def update_scan_metadata(self, scan_id, metadata, replace=False):
@@ -237,7 +305,9 @@ class PlantDBClient:
             'replace': replace
         }
         response = self.session.post(url, json=data)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def list_scan_filesets(self, scan_id, query=None, fuzzy=False):
@@ -280,7 +350,9 @@ class PlantDBClient:
         if fuzzy:
             params['fuzzy'] = fuzzy
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def create_fileset(self, fileset_id, scan_id, metadata=None):
@@ -327,36 +399,8 @@ class PlantDBClient:
         response = self.session.post(url, json=data)
 
         # Handle HTTP errors with explicit messages
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            # Get the error message from the response if available
-            error_detail = ""
-            try:
-                error_data = response.json()
-                if 'message' in error_data:
-                    error_detail = f": {error_data['message']}"
-            except:
-                pass
-
-            if response.status_code == 400:
-                raise ValueError(f"Invalid request data{error_detail}")
-            elif response.status_code == 404:
-                raise ValueError(f"Resource not found{error_detail}")
-            elif response.status_code == 500:
-                raise ValueError(f"Server error{error_detail}")
-            else:
-                # Re-raise the original exception if we can't provide a better message
-                raise
-
-        response_data = response.json()
-
-        # Check if the response contains an error message despite successful status code
-        if response.status_code >= 200 and response.status_code < 300:
-            return response_data
-        else:
-            error_message = response_data.get('message', 'Unknown error')
-            raise ValueError(f"Failed to create fileset: {error_message}")
+        self._handle_http_errors(response)
+        return response.json()
 
     def get_fileset_metadata(self, scan_id, fileset_id, key=None):
         """Retrieve metadata for a specified fileset.
@@ -399,7 +443,9 @@ class PlantDBClient:
         url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
         params = {'key': key} if key else None
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def update_fileset_metadata(self, scan_id, fileset_id, metadata, replace=False):
@@ -446,7 +492,9 @@ class PlantDBClient:
             'replace': replace
         }
         response = self.session.post(url, json=data)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def list_fileset_files(self, scan_id, fileset_id, query=None, fuzzy=False):
@@ -491,7 +539,9 @@ class PlantDBClient:
         if fuzzy:
             params['fuzzy'] = fuzzy
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def create_file(self, file_data, file_id, ext, scan_id, fileset_id, metadata=None):
@@ -575,7 +625,12 @@ class PlantDBClient:
 
         # Add metadata if provided
         if metadata:
-            data['metadata'] = json.dumps(metadata)
+            if isinstance(metadata, dict):
+                data['metadata'] = json.dumps(metadata)
+            elif isinstance(metadata, str):
+                data['metadata'] = metadata
+            else:
+                raise TypeError("Invalid metadata type. Must be a dictionary or string.")
 
         # Prepare file data based on the type of file_data
         if isinstance(file_data, BytesIO):
@@ -596,11 +651,9 @@ class PlantDBClient:
                     'file': (filename, file_handle, 'application/octet-stream')
                 }
                 response = self.session.post(url, files=files, data=data)
-        try:
-            response.raise_for_status()
-        except RequestException as e:
-            response_data = response.json()["message"]
-            raise type(e)(response_data) from e
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def get_file_metadata(self, scan_id, fileset_id, file_id, key=None):
@@ -646,7 +699,9 @@ class PlantDBClient:
         url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
         params = {'key': key} if key else None
         response = self.session.get(url, params=params)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
 
     def update_file_metadata(self, scan_id, fileset_id, file_id, metadata, replace=False):
@@ -700,5 +755,7 @@ class PlantDBClient:
             'replace': replace
         }
         response = self.session.post(url, json=data)
-        response.raise_for_status()
+
+        # Handle HTTP errors with explicit messages
+        self._handle_http_errors(response)
         return response.json()
