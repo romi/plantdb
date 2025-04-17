@@ -72,6 +72,47 @@ class PlantDBClient:
         self.base_url = base_url
         self.session = requests.Session()
 
+    def list_scans(self, query=None, fuzzy=False):
+        """List all scans in the database.
+
+        Parameters
+        ----------
+        query : str, optional
+            Query string to filter scans
+        fuzzy : bool, optional
+            Whether to use fuzzy matching for the query (default: False)
+
+        Returns
+        -------
+        dict
+            Server response containing the list of scan IDs
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import base_url
+        >>> client = PlantDBClient(base_url())
+        >>> response = client.list_scans()
+        >>> print(response)
+        ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+        """
+        url = f"{self.base_url}/scans"
+        params = {}
+        if query is not None:
+            params['query'] = query
+        if fuzzy:
+            params['fuzzy'] = fuzzy
+        response = self.session.get(url, params=params)
+        response.raise_for_status()
+        return response.json()
+
     def create_scan(self, name, metadata=None):
         """Create a new scan in the database.
 
