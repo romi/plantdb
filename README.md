@@ -73,7 +73,7 @@ The `plantdb` packages are available through:
 
 To create a new conda environment for PlantDB:
 ``` shell
-conda create -n plantdb 'python=3.10' ipython
+conda create -n plantdb 'python=3.11' ipython
 ```
 
 ## Installation
@@ -96,16 +96,14 @@ conda install -c romi-eu plantdb plantdb.server plantdb.client
 
 ### For Developers
 
-To install the library for development:
+To install the library for development, you first have to clone the repository:
+``` shell
+git clone https://github.com/romi/plantdb.git -b dev  # clone the 'dev' branch
+cd plantdb
+conda activate plantdb  # activate your environment first!
+```
 
-1. Clone the repository:
-   ``` shell
-   git clone https://github.com/romi/plantdb.git -b dev  # clone the 'dev' branch
-   cd plantdb
-   conda activate plantdb  # activate your environment first!
-   ```
-
-2. Install components:
+Then you may proceed to install the following components:
 #### Core library:
 ``` shell
 python -m pip install -e src/commons/.
@@ -179,7 +177,7 @@ If you want to use it, simply do:
 docker run -p 5000:5000 -v $ROMI_DB:/myapp/db -it roboticsmicrofarms/plantdb
 ```
 
-**Obviously you have to install docker first!**
+**Obviously, you have to install docker first!**
 
 ## Usage
 
@@ -203,7 +201,7 @@ dataset = db.get_scan("real_plant")
 img_fs = dataset.get_fileset('images')
 ```
 
-A detailed documentation of the Python API is available here: https://romi.github.io/plantdb/reference.html
+Detailed documentation of the Python API is available here: https://romi.github.io/plantdb/reference.html
 
 ### Serve the REST API
 
@@ -230,7 +228,7 @@ Open your favorite browser here:
 - scans: http://0.0.0.0:5000/scans
 - 'real_plant_analyzed' dataset: http://0.0.0.0:5000/scans/real_plant_analyzed
 
-A detailed documentation of the REST API is available here: https://romi.github.io/plantdb/webapi.html
+Detailed documentation of the REST API is available here: https://romi.github.io/plantdb/webapi.html
 
 ## Developers & contributors
 
