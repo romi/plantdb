@@ -1,6 +1,6 @@
 # Template for generating Conda package metadata YAML files
 
-{% set subpackage = os.environ.get('PLANTDB_SUBPACKAGE', '') %}
+{% set subpackage = os.environ.get('ROMI_SUBPACKAGE', '') %}
 {% set package_path = "../../src/" + subpackage%}  # Define path to package directory
 {% set pyproject = load_file_data(package_path + '/pyproject.toml', 'toml', from_recipe_dir=True) %}  # Load pyproject.toml content
 {% set project = pyproject.get('project', {}) %}  # Extract project metadata
@@ -42,7 +42,7 @@ requirements:
 
 test:
   imports:
-    - plantdb.{{ subpackage }}  # Basic import test
+    - {{ project.get('name') }}  # Basic import test
 
 about:
   home: {{ urls.get('homepage', '') }}  # Project homepage

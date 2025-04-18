@@ -36,7 +36,7 @@ jobs:
       # Step 3: Build and upload the conda package with environment variable
       - name: Conda build
         env:
-          PLANTDB_SUBPACKAGE: ${{ matrix.package }}  # set the environment variable to use in the `meta.yaml`
+          ROMI_SUBPACKAGE: ${{ matrix.package }}  # set the environment variable to use in the `meta.yaml`
         run: |
           # Install necessary tools for building and uploading packages
           conda install conda-build anaconda-client
