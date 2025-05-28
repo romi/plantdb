@@ -1,0 +1,10 @@
+{% set pyproject = load_file_data('../../src/client/pyproject.toml', 'toml', from_recipe_dir=True) %}
+{% set requires-python = pyproject.get('project', {}).get('requires-python') %}
+
+name: plantdb_client
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python {{ requires-python }}
+  - toml

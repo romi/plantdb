@@ -1,7 +1,7 @@
-{% set pyproject = load_file_data('../../pyproject.toml', 'toml', from_recipe_dir=True) %}
+{% set pyproject = load_file_data('../../src/server/pyproject.toml', 'toml', from_recipe_dir=True) %}
 {% set requires-python = pyproject.get('project', {}).get('requires-python') %}
 
-name: plantdb
+name: plantdb_server
 channels:
   - defaults
   - conda-forge
