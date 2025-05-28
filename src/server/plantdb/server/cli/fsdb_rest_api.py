@@ -136,7 +136,7 @@ def parsing():
     return parser
 
 
-def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, empty=False, models=False,
+def rest_api(db_location, host="0.0.0.0", port=5000, proxy=False, debug=False, test=False, empty=False, models=False,
              log_level=DEFAULT_LOG_LEVEL):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
@@ -177,7 +177,10 @@ def rest_api(db_location, host="0.0.0.0", port=5000, debug=False, test=False, em
     # Instantiate the Flask application:
     app = Flask(__name__)
     CORS(app)
-    api = Api(app)
+    if proxy:
+        api = Api(app, prefix="/plantdb")
+    else:
+        api = Api(app)
     # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
     logger = get_logger('fsdb_rest_api', log_level=log_level)
