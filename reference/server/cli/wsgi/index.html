@@ -12,25 +12,25 @@
         <meta name="author" content="ROMI Team">
       
       
-        <link rel="canonical" href="https://romi.github.io/plantdb/reference/client/">
+        <link rel="canonical" href="https://romi.github.io/plantdb/reference/server/cli/wsgi/">
       
       
-        <link rel="prev" href="../server/webcache/">
+        <link rel="prev" href="../fsdb_rest_api/">
       
       
-        <link rel="next" href="cli/">
+        <link rel="next" href="../../rest_api/">
       
       
-      <link rel="icon" href="../../assets/images/ROMI_ICON_green.png">
+      <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
-        <title>client - PlantDB</title>
+        <title>wsgi - PlantDB</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
       
       
 
@@ -49,15 +49,15 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_markdown_exec_pyodide.css">
+      <link rel="stylesheet" href="../../../../assets/_markdown_exec_pyodide.css">
     
-      <link rel="stylesheet" href="../../assets/_markdown_exec_ansi.css">
+      <link rel="stylesheet" href="../../../../assets/_markdown_exec_ansi.css">
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../assets/css/extra.css">
+      <link rel="stylesheet" href="../../../../assets/css/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#plantdb.client" class="md-skip">
+        <a href="#plantdb.server.cli.wsgi" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="https://romi.github.io/plantdb/" title="PlantDB" class="md-header__button md-logo" aria-label="PlantDB" data-md-component="logo">
       
-  <img src="../../assets/images/ROMI_logo_white.svg" alt="logo">
+  <img src="../../../../assets/images/ROMI_logo_white.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              client
+              wsgi
             
           </span>
         </div>
@@ -190,7 +190,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../../.." class="md-tabs__link">
         
   
   
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../rest_api/" class="md-tabs__link">
+      <a href="../../../../rest_api/" class="md-tabs__link">
         
   
   
@@ -241,7 +241,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../commons/" class="md-tabs__link">
+        <a href="../../../commons/" class="md-tabs__link">
           
   
   
@@ -286,7 +286,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="https://romi.github.io/plantdb/" title="PlantDB" class="md-nav__button md-logo" aria-label="PlantDB" data-md-component="logo">
       
-  <img src="../../assets/images/ROMI_logo_white.svg" alt="logo">
+  <img src="../../../../assets/images/ROMI_logo_white.svg" alt="logo">
 
     </a>
     PlantDB
@@ -313,7 +313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -335,7 +335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../rest_api/" class="md-nav__link">
+      <a href="../../../../rest_api/" class="md-nav__link">
         
   
   
@@ -459,7 +459,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../commons/" class="md-nav__link ">
+            <a href="../../../commons/" class="md-nav__link ">
               
   
   
@@ -507,7 +507,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../commons/cli/" class="md-nav__link ">
+            <a href="../../../commons/cli/" class="md-nav__link ">
               
   
   
@@ -540,7 +540,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/fsdb_check/" class="md-nav__link">
+      <a href="../../../commons/cli/fsdb_check/" class="md-nav__link">
         
   
   
@@ -563,7 +563,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/fsdb_import_file/" class="md-nav__link">
+      <a href="../../../commons/cli/fsdb_import_file/" class="md-nav__link">
         
   
   
@@ -586,7 +586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/fsdb_import_folder/" class="md-nav__link">
+      <a href="../../../commons/cli/fsdb_import_folder/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/fsdb_import_images/" class="md-nav__link">
+      <a href="../../../commons/cli/fsdb_import_images/" class="md-nav__link">
         
   
   
@@ -632,7 +632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/fsdb_sync/" class="md-nav__link">
+      <a href="../../../commons/cli/fsdb_sync/" class="md-nav__link">
         
   
   
@@ -655,7 +655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/cli/shared_fsdb/" class="md-nav__link">
+      <a href="../../../commons/cli/shared_fsdb/" class="md-nav__link">
         
   
   
@@ -686,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/db/" class="md-nav__link">
+      <a href="../../../commons/db/" class="md-nav__link">
         
   
   
@@ -724,7 +724,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../commons/fsdb/" class="md-nav__link ">
+            <a href="../../../commons/fsdb/" class="md-nav__link ">
               
   
   
@@ -757,7 +757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/core/" class="md-nav__link">
+      <a href="../../../commons/fsdb/core/" class="md-nav__link">
         
   
   
@@ -780,7 +780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/exceptions/" class="md-nav__link">
+      <a href="../../../commons/fsdb/exceptions/" class="md-nav__link">
         
   
   
@@ -803,7 +803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/file_ops/" class="md-nav__link">
+      <a href="../../../commons/fsdb/file_ops/" class="md-nav__link">
         
   
   
@@ -826,7 +826,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/fsdb_tools/" class="md-nav__link">
+      <a href="../../../commons/fsdb/fsdb_tools/" class="md-nav__link">
         
   
   
@@ -849,7 +849,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/metadata/" class="md-nav__link">
+      <a href="../../../commons/fsdb/metadata/" class="md-nav__link">
         
   
   
@@ -872,7 +872,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/path_helpers/" class="md-nav__link">
+      <a href="../../../commons/fsdb/path_helpers/" class="md-nav__link">
         
   
   
@@ -895,7 +895,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/serialization/" class="md-nav__link">
+      <a href="../../../commons/fsdb/serialization/" class="md-nav__link">
         
   
   
@@ -918,7 +918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/fsdb/validation/" class="md-nav__link">
+      <a href="../../../commons/fsdb/validation/" class="md-nav__link">
         
   
   
@@ -949,7 +949,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/io/" class="md-nav__link">
+      <a href="../../../commons/io/" class="md-nav__link">
         
   
   
@@ -972,7 +972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/log/" class="md-nav__link">
+      <a href="../../../commons/log/" class="md-nav__link">
         
   
   
@@ -995,7 +995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/sshfsdb/" class="md-nav__link">
+      <a href="../../../commons/sshfsdb/" class="md-nav__link">
         
   
   
@@ -1018,7 +1018,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/sync/" class="md-nav__link">
+      <a href="../../../commons/sync/" class="md-nav__link">
         
   
   
@@ -1041,7 +1041,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/test_database/" class="md-nav__link">
+      <a href="../../../commons/test_database/" class="md-nav__link">
         
   
   
@@ -1064,7 +1064,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/testing/" class="md-nav__link">
+      <a href="../../../commons/testing/" class="md-nav__link">
         
   
   
@@ -1087,7 +1087,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commons/utils/" class="md-nav__link">
+      <a href="../../../commons/utils/" class="md-nav__link">
         
   
   
@@ -1123,6 +1123,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1133,11 +1135,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -1153,7 +1155,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             server
@@ -1164,6 +1166,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1174,15 +1178,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_1" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../server/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -1201,7 +1205,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2_1">
             <span class="md-nav__icon md-icon"></span>
             server
@@ -1212,6 +1216,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1222,15 +1228,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_1_1" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../server/cli/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -1249,7 +1255,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_2_1_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_2_1_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2_1_1">
             <span class="md-nav__icon md-icon"></span>
             cli
@@ -1263,7 +1269,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../server/cli/fsdb_rest_api/" class="md-nav__link">
+      <a href="../fsdb_rest_api/" class="md-nav__link">
         
   
   
@@ -1283,10 +1289,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../server/cli/wsgi/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    wsgi
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1297,6 +1323,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#plantdb.server.cli.wsgi" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;wsgi
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1317,7 +1370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../server/rest_api/" class="md-nav__link">
+      <a href="../../rest_api/" class="md-nav__link">
         
   
   
@@ -1340,7 +1393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../server/webcache/" class="md-nav__link">
+      <a href="../../webcache/" class="md-nav__link">
         
   
   
@@ -1376,8 +1429,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1388,11 +1439,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -1408,7 +1459,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             client
@@ -1419,8 +1470,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1431,15 +1480,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href="../../../client/" class="md-nav__link ">
               
   
   
@@ -1452,13 +1501,13 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_3_3_1" id="__nav_3_3_1_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_3_1" id="__nav_3_3_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3_1">
             <span class="md-nav__icon md-icon"></span>
             client
@@ -1487,7 +1536,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="cli/" class="md-nav__link ">
+            <a href="../../../client/cli/" class="md-nav__link ">
               
   
   
@@ -1520,7 +1569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/fsdb_rest_api_sync/" class="md-nav__link">
+      <a href="../../../client/cli/fsdb_rest_api_sync/" class="md-nav__link">
         
   
   
@@ -1551,7 +1600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="plantdb_client/" class="md-nav__link">
+      <a href="../../../client/plantdb_client/" class="md-nav__link">
         
   
   
@@ -1574,7 +1623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="rest_api/" class="md-nav__link">
+      <a href="../../../client/rest_api/" class="md-nav__link">
         
   
   
@@ -1638,9 +1687,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#plantdb.client" class="md-nav__link">
+  <a href="#plantdb.server.cli.wsgi" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;client
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;wsgi
     </span>
   </a>
   
@@ -1665,19 +1714,22 @@
   
 
 
-  <h1>client</h1>
+  <h1>wsgi</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="plantdb.client" class="doc doc-heading">
-            <span class="doc doc-object-name doc-module-name">plantdb.client</span>
+<h2 id="plantdb.server.cli.wsgi" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">plantdb.server.cli.wsgi</span>
 
 
-<a href="#plantdb.client" class="headerlink" title="Permanent link">Link</a></h2>
+<a href="#plantdb.server.cli.wsgi" class="headerlink" title="Permanent link">Link</a></h2>
 
     <div class="doc doc-contents first">
+
+        <div class="language-shell highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>uwsgi<span style="color: #BBB"> </span>--http<span style="color: #BBB"> </span>:5000<span style="color: #BBB"> </span>--module<span style="color: #BBB"> </span>plantdb.server.cli.wsgi:application<span style="color: #BBB"> </span>--callable<span style="color: #BBB"> </span>application<span style="color: #BBB"> </span>--master
+</code></pre></div>
 
 
 
@@ -1804,12 +1856,12 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
-        <script src="../../assets/_markdown_exec_pyodide.js"></script>
+        <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       

@@ -152,4 +152,8 @@
          <loc>https://romi.github.io/plantdb/reference/server/cli/fsdb_rest_api/</loc>
          <lastmod>2025-05-28</lastmod>
     </url>
+    <url>
+         <loc>https://romi.github.io/plantdb/reference/server/cli/wsgi/</loc>
+         <lastmod>2025-05-28</lastmod>
+    </url>
 </urlset>
