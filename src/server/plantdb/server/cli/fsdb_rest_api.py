@@ -81,6 +81,8 @@ from plantdb.commons.fsdb import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
+from plantdb.commons.test_database import DATASET
+from plantdb.commons.test_database import test_database
 from plantdb.server.rest_api import Archive
 from plantdb.server.rest_api import CurveSkeleton
 from plantdb.server.rest_api import DatasetFile
@@ -104,8 +106,6 @@ from plantdb.server.rest_api import ScanMetadata
 from plantdb.server.rest_api import ScansList
 from plantdb.server.rest_api import ScansTable
 from plantdb.server.rest_api import Sequence
-from plantdb.commons.test_database import DATASET
-from plantdb.commons.test_database import test_database
 
 
 def parsing():
@@ -136,8 +136,7 @@ def parsing():
     return parser
 
 
-def rest_api(db_location, host="0.0.0.0", port=5000, proxy=False, debug=False, test=False, empty=False, models=False,
-             log_level=DEFAULT_LOG_LEVEL):
+def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, empty=False, models=False):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -151,15 +150,10 @@ def rest_api(db_location, host="0.0.0.0", port=5000, proxy=False, debug=False, t
     db_location : str
         The path to the local plant database to be served. If set to "/none", the server will raise
         an error and terminate unless the path is appropriately overridden in test mode.
-    host : str, optional
-        The hostname or IP address on which the Flask application will listen for incoming requests.
-         Defaults to ``"0.0.0.0"``.
-    port : int, optional
-        The port number to bind the Flask application for incoming HTTP requests.
-         Defaults to ``5000``.
-    debug : bool, optional
-        A boolean flag indicating whether Flask debugging mode should be enabled.
-        Useful for debugging during development. Defaults to ``False``.
+    proxy : bool, optional
+        Boolean flag indicating whether the application is behind a reverse proxy, by default ``False``.
+    log_level : str, optional
+        The logging level to use for the application. Defaults to ``DEFAULT_LOG_LEVEL``.
     test : bool, optional
         A boolean flag to specify if the application should run in test mode. When enabled, a test
         database will be instantiated with sample datasets or an empty configuration if specified.
@@ -170,8 +164,6 @@ def rest_api(db_location, host="0.0.0.0", port=5000, proxy=False, debug=False, t
     models : bool, optional
         A boolean flag to specify whether the test database should be populated with trained CNN models.
         Defaults to ``False``.
-    log_level : str, optional
-        The logging level to use for the application. Defaults to ``DEFAULT_LOG_LEVEL``.
 
     """
     # Instantiate the Flask application:
@@ -267,8 +259,7 @@ def rest_api(db_location, host="0.0.0.0", port=5000, proxy=False, debug=False, t
     api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata',
                      resource_class_args=tuple([db, logger]))
 
-    # Start the Flask application:
-    app.run(host=host, port=port, debug=debug)
+    return app
 
 
 def main():
@@ -279,7 +270,10 @@ def main():
     """
     parser = parsing()
     args = parser.parse_args()
-    rest_api(args.db_location, args.host, args.port, args.debug, args.test, args.empty, args.models, args.log_level)
+    app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level,
+                   test=args.test, empty=args.empty, models=args.models)
+    # Start the Flask application:
+    app.run(host=args.host, port=args.port, debug=args.debug)
 
 
 if __name__ == '__main__':
