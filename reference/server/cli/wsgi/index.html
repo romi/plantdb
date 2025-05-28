@@ -1728,9 +1728,31 @@
 
     <div class="doc doc-contents first">
 
-        <div class="language-shell highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>uwsgi<span style="color: #BBB"> </span>--http<span style="color: #BBB"> </span>:5000<span style="color: #BBB"> </span>--module<span style="color: #BBB"> </span>plantdb.server.cli.wsgi:application<span style="color: #BBB"> </span>--callable<span style="color: #BBB"> </span>application<span style="color: #BBB"> </span>--master
-</code></pre></div>
+        <p>WSGI Application Entry Point</p>
+<p>This module serves as the Web Server Gateway Interface (WSGI) entry point for the application,
+allowing web servers like Gunicorn, uWSGI, or Apache with mod_wsgi to interact with the application.</p>
 
+
+<details class="key-features:" open>
+  <summary>Key Features:</summary>
+  <ul>
+<li>Provides the application instance for WSGI-compatible web servers</li>
+<li>Serves as the deployment entry point in production environments</li>
+<li>Separates server configuration from application logic</li>
+<li>Enables standard deployment practices for Python web applications</li>
+</ul>
+</details>
+
+<details class="usage-examples:" open>
+  <summary>Usage Examples:</summary>
+  <p>When deploying with Gunicorn:</p>
+<div class="language-text highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>gunicorn wsgi:app
+</code></pre></div>
+<p>When deploying with uWSGI:
+<div class="language-shell highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>uwsgi<span style="color: #BBB"> </span>--http<span style="color: #BBB"> </span>:5000<span style="color: #BBB"> </span>--module<span style="color: #BBB"> </span>plantdb.server.cli.wsgi:application<span style="color: #BBB"> </span>--callable<span style="color: #BBB"> </span>application<span style="color: #BBB"> </span>--master
+</code></pre></div>
+Should then be accessible under: https://localhost:5000/plantds/scans</p>
+</details>
 
 
 
