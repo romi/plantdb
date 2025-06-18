@@ -1,3 +1,27 @@
+# ============= Builder stage for uwsgi =============
+FROM ubuntu:22.04 AS builder
+
+# Set up environment for building uwsgi
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends \
+        python3 python3-pip \
+        # Install python3.10 & pip
+        python3 python3-pip \
+        # Install 'gcc', 'libc6-dev' & 'python3-dev' to be able to build uwsgi
+        gcc libc6-dev python3-dev && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Build uwsgi
+RUN python3 -m pip install --no-cache-dir wheel && \
+    python3 -m pip install --no-cache-dir uwsgi && \
+    python3 -m pip cache purge
+
+# ============= Final stage =============
 FROM ubuntu:22.04
 #FROM python:3.9-slim-bullseye
 LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
@@ -33,6 +57,8 @@ RUN apt-get update && \
         git ca-certificates rsync \
         # Install python3.10 & pip
         python3 python3-pip \
+        # Add python3-dev to ensure libpython is available for uwsgi
+        python3-dev \
         # Install Open3D system dependencies
         libegl1 libgl1 libgomp1 && \
     # Clean package manager:
@@ -47,6 +73,10 @@ RUN apt-get update && \
     touch ${ROMI_DB}/romidb && \
     chown -R ${USER_NAME} ${ROMI_DB}
 
+# Copy uwsgi from builder stage
+COPY --from=builder /usr/local/bin/uwsgi /usr/local/bin/
+COPY --from=builder /usr/local/lib/python3.10/dist-packages/ /usr/local/lib/python3.10/dist-packages/
+
 # Change to non-root user:
 USER ${USER_NAME}
 # Change working directory:
@@ -58,7 +88,7 @@ RUN cd plantdb/ && \
     # Install `plantdb` dependencies and sources:
     python3 -m pip install --no-cache-dir src/commons/.[io] && \
     python3 -m pip install --no-cache-dir src/server/. && \
-    python3 -m pip install --no-cache-dir src/client/. && \
+    python3 -m pip install uwsgi && \
     # Clean pip cache:
     python3 -m pip cache purge
 

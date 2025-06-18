@@ -4,29 +4,29 @@
 # Functions for colors and messages
 # --------------------------------
 setup_colors() {
-  RED="\033[0;31m"
-  GREEN="\033[0;32m"
-  YELLOW="\033[0;33m"
-  NC="\033[0m" # No Color
-  INFO="${GREEN}INFO${NC}    "
-  WARNING="${YELLOW}WARNING${NC} "
-  ERROR="${RED}$(bold ERROR)${NC}   "
+  RED="\033[0;31m"    # Define red color code
+  GREEN="\033[0;32m"  # Define green color code
+  YELLOW="\033[0;33m" # Define yellow color code
+  NC="\033[0m"        # No Color code to reset colors
+  INFO="${GREEN}INFO${NC}    "    # Prefix for info messages
+  WARNING="${YELLOW}WARNING${NC} " # Prefix for warning messages
+  ERROR="${RED}$(bold ERROR)${NC}   " # Prefix for error messages using bold function
 }
 
 bold() {
-  echo -e "\e[1m$*\e[0m"
+  echo -e "\e[1m$*\e[0m" # Make text bold and reset
 }
 
 log_info() {
-  echo -e "${INFO}$1"
+  echo -e "${INFO}$1" # Print info message with INFO prefix
 }
 
 log_warning() {
-  echo -e "${WARNING}$1"
+  echo -e "${WARNING}$1" # Print warning message with WARNING prefix
 }
 
 log_error() {
-  echo -e "${ERROR}$1"
+  echo -e "${ERROR}$1" # Print error message with ERROR prefix
 }
 
 # --------------------------------
@@ -230,12 +230,34 @@ check_terminal() {
 # --------------------------------
 # Docker run functions
 # --------------------------------
-run_docker_default() {
+run_docker_development() {
   # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
-  docker run --rm -p ${port}:5000 ${mount_option} \
+  docker run \
+    --rm \
+    -p ${port}:5000 \
+    ${mount_option} \
     --user romi:${gid} \
-    -i ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
+    -i ${USE_TTY} \
+    roboticsmicrofarms/plantdb:${vtag} \
     "fsdb_rest_api --port 5000"
+}
+
+run_docker_production() {
+  # Start the Docker container in detached mode.
+  # Map the specified host port to the container's port 5000.
+  # Mount options for the container filesystem.
+  # Set the user and group ID within the container.
+  # Load `~/.bashrc` if `-i` is set, interactive mode.
+  # Use the specified Docker image tag for the roboticsmicrofarms/plantdb service.
+  # Run uWSGI to serve the application on port 5000.
+  docker run \
+    -d \
+    -p ${port}:5000 \
+    ${mount_option} \
+    --user romi:${gid} \
+    -i ${USE_TTY} \
+    roboticsmicrofarms/plantdb:${vtag} \
+    "uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master"
 }
 
 run_docker_command() {
@@ -279,7 +301,7 @@ main() {
   check_terminal
 
   if [ "${cmd}" = "" ]; then
-    run_docker_default
+    run_docker_development
   else
     run_docker_command
   fi

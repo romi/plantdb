@@ -4,29 +4,29 @@
 # Functions for colors and messages
 # --------------------------------
 setup_colors() {
-  RED="\033[0;31m"
-  GREEN="\033[0;32m"
-  YELLOW="\033[0;33m"
-  NC="\033[0m" # No Color
-  INFO="${GREEN}INFO${NC}    "
-  WARNING="${YELLOW}WARNING${NC} "
-  ERROR="${RED}$(bold ERROR)${NC}   "
+  RED="\033[0;31m"    # Define red color code
+  GREEN="\033[0;32m"  # Define green color code
+  YELLOW="\033[0;33m" # Define yellow color code
+  NC="\033[0m"        # No Color code to reset colors
+  INFO="${GREEN}INFO${NC}    "    # Prefix for info messages
+  WARNING="${YELLOW}WARNING${NC} " # Prefix for warning messages
+  ERROR="${RED}$(bold ERROR)${NC}   " # Prefix for error messages using bold function
 }
 
 bold() {
-  echo -e "\e[1m$*\e[0m"
+  echo -e "\e[1m$*\e[0m" # Make text bold and reset
 }
 
 log_info() {
-  echo -e "${INFO}$1"
+  echo -e "${INFO}$1" # Print info message with INFO prefix
 }
 
 log_warning() {
-  echo -e "${WARNING}$1"
+  echo -e "${WARNING}$1" # Print warning message with WARNING prefix
 }
 
 log_error() {
-  echo -e "${ERROR}$1"
+  echo -e "${ERROR}$1" # Print error message with ERROR prefix
 }
 
 # --------------------------------
