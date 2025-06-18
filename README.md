@@ -201,17 +201,19 @@ dataset = db.get_scan("real_plant")
 img_fs = dataset.get_fileset('images')
 ```
 
-Detailed documentation of the Python API is available here: https://romi.github.io/plantdb/reference.html
+For detailed documentation of the Python API, visit: [Python API Documentation](https://romi.github.io/plantdb/reference.html).
 
 ### Serve the REST API
 
-Then you can start the REST API with `fsdb_rest_api`:
+#### Development Mode
+
+To start the REST API in development mode using `fsdb_rest_api`, run:
 
 ```shell
 fsdb_rest_api -db $ROMI_DB
 ```
 
-You should see something like:
+You should see output similar to this:
 
 ```
 n scans = 5
@@ -223,12 +225,52 @@ n scans = 5
  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
 ```
 
-Open your favorite browser here:
+Open your favorite browser and navigate to:
 
-- scans: http://0.0.0.0:5000/scans
-- 'real_plant_analyzed' dataset: http://0.0.0.0:5000/scans/real_plant_analyzed
+- scans: [http://0.0.0.0:5000/scans](http://0.0.0.0:5000/scans)
+- 'real_plant_analyzed' dataset: [http://0.0.0.0:5000/scans/real_plant_analyzed](http://0.0.0.0:5000/scans/real_plant_analyzed)
 
-Detailed documentation of the REST API is available here: https://romi.github.io/plantdb/webapi.html
+For detailed documentation of the REST API, visit: [REST API Documentation](https://romi.github.io/plantdb/webapi.html).
+
+
+
+#### Production Mode
+
+To serve in a production environment, we recommend building a Docker image.
+
+1. **Create a new volume** (e.g., `romi_db`):
+   ```shell
+   docker volume create romi_db
+   ```
+
+2. **Initialize the database**:
+   ```shell
+   docker run --rm \
+     -v romi_db:/myapp/db \
+     --user romi \
+     roboticsmicrofarms/plantdb:latest \
+     touch /myapp/db/romidb
+   ```
+
+3. **Build the Docker image** using the provided script:
+   ```shell
+   ./docker/build.sh -t latest
+   ```
+
+4. **Start a Docker container**:
+   ```shell
+   docker run --name plantdb_server \
+     -d \
+     -p 5000:5000 \
+     -v romi_db:/myapp/db \
+     --user romi \
+     roboticsmicrofarms/plantdb:latest \
+     uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
+   ```
+
+If you want to bind mount a local database, replace `-v romi_db:/myapp/db` with `-v /path/to/db:/myapp/db`.
+The served database will be accessible at [http://localhost:5000/plantdb/scans](http://localhost:5000/plantdb/scans).
+
 
 ## Developers & contributors
 
