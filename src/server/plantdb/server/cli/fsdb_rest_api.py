@@ -120,6 +120,8 @@ def parsing():
                           help="the port of the webserver, defaults to '5000'.")
     app_args.add_argument('--debug', action='store_true',
                           help="enable debug mode.")
+    app_args.add_argument('--proxy', action='store_true',
+                          help="use this flag when this server sits behind a reverse proxy")
 
     misc_args = parser.add_argument_group("other arguments")
     misc_args.add_argument("--test", action='store_true',
