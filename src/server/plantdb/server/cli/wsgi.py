@@ -32,13 +32,15 @@ When deploying with uWSGI:
 ```shell
 uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
 ```
-Should then be accessible under: https://localhost:5000/plantds/scans
+Should then be accessible under: http://localhost:5000/plantdb/scans
 """
+import os
 
 from plantdb.server.cli.fsdb_rest_api import rest_api
 
+romi_db = os.environ.get('ROMI_DB', '/myapp/db')
 # Get the Flask application
-application = rest_api("/data/ROMI/test_owner", proxy=True, log_level='INFO')
+application = rest_api(romi_db, proxy=True, log_level='INFO')
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=5000, debug=True)
