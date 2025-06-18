@@ -308,7 +308,7 @@ To build the `plantdb` conda packages, from the root directory of the repository
     for pkg in commons server client; do
       echo "Building plantdb-$pkg package..."
       export ROMI_SUBPACKAGE=$pkg
-      conda build conda/recipe/ --no-anaconda-upload
+      conda build conda/recipe/ -c conda-forge --no-anaconda-upload
     done
     ```
 
