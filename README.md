@@ -106,7 +106,7 @@ conda activate plantdb  # activate your environment first!
 Then you may proceed to install the following components:
 #### Core library:
 ``` shell
-python -m pip install -e src/commons/.
+python -m pip install -e src/commons/.[io]
 ```
 
 #### Client-side library:
