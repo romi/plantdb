@@ -76,6 +76,7 @@ from time import sleep
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from plantdb.commons.fsdb import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
@@ -168,31 +169,41 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
         Defaults to ``False``.
 
     """
-    # Instantiate the Flask application:
-    app = Flask(__name__)
-    CORS(app)
-    if proxy:
-        api = Api(app, prefix="/plantdb")
-    else:
-        api = Api(app)
     # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
     logger = get_logger('fsdb_rest_api', log_level=log_level)
 
+    # Instantiate the Flask application:
+    app = Flask(__name__)
+    CORS(app)  # Enable Cross-Origin Resource Sharing for the app
+    if proxy:
+        api = Api(app, prefix=os.environ.get("PLANTDB_API_PREFIX", ""))
+        # App is behind one proxy that sets the -For and -Host headers.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
+        # Set secure cookies
+        app.config.update(
+            SESSION_COOKIE_SECURE=True,
+            SESSION_COOKIE_SAMESITE='Lax'
+        )
+    else:
+        api = Api(app)  # Initialize API without proxy settings
+
     if test:
         if empty:
+            # Create an empty test database
             db_location = test_database(None).path()
         else:
+            # Create a populated test database
             db_location = test_database(DATASET, with_configs=True, with_models=models).path()
 
         # Register cleanup if a temporary database was created
         def cleanup():
             logger.info(f"Cleaning up temporary database directory at '{db_location}'...")
             try:
-                shutil.rmtree(db_location)
+                shutil.rmtree(db_location)  # Remove the temporary database directory
                 logger.info(f"Successfully removed temporary directory at '{db_location}'.")
             except OSError as e:
-                logger.error(f"Error removing temporary directory: {e}.")
+                logger.error(f"Error removing temporary directory: {e}.") # Log any errors during cleanup
 
         atexit.register(cleanup)
 
@@ -201,7 +212,7 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
         logger.info(
             "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
         sleep(1)
-        sys.exit("Wrong database location!")
+        sys.exit("Wrong database location!")  # Exit with an error message if no database path is provided
 
     # Connect to the database:
     db = FSDB(db_location)
