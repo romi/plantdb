@@ -2096,8 +2096,8 @@ and target databases.</p>
     args <span style="color: #666">=</span> parser<span style="color: #666">.</span>parse_args()
 
     <span style="color: #3D7B7B; font-style: italic"># Validate the availability of origin and target database URLs</span>
-    test_host_port_availability(args<span style="color: #666">.</span>origin)
-    test_host_port_availability(args<span style="color: #666">.</span>target)
+    test_availability(args<span style="color: #666">.</span>origin)
+    test_availability(args<span style="color: #666">.</span>target)
 
     <span style="color: #3D7B7B; font-style: italic"># Synchronize scan archives between the origin and target databases</span>
     sync_scan_archives(args<span style="color: #666">.</span>origin, args<span style="color: #666">.</span>target, args<span style="color: #666">.</span>filter, args<span style="color: #666">.</span>log_level)  <span style="color: #3D7B7B; font-style: italic"># Perform synchronization</span>
