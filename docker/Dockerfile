@@ -45,7 +45,7 @@ ENV PATH="${PATH}:/home/${USER_NAME}/.local/bin"
 # See: https://github.com/pypa/setuptools/issues/3269#issuecomment-1254507377
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 
-# Required by `romi_run_task`:
+# Location of the database folder to serve:
 ENV ROMI_DB="/myapp/db"
 
 # Change Shell to 'bash', default is 'sh':
