@@ -36,6 +36,8 @@ import requests
 from PIL import Image
 from plyfile import PlyData
 
+from plantdb.commons import api_prefix
+
 #: Default URL to REST API is 'localhost':
 REST_API_URL = "127.0.0.1"
 # Default port to REST API:
@@ -121,8 +123,12 @@ def scans_url(host=REST_API_URL, port=REST_API_PORT):
     >>> from plantdb.client.rest_api import scans_url
     >>> scans_url()
     'http://127.0.0.1:5000/scans'
+    >>> import os
+    >>> os.environ['PLANTDB_API_PREFIX'] = "/plantdb"
+    >>> scans_url()
+    'http://127.0.0.1:5000/plantdb/scans'
     """
-    return urljoin(base_url(host, port), "/scans")
+    return urljoin(base_url(host, port), f"{api_prefix()}/scans")
 
 
 def scan_url(scan_id, host=REST_API_URL, port=REST_API_PORT):
@@ -148,7 +154,7 @@ def scan_url(scan_id, host=REST_API_URL, port=REST_API_PORT):
     >>> scan_url("real_plant")
     'http://127.0.0.1:5000/scans/real_plant'
     """
-    return urljoin(base_url(host, port), f"/scans/{sanitize_name(scan_id)}")
+    return urljoin(base_url(host, port), f"{api_prefix()}/scans/{sanitize_name(scan_id)}")
 
 
 def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL, port=REST_API_PORT):
@@ -187,7 +193,7 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', host=REST_API_URL,
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return urljoin(base_url(host, port), f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}")
+    return urljoin(base_url(host, port), f"{api_prefix()}/image/{scan_id}/{fileset_id}/{file_id}?size={size}")
 
 
 def refresh_url(dataset_name=None, **kwargs):
@@ -211,10 +217,16 @@ def refresh_url(dataset_name=None, **kwargs):
     -------
     str
         A correctly formatted URL for refreshing the specified dataset or the entire PlantDB REST API server.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import refresh_url
+    >>> refresh_url("real_plant")
+    'http://127.0.0.1:5000/refresh?scan_id=real_plant'
     """
     url = urljoin(
-        base_url(host=kwargs.get("host", None), port=kwargs.get("port", None)),
-        "/refresh"
+        base_url(host=kwargs.get("host", REST_API_URL), port=kwargs.get("port", REST_API_PORT)),
+        f"{api_prefix()}/refresh"
     )
     if dataset_name is None:
         return url
@@ -255,8 +267,8 @@ def archive_url(dataset_name, **kwargs):
     """
     dataset_name = sanitize_name(dataset_name)
     url = urljoin(
-        base_url(host=kwargs.get("host", None), port=kwargs.get("port", None)),
-        f"/archive/{dataset_name}"
+        base_url(host=kwargs.get("host", REST_API_URL), port=kwargs.get("port", REST_API_PORT)),
+        f"{api_prefix()}/archive/{dataset_name}"
     )
     return url
 
@@ -277,6 +289,12 @@ def get_file_uri(scan, fileset, file):
     -------
     str
         The URI for the corresponding `scan/fileset/file` tree.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import get_file_uri
+    >>> get_file_uri('real_plant', 'images', '00000_rgb')
+    '/plantdb/files/real_plant/images/00000_rgb'
     """
     from plantdb.commons.fsdb import Scan
     from plantdb.commons.fsdb import Fileset
@@ -284,7 +302,7 @@ def get_file_uri(scan, fileset, file):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"/files/{scan_id}/{fileset_id}/{file_id}"
+    return f"{api_prefix()}/files/{scan_id}/{fileset_id}/{file_id}"
 
 
 def test_host_port_availability(url):
@@ -311,7 +329,7 @@ def test_host_port_availability(url):
     Examples
     --------
     >>> from plantdb.client.rest_api import test_host_port_availability
-    >>> test_host_port_availability('127.0.0.1:5000')
+    >>> test_host_port_availability('http://127.0.0.1:5000')
     """
     import socket
     try:
@@ -345,7 +363,7 @@ def list_scan_names(host=REST_API_URL, port=REST_API_PORT):
     Examples
     --------
     >>> from plantdb.client.rest_api import list_scan_names
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
+    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb.server library)
     >>> print(list_scan_names())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
@@ -460,6 +478,12 @@ def scan_preview_image_url(scan_id, host=REST_API_URL, port=REST_API_PORT, size=
     -------
     str
         The URL to the preview image for a scan dataset.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import scan_preview_image_url
+    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
+    >>> scan_preview_image_url('real_plant')
     """
     scan_id = sanitize_name(scan_id)
     thumb_uri = get_scan_data(scan_id, host, port)["thumbnailUri"]

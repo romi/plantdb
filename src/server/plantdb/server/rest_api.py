@@ -55,6 +55,7 @@ from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import is_radians
 from plantdb.server import webcache
+from plantdb.commons import api_prefix
 
 
 def get_scan_date(scan):
@@ -242,15 +243,15 @@ def get_scan_info(scan, **kwargs):
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
     ## Get the URL to the archive:
-    scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
+    scan_info["metadata"]["files"]["archive"] = f"{api_prefix()}/archive/{scan.id}"
     ## Get the path to the JSON metadata file:
-    metadata_json_path = os.path.join("/files/", scan.id, "metadata", "metadata.json")
+    metadata_json_path = os.path.join(f"{api_prefix()}/files/", scan.id, "metadata", "metadata.json")
     scan_info["metadata"]["files"]["metadata"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
     img_f = img_fs.get_files()[0]
-    scan_info["thumbnailUri"] = f"/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
+    scan_info["thumbnailUri"] = f"{api_prefix()}/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
@@ -287,33 +288,81 @@ def get_scan_info(scan, **kwargs):
     scan_info["hasSegmentedPcdEvaluation"] = _try_has_file('SegmentedPointCloudEvaluation',
                                                            'SegmentedPointCloudEvaluation')
 
-    ## Get the URI (file path) to the output of the `PointCloud` task:
+    # Get the URI (file path) to the output of the tasks:
     for task, uri_key in task_filesUri_mapping.items():
         if scan_info[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
             scan_info["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
 
-    print(f"Bounding-box: {img_fs.get_metadata('workspace')}")
+    # Get the workspace metadata
     scan_info["workspace"] = img_fs.get_metadata("workspace")
-
+    # Get the camera metadata
     scan_info["camera"] = {}
+    if img_f.get_metadata("colmap_camera") != {}:
+        model, poses = _get_colmap_camera_model(scan)
+        scan_info["camera"]["model"] = model
+        scan_info["camera"]["poses"] = poses
 
-    print(f"Camera model: {img_f.get_metadata('colmap_camera')}")
-    scan_info["camera"]["model"] = img_f.get_metadata("colmap_camera")['camera_model']
+    return scan_info
 
-    scan_info["camera"]["poses"] = []
+
+def _get_colmap_camera_model(scan):
+    """Retrieve the COLMAP camera model and camera poses from a scan object.
+
+    This function extracts the COLMAP camera model from the metadata of the first image file
+    in the specified scan's image fileset. It then iterates over all RGB images in the same
+    fileset to collect their camera poses, including translation vectors (`tvec`), rotation
+    matrices (`rotmat`), and URIs for both original and thumbnail images.
+
+    Parameters
+    ----------
+    scan : Scan object
+        The scan object containing the image fileset with COLMAP metadata.
+
+    Returns
+    -------
+    Tuple[str, List[Dict[str, Union[int, str, np.ndarray]]]]
+        A tuple where the first element is the COLMAP camera model as a string, and the second
+        element is a list of dictionaries. Each dictionary contains the following keys:
+        - 'id': The unique identifier for the image file (int).
+        - 'tvec': The translation vector of the camera pose (np.ndarray).
+        - 'rotmat': The rotation matrix of the camera pose (np.ndarray).
+        - 'photoUri': The URI to the original size image (str).
+        - 'thumbnailUri': The URI to the thumbnail size image (str).
+
+    See Also
+    --------
+    get_image_uri : Function used to generate URIs for images based on scan, fileset, and file objects.
+
+    Examples
+    --------
+    >>> from plantdb.server.rest_api import _get_colmap_camera_model
+    >>> from plantdb.commons.test_database import test_database
+    >>> db = test_database('real_plant_analyzed')
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant_analyzed')
+    >>> camera_model, poses = _get_colmap_camera_model(scan)
+    >>> print(camera_model)
+    {'height': 1080, 'id': 1, 'model': 'OPENCV', 'params': [1166.9518889440105, 1166.9518889440105, 720.0, 540.0, -0.0013571157486977348, -0.0013571157486977348, 0.0, 0.0], 'width': 1440}
+    >>> print(poses[0])
+    {'id': '00000_rgb', 'tvec': [369.4279687732083, 120.36109311437637, -62.07043190848918], 'rotmat': [[0.06475585405884698, -0.9971710205080586, 0.038165890845442085], [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284], [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]], 'photoUri': '/image/real_plant_analyzed/images/00000_rgb.jpg?size=orig', 'thumbnailUri': '/image/real_plant_analyzed/images/00000_rgb.jpg?size=thumb'}
+
+    """
+    img_fs = scan.get_fileset("images")
+    img_f = img_fs.get_files()[0]
+
+    model = img_f.get_metadata("colmap_camera")['camera_model']
+    poses = []
     for img_f in img_fs.get_files(query={"channel": 'rgb'}):
         camera_md = img_f.get_metadata("colmap_camera")
-        scan_info["camera"]["poses"].append({
+        poses.append({
             "id": img_f.id,
             "tvec": camera_md['tvec'],
             "rotmat": camera_md['rotmat'],
             "photoUri": get_image_uri(scan.id, img_fs.id, img_f, size="orig"),
             "thumbnailUri": get_image_uri(scan.id, img_fs.id, img_f, size="thumb")
         })
-
-    return scan_info
-
+    return model, poses
 
 def get_file_uri(scan, fileset, file):
     """Return the URI for the corresponding `scan/fileset/file` tree.
@@ -352,7 +401,7 @@ def get_file_uri(scan, fileset, file):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"/files/{scan_id}/{fileset_id}/{file_id}"
+    return f"{api_prefix()}/files/{scan_id}/{fileset_id}/{file_id}"
 
 
 def get_image_uri(scan, fileset, file, size="orig"):
@@ -398,7 +447,7 @@ def get_image_uri(scan, fileset, file, size="orig"):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
+    return f"{api_prefix()}/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
 
 
 task_filesUri_mapping = {
