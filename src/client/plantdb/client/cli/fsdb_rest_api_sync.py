@@ -77,7 +77,7 @@ from plantdb.commons.log import get_logger
 from plantdb.client.rest_api import download_scan_archive
 from plantdb.client.rest_api import list_scan_names
 from plantdb.client.rest_api import refresh
-from plantdb.client.rest_api import test_host_port_availability
+from plantdb.client.rest_api import test_availability
 from plantdb.client.rest_api import upload_scan_archive
 
 
@@ -218,8 +218,8 @@ def main():
     args = parser.parse_args()
 
     # Validate the availability of origin and target database URLs
-    test_host_port_availability(args.origin)
-    test_host_port_availability(args.target)
+    test_availability(args.origin)
+    test_availability(args.target)
 
     # Synchronize scan archives between the origin and target databases
     sync_scan_archives(args.origin, args.target, args.filter, args.log_level)  # Perform synchronization

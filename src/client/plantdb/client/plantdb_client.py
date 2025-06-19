@@ -39,6 +39,8 @@ import mimetypes
 import requests
 from requests import RequestException
 
+from plantdb.commons import api_prefix
+
 
 def get_mime_type(extension):
     """Determine the MIME type from a file extension.
@@ -98,14 +100,17 @@ class PlantDBClient:
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import base_url
     >>> client = PlantDBClient(base_url())
+    >>> client.base_url
     >>> scans = client.list_scans()
     >>> print(scans)
     ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
     """
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, prefix=None):
         """Initialize the PlantDBClient with a base URL."""
-        self.base_url = base_url
+        if prefix is None:
+            prefix = api_prefix()
+        self.base_url = f"{base_url}{prefix}"
         self.session = requests.Session()
 
     def _handle_http_errors(self, response):
