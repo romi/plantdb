@@ -264,6 +264,7 @@ To serve in a production environment, we recommend building a Docker image.
      -p 5000:5000 \
      -v romi_db:/myapp/db \
      --user romi \
+     -e PLANTDB_API_PREFIX='/plantdb'
      roboticsmicrofarms/plantdb:latest \
      uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
    ```
@@ -271,6 +272,7 @@ To serve in a production environment, we recommend building a Docker image.
 If you want to bind mount a local database, replace `-v romi_db:/myapp/db` with `-v /path/to/db:/myapp/db`.
 The served database will be accessible at [http://localhost:5000/plantdb/scans](http://localhost:5000/plantdb/scans).
 
+Note: we use NGINX reverse proxy and locate the database behind the '/plantdb' prefix, hence the `-e PLANTDB_API_PREFIX='/plantdb'`.
 
 ## Developers & contributors
 
