@@ -1068,6 +1068,124 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
     return parse_task_requests_data(task, data, ext)
 
 
+def scan_file_url(dataset_name, file_path, **kwargs):
+    """Build the URL for accessing a dataset file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    file_path : str
+        The path to the file.
+    **kwargs
+        Keyword arguments passed to base_url().
+
+    Returns
+    -------
+    str
+        The complete URL for the dataset file.
+    """
+    url = base_url(
+        host=kwargs.get("host", REST_API_URL),
+        port=kwargs.get("port", REST_API_PORT),
+        prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+        ssl=kwargs.get("ssl", False)
+    )
+    return urljoin(url, f"files/{dataset_name}/{file_path}")
+
+def scan_config_url(dataset_name, cfg_fname='scan.toml', **kwargs):
+    """Return the scan URL to access the scanning configuration file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the TOML scan file, defaults to ``'scan.toml'``.
+
+    Other Parameters
+    ----------------
+    host : str, optional
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
+    prefix : str, optional
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The URL to the scanning configuration file.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import scan_config_url
+    >>> scan_config_url('real_plant')
+    'http://127.0.0.1:5000/files/real_plant/scan.toml'
+    >>> scan_config_url('real_plant', prefix='/plantdb')
+    'http://127.0.0.1/plantdb/files/real_plant/scan.toml'
+    """
+    return scan_file_url(dataset_name, cfg_fname, **kwargs)
+
+def scan_reconstruction_url(dataset_name, cfg_fname='pipeline.toml', **kwargs):
+    """Return the scan URL to access the reconstruction configuration file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the TOML scan file, defaults to ``'pipeline.toml'``.
+
+    Other Parameters
+    ----------------
+    host : str, optional
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
+    prefix : str, optional
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The URL to the reconstruction configuration file.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import scan_reconstruction_url
+    >>> scan_reconstruction_url('real_plant')
+    'http://127.0.0.1:5000/files/real_plant/pipeline.toml'
+    >>> scan_reconstruction_url('real_plant', prefix='/plantdb')
+    'http://127.0.0.1/plantdb/files/real_plant/pipeline.toml'
+    """
+    return scan_file_url(dataset_name, cfg_fname, **kwargs)
+
+def _load_toml_from_url(url):
+    """Load and parse a TOML file from a given URL.
+
+    Parameters
+    ----------
+    url : str
+        The URL to fetch the TOML file from.
+
+    Returns
+    -------
+    dict or None
+        The parsed TOML data as a dictionary, or None if the request fails.
+    """
+    import toml
+    res = requests.get(url)
+    if res.ok:
+        return toml.loads(res.content.decode('utf-8'))
+    return None
+
 def get_toml_file(dataset_name, file_path, **kwargs):
     """Return a loaded TOML file for selected dataset, if it exists.
 
@@ -1077,7 +1195,6 @@ def get_toml_file(dataset_name, file_path, **kwargs):
         The name of the dataset.
     file_path : str
         The path to the TOML file.
-
     Other Parameters
     ----------------
     host : str, optional
@@ -1104,18 +1221,8 @@ def get_toml_file(dataset_name, file_path, **kwargs):
     >>> cfg['PointCloud']
     {'upstream_task': 'Voxels', 'level_set_value': 1.0}
     """
-    import toml
-    url = base_url(host=kwargs.get("host", REST_API_URL),
-                   port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
-                   ssl=kwargs.get("ssl", False))
-    res = requests.get(urljoin(url, f"files/{dataset_name}/{file_path}"))
-    if res.ok:
-        data = toml.loads(res.content.decode('utf-8'))
-        return data
-    else:
-        return None
-
+    url = scan_file_url(dataset_name, file_path, **kwargs)
+    return _load_toml_from_url(url)
 
 def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
     """Return the scan configuration for selected dataset, if it exists.
@@ -1126,7 +1233,6 @@ def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
         The name of the dataset.
     cfg_fname : str, optional
         The name of the configuration file.
-
     Other Parameters
     ----------------
     host : str, optional
@@ -1152,9 +1258,9 @@ def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
     >>> cfg = get_scan_config('real_plant')
     >>> cfg['ScanPath']['class_name']
     'Circle'
+
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
-
 
 def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs):
     """Return the reconstruction configuration for selected dataset, if it exists.
@@ -1165,7 +1271,6 @@ def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs)
         The name of the dataset.
     cfg_fname : str, optional
         The name of the configuration file.
-
     Other Parameters
     ----------------
     host : str, optional
@@ -1191,9 +1296,9 @@ def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs)
     >>> cfg = get_reconstruction_config('real_plant_analyzed')
     >>> cfg['PointCloud']['upstream_task']
     'Voxels'
+
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
-
 
 def get_angles_and_internodes_data(dataset_name, **kwargs):
     """Return a dictionary with 'angles' and 'internodes' data for selected dataset, if it exists.
