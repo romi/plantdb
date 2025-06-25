@@ -1849,18 +1849,18 @@ for configuring and running the REST API server.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main function to initialize and execute the REST API server.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function utilizes argument parsing to extract user-provided input values</span>
@@ -2017,9 +2017,7 @@ Defaults to <code>False</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">146</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
@@ -2155,7 +2153,12 @@ Defaults to <code>False</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_location, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_location, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize and configure a RESTful API server for Plant Database querying.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function sets up a Flask application with various RESTful endpoints to enable interaction with a</span>
@@ -2195,7 +2198,7 @@ Defaults to <code>False</code>.</p>
     <span style="color: #008000; font-weight: bold">if</span> proxy:
         logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up Flask application with proxy support...&quot;</span>)
         prefix <span style="color: #666">=</span> os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;PLANTDB_API_PREFIX&quot;</span>, <span style="color: #BA2121">&quot;&quot;</span>)
-        api <span style="color: #666">=</span> Api(app, )
+        api <span style="color: #666">=</span> Api(app, prefix<span style="color: #666">=</span>prefix)
         logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Using prefix &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>prefix<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; for all RESTful endpoints.&quot;</span>)
         <span style="color: #3D7B7B; font-style: italic"># App is behind one proxy that sets the -For and -Host headers.</span>
         app<span style="color: #666">.</span>wsgi_app <span style="color: #666">=</span> ProxyFix(app<span style="color: #666">.</span>wsgi_app, x_for<span style="color: #666">=1</span>, x_host<span style="color: #666">=1</span>, x_proto<span style="color: #666">=1</span>)
@@ -2224,7 +2227,7 @@ Defaults to <code>False</code>.</p>
                 shutil<span style="color: #666">.</span>rmtree(db_location)  <span style="color: #3D7B7B; font-style: italic"># Remove the temporary database directory</span>
                 logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Successfully removed temporary directory at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db_location<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
             <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">OSError</span> <span style="color: #008000; font-weight: bold">as</span> e:
-                logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Error removing temporary directory: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.&quot;</span>) <span style="color: #3D7B7B; font-style: italic"># Log any errors during cleanup</span>
+                logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Error removing temporary directory: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Log any errors during cleanup</span>
 
         atexit<span style="color: #666">.</span>register(cleanup)
 
@@ -2242,6 +2245,9 @@ Defaults to <code>False</code>.</p>
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Found </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans dataset to serve in local plant database.&quot;</span>)
 
     <span style="color: #3D7B7B; font-style: italic"># Initialize RESTful resources to serve:</span>
+    api<span style="color: #666">.</span>add_resource(Home, <span style="color: #BA2121">&#39;/&#39;</span>)
+    api<span style="color: #666">.</span>add_resource(Test, <span style="color: #BA2121">&#39;/test&#39;</span>,
+                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
     api<span style="color: #666">.</span>add_resource(ScansList, <span style="color: #BA2121">&#39;/scans&#39;</span>,
                      resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
     api<span style="color: #666">.</span>add_resource(ScansTable, <span style="color: #BA2121">&#39;/scans_info&#39;</span>,
