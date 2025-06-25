@@ -73,7 +73,7 @@ The `plantdb` packages are available through:
 
 To create a new conda environment for PlantDB:
 ``` shell
-conda create -n plantdb 'python=3.11' ipython
+conda create -n plantdb 'python=3.10' ipython
 ```
 
 ## Installation
