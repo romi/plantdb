@@ -45,6 +45,8 @@ ENV PATH="${PATH}:/home/${USER_NAME}/.local/bin"
 # See: https://github.com/pypa/setuptools/issues/3269#issuecomment-1254507377
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 
+# URI prefix to use when behind a reverse proxy (NGINX)
+ENV PLANTDB_API_PREFIX=""
 # Location of the database folder to serve:
 ENV ROMI_DB="/myapp/db"
 
