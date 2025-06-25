@@ -38,9 +38,10 @@ import os
 
 from plantdb.server.cli.fsdb_rest_api import rest_api
 
+# Get the path to the FSDB to serve using `ROMI_DB` environment variable, use '/myapp/db' as default (container)
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
-# Get the Flask application
-application = rest_api(romi_db, proxy=True, log_level='INFO')
+# Get the Flask application with a Proxy:
+application = rest_api(romi_db, proxy=True, log_level='INFO', test=False, empty=False, models=False)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=5000, debug=True)
