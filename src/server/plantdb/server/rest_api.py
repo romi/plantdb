@@ -696,6 +696,68 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
+# Home page resource
+class Home(Resource):
+    def get(self):
+        """Return basic API information and documentation."""
+        def _package_version(package_name):
+            # Get plantdb.server version
+            try:
+                from importlib.metadata import version, PackageNotFoundError
+                try:
+                    package_version = version(package_name)
+                except PackageNotFoundError:
+                    package_version = "unknown"
+            except ImportError:
+                # Fallback for older Python versions
+                try:
+                    import pkg_resources
+                    package_version = pkg_resources.get_distribution(package_name).version
+                except (ImportError, pkg_resources.DistributionNotFound):
+                    package_version = "unknown"
+            return package_version
+
+        api_info = {
+            "name": "PlantDB REST API",
+            "description": "RESTful API for PlantDB querying",
+            "plantdb.commons": _package_version("plantdb.commons"),
+            "plantdb.server": _package_version("plantdb.server"),
+            "endpoints": {
+                "/": "This documentation",
+                "/test": "Test endpoint to verify API is working",
+                "/scans": "List all available scans",
+                "/scans_info": "Table with scan information",
+                # Add other endpoints here
+            }
+        }
+        return api_info
+
+
+# Test resource
+class Test(Resource):
+    def __init__(self, db):
+        self.db = db
+
+    def get(self):
+        """Simple test endpoint to verify the API is working correctly."""
+        try:
+            # Try to check database connection
+            scan_count = len(self.db.list_scans(owner_only=False))
+            return {
+                "status": "ok",
+                "message": "API is running correctly",
+                "database": {
+                    "location": str(self.db.path()),
+                    "scan_count": scan_count
+                }
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"API encountered an issue: {str(e)}"
+            }, 500
+
+
 class Register(Resource):
     """A RESTful resource to manage user registration via HTTP POST requests.
 
