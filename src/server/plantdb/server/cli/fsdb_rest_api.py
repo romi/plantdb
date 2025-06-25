@@ -93,6 +93,7 @@ from plantdb.server.rest_api import FileMetadata
 from plantdb.server.rest_api import FilesetCreate
 from plantdb.server.rest_api import FilesetFiles
 from plantdb.server.rest_api import FilesetMetadata
+from plantdb.server.rest_api import Home
 from plantdb.server.rest_api import Image
 from plantdb.server.rest_api import Login
 from plantdb.server.rest_api import Mesh
@@ -107,6 +108,7 @@ from plantdb.server.rest_api import ScanMetadata
 from plantdb.server.rest_api import ScansList
 from plantdb.server.rest_api import ScansTable
 from plantdb.server.rest_api import Sequence
+from plantdb.server.rest_api import Test
 
 
 def parsing():
@@ -179,7 +181,7 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
     if proxy:
         logger.info(f"Setting up Flask application with proxy support...")
         prefix = os.environ.get("PLANTDB_API_PREFIX", "")
-        api = Api(app, )
+        api = Api(app, prefix=prefix)
         logger.info(f"Using prefix '{prefix}' for all RESTful endpoints.")
         # App is behind one proxy that sets the -For and -Host headers.
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
@@ -208,7 +210,7 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
                 shutil.rmtree(db_location)  # Remove the temporary database directory
                 logger.info(f"Successfully removed temporary directory at '{db_location}'.")
             except OSError as e:
-                logger.error(f"Error removing temporary directory: {e}.") # Log any errors during cleanup
+                logger.error(f"Error removing temporary directory: {e}.")  # Log any errors during cleanup
 
         atexit.register(cleanup)
 
@@ -226,6 +228,9 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
     logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
 
     # Initialize RESTful resources to serve:
+    api.add_resource(Home, '/')
+    api.add_resource(Test, '/test',
+                     resource_class_args=tuple([db]))
     api.add_resource(ScansList, '/scans',
                      resource_class_args=tuple([db]))
     api.add_resource(ScansTable, '/scans_info',
