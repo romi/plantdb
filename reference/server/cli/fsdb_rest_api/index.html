@@ -1849,18 +1849,18 @@ for configuring and running the REST API server.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main function to initialize and execute the REST API server.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function utilizes argument parsing to extract user-provided input values</span>
@@ -2150,7 +2150,12 @@ Defaults to <code>False</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">273</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_location, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_location, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize and configure a RESTful API server for Plant Database querying.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function sets up a Flask application with various RESTful endpoints to enable interaction with a</span>
@@ -2188,7 +2193,10 @@ Defaults to <code>False</code>.</p>
     app <span style="color: #666">=</span> Flask(<span style="color: #19177C">__name__</span>)
     CORS(app)  <span style="color: #3D7B7B; font-style: italic"># Enable Cross-Origin Resource Sharing for the app</span>
     <span style="color: #008000; font-weight: bold">if</span> proxy:
-        api <span style="color: #666">=</span> Api(app, prefix<span style="color: #666">=</span>os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;PLANTDB_API_PREFIX&quot;</span>, <span style="color: #BA2121">&quot;&quot;</span>))
+        logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up Flask application with proxy support...&quot;</span>)
+        prefix <span style="color: #666">=</span> os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;PLANTDB_API_PREFIX&quot;</span>, <span style="color: #BA2121">&quot;&quot;</span>)
+        api <span style="color: #666">=</span> Api(app, )
+        logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Using prefix &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>prefix<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; for all RESTful endpoints.&quot;</span>)
         <span style="color: #3D7B7B; font-style: italic"># App is behind one proxy that sets the -For and -Host headers.</span>
         app<span style="color: #666">.</span>wsgi_app <span style="color: #666">=</span> ProxyFix(app<span style="color: #666">.</span>wsgi_app, x_for<span style="color: #666">=1</span>, x_host<span style="color: #666">=1</span>, x_proto<span style="color: #666">=1</span>)
         <span style="color: #3D7B7B; font-style: italic"># Set secure cookies</span>
@@ -2201,9 +2209,11 @@ Defaults to <code>False</code>.</p>
 
     <span style="color: #008000; font-weight: bold">if</span> test:
         <span style="color: #008000; font-weight: bold">if</span> empty:
+            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up a temporary test database without any datasets or configurations...&quot;</span>)
             <span style="color: #3D7B7B; font-style: italic"># Create an empty test database</span>
             db_location <span style="color: #666">=</span> test_database(<span style="color: #008000; font-weight: bold">None</span>)<span style="color: #666">.</span>path()
         <span style="color: #008000; font-weight: bold">else</span>:
+            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up a temporary test database with sample datasets and configurations...&quot;</span>)
             <span style="color: #3D7B7B; font-style: italic"># Create a populated test database</span>
             db_location <span style="color: #666">=</span> test_database(DATASET, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_models<span style="color: #666">=</span>models)<span style="color: #666">.</span>path()
 
