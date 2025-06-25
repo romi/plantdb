@@ -49,13 +49,13 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
+
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import is_radians
 from plantdb.server import webcache
-from plantdb.commons import api_prefix
 
 
 def get_scan_date(scan):
@@ -243,15 +243,15 @@ def get_scan_info(scan, **kwargs):
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
     ## Get the URL to the archive:
-    scan_info["metadata"]["files"]["archive"] = f"{api_prefix()}/archive/{scan.id}"
+    scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
     ## Get the path to the JSON metadata file:
-    metadata_json_path = os.path.join(f"{api_prefix()}/files/", scan.id, "metadata", "metadata.json")
+    metadata_json_path = os.path.join(f"/files/", scan.id, "metadata", "metadata.json")
     scan_info["metadata"]["files"]["metadata"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
     img_f = img_fs.get_files()[0]
-    scan_info["thumbnailUri"] = f"{api_prefix()}/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
+    scan_info["thumbnailUri"] = f"/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
@@ -364,6 +364,7 @@ def _get_colmap_camera_model(scan):
         })
     return model, poses
 
+
 def get_file_uri(scan, fileset, file):
     """Return the URI for the corresponding `scan/fileset/file` tree.
 
@@ -401,7 +402,7 @@ def get_file_uri(scan, fileset, file):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"{api_prefix()}/files/{scan_id}/{fileset_id}/{file_id}"
+    return f"/files/{scan_id}/{fileset_id}/{file_id}"
 
 
 def get_image_uri(scan, fileset, file, size="orig"):
@@ -447,7 +448,7 @@ def get_image_uri(scan, fileset, file, size="orig"):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"{api_prefix()}/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
+    return f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
 
 
 task_filesUri_mapping = {
