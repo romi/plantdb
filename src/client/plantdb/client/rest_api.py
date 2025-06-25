@@ -78,37 +78,68 @@ def sanitize_name(name):
     return sanitized_name
 
 
-def base_url(host=REST_API_URL, port=REST_API_PORT, prefix=None):
-    """Generates the URL for the PlantDB REST API using the specified host and port.
+def base_url(host: str = REST_API_URL, port: int | str = REST_API_PORT, prefix: str = None, ssl: bool = False) -> str:
+    """
+    Generates the URL for the PlantDB REST API using the specified host and port.
+
+    This function constructs a URL by combining the provided host, port, prefix, and SSL settings.
+    The default values are used if no arguments are supplied.
 
     Parameters
     ----------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        If provided, it will be added to the end of the URL, excluding the port number.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     str
-        A properly formatted URL of the PlantDB REST API.
+        A properly formatted URL for the PlantDB REST API.
+
+    Notes
+    -----
+    - The function ensures that the prefix is correctly formatted by stripping leading and trailing slashes.
+    - The SSL flag determines whether 'http' or 'https' is used in the URL scheme.
 
     Examples
     --------
     >>> from plantdb.client.rest_api import base_url
     >>> base_url()
     'http://127.0.0.1:5000'
-    >>> base_url(prefix='/plantdb')
-    'http://127.0.0.1:5000/plantdb'
+    >>> base_url(host='api.example.com', port=8443, ssl=True)
+    'https://api.example.com:8443'
+    >>> base_url(prefix='/plantdb', ssl=True)
+    'https://127.0.0.1/plantdb/'
     """
-    if prefix:
-        prefix = '/' + prefix.lstrip('/')
-        prefix = prefix.rstrip('/') + '/'
+    # Attempt to split the host to check for an existing scheme (http/https)
+    try:
+        scheme, host = host.split('://')
+    except ValueError:
+        pass  # If no scheme is found, proceed with the default
     else:
-        prefix = ''
-    return f"http://{host}:{port}{prefix}"
+        # If 's' is in the scheme, it indicates HTTPS
+        if 's' in scheme:
+            ssl = True
+
+    # Format the prefix by stripping leading and trailing slashes and adding a leading slash
+    if prefix:
+        prefix = '/' + prefix.lstrip('/').rstrip('/') + '/'
+
+    # Ensure port is converted to string and has no leading colon
+    if port:
+        if isinstance(port, int):
+            port = str(port)
+        port = ':' + port.lstrip(':')
+
+    # Construct the final URL using f-string for clarity and formatting
+    return f"http{'s' if ssl else ''}://{host}{prefix if prefix else port}"
 
 
 def scans_url(**kwargs):
@@ -117,11 +148,14 @@ def scans_url(**kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -133,14 +167,13 @@ def scans_url(**kwargs):
     >>> from plantdb.client.rest_api import scans_url
     >>> scans_url()
     'http://127.0.0.1:5000/scans'
-    >>> import os
-    >>> os.environ['PLANTDB_API_PREFIX'] = "/plantdb"
-    >>> scans_url()
-    'http://127.0.0.1:5000/plantdb/scans'
+    >>> scans_url(prefix='/plantdb')
+    'http://127.0.0.1/plantdb/scans'
     """
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     return urljoin(url, "scans")
 
 
@@ -155,11 +188,14 @@ def scan_url(scan_id, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -171,10 +207,13 @@ def scan_url(scan_id, **kwargs):
     >>> from plantdb.client.rest_api import scan_url
     >>> scan_url("real_plant")
     'http://127.0.0.1:5000/scans/real_plant'
+    >>> scan_url("real_plant", prefix='/plantdb')
+    'http://127.0.0.1/plantdb/scans/real_plant'
     """
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     return urljoin(url, f"scans/{sanitize_name(scan_id)}")
 
 
@@ -199,11 +238,14 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -215,13 +257,16 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', **kwargs):
     >>> from plantdb.client.rest_api import scan_image_url
     >>> scan_image_url("real_plant", "images", "00000_rgb")
     'http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=orig'
+    >>> scan_image_url("real_plant", "images", "00000_rgb", prefix='/plantdb')
+    'http://127.0.0.1/plantdb/image/real_plant/images/00000_rgb?size=orig'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     return urljoin(url, f"image/{scan_id}/{fileset_id}/{file_id}?size={size}")
 
 
@@ -238,11 +283,14 @@ def refresh_url(dataset_name=None, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -254,10 +302,13 @@ def refresh_url(dataset_name=None, **kwargs):
     >>> from plantdb.client.rest_api import refresh_url
     >>> refresh_url("real_plant")
     'http://127.0.0.1:5000/refresh?scan_id=real_plant'
+    >>> refresh_url("real_plant", prefix='/plantdb')
+    'http://127.0.0.1/plantdb/refresh?scan_id=real_plant'
     """
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     url = urljoin(url, "refresh")
     if dataset_name is None:
         return url
@@ -277,11 +328,14 @@ def archive_url(dataset_name, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -297,11 +351,14 @@ def archive_url(dataset_name, **kwargs):
     'http://127.0.0.1:5000/archive/arabidopsis000'
     >>> archive_url('arabidopsis+000')
     ValueError: Invalid dataset name: 'arabidopsis+000'. Dataset names must be alphanumeric and can include underscores or dashes.
+    >>> archive_url('arabidopsis000', prefix='/plantdb')
+    'http://127.0.0.1/plantdb/archive/arabidopsis000'
     """
     dataset_name = sanitize_name(dataset_name)
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     url = urljoin(url, f"archive/{dataset_name}"
                   )
     return url
@@ -328,7 +385,7 @@ def get_file_uri(scan, fileset, file):
     --------
     >>> from plantdb.client.rest_api import get_file_uri
     >>> get_file_uri('real_plant', 'images', '00000_rgb')
-    '/plantdb/files/real_plant/images/00000_rgb'
+    'files/real_plant/images/00000_rgb'
     """
     from plantdb.commons.fsdb import Scan
     from plantdb.commons.fsdb import Fileset
@@ -336,7 +393,7 @@ def get_file_uri(scan, fileset, file):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"/files/{scan_id}/{fileset_id}/{file_id}"
+    return f"files/{scan_id}/{fileset_id}/{file_id}"
 
 
 def test_availability(url):
@@ -362,6 +419,8 @@ def test_availability(url):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import test_availability
     >>> test_availability('http://127.0.0.1:5000')
     >>> test_availability('http://127.0.0.1:5000/plantdb/')
@@ -376,8 +435,8 @@ def test_availability(url):
                 raise ConnectionError(f"Cannot connect to {host}:{port}. Port might be closed or unavailable.")
     except ValueError:
         raise ValueError(f"Database URL should be 'host:port', got '{url}' instead.")
-    except Exception as e:
-        raise RuntimeError(f"Error verifying the URL '{url}': {e}")
+    except ConnectionError as e:
+        raise e
 
 
 def list_scan_names(**kwargs):
@@ -386,11 +445,14 @@ def list_scan_names(**kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -399,8 +461,9 @@ def list_scan_names(**kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import list_scan_names
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb.server library)
     >>> print(list_scan_names())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
@@ -417,11 +480,14 @@ def get_scans_info(**kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -430,8 +496,9 @@ def get_scans_info(**kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import get_scans_info
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> get_scans_info()
     """
     scan_list = list_scan_names(**kwargs)
@@ -444,11 +511,14 @@ def parse_scans_info(**kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -457,8 +527,9 @@ def parse_scans_info(**kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import parse_scans_info
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> scan_dict = parse_scans_info()
     >>> print(sorted(scan_dict.keys()))
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
@@ -482,11 +553,14 @@ def get_scan_data(scan_id, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -495,8 +569,9 @@ def get_scan_data(scan_id, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import get_scan_data
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
     >>> scan_data = get_scan_data('real_plant')
     >>> print(scan_data['id'])
     real_plant
@@ -509,6 +584,7 @@ def get_scan_data(scan_id, **kwargs):
         return requests.get(url=scan_url(scan_id, **kwargs)).json()
     else:
         return {}
+
 
 def scan_preview_image_url(scan_id, size="thumb", **kwargs):
     """Get the URL to the preview image for a scan dataset served by the PlantDB REST API.
@@ -527,11 +603,14 @@ def scan_preview_image_url(scan_id, size="thumb", **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -540,9 +619,22 @@ def scan_preview_image_url(scan_id, size="thumb", **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import scan_preview_image_url
-    >>> # This example requires the PlantDB REST API to be active (`fsdb_rest_api --test` from plantdb library)
-    >>> scan_preview_image_url('real_plant')
+    >>> img_url = scan_preview_image_url('real_plant')
+    >>> print(img_url)
+    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=thumb
+    >>> img_url = scan_preview_image_url('real_plant', size=100)
+    >>> print(img_url)
+    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=100
+    >>> # Download and display the image
+    >>> import requests
+    >>> from PIL import Image
+    >>> from io import BytesIO
+    >>> response = requests.get(img_url)  # Send a GET request to the URL
+    >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
+    >>> image.show()  # Display the image
     """
     scan_id = sanitize_name(scan_id)
     scan_names = list_scan_names(**kwargs)
@@ -554,7 +646,8 @@ def scan_preview_image_url(scan_id, size="thumb", **kwargs):
         thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     return urljoin(url, thumb_uri.lstrip("/"))
 
 
@@ -579,16 +672,33 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     requests.Response
         The URL to an image of a scan dataset and task fileset.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import get_scan_image
+    >>> response = get_scan_image('real_plant', 'images', '00000_rgb')  # download the image
+    >>> print(response.status_code)
+    200
+    >>> # Display the image
+    >>> from PIL import Image
+    >>> from io import BytesIO
+    >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
+    >>> image.show()  # Display the image
     """
     return requests.get(url=scan_image_url(scan_id, fileset_id, file_id, size, **kwargs))
 
@@ -604,11 +714,14 @@ def get_tasks_fileset_from_api(dataset_name, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -617,8 +730,11 @@ def get_tasks_fileset_from_api(dataset_name, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import get_tasks_fileset_from_api
     >>> get_tasks_fileset_from_api('real_plant')
+    {'images': 'images'}
     """
     return get_scan_data(dataset_name, **kwargs).get('tasks_fileset', dict())
 
@@ -642,16 +758,29 @@ def list_task_images_uri(dataset_name, task_name='images', size='orig', **kwargs
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     list of str
         The list of image URI strings for the PlantDB REST API.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import list_task_images_uri
+    >>> print(list_task_images_uri('real_plant')[2])
+    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=orig
+    >>> print(list_task_images_uri('real_plant', size=100)[2])
+    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=100
     """
     dataset_name = sanitize_name(dataset_name)
     task_name = sanitize_name(task_name)
@@ -660,8 +789,10 @@ def list_task_images_uri(dataset_name, task_name='images', size='orig', **kwargs
     images = scan_info["images"]
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
-    return [urljoin(url, f"image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}") for img in images]
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
+    return [urljoin(url, f"image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}") for img in
+            images]
 
 
 def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs):
@@ -683,11 +814,14 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -696,8 +830,10 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import get_images_from_task
-    >>> images = get_images_from_task('real_plant', host='127.0.0.1', port='5000')
+    >>> images = get_images_from_task('real_plant')
     >>> print(len(images))
     60
     >>> img1 = images[0]
@@ -885,11 +1021,14 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -900,6 +1039,16 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
     --------
     plantdb.server.rest_api.filesUri_task_mapping
     plantdb.client.rest_api.parse_task_requests_data
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> import numpy as np
+    >>> from plantdb.client.rest_api import get_task_data
+    >>> pcd = get_task_data('real_plant_analyzed', 'PointCloud')
+    >>> np.array(pcd).shape
+    (3, 57890)
     """
     if api_data is None:
         api_data = get_scan_data(dataset_name, **kwargs)
@@ -913,7 +1062,8 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
 
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     data = requests.get(url + file_uri).content
     return parse_task_requests_data(task, data, ext)
 
@@ -931,21 +1081,34 @@ def get_toml_file(dataset_name, file_path, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     dict
         The configuration dictionary.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import get_toml_file
+    >>> cfg = get_toml_file('real_plant_analyzed', 'pipeline.toml')
+    >>> cfg['PointCloud']
+    {'upstream_task': 'Voxels', 'level_set_value': 1.0}
     """
     import toml
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     res = requests.get(urljoin(url, f"files/{dataset_name}/{file_path}"))
     if res.ok:
         data = toml.loads(res.content.decode('utf-8'))
@@ -967,16 +1130,28 @@ def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     dict
         The configuration dictionary.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import get_scan_config
+    >>> cfg = get_scan_config('real_plant')
+    >>> cfg['ScanPath']['class_name']
+    'Circle'
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
 
@@ -994,16 +1169,28 @@ def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs)
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     dict
         The configuration dictionary.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import get_reconstruction_config
+    >>> cfg = get_reconstruction_config('real_plant_analyzed')
+    >>> cfg['PointCloud']['upstream_task']
+    'Voxels'
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
 
@@ -1019,20 +1206,35 @@ def get_angles_and_internodes_data(dataset_name, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
     dict
         A dictionary with 'angles' and 'internodes' data.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import get_angles_and_internodes_data
+    >>> data = get_angles_and_internodes_data('real_plant_analyzed')
+    >>> print(list(data.keys()))
+    ['angles', 'internodes']
+    >>> print(len(data['angles']))
+    33
     """
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
     res = requests.get(urljoin(url, f"sequence/{dataset_name}"))
     if res.ok:
         data = json.loads(res.content.decode('utf-8'))
@@ -1058,11 +1260,14 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
     -------
@@ -1071,6 +1276,8 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import upload_dataset_file
     >>> upload_dataset_file('arabidopsis000', '/path/to/local/file.txt')
     """
@@ -1080,8 +1287,9 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
     scan_id = sanitize_name(scan_id)
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)))
-    url = urljoin(url,f"files/{scan_id}")
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
+    url = urljoin(url, f"files/{scan_id}")
 
     filename = basename(file_path)
     file_size = getsize(file_path)
@@ -1136,13 +1344,16 @@ def refresh(dataset_name=None, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
     timeout : int, optional
-        A timeout, in seconds, to suceed the refresh request. Defaults to ``5``.
+        A timeout, in seconds, to succeed the refresh request. Defaults to ``5``.
 
     Returns
     -------
@@ -1156,8 +1367,11 @@ def refresh(dataset_name=None, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import refresh
-    >>> refresh("arabidopsis000", host="127.0.0.1", port="5000")
+    >>> refresh("arabidopsis000")
+    {'message': "Successfully reloaded scan 'arabidopsis000'."}
     """
     res = requests.get(refresh_url(dataset_name, **kwargs), timeout=kwargs.get("timeout", 5))
     if res.ok:
@@ -1183,13 +1397,16 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
     timeout : int, optional
-        A timeout, in seconds, to suceed the download request. Defaults to ``10``.
+        A timeout, in seconds, to succeed the download request. Defaults to ``10``.
 
     Returns
     -------
@@ -1199,8 +1416,11 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import download_scan_archive
-    >>> download_scan_archive("arabidopsis000", out_dir='/tmp', host="127.0.0.1", port="5000")
+    >>> download_scan_archive("arabidopsis000", out_dir='/tmp')
+    ('/tmp/arabidopsis000.zip', 'Download completed in 0.05 seconds.')
     """
     import time
     url = archive_url(dataset_name, **kwargs)
@@ -1241,13 +1461,16 @@ def upload_scan_archive(dataset_name, path, **kwargs):
     Other Parameters
     ----------------
     host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``"127.0.0.1"``.
-    port : str or int, optional
-        The port number of the PlantDB REST API server. Defaults to ``5000``.
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str, optional
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
     prefix : str, optional
-        The prefix to be prepended to the URL. Defaults to ``None``.
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool, optional
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
     timeout : int, optional
-        A timeout, in seconds, to suceed the upload request. Defaults to ``120``.
+        A timeout, in seconds, to succeed the upload request. Defaults to ``120``.
 
     Returns
     -------
@@ -1263,8 +1486,11 @@ def upload_scan_archive(dataset_name, path, **kwargs):
 
     Examples
     --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import upload_scan_archive
-    >>> upload_scan_archive("arabidopsis000", path='/tmp/arabidopsis000.zip', host="127.0.0.1", port="5002")
+    >>> upload_scan_archive("arabidopsis000", path='/tmp/arabidopsis000.zip')
+    'Upload completed in 0.10 seconds.'
     """
     import time
     from zipfile import ZipFile
