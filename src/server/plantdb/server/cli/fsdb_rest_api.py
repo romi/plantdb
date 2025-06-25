@@ -177,7 +177,10 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
     app = Flask(__name__)
     CORS(app)  # Enable Cross-Origin Resource Sharing for the app
     if proxy:
-        api = Api(app, prefix=os.environ.get("PLANTDB_API_PREFIX", ""))
+        logger.info(f"Setting up Flask application with proxy support...")
+        prefix = os.environ.get("PLANTDB_API_PREFIX", "")
+        api = Api(app, )
+        logger.info(f"Using prefix '{prefix}' for all RESTful endpoints.")
         # App is behind one proxy that sets the -For and -Host headers.
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
         # Set secure cookies
@@ -190,9 +193,11 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
 
     if test:
         if empty:
+            logger.info(f"Setting up a temporary test database without any datasets or configurations...")
             # Create an empty test database
             db_location = test_database(None).path()
         else:
+            logger.info(f"Setting up a temporary test database with sample datasets and configurations...")
             # Create a populated test database
             db_location = test_database(DATASET, with_configs=True, with_models=models).path()
 
