@@ -7,6 +7,7 @@ name = "plantdb.commons"
 version = "0.14.4"
 dependencies = [
     "appdirs",
+    "bcrypt",
     "colorlog",
     "imagecodecs",
     "imageio >=2.16.2",
