@@ -78,7 +78,7 @@ def sanitize_name(name):
     return sanitized_name
 
 
-def base_url(host: str = REST_API_URL, port: int | str = REST_API_PORT, prefix: str = None, ssl: bool = False) -> str:
+def base_url(host=REST_API_URL, port=REST_API_PORT, prefix=None, ssl=False) -> str:
     """
     Generates the URL for the PlantDB REST API using the specified host and port.
 
