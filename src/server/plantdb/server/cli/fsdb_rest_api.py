@@ -134,9 +134,9 @@ def parsing():
     misc_args.add_argument("--models", action='store_true',
                            help="the test database will contain the trained CNN model.")
 
-    log_opt = parser.add_argument_group("Logging options")
+    log_opt = parser.add_argument_group("logging options")
     log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
-                         help="Level of message logging, defaults to 'INFO'.")
+                         help="level of message logging, defaults to 'INFO'.")
 
     return parser
 

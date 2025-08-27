@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 """WSGI Application Entry Point
 
 This module serves as the Web Server Gateway Interface (WSGI) entry point for the application,
@@ -28,6 +27,7 @@ uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable appli
 ```
 Should then be accessible under: http://localhost:5000/plantdb/scans
 """
+
 import os
 
 from plantdb.server.cli.fsdb_rest_api import rest_api
