@@ -22,7 +22,7 @@ RUN python3 -m pip install --no-cache-dir wheel && \
     python3 -m pip cache purge
 
 # ============= Final stage =============
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS runtime
 #FROM python:3.9-slim-bullseye
 LABEL maintainer="Jonathan LEGRAND <jonathan.legrand@ens-lyon.fr>"
 LABEL corresponding_author="Peter Hanappe <peter@romi-project.eu>"
@@ -84,12 +84,13 @@ USER ${USER_NAME}
 # Change working directory:
 WORKDIR /home/${USER_NAME}
 # Copy the source files starting from the root folder (relative to context build):
-COPY --chown=${USER_NAME} ./ ./plantdb/
+COPY --chown=${USER_NAME} src/commons commons/
+COPY --chown=${USER_NAME} src/server server/
 
-RUN cd plantdb/ && \
-    # Install `plantdb` dependencies and sources:
-    python3 -m pip install --no-cache-dir src/commons/.[io] && \
-    python3 -m pip install --no-cache-dir src/server/. && \
+RUN echo "\n\n# Installing 'plantdb.commons' from sources..." && \
+    python3 -m pip install --no-cache-dir commons/.[io] && \
+    echo "\n\n# Installing 'plantdb.server' from sources..." && \
+    python3 -m pip install --no-cache-dir server/. && \
     python3 -m pip install uwsgi && \
     # Clean pip cache:
     python3 -m pip cache purge
