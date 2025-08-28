@@ -2010,8 +2010,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">330</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">334</span>
@@ -2037,7 +2036,8 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the pipeline configurations from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2139,7 +2139,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to force redownload of archive. Defaults to <code>False</code>.</p>
+                <p>Whether to force redownloading of the archive. Defaults to <code>False</code>.</p>
               </div>
             </td>
             <td>
@@ -2181,8 +2181,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">300</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
@@ -2208,7 +2207,8 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_models_dataset</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_models_dataset</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the trained CNN model from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2218,7 +2218,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        Whether to force redownload of archive. Defaults to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to force redownloading of the archive. Defaults to ``False``.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -2326,7 +2326,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to force redownload of archive. Defaults to <code>False</code>.</p>
+                <p>Whether to force redownloading of the archive. Defaults to <code>False</code>.</p>
               </div>
             </td>
             <td>
@@ -2368,8 +2368,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
@@ -2397,7 +2396,8 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract a test dataset from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2409,7 +2409,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        Whether to force redownload of archive. Defaults to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to force redownloading of the archive. Defaults to ``False``.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -2517,8 +2517,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
@@ -2566,7 +2565,9 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sets up an empty ROMI database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Sets up necessary marker file and ensures the absence of a lock file.</span>
@@ -2603,7 +2604,8 @@ Defaults to <code>None</code>.</p>
             <span style="color: #008000; font-weight: bold">assert</span> <span style="color: #008000">isinstance</span>(out_path, Path)
         <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">AssertionError</span>:
             logger<span style="color: #666">.</span>critical(<span style="color: #BA2121">f&quot;Invalid pth to set up the database: &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>out_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
-            logger<span style="color: #666">.</span>critical(<span style="color: #BA2121">&quot;Please provide a valid path to set up the database or leave it to None to use a temporary directory.&quot;</span>)
+            logger<span style="color: #666">.</span>critical(
+                <span style="color: #BA2121">&quot;Please provide a valid path to set up the database or leave it to None to use a temporary directory.&quot;</span>)
             <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">TypeError</span>(<span style="color: #BA2121">f&quot;Invalid type for &#39;out_path&#39;: </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">type</span>(out_path)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.&quot;</span>)
 
     <span style="color: #3D7B7B; font-style: italic"># Make sure the path to the database exists:</span>
@@ -2797,10 +2799,7 @@ See notes below for a list of dataset names and their meanings.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
@@ -2861,7 +2860,23 @@ See notes below for a list of dataset names and their meanings.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">472</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">473</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">474</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">476</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">477</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">479</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">480</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">484</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the test database from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2918,11 +2933,24 @@ See notes below for a list of dataset names and their meanings.</p>
         [get_test_dataset(ds, <span style="color: #666">**</span>kwargs) <span style="color: #008000; font-weight: bold">for</span> ds <span style="color: #A2F; font-weight: bold">in</span> dataset]
     <span style="color: #008000; font-weight: bold">else</span>:
         _ <span style="color: #666">=</span> get_test_dataset(dataset, <span style="color: #666">**</span>kwargs)
-    <span style="color: #3D7B7B; font-style: italic"># Download configs archive if requested:</span>
+    <span style="color: #3D7B7B; font-style: italic"># Download the configuration files archive if requested:</span>
     <span style="color: #008000; font-weight: bold">if</span> with_configs:
         _ <span style="color: #666">=</span> get_configs(<span style="color: #666">**</span>kwargs)
+    <span style="color: #3D7B7B; font-style: italic"># Download the trained CNN files archive if requested:</span>
     <span style="color: #008000; font-weight: bold">if</span> with_models:
         _ <span style="color: #666">=</span> get_models_dataset(<span style="color: #666">**</span>kwargs)
+
+    <span style="color: #3D7B7B; font-style: italic"># --- Backward compatibility ---</span>
+    <span style="color: #3D7B7B; font-style: italic"># If the database was set up under a previous version, the Scan may not have an &#39;owner&#39; entry in their metadata.</span>
+    <span style="color: #3D7B7B; font-style: italic"># -----------------------------</span>
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
+    <span style="color: #3D7B7B; font-style: italic"># Connect to the database and iterate over scans to get the owner of each scan:</span>
+    db <span style="color: #666">=</span> FSDB(out_path)
+    db<span style="color: #666">.</span>connect()
+    db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    <span style="color: #008000; font-weight: bold">for</span> scan_name, scan <span style="color: #A2F; font-weight: bold">in</span> db<span style="color: #666">.</span>scans<span style="color: #666">.</span>items():
+        _ <span style="color: #666">=</span> scan<span style="color: #666">.</span>owner  <span style="color: #3D7B7B; font-style: italic"># get the owner of the scan, if unknown, it will be set to the anonymous user</span>
+    db<span style="color: #666">.</span>disconnect()
 
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;The test database is set up under &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>out_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
     <span style="color: #008000; font-weight: bold">return</span> out_path
@@ -3092,23 +3120,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">479</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">480</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">484</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
@@ -3135,7 +3147,23 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">518</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">519</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">520</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">521</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">521</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">522</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">523</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">524</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">525</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">528</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and return an FSDB test database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
