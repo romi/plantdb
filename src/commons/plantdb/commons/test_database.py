@@ -468,11 +468,24 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
         [get_test_dataset(ds, **kwargs) for ds in dataset]
     else:
         _ = get_test_dataset(dataset, **kwargs)
-    # Download configs archive if requested:
+    # Download the configuration files archive if requested:
     if with_configs:
         _ = get_configs(**kwargs)
+    # Download the trained CNN files archive if requested:
     if with_models:
         _ = get_models_dataset(**kwargs)
+
+    # --- Backward compatibility ---
+    # If the database was set up under a previous version, the Scan may not have an 'owner' entry in their metadata.
+    # -----------------------------
+    from plantdb.commons.fsdb import FSDB
+    # Connect to the database and iterate over scans to get the owner of each scan:
+    db = FSDB(out_path)
+    db.connect()
+    db.list_scans(owner_only=False)
+    for scan_name, scan in db.scans.items():
+        _ = scan.owner  # get the owner of the scan, if unknown, it will be set to the anonymous user
+    db.disconnect()
 
     logger.info(f"The test database is set up under '{out_path}'.")
     return out_path
