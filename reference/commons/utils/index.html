@@ -2363,7 +2363,7 @@
 
 
 <a href="#plantdb.commons.utils.partial_match" class="headerlink" title="Permanent link">Link</a></h3>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>partial_match(reference, target, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>partial_match(source, target, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2384,14 +2384,14 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>reference</code>
+                <code>source</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The reference dictionary with partial information to test against the target.</p>
+                <p>The source dictionary, list or string, with partial information, to test against the target.</p>
               </div>
             </td>
             <td>
@@ -2403,11 +2403,11 @@
                 <code>target</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The target dictionary.</p>
+                <p>The target dictionary, list or string holding the complete information to match against.</p>
               </div>
             </td>
             <td>
@@ -2520,15 +2520,20 @@
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">252</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">253</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">254</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">partial_match</span>(reference, target, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">256</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">258</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">259</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">260</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">partial_match</span>(source, target, fuzzy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Partial matching of a reference dictionary against a target, potentially using regexp.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
-<span style="color: #BA2121; font-style: italic">    reference : dict</span>
-<span style="color: #BA2121; font-style: italic">        The reference dictionary with partial information to test against the target.</span>
-<span style="color: #BA2121; font-style: italic">    target : dict</span>
-<span style="color: #BA2121; font-style: italic">        The target dictionary.</span>
+<span style="color: #BA2121; font-style: italic">    source : dict or list or str</span>
+<span style="color: #BA2121; font-style: italic">        The source dictionary, list or string, with partial information, to test against the target.</span>
+<span style="color: #BA2121; font-style: italic">    target : dict or list or str</span>
+<span style="color: #BA2121; font-style: italic">        The target dictionary, list or string holding the complete information to match against.</span>
 <span style="color: #BA2121; font-style: italic">    fuzzy : bool</span>
 <span style="color: #BA2121; font-style: italic">        Whether to use fuzzy matching or not, that is the use of regular expressions.</span>
 
@@ -2550,23 +2555,28 @@
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; ref = {&quot;species&quot;:&quot;Arabidopsis.*&quot;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; partial_match(ref, target, fuzzy=True)</span>
 <span style="color: #BA2121; font-style: italic">    False</span>
-
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">re</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> match
-    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(reference, <span style="color: #008000">dict</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">dict</span>):
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">all</span>(
-            key <span style="color: #A2F; font-weight: bold">in</span> target <span style="color: #A2F; font-weight: bold">and</span> partial_match(value, target[key], fuzzy)
-            <span style="color: #008000; font-weight: bold">for</span> key, value <span style="color: #A2F; font-weight: bold">in</span> reference<span style="color: #666">.</span>items()
+
+    <span style="color: #3D7B7B; font-style: italic"># Check if both are dictionaries</span>
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(source, <span style="color: #008000">dict</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">dict</span>):
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">all</span>(  <span style="color: #3D7B7B; font-style: italic"># Use all() to ensure every key in source is matched</span>
+            key <span style="color: #A2F; font-weight: bold">in</span> target <span style="color: #A2F; font-weight: bold">and</span> partial_match(value, target[key], fuzzy)  <span style="color: #3D7B7B; font-style: italic"># Recursively check each dictionary item</span>
+            <span style="color: #008000; font-weight: bold">for</span> key, value <span style="color: #A2F; font-weight: bold">in</span> source<span style="color: #666">.</span>items()
         )
-    <span style="color: #008000; font-weight: bold">elif</span> <span style="color: #008000">isinstance</span>(reference, <span style="color: #008000">list</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">list</span>):
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">len</span>(reference) <span style="color: #666">&lt;=</span> <span style="color: #008000">len</span>(target) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">all</span>(
-            <span style="color: #008000">any</span>(partial_match(ref_item, target_item, fuzzy) <span style="color: #008000; font-weight: bold">for</span> target_item <span style="color: #A2F; font-weight: bold">in</span> target)
-            <span style="color: #008000; font-weight: bold">for</span> ref_item <span style="color: #A2F; font-weight: bold">in</span> reference
+    <span style="color: #3D7B7B; font-style: italic"># Check if both are lists</span>
+    <span style="color: #008000; font-weight: bold">elif</span> <span style="color: #008000">isinstance</span>(source, <span style="color: #008000">list</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">list</span>):
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">len</span>(source) <span style="color: #666">&lt;=</span> <span style="color: #008000">len</span>(target) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">all</span>(  <span style="color: #3D7B7B; font-style: italic"># Ensure source list is shorter or equal length to target list</span>
+            <span style="color: #008000">any</span>(partial_match(ref_item, target_item, fuzzy) <span style="color: #008000; font-weight: bold">for</span> target_item <span style="color: #A2F; font-weight: bold">in</span> target)  <span style="color: #3D7B7B; font-style: italic"># Use any() to check at least one match per item</span>
+            <span style="color: #008000; font-weight: bold">for</span> ref_item <span style="color: #A2F; font-weight: bold">in</span> source
         )
-    <span style="color: #008000; font-weight: bold">elif</span> fuzzy <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(reference, <span style="color: #008000">str</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">str</span>):
-        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">bool</span>(match(reference, target))
+    <span style="color: #3D7B7B; font-style: italic"># Check if both are strings for fuzzy matching</span>
+    <span style="color: #008000; font-weight: bold">elif</span> fuzzy <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(source, <span style="color: #008000">str</span>) <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">isinstance</span>(target, <span style="color: #008000">str</span>):
+         <span style="color: #3D7B7B; font-style: italic"># Return True if the source regex pattern matches the target string</span>
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">bool</span>(match(source, target))
     <span style="color: #008000; font-weight: bold">else</span>:
-        <span style="color: #008000; font-weight: bold">return</span> reference <span style="color: #666">==</span> target
+        <span style="color: #3D7B7B; font-style: italic"># Direct comparison of values</span>
+        <span style="color: #008000; font-weight: bold">return</span> source <span style="color: #666">==</span> target
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
