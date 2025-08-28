@@ -111,7 +111,6 @@ import bcrypt
 from plantdb.commons import db
 from plantdb.commons.db import DBBusyError
 from plantdb.commons.log import get_logger
-
 from .exceptions import FilesetNotFoundError
 from .exceptions import NotAnFSDBError
 from .exceptions import ScanNotFoundError
@@ -422,6 +421,26 @@ class FSDB(db.DB):
 
         return f"Welcome {self.users[username]['fullname']}!'"
 
+    def _lock_db(self):
+        """Lock the database by creating a `LOCK_FILE_NAME` file in the database root directory."""
+        try:
+            # Create lock file to prevent concurrent access
+            with self.lock_path.open(mode="x") as _:
+                self.is_connected = True
+            # Register disconnect function to run at program exit
+            atexit.register(self.disconnect)
+        except FileExistsError:
+            # Database is already locked by another process
+            raise DBBusyError(f"Lock file {LOCK_FILE_NAME} already exists in DB!")
+
+    def _unlock_db(self):
+        """Unlock the database by removing the `LOCK_FILE_NAME` file from the DB."""
+        if _is_safe_to_delete(self.lock_path):
+            self.lock_path.unlink(missing_ok=True)
+            atexit.unregister(self.disconnect)
+        else:
+            raise IOError("Could not remove lock, maybe you messed with the `lock_path` attribute?")
+
     def connect(self, login=None, password="", unsafe=False):
         """Connect to the local database.
 
@@ -490,16 +509,10 @@ class FSDB(db.DB):
                 self.scans = _load_scans(self)
                 self.is_connected = True
             else:
-                try:
-                    # Create lock file to prevent concurrent access
-                    with self.lock_path.open(mode="x") as _:
-                        self.scans = _load_scans(self)
-                        self.is_connected = True
-                    # Register disconnect function to run at program exit
-                    atexit.register(self.disconnect)
-                except FileExistsError:
-                    # Database is already locked by another process
-                    raise DBBusyError(f"File {LOCK_FILE_NAME} exists in DB root: DB is busy, cannot connect.")
+                # Create lock file to prevent concurrent access
+                self._lock_db()
+                # Load scans dataset
+                self.scans = _load_scans(self)
         else:
             # Already connected - log appropriate message based on user change
             if self.user != prev_user:
@@ -621,11 +634,7 @@ class FSDB(db.DB):
         if self.is_connected:
             for s_id, scan in self.scans.items():
                 scan._erase()
-            if _is_safe_to_delete(self.lock_path):
-                self.lock_path.unlink(missing_ok=True)
-                atexit.unregister(self.disconnect)
-            else:
-                raise IOError("Could not remove lock, maybe you messed with the `lock_path` attribute?")
+            self._unlock_db()
             self.scans = {}
             self.is_connected = False
         else:
@@ -899,17 +908,17 @@ class FSDB(db.DB):
         --------
         >>> from plantdb.commons.fsdb import dummy_db
         >>> db = dummy_db(with_scan=True)
-        >>> db.list_scans()
+        >>> db.list_scans()  # list scans owned by the current user
+        ['myscan_001']
+        >>> db.create_user("batman", "Bruce Wayne", 'joker')
+        >>> db.connect('batman', 'joker')
+        >>> db.list_scans()  # list scans owned by the current user
+        >>> []
+        >>> db.list_scans(owner_only=False)  # list all scans
         ['myscan_001']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if owner_only:
-            if query is None:
-                query = {'owner': self.user}
-            else:
-                query.update({'owner': self.user})
-
-        if query is None:
+        if query is None and not owner_only:
             return list(self.scans.keys())
         else:
             return [scan.id for scan in self.get_scans(query, fuzzy, owner_only)]
@@ -1025,6 +1034,13 @@ class Scan(db.Scan):
         self.filesets = {}
         self.measures = None
         return
+
+    @property
+    def owner(self):
+        # If no owner is defined, set it to the anonymous user
+        if 'owner' not in self.metadata:
+            self.set_metadata('owner', "anonymous")
+        return self.metadata.get('owner')
 
     def fileset_exists(self, fileset_id: str) -> bool:
         """Check if a given fileset ID exists in the database.
