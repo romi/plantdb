@@ -12,6 +12,7 @@ dependencies = [
     "imagecodecs",
     "imageio >=2.16.2",
     "numpy",
+    "paramiko",  # Pure Python implementation of SSHv2 protocol
     "pillow",
     "plyfile",
     "toml",
