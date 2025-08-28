@@ -34,9 +34,9 @@ log_error() {
 # --------------------------------
 initialize_variables() {
   # Image tag to use, 'latest' by default:
-  vtag="latest"
+  VTAG="latest"
   # String aggregating the docker build options to use:
-  docker_opts=""
+  DOCKER_OPTS=""
 }
 
 # --------------------------------
@@ -54,7 +54,7 @@ show_usage() {
 
   echo -e "$(bold OPTIONS):"
   echo "  -t, --tag
-    Docker image tag to use, default to '${vtag}'."
+    Docker image tag to use, default to '${VTAG}'."
   # -- Docker options:
   echo "  --no-cache
     Do not use cache when building the image, (re)start from scratch."
@@ -76,23 +76,23 @@ parse_arguments() {
     case $1 in
     -t | --tag)
       shift
-      vtag=$1
+      VTAG=$1
       ;;
     --no-cache)
-      docker_opts="${docker_opts} --no-cache"
+      DOCKER_OPTS="${DOCKER_OPTS} --no-cache"
       ;;
     --pull)
-      docker_opts="${docker_opts} --pull"
+      DOCKER_OPTS="${DOCKER_OPTS} --pull"
       ;;
     --plain)
-      docker_opts="${docker_opts} --progress=plain"
+      DOCKER_OPTS="${DOCKER_OPTS} --progress=plain"
       ;;
     -h | --help)
-      usage
+      show_usage
       exit
       ;;
     *)
-      usage
+      show_usage
       exit 1
       ;;
     esac
@@ -104,13 +104,13 @@ parse_arguments() {
 # Docker build function
 # --------------------------------
 build_docker(){
-  log_info "Starting Docker build for roboticsmicrofarms/plantdb:${vtag}"
+  log_info "Starting Docker build for roboticsmicrofarms/plantdb:${VTAG}"
 
   # Get the date to estimate docker image build time:
   start_time=$(date +%s)
 
   # Start the docker image build:
-  docker build -t roboticsmicrofarms/plantdb:${vtag} ${docker_opts} \
+  docker build -t roboticsmicrofarms/plantdb:${VTAG} ${DOCKER_OPTS} \
     -f docker/Dockerfile .
 
   # Get docker build status:
