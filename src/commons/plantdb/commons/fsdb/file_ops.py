@@ -121,8 +121,8 @@ def _load_scans(db):
 
     Returns
     -------
-    list of plantdb.commons.fsdb.Scan
-         The list of ``fsdb.Scan`` found in the database.
+    dict of plantdb.commons.fsdb.Scan
+         The scan-id indexex dictionary of ``fsdb.Scan`` found in the database.
 
     See Also
     --------
@@ -149,9 +149,18 @@ def _load_scans(db):
     >>> print(scans)
     [<plantdb.commons.fsdb.Scan object at 0x7fa01220bd50>]
     """
+    # List all subdirectories of the database path:
+    dir_names = db.path().iterdir()
+    # Filter out non-directories:
+    dir_names = [dir_name for dir_name in dir_names if dir_name.is_dir()]
+    # Return empty list if no directory found:
+    if len(dir_names) == 0:
+        return {}
+
+    # Loop through the directories and load them as scan if they meet the criteria
     scans = {}
-    dir_names = os.listdir(db.path())
-    for scan_name in tqdm(dir_names, unit="scan"):
+    for dir_name in tqdm(dir_names, unit="scan"):
+        scan_name = dir_name.name
         scan = _load_scan(db, scan_name)
         if scan is not None:
             scans[scan_name] = scan
