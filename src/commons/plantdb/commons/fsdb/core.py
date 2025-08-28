@@ -1991,18 +1991,20 @@ class File(db.File):
         return _file_path(self)
 
 
-def _filter_query(l, query=None, fuzzy=False):
+def _filter_query(obj_list, query=None, fuzzy=False, debug=False):
     """Filter a list of `Scan`s, `Fileset`s or `File`s using a `query` on their metadata.
 
     Parameters
     ----------
-    l : list
+    obj_list : list
         A list of `Scan`s, `Fileset`s or `File`s to filter.
     query : dict, optional
         A filtering query in the form of a dictionary.
         The list of instances must have metadata matching ``key`` and ``value`` from the `query`.
     fuzzy : bool
         Whether to use fuzzy matching or not, that is the use of regular expressions.
+    debug : bool
+        If active, print each step of the fuzzy matching process for each object of the list.
 
     Returns
     -------
@@ -2021,7 +2023,7 @@ def _filter_query(l, query=None, fuzzy=False):
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
-    >>> print({f.id: f.metadata for f in fs.get_files()})
+    >>> print({obj.id: obj.metadata for f in fs.get_files()})
     {'dummy_image': {'dummy image': True}, 'test_image': {'random image': True}, 'test_json': {'random json': True}}
     >>> files = _filter_query(fs.get_files(), query=None)
     >>> print(len(files))  # no filtering so all three files are here!
@@ -2047,21 +2049,32 @@ def _filter_query(l, query=None, fuzzy=False):
     from plantdb.commons.utils import partial_match
     if query is None or query == {}:
         # If there is no `query` return the unfiltered list of instances
-        query_result = [f for f in l]
+        query_result = [f for f in obj_list]
     else:
         # Else apply the filter on metadata using key(s) and value(s) from `query`:
         query_result = []
-        for f in l:
+        query_debug = {}
+        for obj in obj_list:
+            query_debug[obj.id] = {}
             f_query = []  # boolean list gathering the "filter test results"
             for q in query.keys():
+                query_test = partial_match(obj.get_metadata(q), query[q], fuzzy=fuzzy)
+                query_debug[obj.id][q] = {
+                    'query_value': query[q],
+                    'metadata_value': obj.get_metadata(q),
+                    'fuzzy': fuzzy,
+                    'result': query_test,
+                }
                 try:
                     # assert f.get_metadata(q) == query[q]
-                    assert partial_match(query[q], f.get_metadata(q), fuzzy)
+                    assert query_test
                 except AssertionError:
                     f_query.append(False)
                 else:
                     f_query.append(True)
             # All requirements have to be fulfilled:
             if all(f_query):
-                query_result.append(f)
+                query_result.append(obj)
+        if debug:
+            print("query_debug: ", query_debug)
     return query_result
