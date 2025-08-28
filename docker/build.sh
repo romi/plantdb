@@ -7,10 +7,12 @@ setup_colors() {
   RED="\033[0;31m"    # Define red color code
   GREEN="\033[0;32m"  # Define green color code
   YELLOW="\033[0;33m" # Define yellow color code
+  BLUE="\033[0;34m"   # Define blue color code for debug messages
   NC="\033[0m"        # No Color code to reset colors
   INFO="${GREEN}INFO${NC}    "    # Prefix for info messages
   WARNING="${YELLOW}WARNING${NC} " # Prefix for warning messages
   ERROR="${RED}$(bold ERROR)${NC}   " # Prefix for error messages using bold function
+  DEBUG="${BLUE}DEBUG${NC}   "   # Prefix for debug messages
 }
 
 bold() {
@@ -29,6 +31,12 @@ log_error() {
   echo -e "${ERROR}$1" # Print error message with ERROR prefix
 }
 
+log_debug() {
+  if [ "${DEBUG_MODE}" = true ]; then
+    echo -e "${DEBUG}$1" # Print debug message with DEBUG prefix if debug mode is enabled
+  fi
+}
+
 # --------------------------------
 # Functions for script initialization
 # --------------------------------
@@ -37,6 +45,8 @@ initialize_variables() {
   VTAG="latest"
   # String aggregating the docker build options to use:
   DOCKER_OPTS=""
+  # Debug mode is disabled by default
+  DEBUG_MODE=false
 }
 
 # --------------------------------
@@ -62,6 +72,9 @@ show_usage() {
     Always attempt to pull a newer version of the parent image."
   echo "  --plain
     Plain output during docker build."
+  # -- Debug option:
+  echo "  --debug
+    Enable debug mode to print additional debug information."
   # -- General options:
   echo "  -h, --help
     Output a usage message and exit."
@@ -87,6 +100,10 @@ parse_arguments() {
     --plain)
       DOCKER_OPTS="${DOCKER_OPTS} --progress=plain"
       ;;
+    --debug)
+      DEBUG_MODE=true
+      log_debug "Debug mode enabled"
+      ;;
     -h | --help)
       show_usage
       exit
@@ -104,14 +121,27 @@ parse_arguments() {
 # Docker build function
 # --------------------------------
 build_docker(){
+  # Construct the docker build command
+  docker_cmd="docker build"
+  docker_cmd+=" -t \"roboticsmicrofarms/plantdb:${VTAG}\""
+  docker_cmd+=" ${DOCKER_OPTS}"  # Additional options like --no-cache, --pull, etc.
+  docker_cmd+=" -f \"docker/Dockerfile\""
+  docker_cmd+=" ."  # Build context
+
+  # Print the build configuration options
+  log_debug "Build configuration:"
+  log_debug "- Docker tag: ${VTAG}"
+  log_debug "- Docker options: ${DOCKER_OPTS}"
+  # Print the full command that will be executed
+  log_debug "Executing command: ${docker_cmd}"
+
   log_info "Starting Docker build for roboticsmicrofarms/plantdb:${VTAG}"
 
   # Get the date to estimate docker image build time:
   start_time=$(date +%s)
 
-  # Start the docker image build:
-  docker build -t roboticsmicrofarms/plantdb:${VTAG} ${DOCKER_OPTS} \
-    -f docker/Dockerfile .
+  # Execute the docker build command
+  eval ${docker_cmd}
 
   # Get docker build status:
   docker_build_status=$?
