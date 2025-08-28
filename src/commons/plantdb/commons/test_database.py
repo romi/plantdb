@@ -136,6 +136,7 @@ def _mkdtemp_romidb() -> Path:
     """
     return Path(mkdtemp(prefix='ROMI_DB_'))
 
+
 def _save_file_from_url(url) -> Path:
     """Save URL to a temporary file.
 
@@ -184,7 +185,7 @@ def _save_file_from_url(url) -> Path:
 
 
 def _test_hash(tmp_fname, hash_value, hash_method="md5"):
-    """Test the hash value of downloaded file against known hash from ZENODO.
+    """Test the hash value of a downloaded file against known hash from ZENODO.
 
     Parameters
     ----------
@@ -233,7 +234,7 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force redownloading of the archive. Defaults to ``False``.
 
     Notes
     -----
@@ -254,9 +255,9 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
         logger.info(f"File '{tmp_fname.name}' exists locally. Skipping download.")
     else:
         tmp_fname = _save_file_from_url(url)
-    # Test the downloaded file hash against known value:
+    # Test the downloaded file hash against a known value:
     _test_hash(tmp_fname, ZIP_MD5S[archive], "md5")
-    # Extract to given destination if no error was raised:
+    # Extract to the given destination if no error was raised:
     ZipFile(tmp_fname).extractall(path=out_path)
     # Remove the temporary file if not explicitly requested to keep it:
     if not keep_tmp:
@@ -277,7 +278,7 @@ def get_test_dataset(dataset, out_path=TEST_DIR, keep_tmp=False, force=False):
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force redownloading of the archive. Defaults to ``False``.
 
     Returns
     -------
@@ -307,7 +308,7 @@ def get_models_dataset(out_path=TEST_DIR, keep_tmp=False, force=False):
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force redownloading of the archive. Defaults to ``False``.
 
     Returns
     -------
@@ -394,7 +395,8 @@ def setup_empty_database(out_path=None):
             assert isinstance(out_path, Path)
         except AssertionError:
             logger.critical(f"Invalid pth to set up the database: '{out_path}'.")
-            logger.critical("Please provide a valid path to set up the database or leave it to None to use a temporary directory.")
+            logger.critical(
+                "Please provide a valid path to set up the database or leave it to None to use a temporary directory.")
             raise TypeError(f"Invalid type for 'out_path': {type(out_path)}.")
 
     # Make sure the path to the database exists:
@@ -407,6 +409,7 @@ def setup_empty_database(out_path=None):
     lock_path.unlink(missing_ok=True)
 
     return out_path
+
 
 def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=False, with_models=False, force=False):
     """Download and extract the test database from ZENODO.
