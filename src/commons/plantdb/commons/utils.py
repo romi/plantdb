@@ -206,15 +206,15 @@ def tmpdir_from_fileset(fileset):
     return tmpdir
 
 
-def partial_match(reference, target, fuzzy=False):
+def partial_match(source, target, fuzzy=False):
     """Partial matching of a reference dictionary against a target, potentially using regexp.
 
     Parameters
     ----------
-    reference : dict
-        The reference dictionary with partial information to test against the target.
-    target : dict
-        The target dictionary.
+    source : dict or list or str
+        The source dictionary, list or string, with partial information, to test against the target.
+    target : dict or list or str
+        The target dictionary, list or string holding the complete information to match against.
     fuzzy : bool
         Whether to use fuzzy matching or not, that is the use of regular expressions.
 
@@ -236,20 +236,25 @@ def partial_match(reference, target, fuzzy=False):
     >>> ref = {"species":"Arabidopsis.*"}
     >>> partial_match(ref, target, fuzzy=True)
     False
-
     """
     from re import match
-    if isinstance(reference, dict) and isinstance(target, dict):
-        return all(
-            key in target and partial_match(value, target[key], fuzzy)
-            for key, value in reference.items()
+
+    # Check if both are dictionaries
+    if isinstance(source, dict) and isinstance(target, dict):
+        return all(  # Use all() to ensure every key in source is matched
+            key in target and partial_match(value, target[key], fuzzy)  # Recursively check each dictionary item
+            for key, value in source.items()
         )
-    elif isinstance(reference, list) and isinstance(target, list):
-        return len(reference) <= len(target) and all(
-            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)
-            for ref_item in reference
+    # Check if both are lists
+    elif isinstance(source, list) and isinstance(target, list):
+        return len(source) <= len(target) and all(  # Ensure source list is shorter or equal length to target list
+            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)  # Use any() to check at least one match per item
+            for ref_item in source
         )
-    elif fuzzy and isinstance(reference, str) and isinstance(target, str):
-        return bool(match(reference, target))
+    # Check if both are strings for fuzzy matching
+    elif fuzzy and isinstance(source, str) and isinstance(target, str):
+         # Return True if the source regex pattern matches the target string
+        return bool(match(source, target))
     else:
-        return reference == target
+        # Direct comparison of values
+        return source == target
