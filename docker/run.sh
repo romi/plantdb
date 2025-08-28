@@ -35,16 +35,12 @@ log_error() {
 initialize_variables() {
   # Image tag to use, 'latest' by default:
   vtag="latest"
-  # Command to use to run unit tests:
-  unittest="python3 -m pip install 'plantdb/src/commons/.[io,test]' && nose2 -v -s plantdb/tests/"
   # Command to execute after starting the docker container:
   cmd=''
   # Volume mounting options:
   mount_option=""
   # Port flag to track if port was manually specified
   port_specified=0
-  # Self-test flag (0/1 to indicate call to unittest)
-  self_test=0
 
   # If the `ROMI_DB` variable is set, use it as default database location, else set it to empty:
   if [ -z ${ROMI_DB+x} ]; then
@@ -77,8 +73,6 @@ show_usage() {
   echo "  -v, --volume
     Volume mapping for docker, e.g. '-v /abs/host/dir:/abs/container/dir'.
     Multiple use is allowed."
-  echo " --unittest
-    Runs unit tests defined in 'plantdb/tests/'."
   echo "  -p, --port
     Port to use for the REST API (default: first available port in 5000-5100 range)."
   echo "  -h, --help
@@ -102,10 +96,6 @@ parse_arguments() {
     -db | --database)
       shift
       host_db=$1
-      ;;
-    --unittest)
-      cmd=${unittest}
-      self_test=1
       ;;
     -v | --volume)
       shift
@@ -133,7 +123,7 @@ parse_arguments() {
 # Database setup functions
 # --------------------------------
 check_database_environment() {
-  if [ -z ${ROMI_DB+x} ] && [ ${self_test} -eq 0 ]; then
+  if [ -z ${ROMI_DB+x} ] ; then
     log_warning "Environment variable 'ROMI_DB' is not defined, set it to use as default database location!"
   fi
 }
@@ -143,12 +133,9 @@ setup_database_mount() {
     mount_option="${mount_option} -v ${host_db}:/myapp/db"
     log_info "Automatic bind mount of '${host_db}' (host) to '/myapp/db' (container)!"
   else
-    # Only raise ERROR message if not a SELF-TEST:
-    if [ ${self_test} -eq 0 ]; then
-      log_error "No local host database defined!"
-      log_info "Set 'ROMI_DB' or use the '-db' | '--database' option to define it."
-      exit 1
-    fi
+    log_error "No local host database defined!"
+    log_info "Set 'ROMI_DB' or use the '-db' | '--database' option to define it."
+    exit 1
   fi
 }
 
@@ -160,10 +147,7 @@ setup_user_group() {
   else
     group_name='romi'
     gid=2020
-    # Only raise WARNING message if not a SELF-TEST:
-    if [ ${self_test} -eq 0 ]; then
-      log_warning "Using default group name '${group_name}' & '${gid}'."
-    fi
+    log_warning "Using default group name '${group_name}' & '${gid}'."
   fi
 }
 
