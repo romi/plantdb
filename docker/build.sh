@@ -45,6 +45,8 @@ initialize_variables() {
   VTAG="latest"
   # String aggregating the docker build options to use:
   DOCKER_OPTS=""
+  # Running the Docker test stage is disabled by default
+  RUN_TESTS=false
   # Debug mode is disabled by default
   DEBUG_MODE=false
 }
@@ -65,6 +67,8 @@ show_usage() {
   echo -e "$(bold OPTIONS):"
   echo "  -t, --tag
     Docker image tag to use, default to '${VTAG}'."
+  echo "  --test
+    Run test stage prior to building the final image."
   # -- Docker options:
   echo "  --no-cache
     Do not use cache when building the image, (re)start from scratch."
@@ -91,6 +95,10 @@ parse_arguments() {
       shift
       VTAG=$1
       ;;
+    --test)
+      RUN_TESTS=true
+      log_debug "Test stage enabled!"
+      ;;
     --no-cache)
       DOCKER_OPTS="${DOCKER_OPTS} --no-cache"
       ;;
@@ -102,7 +110,7 @@ parse_arguments() {
       ;;
     --debug)
       DEBUG_MODE=true
-      log_debug "Debug mode enabled"
+      log_debug "Debug mode enabled!"
       ;;
     -h | --help)
       show_usage
@@ -120,13 +128,57 @@ parse_arguments() {
 # --------------------------------
 # Docker build function
 # --------------------------------
-build_docker(){
+docker_build_cmd() {
+  if [ "${RUN_TESTS}" = true ]; then
+    local VTAG='test'
+  fi
   # Construct the docker build command
   docker_cmd="docker build"
   docker_cmd+=" -t \"roboticsmicrofarms/plantdb:${VTAG}\""
   docker_cmd+=" ${DOCKER_OPTS}"  # Additional options like --no-cache, --pull, etc.
+  if [ "${RUN_TESTS}" = true ]; then
+      docker_cmd+=" --target test"
+  fi
   docker_cmd+=" -f \"docker/Dockerfile\""
   docker_cmd+=" ."  # Build context
+}
+
+build_test_docker() {
+  # Create the docker build command
+  docker_build_cmd
+  # Print the full command that will be executed
+  log_debug "Executing command: ${docker_cmd}"
+
+  log_info "Starting Docker build TEST stage..."
+  # Get the date to estimate docker image build time:
+  start_time=$(date +%s)
+  # Execute the docker build command with test stage as target
+  eval ${docker_cmd}
+
+  # Get docker build status:
+  docker_build_status=$?
+  # Get elapsed time:
+  elapsed_time=$(($(date +%s) - start_time))
+  # Print build time if successful (code 0), else print exit code
+  if [ ${docker_build_status} == 0 ]; then
+    log_info "Docker TEST build SUCCEEDED in ${elapsed_time}s!"
+    # Remove the test image after successful TEST build
+    docker rmi "roboticsmicrofarms/plantdb:test" || log_warning "Could not remove test image"
+    RUN_TESTS=false  # switch the variable to false after running the tests
+  else
+    log_error "Docker TEST build FAILED after ${elapsed_time}s with code ${docker_build_status}!"
+    # Exit with docker build exit code:
+    exit ${docker_build_status}
+  fi
+}
+
+build_docker(){
+  if [ "${RUN_TESTS}" = true ]; then
+    build_test_docker
+  fi
+
+  # Create the docker build command
+  docker_build_cmd
 
   # Print the build configuration options
   log_debug "Build configuration:"
@@ -135,20 +187,16 @@ build_docker(){
   # Print the full command that will be executed
   log_debug "Executing command: ${docker_cmd}"
 
-  log_info "Starting Docker build for roboticsmicrofarms/plantdb:${VTAG}"
-
+  log_info "Starting Docker build..."
   # Get the date to estimate docker image build time:
   start_time=$(date +%s)
-
   # Execute the docker build command
   eval ${docker_cmd}
 
   # Get docker build status:
   docker_build_status=$?
-
   # Get elapsed time:
   elapsed_time=$(($(date +%s) - start_time))
-
   # Print build time if successful (code 0), else print exit code
   if [ ${docker_build_status} == 0 ]; then
     log_info "Docker build SUCCEEDED in ${elapsed_time}s!"
