@@ -141,7 +141,8 @@ def parsing():
     return parser
 
 
-def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, empty=False, models=False):
+def rest_api(db_location, proxy=False, url_prefix="",
+             log_level=DEFAULT_LOG_LEVEL, test=False, empty=False, models=False):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -157,6 +158,8 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
         an error and terminate unless the path is appropriately overridden in test mode.
     proxy : bool, optional
         Boolean flag indicating whether the application is behind a reverse proxy, by default ``False``.
+    url_prefix : str, optional
+        Prefix for all endpoints, by default ""
     log_level : str, optional
         The logging level to use for the application. Defaults to ``DEFAULT_LOG_LEVEL``.
     test : bool, optional
@@ -180,9 +183,8 @@ def rest_api(db_location, proxy=False, log_level=DEFAULT_LOG_LEVEL, test=False, 
     CORS(app)  # Enable Cross-Origin Resource Sharing for the app
     if proxy:
         logger.info(f"Setting up Flask application with proxy support...")
-        prefix = os.environ.get("PLANTDB_API_PREFIX", "")
-        api = Api(app, prefix=prefix)
-        logger.info(f"Using prefix '{prefix}' for all RESTful endpoints.")
+        api = Api(app, prefix=url_prefix)
+        logger.info(f"Using prefix '{url_prefix}' for all RESTful endpoints.")
         # App is behind one proxy that sets the -For and -Host headers.
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
         # Set secure cookies
