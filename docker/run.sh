@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # --------------------------------
@@ -7,10 +8,12 @@ setup_colors() {
   RED="\033[0;31m"    # Define red color code
   GREEN="\033[0;32m"  # Define green color code
   YELLOW="\033[0;33m" # Define yellow color code
+  BLUE="\033[0;34m"   # Define blue color code for debug messages
   NC="\033[0m"        # No Color code to reset colors
   INFO="${GREEN}INFO${NC}    "    # Prefix for info messages
   WARNING="${YELLOW}WARNING${NC} " # Prefix for warning messages
   ERROR="${RED}$(bold ERROR)${NC}   " # Prefix for error messages using bold function
+  DEBUG="${BLUE}DEBUG${NC}   "   # Prefix for debug messages
 }
 
 bold() {
@@ -29,6 +32,12 @@ log_error() {
   echo -e "${ERROR}$1" # Print error message with ERROR prefix
 }
 
+log_debug() {
+  if [ "${DEBUG_MODE}" = true ]; then
+    echo -e "${DEBUG}$1" # Print debug message with DEBUG prefix if debug mode is enabled
+  fi
+}
+
 # --------------------------------
 # Functions for script initialization
 # --------------------------------
@@ -41,6 +50,10 @@ initialize_variables() {
   mount_option=""
   # Port flag to track if port was manually specified
   port_specified=0
+  # Debug mode is disabled by default
+  DEBUG_MODE=false
+  # Production mode is disabled by default
+  PRODUCTION_MODE=false
 
   # If the `ROMI_DB` variable is set, use it as default database location, else set it to empty:
   if [ -z ${ROMI_DB+x} ]; then
@@ -63,6 +76,8 @@ show_usage() {
   echo -e "$(bold OPTIONS):"
   echo "  -t, --tag
     Docker image tag to use, default to '${vtag}'."
+  echo "  --production
+      Run in production mode using uWSGI. By default, development mode is used."
   echo "  -c, --cmd
     Defines the command to run at container startup.
     By default, starts the container and serve the database using the REST API on port 5000.
@@ -75,6 +90,9 @@ show_usage() {
     Multiple use is allowed."
   echo "  -p, --port
     Port to use for the REST API (default: first available port in 5000-5100 range)."
+  # -- Debug option:
+  echo "  --debug
+    Enable debug mode to print additional debug information."
   echo "  -h, --help
     Output a usage message and exit."
 }
@@ -105,6 +123,14 @@ parse_arguments() {
       shift
       port=$1
       port_specified=1
+      ;;
+    --production)
+      PRODUCTION_MODE=true
+      log_info "Production mode enabled"
+      ;;
+    --debug)
+      DEBUG_MODE=true
+      log_debug "Debug mode enabled!"
       ;;
     -h | --help)
       show_usage
@@ -214,48 +240,100 @@ check_terminal() {
 # --------------------------------
 # Docker run functions
 # --------------------------------
-run_docker_development() {
+create_docker_run_cmd() {
+  # Base docker run command
+  docker_cmd="docker run"
+
+  # Add appropriate flags based on mode
+  if [ "$1" = "development" ]; then
+    docker_cmd+=" --rm"
+  elif [ "$1" = "production" ]; then
+    # Start the Docker container in detached mode.
+    docker_cmd+=" -d"
+  elif [ "$1" = "command" ]; then
+    docker_cmd+=" --rm"
+  fi
+
+  # Add common parameters
+  # Map the specified host port to the container's port 5000.
+  docker_cmd+=" -p ${port}:5000"
+  # Mount options for the container filesystem.
+  docker_cmd+=" ${mount_option}"
+  # Set the user and group ID within the container.
+  docker_cmd+=" --user romi:${gid}"
   # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
-  docker run \
-    --rm \
-    -p ${port}:5000 \
-    ${mount_option} \
-    --user romi:${gid} \
-    -i ${USE_TTY} \
-    roboticsmicrofarms/plantdb:${vtag} \
-    "fsdb_rest_api --port 5000"
+  docker_cmd+=" -i"
+  docker_cmd+=" ${USE_TTY}"
+  # Use the specified Docker image tag for the roboticsmicrofarms/plantdb service.
+  docker_cmd+=" roboticsmicrofarms/plantdb:${vtag}"
+
+  # Add the command to run
+  if [ "$1" = "development" ]; then
+    docker_cmd+=" \"fsdb_rest_api --port 5000\""
+  elif [ "$1" = "production" ]; then
+  # Run uWSGI to serve the application on port 5000.
+    docker_cmd+=" \"uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master\""
+  elif [ "$1" = "command" ]; then
+    docker_cmd+=" \"${cmd}\""
+  fi
+}
+
+run_docker_development() {
+  log_debug "Running docker in development mode"
+  log_debug "- Docker tag: ${vtag}"
+  log_debug "- Port: ${port}"
+  log_debug "- Mount options: ${mount_option}"
+  log_debug "- User: romi:${gid}"
+
+  # Create the docker run command
+  create_docker_run_cmd "development"
+
+  # Print the full command that will be executed
+  log_debug "Executing command: ${docker_cmd}"
+
+  # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
+  eval ${docker_cmd}
 }
 
 run_docker_production() {
-  # Start the Docker container in detached mode.
-  # Map the specified host port to the container's port 5000.
-  # Mount options for the container filesystem.
-  # Set the user and group ID within the container.
-  # Load `~/.bashrc` if `-i` is set, interactive mode.
-  # Use the specified Docker image tag for the roboticsmicrofarms/plantdb service.
-  # Run uWSGI to serve the application on port 5000.
-  docker run \
-    -d \
-    -p ${port}:5000 \
-    ${mount_option} \
-    --user romi:${gid} \
-    -i ${USE_TTY} \
-    roboticsmicrofarms/plantdb:${vtag} \
-    "uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master"
+  log_debug "Running docker in production mode"
+  log_debug "- Docker tag: ${vtag}"
+  log_debug "- Port: ${port}"
+  log_debug "- Mount options: ${mount_option}"
+  log_debug "- User: romi:${gid}"
+
+  # Create the docker run command
+  create_docker_run_cmd "production"
+
+  # Print the full command that will be executed
+  log_debug "Executing command: ${docker_cmd}"
+
+  # Execute the docker run command
+  eval ${docker_cmd}
 }
 
 run_docker_command() {
   log_info "Running: '${cmd}'."
   log_info "Bind mount: '${mount_option}'."
 
+  log_debug "Docker run configuration:"
+  log_debug "- Docker tag: ${vtag}"
+  log_debug "- Command: ${cmd}"
+  log_debug "- Port: ${port}"
+  log_debug "- Mount options: ${mount_option}"
+  log_debug "- User: romi:${gid}"
+
+  # Create the docker run command
+  create_docker_run_cmd "command"
+
+  # Print the full command that will be executed
+  log_debug "Executing command: ${docker_cmd}"
+
   # Get the date to estimate command execution time:
   start_time=$(date +%s)
 
-  # Start in interactive mode, using the `-i` flag (load `~/.bashrc`).
-  docker run --rm -p ${port}:5000 ${mount_option} \
-    --user romi:${gid} \
-    -i ${USE_TTY} roboticsmicrofarms/plantdb:${vtag} \
-    "${cmd}"
+  # Execute the docker run command
+  eval ${docker_cmd}
 
   # Get command exit code:
   cmd_status=$?
@@ -271,6 +349,7 @@ run_docker_command() {
   exit ${cmd_status}
 }
 
+
 # --------------------------------
 # Main script execution
 # --------------------------------
@@ -285,7 +364,11 @@ main() {
   check_terminal
 
   if [ "${cmd}" = "" ]; then
-    run_docker_development
+    if [ "${PRODUCTION_MODE}" = true ]; then
+      run_docker_production
+    else
+      run_docker_development
+    fi
   else
     run_docker_command
   fi
