@@ -23,22 +23,22 @@ This variable represents the version number you want to assign to your build.
 export NEW_TAG=0.14.4
 ```
 
-#### 1. Building the Docker Image
+#### 1. Running Unit Tests
+
+Before building the runtime image and publishing it, verify it passes all tests:
+
+```shell
+# Run the test suite inside the container
+./docker/build.sh --test-only --no-cache
+```
+
+#### 2. Building the Docker Image
 
 The following command builds a Docker image with the specified tag:
 
 ```shell
 # Build using the tag set in NEW_TAG
 ./docker/build.sh -t $NEW_TAG
-```
-
-#### 2. Running Unit Tests
-
-Before publishing the image, verify it passes all tests:
-
-```shell
-# Run the test suite inside the container
-./docker/run.sh --unittest
 ```
 
 #### 3. Tagging as Latest
@@ -61,6 +61,16 @@ docker push roboticsmicrofarms/plantdb:$NEW_TAG
 # Push the 'latest' version
 docker push roboticsmicrofarms/plantdb:latest
 ```
+
+#### 5. Production Deployment
+
+To deploy the PlantDB application as a standalone container, use our `docker/run.sh` script as follows:
+
+```shell
+export ROMI_DB="/path/to/my/database" && \ 
+./docker/run.sh -t $NEW_TAG --production 
+```
+
 
 ### Complete Workflow Command
 
