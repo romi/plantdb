@@ -14,6 +14,8 @@ RUN apt-get update && \
         python3 python3-pip python3-dev \
         # Install 'gcc', 'libc6-dev' & 'python3-dev' to be able to build uwsgi
         gcc libc6-dev \
+        # Install PCRE for uWSGI routing support
+        libpcre3-dev \
         # Install build tools for compiling Python packages
         build-essential && \
     # Clean package manager:
