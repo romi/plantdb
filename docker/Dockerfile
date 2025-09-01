@@ -100,7 +100,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm -rf /var/cache/apt/archives/* /var/cache/apt/*.bin && \
     # Remove man pages and docs
-    rm -rf /usr/share/man/* /usr/share/doc/* /usr/share/info/* /usr/share/locale/* && \
+    rm -rf /usr/share/man/* /usr/share/doc/* /usr/share/info/* && \
+    # Keep only C.UTF-8 locale
+    cd /usr/share/locale/ && \
+    find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + && \
+
     # Create a non-root user and create a "home" folder for it:
     adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
