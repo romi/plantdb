@@ -16,6 +16,7 @@ RUN apt-get update && \
         gcc libc6-dev \
         # Install build tools for compiling Python packages
         build-essential && \
+    # Clean package manager:
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
@@ -97,14 +98,13 @@ RUN apt-get update && \
     # Clean package manager:
     apt-get clean -y && \
     apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm -rf /var/cache/apt/archives/* /var/cache/apt/*.bin && \
+    # Cleanup package manager and temp files
+    find /var/lib/apt/lists/ /tmp/ /var/tmp/ /var/cache/apt/archives/ -mindepth 1 -delete && \
     # Remove man pages and docs
-    rm -rf /usr/share/man/* /usr/share/doc/* /usr/share/info/* && \
+    find /usr/share/man/ /usr/share/doc/ /usr/share/info/ -mindepth 1 -delete && \
     # Keep only C.UTF-8 locale
     cd /usr/share/locale/ && \
     find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + && \
-
     # Create a non-root user and create a "home" folder for it:
     adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
