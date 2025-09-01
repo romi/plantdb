@@ -47,6 +47,7 @@ initialize_variables() {
   DOCKER_OPTS=""
   # Running the Docker test stage is disabled by default
   RUN_TESTS=false
+  TEST_ONLY=false
   # Debug mode is disabled by default
   DEBUG_MODE=false
 }
@@ -69,6 +70,8 @@ show_usage() {
     Docker image tag to use, default to '${VTAG}'."
   echo "  --test
     Run test stage prior to building the final image."
+  echo "  --test-only
+    Run test stage only (do not build final image)."
   # -- Docker options:
   echo "  --no-cache
     Do not use cache when building the image, (re)start from scratch."
@@ -99,6 +102,11 @@ parse_arguments() {
       RUN_TESTS=true
       log_debug "Test stage enabled!"
       ;;
+    --test-only)
+      RUN_TESTS=true
+      TEST_ONLY=true
+      log_debug "Test only mode enabled!"
+    ;;
     --no-cache)
       DOCKER_OPTS="${DOCKER_OPTS} --no-cache"
       ;;
@@ -167,6 +175,12 @@ build_test_docker() {
     RUN_TESTS=false  # switch the variable to false after running the tests
   else
     log_error "Docker TEST build FAILED after ${elapsed_time}s with code ${docker_build_status}!"
+    # Exit with docker build exit code:
+    exit ${docker_build_status}
+  fi
+
+   # Check if it's test-only mode and exit if true
+  if [ "${TEST_ONLY}" = true ]; then
     # Exit with docker build exit code:
     exit ${docker_build_status}
   fi
