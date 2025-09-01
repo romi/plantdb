@@ -18,7 +18,7 @@ RUN apt-get update && \
         build-essential && \
     # Clean package manager:
     apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* 2>/dev/null || true
 
 # Copy the source files starting from the root folder (relative to context build):
 COPY src/commons commons/
@@ -106,7 +106,7 @@ RUN apt-get update && \
     find /usr/share/man /usr/share/doc /usr/share/info -delete 2>/dev/null || true && \
     # Keep only C.UTF-8 locale
     cd /usr/share/locale/ && \
-    find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + && \
+    find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + 2>/dev/null || true && \
     # Create a non-root user and create a "home" folder for it:
     adduser --disabled-password --gecos '' --uid ${USER_ID} ${USER_NAME} && \
     chown -R ${USER_NAME}: /home/${USER_NAME} && \
@@ -128,8 +128,8 @@ RUN echo "\n\n# Installing 'plantdb.commons', 'plantdb.server' & uwsgi..." && \
     # Clean pip cache:
     python3 -m pip cache purge && \
     # Clean unnecessary files:
-    find /home/${USER_NAME}/.local -name "*.pyc" -delete && \
-    find /home/${USER_NAME}/.local -name "__pycache__" -type d -exec rm -rf {} +
+    find /home/${USER_NAME}/.local -name "*.pyc" -delete 2>/dev/null || true && \
+    find /home/${USER_NAME}/.local -name "__pycache__" -type d -exec rm -rf {} 2>/dev/null || true +
 
 COPY --chown=${USER_NAME} docker/entrypoint.sh .
 ENTRYPOINT ["./entrypoint.sh"]
