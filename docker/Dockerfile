@@ -103,9 +103,9 @@ RUN apt-get update && \
     rm -rf /tmp/* /var/tmp/* && \
     rm -rf /var/cache/apt/archives/*.deb && \
     # Remove man pages and docs
-    rm -rf /usr/share/man/* && \
-    rm -rf /usr/share/doc/* && \
-    rm -rf /usr/share/info/* && \
+    rm -rf /usr/share/man && \
+    rm -rf /usr/share/doc && \
+    rm -rf /usr/share/info && \
     # Keep only C.UTF-8 locale
     cd /usr/share/locale/ && \
     find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + && \
