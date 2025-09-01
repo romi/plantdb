@@ -92,7 +92,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
         # Install python3.10 & pip
-        python3 python3-distutils \
+        python3 python3-distutils python3-dev \
         # Install Open3D system dependencies
         libegl1 libgl1 libgomp1 && \
     # Clean package manager:
