@@ -97,7 +97,8 @@ RUN apt-get update && \
     # Clean package manager:
     apt-get clean -y && \
     apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/* && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm -rf /var/cache/apt/archives/* /var/cache/apt/*.bin && \
     # Remove man pages and docs
     rm -rf /usr/share/man/* /usr/share/doc/* /usr/share/info/* /usr/share/locale/* && \
     # Create a non-root user and create a "home" folder for it:
