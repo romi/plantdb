@@ -99,11 +99,11 @@ RUN apt-get update && \
     apt-get clean -y && \
     apt-get autoremove -y && \
     # Cleanup package manager and temp files
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /tmp/* /var/tmp/* && \
-    rm -rf /var/cache/apt/archives/*.deb && \
+    rm -rf /var/lib/apt/lists/* 2>/dev/null || true && \
+    rm -rf /tmp/* /var/tmp/* 2>/dev/null || true && \
+    rm -rf /var/cache/apt/archives/*.deb 2>/dev/null || true && \
     # Remove man pages and docs
-    find /usr/share/man /usr/share/doc /usr/share/info -delete && \
+    find /usr/share/man /usr/share/doc /usr/share/info -delete 2>/dev/null || true && \
     # Keep only C.UTF-8 locale
     cd /usr/share/locale/ && \
     find . -mindepth 1 -maxdepth 1 ! -name 'C.UTF-8' -exec rm -rf {} + && \
