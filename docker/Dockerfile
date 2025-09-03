@@ -93,6 +93,8 @@ SHELL ["/bin/bash", "-c"]
 # Update package manager & install requirements:
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
+        # Install curl to performs healthcheck
+        curl \
         # Install python3.10 & pip
         python3 python3-distutils python3-dev \
         # Install Open3D system dependencies
