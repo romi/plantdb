@@ -35,11 +35,10 @@ Usage Examples
 """
 
 import mimetypes
+import os
 
 import requests
 from requests import RequestException
-
-from plantdb.commons import api_prefix
 
 
 def get_mime_type(extension):
@@ -764,3 +763,29 @@ class PlantDBClient:
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
         return response.json()
+
+
+def api_prefix(prefix=""):
+    """Set the API prefix for all URL generation functions.
+
+    Parameters
+    ----------
+    prefix : str, optional
+        The prefix to add to all API URLs, e.g., '/plantdb'. Defaults to empty string.
+
+    Examples
+    --------
+    >>> import os
+    >>> from plantdb.client.plantdb_client import api_prefix
+    >>> api_prefix()
+    ''
+    >>> os.environ['PLANTDB_API_PREFIX'] = "/plantdb"
+    >>> api_prefix()
+    '/plantdb'
+    """
+    if prefix is None or prefix == "":
+        prefix = os.environ.get("PLANTDB_API_PREFIX", "")  # Default to no prefix
+
+    prefix = prefix.rstrip('/')  # Remove the trailing slash if present
+    os.environ['PLANTDB_API_PREFIX'] = prefix
+    return prefix
