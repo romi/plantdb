@@ -27,6 +27,7 @@
 This module regroup the client-side methods of the REST API.
 """
 import json
+import logging
 import os
 from io import BytesIO
 from pathlib import Path
@@ -115,7 +116,7 @@ def base_url(host=REST_API_URL, port=REST_API_PORT, prefix=None, ssl=False) -> s
     'http://127.0.0.1:5000'
     >>> base_url(host='api.example.com', port=8443, ssl=True)
     'https://api.example.com:8443'
-    >>> base_url(prefix='/plantdb', ssl=True)
+    >>> base_url(port=5000, prefix='/plantdb', ssl=True)
     'https://127.0.0.1/plantdb/'
     """
     # Attempt to split the host to check for an existing scheme (http/https)
@@ -169,12 +170,123 @@ def scans_url(**kwargs):
     'http://127.0.0.1:5000/scans'
     >>> scans_url(prefix='/plantdb')
     'http://127.0.0.1/plantdb/scans'
+    >>> scans_url(host='mellitus.biologie.ens-lyon.fr', port=433, prefix='/plantdb/', ssl=True)
     """
     url = base_url(host=kwargs.get("host", REST_API_URL),
                    port=kwargs.get("port", REST_API_PORT),
                    prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
                    ssl=kwargs.get("ssl", False))
     return urljoin(url, "scans")
+
+
+def configure_requests_with_certificate(cert_path, logger=None):
+    """
+    Configure the Requests library to use a specific SSL certificate.
+
+    This function sets up the Requests library to use a given SSL certificate by
+    modifying the environment variable `REQUESTS_CA_BUNDLE`. It also ensures that
+    the specified certificate file exists. If the file does not exist, it raises
+    a FileNotFoundError.
+
+    Parameters
+    ----------
+    cert_path : str
+        The path to the SSL certificate file.
+    logger : logging.Logger, optional
+        A logger instance to use. Defaults to ``None``.
+
+    Raises
+    ------
+    FileNotFoundError
+        If `cert_path` does not point to a valid certificate file.
+    """
+    if not os.path.exists(cert_path):
+        raise FileNotFoundError(f"Certificate file not found: {cert_path}")
+
+    os.environ['REQUESTS_CA_BUNDLE'] = cert_path
+    if logger is not None and isinstance(logger, logging.Logger):
+        logger.debug(f"Requests configured to use certificate: {cert_path}")
+
+
+def make_api_request(url, method="GET", params=None, json_data=None,
+                     cert_path=None, allow_redirects=True, **kwargs):
+    """
+    Function to make an API request with various HTTP methods and options.
+
+    Parameters
+    ----------
+    url : str
+        The URL for the API endpoint.
+    method : {'GET', 'POST', 'PUT', 'DELETE'}, optional
+        The HTTP method to use. Default is 'GET'.
+    params : dict, optional
+        Dictionary of query parameters to append to the URL.
+    json_data : dict, optional
+        JSON payload to send in the body of the request for 'POST' and 'PUT' methods.
+    cert_path : str or None, optional
+        Path to a certificate file for SSL verification. If None, default SSL verification is used.
+    allow_redirects : bool, optional
+        Whether to allow redirects. Default is True.
+
+    Other Parameters
+    ----------------
+    header : dict, optional
+        The HTTP headers to send in the request. Default is None.
+    files : dict, optional
+        Additional files to send in the request. Default is None.
+    data : dict, list, or bytes, optional
+        The data to send in the request. Default is None.
+    timeout : int, optional
+        Timeout to use for the request. Default is 5 seconds.
+    stream : bool, optional
+        Flag indicating whether to stream the request. Default is False.
+
+    Returns
+    -------
+    response : requests.Response
+        The response object from the API request.
+
+    Raises
+    ------
+    ValueError
+        If an unsupported HTTP method is provided.
+    requests.exceptions.SSLError
+        If there's an SSL error during the request.
+    requests.exceptions.RequestException
+        For any other exception raised by the underlying `requests` library.
+
+    Notes
+    -----
+    This function is designed to handle various HTTP methods (GET, POST, PUT, DELETE) and provides a unified interface for making API requests. It supports SSL verification and allows for custom parameters and JSON data to be sent with the request.
+    It passes keyword arguments to the underlying `requests` library.
+    """
+    # Add a default timeout of 5 seconds if not provided
+    if 'timeout' not in kwargs:
+        kwargs['timeout'] = 5.0
+
+    try:
+        verify = cert_path if cert_path else True
+
+        if method.upper() == "GET":
+            response = requests.get(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
+        elif method.upper() == "POST":
+            response = requests.post(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects, **kwargs)
+        elif method.upper() == "PUT":
+            response = requests.put(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects, **kwargs)
+        elif method.upper() == "DELETE":
+            response = requests.delete(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
+        else:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+
+        response.raise_for_status()  # Raise exception for 4XX/5XX responses
+        return response
+    except requests.exceptions.SSLError as e:
+        print(f"SSL Error: {e}")
+        print("Try providing the specific certificate path with cert_path parameter")
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
+        raise
 
 
 def scan_url(scan_id, **kwargs):
@@ -398,45 +510,54 @@ def get_file_uri(scan, fileset, file):
 
 def test_availability(url):
     """Verifies the connectivity to a given host and port from a URL-like string.
-
     This function parses a URL string into host and port components, attempts to establish a
     socket connection to check its availability, and raises appropriate exceptions on failure.
-
     Parameters
     ----------
     url : str
-        A string specifying the host and port in the format 'host:port'.
-
+        A URL string in various formats like 'http://host:port', 'https://host/path/', etc.
     Raises
     ------
     ValueError
-        If the input URL is not in the correct format 'host:port'.
+        If the input URL is not a valid URL format.
     ConnectionError
-        If the specified host and port cannot be connected, indicating that the port might
-        be closed or unavailable.
+        If the specified host cannot be connected, indicating that the server might
+        be unavailable.
     RuntimeError
         If an unexpected error occurs during the verification process.
-
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import test_availability
     >>> test_availability('http://127.0.0.1:5000')
-    >>> test_availability('http://127.0.0.1:5000/plantdb/')
+    >>> test_availability('https://127.0.0.1/plantdb/')
+    >>> test_availability('https://mellitus.biologie.ens-lyon.fr/plantdb/')
     """
     import socket
     try:
         parsed_url = urlparse(url)
-        host, port = parsed_url.hostname, parsed_url.port
+
+        # Validate URL has at least a scheme and hostname
+        if not parsed_url.scheme or not parsed_url.netloc:
+            raise ValueError(f"Invalid URL format: '{url}'. Must include scheme (http/https) and hostname.")
+
+        host = parsed_url.hostname
+        # Use default port based on scheme if not specified
+        port = parsed_url.port
+        if port is None:
+            port = 443 if parsed_url.scheme == 'https' else 80
+
         socket.setdefaulttimeout(2)  # Set a timeout for the connection check
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             if s.connect_ex((host, port)) != 0:
-                raise ConnectionError(f"Cannot connect to {host}:{port}. Port might be closed or unavailable.")
-    except ValueError:
-        raise ValueError(f"Database URL should be 'host:port', got '{url}' instead.")
+                raise ConnectionError(f"Cannot connect to {host}:{port}. Server might be unavailable.")
+    except ValueError as e:
+        raise ValueError(f"{e}")
     except ConnectionError as e:
         raise e
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error during connection check: {e}")
 
 
 def list_scan_names(**kwargs):
@@ -466,11 +587,10 @@ def list_scan_names(**kwargs):
     >>> from plantdb.client.rest_api import list_scan_names
     >>> print(list_scan_names())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
+    >>> print(list_scan_names(host='mellitus.biologie.ens-lyon.fr', port=433, prefix='/plantdb/', ssl=True))
     """
-    try:
-        response = requests.get(url=scans_url(**kwargs))
-    except Exception as e:
-        return []
+    url = scans_url(**kwargs)
+    response = make_api_request(url=url, cert_path=kwargs.get('cert_path', None))
     return sorted(response.json())
 
 
@@ -502,7 +622,8 @@ def get_scans_info(**kwargs):
     >>> get_scans_info()
     """
     scan_list = list_scan_names(**kwargs)
-    return [requests.get(url=scan_url(scan, **kwargs)).json() for scan in scan_list]
+    return [make_api_request(url=scan_url(scan, **kwargs), cert_path=kwargs.get('cert_path', None)).json() for scan in
+            scan_list]
 
 
 def parse_scans_info(**kwargs):
@@ -581,7 +702,8 @@ def get_scan_data(scan_id, **kwargs):
     scan_id = sanitize_name(scan_id)
     scan_names = list_scan_names(**kwargs)
     if scan_id in scan_names:
-        return requests.get(url=scan_url(scan_id, **kwargs)).json()
+        url = scan_url(scan_id, **kwargs)
+        return make_api_request(url=url, cert_path=kwargs.get('cert_path', None)).json()
     else:
         return {}
 
@@ -700,7 +822,8 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
     >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
     >>> image.show()  # Display the image
     """
-    return requests.get(url=scan_image_url(scan_id, fileset_id, file_id, size, **kwargs))
+    url = scan_image_url(scan_id, fileset_id, file_id, size, **kwargs)
+    return make_api_request(url=url, cert_path=kwargs.get('cert_path', None))
 
 
 def get_tasks_fileset_from_api(dataset_name, **kwargs):
@@ -842,7 +965,7 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
     """
     images = []
     for img_uri in list_task_images_uri(dataset_name, task_name, size, **kwargs):
-        images.append(Image.open(BytesIO(requests.get(img_uri).content)))
+        images.append(Image.open(BytesIO(make_api_request(url=img_uri, cert_path=kwargs.get('cert_path', None)).content)))
     return images
 
 
@@ -1064,7 +1187,7 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
                    port=kwargs.get("port", REST_API_PORT),
                    prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
                    ssl=kwargs.get("ssl", False))
-    data = requests.get(url + file_uri).content
+    data = make_api_request(url + file_uri, cert_path=kwargs.get('cert_path', None)).content
     return parse_task_requests_data(task, data, ext)
 
 
@@ -1092,6 +1215,7 @@ def scan_file_url(dataset_name, file_path, **kwargs):
         ssl=kwargs.get("ssl", False)
     )
     return urljoin(url, f"files/{dataset_name}/{file_path}")
+
 
 def scan_config_url(dataset_name, cfg_fname='scan.toml', **kwargs):
     """Return the scan URL to access the scanning configuration file.
@@ -1130,6 +1254,7 @@ def scan_config_url(dataset_name, cfg_fname='scan.toml', **kwargs):
     """
     return scan_file_url(dataset_name, cfg_fname, **kwargs)
 
+
 def scan_reconstruction_url(dataset_name, cfg_fname='pipeline.toml', **kwargs):
     """Return the scan URL to access the reconstruction configuration file.
 
@@ -1167,7 +1292,8 @@ def scan_reconstruction_url(dataset_name, cfg_fname='pipeline.toml', **kwargs):
     """
     return scan_file_url(dataset_name, cfg_fname, **kwargs)
 
-def _load_toml_from_url(url):
+
+def _load_toml_from_url(url, **kwargs):
     """Load and parse a TOML file from a given URL.
 
     Parameters
@@ -1181,10 +1307,11 @@ def _load_toml_from_url(url):
         The parsed TOML data as a dictionary, or None if the request fails.
     """
     import toml
-    res = requests.get(url)
-    if res.ok:
-        return toml.loads(res.content.decode('utf-8'))
+    response = make_api_request(url, cert_path=kwargs.get('cert_path', None))
+    if response.ok:
+        return toml.loads(response.content.decode('utf-8'))
     return None
+
 
 def get_toml_file(dataset_name, file_path, **kwargs):
     """Return a loaded TOML file for selected dataset, if it exists.
@@ -1222,7 +1349,8 @@ def get_toml_file(dataset_name, file_path, **kwargs):
     {'upstream_task': 'Voxels', 'level_set_value': 1.0}
     """
     url = scan_file_url(dataset_name, file_path, **kwargs)
-    return _load_toml_from_url(url)
+    return _load_toml_from_url(url, **kwargs)
+
 
 def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
     """Return the scan configuration for selected dataset, if it exists.
@@ -1262,6 +1390,7 @@ def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
 
+
 def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs):
     """Return the reconstruction configuration for selected dataset, if it exists.
 
@@ -1299,6 +1428,7 @@ def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs)
 
     """
     return get_toml_file(dataset_name, cfg_fname, **kwargs)
+
 
 def get_angles_and_internodes_data(dataset_name, **kwargs):
     """Return a dictionary with 'angles' and 'internodes' data for selected dataset, if it exists.
@@ -1340,9 +1470,9 @@ def get_angles_and_internodes_data(dataset_name, **kwargs):
                    port=kwargs.get("port", REST_API_PORT),
                    prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
                    ssl=kwargs.get("ssl", False))
-    res = requests.get(urljoin(url, f"sequence/{dataset_name}"))
-    if res.ok:
-        data = json.loads(res.content.decode('utf-8'))
+    response = make_api_request(urljoin(url, f"sequence/{dataset_name}"), cert_path=kwargs.get('cert_path', None))
+    if response.ok:
+        data = json.loads(response.content.decode('utf-8'))
         return {seq: data[seq] for seq in ['angles', 'internodes']}
     else:
         return None
@@ -1414,10 +1544,12 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
                 bytes_sent = 0
                 while bytes_sent < file_size:
                     chunk = f.read(chunk_size)
-                    response = requests.post(
+                    response = make_api_request(
                         url,
+                        method="POST",
                         headers=headers,
                         data=chunk,
+                        cert_path=kwargs.get('cert_path', None)
                     )
                     bytes_sent += len(chunk)
                     # Check if the request was successful
@@ -1426,7 +1558,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
                                 "response": response.json()}
             else:
                 # Upload the entire file
-                response = requests.post(url, headers=headers, data=f)
+                response = make_api_request(url, method='POST', headers=headers, data=f, cert_path=kwargs.get('cert_path', None))
 
         # Return the server's response
         if response.status_code in (200, 201):
@@ -1478,11 +1610,12 @@ def refresh(dataset_name=None, **kwargs):
     >>> refresh("arabidopsis000")
     {'message': "Successfully reloaded scan 'arabidopsis000'."}
     """
-    res = requests.get(refresh_url(dataset_name, **kwargs), timeout=kwargs.get("timeout", 5))
-    if res.ok:
-        return res.json()
+    url = refresh_url(dataset_name, **kwargs)
+    response = make_api_request(url, cert_path=kwargs.get('cert_path', None))
+    if response.ok:
+        return response.json()
     else:
-        res.raise_for_status()  # Raise an error if the request failed
+        response.raise_for_status()  # Raise an error if the request failed
 
 
 def download_scan_archive(dataset_name, out_dir=None, **kwargs):
@@ -1531,21 +1664,23 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     url = archive_url(dataset_name, **kwargs)
 
     start_time = time.time()  # Start timing
-    res = requests.get(url, stream=True, timeout=kwargs.get("timeout", 10))
+    response = make_api_request(url, stream=True,
+                                timeout=kwargs.get("timeout", 10),
+                                cert_path=kwargs.get('cert_path', None))
     end_time = time.time()  # End timing
     duration = end_time - start_time
     msg = f"Download completed in {duration:.2f} seconds."
 
-    if res.ok:
+    if response.ok:
         if out_dir is not None:
             out_dir = Path(out_dir) / f"{dataset_name}.zip"
             with open(out_dir, "wb") as archive_file:
-                archive_file.write(res.content)
+                archive_file.write(response.content)
             return f"{out_dir}", msg
         else:
-            return BytesIO(res.content), msg
+            return BytesIO(response.content), msg
     else:
-        res.raise_for_status()  # Raise an error if the request failed
+        response.raise_for_status()  # Raise an error if the request failed
 
 
 def upload_scan_archive(dataset_name, path, **kwargs):
@@ -1617,11 +1752,15 @@ def upload_scan_archive(dataset_name, path, **kwargs):
 
     start_time = time.time()  # Start timing
     with open(path, "rb") as f:
-        timeout = kwargs.get("timeout", 120)
         try:
-            res = requests.post(url, files={"zip_file": (path.name, f, "application/zip")}, stream=True,
-                                timeout=timeout)
+            res = make_api_request(url,
+                                   method="POST",
+                                   files={"zip_file": (path.name, f, "application/zip")},
+                                   stream=True,
+                                   timeout=kwargs.get("timeout", 120),
+                                   cert_path=kwargs.get("cert_path", None))
         except requests.exceptions.Timeout:
+            timeout = kwargs.get("timeout", 120)
             raise RuntimeError(f"The upload request timed out after {timeout} seconds.")
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"An error occurred during the upload: {e}")
