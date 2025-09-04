@@ -700,21 +700,14 @@ def rate_limit(max_requests=5, window_seconds=60):
 class Home(Resource):
     def get(self):
         """Return basic API information and documentation."""
+
         def _package_version(package_name):
             # Get plantdb.server version
+            from importlib.metadata import version, PackageNotFoundError
             try:
-                from importlib.metadata import version, PackageNotFoundError
-                try:
-                    package_version = version(package_name)
-                except PackageNotFoundError:
-                    package_version = "unknown"
-            except ImportError:
-                # Fallback for older Python versions
-                try:
-                    import pkg_resources
-                    package_version = pkg_resources.get_distribution(package_name).version
-                except (ImportError, pkg_resources.DistributionNotFound):
-                    package_version = "unknown"
+                package_version = version(package_name)
+            except PackageNotFoundError:
+                package_version = "unknown"
             return package_version
 
         api_info = {
@@ -727,7 +720,27 @@ class Home(Resource):
                 "/healthcheck": "Health check endpoint to verify API is working",
                 "/scans": "List all available scans",
                 "/scans_info": "Table with scan information",
-                # Add other endpoints here
+                "/scans/<scan_id>": "Get information about a specific scan",
+                "/files/<path>": "Access files from the database",
+                "/files/<scan_id>": "Access dataset files for a specific scan",
+                "/refresh": "Refresh the database",
+                "/image/<scan_id>/<fileset_id>/<file_id>": "Access specific images",
+                "/pointcloud/<scan_id>/<fileset_id>/<file_id>": "Access specific point clouds",
+                "/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>": "Access ground truth point clouds",
+                "/mesh/<scan_id>/<fileset_id>/<file_id>": "Access specific meshes",
+                "/skeleton/<scan_id>": "Access curve skeleton data",
+                "/sequence/<scan_id>": "Access sequence data",
+                "/archive/<scan_id>": "Access archive data",
+                "/register": "Register a new user",
+                "/login": "User login endpoint",
+                "/api/scan": "Create a new scan",
+                "/api/scan/<scan_id>/metadata": "Access/modify scan metadata",
+                "/api/scan/<scan_id>/filesets": "Access scan filesets",
+                "/api/fileset": "Create a new fileset",
+                "/api/fileset/<scan_id>/<fileset_id>/metadata": "Access/modify fileset metadata",
+                "/api/fileset/<scan_id>/<fileset_id>/files": "Access fileset files",
+                "/api/file": "Create a new file",
+                "/api/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Access/modify file metadata"
             }
         }
         return api_info
