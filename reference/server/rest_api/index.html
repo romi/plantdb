@@ -1620,6 +1620,30 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.HealthCheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HealthCheck
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" HealthCheck">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.HealthCheck.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.Home" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Home
@@ -2021,30 +2045,6 @@
         
           <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.Sequence.get" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Test" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Test
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" Test">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Test.get" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
     </span>
@@ -2724,6 +2724,30 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.HealthCheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HealthCheck
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" HealthCheck">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.HealthCheck.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.Home" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Home
@@ -3125,30 +3149,6 @@
         
           <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.Sequence.get" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Test" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Test
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" Test">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Test.get" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
     </span>
@@ -8063,6 +8063,118 @@ logged, and returned as a 500 error response.</p>
 
 
 
+<h3 id="plantdb.server.rest_api.HealthCheck" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">HealthCheck</span>
+
+
+<a href="#plantdb.server.rest_api.HealthCheck" class="headerlink" title="Permanent link">Link</a></h3>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>HealthCheck(db)
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="flask_restful.Resource">Resource</span></code></p>
+
+
+
+
+
+
+
+
+
+                  <details class="quote">
+                    <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">738</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">739</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
+    <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="plantdb.server.rest_api.HealthCheck.get" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get</span>
+
+
+<a href="#plantdb.server.rest_api.HealthCheck.get" class="headerlink" title="Permanent link">Link</a></h4>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>get()
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Simple test endpoint to verify the API is working correctly.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">741</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">742</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">744</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">745</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">746</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">747</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">748</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">749</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">750</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">751</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">752</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">753</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">754</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">755</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">756</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">757</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">758</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Simple test endpoint to verify the API is working correctly.&quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">try</span>:
+        <span style="color: #3D7B7B; font-style: italic"># Try to check database connection</span>
+        scan_count <span style="color: #666">=</span> <span style="color: #008000">len</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))
+        <span style="color: #008000; font-weight: bold">return</span> jsonify({
+            <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;healthy&quot;</span>,
+            <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">&quot;API is running correctly&quot;</span>,
+            <span style="color: #BA2121">&quot;database&quot;</span>: {
+                <span style="color: #BA2121">&quot;location&quot;</span>: <span style="color: #008000">str</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()),
+                <span style="color: #BA2121">&quot;scan_count&quot;</span>: scan_count
+            }
+        }), <span style="color: #666">200</span>
+    <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
+        <span style="color: #008000; font-weight: bold">return</span> jsonify({
+            <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;error&quot;</span>,
+            <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">f&quot;API encountered an issue: </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">str</span>(e)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
+        }), <span style="color: #666">500</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h3 id="plantdb.server.rest_api.Home" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">Home</span>
 
@@ -8171,8 +8283,8 @@ logged, and returned as a 500 error response.</p>
         <span style="color: #BA2121">&quot;plantdb.commons&quot;</span>: _package_version(<span style="color: #BA2121">&quot;plantdb.commons&quot;</span>),
         <span style="color: #BA2121">&quot;plantdb.server&quot;</span>: _package_version(<span style="color: #BA2121">&quot;plantdb.server&quot;</span>),
         <span style="color: #BA2121">&quot;endpoints&quot;</span>: {
-            <span style="color: #BA2121">&quot;/&quot;</span>: <span style="color: #BA2121">&quot;This documentation&quot;</span>,
-            <span style="color: #BA2121">&quot;/test&quot;</span>: <span style="color: #BA2121">&quot;Test endpoint to verify API is working&quot;</span>,
+            <span style="color: #BA2121">&quot;/&quot;</span>: <span style="color: #BA2121">&quot;This endpoint provides information about the PlantDB REST API&quot;</span>,
+            <span style="color: #BA2121">&quot;/healthcheck&quot;</span>: <span style="color: #BA2121">&quot;Health check endpoint to verify API is working&quot;</span>,
             <span style="color: #BA2121">&quot;/scans&quot;</span>: <span style="color: #BA2121">&quot;List all available scans&quot;</span>,
             <span style="color: #BA2121">&quot;/scans_info&quot;</span>: <span style="color: #BA2121">&quot;Table with scan information&quot;</span>,
             <span style="color: #3D7B7B; font-style: italic"># Add other endpoints here</span>
@@ -14817,118 +14929,6 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
         <span style="color: #008000; font-weight: bold">return</span> measures[<span style="color: #008000">type</span>]
     <span style="color: #008000; font-weight: bold">else</span>:
         <span style="color: #008000; font-weight: bold">return</span> measures
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="plantdb.server.rest_api.Test" class="doc doc-heading">
-            <span class="doc doc-object-name doc-class-name">Test</span>
-
-
-<a href="#plantdb.server.rest_api.Test" class="headerlink" title="Permanent link">Link</a></h3>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>Test(db)
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="flask_restful.Resource">Resource</span></code></p>
-
-
-
-
-
-
-
-
-
-                  <details class="quote">
-                    <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">738</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">739</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
-    <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
-</code></pre></div></td></tr></table></div>
-                  </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="plantdb.server.rest_api.Test.get" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">get</span>
-
-
-<a href="#plantdb.server.rest_api.Test.get" class="headerlink" title="Permanent link">Link</a></h4>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>get()
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Simple test endpoint to verify the API is working correctly.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">741</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">742</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">743</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">744</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">745</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">746</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">747</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">748</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">749</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">750</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">751</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">752</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">753</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">754</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">755</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">756</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">757</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">758</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>):
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Simple test endpoint to verify the API is working correctly.&quot;&quot;&quot;</span>
-    <span style="color: #008000; font-weight: bold">try</span>:
-        <span style="color: #3D7B7B; font-style: italic"># Try to check database connection</span>
-        scan_count <span style="color: #666">=</span> <span style="color: #008000">len</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))
-        <span style="color: #008000; font-weight: bold">return</span> {
-            <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;ok&quot;</span>,
-            <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">&quot;API is running correctly&quot;</span>,
-            <span style="color: #BA2121">&quot;database&quot;</span>: {
-                <span style="color: #BA2121">&quot;location&quot;</span>: <span style="color: #008000">str</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()),
-                <span style="color: #BA2121">&quot;scan_count&quot;</span>: scan_count
-            }
-        }
-    <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
-        <span style="color: #008000; font-weight: bold">return</span> {
-            <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;error&quot;</span>,
-            <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">f&quot;API encountered an issue: </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">str</span>(e)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
-        }, <span style="color: #666">500</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
