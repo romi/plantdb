@@ -108,7 +108,7 @@ from plantdb.server.rest_api import ScanMetadata
 from plantdb.server.rest_api import ScansList
 from plantdb.server.rest_api import ScansTable
 from plantdb.server.rest_api import Sequence
-from plantdb.server.rest_api import Test
+from plantdb.server.rest_api import HealthCheck
 
 
 def parsing():
@@ -153,7 +153,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
 
     Parameters
     ----------
-    db_location : str
+    db_location : str or pathlib.Path
         The path to the local plant database to be served. If set to "/none", the server will raise
         an error and terminate unless the path is appropriately overridden in test mode.
     proxy : bool, optional
@@ -231,7 +231,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
 
     # Initialize RESTful resources to serve:
     api.add_resource(Home, '/')
-    api.add_resource(Test, '/test',
+    api.add_resource(HealthCheck, '/test',
                      resource_class_args=tuple([db]))
     api.add_resource(ScansList, '/scans',
                      resource_class_args=tuple([db]))

@@ -723,8 +723,8 @@ class Home(Resource):
             "plantdb.commons": _package_version("plantdb.commons"),
             "plantdb.server": _package_version("plantdb.server"),
             "endpoints": {
-                "/": "This documentation",
-                "/test": "Test endpoint to verify API is working",
+                "/": "This endpoint provides information about the PlantDB REST API",
+                "/healthcheck": "Health check endpoint to verify API is working",
                 "/scans": "List all available scans",
                 "/scans_info": "Table with scan information",
                 # Add other endpoints here
@@ -733,8 +733,8 @@ class Home(Resource):
         return api_info
 
 
-# Test resource
-class Test(Resource):
+# Resource HealthCheck
+class HealthCheck(Resource):
     def __init__(self, db):
         self.db = db
 
@@ -743,19 +743,19 @@ class Test(Resource):
         try:
             # Try to check database connection
             scan_count = len(self.db.list_scans(owner_only=False))
-            return {
-                "status": "ok",
+            return jsonify({
+                "status": "healthy",
                 "message": "API is running correctly",
                 "database": {
                     "location": str(self.db.path()),
                     "scan_count": scan_count
                 }
-            }
+            }), 200
         except Exception as e:
-            return {
+            return jsonify({
                 "status": "error",
                 "message": f"API encountered an issue: {str(e)}"
-            }, 500
+            }), 500
 
 
 class Register(Resource):
