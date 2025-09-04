@@ -70,6 +70,8 @@ class TestRestApiServer:
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
     >>> list_scan_names(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> print(scans_list)
+    ['real_plant_analyzed']
     >>> server.stop()
     """
 
@@ -186,6 +188,10 @@ class TestRestApiServer:
         """
         protocol = 'https' if self.ssl else 'http'
         return f"{protocol}://{self.host}:{self.port}{self.prefix}"
+
+    def get_server_config(self):
+        """Get the server configuration settings."""
+        return {"host": self.host, "port": self.port, "prefix": self.prefix, "ssl": self.ssl}
 
     def __enter__(self):
         """Context manager entry."""
