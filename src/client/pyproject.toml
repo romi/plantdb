@@ -9,6 +9,7 @@ dependencies = [
     "plantdb.commons",
     "requests",
     "tqdm",
+    "urllib3"
 ]
 description = "Client-side database library for the ROMI plant database ecosystem."
 readme = "README.md"
