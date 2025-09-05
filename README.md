@@ -233,6 +233,21 @@ Open your favorite browser and navigate to:
 For detailed documentation of the REST API, visit: [REST API Documentation](https://romi.github.io/plantdb/webapi.html).
 
 
+### Transfer datasets between databases
+To transfer datasets from one database to another, you may use the PlantDB Synchronization UI.
+
+#### 1. Install conda libraries
+If not done already, create a new conda environment and install necessary packages:
+```shell
+conda create -n plantdb 'python=3.10' ipython plantdb.commons plantdb.client dash dash-bootstrap-components paramiko
+```
+
+#### 2. Start the PlantDB Synchronization App
+You may now start the PlantDB Synchronization App:
+```shell
+conda activate plantdb
+sync_app
+```
 
 #### Production Mode
 
