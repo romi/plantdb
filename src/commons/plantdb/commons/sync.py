@@ -34,10 +34,13 @@ This module provides a robust synchronization mechanism for File System Database
 - Automatic locking and unlocking of source and target databases
 - Recursive directory synchronization
 - SSH-based remote file transfer using SFTP
+- HTTP(S) REST API synchronization with archive transfer
+- Support for FSDB instances, local paths, and various remote protocols
 - Error handling and validation of database paths
 
 ## Usage Examples
 
+### Local Path to Local Path
 Create two test databases, a source with a dataset and a target without dataset, then sync them.
 ```python
 >>> from plantdb.commons.sync import FSDBSync
@@ -66,43 +69,114 @@ Create two test databases, a source with a dataset and a target without dataset,
 >>> db_source.disconnect()  # Remove the test database
 >>> db_target.disconnect()  # Remove the test database
 ```
+
+### FSDB instance to Local Path
+```python
+>>> from plantdb.commons.sync import FSDBSync
+>>> from plantdb.commons.test_database import test_database
+>>> # Create a test source database
+>>> db_source = test_database()
+>>> # Create a test target database
+>>> db_target = test_database(dataset=None)
+>>> # FSDB instance to local path
+>>> db_sync = FSDBSync(db_source, db_target.path())
+>>> db_sync.sync()
+>>> # Connect to the target and list scans
+>>> db_target.connect()
+>>> print(db_target.list_scans())  # verify that target now has the 'real_plant_analyzed' dataset
+['real_plant_analyzed']
+>>> db_target.disconnect()
+>>> db_source.disconnect()
+```
+
+### Local path to HTTP REST API
+```python
+>>> from plantdb.commons.sync import FSDBSync
+>>> from plantdb.server.test_rest_api import TestRestApiServer
+>>> from plantdb.client.rest_api import list_scan_names
+>>> from plantdb.commons.test_database import test_database
+>>> # Create a test source database
+>>> db_source = test_database()
+>>> # Create a test target database
+>>> db_target = TestRestApiServer(test=True, empty=True)
+>>> db_target.start()
+Test REST API server started at http://127.0.0.1:5000
+>>> server_cfg = db_target.get_server_config()
+>>> # Use REST API to list scans and verify target DB is empty
+>>> scans_list = list_scan_names(**server_cfg)
+>>> print(scans_list)
+[]
+>>> # Sync target database with source
+>>> db_sync = FSDBSync(db_source.path(), db_target.get_base_url())
+>>> db_sync.sync()
+>>> # Use REST API endpoint to refresh scans
+>>> from plantdb.client.rest_api import refresh
+>>> refresh(**server_cfg)
+>>> # Use REST API to list scans and verify target DB contains the new scans
+>>> scans_list = list_scan_names(**server_cfg))
+>>> print(scans_list)
+>>> db_target.stop()
+>>> db_source.disconnect()
+```
+
+### SSH to local with credentials
+```python
+>>> db_sync = FSDBSync("ssh://server.example.com:/data/sourcedb", "/local/target/db")
+>>> db_sync.set_ssh_credentials("server.example.com", "username", "password")
+>>> db_sync.sync()
+```
+
 """
 
-
+import getpass
 import os
 import shutil
 import stat
+import tempfile
+import zipfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 import paramiko
+import requests
+import urllib3
 
+from plantdb.client.rest_api import download_scan_archive
+from plantdb.client.rest_api import upload_scan_archive
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import LOCK_FILE_NAME
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 
 
 class FSDBSync():
-    """Class for sync between two FSDB databases.
+    """Class for sync between two FSDB databases with support for multiple protocols.
 
-    It checks for the validity of both source and target by checking that:
+    It supports synchronization between different types of database sources and targets:
+    - FSDB instances or local paths: Uses file system operations
+    - HTTP(S) URLs: Uses REST API with archive transfer
+    - SSH URLs: Uses SFTP protocol
 
-      * there is a marker file in the DB path root
-      * the DB is not busy by checking for the lock file in the DB path root.
-
-    It locks the two databases during the sync. The sync is done using rsync as a subprocess
+    It checks for the validity of both source and target and locks the databases during sync.
 
     Attributes
     ----------
-    source_str : str
-        Source path
-    target_str : str
-        Target path
+    source_str : str or FSDB or pathlib.Path
+        Source database specification
+    target_str : str or FSDB or pathlib.Path
+        Target database specification
     source : dict
-        Source path description
+        Source database description
     target : dict
-        Target path description
+        Target database description
     ssh_clients : dict
         Dictionary of SSH clients, keyed by host name.
+    ssh_credentials : dict
+        Dictionary of SSH credentials, keyed by host name.
+    synchronizing : bool
+        Flag indicating whether a sync operation is currently in progress.
+    sync_progress : float
+        Progress of the sync operation as a percentage.
 
     Examples
     --------
@@ -139,18 +213,22 @@ class FSDBSync():
 
         Parameters
         ----------
-        source : str or pathlib.Path
-            Source database path (remote or local)
-        target : str or pathlib.Path
-            Target database path (remote or local)
-        ssh_clients : dict
-            Dictionary of SSH clients, keyed by host name.
+        source : str or pathlib.Path or FSDB
+            Source database specification:
+            - FSDB instance or local path for file system databases
+            - HTTP(S) URL for REST API access
+            - SSH URL (ssh://server.example.com:/path/to/db) for SFTP access
+        target : str or pathlib.Path or FSDB
+            Target database specification (same format as source)
         """
         self.source_str = source
         self.target_str = target
-        self.source = _fmt_path(source)
-        self.target = _fmt_path(target)
+        self.source = _parse_database_spec(source)
+        self.target = _parse_database_spec(target)
         self.ssh_clients = {}  # Store SSH connections
+        self.ssh_credentials = {}  # Store SSH credentials
+        self.synchronizing = False
+        self.sync_progress = 0.
 
     def __del__(self):
         """Ensure unlocking on object destruction."""
@@ -159,21 +237,56 @@ class FSDBSync():
         except:
             return
 
+    def set_ssh_credentials(self, host, username, password=None):
+        """Set SSH credentials for a specific host.
+
+        Parameters
+        ----------
+        host : str
+            The hostname for SSH connection
+        username : str
+            SSH username
+        password : str, optional
+            SSH password. If not provided, will be prompted during connection.
+        """
+        self.ssh_credentials[host] = {
+            'username': username,
+            'password': password
+        }
+
     def lock(self):
         """Lock both source and target databases prior to sync."""
         for db in [self.source, self.target]:
-            if db["type"] == "local":
+            if db["type"] == "fsdb":
+                self._lock_fsdb(db)
+            elif db["type"] == "local":
                 self._lock_local(db)
-            else:
+            elif db["type"] == "ssh":
                 self._lock_remote(db)
+            # HTTP databases don't need locking
 
     def unlock(self):
         """Unlock both source and target databases after sync."""
         for db in [self.source, self.target]:
-            if db["type"] == "local":
+            if db["type"] == "fsdb":
+                self._unlock_fsdb(db)
+            elif db["type"] == "local":
                 self._unlock_local(db)
-            else:
+            elif db["type"] == "ssh":
                 self._unlock_remote(db)
+            # HTTP databases don't need locking
+
+    def _lock_fsdb(self, db):
+        """Lock an FSDB instance."""
+        fsdb = db["fsdb"]
+        if not fsdb.is_connected:
+            fsdb.connect()
+
+    def _unlock_fsdb(self, db):
+        """Unlock an FSDB instance."""
+        fsdb = db["fsdb"]
+        if fsdb.is_connected:
+            fsdb.disconnect()
 
     def _lock_local(self, db):
         """Create a local lock file."""
@@ -227,65 +340,391 @@ class FSDBSync():
             sftp.close()
 
     def sync(self):
-        """Sync the two DBs using modern Python approaches with proper locking."""
+        """Sync the two DBs using appropriate strategy based on database types."""
         self.lock()
         try:
-            if self.source["type"] == "local" and self.target["type"] == "local":
-                self._sync_local()
+            self.synchronizing = True
+            # Determine sync strategy based on source and target types
+            src_type = self.source["type"]
+            tgt_type = self.target["type"]
+
+            if src_type in ["fsdb", "local"] and tgt_type in ["fsdb", "local"]:
+                self._sync_local_to_local()
+            elif src_type in ["fsdb", "local"] and tgt_type == "http":
+                self._sync_local_to_http()
+            elif src_type == "http" and tgt_type in ["fsdb", "local"]:
+                self._sync_http_to_local()
+            elif src_type in ["fsdb", "local"] and tgt_type == "ssh":
+                self._sync_local_to_ssh()
+            elif src_type == "ssh" and tgt_type in ["fsdb", "local"]:
+                self._sync_ssh_to_local()
+            elif src_type == "ssh" and tgt_type == "ssh":
+                self._sync_ssh_to_ssh()
+            elif src_type == "http" and tgt_type == "http":
+                self._sync_http_to_http()
+            elif src_type == "http" and tgt_type == "ssh":
+                self._sync_http_to_ssh()
+            elif src_type == "ssh" and tgt_type == "http":
+                self._sync_ssh_to_http()
             else:
-                self._sync_remote()
+                raise NotImplementedError(f"Sync from {src_type} to {tgt_type} not implemented")
         finally:
+            self.synchronizing = False
             self.unlock()
             self._close_ssh_connections()
 
-    def _sync_local(self):
-        """Synchronize local directories using shutil."""
-        src_path = self.source["path"]
-        dst_path = self.target["path"]
+    def _sync_local_to_local(self):
+        """Synchronize between local databases using shutil."""
+        src_path = self._get_local_path(self.source)
+        dst_path = self._get_local_path(self.target)
 
         # Create destination if it doesn't exist
         dst_path.mkdir(parents=True, exist_ok=True)
 
+        # Get list of scans to sync
+        src_scans = self._list_local_scans(src_path)
+
+        n_scans_to_sync = len(src_scans)
+        self.sync_progress = 0.
+        for n, scan_id in enumerate(src_scans):
+            self.sync_progress = n / float(n_scans_to_sync) * 100
+            src_scan_path = src_path / scan_id
+            dst_scan_path = dst_path / scan_id
+
+            # Sync scan directory
+            self._sync_directory_local(src_scan_path, dst_scan_path)
+
+    def _sync_local_to_http(self):
+        """Sync from local database to HTTP REST API."""
+        src_path = self._get_local_path(self.source)
+        target_url = self.target["url"]
+
+        # Get list of scans to sync
+        src_scans = self._list_local_scans(src_path)
+
+        n_scans_to_sync = len(src_scans)
+        self.sync_progress = 0.
+        for n, scan_id in enumerate(src_scans):
+            self.sync_progress = n / float(n_scans_to_sync) * 100
+            src_scan_path = src_path / scan_id
+
+            # Create archive of scan
+            with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as tmp_file:
+                archive_path = tmp_file.name
+
+            try:
+                self._create_scan_archive(src_scan_path, archive_path)
+                # Upload via REST API
+                response = upload_scan_archive(scan_id, archive_path, **config_from_url(target_url))
+            finally:
+                Path(archive_path).unlink(missing_ok=True)
+
+    def _sync_http_to_local(self):
+        """Sync from HTTP REST API to local database."""
+        src_url = self.source["url"]
+        dst_path = self._get_local_path(self.target)
+
+        # Create destination if it doesn't exist
+        dst_path.mkdir(parents=True, exist_ok=True)
+
+        # Get list of scans from REST API
+        src_scans = self._list_http_scans(src_url)
+
+        n_scans_to_sync = len(src_scans)
+        self.sync_progress = 0.
+        for n, scan_id in enumerate(src_scans):
+            self.sync_progress = n / float(n_scans_to_sync) * 100
+
+            archive_path = Path(dst_path) / f"{scan_id}.zip"
+            try:
+                # Download archive
+                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+                # Extract the downloaded archive
+                self._extract_scan_archive(str(archive_path), dst_path / scan_id)
+            finally:
+                Path(archive_path).unlink(missing_ok=True)
+
+    def _sync_local_to_ssh(self):
+        """Sync from local database to SSH server using SFTP."""
+        src_path = self._get_local_path(self.source)
+        ssh = self._get_ssh_client(self.target["host"])
+        sftp = ssh.open_sftp()
+
+        try:
+            # Ensure remote directory exists
+            remote_path = str(self.target["path"])
+            self._ensure_remote_directory(sftp, remote_path)
+
+            # Get list of scans to sync
+            src_scans = self._list_local_scans(src_path)
+
+            n_scans_to_sync = len(src_scans)
+            self.sync_progress = 0.
+            for n, scan_id in enumerate(src_scans):
+                self.sync_progress = n / float(n_scans_to_sync) * 100
+                src_scan_path = src_path / scan_id
+                remote_scan_path = f"{remote_path}/{scan_id}"
+
+                # Upload scan directory
+                self._upload_recursive(sftp, src_scan_path, remote_scan_path)
+        finally:
+            sftp.close()
+
+    def _sync_ssh_to_local(self):
+        """Sync from SSH server to local database using SFTP."""
+        dst_path = self._get_local_path(self.target)
+        ssh = self._get_ssh_client(self.source["host"])
+        sftp = ssh.open_sftp()
+
+        try:
+            # Create destination if it doesn't exist
+            dst_path.mkdir(parents=True, exist_ok=True)
+
+            # Get list of scans from SSH server
+            remote_path = str(self.source["path"])
+            src_scans = self._list_ssh_scans(sftp, remote_path)
+
+            n_scans_to_sync = len(src_scans)
+            self.sync_progress = 0.
+            for n, scan_id in enumerate(src_scans):
+                self.sync_progress = n / float(n_scans_to_sync) * 100
+                remote_scan_path = f"{remote_path}/{scan_id}"
+                dst_scan_path = dst_path / scan_id
+
+                # Download scan directory
+                self._download_recursive(sftp, remote_scan_path, dst_scan_path)
+        finally:
+            sftp.close()
+
+    def _sync_ssh_to_ssh(self):
+        """Sync between two SSH servers via temporary local storage."""
+        # Create temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+
+            # Download from source SSH to temp
+            src_ssh = self._get_ssh_client(self.source["host"])
+            src_sftp = src_ssh.open_sftp()
+
+            try:
+                remote_src_path = str(self.source["path"])
+                src_scans = self._list_ssh_scans(src_sftp, remote_src_path)
+
+                n_scans_to_sync = len(src_scans)
+                self.sync_progress = 0.
+                for n, scan_id in enumerate(src_scans):
+                    self.sync_progress = n / float(n_scans_to_sync) * 100
+                    remote_scan_path = f"{remote_src_path}/{scan_id}"
+                    temp_scan_path = temp_path / scan_id
+
+                    # Download to temp
+                    self._download_recursive(src_sftp, remote_scan_path, temp_scan_path)
+            finally:
+                src_sftp.close()
+
+            # Upload from temp to target SSH
+            dst_ssh = self._get_ssh_client(self.target["host"])
+            dst_sftp = dst_ssh.open_sftp()
+
+            try:
+                remote_dst_path = str(self.target["path"])
+                self._ensure_remote_directory(dst_sftp, remote_dst_path)
+
+                for scan_id in src_scans:
+                    temp_scan_path = temp_path / scan_id
+                    remote_scan_path = f"{remote_dst_path}/{scan_id}"
+
+                    if temp_scan_path.exists():
+                        # Upload from temp
+                        self._upload_recursive(dst_sftp, temp_scan_path, remote_scan_path)
+            finally:
+                dst_sftp.close()
+
+    def _sync_http_to_http(self):
+        """Sync between two HTTP REST APIs via temporary local storage."""
+        src_url = self.source["url"]
+        dst_url = self.target["url"]
+
+        # Get list of scans from source REST API
+        src_scans = self._list_http_scans(src_url)
+
+        n_scans_to_sync = len(src_scans)
+        self.sync_progress = 0.
+        for n, scan_id in enumerate(src_scans):
+            self.sync_progress = n / float(n_scans_to_sync) * 100
+            dst_path = tempfile.gettempdir()
+            archive_path = Path(dst_path) / f"{scan_id}.zip"
+            try:
+                # Download archive from source
+                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+                # Upload archive to target
+                response = upload_scan_archive(scan_id, archive_path, **config_from_url(dst_url))
+            finally:
+                Path(archive_path).unlink(missing_ok=True)
+
+    def _sync_http_to_ssh(self):
+        """Sync from HTTP REST API to SSH server via temporary local storage."""
+        src_url = self.source["url"]
+        ssh = self._get_ssh_client(self.target["host"])
+        sftp = ssh.open_sftp()
+
+        try:
+            # Ensure remote directory exists
+            remote_path = str(self.target["path"])
+            self._ensure_remote_directory(sftp, remote_path)
+
+            # Get list of scans from REST API
+            src_scans = self._list_http_scans(src_url)
+
+            n_scans_to_sync = len(src_scans)
+            self.sync_progress = 0.
+            for n, scan_id in enumerate(src_scans):
+                self.sync_progress = n / float(n_scans_to_sync) * 100
+                dst_path = Path(tempfile.gettempdir())
+                archive_path = dst_path / f"{scan_id}.zip"
+                # Download archive from source
+                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+
+                # Extract to temp directory
+                temp_scan_path = dst_path / scan_id
+                self._extract_scan_archive(str(archive_path), temp_scan_path)
+
+                # Upload to SSH server
+                remote_scan_path = f"{remote_path}/{scan_id}"
+                self._upload_recursive(sftp, temp_scan_path, remote_scan_path)
+        finally:
+            sftp.close()
+
+    def _sync_ssh_to_http(self):
+        """Sync from SSH server to HTTP REST API via temporary local storage."""
+        dst_url = self.target["url"]
+        ssh = self._get_ssh_client(self.source["host"])
+        sftp = ssh.open_sftp()
+
+        try:
+            # Get list of scans from SSH server
+            remote_path = str(self.source["path"])
+            src_scans = self._list_ssh_scans(sftp, remote_path)
+
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir)
+
+                n_scans_to_sync = len(src_scans)
+                self.sync_progress = 0.
+                for n, scan_id in enumerate(src_scans):
+                    self.sync_progress = n / float(n_scans_to_sync) * 100
+                    # Download from SSH to temp
+                    remote_scan_path = f"{remote_path}/{scan_id}"
+                    temp_scan_path = temp_path / scan_id
+
+                    self._download_recursive(sftp, remote_scan_path, temp_scan_path)
+
+                    # Create archive
+                    archive_path = temp_path / f"{scan_id}.zip"
+                    self._create_scan_archive(temp_scan_path, str(archive_path))
+
+                    # Upload archive via REST API
+                    upload_scan_archive(scan_id, str(archive_path), **config_from_url(dst_url))
+        finally:
+            sftp.close()
+
+    def _get_local_path(self, db):
+        """Get the local path for a database."""
+        if db["type"] == "fsdb":
+            return db["fsdb"].path()
+        else:
+            return db["path"]
+
+    def _list_local_scans(self, db_path):
+        """List scan directories in a local database."""
+        if db_path.exists():
+            return [d.name for d in db_path.iterdir()
+                    if d.is_dir() and not d.name.startswith('.')]
+        return []
+
+    def _list_http_scans(self, base_url):
+        """List scans available via HTTP REST API."""
+        try:
+            response = requests.get(f"{base_url}/scans/")
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            print(f"Error listing HTTP scans: {e}")
+            return []
+
+    def _list_ssh_scans(self, sftp, remote_path):
+        """List scan directories on SSH server."""
+        try:
+            entries = sftp.listdir_attr(remote_path)
+            return [entry.filename for entry in entries
+                    if stat.S_ISDIR(entry.st_mode) and not entry.filename.startswith('.')]
+        except Exception as e:
+            print(f"Error listing SSH scans: {e}")
+            return []
+
+    def _create_scan_archive(self, scan_path, archive_path):
+        """Create a ZIP archive of a scan directory."""
+        with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(scan_path):
+                for file in files:
+                    file_path = Path(root) / file
+                    arc_path = file_path.relative_to(scan_path)
+                    zipf.write(file_path, arc_path)
+
+    def _extract_scan_archive(self, archive_path, extract_path):
+        """Extract a ZIP archive to a directory."""
+        extract_path.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(archive_path, 'r') as zipf:
+            zipf.extractall(extract_path)
+
+    def _upload_scan_archive(self, base_url, scan_id, archive_path):
+        """Upload a scan archive via HTTP REST API."""
+        try:
+            with open(archive_path, 'rb') as f:
+                files = {'archive': f}
+                response = requests.post(f"{base_url}/scans/{scan_id}/upload", files=files)
+                response.raise_for_status()
+        except Exception as e:
+            print(f"Error uploading scan archive: {e}")
+
+    def _download_scan_archive(self, base_url, scan_id, archive_path):
+        """Download a scan archive via HTTP REST API."""
+        try:
+            response = requests.get(f"{base_url}/scans/{scan_id}/download")
+            response.raise_for_status()
+            with open(archive_path, 'wb') as f:
+                f.write(response.content)
+        except Exception as e:
+            print(f"Error downloading scan archive: {e}")
+
+    def _ensure_remote_directory(self, sftp, remote_path):
+        """Ensure a remote directory exists."""
+        try:
+            sftp.stat(remote_path)
+        except FileNotFoundError:
+            # Try to create directory recursively
+            parent = str(Path(remote_path).parent)
+            if parent != remote_path:
+                self._ensure_remote_directory(sftp, parent)
+            sftp.mkdir(remote_path)
+
+    def _sync_directory_local(self, src_dir, dst_dir):
+        """Synchronize a directory locally."""
+        # Create destination if it doesn't exist
+        dst_dir.mkdir(parents=True, exist_ok=True)
+
         # Walk through source directory
-        for src_dir, dirs, files in os.walk(src_path):
-            # Get relative path
-            rel_path = Path(src_dir).relative_to(src_path)
-            dst_dir = dst_path / rel_path
+        for src_file in src_dir.rglob('*'):
+            if src_file.is_file():
+                rel_path = src_file.relative_to(src_dir)
+                dst_file = dst_dir / rel_path
 
-            # Create destination directory
-            dst_dir.mkdir(exist_ok=True)
-
-            # Copy files
-            for file in files:
-                src_file = Path(src_dir) / file
-                dst_file = dst_dir / file
+                # Ensure parent directory exists
+                dst_file.parent.mkdir(parents=True, exist_ok=True)
 
                 # Check if file needs to be updated
                 if self._should_update_file(src_file, dst_file):
                     shutil.copy2(src_file, dst_file)
-
-    def _sync_remote(self):
-        """Synchronize with remote system using SFTP."""
-        if self.source["type"] == "remote":
-            remote = self.source
-            local = self.target["path"]
-            download = True
-        else:
-            remote = self.target
-            local = self.source["path"]
-            download = False
-
-        # Setup SFTP client
-        ssh = self._get_ssh_client(remote["host"])
-        sftp = ssh.open_sftp()
-
-        try:
-            if download:
-                self._download_recursive(sftp, str(remote["path"]), local)
-            else:
-                self._upload_recursive(sftp, local, str(remote["path"]))
-        finally:
-            sftp.close()
 
     def _should_update_file(self, src_file, dst_file):
         """Check if file needs to be updated based on mtime and size."""
@@ -321,10 +760,7 @@ class FSDBSync():
         local_dir = Path(local_dir)
 
         # Ensure remote directory exists
-        try:
-            sftp.stat(remote_dir)
-        except FileNotFoundError:
-            sftp.mkdir(remote_dir)
+        self._ensure_remote_directory(sftp, remote_dir)
 
         for item in local_dir.iterdir():
             remote_path = f"{remote_dir}/{item.name}"
@@ -346,7 +782,18 @@ class FSDBSync():
         if host not in self.ssh_clients:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname=host)
+
+            # Get credentials
+            if host in self.ssh_credentials:
+                creds = self.ssh_credentials[host]
+                username = creds['username']
+                password = creds['password']
+            else:
+                # Prompt for credentials
+                username = input(f"Username for {host}: ")
+                password = getpass.getpass(f"Password for {username}@{host}: ")
+
+            client.connect(hostname=host, username=username, password=password)
             self.ssh_clients[host] = client
         return self.ssh_clients[host]
 
@@ -357,86 +804,148 @@ class FSDBSync():
         self.ssh_clients.clear()
 
 
-def _fmt_path(path):
-    """
-    Format and validate a filesystem database (DB) path, determining local or remote type.
+def config_from_url(url):
+    """Parse URL into configuration dictionary.
 
-    This function preprocesses path inputs, performing syntax validation and
-    generating a structured representation of the database path. It supports
-    both local and remote filesystem paths with consistent output formatting.
+    Examples
+    --------
+    >>> from plantdb.commons.sync import config_from_url
+    >>> config = config_from_url("http://localhost:5014/api/")
+    >>> print(config)
+    {'protocol': 'http', 'host': 'localhost', 'port': 5014, 'prefix': '/api/', 'ssl': False}
+    """
+    parsed_url = urllib3.util.parse_url(url)
+    config = {}
+    config["protocol"] = parsed_url.scheme.lower()
+    config["host"] = parsed_url.host
+    config["port"] = parsed_url.port
+    config["prefix"] = parsed_url.path
+    config["ssl"] = True if "https" in url else False
+    return config
+
+
+def _parse_database_spec(spec):
+    """
+    Parse and validate a database specification, determining the appropriate synchronization strategy.
+
+    This function analyzes database specifications and returns a structured representation
+    suitable for synchronization operations. It supports multiple database types including
+    FSDB instances, local paths, HTTP(S) REST APIs, and SSH/SFTP connections.
 
     Parameters
     ----------
-    path : str or pathlib.Path
-        Path to a filesystem database resource. Supports two formats:
-        - Local paths: Absolute or relative filesystem paths
-        - Remote paths: Hostname and path separated by a colon (e.g., 'hostname:path')
+    spec : str, pathlib.Path, or FSDB
+        Database specification in one of the following formats:
+        - FSDB instance: A connected FSDB object
+        - Local path: Absolute or relative filesystem paths
+        - HTTP(S) URL: REST API endpoints (http://... or https://...)
+        - SSH URL: SFTP connections (ssh://hostname:/path/to/db)
 
     Returns
     -------
     dict
-        A comprehensive dictionary describing the database path with keys:
-        - "type": str, either "local" or "remote"
-        - "path": pathlib.Path, resolved absolute path
-        - "host": str, remote hostname, empty for local paths
-        - "lock_path": pathlib.Path, path to the lock file
-        - "marker_path": pathlib.Path, path to the marker file
+        A comprehensive dictionary describing the database specification with keys:
+        - "type": str, one of "fsdb", "local", "http", "ssh"
+        - "path": pathlib.Path (for local/ssh types)
+        - "fsdb": FSDB instance (for fsdb type)
+        - "url": str (for http type)
+        - "host": str (for ssh type)
+        - "lock_path": pathlib.Path (for local/ssh types)
+        - "marker_path": pathlib.Path (for local/ssh types)
 
     Raises
     ------
     OSError
-        If the path is invalid or does not meet database structure requirements.
-        - For remote paths: Incorrect hostname:path format
+        If the specification is invalid or does not meet requirements.
         - For local paths: Path is not a valid filesystem database
+        - For SSH paths: Incorrect ssh://hostname:/path format
+    ValueError
+        If the specification type is not recognized or supported.
 
     Examples
     --------
-    >>> from pathlib import Path
-    >>> # Local path example
-    >>> local_result = _fmt_path('/home/user/mydb')
-    >>> local_result['type']
+    >>> from plantdb.commons.sync import _parse_database_spec
+    >>> from plantdb.commons.fsdb import FSDB
+    >>>
+    >>> # FSDB instance
+    >>> db = FSDB('/path/to/db')
+    >>> result = _parse_database_spec(db)
+    >>> result['type']
+    'fsdb'
+    >>>
+    >>> # Local path
+    >>> result = _parse_database_spec('/home/user/mydb')
+    >>> result['type']
     'local'
-    >>> local_result['path']  # Resolves to absolute path
-    PosixPath('/home/user/mydb')
-
-    >>> # Remote path example
-    >>> remote_result = _fmt_path('server.example.com:/data/mydb')
-    >>> remote_result['type']
-    'remote'
-    >>> remote_result['host']
+    >>>
+    >>> # HTTP REST API
+    >>> result = _parse_database_spec('https://api.example.com/plantdb')
+    >>> result['type']
+    'http'
+    >>>
+    >>> # SSH/SFTP
+    >>> result = _parse_database_spec('ssh://server.example.com:/data/mydb')
+    >>> result['type']
+    'ssh'
+    >>> result['host']
     'server.example.com'
 
     Notes
     -----
-    - The function uses `_is_fsdb()` to validate local database paths
-    - Lock and marker file paths are automatically generated
-    - Paths are resolved to absolute paths for consistency
+    - FSDB instances are detected by checking for the FSDB class type
+    - Local paths are validated using `_is_fsdb()` function
+    - HTTP(S) URLs are identified by protocol prefixes
+    - SSH URLs must follow the ssh://hostname:/path format
+    - Lock and marker file paths are automatically generated for local and SSH types
     """
+    # Check if it's an FSDB instance
+    if hasattr(spec, '__class__') and spec.__class__.__name__ == 'FSDB':
+        return {
+            "type": "fsdb",
+            "fsdb": spec,
+            "path": spec.path(),
+            "lock_path": spec.path() / LOCK_FILE_NAME,
+            "marker_path": spec.path() / MARKER_FILE_NAME,
+        }
 
-    if ':' in str(path):  # Remote path
-        path_split = str(path).split(':')
-        if len(path_split) != 2:
-            raise OSError(f"Invalid remote path format: {path}")
+    spec_str = str(spec)
 
-        host = path_split[0]
-        path = Path(path_split[1])
+    # Check for HTTP(S) URLs
+    if spec_str.startswith(('http://', 'https://')):
+        config = {
+            "type": "http",
+            "url": spec_str,
+        }
+        config.update(config_from_url(spec_str))
+        return config
+
+    # Check for SSH URLs
+    if spec_str.startswith('ssh://'):
+        # Parse ssh://hostname:/path/to/db format
+        parsed = urlparse(spec_str)
+        if not parsed.hostname or not parsed.path:
+            raise OSError(f"Invalid SSH URL format: {spec_str}. Expected format: ssh://hostname:/path/to/db")
+
+        host = parsed.hostname
+        path = Path(parsed.path)
 
         return {
-            "type": "remote",
+            "type": "ssh",
             "host": host,
             "path": path,
             "lock_path": path / LOCK_FILE_NAME,
             "marker_path": path / MARKER_FILE_NAME,
         }
-    else:  # Local path
-        path = Path(path).resolve()
-        if not _is_fsdb(path):
-            raise OSError(f"Not a valid DB path: {path}")
 
-        return {
-            "type": "local",
-            "host": '',
-            "path": path,
-            "lock_path": path / LOCK_FILE_NAME,
-            "marker_path": path / MARKER_FILE_NAME,
-        }
+    # Treat as local path
+    path = Path(spec).resolve()
+    if not _is_fsdb(path):
+        raise OSError(f"Not a valid DB path: {path}")
+
+    return {
+        "type": "local",
+        "host": '',
+        "path": path,
+        "lock_path": path / LOCK_FILE_NAME,
+        "marker_path": path / MARKER_FILE_NAME,
+    }
