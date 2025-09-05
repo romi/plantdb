@@ -480,7 +480,7 @@ class FSDBSync():
         n_scans_to_sync = len(src_scans)
         self.sync_progress = 0.
         for n, scan_id in enumerate(src_scans):
-            self.sync_progress = n / float(n_scans_to_sync) * 100
+            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
             src_scan_path = src_path / scan_id
             dst_scan_path = dst_path / scan_id
 
@@ -498,7 +498,7 @@ class FSDBSync():
         n_scans_to_sync = len(src_scans)
         self.sync_progress = 0.
         for n, scan_id in enumerate(src_scans):
-            self.sync_progress = n / float(n_scans_to_sync) * 100
+            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
             src_scan_path = src_path / scan_id
 
             # Create an archive of scan
@@ -526,7 +526,7 @@ class FSDBSync():
         n_scans_to_sync = len(src_scans)
         self.sync_progress = 0.
         for n, scan_id in enumerate(src_scans):
-            self.sync_progress = n / float(n_scans_to_sync) * 100
+            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
 
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
@@ -554,7 +554,7 @@ class FSDBSync():
             n_scans_to_sync = len(src_scans)
             self.sync_progress = 0.
             for n, scan_id in enumerate(src_scans):
-                self.sync_progress = n / float(n_scans_to_sync) * 100
+                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
                 src_scan_path = src_path / scan_id
                 remote_scan_path = f"{remote_path}/{scan_id}"
 
@@ -580,7 +580,7 @@ class FSDBSync():
             n_scans_to_sync = len(src_scans)
             self.sync_progress = 0.
             for n, scan_id in enumerate(src_scans):
-                self.sync_progress = n / float(n_scans_to_sync) * 100
+                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
                 remote_scan_path = f"{remote_path}/{scan_id}"
                 dst_scan_path = dst_path / scan_id
 
@@ -606,7 +606,7 @@ class FSDBSync():
                 n_scans_to_sync = len(src_scans)
                 self.sync_progress = 0.
                 for n, scan_id in enumerate(src_scans):
-                    self.sync_progress = n / float(n_scans_to_sync) * 100
+                    self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
                     remote_scan_path = f"{remote_src_path}/{scan_id}"
                     temp_scan_path = temp_path / scan_id
 
@@ -644,7 +644,7 @@ class FSDBSync():
         n_scans_to_sync = len(src_scans)
         self.sync_progress = 0.
         for n, scan_id in enumerate(src_scans):
-            self.sync_progress = n / float(n_scans_to_sync) * 100
+            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
             dst_path = tempfile.gettempdir()
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
@@ -672,7 +672,7 @@ class FSDBSync():
             n_scans_to_sync = len(src_scans)
             self.sync_progress = 0.
             for n, scan_id in enumerate(src_scans):
-                self.sync_progress = n / float(n_scans_to_sync) * 100
+                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
                 dst_path = Path(tempfile.gettempdir())
                 archive_path = dst_path / f"{scan_id}.zip"
                 # Download archive from source
@@ -705,7 +705,7 @@ class FSDBSync():
                 n_scans_to_sync = len(src_scans)
                 self.sync_progress = 0.
                 for n, scan_id in enumerate(src_scans):
-                    self.sync_progress = n / float(n_scans_to_sync) * 100
+                    self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
                     # Download from SSH to temp
                     remote_scan_path = f"{remote_path}/{scan_id}"
                     temp_scan_path = temp_path / scan_id
