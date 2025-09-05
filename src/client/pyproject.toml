@@ -50,3 +50,15 @@ issues = "https://github.com/romi/plantdb/issues"
 
 [project.scripts]
 fsdb_rest_api_sync = "plantdb.client.cli.fsdb_rest_api_sync:main"
+fsdb_sync = "plantdb.client.cli.fsdb_sync:main"
+sync_app = "plantdb.client.sync_app.app:main"
+
+[project.optional-dependencies]
+sync = [
+    "dash",
+    "dash-bootstrap-components",
+    "paramiko"
+]
+
+[tool.setuptools.package-data]
+"plantdb.client.sync_app" = ["assets/custom.css"]

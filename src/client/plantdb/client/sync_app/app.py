@@ -60,8 +60,8 @@ from dash import html
 
 from plantdb.client.rest_api import list_scan_names
 from plantdb.commons.fsdb import FSDB
-from plantdb.commons.sync import FSDBSync
-from plantdb.commons.sync import config_from_url
+from plantdb.client.sync import FSDBSync
+from plantdb.client.sync import config_from_url
 
 #: URL for the ROMI project logo used in the navigation bar
 ROMI_LOGO: str = "https://romi-project.eu/assets/logo.svg"

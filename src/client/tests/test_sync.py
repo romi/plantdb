@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
-from plantdb.commons.sync import FSDBSync
+from plantdb.client.sync import FSDBSync
 from plantdb.commons.testing import DummyDBTestCase
 
 
