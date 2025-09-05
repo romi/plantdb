@@ -23,16 +23,30 @@
 # ------------------------------------------------------------------------------
 
 """
-API for the database module in the ROMI project.
+Data handling tools for the ROMI project (plantdb).
 
+This module provides a structured API for interacting with a database in the context of the ROMI project.
+It defines abstract classes for representing databases (`DB`), scans (`Scan`), filesets (`Fileset`), and individual files (`File`).
+These classes allow for consistent data organization, retrieval, and manipulation.
+
+Key Features
+------------
+- **Hierarchical Data Model**: Organizes data into a multi-level structure with Databases containing Scans, which in turn contain Filesets of Files.
+- **Abstract Interfaces**: Defines interfaces that must be implemented to interact with actual databases or storage systems.
+- **Metadata Handling**: Provides methods for associating metadata with scans and filesets.
+- **File Management**: Supports file creation, deletion, importing, reading, and writing.
+
+Implementation
+--------------
 The following classes are defined:
 
-  * A database `DB` contains a list of scans `Scan` distinguishable by their id.
-  * A `Scan` can be made of several list of files `Fileset`.
-  * A `Fileset` is made of a list of files `Files`.
-  * A `File` can be an image, text of bytes.
+  * A database ``DB`` contains a list of scans ``Scan`` distinguishable by their id.
+  * A ``Scan`` is made of several sets of files ``Fileset``.
+  * A ``Fileset`` is made of a list of files ``File``.
+  * A ``File`` can be any other data format.
 
 It should be subclassed to implement an actual database interface.
+See :mod:`plantdb.commons.fsdb.core` for a concrete implementation.
 """
 
 from copy import deepcopy

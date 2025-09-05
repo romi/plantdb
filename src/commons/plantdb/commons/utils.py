@@ -24,8 +24,9 @@
 # ------------------------------------------------------------------------------
 
 """
-This module contains utility functions.
+This module provides a collection of utility functions for data handling in the ROMI project.
 """
+
 import tempfile
 from pathlib import Path
 
