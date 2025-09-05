@@ -717,7 +717,7 @@ class Home(Resource):
             "plantdb.server": _package_version("plantdb.server"),
             "endpoints": {
                 "/": "This endpoint provides information about the PlantDB REST API",
-                "/healthcheck": "Health check endpoint to verify API is working",
+                "/health": "Health check endpoint to verify API is working",
                 "/scans": "List all available scans",
                 "/scans_info": "Table with scan information",
                 "/scans/<scan_id>": "Get information about a specific scan",
@@ -756,19 +756,19 @@ class HealthCheck(Resource):
         try:
             # Try to check database connection
             scan_count = len(self.db.list_scans(owner_only=False))
-            return jsonify({
+            return {
                 "status": "healthy",
                 "message": "API is running correctly",
                 "database": {
                     "location": str(self.db.path()),
                     "scan_count": scan_count
                 }
-            }), 200
+            }, 200
         except Exception as e:
-            return jsonify({
+            return {
                 "status": "error",
                 "message": f"API encountered an issue: {str(e)}"
-            }), 500
+            }, 500
 
 
 class Register(Resource):
@@ -2378,6 +2378,30 @@ def is_within_directory(directory, target):
     abs_target = os.path.abspath(target)
     return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
 
+def is_directory_in_archive(archive_path, target_dir):
+    """
+    Check if a specific directory exists within an archive file.
+
+    This function checks whether a given directory is present at the top level of a ZIP archive.
+
+    Parameters
+    ----------
+    archive_path : str or pathlib.Path
+        The path to the ZIP archive file.
+    target_dir : str
+        The name of the target directory to check for within the archive.
+
+    Returns
+    -------
+    bool
+        True if the target directory exists at the top level of the archive, False otherwise.
+    """
+    with ZipFile(archive_path, 'r') as zip_ref:
+        # List all members in the zip file
+        top_level_members = [name for name in zip_ref.namelist() if '/' not in name]
+        # Check if the target directory is among them
+        return f"{target_dir}/" in top_level_members or target_dir in top_level_members
+
 
 class Archive(Resource):
     """A RESTful resource class for managing dataset archives.
@@ -2582,7 +2606,11 @@ class Archive(Resource):
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
         scan_path = Path(self.db.get_scan(scan_id, create=True).path())
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
-        db_path = scan_path.parent  # move up to db path as the archive contain the top level
+
+        if is_directory_in_archive(temp_path, scan_id):
+            extract_to_path = scan_path.parent  # move up to db path as the archive contain the top level
+        else:
+            extract_to_path = scan_path
 
         # Open the zip file and extract non-existing files:
         extracted_files = []
@@ -2597,16 +2625,16 @@ class Archive(Resource):
                         Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Filename encoding error in zip archive'}, 400
 
-                    file_path = db_path / file
+                    file_path = extract_to_path / file
                     # Ensure the extracted files remain within the target directory
-                    if not is_within_directory(db_path, file_path):
+                    if not is_within_directory(extract_to_path, file_path):
                         self.logger.error(f"Invalid file path detected in ZIP: '{file}'")
                         Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Invalid file paths in zip archive'}, 400
 
                     # Extract only if the file does not already exist
                     if not file_path.exists():
-                        zip_obj.extract(file, path=db_path)
+                        zip_obj.extract(file, path=extract_to_path)
                         extracted_files.append(file)
         except Exception as e:
             self.logger.error(f"Failed to extract ZIP archive: {e}")
