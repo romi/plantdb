@@ -95,8 +95,8 @@ Create two test databases, a source with a dataset and a target without dataset,
 >>> from plantdb.server.test_rest_api import TestRestApiServer
 >>> from plantdb.client.rest_api import list_scan_names
 >>> from plantdb.commons.test_database import test_database
->>> # Create a test source database
->>> db_source = test_database()
+>>> # Create a test source database with all 5 test dataset
+>>> db_source = test_database("all")
 >>> # Create a test target database
 >>> db_target = TestRestApiServer(test=True, empty=True)
 >>> db_target.start()
@@ -106,17 +106,31 @@ Test REST API server started at http://127.0.0.1:5000
 >>> scans_list = list_scan_names(**server_cfg)
 >>> print(scans_list)
 []
->>> # Sync target database with source
+>>> # Asynchronous sync target database with source
 >>> db_sync = FSDBSync(db_source.path(), db_target.get_base_url())
->>> db_sync.sync()
+>>> thread = db_sync.sync(thread=True)  # Returns immediately
+>>> print(f"Database synchronization in progress: {db_sync.is_synchronizing()}")
+>>> # Monitor progress
+>>> import time
+>>> while db_sync.is_synchronizing():
+...     progress = db_sync.get_sync_progress()
+...     print(f"Progress: {progress:.1f}%")
+...     time.sleep(0.3)
+>>> # Wait for completion
+>>> db_sync.wait_for_sync()
+>>> # Check for errors
+>>> if db_sync.get_sync_error():
+...     print(f"Sync failed: {db_sync.get_sync_error()}")
+>>> else:
+...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
 >>> from plantdb.client.rest_api import refresh
 >>> refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
->>> scans_list = list_scan_names(**server_cfg))
+>>> scans_list = list_scan_names(**server_cfg)
 >>> print(scans_list)
+['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
 >>> db_target.stop()
->>> db_source.disconnect()
 ```
 
 ### SSH to local with credentials
@@ -133,6 +147,7 @@ import os
 import shutil
 import stat
 import tempfile
+import threading
 import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
@@ -227,8 +242,9 @@ class FSDBSync():
         self.target = _parse_database_spec(target)
         self.ssh_clients = {}  # Store SSH connections
         self.ssh_credentials = {}  # Store SSH credentials
-        self.synchronizing = False
         self.sync_progress = 0.
+        self._sync_thread = None
+        self._sync_error = None
 
     def __del__(self):
         """Ensure unlocking on object destruction."""
@@ -320,14 +336,14 @@ class FSDBSync():
             sftp.close()
 
     def _unlock_local(self, db):
-        """Remove local lock file."""
+        """Remove the local lock file."""
         try:
             db["lock_path"].unlink()
         except FileNotFoundError:
-            pass  # Ignore if file doesn't exist
+            pass  # Ignore if a file doesn't exist
 
     def _unlock_remote(self, db):
-        """Remove remote lock file using SFTP."""
+        """Remove the remote lock file using SFTP."""
         ssh = self._get_ssh_client(db["host"])
         sftp = ssh.open_sftp()
 
@@ -335,16 +351,42 @@ class FSDBSync():
             try:
                 sftp.remove(str(db["lock_path"]))
             except FileNotFoundError:
-                pass  # Ignore if file doesn't exist
+                pass  # Ignore if a file doesn't exist
         finally:
             sftp.close()
 
-    def sync(self):
-        """Sync the two DBs using appropriate strategy based on database types."""
+    def sync(self, thread=False):
+        """Sync the two DBs using the appropriate strategy based on database types.
+
+        Parameters
+        ----------
+        thread : bool, optional
+            If True, run synchronization in a separate thread. Default is `False`.
+            When running in a thread, use `is_synchronizing()` to check status
+            and `get_sync_progress()` to track progress.
+
+        Returns
+        -------
+        threading.Thread or None
+            If `thread=True`, returns the `Thread` object. Otherwise, returns `None`.
+        """
+        if thread:
+            if self.is_synchronizing():
+                raise RuntimeError("Synchronization is already in progress")
+
+            self._sync_thread = threading.Thread(target=self._sync_worker)
+            self._sync_thread.daemon = True
+            self._sync_thread.start()
+            return self._sync_thread
+        else:
+            self._sync_worker()
+
+    def _sync_worker(self):
+        """Internal worker method that performs the actual synchronization."""
         self.lock()
         try:
-            self.synchronizing = True
-            # Determine sync strategy based on source and target types
+            self._sync_error = None
+            # Determine a sync strategy based on source and target types
             src_type = self.source["type"]
             tgt_type = self.target["type"]
 
@@ -368,20 +410,71 @@ class FSDBSync():
                 self._sync_ssh_to_http()
             else:
                 raise NotImplementedError(f"Sync from {src_type} to {tgt_type} not implemented")
+        except Exception as e:
+            self._sync_error = e
+            raise
         finally:
-            self.synchronizing = False
+            self._sync_thread = None
             self.unlock()
             self._close_ssh_connections()
+
+    def is_synchronizing(self):
+        """Check if synchronization is currently in progress.
+
+        Returns
+        -------
+        bool
+            True if synchronization is in progress, False otherwise.
+        """
+        return self._sync_thread is not None
+
+    def get_sync_progress(self):
+        """Get the current synchronization progress.
+
+        Returns
+        -------
+        float
+            Progress as a percentage (0.0 to 100.0).
+        """
+        return self.sync_progress
+
+    def get_sync_error(self):
+        """Get any error that occurred during threaded synchronization.
+
+        Returns
+        -------
+        Exception or None
+            The exception that occurred during sync, or `None` if no error.
+        """
+        return self._sync_error
+
+    def wait_for_sync(self, timeout=None):
+        """Wait for the synchronization thread to complete.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            Maximum time to wait in seconds. If None, wait indefinitely.
+
+        Returns
+        -------
+        bool
+            `True` if the thread is completed, `False` if timeout was reached.
+        """
+        if self._sync_thread is not None:
+            self._sync_thread.join(timeout)
+            return not self._sync_thread.is_alive()
+        return True
 
     def _sync_local_to_local(self):
         """Synchronize between local databases using shutil."""
         src_path = self._get_local_path(self.source)
         dst_path = self._get_local_path(self.target)
 
-        # Create destination if it doesn't exist
+        # Create a destination directory if it doesn't exist
         dst_path.mkdir(parents=True, exist_ok=True)
 
-        # Get list of scans to sync
+        # Get the list of scans to sync
         src_scans = self._list_local_scans(src_path)
 
         n_scans_to_sync = len(src_scans)
@@ -395,11 +488,11 @@ class FSDBSync():
             self._sync_directory_local(src_scan_path, dst_scan_path)
 
     def _sync_local_to_http(self):
-        """Sync from local database to HTTP REST API."""
+        """Sync from a local database to HTTP REST API."""
         src_path = self._get_local_path(self.source)
         target_url = self.target["url"]
 
-        # Get list of scans to sync
+        # Get the list of scans to sync
         src_scans = self._list_local_scans(src_path)
 
         n_scans_to_sync = len(src_scans)
@@ -408,7 +501,7 @@ class FSDBSync():
             self.sync_progress = n / float(n_scans_to_sync) * 100
             src_scan_path = src_path / scan_id
 
-            # Create archive of scan
+            # Create an archive of scan
             with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as tmp_file:
                 archive_path = tmp_file.name
 
@@ -420,14 +513,14 @@ class FSDBSync():
                 Path(archive_path).unlink(missing_ok=True)
 
     def _sync_http_to_local(self):
-        """Sync from HTTP REST API to local database."""
+        """Sync from HTTP REST API to a local database."""
         src_url = self.source["url"]
         dst_path = self._get_local_path(self.target)
 
-        # Create destination if it doesn't exist
+        # Create the destination directory if it doesn't exist
         dst_path.mkdir(parents=True, exist_ok=True)
 
-        # Get list of scans from REST API
+        # Get the list of scans from REST API
         src_scans = self._list_http_scans(src_url)
 
         n_scans_to_sync = len(src_scans)
@@ -455,7 +548,7 @@ class FSDBSync():
             remote_path = str(self.target["path"])
             self._ensure_remote_directory(sftp, remote_path)
 
-            # Get list of scans to sync
+            # Get the list of scans to sync
             src_scans = self._list_local_scans(src_path)
 
             n_scans_to_sync = len(src_scans)
@@ -477,10 +570,10 @@ class FSDBSync():
         sftp = ssh.open_sftp()
 
         try:
-            # Create destination if it doesn't exist
+            # Create the destination directory if it doesn't exist
             dst_path.mkdir(parents=True, exist_ok=True)
 
-            # Get list of scans from SSH server
+            # Get the list of scans from SSH server
             remote_path = str(self.source["path"])
             src_scans = self._list_ssh_scans(sftp, remote_path)
 
@@ -498,7 +591,7 @@ class FSDBSync():
 
     def _sync_ssh_to_ssh(self):
         """Sync between two SSH servers via temporary local storage."""
-        # Create temporary directory
+        # Create a temporary directory
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
 
@@ -545,7 +638,7 @@ class FSDBSync():
         src_url = self.source["url"]
         dst_url = self.target["url"]
 
-        # Get list of scans from source REST API
+        # Get the list of scans from source REST API
         src_scans = self._list_http_scans(src_url)
 
         n_scans_to_sync = len(src_scans)
@@ -573,7 +666,7 @@ class FSDBSync():
             remote_path = str(self.target["path"])
             self._ensure_remote_directory(sftp, remote_path)
 
-            # Get list of scans from REST API
+            # Get the list of scans from REST API
             src_scans = self._list_http_scans(src_url)
 
             n_scans_to_sync = len(src_scans)
@@ -602,7 +695,7 @@ class FSDBSync():
         sftp = ssh.open_sftp()
 
         try:
-            # Get list of scans from SSH server
+            # Get the list of scans from the SSH server
             remote_path = str(self.source["path"])
             src_scans = self._list_ssh_scans(sftp, remote_path)
 
@@ -653,7 +746,7 @@ class FSDBSync():
             return []
 
     def _list_ssh_scans(self, sftp, remote_path):
-        """List scan directories on SSH server."""
+        """List scan directories on the SSH server."""
         try:
             entries = sftp.listdir_attr(remote_path)
             return [entry.filename for entry in entries
@@ -710,10 +803,10 @@ class FSDBSync():
 
     def _sync_directory_local(self, src_dir, dst_dir):
         """Synchronize a directory locally."""
-        # Create destination if it doesn't exist
+        # Create the destination directory if it doesn't exist
         dst_dir.mkdir(parents=True, exist_ok=True)
 
-        # Walk through source directory
+        # Walk through the source directory
         for src_file in src_dir.rglob('*'):
             if src_file.is_file():
                 rel_path = src_file.relative_to(src_dir)
@@ -722,12 +815,12 @@ class FSDBSync():
                 # Ensure parent directory exists
                 dst_file.parent.mkdir(parents=True, exist_ok=True)
 
-                # Check if file needs to be updated
+                # Check if a file needs to be updated
                 if self._should_update_file(src_file, dst_file):
                     shutil.copy2(src_file, dst_file)
 
     def _should_update_file(self, src_file, dst_file):
-        """Check if file needs to be updated based on mtime and size."""
+        """Check if a file needs to be updated based on mtime and size."""
         if not dst_file.exists():
             return True
 
@@ -778,7 +871,7 @@ class FSDBSync():
                     sftp.put(str(item), remote_path)
 
     def _get_ssh_client(self, host):
-        """Get or create SSH client for a host."""
+        """Get or create an SSH client for a host."""
         if host not in self.ssh_clients:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -805,7 +898,7 @@ class FSDBSync():
 
 
 def config_from_url(url):
-    """Parse URL into configuration dictionary.
+    """Parse URL into a configuration dictionary.
 
     Examples
     --------
