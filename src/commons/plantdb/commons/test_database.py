@@ -24,7 +24,7 @@
 # ------------------------------------------------------------------------------
 
 """
-This module regroup tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
+This module regroups tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
 It aims at simplifying the creation of a test database for demonstration or CI purposes.
 
 Examples
@@ -185,7 +185,7 @@ def _save_file_from_url(url) -> Path:
 
 
 def _test_hash(tmp_fname, hash_value, hash_method="md5"):
-    """Test the hash value of a downloaded file against known hash from ZENODO.
+    """Test the hash value of a downloaded file against a known hash from ZENODO.
 
     Parameters
     ----------
@@ -216,7 +216,7 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     except AssertionError:
         logger.critical(f"{hash_method.upper()} hash verification failed for file {tmp_fname}!")
         logger.critical(f"Expected '{hash_value}', got '{h.hexdigest()}'.")
-        tmp_fname.unlink()  # Delete the file if hash comparison fail!
+        tmp_fname.unlink()  # Delete the file if hash comparison fails!
         logger.warning(f"Deleted {tmp_fname}.")
         raise ValueError("Wrong hash value.")
     return
@@ -338,7 +338,7 @@ def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force redownloading of archive. Defaults to ``False``.
 
     Returns
     -------
@@ -404,7 +404,7 @@ def setup_empty_database(out_path=None):
     # Make sure the marker file exists:
     marker_path = out_path / MARKER_FILE_NAME
     marker_path.touch(exist_ok=True)
-    # Make sure the locking file do NOT exist:
+    # Make sure the locking file does NOT exist:
     lock_path = out_path / LOCK_FILE_NAME
     lock_path.unlink(missing_ok=True)
 
@@ -418,8 +418,8 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     ----------
     dataset : "all" or str or list
         The dataset name or a list of dataset names to download to the test database.
-        Using "all" allows to download all defined datasets.
-        See notes below for a list of dataset names and their meanings.
+        Using "all" allows downloading all defined datasets.
+        See the notes below for a list of dataset names and their meanings.
     out_path : str or pathlib.Path, optional
         The path where to set up the database. Defaults to ``TEST_DIR``.
     keep_tmp : bool, optional
@@ -498,6 +498,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     ----------
     dataset : str or list[str] or None, optional
         The (list of) test dataset to use, by default 'real_plant_analyzed'.
+        Using "all" allows downloading all defined datasets.
         If ``None``, only set up an empty database.
     out_path : str or pathlib.Path, optional
         The path where to set up the database.
@@ -512,7 +513,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     with_models : bool
         Whether to download the trained CNN model files. Defaults to ``False``.
     force : bool
-        Whether to force redownload of archive. Defaults to ``False``.
+        Whether to force redownloading of archive. Defaults to ``False``.
 
     Returns
     -------
