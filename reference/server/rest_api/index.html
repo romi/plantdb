@@ -2130,6 +2130,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.is_directory_in_archive" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;is_directory_in_archive
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.is_within_directory" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;is_within_directory
@@ -3257,6 +3266,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.server.rest_api.is_directory_in_archive" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;is_directory_in_archive
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.server.rest_api.is_within_directory" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;is_within_directory
@@ -3458,18 +3476,18 @@ of temporary files.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2397</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2398</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2399</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2400</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2401</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2402</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2403</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2404</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2405</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2406</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2407</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2408</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2421</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2422</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2423</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2424</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2425</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2426</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2427</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2428</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2429</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2430</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2431</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2432</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize the Archive resource.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3609,31 +3627,7 @@ HTTP status code <code>400</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2410</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2411</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2412</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2413</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2414</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2415</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2416</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2417</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2418</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2419</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2420</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2421</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2422</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2423</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2424</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2425</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2426</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2427</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2428</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2429</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2430</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2431</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2432</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2433</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2434</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2434</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2435</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2436</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2437</span>
@@ -3699,7 +3693,31 @@ HTTP status code <code>400</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2497</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2498</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2499</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2500</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2500</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2501</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2502</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2503</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2504</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2505</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2510</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2511</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2512</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2515</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2516</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2517</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2518</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2519</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2520</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2521</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2522</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2523</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2524</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and serve a ZIP archive for the specified scan dataset.</span>
 
@@ -3900,31 +3918,7 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2502</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2503</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2504</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2505</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2506</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2507</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2508</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2509</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2510</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2511</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2512</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2513</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2514</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2515</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2516</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2517</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2518</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2519</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2520</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2521</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2522</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2523</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2524</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2525</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2526</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2526</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2527</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2528</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2529</span>
@@ -4018,7 +4012,35 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2617</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2618</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2619</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2620</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2620</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2621</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2622</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2623</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2624</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2625</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2626</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2627</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2628</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2629</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2630</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2631</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2632</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2633</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2634</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2635</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2636</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2637</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2638</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2639</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2640</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2641</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2642</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2643</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2644</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2645</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2646</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2647</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2648</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Handle ZIP file upload and extraction for a scan dataset.</span>
 
@@ -4101,7 +4123,11 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;REST API path to fsdb is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
     scan_path <span style="color: #666">=</span> Path(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)<span style="color: #666">.</span>path())
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Exporting archive contents to &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
-    db_path <span style="color: #666">=</span> scan_path<span style="color: #666">.</span>parent  <span style="color: #3D7B7B; font-style: italic"># move up to db path as the archive contain the top level</span>
+
+    <span style="color: #008000; font-weight: bold">if</span> is_directory_in_archive(temp_path, scan_id):
+        extract_to_path <span style="color: #666">=</span> scan_path<span style="color: #666">.</span>parent  <span style="color: #3D7B7B; font-style: italic"># move up to db path as the archive contain the top level</span>
+    <span style="color: #008000; font-weight: bold">else</span>:
+        extract_to_path <span style="color: #666">=</span> scan_path
 
     <span style="color: #3D7B7B; font-style: italic"># Open the zip file and extract non-existing files:</span>
     extracted_files <span style="color: #666">=</span> []
@@ -4116,16 +4142,16 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
                     Path(temp_path)<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)  <span style="color: #3D7B7B; font-style: italic"># Cleanup temporary file</span>
                     <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">&#39;Filename encoding error in zip archive&#39;</span>}, <span style="color: #666">400</span>
 
-                file_path <span style="color: #666">=</span> db_path <span style="color: #666">/</span> file
+                file_path <span style="color: #666">=</span> extract_to_path <span style="color: #666">/</span> file
                 <span style="color: #3D7B7B; font-style: italic"># Ensure the extracted files remain within the target directory</span>
-                <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> is_within_directory(db_path, file_path):
+                <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> is_within_directory(extract_to_path, file_path):
                     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Invalid file path detected in ZIP: &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>file<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
                     Path(temp_path)<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)  <span style="color: #3D7B7B; font-style: italic"># Cleanup temporary file</span>
                     <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">&#39;Invalid file paths in zip archive&#39;</span>}, <span style="color: #666">400</span>
 
                 <span style="color: #3D7B7B; font-style: italic"># Extract only if the file does not already exist</span>
                 <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> file_path<span style="color: #666">.</span>exists():
-                    zip_obj<span style="color: #666">.</span>extract(file, path<span style="color: #666">=</span>db_path)
+                    zip_obj<span style="color: #666">.</span>extract(file, path<span style="color: #666">=</span>extract_to_path)
                     extracted_files<span style="color: #666">.</span>append(file)
     <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
         <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to extract ZIP archive: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
@@ -5607,9 +5633,9 @@ which prevents directory traversal attacks and handles file access permissions.<
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3305</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3306</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3307</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3333</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3334</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3335</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -5727,35 +5753,7 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3309</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3310</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3311</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3312</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3313</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3314</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3315</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3316</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3317</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3318</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3319</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3320</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3321</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3322</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3323</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3324</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3325</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3326</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3327</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3328</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3329</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3330</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3331</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3332</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3333</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3334</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3335</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3336</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3337</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3337</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3338</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3339</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3340</span>
@@ -5849,7 +5847,35 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3428</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3429</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3430</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3431</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3431</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3432</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3435</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3436</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3441</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3442</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3443</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3448</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3449</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3450</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3451</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3452</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3453</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3454</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3455</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3456</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3457</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3458</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3459</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new file in a fileset and write data to it.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method handles POST requests to create a new file with data. It expects</span>
@@ -6057,9 +6083,9 @@ files within a scan's fileset.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3452</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3453</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3454</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3480</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3482</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -6216,35 +6242,7 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3456</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3457</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3458</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3459</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3460</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3461</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3462</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3463</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3464</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3465</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3466</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3467</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3468</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3469</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3470</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3471</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3472</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3473</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3474</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3475</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3476</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3477</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3478</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3479</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3480</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3481</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3482</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3483</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3484</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3484</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3485</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3486</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3487</span>
@@ -6273,7 +6271,35 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3510</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3511</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3512</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3513</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3515</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3516</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3517</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3518</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3519</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3520</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3521</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3522</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3523</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3524</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3525</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3526</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3527</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3528</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3529</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3530</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3531</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3532</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3533</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3534</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3535</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3536</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3537</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3538</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3539</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3540</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3541</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6474,35 +6500,7 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3515</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3516</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3517</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3518</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3519</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3520</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3521</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3522</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3523</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3524</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3525</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3526</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3527</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3528</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3529</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3530</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3531</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3532</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3533</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3534</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3535</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3537</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3538</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3539</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3540</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3541</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3542</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3543</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3543</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3544</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3545</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3546</span>
@@ -6559,7 +6557,35 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3597</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3598</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3600</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3600</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3601</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3602</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3603</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3604</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3605</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3606</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3607</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3608</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3609</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3610</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3611</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3612</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3613</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3614</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3615</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3616</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3617</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3618</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3619</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3620</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3621</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3622</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3623</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3624</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3625</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3626</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3627</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3628</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -6724,9 +6750,9 @@ If key is provided, returns the value for that key.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2942</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2943</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2944</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2970</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2971</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2972</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -6850,35 +6876,7 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2946</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2947</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2948</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2949</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2950</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2951</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2952</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2953</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2954</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2955</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2956</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2957</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2958</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2959</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2960</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2961</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2962</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2963</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2964</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2965</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2966</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2967</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2968</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2969</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2970</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2971</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2972</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2973</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2974</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2974</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2975</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2976</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2977</span>
@@ -6931,7 +6929,35 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3024</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3025</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3026</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3027</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3027</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3028</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3029</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3030</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3031</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3032</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3033</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3034</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3035</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3036</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3037</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3038</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3039</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3040</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3041</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3042</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3043</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3044</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3045</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3046</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3047</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3048</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3049</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3050</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3051</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3052</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3053</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3054</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3055</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new fileset associated with a scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method handles POST requests to create a new fileset. It validates the input data,</span>
@@ -7055,9 +7081,9 @@ returned as 500 error responses.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3227</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3228</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3229</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3255</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3256</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3257</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -7193,35 +7219,7 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3231</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3232</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3233</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3234</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3235</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3236</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3237</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3238</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3239</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3240</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3241</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3242</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3243</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3244</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3245</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3246</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3247</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3248</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3249</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3250</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3251</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3252</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3253</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3254</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3255</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3256</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3257</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3258</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3259</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3259</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3260</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3261</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3262</span>
@@ -7247,7 +7245,35 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3282</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3283</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3284</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3285</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3285</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3286</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3287</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3288</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3289</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3290</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3291</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3292</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3293</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3294</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3295</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3296</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3297</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3298</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3299</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3300</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3301</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3302</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3303</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3304</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3305</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3306</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3307</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3308</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3309</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3310</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3311</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3312</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3313</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all files in a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the list of files contained in a fileset using the</span>
@@ -7389,9 +7415,9 @@ alphanumeric characters, underscores, dashes, or periods.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3050</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3051</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3052</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3078</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3079</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3080</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -7571,35 +7597,7 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3054</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3055</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3056</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3057</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3058</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3059</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3060</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3061</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3062</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3063</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3064</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3065</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3066</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3067</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3068</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3069</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3070</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3071</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3072</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3073</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3074</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3075</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3076</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3077</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3078</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3079</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3080</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3081</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3082</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3082</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3083</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3084</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3085</span>
@@ -7636,7 +7634,35 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3116</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3117</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3118</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3119</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3119</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3120</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3121</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3122</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3123</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3124</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3125</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3126</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3127</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3128</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3129</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3130</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3131</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3132</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3133</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3134</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3136</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3137</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3138</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3139</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3142</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3143</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3144</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3145</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3146</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3147</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the metadata dictionary for a fileset. Optionally, it can</span>
@@ -7867,35 +7893,7 @@ logged, and returned as a 500 error response.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3121</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3122</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3123</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3124</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3125</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3126</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3127</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3128</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3129</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3130</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3131</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3132</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3133</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3134</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3135</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3136</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3137</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3138</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3139</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3140</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3141</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3142</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3143</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3144</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3145</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3146</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3147</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3148</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3149</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3149</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3150</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3151</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3152</span>
@@ -7967,7 +7965,35 @@ logged, and returned as a 500 error response.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3218</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3219</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3220</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3221</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3221</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3223</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3224</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3225</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3226</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3227</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3228</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3229</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3230</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3231</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3232</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3233</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3235</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3238</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3239</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3240</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3241</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3242</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3243</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3244</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3245</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3246</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3247</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3248</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3249</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method handles updating metadata for a fileset within a scan. It supports both</span>
@@ -8167,19 +8193,19 @@ logged, and returned as a 500 error response.</p>
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Try to check database connection</span>
         scan_count <span style="color: #666">=</span> <span style="color: #008000">len</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))
-        <span style="color: #008000; font-weight: bold">return</span> jsonify({
+        <span style="color: #008000; font-weight: bold">return</span> {
             <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;healthy&quot;</span>,
             <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">&quot;API is running correctly&quot;</span>,
             <span style="color: #BA2121">&quot;database&quot;</span>: {
                 <span style="color: #BA2121">&quot;location&quot;</span>: <span style="color: #008000">str</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()),
                 <span style="color: #BA2121">&quot;scan_count&quot;</span>: scan_count
             }
-        }), <span style="color: #666">200</span>
+        }, <span style="color: #666">200</span>
     <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
-        <span style="color: #008000; font-weight: bold">return</span> jsonify({
+        <span style="color: #008000; font-weight: bold">return</span> {
             <span style="color: #BA2121">&quot;status&quot;</span>: <span style="color: #BA2121">&quot;error&quot;</span>,
             <span style="color: #BA2121">&quot;message&quot;</span>: <span style="color: #BA2121">f&quot;API encountered an issue: </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">str</span>(e)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
-        }), <span style="color: #666">500</span>
+        }, <span style="color: #666">500</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8313,7 +8339,7 @@ logged, and returned as a 500 error response.</p>
         <span style="color: #BA2121">&quot;plantdb.server&quot;</span>: _package_version(<span style="color: #BA2121">&quot;plantdb.server&quot;</span>),
         <span style="color: #BA2121">&quot;endpoints&quot;</span>: {
             <span style="color: #BA2121">&quot;/&quot;</span>: <span style="color: #BA2121">&quot;This endpoint provides information about the PlantDB REST API&quot;</span>,
-            <span style="color: #BA2121">&quot;/healthcheck&quot;</span>: <span style="color: #BA2121">&quot;Health check endpoint to verify API is working&quot;</span>,
+            <span style="color: #BA2121">&quot;/health&quot;</span>: <span style="color: #BA2121">&quot;Health check endpoint to verify API is working&quot;</span>,
             <span style="color: #BA2121">&quot;/scans&quot;</span>: <span style="color: #BA2121">&quot;List all available scans&quot;</span>,
             <span style="color: #BA2121">&quot;/scans_info&quot;</span>: <span style="color: #BA2121">&quot;Table with scan information&quot;</span>,
             <span style="color: #BA2121">&quot;/scans/&lt;scan_id&gt;&quot;</span>: <span style="color: #BA2121">&quot;Get information about a specific scan&quot;</span>,
@@ -12530,9 +12556,9 @@ Must contain only alphanumeric characters, underscores, dashes, or periods.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2636</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2637</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2638</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2664</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2665</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2666</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -12621,35 +12647,7 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2640</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2641</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2642</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2643</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2644</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2645</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2646</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2647</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2648</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2649</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2650</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2651</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2652</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2653</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2654</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2655</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2656</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2657</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2658</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2659</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2660</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2661</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2662</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2663</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2664</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2665</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2666</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2667</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2668</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2668</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2669</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2670</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2671</span>
@@ -12678,7 +12676,35 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2694</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2695</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2696</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2697</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2697</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2698</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2699</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2700</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2701</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2702</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2703</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2704</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2705</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2706</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2707</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2708</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2709</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2710</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2711</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2712</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2713</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2714</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2715</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2716</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2717</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2718</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2719</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2720</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2721</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2722</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2723</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2724</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2725</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new scan in the database.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method handles POST requests to create a new scan. It validates the input data,</span>
@@ -12816,9 +12842,9 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2873</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2874</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2875</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2901</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2902</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2903</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -12938,35 +12964,7 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2877</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2878</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2879</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2880</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2881</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2882</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2883</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2884</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2885</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2886</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2887</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2888</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2889</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2890</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2891</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2892</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2893</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2894</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2895</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2896</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2897</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2898</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2899</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2900</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2901</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2902</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2903</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2904</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2905</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2905</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2906</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2907</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2908</span>
@@ -12987,7 +12985,35 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2923</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2924</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2925</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2926</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2926</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2927</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2928</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2929</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2930</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2931</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2932</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2933</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2934</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2935</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2936</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2937</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2938</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2939</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2940</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2941</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2942</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2943</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2944</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2945</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2946</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2947</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2948</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2949</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2950</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2951</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2952</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2953</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2954</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all filesets in a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the list of filesets contained in a scan using the</span>
@@ -13117,9 +13143,9 @@ a RESTful interface. It handles both complete metadata operations and individual
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2714</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2715</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2716</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2742</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2743</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2744</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -13283,35 +13309,7 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2718</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2719</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2720</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2721</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2722</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2723</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2724</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2725</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2726</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2727</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2728</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2729</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2730</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2731</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2732</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2733</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2734</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2735</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2736</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2737</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2738</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2739</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2740</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2741</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2742</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2743</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2744</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2745</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2746</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2746</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2747</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2748</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2749</span>
@@ -13343,7 +13341,35 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2775</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2776</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2777</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2778</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2778</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2779</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2780</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2781</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2782</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2783</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2784</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2785</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2786</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2787</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2788</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2789</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2790</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2791</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2792</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2793</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2794</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2795</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2796</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2797</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2798</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2799</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2800</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2801</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2802</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2803</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2804</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2805</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2806</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the metadata dictionary for a scan. Optionally, it can</span>
@@ -13520,35 +13546,7 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2780</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2781</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2782</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2783</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2784</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2785</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2786</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2787</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2788</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2789</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2790</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2791</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2792</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2793</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2794</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2795</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2796</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2797</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2798</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2799</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2800</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2801</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2802</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2803</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2804</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2805</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2806</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2807</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2808</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2808</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2809</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2810</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2811</span>
@@ -13596,7 +13594,35 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2853</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2854</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2855</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2856</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2856</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2857</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2858</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2859</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2860</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2861</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2862</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2863</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2864</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2865</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2866</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2867</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2868</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2869</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2870</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2871</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2872</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2873</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2874</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2875</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2876</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2877</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2878</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2879</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2880</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2881</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2882</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2883</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2884</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -16691,6 +16717,146 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
         <span style="color: #BA2121">&quot;hasSegmentedPcdEvaluation&quot;</span>: <span style="color: #008000; font-weight: bold">False</span>,
         <span style="color: #BA2121">&quot;error&quot;</span>: error,
     }
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="plantdb.server.rest_api.is_directory_in_archive" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">is_directory_in_archive</span>
+
+
+<a href="#plantdb.server.rest_api.is_directory_in_archive" class="headerlink" title="Permanent link">Link</a></h3>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>is_directory_in_archive(archive_path, target_dir)
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if a specific directory exists within an archive file.</p>
+<p>This function checks whether a given directory is present at the top level of a ZIP archive.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>archive_path</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the ZIP archive file.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>target_dir</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the target directory to check for within the archive.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the target directory exists at the top level of the archive, False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2381</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2383</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2384</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2385</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2386</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2387</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2388</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2389</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2390</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2391</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2392</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2393</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2394</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2395</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2396</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2397</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2398</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2399</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2400</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2401</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2403</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_directory_in_archive</span>(archive_path, target_dir):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
+<span style="color: #BA2121; font-style: italic">    Check if a specific directory exists within an archive file.</span>
+
+<span style="color: #BA2121; font-style: italic">    This function checks whether a given directory is present at the top level of a ZIP archive.</span>
+
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    archive_path : str or pathlib.Path</span>
+<span style="color: #BA2121; font-style: italic">        The path to the ZIP archive file.</span>
+<span style="color: #BA2121; font-style: italic">    target_dir : str</span>
+<span style="color: #BA2121; font-style: italic">        The name of the target directory to check for within the archive.</span>
+
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    bool</span>
+<span style="color: #BA2121; font-style: italic">        True if the target directory exists at the top level of the archive, False otherwise.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000; font-weight: bold">with</span> ZipFile(archive_path, <span style="color: #BA2121">&#39;r&#39;</span>) <span style="color: #008000; font-weight: bold">as</span> zip_ref:
+        <span style="color: #3D7B7B; font-style: italic"># List all members in the zip file</span>
+        top_level_members <span style="color: #666">=</span> [name <span style="color: #008000; font-weight: bold">for</span> name <span style="color: #A2F; font-weight: bold">in</span> zip_ref<span style="color: #666">.</span>namelist() <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;/&#39;</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #A2F; font-weight: bold">in</span> name]
+        <span style="color: #3D7B7B; font-style: italic"># Check if the target directory is among them</span>
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>target_dir<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">/&quot;</span> <span style="color: #A2F; font-weight: bold">in</span> top_level_members <span style="color: #A2F; font-weight: bold">or</span> target_dir <span style="color: #A2F; font-weight: bold">in</span> top_level_members
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

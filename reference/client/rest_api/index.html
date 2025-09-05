@@ -3360,7 +3360,12 @@ A path to the downloaded file, if a directory path is specified.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1680</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1681</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1682</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1683</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">download_scan_archive</span>(dataset_name, out_dir<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1683</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1684</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1685</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1686</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1687</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1688</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">download_scan_archive</span>(dataset_name, out_dir<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Downloads a scan archive file from a defined dataset based on the specified API parameters.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function fetches a scan archive in stream mode from a remote API. The archive</span>
@@ -3403,9 +3408,12 @@ A path to the downloaded file, if a directory path is specified.</p>
 <span style="color: #BA2121; font-style: italic">    (&#39;/tmp/arabidopsis000.zip&#39;, &#39;Download completed in 0.05 seconds.&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">time</span>
+    <span style="color: #3D7B7B; font-style: italic"># Construct API URL for archive download using dataset name and optional parameters</span>
     url <span style="color: #666">=</span> archive_url(dataset_name, <span style="color: #666">**</span>kwargs)
 
+    <span style="color: #3D7B7B; font-style: italic"># Track download duration for performance monitoring</span>
     start_time <span style="color: #666">=</span> time<span style="color: #666">.</span>time()  <span style="color: #3D7B7B; font-style: italic"># Start timing</span>
+    <span style="color: #3D7B7B; font-style: italic"># Make streaming API request with configurable timeout and optional certificate</span>
     response <span style="color: #666">=</span> make_api_request(url, stream<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,
                                 timeout<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;timeout&quot;</span>, <span style="color: #666">10</span>),
                                 cert_path<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;cert_path&#39;</span>, <span style="color: #008000; font-weight: bold">None</span>))
@@ -3415,11 +3423,13 @@ A path to the downloaded file, if a directory path is specified.</p>
 
     <span style="color: #008000; font-weight: bold">if</span> response<span style="color: #666">.</span>ok:
         <span style="color: #008000; font-weight: bold">if</span> out_dir <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
+            <span style="color: #3D7B7B; font-style: italic"># Save archive to specified directory with dataset name as filename</span>
             out_dir <span style="color: #666">=</span> Path(out_dir) <span style="color: #666">/</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>dataset_name<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.zip&quot;</span>
             <span style="color: #008000; font-weight: bold">with</span> <span style="color: #008000">open</span>(out_dir, <span style="color: #BA2121">&quot;wb&quot;</span>) <span style="color: #008000; font-weight: bold">as</span> archive_file:
                 archive_file<span style="color: #666">.</span>write(response<span style="color: #666">.</span>content)
             <span style="color: #008000; font-weight: bold">return</span> <span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span>out_dir<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>, msg
         <span style="color: #008000; font-weight: bold">else</span>:
+            <span style="color: #3D7B7B; font-style: italic"># Return archive content in memory if no output directory specified</span>
             <span style="color: #008000; font-weight: bold">return</span> BytesIO(response<span style="color: #666">.</span>content), msg
     <span style="color: #008000; font-weight: bold">else</span>:
         response<span style="color: #666">.</span>raise_for_status()  <span style="color: #3D7B7B; font-style: italic"># Raise an error if the request failed</span>
@@ -10713,7 +10723,7 @@ file opening/closing procedures and response status checks.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code>(<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10865,12 +10875,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1686</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1687</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1688</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1689</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1690</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1691</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1691</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1692</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1693</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1694</span>
@@ -10952,7 +10957,13 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1770</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1771</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1772</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1773</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">upload_scan_archive</span>(dataset_name, path, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1773</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1774</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1775</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1776</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1777</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1778</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1779</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">upload_scan_archive</span>(dataset_name, path, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Upload a scan archive file to a specified dataset on a server.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function sends a POST request to upload a scan archive file to a</span>
@@ -10964,7 +10975,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    dataset_name : str</span>
 <span style="color: #BA2121; font-style: italic">        The name of the target dataset for the archive upload.</span>
-<span style="color: #BA2121; font-style: italic">    path : str</span>
+<span style="color: #BA2121; font-style: italic">    path : str, pathlib.Path</span>
 <span style="color: #BA2121; font-style: italic">        The local file system path to the archive to be uploaded.</span>
 
 <span style="color: #BA2121; font-style: italic">    Other Parameters</span>
@@ -11004,7 +11015,8 @@ Defaults to <code>None</code>.</p>
     <span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">time</span>
     <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">zipfile</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> ZipFile
 
-    path <span style="color: #666">=</span> Path(path)
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(path, <span style="color: #008000">str</span>):
+        path <span style="color: #666">=</span> Path(path)
     <span style="color: #3D7B7B; font-style: italic"># Verify path existence</span>
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> path<span style="color: #666">.</span>is_file():
         <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">FileNotFoundError</span>(<span style="color: #BA2121">f&quot;The file at path &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; does not exist!&quot;</span>)

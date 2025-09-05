@@ -2291,7 +2291,7 @@ Defaults to <code>False</code>.</p>
 
     <span style="color: #3D7B7B; font-style: italic"># Initialize RESTful resources to serve:</span>
     api<span style="color: #666">.</span>add_resource(Home, <span style="color: #BA2121">&#39;/&#39;</span>)
-    api<span style="color: #666">.</span>add_resource(HealthCheck, <span style="color: #BA2121">&#39;/test&#39;</span>,
+    api<span style="color: #666">.</span>add_resource(HealthCheck, <span style="color: #BA2121">&#39;/health&#39;</span>,
                      resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
     api<span style="color: #666">.</span>add_resource(ScansList, <span style="color: #BA2121">&#39;/scans&#39;</span>,
                      resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))

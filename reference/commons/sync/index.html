@@ -1093,6 +1093,48 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--local-path-to-local-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Path to Local Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--fsdb-instance-to-local-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      FSDB instance to Local Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--local-path-to-http-rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local path to HTTP REST API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--ssh-to-local-with-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH to local with credentials
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1124,6 +1166,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.commons.sync.FSDBSync.set_ssh_credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_ssh_credentials
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.commons.sync.FSDBSync.sync" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sync
@@ -1143,6 +1194,15 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync.config_from_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;config_from_url
+    </span>
+  </a>
   
 </li>
         
@@ -1808,6 +1868,48 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--local-path-to-local-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Path to Local Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--fsdb-instance-to-local-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      FSDB instance to Local Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--local-path-to-http-rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local path to HTTP REST API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync--ssh-to-local-with-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH to local with credentials
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1839,6 +1941,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.commons.sync.FSDBSync.set_ssh_credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_ssh_credentials
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.commons.sync.FSDBSync.sync" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;sync
@@ -1858,6 +1969,15 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.sync.config_from_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;config_from_url
+    </span>
+  </a>
   
 </li>
         
@@ -1908,9 +2028,12 @@
 <li>Automatic locking and unlocking of source and target databases</li>
 <li>Recursive directory synchronization</li>
 <li>SSH-based remote file transfer using SFTP</li>
+<li>HTTP(S) REST API synchronization with archive transfer</li>
+<li>Support for FSDB instances, local paths, and various remote protocols</li>
 <li>Error handling and validation of database paths</li>
 </ul>
 <h4 id="plantdb.commons.sync--usage-examples">Usage Examples<a class="headerlink" href="#plantdb.commons.sync--usage-examples" title="Permanent link">Link</a></h4>
+<h5 id="plantdb.commons.sync--local-path-to-local-path">Local Path to Local Path<a class="headerlink" href="#plantdb.commons.sync--local-path-to-local-path" title="Permanent link">Link</a></h5>
 <p>Create two test databases, a source with a dataset and a target without dataset, then sync them.
 <div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.sync</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDBSync
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> test_database
@@ -1938,6 +2061,56 @@
 <span style="color: #666">&gt;&gt;&gt;</span> db_source<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># Remove the test database</span>
 <span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># Remove the test database</span>
 </code></pre></div></p>
+<h5 id="plantdb.commons.sync--fsdb-instance-to-local-path">FSDB instance to Local Path<a class="headerlink" href="#plantdb.commons.sync--fsdb-instance-to-local-path" title="Permanent link">Link</a></h5>
+<div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.sync</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDBSync
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> test_database
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test source database</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_source <span style="color: #666">=</span> test_database()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test target database</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_target <span style="color: #666">=</span> test_database(dataset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># FSDB instance to local path</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync <span style="color: #666">=</span> FSDBSync(db_source, db_target<span style="color: #666">.</span>path())
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync<span style="color: #666">.</span>sync()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Connect to the target and list scans</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>connect()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000">print</span>(db_target<span style="color: #666">.</span>list_scans())  <span style="color: #3D7B7B; font-style: italic"># verify that target now has the &#39;real_plant_analyzed&#39; dataset</span>
+[<span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>]
+<span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>disconnect()
+<span style="color: #666">&gt;&gt;&gt;</span> db_source<span style="color: #666">.</span>disconnect()
+</code></pre></div>
+<h5 id="plantdb.commons.sync--local-path-to-http-rest-api">Local path to HTTP REST API<a class="headerlink" href="#plantdb.commons.sync--local-path-to-http-rest-api" title="Permanent link">Link</a></h5>
+<div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.sync</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDBSync
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> list_scan_names
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> test_database
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test source database</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_source <span style="color: #666">=</span> test_database()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test target database</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_target <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+<span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>start()
+Test REST API server started at http:<span style="color: #666">//127.0.0.1</span>:<span style="color: #666">5000</span>
+<span style="color: #666">&gt;&gt;&gt;</span> server_cfg <span style="color: #666">=</span> db_target<span style="color: #666">.</span>get_server_config()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Use REST API to list scans and verify target DB is empty</span>
+<span style="color: #666">&gt;&gt;&gt;</span> scans_list <span style="color: #666">=</span> list_scan_names(<span style="color: #666">**</span>server_cfg)
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000">print</span>(scans_list)
+[]
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Sync target database with source</span>
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync <span style="color: #666">=</span> FSDBSync(db_source<span style="color: #666">.</span>path(), db_target<span style="color: #666">.</span>get_base_url())
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync<span style="color: #666">.</span>sync()
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Use REST API endpoint to refresh scans</span>
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> refresh
+<span style="color: #666">&gt;&gt;&gt;</span> refresh(<span style="color: #666">**</span>server_cfg)
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Use REST API to list scans and verify target DB contains the new scans</span>
+<span style="color: #666">&gt;&gt;&gt;</span> scans_list <span style="color: #666">=</span> list_scan_names(<span style="color: #666">**</span>server_cfg))
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000">print</span>(scans_list)
+<span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>stop()
+<span style="color: #666">&gt;&gt;&gt;</span> db_source<span style="color: #666">.</span>disconnect()
+</code></pre></div>
+<h5 id="plantdb.commons.sync--ssh-to-local-with-credentials">SSH to local with credentials<a class="headerlink" href="#plantdb.commons.sync--ssh-to-local-with-credentials" title="Permanent link">Link</a></h5>
+<div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> db_sync <span style="color: #666">=</span> FSDBSync(<span style="color: #BA2121">&quot;ssh://server.example.com:/data/sourcedb&quot;</span>, <span style="color: #BA2121">&quot;/local/target/db&quot;</span>)
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync<span style="color: #666">.</span>set_ssh_credentials(<span style="color: #BA2121">&quot;server.example.com&quot;</span>, <span style="color: #BA2121">&quot;username&quot;</span>, <span style="color: #BA2121">&quot;password&quot;</span>)
+<span style="color: #666">&gt;&gt;&gt;</span> db_sync<span style="color: #666">.</span>sync()
+</code></pre></div>
 
 
 
@@ -1973,13 +2146,12 @@
     <div class="doc doc-contents ">
 
 
-        <p>Class for sync between two FSDB databases.</p>
-<p>It checks for the validity of both source and target by checking that:</p>
-<ul>
-<li>there is a marker file in the DB path root</li>
-<li>the DB is not busy by checking for the lock file in the DB path root.</li>
-</ul>
-<p>It locks the two databases during the sync. The sync is done using rsync as a subprocess</p>
+        <p>Class for sync between two FSDB databases with support for multiple protocols.</p>
+<p>It supports synchronization between different types of database sources and targets:
+- FSDB instances or local paths: Uses file system operations
+- HTTP(S) URLs: Uses REST API with archive transfer
+- SSH URLs: Uses SFTP protocol</p>
+<p>It checks for the validity of both source and target and locks the databases during sync.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1995,22 +2167,22 @@
           <tr class="doc-section-item">
             <td><code><span title="plantdb.commons.sync.FSDBSync.source_str">source_str</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-internal" title="FSDB (plantdb.commons.fsdb.core.FSDB)" href="../fsdb/core/#plantdb.commons.fsdb.core.FSDB">FSDB</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Source path</p>
+                <p>Source database specification</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="plantdb.commons.sync.FSDBSync.target_str">target_str</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-internal" title="FSDB (plantdb.commons.fsdb.core.FSDB)" href="../fsdb/core/#plantdb.commons.fsdb.core.FSDB">FSDB</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Target path</p>
+                <p>Target database specification</p>
               </div>
             </td>
           </tr>
@@ -2021,7 +2193,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Source path description</p>
+                <p>Source database description</p>
               </div>
             </td>
           </tr>
@@ -2032,7 +2204,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Target path description</p>
+                <p>Target database description</p>
               </div>
             </td>
           </tr>
@@ -2044,6 +2216,39 @@
             <td>
               <div class="doc-md-description">
                 <p>Dictionary of SSH clients, keyed by host name.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="plantdb.commons.sync.FSDBSync.ssh_credentials">ssh_credentials</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dictionary of SSH credentials, keyed by host name.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="plantdb.commons.sync.FSDBSync.synchronizing">synchronizing</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Flag indicating whether a sync operation is currently in progress.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="plantdb.commons.sync.FSDBSync.sync_progress">sync_progress</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Progress of the sync operation as a percentage.</p>
               </div>
             </td>
           </tr>
@@ -2099,11 +2304,14 @@
                 <code>source</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-internal" title="FSDB (plantdb.commons.fsdb.core.FSDB)" href="../fsdb/core/#plantdb.commons.fsdb.core.FSDB">FSDB</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Source database path (remote or local)</p>
+                <p>Source database specification:
+- FSDB instance or local path for file system databases
+- HTTP(S) URL for REST API access
+- SSH URL (ssh://server.example.com:/path/to/db) for SFTP access</p>
               </div>
             </td>
             <td>
@@ -2115,27 +2323,11 @@
                 <code>target</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-internal" title="FSDB (plantdb.commons.fsdb.core.FSDB)" href="../fsdb/core/#plantdb.commons.fsdb.core.FSDB">FSDB</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Target database path (remote or local)</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>ssh_clients</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of SSH clients, keyed by host name.</p>
+                <p>Target database specification (same format as source)</p>
               </div>
             </td>
             <td>
@@ -2154,39 +2346,47 @@
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">140</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">141</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">142</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">143</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">144</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">145</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">146</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">149</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, source, target):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, source, target):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Class constructor.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
-<span style="color: #BA2121; font-style: italic">    source : str or pathlib.Path</span>
-<span style="color: #BA2121; font-style: italic">        Source database path (remote or local)</span>
-<span style="color: #BA2121; font-style: italic">    target : str or pathlib.Path</span>
-<span style="color: #BA2121; font-style: italic">        Target database path (remote or local)</span>
-<span style="color: #BA2121; font-style: italic">    ssh_clients : dict</span>
-<span style="color: #BA2121; font-style: italic">        Dictionary of SSH clients, keyed by host name.</span>
+<span style="color: #BA2121; font-style: italic">    source : str or pathlib.Path or FSDB</span>
+<span style="color: #BA2121; font-style: italic">        Source database specification:</span>
+<span style="color: #BA2121; font-style: italic">        - FSDB instance or local path for file system databases</span>
+<span style="color: #BA2121; font-style: italic">        - HTTP(S) URL for REST API access</span>
+<span style="color: #BA2121; font-style: italic">        - SSH URL (ssh://server.example.com:/path/to/db) for SFTP access</span>
+<span style="color: #BA2121; font-style: italic">    target : str or pathlib.Path or FSDB</span>
+<span style="color: #BA2121; font-style: italic">        Target database specification (same format as source)</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>source_str <span style="color: #666">=</span> source
     <span style="color: #008000">self</span><span style="color: #666">.</span>target_str <span style="color: #666">=</span> target
-    <span style="color: #008000">self</span><span style="color: #666">.</span>source <span style="color: #666">=</span> _fmt_path(source)
-    <span style="color: #008000">self</span><span style="color: #666">.</span>target <span style="color: #666">=</span> _fmt_path(target)
+    <span style="color: #008000">self</span><span style="color: #666">.</span>source <span style="color: #666">=</span> _parse_database_spec(source)
+    <span style="color: #008000">self</span><span style="color: #666">.</span>target <span style="color: #666">=</span> _parse_database_spec(target)
     <span style="color: #008000">self</span><span style="color: #666">.</span>ssh_clients <span style="color: #666">=</span> {}  <span style="color: #3D7B7B; font-style: italic"># Store SSH connections</span>
+    <span style="color: #008000">self</span><span style="color: #666">.</span>ssh_credentials <span style="color: #666">=</span> {}  <span style="color: #3D7B7B; font-style: italic"># Store SSH credentials</span>
+    <span style="color: #008000">self</span><span style="color: #666">.</span>synchronizing <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>
+    <span style="color: #008000">self</span><span style="color: #666">.</span>sync_progress <span style="color: #666">=</span> <span style="color: #666">0.</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -2221,12 +2421,12 @@
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">155</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__del__</span>(<span style="color: #008000">self</span>):
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__del__</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Ensure unlocking on object destruction.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #008000">self</span><span style="color: #666">.</span>unlock()
@@ -2256,19 +2456,141 @@
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">166</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">lock</span>(<span style="color: #008000">self</span>):
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">258</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">259</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">260</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">261</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">262</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">263</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">264</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">265</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">lock</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Lock both source and target databases prior to sync.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">for</span> db <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666">.</span>source, <span style="color: #008000">self</span><span style="color: #666">.</span>target]:
-        <span style="color: #008000; font-weight: bold">if</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
+        <span style="color: #008000; font-weight: bold">if</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;fsdb&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_lock_fsdb(db)
+        <span style="color: #008000; font-weight: bold">elif</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
             <span style="color: #008000">self</span><span style="color: #666">.</span>_lock_local(db)
-        <span style="color: #008000; font-weight: bold">else</span>:
+        <span style="color: #008000; font-weight: bold">elif</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
             <span style="color: #008000">self</span><span style="color: #666">.</span>_lock_remote(db)
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="plantdb.commons.sync.FSDBSync.set_ssh_credentials" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">set_ssh_credentials</span>
+
+
+<a href="#plantdb.commons.sync.FSDBSync.set_ssh_credentials" class="headerlink" title="Permanent link">Link</a></h4>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>set_ssh_credentials(host, username, password<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set SSH credentials for a specific host.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>host</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The hostname for SSH connection</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>username</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>SSH username</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>password</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>SSH password. If not provided, will be prompted during connection.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">241</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">242</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">244</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">245</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">246</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">247</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">248</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">249</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">250</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">251</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">252</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">253</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">254</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">set_ssh_credentials</span>(<span style="color: #008000">self</span>, host, username, password<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Set SSH credentials for a specific host.</span>
+
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    host : str</span>
+<span style="color: #BA2121; font-style: italic">        The hostname for SSH connection</span>
+<span style="color: #BA2121; font-style: italic">    username : str</span>
+<span style="color: #BA2121; font-style: italic">        SSH username</span>
+<span style="color: #BA2121; font-style: italic">    password : str, optional</span>
+<span style="color: #BA2121; font-style: italic">        SSH password. If not provided, will be prompted during connection.</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    <span style="color: #008000">self</span><span style="color: #666">.</span>ssh_credentials[host] <span style="color: #666">=</span> {
+        <span style="color: #BA2121">&#39;username&#39;</span>: username,
+        <span style="color: #BA2121">&#39;password&#39;</span>: password
+    }
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2288,30 +2610,74 @@
 
     <div class="doc doc-contents ">
 
-        <p>Sync the two DBs using modern Python approaches with proper locking.</p>
+        <p>Sync the two DBs using appropriate strategy based on database types.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">232</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync</span>(<span style="color: #008000">self</span>):
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sync the two DBs using modern Python approaches with proper locking.&quot;&quot;&quot;</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">342</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync</span>(<span style="color: #008000">self</span>):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sync the two DBs using appropriate strategy based on database types.&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>lock()
     <span style="color: #008000; font-weight: bold">try</span>:
-        <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">self</span><span style="color: #666">.</span>source[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> <span style="color: #008000">self</span><span style="color: #666">.</span>target[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
-            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_local()
+        <span style="color: #008000">self</span><span style="color: #666">.</span>synchronizing <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">True</span>
+        <span style="color: #3D7B7B; font-style: italic"># Determine sync strategy based on source and target types</span>
+        src_type <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>source[<span style="color: #BA2121">&quot;type&quot;</span>]
+        tgt_type <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>target[<span style="color: #BA2121">&quot;type&quot;</span>]
+
+        <span style="color: #008000; font-weight: bold">if</span> src_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>] <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>]:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_local_to_local()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>] <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_local_to_http()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>]:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_http_to_local()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>] <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_local_to_ssh()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #BA2121">&quot;fsdb&quot;</span>, <span style="color: #BA2121">&quot;local&quot;</span>]:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_ssh_to_local()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_ssh_to_ssh()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_http_to_http()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_http_to_ssh()
+        <span style="color: #008000; font-weight: bold">elif</span> src_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span> <span style="color: #A2F; font-weight: bold">and</span> tgt_type <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_ssh_to_http()
         <span style="color: #008000; font-weight: bold">else</span>:
-            <span style="color: #008000">self</span><span style="color: #666">.</span>_sync_remote()
+            <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">NotImplementedError</span>(<span style="color: #BA2121">f&quot;Sync from </span><span style="color: #A45A77; font-weight: bold">{</span>src_type<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> to </span><span style="color: #A45A77; font-weight: bold">{</span>tgt_type<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> not implemented&quot;</span>)
     <span style="color: #008000; font-weight: bold">finally</span>:
+        <span style="color: #008000">self</span><span style="color: #666">.</span>synchronizing <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>
         <span style="color: #008000">self</span><span style="color: #666">.</span>unlock()
         <span style="color: #008000">self</span><span style="color: #666">.</span>_close_ssh_connections()
 </code></pre></div></td></tr></table></div>
@@ -2338,18 +2704,22 @@
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">unlock</span>(<span style="color: #008000">self</span>):
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">273</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">unlock</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Unlock both source and target databases after sync.&quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">for</span> db <span style="color: #A2F; font-weight: bold">in</span> [<span style="color: #008000">self</span><span style="color: #666">.</span>source, <span style="color: #008000">self</span><span style="color: #666">.</span>target]:
-        <span style="color: #008000; font-weight: bold">if</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
+        <span style="color: #008000; font-weight: bold">if</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;fsdb&quot;</span>:
+            <span style="color: #008000">self</span><span style="color: #666">.</span>_unlock_fsdb(db)
+        <span style="color: #008000; font-weight: bold">elif</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
             <span style="color: #008000">self</span><span style="color: #666">.</span>_unlock_local(db)
-        <span style="color: #008000; font-weight: bold">else</span>:
+        <span style="color: #008000; font-weight: bold">elif</span> db[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
             <span style="color: #008000">self</span><span style="color: #666">.</span>_unlock_remote(db)
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2365,6 +2735,73 @@
 
 </div>
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="plantdb.commons.sync.config_from_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">config_from_url</span>
+
+
+<a href="#plantdb.commons.sync.config_from_url" class="headerlink" title="Permanent link">Link</a></h3>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>config_from_url(url)
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Parse URL into configuration dictionary.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.sync</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> config_from_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>config <span style="color: #666">=</span> config_from_url(<span style="color: #BA2121">&quot;http://localhost:5014/api/&quot;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(config)
+<span style="color: #717171">{&#39;protocol&#39;: &#39;http&#39;, &#39;host&#39;: &#39;localhost&#39;, &#39;port&#39;: 5014, &#39;prefix&#39;: &#39;/api/&#39;, &#39;ssl&#39;: False}</span>
+</code></pre></div>
+
+
+            <details class="quote">
+              <summary>Source code in <code>plantdb/commons/sync.py</code></summary>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">807</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">808</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">809</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">810</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">811</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">812</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">813</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">814</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">815</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">816</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">817</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">818</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">819</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">820</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">821</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">822</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">823</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">824</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">config_from_url</span>(url):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Parse URL into configuration dictionary.</span>
+
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.sync import config_from_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; config = config_from_url(&quot;http://localhost:5014/api/&quot;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(config)</span>
+<span style="color: #BA2121; font-style: italic">    {&#39;protocol&#39;: &#39;http&#39;, &#39;host&#39;: &#39;localhost&#39;, &#39;port&#39;: 5014, &#39;prefix&#39;: &#39;/api/&#39;, &#39;ssl&#39;: False}</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    parsed_url <span style="color: #666">=</span> urllib3<span style="color: #666">.</span>util<span style="color: #666">.</span>parse_url(url)
+    config <span style="color: #666">=</span> {}
+    config[<span style="color: #BA2121">&quot;protocol&quot;</span>] <span style="color: #666">=</span> parsed_url<span style="color: #666">.</span>scheme<span style="color: #666">.</span>lower()
+    config[<span style="color: #BA2121">&quot;host&quot;</span>] <span style="color: #666">=</span> parsed_url<span style="color: #666">.</span>host
+    config[<span style="color: #BA2121">&quot;port&quot;</span>] <span style="color: #666">=</span> parsed_url<span style="color: #666">.</span>port
+    config[<span style="color: #BA2121">&quot;prefix&quot;</span>] <span style="color: #666">=</span> parsed_url<span style="color: #666">.</span>path
+    config[<span style="color: #BA2121">&quot;ssl&quot;</span>] <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">True</span> <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&quot;https&quot;</span> <span style="color: #A2F; font-weight: bold">in</span> url <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">False</span>
+    <span style="color: #008000; font-weight: bold">return</span> config
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
