@@ -1661,9 +1661,12 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     ('/tmp/arabidopsis000.zip', 'Download completed in 0.05 seconds.')
     """
     import time
+    # Construct API URL for archive download using dataset name and optional parameters
     url = archive_url(dataset_name, **kwargs)
 
+    # Track download duration for performance monitoring
     start_time = time.time()  # Start timing
+    # Make streaming API request with configurable timeout and optional certificate
     response = make_api_request(url, stream=True,
                                 timeout=kwargs.get("timeout", 10),
                                 cert_path=kwargs.get('cert_path', None))
@@ -1673,11 +1676,13 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
 
     if response.ok:
         if out_dir is not None:
+            # Save archive to specified directory with dataset name as filename
             out_dir = Path(out_dir) / f"{dataset_name}.zip"
             with open(out_dir, "wb") as archive_file:
                 archive_file.write(response.content)
             return f"{out_dir}", msg
         else:
+            # Return archive content in memory if no output directory specified
             return BytesIO(response.content), msg
     else:
         response.raise_for_status()  # Raise an error if the request failed
@@ -1695,7 +1700,7 @@ def upload_scan_archive(dataset_name, path, **kwargs):
     ----------
     dataset_name : str
         The name of the target dataset for the archive upload.
-    path : str
+    path : str, pathlib.Path
         The local file system path to the archive to be uploaded.
 
     Other Parameters
@@ -1735,7 +1740,8 @@ def upload_scan_archive(dataset_name, path, **kwargs):
     import time
     from zipfile import ZipFile
 
-    path = Path(path)
+    if isinstance(path, str):
+        path = Path(path)
     # Verify path existence
     if not path.is_file():
         raise FileNotFoundError(f"The file at path '{path}' does not exist!")
