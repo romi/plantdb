@@ -698,8 +698,16 @@ def rate_limit(max_requests=5, window_seconds=60):
 
 # Home page resource
 class Home(Resource):
+
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
-        """Return basic API information and documentation."""
+        """Return basic API information and documentation.
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+        """
 
         def _package_version(package_name):
             # Get plantdb.server version
@@ -751,8 +759,15 @@ class HealthCheck(Resource):
     def __init__(self, db):
         self.db = db
 
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
-        """Simple test endpoint to verify the API is working correctly."""
+        """Simple test endpoint to verify the API is working correctly.
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+        """
         try:
             # Try to check database connection
             scan_count = len(self.db.list_scans(owner_only=False))
@@ -821,6 +836,11 @@ class Register(Resource):
                 - 'message' (str): Description of the operation result
         int
             HTTP status code (``201`` for success, ``400`` for error)
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Examples
         --------
@@ -910,6 +930,11 @@ class Login(Resource):
         int
             An HTTP status code. If the `username` is missing  the status code will be ``400``, otherwise ``200``.
 
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
         Examples
         --------
         >>> # Start a test REST API server first:
@@ -957,6 +982,8 @@ class Login(Resource):
         ------
         BadRequest
             If the request doesn't contain valid JSON data (handled by Flask)
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -1078,6 +1105,11 @@ class ScansList(Resource):
         int
             HTTP status code (``200`` for success, ``400``/``500`` for errors).
 
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
         Examples
         --------
         >>> # Start a test REST API server first:
@@ -1161,6 +1193,7 @@ class ScansTable(Resource):
         self.db = db
         self.logger = logger
 
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
         """Retrieve a list of scan dataset information.
 
@@ -1189,6 +1222,8 @@ class ScansTable(Resource):
         ------
         JSONDecodeError
             If the provided filterQuery parameter is not valid JSON.
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Examples
         --------
@@ -1255,6 +1290,7 @@ class Scan(Resource):
         self.db = db
         self.logger = logger
 
+    @rate_limit(max_requests=120, window_seconds=60)
     def get(self, scan_id):
         """Retrieve detailed information about a specific scan dataset.
 
@@ -1279,6 +1315,8 @@ class Scan(Resource):
             If the scan_id contains invalid characters
         NotFoundError
             If the specified scan does not exist in the database
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Examples
         --------
@@ -1316,6 +1354,11 @@ class Scan(Resource):
             A dictionary containing the response with following possible structures:
                 - On success: {'message': 'Scan created successfully', 'scan_id': scan_id}
                 - On error: {'error': error_message}
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -1406,6 +1449,8 @@ class File(Resource):
             If the requested file does not exist
         werkzeug.exceptions.Forbidden
             If the file access is forbidden
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -1499,6 +1544,8 @@ class DatasetFile(Resource):
         Exception
             When database access fails or file operations encounter errors.
             All exceptions are caught and returned as HTTP 400 or 500 responses.
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         See Also
         --------
@@ -1638,6 +1685,11 @@ class Refresh(Resource):
         dict, int
             A dictionary with a success message and HTTP status code 200,
             or an error message and status code 500
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
         """
         try:
             self.db.reload(scan_id)
@@ -1645,7 +1697,7 @@ class Refresh(Resource):
         except Exception as e:
             return {'message': f"Error during scan reload: {str(e)}"}, 500
 
-    @rate_limit(max_requests=1, window_seconds=60)
+    @rate_limit(max_requests=12, window_seconds=60)
     def get_full_database(self):
         """Reload the entire plant database.
 
@@ -1654,6 +1706,11 @@ class Refresh(Resource):
         dict, int
             A dictionary with a success message and HTTP status code 200,
             or an error message and status code 500
+
+        Raises
+        ------
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
         """
         try:
             self.db.reload(None)
@@ -1777,6 +1834,13 @@ class Image(Resource):
         flask.Response
             HTTP response containing the image data with 'image/jpeg' mimetype.
 
+        Raises
+        ------
+        werkzeug.exceptions.NotFound
+            If the requested image file doesn't exist.
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
         Notes
         -----
         - All input parameters are sanitized before use.
@@ -1876,6 +1940,13 @@ class PointCloud(Resource):
         -------
         flask.Response
             HTTP response containing the PLY data with 'application/octet-stream' mimetype.
+
+        Raises
+        ------
+        werkzeug.exceptions.NotFound
+            If the requested point-cloud file doesn't exist.
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -1981,6 +2052,8 @@ class PointCloudGroundTruth(Resource):
         ------
         werkzeug.exceptions.NotFound
             If the requested point-cloud file doesn't exist.
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -2082,6 +2155,8 @@ class Mesh(Resource):
         ------
         werkzeug.exceptions.NotFound
             If the requested mesh file doesn't exist
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -2173,6 +2248,8 @@ class CurveSkeleton(Resource):
             If the CurveSkeleton fileset is not found for the scan
         FileNotFoundError
             If the CurveSkeleton file is missing from the fileset
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -2289,6 +2366,8 @@ class Sequence(Resource):
             If the AnglesAndInternodes fileset is not found
         FileNotFoundError
             If the AnglesAndInternodes file is not found within the fileset
+        HTTPException
+             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
         Notes
         -----
@@ -2377,6 +2456,7 @@ def is_within_directory(directory, target):
     abs_directory = os.path.abspath(directory)
     abs_target = os.path.abspath(target)
     return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
+
 
 def is_directory_in_archive(archive_path, target_dir):
     """
