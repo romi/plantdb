@@ -231,7 +231,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
 
     # Initialize RESTful resources to serve:
     api.add_resource(Home, '/')
-    api.add_resource(HealthCheck, '/test',
+    api.add_resource(HealthCheck, '/health',
                      resource_class_args=tuple([db]))
     api.add_resource(ScansList, '/scans',
                      resource_class_args=tuple([db]))
