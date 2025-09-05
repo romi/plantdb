@@ -60,9 +60,7 @@ fsdb_check = "plantdb.commons.cli.fsdb_check:main"
 fsdb_import_file = "plantdb.commons.cli.fsdb_import_file:main"
 fsdb_import_folder = "plantdb.commons.cli.fsdb_import_folder:main"
 fsdb_import_images = "plantdb.commons.cli.fsdb_import_images:main"
-fsdb_sync = "plantdb.commons.cli.fsdb_sync:main"
 shared_fsdb = "plantdb.commons.cli.shared_fsdb:main"
-sync_app = "plantdb.commons.sync_app.app:main"
 
 [project.optional-dependencies]
 doc = [
@@ -83,8 +81,4 @@ io = [
 test = [
     "nose2[coverage]",
     "coverage[toml]",
-]
-sync = [
-    "dash",
-    "dash-bootstrap-components"
 ]
