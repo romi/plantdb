@@ -323,10 +323,13 @@ To build the `plantdb` conda packages, from the root directory of the repository
     
     # Install the locally built package
     # Replace with actual path from conda build output
-    conda install --use-local plantdb-commons
-    conda install --use-local plantdb-server
-    conda install --use-local plantdb-client
+    conda install -y -c conda-forge --use-local plantdb.commons
+    conda install -y --use-local plantdb.client
+    conda install -y --use-local plantdb.server
     
+    # Install optional dependencies to run the PlantDB Sync App
+    conda install -y -c conda-forge dash dash-bootstrap-components paramiko
+   
     # Test importing the packages
     python -c "import plantdb.commons; print('Successfully imported plantdb.commons')"
     python -c "import plantdb.server; print('Successfully imported plantdb.server')"
