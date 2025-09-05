@@ -1869,7 +1869,7 @@
 
     <div class="doc doc-contents first">
 
-        <p>This module regroup tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
+        <p>This module regroups tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
 It aims at simplifying the creation of a test database for demonstration or CI purposes.</p>
 
 
@@ -1991,7 +1991,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to force redownload of archive. Defaults to <code>False</code>.</p>
+                <p>Whether to force redownloading of archive. Defaults to <code>False</code>.</p>
               </div>
             </td>
             <td>
@@ -2070,7 +2070,7 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        Whether to force redownload of archive. Defaults to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to force redownloading of archive. Defaults to ``False``.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -2636,7 +2636,7 @@ Defaults to <code>None</code>.</p>
     <span style="color: #3D7B7B; font-style: italic"># Make sure the marker file exists:</span>
     marker_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> MARKER_FILE_NAME
     marker_path<span style="color: #666">.</span>touch(exist_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
-    <span style="color: #3D7B7B; font-style: italic"># Make sure the locking file do NOT exist:</span>
+    <span style="color: #3D7B7B; font-style: italic"># Make sure the locking file does NOT exist:</span>
     lock_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> LOCK_FILE_NAME
     lock_path<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 
@@ -2684,8 +2684,8 @@ Defaults to <code>None</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>The dataset name or a list of dataset names to download to the test database.
-Using "all" allows to download all defined datasets.
-See notes below for a list of dataset names and their meanings.</p>
+Using "all" allows downloading all defined datasets.
+See the notes below for a list of dataset names and their meanings.</p>
               </div>
             </td>
             <td>
@@ -2906,8 +2906,8 @@ See notes below for a list of dataset names and their meanings.</p>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    dataset : &quot;all&quot; or str or list</span>
 <span style="color: #BA2121; font-style: italic">        The dataset name or a list of dataset names to download to the test database.</span>
-<span style="color: #BA2121; font-style: italic">        Using &quot;all&quot; allows to download all defined datasets.</span>
-<span style="color: #BA2121; font-style: italic">        See notes below for a list of dataset names and their meanings.</span>
+<span style="color: #BA2121; font-style: italic">        Using &quot;all&quot; allows downloading all defined datasets.</span>
+<span style="color: #BA2121; font-style: italic">        See the notes below for a list of dataset names and their meanings.</span>
 <span style="color: #BA2121; font-style: italic">    out_path : str or pathlib.Path, optional</span>
 <span style="color: #BA2121; font-style: italic">        The path where to set up the database. Defaults to ``TEST_DIR``.</span>
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
@@ -3020,6 +3020,7 @@ See notes below for a list of dataset names and their meanings.</p>
             <td>
               <div class="doc-md-description">
                 <p>The (list of) test dataset to use, by default 'real_plant_analyzed'.
+Using "all" allows downloading all defined datasets.
 If <code>None</code>, only set up an empty database.</p>
               </div>
             </td>
@@ -3098,7 +3099,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to force redownload of archive. Defaults to <code>False</code>.</p>
+                <p>Whether to force redownloading of archive. Defaults to <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -3186,13 +3187,15 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and return an FSDB test database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    dataset : str or list[str] or None, optional</span>
 <span style="color: #BA2121; font-style: italic">        The (list of) test dataset to use, by default &#39;real_plant_analyzed&#39;.</span>
+<span style="color: #BA2121; font-style: italic">        Using &quot;all&quot; allows downloading all defined datasets.</span>
 <span style="color: #BA2121; font-style: italic">        If ``None``, only set up an empty database.</span>
 <span style="color: #BA2121; font-style: italic">    out_path : str or pathlib.Path, optional</span>
 <span style="color: #BA2121; font-style: italic">        The path where to set up the database.</span>
@@ -3207,7 +3210,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: #BA2121; font-style: italic">    with_models : bool</span>
 <span style="color: #BA2121; font-style: italic">        Whether to download the trained CNN model files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool</span>
-<span style="color: #BA2121; font-style: italic">        Whether to force redownload of archive. Defaults to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to force redownloading of archive. Defaults to ``False``.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
