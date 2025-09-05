@@ -7,4 +7,9 @@ channels:
   - conda-forge
 dependencies:
   - python {{ requires-python }}
-  - toml
+  - requests
+  - tqdm
+  - urllib3
+  - dash
+  - dash-bootstrap-components
+  - paramiko
