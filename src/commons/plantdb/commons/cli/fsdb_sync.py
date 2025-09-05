@@ -24,5 +24,6 @@ def main():
     fsdb_sync = FSDBSync(args.origin, args.target)
     fsdb_sync.sync()
 
+
 if __name__ == '__main__':
     main()
