@@ -355,13 +355,15 @@ class FSDBSync():
         finally:
             sftp.close()
 
-    def sync(self, thread=False):
+    def sync(self, source_scans=None, thread=False):
         """Sync the two DBs using the appropriate strategy based on database types.
 
         Parameters
         ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If `None`, synchronizes all scans.
         thread : bool, optional
-            If True, run synchronization in a separate thread. Default is `False`.
+            If `True`, run synchronization in a separate thread. Default is `False`.
             When running in a thread, use `is_synchronizing()` to check status
             and `get_sync_progress()` to track progress.
 
@@ -374,15 +376,21 @@ class FSDBSync():
             if self.is_synchronizing():
                 raise RuntimeError("Synchronization is already in progress")
 
-            self._sync_thread = threading.Thread(target=self._sync_worker)
+            self._sync_thread = threading.Thread(target=self._sync_worker, args=(source_scans,))
             self._sync_thread.daemon = True
             self._sync_thread.start()
             return self._sync_thread
         else:
-            self._sync_worker()
+            self._sync_worker(source_scans)
 
-    def _sync_worker(self):
-        """Internal worker method that performs the actual synchronization."""
+    def _sync_worker(self, source_scans=None):
+        """Internal worker method that performs the actual synchronization.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If `None`, synchronizes all scans.
+        """
         self.lock()
         try:
             self._sync_error = None
@@ -391,23 +399,23 @@ class FSDBSync():
             tgt_type = self.target["type"]
 
             if src_type in ["fsdb", "local"] and tgt_type in ["fsdb", "local"]:
-                self._sync_local_to_local()
+                self._sync_local_to_local(source_scans)
             elif src_type in ["fsdb", "local"] and tgt_type == "http":
-                self._sync_local_to_http()
+                self._sync_local_to_http(source_scans)
             elif src_type == "http" and tgt_type in ["fsdb", "local"]:
-                self._sync_http_to_local()
+                self._sync_http_to_local(source_scans)
             elif src_type in ["fsdb", "local"] and tgt_type == "ssh":
-                self._sync_local_to_ssh()
+                self._sync_local_to_ssh(source_scans)
             elif src_type == "ssh" and tgt_type in ["fsdb", "local"]:
-                self._sync_ssh_to_local()
+                self._sync_ssh_to_local(source_scans)
             elif src_type == "ssh" and tgt_type == "ssh":
-                self._sync_ssh_to_ssh()
+                self._sync_ssh_to_ssh(source_scans)
             elif src_type == "http" and tgt_type == "http":
-                self._sync_http_to_http()
+                self._sync_http_to_http(source_scans)
             elif src_type == "http" and tgt_type == "ssh":
-                self._sync_http_to_ssh()
+                self._sync_http_to_ssh(source_scans)
             elif src_type == "ssh" and tgt_type == "http":
-                self._sync_ssh_to_http()
+                self._sync_ssh_to_http(source_scans)
             else:
                 raise NotImplementedError(f"Sync from {src_type} to {tgt_type} not implemented")
         except Exception as e:
@@ -424,7 +432,7 @@ class FSDBSync():
         Returns
         -------
         bool
-            True if synchronization is in progress, False otherwise.
+            `True` if synchronization is in progress, `False` otherwise.
         """
         return self._sync_thread is not None
 
@@ -454,7 +462,7 @@ class FSDBSync():
         Parameters
         ----------
         timeout : float, optional
-            Maximum time to wait in seconds. If None, wait indefinitely.
+            Maximum time to wait in seconds. If `None`, wait indefinitely.
 
         Returns
         -------
@@ -466,8 +474,14 @@ class FSDBSync():
             return not self._sync_thread.is_alive()
         return True
 
-    def _sync_local_to_local(self):
-        """Synchronize between local databases using shutil."""
+    def _sync_local_to_local(self, source_scans=None):
+        """Synchronize between local databases using shutil.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_path = self._get_local_path(self.source)
         dst_path = self._get_local_path(self.target)
 
@@ -475,30 +489,46 @@ class FSDBSync():
         dst_path.mkdir(parents=True, exist_ok=True)
 
         # Get the list of scans to sync
-        src_scans = self._list_local_scans(src_path)
+        available_scans = self._list_local_scans(src_path)
+        if source_scans is None:
+            scans_to_sync = available_scans
+        else:
+            # Filter to only include scans that exist in source and are requested
+            scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-        n_scans_to_sync = len(src_scans)
+        n_scans_to_sync = len(scans_to_sync)
         self.sync_progress = 0.
-        for n, scan_id in enumerate(src_scans):
-            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+        for n, scan_id in enumerate(scans_to_sync):
+            self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
             src_scan_path = src_path / scan_id
             dst_scan_path = dst_path / scan_id
 
             # Sync scan directory
             self._sync_directory_local(src_scan_path, dst_scan_path)
 
-    def _sync_local_to_http(self):
-        """Sync from a local database to HTTP REST API."""
+    def _sync_local_to_http(self, source_scans=None):
+        """Sync from a local database to HTTP REST API.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_path = self._get_local_path(self.source)
         target_url = self.target["url"]
 
         # Get the list of scans to sync
-        src_scans = self._list_local_scans(src_path)
+        available_scans = self._list_local_scans(src_path)
+        if source_scans is None:
+            scans_to_sync = available_scans
+        else:
+            # Filter to only include scans that exist in source and are requested
+            scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-        n_scans_to_sync = len(src_scans)
+        n_scans_to_sync = len(scans_to_sync)
         self.sync_progress = 0.
-        for n, scan_id in enumerate(src_scans):
-            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+        for n, scan_id in enumerate(scans_to_sync):
+            self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
             src_scan_path = src_path / scan_id
 
             # Create an archive of scan
@@ -512,8 +542,14 @@ class FSDBSync():
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
-    def _sync_http_to_local(self):
-        """Sync from HTTP REST API to a local database."""
+    def _sync_http_to_local(self, source_scans=None):
+        """Sync from HTTP REST API to a local database.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_url = self.source["url"]
         dst_path = self._get_local_path(self.target)
 
@@ -521,12 +557,17 @@ class FSDBSync():
         dst_path.mkdir(parents=True, exist_ok=True)
 
         # Get the list of scans from REST API
-        src_scans = self._list_http_scans(src_url)
+        available_scans = self._list_http_scans(src_url)
+        if source_scans is None:
+            scans_to_sync = available_scans
+        else:
+            # Filter to only include scans that exist in source and are requested
+            scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-        n_scans_to_sync = len(src_scans)
+        n_scans_to_sync = len(scans_to_sync)
         self.sync_progress = 0.
-        for n, scan_id in enumerate(src_scans):
-            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+        for n, scan_id in enumerate(scans_to_sync):
+            self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
 
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
@@ -537,8 +578,14 @@ class FSDBSync():
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
-    def _sync_local_to_ssh(self):
-        """Sync from local database to SSH server using SFTP."""
+    def _sync_local_to_ssh(self, source_scans=None):
+        """Sync from local database to SSH server using SFTP.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_path = self._get_local_path(self.source)
         ssh = self._get_ssh_client(self.target["host"])
         sftp = ssh.open_sftp()
@@ -549,12 +596,17 @@ class FSDBSync():
             self._ensure_remote_directory(sftp, remote_path)
 
             # Get the list of scans to sync
-            src_scans = self._list_local_scans(src_path)
+            available_scans = self._list_local_scans(src_path)
+            if source_scans is None:
+                scans_to_sync = available_scans
+            else:
+                # Filter to only include scans that exist in source and are requested
+                scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-            n_scans_to_sync = len(src_scans)
+            n_scans_to_sync = len(scans_to_sync)
             self.sync_progress = 0.
-            for n, scan_id in enumerate(src_scans):
-                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+            for n, scan_id in enumerate(scans_to_sync):
+                self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                 src_scan_path = src_path / scan_id
                 remote_scan_path = f"{remote_path}/{scan_id}"
 
@@ -563,8 +615,14 @@ class FSDBSync():
         finally:
             sftp.close()
 
-    def _sync_ssh_to_local(self):
-        """Sync from SSH server to local database using SFTP."""
+    def _sync_ssh_to_local(self, source_scans=None):
+        """Sync from SSH server to local database using SFTP.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         dst_path = self._get_local_path(self.target)
         ssh = self._get_ssh_client(self.source["host"])
         sftp = ssh.open_sftp()
@@ -575,12 +633,17 @@ class FSDBSync():
 
             # Get the list of scans from SSH server
             remote_path = str(self.source["path"])
-            src_scans = self._list_ssh_scans(sftp, remote_path)
+            available_scans = self._list_ssh_scans(sftp, remote_path)
+            if source_scans is None:
+                scans_to_sync = available_scans
+            else:
+                # Filter to only include scans that exist in source and are requested
+                scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-            n_scans_to_sync = len(src_scans)
+            n_scans_to_sync = len(scans_to_sync)
             self.sync_progress = 0.
-            for n, scan_id in enumerate(src_scans):
-                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+            for n, scan_id in enumerate(scans_to_sync):
+                self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                 remote_scan_path = f"{remote_path}/{scan_id}"
                 dst_scan_path = dst_path / scan_id
 
@@ -589,8 +652,14 @@ class FSDBSync():
         finally:
             sftp.close()
 
-    def _sync_ssh_to_ssh(self):
-        """Sync between two SSH servers via temporary local storage."""
+    def _sync_ssh_to_ssh(self, source_scans=None):
+        """Sync between two SSH servers via temporary local storage.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         # Create a temporary directory
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -601,12 +670,17 @@ class FSDBSync():
 
             try:
                 remote_src_path = str(self.source["path"])
-                src_scans = self._list_ssh_scans(src_sftp, remote_src_path)
+                available_scans = self._list_ssh_scans(src_sftp, remote_src_path)
+                if source_scans is None:
+                    scans_to_sync = available_scans
+                else:
+                    # Filter to only include scans that exist in source and are requested
+                    scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-                n_scans_to_sync = len(src_scans)
+                n_scans_to_sync = len(scans_to_sync)
                 self.sync_progress = 0.
-                for n, scan_id in enumerate(src_scans):
-                    self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+                for n, scan_id in enumerate(scans_to_sync):
+                    self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                     remote_scan_path = f"{remote_src_path}/{scan_id}"
                     temp_scan_path = temp_path / scan_id
 
@@ -623,7 +697,7 @@ class FSDBSync():
                 remote_dst_path = str(self.target["path"])
                 self._ensure_remote_directory(dst_sftp, remote_dst_path)
 
-                for scan_id in src_scans:
+                for scan_id in scans_to_sync:
                     temp_scan_path = temp_path / scan_id
                     remote_scan_path = f"{remote_dst_path}/{scan_id}"
 
@@ -633,18 +707,29 @@ class FSDBSync():
             finally:
                 dst_sftp.close()
 
-    def _sync_http_to_http(self):
-        """Sync between two HTTP REST APIs via temporary local storage."""
+    def _sync_http_to_http(self, source_scans=None):
+        """Sync between two HTTP REST APIs via temporary local storage.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_url = self.source["url"]
         dst_url = self.target["url"]
 
         # Get the list of scans from source REST API
-        src_scans = self._list_http_scans(src_url)
+        available_scans = self._list_http_scans(src_url)
+        if source_scans is None:
+            scans_to_sync = available_scans
+        else:
+            # Filter to only include scans that exist in source and are requested
+            scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-        n_scans_to_sync = len(src_scans)
+        n_scans_to_sync = len(scans_to_sync)
         self.sync_progress = 0.
-        for n, scan_id in enumerate(src_scans):
-            self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+        for n, scan_id in enumerate(scans_to_sync):
+            self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
             dst_path = tempfile.gettempdir()
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
@@ -655,8 +740,14 @@ class FSDBSync():
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
-    def _sync_http_to_ssh(self):
-        """Sync from HTTP REST API to SSH server via temporary local storage."""
+    def _sync_http_to_ssh(self, source_scans=None):
+        """Sync from HTTP REST API to SSH server via temporary local storage.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         src_url = self.source["url"]
         ssh = self._get_ssh_client(self.target["host"])
         sftp = ssh.open_sftp()
@@ -667,12 +758,17 @@ class FSDBSync():
             self._ensure_remote_directory(sftp, remote_path)
 
             # Get the list of scans from REST API
-            src_scans = self._list_http_scans(src_url)
+            available_scans = self._list_http_scans(src_url)
+            if source_scans is None:
+                scans_to_sync = available_scans
+            else:
+                # Filter to only include scans that exist in source and are requested
+                scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
-            n_scans_to_sync = len(src_scans)
+            n_scans_to_sync = len(scans_to_sync)
             self.sync_progress = 0.
-            for n, scan_id in enumerate(src_scans):
-                self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+            for n, scan_id in enumerate(scans_to_sync):
+                self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                 dst_path = Path(tempfile.gettempdir())
                 archive_path = dst_path / f"{scan_id}.zip"
                 # Download archive from source
@@ -688,8 +784,14 @@ class FSDBSync():
         finally:
             sftp.close()
 
-    def _sync_ssh_to_http(self):
-        """Sync from SSH server to HTTP REST API via temporary local storage."""
+    def _sync_ssh_to_http(self, source_scans=None):
+        """Sync from SSH server to HTTP REST API via temporary local storage.
+
+        Parameters
+        ----------
+        source_scans : list of str, optional
+            List of scan IDs to synchronize. If None, synchronizes all scans.
+        """
         dst_url = self.target["url"]
         ssh = self._get_ssh_client(self.source["host"])
         sftp = ssh.open_sftp()
@@ -697,15 +799,20 @@ class FSDBSync():
         try:
             # Get the list of scans from the SSH server
             remote_path = str(self.source["path"])
-            src_scans = self._list_ssh_scans(sftp, remote_path)
+            available_scans = self._list_ssh_scans(sftp, remote_path)
+            if source_scans is None:
+                scans_to_sync = available_scans
+            else:
+                # Filter to only include scans that exist in source and are requested
+                scans_to_sync = [scan for scan in source_scans if scan in available_scans]
 
             with tempfile.TemporaryDirectory() as temp_dir:
                 temp_path = Path(temp_dir)
 
-                n_scans_to_sync = len(src_scans)
+                n_scans_to_sync = len(scans_to_sync)
                 self.sync_progress = 0.
-                for n, scan_id in enumerate(src_scans):
-                    self.sync_progress = (n+1) / float(n_scans_to_sync) * 100
+                for n, scan_id in enumerate(scans_to_sync):
+                    self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                     # Download from SSH to temp
                     remote_scan_path = f"{remote_path}/{scan_id}"
                     temp_scan_path = temp_path / scan_id
