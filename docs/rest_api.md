@@ -1,364 +1,440 @@
-# PlantDB REST API
+# PlantDB REST API Documentation
 
-Hereafter we introduce the URLS to use to communicate via the PlantDB REST API.
+This document describes the REST API endpoints for the PlantDB (Plant Database) system, which provides access to plant scan datasets, images, point clouds, meshes, and related data through RESTful endpoints.
 
-The Python implementation is done in the `plantdb.server.rest_api` module and the CLI to start a Flask server is in `fsdb_rest_api`.
+## Overview
 
-## Metadata and Files Endpoints
+The PlantDB REST API is implemented using Flask and Flask-RESTful, providing a comprehensive interface for managing and accessing plant-related datasets. The Python implementation is located in the `plantdb.server.rest_api` module, and the CLI server is started using `fsdb_rest_api.py`.
 
-### `/scans`
+**Base URL**: `http://127.0.0.1:5000` (default, configurable)
 
-Here are the specifications for the `/scans` URL:
+## Table of Contents
 
-* Resource: [`plantdb.server.rest_api.ScansList`](reference/plantdb/rest_api.md#plantdb.server.rest_api.ScansList)
-* Methods: GET
-* Arguments: `filterQuery`
-* Returns: a JSON compliant list of dictionaries.
-* Examples:
-    * Get all scans:
-    [http://127.0.0.1:5000/scans](http://127.0.0.1:5000/scans)
-    * Search for "arabidopsis" in metadata:
-    [http://127.0.0.1:5000/scans?filterQuery=arabidopsis](http://127.0.0.1:5000/scans?filterQuery=arabidopsis)
+1. [Getting Started](#getting-started)
+2. [Core Dataset Endpoints](#core-dataset-endpoints)
+3. [File Access Endpoints](#file-access-endpoints)
+4. [Specialized Data Endpoints](#specialized-data-endpoints)
+5. [Database Management](#database-management)
+6. [API Management Endpoints](#api-management-endpoints)
+7. [Health and Status](#health-and-status)
+8. [Data Structures](#data-structures)
+9. [Examples](#examples)
 
-### `/scans_info`
+---
 
-Here are the specifications for the `/scans_info` URL:
+## Getting Started
 
-* Resource: [`plantdb.server.rest_api.ScansTable`](reference/plantdb/rest_api.md#plantdb.server.rest_api.ScansTable)
-* Methods: GET
-* Arguments: `filterQuery`
-* Returns: A JSON-compliant dictionary containing scan data in a tabular format, including:
-    * Basic scan metadata
-    * File counts per fileset
-    * Task status information
-    * Derived data availability
-* Example:
-    * Get all scans in a tabular format:
-    [http://127.0.0.1:5000/scans_info/real_plant_analyzed](http://127.0.0.1:5000/scans_info/real_plant_analyzed)
+### Starting the Server
 
-!!! note
-    The response includes information about all filesets and tasks associated with the scan, making it useful for getting a comprehensive overview of a specific scan's contents and processing status.
+```bash
+# Start with default settings
+python fsdb_rest_api.py --db_location /path/to/database
 
-### `/scans/<scan_id>`
+# Start with custom host and port
+python fsdb_rest_api.py --db_location /path/to/database --host 0.0.0.0 --port 8080
 
-Here are the specifications for the `/scans/<scan_id>` URLs:
+# Start in debug mode
+python fsdb_rest_api.py --db_location /path/to/database --debug
 
-* Resource: [`plantdb.server.rest_api.Scan`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Scan)
-* Arguments: none
-* Returns: a JSON compliant list of dictionaries with detailed information about the scan dataset
-* Examples with the test database:
-    * Get scan info for the `"real_plant_analyzed"` dataset:
-    [http://127.0.0.1:5000/scans/real_plant_analyzed](http://127.0.0.1:5000/scans/real_plant_analyzed)
-    * Get scan info for the `"virtual_plant_analyzed"` dataset:
-    [http://127.0.0.1:5000/scans/virtual_plant_analyzed](http://127.0.0.1:5000/scans/virtual_plant_analyzed)
+# Start with test database
+python fsdb_rest_api.py --test --debug
+```
 
-!!! warning
-    This requires the `Colmap` task!
-    In other words it will fail (response `500`) if this task is missing from the dataset.
+### Authentication
 
+Some endpoints require authentication. Use the `/register` and `/login` endpoints to obtain authentication tokens.
 
-### `/files/<path>`
+---
 
-Here are the specifications for the `/files/<path>` URLs:
+## Core Dataset Endpoints
 
-* Resource: [`plantdb.server.rest_api.File`](reference/plantdb/rest_api.md#plantdb.server.rest_api.File)
-* Arguments: none
-* Returns: The content of the file.
-* Examples  `real_plant_analyzed` dataset (from the test database):
-    * Get the first image of the scan (`00000_rgb`):
-    [http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg](http://127.0.0.1:5000/files/real_plant_analyzed/images/00000_rgb.jpg)
-    * Get the first mask image of the scan (`00000_rgb`):
-    [http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png](http://127.0.0.1:5000/files/real_plant_analyzed/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png)
+### GET `/`
+**Home endpoint**
+- **Description**: Returns basic API information
+- **Response**: Welcome message and API status
 
-### `/file/<scan_id>`
+### GET `/scans`
+**List all scans**
+- **Description**: Retrieve a list of all available scan datasets
+- **Query Parameters**: 
+  - `filterQuery` (optional): Filter scans based on metadata content
+- **Response**: JSON array of scan summaries
+- **Examples**: 
+  - All scans: `GET /scans`
+  - Filtered: `GET /scans?filterQuery=arabidopsis`
 
-Here are the specifications for the `/datasetfile` URL:
+### GET `/scans_info`
+**Scan information table**
+- **Description**: Get comprehensive scan information in tabular format
+- **Query Parameters**: 
+  - `filterQuery` (optional): Filter scans
+- **Response**: JSON object with detailed scan metadata, file counts, and task status
+- **Example**: `GET /scans_info`
 
-* Resource: [`plantdb.server.rest_api.DatasetFile`](reference/plantdb/rest_api.md#plantdb.server.rest_api.DatasetFile)
-* Arguments: 
-    * `file_upload` (POST request) - The file to be uploaded as part of the dataset.
-* Returns: A confirmation of the upload process (success or failure).
-* Example:
-    * Upload a new file to the dataset (example with curl):  
-    ```bash
-    curl -X POST http://127.0.0.1:5000/file/<scan_id> -F "file_upload=@example_file_name.txt"
-    ```
+### GET `/scans/<scan_id>`
+**Individual scan details**
+- **Description**: Get detailed information about a specific scan dataset
+- **Path Parameters**: 
+  - `scan_id`: Unique identifier of the scan
+- **Response**: JSON object with comprehensive scan details including camera parameters, poses, and file URIs
+- **Examples**:
+  - `GET /scans/real_plant_analyzed`
+  - `GET /scans/virtual_plant_analyzed`
 
-### `/archive/<scan_id>`
+!!! warning "Dependency"
+    This endpoint requires the `Colmap` task to be completed. Returns HTTP 500 if missing.
 
-Here are the specifications for the `/archive/<scan_id>` URLs:
+---
 
-* Resource: [`plantdb.server.rest_api.Archive`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Archive)
-* Arguments: none
-* Returns: A zip file containing the dataset.
-* Examples:
-    * Get `real_plant_analyzed` archive:
-    [http://127.0.0.1:5000/archive/real_plant_analyzed/](http://127.0.0.1:5000/archive/real_plant_analyzed/)
-    * Get `virtual_plant_analyzed` archive:
-    [http://127.0.0.1:5000/archive/virtual_plant_analyzed/](http://127.0.0.1:5000/archive/virtual_plant_analyzed/)
+## File Access Endpoints
 
-### `/image/<scan_id>/<fileset_id>/<file_id>`
+### GET `/files/<path>`
+**Direct file access**
+- **Description**: Retrieve any file from the database using its path
+- **Path Parameters**: 
+  - `path`: Full path to the file within the database
+- **Response**: File content (binary or text)
+- **Examples**:
+  - Image: `GET /files/real_plant_analyzed/images/00000_rgb.jpg`
+  - Metadata: `GET /files/real_plant_analyzed/metadata/metadata.json`
 
-Here are the specifications for the `/image/<scan_id>/<fileset_id>/<file_id>` URLs:
+### POST `/files/<scan_id>`
+**Upload file to dataset**
+- **Description**: Upload a new file to a specific scan dataset
+- **Path Parameters**: 
+  - `scan_id`: Target scan identifier
+- **Form Data**: 
+  - `file_upload`: The file to upload
+- **Response**: Upload confirmation
+- **Example**:
+  ```bash
+  curl -X POST http://127.0.0.1:5000/files/my_scan -F "file_upload=@example_file.txt"
+  ```
 
-* Resource: [`plantdb.server.rest_api.Image`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Image)
-* Arguments: `size` in {`orig`, `large`, `thumb`} to control the max size (width or height) of the image to return.
-* Returns: The image file, resized by default.
-* Examples with the `real_plant_analyzed` dataset (from the test database) and the first image of the scan (`00000_rgb`):
-    * Get the preview image:
-    [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb)
-    * Get the original image:
-    [http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig](http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb?size=orig)
+### GET `/archive/<scan_id>`
+**Download dataset archive**
+- **Description**: Download a complete dataset as a ZIP file
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier to archive
+- **Response**: ZIP file containing the entire dataset
+- **Examples**:
+  - `GET /archive/real_plant_analyzed`
+  - `GET /archive/virtual_plant_analyzed`
 
-### `/pointcloud/<scan_id>/<fileset_id>/<file_id>`
+---
 
-Here are the specifications for the `/pointcloud/<scan_id>/<fileset_id>/<file_id>` URLs:
+## Specialized Data Endpoints
 
-* Resource: [`plantdb.server.rest_api.PointCloud`](reference/plantdb/rest_api.md#plantdb.server.rest_api.PointCloud)
-* Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
-* Returns: The point cloud file, preview size by default.
-* Examples with the `real_plant_analyzed` dataset:
-    * Get the preview point cloud:
-    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud)
-    * Get the original point cloud:
-    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig)
-    * Get the point cloud with a voxel size of `2.3`:
-    [http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3](http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3)
+### GET `/image/<scan_id>/<fileset_id>/<file_id>`
+**Access images with resizing**
+- **Description**: Retrieve images with optional resizing
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
+  - `fileset_id`: Fileset identifier (usually 'images')
+  - `file_id`: Image file identifier (without extension)
+- **Query Parameters**: 
+  - `size`: Image size - `orig` (original), `large`, `thumb` (thumbnail)
+- **Response**: Image file (JPEG/PNG)
+- **Examples**:
+  - Thumbnail: `GET /image/real_plant_analyzed/images/00000_rgb`
+  - Original: `GET /image/real_plant_analyzed/images/00000_rgb?size=orig`
+  - Large: `GET /image/real_plant_analyzed/images/00000_rgb?size=large`
 
-### `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>`
+### GET `/pointcloud/<scan_id>/<fileset_id>/<file_id>`
+**Access point clouds**
+- **Description**: Retrieve point cloud files with optional voxel size control
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
+  - `fileset_id`: Point cloud fileset identifier
+  - `file_id`: Point cloud file identifier
+- **Query Parameters**: 
+  - `size`: `orig` (original), `preview`, or a float value for voxel size
+- **Response**: Point cloud file (PLY format)
+- **Examples**:
+  - Preview: `GET /pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud`
+  - Original: `GET /pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=orig`
+  - Custom voxel: `GET /pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud?size=2.3`
 
-Here are the specifications for the `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>` URLs:
+### GET `/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>`
+**Access ground truth point clouds**
+- **Description**: Retrieve ground truth point cloud files
+- **Parameters**: Same as `/pointcloud` endpoint
+- **Response**: Ground truth point cloud file (PLY format)
 
-* Resource: [`plantdb.server.rest_api.PointCloudGroundTruth`](reference/plantdb/rest_api.md#plantdb.server.rest_api.PointCloudGroundTruth)
-* Arguments: `size` in {`orig`, `preview`} or a `float` to control the voxel-size of the pointcloud to returns.
-* Returns: The ground-truth pointcloud file, original size by default.
+### GET `/mesh/<scan_id>/<fileset_id>/<file_id>`
+**Access 3D meshes**
+- **Description**: Retrieve 3D mesh files
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
+  - `fileset_id`: Mesh fileset identifier
+  - `file_id`: Mesh file identifier
+- **Query Parameters**: 
+  - `size`: Currently only `orig` (original) supported
+- **Response**: Mesh file (PLY format)
+- **Example**: `GET /mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh`
 
-### `/mesh/<scan_id>/<fileset_id>/<file_id>`
+### GET `/skeleton/<scan_id>`
+**Access curve skeleton data**
+- **Description**: Retrieve curve skeleton information for a scan
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
+- **Response**: JSON with curve skeleton data
+- **Example**: `GET /skeleton/real_plant_analyzed`
 
-Here are the specifications for the `/mesh/<scan_id>/<fileset_id>/<file_id>` URLs:
+### GET `/sequence/<scan_id>`
+**Access sequence information**
+- **Description**: Retrieve sequence-related information for a scan
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
+- **Response**: JSON with sequence data
+- **Example**: `GET /sequence/real_plant_analyzed`
 
-* Resource: [`plantdb.server.rest_api.Mesh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Mesh)
-* Arguments: `size` in {`orig`}, no control of the size of the mesh to returns.
-* Returns: The mesh file, original size by default.
-* Examples with the `real_plant_analyzed` dataset:
-    * Get the original mesh:
-    [http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh](http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh)
+---
 
-### `/skeleton/<scan_id>`
+## Database Management
 
-Here are the specifications for the `/skeleton/<scan_id>` URL:
+### GET `/refresh`
+**Refresh scan database**
+- **Description**: Refresh the list of scans in the database
+- **Response**: HTTP 200 on completion
+- **Example**: `GET /refresh`
 
-* Resource: [`plantdb.server.rest_api.CurveSkeleton`](reference/plantdb/rest_api.md#plantdb.server.rest_api.CurveSkeleton)
-* Arguments: none
-* Returns: Details about the curve skeleton related to the given scan.
-* Example:
-    * Get curve skeleton information for the `real_plant_analyzed` dataset:
-    [http://127.0.0.1:5000/keleton/real_plant_analyzed](http://127.0.0.1:5000/skeleton/real_plant_analyzed)
+---
 
-### `/sequence/<scan_id>`
+## API Management Endpoints
 
-Here are the specifications for the `/sequence/<scan_id>` URL:
+The following endpoints provide programmatic access to create and manage database content:
 
-* Resource: [`plantdb.server.rest_api.Sequence`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Sequence)
-* Arguments: none
-* Returns: Sequence-related information related to the given scan.
-* Example:
-    * Get sequence information for the `real_plant_analyzed` dataset:
-    [http://127.0.0.1:5000/sequence/real_plant_analyzed](http://127.0.0.1:5000/sequence/real_plant_analyzed)
+### POST `/api/scan`
+**Create new scan**
+- **Description**: Create a new scan dataset
+- **Request Body**: JSON with scan metadata
+- **Response**: Scan creation confirmation
 
-### `/refresh`
-Refresh the list of scans in the `plantdb.server.fsdb.FSDB` database.
+### GET/POST `/api/scan/<scan_id>/metadata`
+**Manage scan metadata**
+- **Description**: Get or update scan metadata
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
 
-Here are the specifications for the `/refresh` URL:
+### GET `/api/scan/<scan_id>/filesets`
+**List scan filesets**
+- **Description**: List all filesets within a scan
+- **Path Parameters**: 
+  - `scan_id`: Scan identifier
 
-* Resource: [`plantdb.server.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Refresh)
-* Arguments: none
-* Returns: `200` on completion.
-* Example: [http://127.0.0.1:5000/refresh](http://127.0.0.1:5000/refresh)
+### POST `/api/fileset`
+**Create new fileset**
+- **Description**: Create a new fileset within a scan
+- **Request Body**: JSON with fileset information
 
+### GET/POST `/api/fileset/<scan_id>/<fileset_id>/metadata`
+**Manage fileset metadata**
+- **Description**: Get or update fileset metadata
 
-## Authentication Endpoints
+### GET `/api/fileset/<scan_id>/<fileset_id>/files`
+**List fileset files**
+- **Description**: List all files within a fileset
 
-### `/register`
+### POST `/api/file`
+**Create new file**
+- **Description**: Add a new file to a fileset
+- **Request Body**: File data and metadata
 
-Here are the specifications for the `/register` URL:
+### GET/POST `/api/file/<scan_id>/<fileset_id>/<file_id>/metadata`
+**Manage file metadata**
+- **Description**: Get or update file metadata
 
-* Resource: [`plantdb.server.rest_api.Register`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Register)
-* Method: POST
-* Arguments:
-    * `username`: The desired username
-    * `password`: The password for the account
-* Returns: Registration confirmation or error message.
-* Example:
-    ```bash
-    curl -X POST http://127.0.0.1:5000/register -H "Content-Type: application/json" -d '{"username":"user123", "password":"securepass"}'
-    ```
+---
 
-### `/login`
+## Health and Status
 
-Here are the specifications for the `/login` URL:
+### GET `/health`
+**Health check**
+- **Description**: Check API server health and database connectivity
+- **Response**: JSON with health status information
+- **Example**: `GET /health`
 
-* Resource: [`plantdb.server.rest_api.Login`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Login)
-* Methods: GET, POST
-* Arguments for POST:
-    * `username`: The username
-    * `password`: The password
-* Returns: Authentication token on successful login.
-* Example:
-    ```bash
-    curl -X POST http://127.0.0.1:5000/login -H "Content-Type: application/json" -d '{"username":"user123", "password":"securepass"}'
-    ```
+---
 
-### `/refresh`
+## Data Structures
 
-Here are the specifications for the `/refresh` URL:
+### Scan Summary Structure
 
-* Resource: [`plantdb.server.rest_api.Refresh`](reference/plantdb/rest_api.md#plantdb.server.rest_api.Refresh)
-* Method: GET
-* Arguments: none (requires valid authentication token in header)
-* Returns: A new authentication token.
-* Example:
-    ```bash
-    curl -X GET http://127.0.0.1:5000/refresh -H "Authorization: Bearer <your_current_token>"
-    ```
-
-## Scan summary
-Information about scans dataset, obtained with the '/scans' URL, are grouped in a JSON dictionary.
-The template can be accessed here: [`plantdb.server.rest_api.get_scan_template`](reference/rest_api.md#methods)
-
-It is organized as follows:
+Information returned by `/scans` endpoint:
 
 ```json
 {
   "id": "scan_id",
   "metadata": {
-    "date": "01-01-00 00:00:00",
-    "species": "N/A",
-    "plant": "N/A",
-    "environment": "N/A",
-    "nbPhotos": 0,
+    "date": "2019-02-01 13:35:42",
+    "species": "Arabidopsis",
+    "plant": "plant_001",
+    "environment": "controlled",
+    "nbPhotos": 150,
     "files": {
-      "metadata": null,
-      "archive": null
+      "metadata": "/files/scan_id/metadata/metadata.json",
+      "archive": "/archive/scan_id"
     }
   },
-  "thumbnailUri": "",
-  "hasPointCloud": false,
-  "hasMesh": false,
+  "thumbnailUri": "/files/scan_id/images/thumbnail.jpg",
+  "hasPointCloud": true,
+  "hasMesh": true,
   "hasSkeleton": false,
   "hasTreeGraph": false,
   "hasAngleData": false,
   "hasAutomatedMeasures": false,
-  "hasManualMeasures": false,
-  "hasSegmentation2D": false,
+  "hasManualMeasures": true,
+  "hasSegmentation2D": true,
   "hasPcdGroundTruth": false,
   "hasPointCloudEvaluation": false,
   "hasSegmentedPointCloud": false,
   "error": false
+}
+```
+
+### Detailed Scan Structure
+
+Information returned by `/scans/<scan_id>` includes all summary fields plus:
+
+#### Camera Model
+```json
+{
+  "camera": {
+    "model": {
+      "id": 1,
+      "model": "OPENCV",
+      "width": 1440,
+      "height": 1080,
+      "params": [1166.95, 1166.95, 720, 540, -0.0014, -0.0014, 0, 0]
+    }
   }
-```
-
-### id
-The name of the corresponding scan dataset.
-
-### metadata
-Some metadata gathered from the corresponding scan dataset.
-
-JSON dictionary with fields:
-
-  * "date": String, example "2019-02-01 13:35:42"
-  * "plant": String
-  * "species": String
-  * "nbPhotos": Number
-  * "environment": String
-  * "files": Object
-      * "files.metadata": String, URL, example "/files/<scanid>/metadata/metadata.json"
-      * "files.archive": String, URL, example "/files/<scanid>/Visualization/scan.zip"
-
-### thumbnailUri
-A path to the thumbnail image to use as "preview" to represent the dataset in the webapp.  
-* thumbnailUri: example "/files/<scanid>/Visualization/thumbnail_pict20190201_134037_0.jpg"
-
-### has*
-All of the `has*` entries indicate if there is an output for a list of selected tasks:
-
-  * `hasPointCloud`: output of the task `PointCloud` has a `PointCloud.ply` file
-  * `hasMesh`: output of the task `TriangleMesh` has a `TriangleMesh.ply` file
-  * `hasSkeleton`: output of the task `CurveSkeleton` has a `CurveSkeleton.json` file
-  * `hasAngleData`: output of the task `AngleAndInternodes` has a `AnglesAndInternodes.json` file
-  * `hasAutomatedMeasures`: output of the task `AutomatedMeasures` has a `AnglesAndInternodes` file
-  * `hasSegmentation2D`: output of the task `Segmentation2D` has a `` file
-  * `hasSegmentedPcdEvaluation`: output of the task `Segmentation2DEvaluation` has a `` file
-  * `hasPointCloudEvaluation`: output of the task `PointCloudEvaluation` has a `` file
-  * `hasSegmentedPointCloud`: output of the task `SegmentedPointCloud` has a `SegmentedPointCloud.ply` file
-  * `hasPcdGroundTruth`: output of the task `PointCloudGroundTruth` has a `PointCloudGroundTruth.ply` file
-
-Finally, `hasManualMeasures` refers to the presence of a JSON file with manual measurements saved as `measures.json`.
-This file should be present at the scan dataset root directory.
-
-
-## Scan detailed summary
-Information about a specific scan dataset, obtained with the '/scans/<scan_id>' URL, are grouped in a JSON dictionary.
-
-It has the same information as those gathered with the '/scans' URL, but also add:
-  * the **files URI** when the following `has*` entries are `True`:
-    * `hasPointCloud`, under `"filesUri"/"pointCloud"`
-    * `hasMesh`, under `"filesUri"/"mesh"`
-    * `hasSkeleton`, under `"filesUri"/"skeleton"`
-    * `hasTreeGraph`, under `"filesUri"/"tree"`
-  * the **files data** when the following `has*` entries are `True`: 
-    * `hasSkeleton`, under `"data"/"skeleton"`
-    * `hasAngleData`, under:
-      * `"data"/"angles"/"angles"` for the angle values
-      * `"data"/"angles"/"internodes"` for the internodes values
-    * `hasManualMeasures`, under:
-      *   `"data"/"angles"/"measured_angles"` for the angle values
-      *   `"data"/"angles"/"measured_internodes"` for the internodes values
-  * the **reconstruction bounding-box** (formerly known as 'workspace') under `"workspace"`, for example `"{"x": [340, 440], "y": [330, 410], "z": [-180, 105]}"`
-  * the **camera model** and its **intrinsics parameters** under `"camera"/"model"`, see [here](#camera-model) for more details
-  * the list of **camera poses**, a.k.a. **extrinsic parameters**, under `"camera"/"poses"`, see [here](#camera-poses) for more details
-
-### Camera model
-
-The details about the camera poses accessible under `"camera"/"model"` are:
-  * `id`: the id of the camera model, should always be `1` if we use a single camera
-  * `model`: the name of the camera model, should always be 'OPENCV' as this is how we save it
-  * `width`: the width of the images
-  * `height`: the height of the images
-  * `params`: the 'OPENCV' intrinsic camera parameters, that is `fx`, `fy`, `cx`, `cy`, `k1`, `k2`, `p1`, `p2`.  
-
-For example with the first image:
-```json
-{
-  "id": 1,
-  "model": "OPENCV",
-  "width": 1440,
-  "height": 1080,
-  "params": [1166.9518889440105, 1166.9518889440105, 720, 540, -0.0013571157486977348, -0.0013571157486977348, 0, 0]
 }
 ```
 
-### Camera poses
-
-The details about the camera poses accessible under `"camera"/"poses"` are:
-  * "id": index of the picture (starts at 1 by COLMAP convention)
-  * "rotmat": Rotation matrix, 3x3 array 
-  * "tvec": Translation vector, 3x1 array
-  * "thumbnailUri": URI to the thumbnail image, example "/images/<scanid>/images/<image_id>?size=thumb.jpg"
-  * "photoUri": URI to the original image, example "/images/<scanid>/images/<image_id>?size=orig.jpg"
-
-For example with the first image:
+#### Camera Poses
 ```json
 {
-  "id": 1,
-  "tvec": [369.4279687732083, 120.36109311437637, -62.07043190848918],
-  "rotmat": [
-    [0.06475585405884698, -0.9971710205080586, 0.038165890845442085],
-    [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284],
-    [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]
-  ],
-  "photoUri": "/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg",
-  "thumbnailUri": "/tmp/ROMI_DB/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg", 
-  "isMatched": true
+  "camera": {
+    "poses": [
+      {
+        "id": 1,
+        "tvec": [369.43, 120.36, -62.07],
+        "rotmat": [
+          [0.0648, -0.9972, 0.0382],
+          [-0.3390, -0.0580, -0.9390],
+          [0.9385, 0.0479, -0.3418]
+        ],
+        "photoUri": "/files/scan_id/images/00000_rgb.jpg",
+        "thumbnailUri": "/files/scan_id/images/00000_rgb?size=thumb",
+        "isMatched": true
+      }
+    ]
+  }
 }
 ```
+
+#### Reconstruction Workspace
+```json
+{
+  "workspace": {
+    "x": [340, 440],
+    "y": [330, 410], 
+    "z": [-180, 105]
+  }
+}
+```
+
+### Status Indicators
+
+The `has*` fields indicate data availability:
+
+- **hasPointCloud**: Point cloud reconstruction available
+- **hasMesh**: 3D mesh reconstruction available
+- **hasSkeleton**: Curve skeleton analysis available
+- **hasTreeGraph**: Tree structure analysis available
+- **hasAngleData**: Angle and internode measurements available
+- **hasAutomatedMeasures**: Automated measurements available
+- **hasManualMeasures**: Manual measurements available (`measures.json`)
+- **hasSegmentation2D**: 2D segmentation masks available
+- **hasPcdGroundTruth**: Ground truth point cloud available
+- **hasPointCloudEvaluation**: Point cloud evaluation results available
+- **hasSegmentedPointCloud**: Segmented point cloud available
+
+---
+
+## Examples
+
+### Basic Usage
+
+```bash
+# Get all scans
+curl http://127.0.0.1:5000/scans
+
+# Get specific scan details  
+curl http://127.0.0.1:5000/scans/real_plant_analyzed
+
+# Get an image thumbnail
+curl http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb
+
+# Download a point cloud
+curl http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_xyz/PointCloud?size=orig -o pointcloud.ply
+
+# Download complete dataset
+curl http://127.0.0.1:5000/archive/real_plant_analyzed -o dataset.zip
+```
+
+### Filtering Scans
+
+```bash
+# Search for Arabidopsis plants
+curl "http://127.0.0.1:5000/scans?filterQuery=arabidopsis"
+
+# Search in scan info table
+curl "http://127.0.0.1:5000/scans_info?filterQuery=controlled_environment"
+```
+
+### Working with Files
+
+```bash
+# Access metadata file
+curl http://127.0.0.1:5000/files/my_scan/metadata/metadata.json
+
+# Upload a new file
+curl -X POST http://127.0.0.1:5000/files/my_scan \
+     -F "file_upload=@measurements.json"
+
+# Get different image sizes
+curl http://127.0.0.1:5000/image/my_scan/images/photo_001        # Default
+curl http://127.0.0.1:5000/image/my_scan/images/photo_001?size=thumb  # Thumbnail
+curl http://127.0.0.1:5000/image/my_scan/images/photo_001?size=orig   # Original
+```
+
+---
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+
+- **200**: Success
+- **400**: Bad Request (invalid parameters)
+- **404**: Not Found (scan/file doesn't exist)
+- **500**: Internal Server Error (missing dependencies, processing errors)
+
+Error responses include JSON with error details:
+
+```json
+{
+  "error": "Scan not found",
+  "message": "The requested scan 'invalid_scan' does not exist"
+}
+```
+
+---
+
+## References
+
+- Implementation: `plantdb.server.rest_api` module
+- Server CLI: `fsdb_rest_api.py`
+- Flask Documentation: [[5]](https://flask.palletsprojects.com/en/stable/api/)
+- Flask-RESTful: [[8]](https://flask-restful.readthedocs.io/)

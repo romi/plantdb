@@ -31,6 +31,7 @@ Core shared library for the ROMI plant database ecosystem.
 This package provides common utilities and base functionality used by both server and client components.
 
 Features include:
+
 - Data management
 - Common data models and schemas
 - File system operations and validation
@@ -43,9 +44,11 @@ Server-side component of the ROMI plant database system.
 Provides a robust REST API server implementation for managing plant phenotyping data.
 
 Features include:
+
 - File system database management
 - Data synchronization services
 - Command-line tools for database management
+- REST API integration
 
 ### `plantdb.client`
 Client-side database library for the ROMI plant database ecosystem.
@@ -54,9 +57,11 @@ This package provides a Python interface for interacting with ROMI's plant datab
 enabling efficient storage, retrieval, and management of plant-related data.
 
 Features include:
+
 - REST API integration
 - Data validation
 - Streamlined access to plant phenotyping data.
+- Data synchronization services
 
 ## Environment Setup
 
