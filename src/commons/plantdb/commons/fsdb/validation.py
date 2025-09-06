@@ -1,6 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+# Python File System Validation Module
+
+A utility module that provides essential validation functions for file system operations and identifier naming conventions.
+This module ensures data integrity and safe operations when working with file system databases (FSDB) and identifiers.
+
+## Key Features
+
+- Identifier validation with comprehensive checks for naming conventions
+- File system database (FSDB) validation
+- Safe deletion verification for file system paths
+- Detailed logging of validation failures
+- Support for both string and Path objects for file system operations
+
+## Usage Examples
+
+```python
+from validation import _is_valid_id, _is_fsdb, _is_safe_to_delete
+from pathlib import Path
+
+# Validate an identifier
+result = _is_valid_id("valid-name.123")  # Returns True
+result = _is_valid_id("invalid/name")    # Returns False
+
+# Check if a path is an FSDB database
+db_path = Path("/path/to/database")
+is_db = _is_fsdb(db_path)
+
+# Verify if a path is safe to delete
+path_to_delete = Path("/path/to/database/subfolder")
+is_safe = _is_safe_to_delete(path_to_delete)
+```
+"""
+
 from pathlib import Path
 
 from ..log import get_logger

@@ -1,6 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+# Path Helpers Module
+
+A utility module that provides standardized path management functions for accessing and manipulating file paths within a plant database system.
+This module simplifies the handling of file paths for scans, filesets, and individual files while maintaining a consistent directory structure.
+
+## Key Features
+
+- File system path resolution for scan directories and their components
+- Path generation for various JSON metadata files (`files.json`, `metadata.json`, `measures.json`)
+- Directory path management for filesets and their associated metadata
+- File path resolution for individual files and their metadata
+- Utility function for generating standardized filenames with specific extensions
+
+## Usage Examples
+```python
+from path_helpers import _scan_path, _file_path, _get_filename
+
+# Get the path to a scan directory
+scan_path = _scan_path(scan_object)
+
+# Get the path to a specific file within a fileset
+file_path = _file_path(file_object)
+
+# Generate a standardized filename with extension
+new_filename = _get_filename(file_object, "jpg")  # Returns: "file_id.jpg"
+```
+"""
+
 def _scan_path(scan):
     """Get the path to given scan.
 

@@ -264,7 +264,7 @@ class Scan(object):
 
         Parameters
         ----------
-        id : str
+        fileset_id : str
             Id of the fileset to delete.
 
         Raises
@@ -418,7 +418,7 @@ class Fileset(object):
 
         Parameters
         ----------
-        id : str
+        file_id : str
             Id of the file to delete.
 
         Raises
@@ -587,7 +587,7 @@ class File(object):
         """
         raise NotImplementedError
 
-    def write(self, str, ext=""):
+    def write(self, data, ext=""):
         """Writes to a file.
 
         Parameters

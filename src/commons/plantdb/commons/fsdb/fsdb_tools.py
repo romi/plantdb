@@ -1,6 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+# FSDB Tools
+
+A utility module for managing metadata in a plant database system, providing functionality to enhance and manipulate scan datasets with additional metadata information.
+
+## Key Features
+
+- Metadata Management
+  - Add or update metadata for scan datasets
+  - Safe handling of non-existent scan IDs
+  - Preserves existing metadata while adding new key-value pairs
+- Database Integration
+  - Seamless integration with FSDB (File System Database)
+  - Support for scan dataset manipulation
+  - Error handling for database operations
+
+## Usage Examples
+
+```python
+from plantdb.commons.fsdb import dummy_db
+from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
+
+# Create a dummy database with a scan
+db = dummy_db(with_scan=True)
+
+# Add metadata to an existing scan
+scan_id = "myscan_001"
+new_metadata = {"Name": "Example Scan", "Date": "2025-09-06"}
+updated_scan = add_metadata_to_scan(db, scan_id, new_metadata)
+
+# Clean up
+db.disconnect()
+```
+"""
 
 from plantdb.commons.log import get_logger
 

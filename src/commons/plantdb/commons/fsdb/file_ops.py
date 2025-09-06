@@ -1,6 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+# File Operations Module
+
+A comprehensive module for managing file system operations in a hierarchical database structure, providing functionality for loading, storing, and manipulating scans, filesets, and individual files in a structured database environment.
+
+## Key Features
+
+- **Scan Management**: Load and manipulate scan data structures with associated metadata
+- **Fileset Handling**: Create, load, and delete filesets with their corresponding files and metadata
+- **File Operations**: Manage individual files within filesets, including metadata handling
+- **Directory Structure Management**: Create and maintain hierarchical directory structures for scans and filesets
+- **Metadata Management**: Load and store metadata for scans, filesets, and individual files
+- **Error Handling**: Comprehensive error checking and logging for file operations
+- **Data Serialization**: JSON-based serialization for storing and loading data structures
+
+## Usage Examples
+
+```python
+>>> # Load all scans from a database
+>>> from plantdb.commons.fsdb import FSDB
+>>> from plantdb.commons.fsdb.file_ops import _load_scans
+
+>>> # Initialize and connect to database
+>>> db = FSDB('/path/to/database')
+>>> db.connect()
+
+>>> # Load all scans
+>>> scans = _load_scans(db)
+
+>>> # Create and store a new scan
+>>> scan = db.create_scan("scan_001")
+>>> _make_scan(scan)
+>>> _store_scan(scan)
+
+>>> # Delete a scan
+>>> _delete_scan(scan)
+```
+"""
+
 import json
 import os
 from shutil import rmtree

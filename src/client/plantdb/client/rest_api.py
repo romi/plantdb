@@ -24,8 +24,47 @@
 # ------------------------------------------------------------------------------
 
 """
-This module regroup the client-side methods of the REST API.
+# REST API Client Module
+
+A Python module that provides a comprehensive interface for interacting with a scanning and image processing REST API service.
+This client handles various operations related to scan management, image processing, and data retrieval while abstracting away the complexities of HTTP communications.
+
+## Key Features
+
+- **Scan Management**: Create, retrieve, refresh, and archive scans
+- **Image Processing**: Handle scan images, preview generations, and image data retrieval
+- **Configuration Management**: Load and manage scan and reconstruction configurations
+- **Data Parsing**: Support for multiple data formats including PCD, mesh, skeleton, and JSON
+- **File Operations**: Upload and download capabilities for datasets and scan archives
+- **Security**: Built-in certificate handling for secure API communications
+- **Task Management**: Retrieve and process task-related data and file sets
+- **URL Generation**: Automated URL construction for various API endpoints
+
+## Usage Examples
+
+```python
+>>> from plantdb.client.rest_api import configure_requests_with_certificate
+>>> from plantdb.client.rest_api import test_availability
+>>> from plantdb.client.rest_api import list_scan_names
+
+>>> # Configure the client with certificates
+>>> configure_requests_with_certificate('path/to/cert.pem')
+
+>>> # Test API availability
+>>> is_available = test_availability()
+>>> if is_available:
+...     print("API service is available")
+
+>>> # List available scans
+>>> scans = list_scan_names()
+>>> print(f"Available scans: {scans}")
+
+>>> # Get scan data
+>>> scan_name = "example_scan"
+>>> scan_data = get_scan_data(scan_name)
+```
 """
+
 import json
 import logging
 import os
@@ -1483,8 +1522,6 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
 
     Parameters
     ----------
-    server_url : str
-        The base URL of the server hosting the REST API.
     scan_id : str
         The unique identifier of the scan associated with the file upload.
     file_path : str

@@ -626,7 +626,7 @@ def write_npz(file, data, **kwargs):
 
     Parameters
     ----------
-    dbfile : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.db.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict of numpy.ndarray
@@ -853,8 +853,6 @@ def read_graph(file, **kwargs):
     ----------
     file : plantdb.commons.db.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
-    ext : str, optional
-        File extension, defaults to "p".
 
     Returns
     -------

@@ -816,18 +816,6 @@ class Register(Resource):
         Processes user registration by validating the input data and creating a new user in the database.
         Expects a JSON payload in the request body with required user details.
 
-        Parameters
-        ----------
-        username : str
-            Unique identifier for the user.
-            Should originate from the JSON payload and be a non-empty string.
-        fullname : str
-            User's full name.
-            Should originate from the JSON payload and be a non-empty string.
-        password : str
-            User's password for authentication.
-            Should originate from the JSON payload and be a non-empty string.
-
         Returns
         -------
         dict
@@ -841,6 +829,18 @@ class Register(Resource):
         ------
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+        ValueError
+            If required fields are missing from the request
+        Exception
+            If user creation fails (e.g., duplicate username)
+
+        Notes
+        -----
+        - The rate limit is enforced per client IP address
+        - The method doesn't take direct parameters but expects a JSON payload in the request body with the following fields:
+            - username: Unique identifier for the user.
+            - fullname: User's full name.
+            - password: User's password (will be hashed before storage).
 
         Examples
         --------
@@ -849,7 +849,7 @@ class Register(Resource):
         >>> import requests
         >>> import json
         >>> # Create a new user:
-        >>> new_user = {"username":"batman", "fullname":"Bruce Wayne", "password":"Alfred"}
+        >>> new_user = {"username":"batman", "fullname":"Bruce Wayne", "password":"Alfred123!"}
         >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user)
         >>> res_dict = response.json()
         >>> res_dict["success"]
@@ -915,12 +915,6 @@ class Login(Resource):
     def get(self):
         """Checks if a given username exists in the database and returns the result.
 
-        Parameters
-        ----------
-        username : str
-            The username to check in the database.
-            This must be a non-empty string and served as a query parameter.
-
         Returns
         -------
         dict
@@ -934,6 +928,10 @@ class Login(Resource):
         ------
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
+        Notes
+        -----
+        In the URL, you can use the `username` parameter to check if a user exists.
 
         Examples
         --------
@@ -1086,17 +1084,6 @@ class ScansList(Resource):
         filtering of results using a JSON-formatted query string and supports fuzzy
         matching for string-based searches.
 
-        Parameters
-        ----------
-        filterQuery : str, optional
-            JSON-formatted string containing filter criteria for querying datasets.
-            Should be passed as a URL query parameter.
-            Example: ``{"object":{"species":"Arabidopsis.*"}}``
-        fuzzy : bool, optional
-            Whether to enable fuzzy matching for string fields in the filter query.
-            Should be passed as a URL query parameter.
-            Default is ``False``.
-
         Returns
         -------
         list
@@ -1109,6 +1096,12 @@ class ScansList(Resource):
         ------
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
+        Notes
+        -----
+        The method can take direct parameters in the request body with the following fields:
+            - filter_query: JSON string representing the filter query, example: ``{"object":{"species":"Arabidopsis.*"}}``.
+            - fuzzy: Boolean indicating whether to perform fuzzy filtering, ``false`` by default.
 
         Examples
         --------
@@ -1201,15 +1194,6 @@ class ScansTable(Resource):
         filtering through query parameters and returns detailed information about
         matching scans.
 
-        Parameters
-        ----------
-        filterQuery : str, optional
-            JSON string containing filter criteria for scans.
-            Must be valid JSON that can be parsed into a query dict.
-        fuzzy : bool, optional
-            If ``True``, enables fuzzy matching in filter queries.
-            Defaults to ``False``.
-
         Returns
         -------
         list of dict
@@ -1224,6 +1208,12 @@ class ScansTable(Resource):
             If the provided filterQuery parameter is not valid JSON.
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
+        Notes
+        -----
+        The method can take direct parameters in the request body with the following fields:
+            - filter_query: JSON string representing the filter query, example: ``{"object":{"species":"Arabidopsis.*"}}``.
+            - fuzzy: Boolean indicating whether to perform fuzzy filtering, ``false`` by default.
 
         Examples
         --------
@@ -1724,12 +1714,6 @@ class Refresh(Resource):
         This endpoint triggers a reload of the plant database data. It can either reload the
         entire database or selectively reload data for a specific plant scan.
 
-        Parameters
-        ----------
-        scan_id : str, optional
-            Identifier for a specific plant scan to reload. If not provided,
-            reloads the entire database.
-
         Returns
         -------
         flask.Response
@@ -1748,8 +1732,9 @@ class Refresh(Resource):
 
         Notes
         -----
-        This endpoint is rate-limited to ``1`` request per minute to prevent excessive
-        database reloads.
+        - In the URL, you can use the `scan_id` parameter to reload a specific scan.
+        - If no scan_id is provided, reloads the entire database.
+        - This endpoint has a request rate-limit to prevent excessive database reloads.
 
         See Also
         --------
@@ -1823,11 +1808,6 @@ class Image(Resource):
             Identifier for the fileset within the scan.
         file_id : str
             Identifier for the specific image file.
-        size : {'orig', 'large', 'thumb'} or int, optional
-            If an integer, use  it as the size of the cached image to create and return.
-            Otherwise, should be one of the valid string.
-            Should be passed as a URL query parameter.
-            Default to `'thumb'`
 
         Returns
         -------
@@ -1844,8 +1824,8 @@ class Image(Resource):
         Notes
         -----
         - All input parameters are sanitized before use.
-        - The 'size' parameter defaults to 'thumb' if not specified.
-        - Supported string size values are:
+        - In the URL, you can use the `size` parameter to retrieve a resized image.
+        - The 'size' parameter defaults to 'thumb' if not specified and can be an integer or one of the following string values:
             * `'thumb'`: image max width and height to `150`;
             * `'large'`: image max width and height to `1500`;
             * `'orig'`: original image, no chache;
@@ -1930,11 +1910,6 @@ class PointCloud(Resource):
             Identifier for the fileset within the scan.
         file_id : str
             Identifier for the specific point cloud file.
-        size : {'orig', 'preview'} or float, optional
-            If a float, use it to downsample the pointcloud and return.
-            Otherwise, should be one of the valid string.
-            Should be passed as a URL query parameter.
-            Default to `'orig'`
 
         Returns
         -------
@@ -1950,7 +1925,7 @@ class PointCloud(Resource):
 
         Notes
         -----
-        - The 'size' parameter can be:
+        - In the URL, you can use a 'size' parameter that accepts:
             * 'orig': original point cloud
             * 'preview': downsampled preview version
             * float value: custom voxel size for downsampling
@@ -2037,11 +2012,6 @@ class PointCloudGroundTruth(Resource):
             Identifier for the fileset within the scan.
         file_id : str
             Identifier for the specific point-cloud file.
-        size : {'orig', 'preview'} or float, optional
-            If a float, use it to downsample the pointcloud and return.
-            Otherwise, should be one of the valid string.
-            Should be passed as a URL query parameter.
-            Default to `'orig'`
 
         Returns
         -------
@@ -2055,9 +2025,9 @@ class PointCloudGroundTruth(Resource):
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
-        Notes
+        Notes²
         -----
-        - The 'size' parameter can be specified in the query string as:
+        - In the URL, you can use the 'size' parameter to specify the size of the point-cloud:
             * 'orig': Original size
             * 'preview': Preview size (default)
             * A float value: Custom voxel size for downsampling
@@ -2141,10 +2111,6 @@ class Mesh(Resource):
             Identifier for the fileset within the scan.
         file_id : str
             Identifier for the specific mesh file.
-        size : {'orig'}, optional
-            A string value specifying the size of the mesh to return.
-            Should be passed as a URL query parameter.
-            Default to `'orig'` (currently the only valid options).
 
         Returns
         -------
@@ -2160,6 +2126,7 @@ class Mesh(Resource):
 
         Notes
         -----
+        - In the URL, you can use the `size` parameter to retrieve a resized mesh.
         - The 'size' parameter currently only supports 'orig' value
         - All identifiers are sanitized before use
         - The mesh is served as a binary PLY file
@@ -2833,8 +2800,6 @@ class ScanMetadata(Resource):
         ----------
         scan_id : str
             The ID of the scan.
-        key : str, optional
-            If provided, returns only the value for this specific metadata key.
 
         Returns
         -------
@@ -2848,6 +2813,11 @@ class ScanMetadata(Resource):
             If the specified scan doesn't exist.
         KeyError
             If the specified key doesn't exist in the metadata.
+
+        Notes
+        -----
+        The method can take direct parameters in the request body with the following fields:
+            - key: If provided, returns only the value for this specific metadata key.
 
         Examples
         --------
@@ -3171,8 +3141,6 @@ class FilesetMetadata(Resource):
             The ID of the scan containing the fileset.
         fileset_id : str
             The name of the fileset.
-        key : str, optional
-            If provided, returns only the value for this specific metadata key.
 
         Returns
         -------
@@ -3186,6 +3154,10 @@ class FilesetMetadata(Resource):
             If the specified fileset doesn't exist.
         KeyError
             If the specified key doesn't exist in the metadata.
+
+        Notes
+        -----
+        In the URL, uou can use the `key` parameter to retrieve specific metadata keys.
 
         Examples
         --------
@@ -3572,14 +3544,16 @@ class FileMetadata(Resource):
             The name of the fileset containing the file.
         file_id : str
             The name of the file.
-        key : str, optional
-            If provided, returns only the value for this specific metadata key.
 
         Returns
         -------
         Union[dict, Any]
             If key is None, returns the complete metadata dictionary.
             If key is provided, returns the value for that key.
+
+        Notes
+        -----
+        In the URL, uou can use the `key` parameter to retrieve specific metadata keys.
 
         Examples
         --------

@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""PlantDB Client Module
+"""
+# PlantDB Client Module
 
 A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data including scans, filesets, and associated metadata.
 
-Key Features
-------------
+## Key Features
+
 - Scan Management: Create new scans and manage scan metadata
 - Fileset Operations: Create and manage collections of files associated with scans
 - File Handling: Upload and manage individual files within filesets
 - Metadata Management: Comprehensive CRUD operations for scan, fileset, and file metadata
 - RESTful Interface: Implements standard HTTP methods for API communication
 
-Usage Examples
---------------
+## Usage Examples
 
+```python
 >>> # Start a test REST API server first:
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
@@ -32,6 +33,7 @@ Usage Examples
 ...     fileset_id="RGB Images",
 ...     description="Top view RGB images"
 ... )
+```
 """
 
 import mimetypes

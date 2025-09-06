@@ -128,7 +128,7 @@ def get_logger(logger_name, log_file=None, log_level=DEFAULT_LOG_LEVEL):
 
     Parameters
     ----------
-    name : str
+    logger_name : str
         A name to use for the logger.
         Typically derived from the module or component that generates the logs.
     log_file : str or pathlib.Path, optional

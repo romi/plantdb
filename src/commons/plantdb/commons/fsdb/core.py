@@ -1625,7 +1625,7 @@ class Fileset(db.Fileset):
 
         Parameters
         ----------
-        fileset_id : str
+        f_id : str
             Name of the file to delete.
 
         Examples

@@ -1,6 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+# Filesystem Database Serialization
+
+This module provides functionality for serializing and deserializing filesystem database (FSDB) objects, facilitating the structured management and manipulation of files and filesets within a scan-based hierarchical storage system.
+
+## Key Features
+
+* Parsing and conversion of filesystem database components (Scans, Filesets, and Files)
+* Validation of filesystem entries and their required attributes
+* Hierarchical data structure serialization to dictionary format
+* Error handling for missing IDs, filenames, and non-existent files
+* Path validation and verification for filesystem integrity
+
+## Usage Examples
+
+```python
+# Example of converting a scan to a dictionary representation
+from plantdb.commons.fsdb import Scan
+
+# Assuming we have a scan object
+scan = Scan(...)
+
+# Convert scan structure to dictionary
+scan_dict = _scan_to_dict(scan)
+# Result format:
+# {
+#     "filesets": [
+#         {
+#             "id": "fileset_id",
+#             "files": [
+#                 {
+#                     "id": "file_id",
+#                     "file": "filename.ext"
+#                 }
+#             ]
+#         }
+#     ]
+# }
+
+# Parse a fileset from dictionary
+fileset_info = {"id": "fileset_id"}
+fileset = _parse_fileset(scan, fileset_info)
+
+# Parse a file from dictionary
+file_info = {"id": "file_id", "file": "example.txt"}
+file = _parse_file(fileset, file_info)
+```
+"""
+
 from .path_helpers import _file_path
 from .path_helpers import _fileset_path
 from .exceptions import FileNoFileNameError
