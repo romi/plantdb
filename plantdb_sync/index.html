@@ -1974,6 +1974,7 @@
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">Link</a></h2>
 <p>The PlantDB Synchronization Tool is a web-based application that allows users to synchronize databases between different sources.
 It provides an intuitive interface for managing database synchronization across various connection types.</p>
+<p><img alt="PlantDB_Sync_UI-screenshot.png" src="../assets/images/PlantDB_Sync_UI-screenshot.png" /></p>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">Link</a></h2>
 <ul>
 <li>Support for multiple database connection types:</li>
@@ -2000,7 +2001,9 @@ The default port is 8050.</p>
 <p>For a complete list of options, call <code>sync_app -h</code>.</p>
 <h3 id="usage-steps">Usage Steps<a class="headerlink" href="#usage-steps" title="Permanent link">Link</a></h3>
 <ol>
-<li><strong>Configure Source Database</strong></li>
+<li>
+<p><strong>Configure Source Database</strong></p>
+<ul>
 <li>Select the database type (Local Path, SSH/SFTP, or HTTP REST API)</li>
 <li>Fill in the required connection details:<ul>
 <li>For Local Path: Enter the filesystem path</li>
@@ -2008,38 +2011,40 @@ The default port is 8050.</p>
 <li>For HTTP REST API: Enter the API URL</li>
 </ul>
 </li>
-<li>
-<p>Click "Test Connection" to verify the connection</p>
+<li>Click "Test Connection" to verify the connection</li>
+</ul>
 </li>
 <li>
 <p><strong>Configure Target Database</strong></p>
-</li>
+<ul>
 <li>Follow the same steps as the source database configuration</li>
-<li>
-<p>The target database will store synchronized data</p>
+<li>The target database will store synchronized data</li>
+</ul>
 </li>
 <li>
 <p><strong>Load Scan Lists</strong></p>
-</li>
+<ul>
 <li>After configuring both databases, click "Load Scan Lists"</li>
 <li>The tool will display available scans from both databases</li>
-<li>
-<p>Scans already present in the target database will be disabled (shown in gray)</p>
+<li>Scans already present in the target database will be disabled (shown in gray)</li>
+</ul>
 </li>
 <li>
 <p><strong>Select Scans to Synchronize</strong></p>
-</li>
+<ul>
 <li>Use the search box to filter source scans by names</li>
 <li>Select the scans you want to synchronize using the checkboxes</li>
-<li>
-<p>The target scans list is read-only and shows existing scans</p>
+<li>The target scans list is read-only and shows existing scans</li>
+</ul>
 </li>
 <li>
 <p><strong>Start Synchronization</strong></p>
-</li>
+<ul>
 <li>Click "Start Synchronization" to begin the process</li>
 <li>Monitor progress through the progress bar</li>
 <li>View detailed logs in the expandable "Synchronization Logs" section</li>
+</ul>
+</li>
 </ol>
 <h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">Link</a></h2>
 <ul>
