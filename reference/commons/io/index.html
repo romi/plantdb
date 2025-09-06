@@ -636,29 +636,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/fsdb_sync/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    fsdb_sync
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../cli/shared_fsdb/" class="md-nav__link">
         
   
@@ -1255,29 +1232,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../sync/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    sync
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../test_database/" class="md-nav__link">
         
   
@@ -1792,6 +1746,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/cli/fsdb_sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    fsdb_sync
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1841,6 +1818,108 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    sync
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../client/sync_app/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    sync_app
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_3_1_5" id="__nav_3_3_1_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_3_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            sync_app
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/sync_app/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    app
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2277,22 +2356,6 @@
                 <em>required</em>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>ext</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>File extension, defaults to "p".</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -2381,17 +2444,13 @@
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">885</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">886</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">887</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">888</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">889</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">890</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">read_graph</span>(file, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">888</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">read_graph</span>(file, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reads a networkx ``Graph`` from a ROMI database file or a path.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    file : plantdb.commons.db.File or pathlib.Path or str</span>
 <span style="color: #BA2121; font-style: italic">        A ``File`` instance or file path, to read from.</span>
-<span style="color: #BA2121; font-style: italic">    ext : str, optional</span>
-<span style="color: #BA2121; font-style: italic">        File extension, defaults to &quot;p&quot;.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -3368,7 +3427,9 @@
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/io.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">943</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">941</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">942</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">943</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">944</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">945</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">946</span>
@@ -3396,9 +3457,7 @@
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">968</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">969</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">970</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">971</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">972</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">973</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">read_torch</span>(file, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;pt&quot;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">971</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">read_torch</span>(file, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;pt&quot;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Reads a torch tensor from a ROMI database file or a path.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3942,7 +4001,9 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/io.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">913</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">911</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">912</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">913</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">914</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">915</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">916</span>
@@ -3967,9 +4028,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">935</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">936</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">937</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">938</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">939</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">940</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">write_graph</span>(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;p&quot;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">938</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">write_graph</span>(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;p&quot;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Writes a networkx ``Graph`` to a ROMI database file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4346,7 +4405,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>dbfile</code>
+                <code>file</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="File (plantdb.commons.db.File)" href="../db/#plantdb.commons.db.File">File</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
@@ -4429,7 +4488,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
-<span style="color: #BA2121; font-style: italic">    dbfile : plantdb.commons.db.File or pathlib.Path or str</span>
+<span style="color: #BA2121; font-style: italic">    file : plantdb.commons.db.File or pathlib.Path or str</span>
 <span style="color: #BA2121; font-style: italic">        If a ``File`` instance, the file will be saved to the associated database/scan/fileset.</span>
 <span style="color: #BA2121; font-style: italic">        Else, write the `data` to the given file path, ignoring the extension parameter `ext`.</span>
 <span style="color: #BA2121; font-style: italic">    data : dict of numpy.ndarray</span>
@@ -4856,7 +4915,9 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/io.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 991</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 989</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 990</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 991</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 992</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 993</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 994</span>
@@ -4868,9 +4929,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1000</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1001</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1002</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1003</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1004</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1005</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">write_torch</span>(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;pt&quot;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1003</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">write_torch</span>(file, data, ext<span style="color: #666">=</span><span style="color: #BA2121">&quot;pt&quot;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Writes a torch tensor to a ROMI database file or to a given path.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>

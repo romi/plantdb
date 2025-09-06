@@ -788,29 +788,6 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/commons/cli/fsdb_sync/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    fsdb_sync
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="reference/commons/cli/shared_fsdb/" class="md-nav__link">
         
   
@@ -1157,29 +1134,6 @@
   
   <span class="md-ellipsis">
     sshfsdb
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reference/commons/sync/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    sync
     
   </span>
   
@@ -1711,6 +1665,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/client/cli/fsdb_sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    fsdb_sync
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1760,6 +1737,108 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/client/sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    sync
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="reference/client/sync_app/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    sync_app
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_3_1_5" id="__nav_3_3_1_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_3_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            sync_app
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/client/sync_app/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    app
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2000,27 +2079,35 @@ It is designed for plant and agricultural research facilities and robotics labs 
 <h3 id="plantdbcommons"><code>plantdb.commons</code><a class="headerlink" href="#plantdbcommons" title="Permanent link">Link</a></h3>
 <p>Core shared library for the ROMI plant database ecosystem.</p>
 <p>This package provides common utilities and base functionality used by both server and client components.</p>
-<p>Features include:
-- Data management
-- Common data models and schemas
-- File system operations and validation
-- Logging and debugging tools
-- Data format specifications and validators</p>
+<p>Features include:</p>
+<ul>
+<li>Data management</li>
+<li>Common data models and schemas</li>
+<li>File system operations and validation</li>
+<li>Logging and debugging tools</li>
+<li>Data format specifications and validators</li>
+</ul>
 <h3 id="plantdbserver"><code>plantdb.server</code><a class="headerlink" href="#plantdbserver" title="Permanent link">Link</a></h3>
 <p>Server-side component of the ROMI plant database system.</p>
 <p>Provides a robust REST API server implementation for managing plant phenotyping data.</p>
-<p>Features include:
-- File system database management
-- Data synchronization services
-- Command-line tools for database management</p>
+<p>Features include:</p>
+<ul>
+<li>File system database management</li>
+<li>Data synchronization services</li>
+<li>Command-line tools for database management</li>
+<li>REST API integration</li>
+</ul>
 <h3 id="plantdbclient"><code>plantdb.client</code><a class="headerlink" href="#plantdbclient" title="Permanent link">Link</a></h3>
 <p>Client-side database library for the ROMI plant database ecosystem.</p>
 <p>This package provides a Python interface for interacting with ROMI's plant database system,
 enabling efficient storage, retrieval, and management of plant-related data.</p>
-<p>Features include:
-- REST API integration
-- Data validation
-- Streamlined access to plant phenotyping data.</p>
+<p>Features include:</p>
+<ul>
+<li>REST API integration</li>
+<li>Data validation</li>
+<li>Streamlined access to plant phenotyping data.</li>
+<li>Data synchronization services</li>
+</ul>
 <h2 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">Link</a></h2>
 <p>We strongly recommend using isolated environments to install ROMI libraries.
 This documentation uses <code>conda</code> as both an environment and package manager.
