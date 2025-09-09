@@ -1,5 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+"""
+# ScanLockManager
+
+File-based locking for thread-safe resource management
+
+The `ScanLockManager` module provides a robust file-based locking mechanism to ensure thread-safe operations across multiple threads or processes.
+It allows acquiring and releasing locks on resources identified by scan IDs, with support for both shared (read) and exclusive (write) locks.
+
+## Key Features
+
+- Thread-safe lock acquisition and release using file-based locking mechanisms
+- Support for both shared (multiple readers) and exclusive (single writer) locks
+- Lock timeout to prevent indefinite waiting for lock acquisition
+- Automatic cleanup of stale locks on initialization
+- Monitoring and debugging capabilities with lock metadata storage
+
+## Usage Examples
+
+```python
+from plantdb.commons.fsdb.lock import ScanLockManager
+
+# Initialize the lock manager with a base path
+manager = ScanLockManager('/path/to/database')
+
+# Acquire an exclusive lock for 'scan123'
+with manager.acquire_lock('scan123', LockType.EXCLUSIVE, user='user1'):
+    # Perform critical section operations...
+
+# Check the status of locks for 'scan123'
+status = manager.get_lock_status('scan123')
+print(status)
+```
+"""
+
 import fcntl
 import json
 import os
@@ -11,8 +46,6 @@ from typing import Dict
 from typing import Optional
 
 
-# Add these imports at the top of the file
-
 class LockType(Enum):
     SHARED = "shared"  # Read operations
     EXCLUSIVE = "exclusive"  # Write operations
@@ -20,7 +53,13 @@ class LockType(Enum):
 
 class LockTimeoutError(Exception):
     """Raised when lock acquisition times out"""
-    pass
+
+    def __init__(self, message: str = "Error: Lock acquisition timed-out!"):
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class ScanLockManager:
@@ -89,23 +128,22 @@ class ScanLockManager:
         # Clean up stale locks on initialization
         self._cleanup_stale_locks()
 
-    def _get_lock_file_path(self, scan_id: str, lock_type: LockType) -> str:
+    def _get_lock_file_path(self, scan_id: str) -> str:
         """
-        Generates the file path for a lock file based on the provided scan ID and lock type.
+        Generates the file path for a lock file based on the provided scan ID.
 
         Parameters
         ----------
         scan_id : str
             The unique identifier for the scan.
-        lock_type : LockType
-            The type of lock to be applied, determining the specific lock file name.
 
         Returns
         -------
         str
             The full path to the lock file.
         """
-        return os.path.join(self.locks_dir, f"{scan_id}_{lock_type.value}.lock")
+        # Use a single lock file per scan_id
+        return os.path.join(self.locks_dir, f"{scan_id}.lock")
 
     def _get_lock_info_path(self, scan_id: str) -> str:
         """
@@ -325,7 +363,7 @@ class ScanLockManager:
                 del self._active_locks[lock_key]
 
                 # Clean up lock file
-                lock_file_path = self._get_lock_file_path(scan_id, lock_type)
+                lock_file_path = self._get_lock_file_path(scan_id)
                 try:
                     os.unlink(lock_file_path)
                 except OSError:
