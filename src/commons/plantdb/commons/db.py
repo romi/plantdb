@@ -59,7 +59,11 @@ class DB(object):
     """
 
     def __init__(self):
-        pass
+        # User management
+        self.user = None
+        # Database state
+        self.is_connected = False
+        self.scans = {}
 
     def connect(self, login_data=None):
         """Connect to the database.
@@ -93,15 +97,13 @@ class DB(object):
         """
         raise NotImplementedError
 
-    def get_scan(self, id, create=False):
+    def get_scan(self, id):
         """Get a scan saved in the database.
 
         Parameters
         ----------
         id : str
             Id of the scan instance to retrieve.
-        create : bool, optional
-            Create the scan if it does not exist, default to ``False``.
 
         Raises
         ------
@@ -193,15 +195,13 @@ class Scan(object):
         """
         raise NotImplementedError
 
-    def get_fileset(self, id, create=False):
+    def get_fileset(self, id):
         """Get a fileset with a given id.
 
         Parameters
         ----------
         id : str
             Id of the fileset to be retrieved.
-        create : bool, optional
-            Create the fileset if it does not exist, default to ``False``.
 
         Raises
         ------
@@ -347,15 +347,13 @@ class Fileset(object):
         """
         raise NotImplementedError
 
-    def get_file(self, id, create=False):
+    def get_file(self, id):
         """Get file with given id.
 
         Parameters
         ----------
         id : str
             File instance id.
-        create : bool, optional
-            Create the file if it does not exist, default to ``False``.
 
         Raises
         ------
