@@ -28,6 +28,7 @@ This module provides a collection of utility functions for data handling in the 
 """
 
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 from PIL import Image
@@ -259,3 +260,39 @@ def partial_match(source, target, fuzzy=False):
     else:
         # Direct comparison of values
         return source == target
+
+
+def date_now(fmt='%Y-%m-%d_%H:%M:%S'):
+    """Get current date and time in specified format.
+
+    Parameters
+    ----------
+    fmt : str, optional
+        The format string for the date and time (default is '%Y-%m-%d_%H:%M:%S').
+
+    Returns
+    -------
+    str
+        The current local date and time as a formatted string.
+
+    Notes
+    -----
+    The function uses Python's `datetime` module to get the current date and time.
+    The formatting follows the directives specified in the `fmt` parameter, which can
+    include various placeholders like '%Y', '%m', '%d', etc. For more details on the
+    allowed format codes, refer to the documentation of `strftime` in Python.
+
+    See Also
+    --------
+    datetime.strftime : Convert a datetime object to a string based on a format.
+    datetime.now : Return the current local date and time.
+
+    Examples
+    --------
+    >>> from plantdb.commons.utils import date_now
+    >>> date_now('%Y-%m-%d')
+    '2025-09-08'
+    >>> date_now()
+    '2025-09-08_15:36:07'
+    """
+    return datetime.strftime(datetime.now(), fmt)
