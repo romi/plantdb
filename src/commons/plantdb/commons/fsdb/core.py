@@ -344,7 +344,6 @@ class FSDB(db.DB):
         self._load_users()
         # Create or load the users database
         self.user = None
-        self.failed_login_attempts = {}  # {username: [timestamps]}
         self.max_login_attempts = 5
         self.lockout_duration = timedelta(minutes=15)
 
@@ -374,6 +373,27 @@ class FSDB(db.DB):
             with open(users_file, "r") as f:
                 self.users = json.load(f)
             logger.debug(f"Loaded {len(self.users)} users from '{users_file}'.")
+        return
+
+    def _save_users(self):
+        """Save users dictionary to file using an atomic write pattern."""
+        users_file = self.basedir / 'users.json'
+        # Create a temporary file in the same directory
+        temp_file = users_file.with_suffix('.tmp')
+        try:
+            # Write to the temporary file first
+            with open(temp_file, "w") as f:
+                json.dump(self.users, f, indent=2)
+
+            # Rename the temporary file to the final filename (atomic operation on most file systems)
+            os.replace(temp_file, users_file)
+        except Exception as e:
+            # If anything goes wrong, clean up the temporary file
+            if temp_file.exists():
+                temp_file.unlink()
+            logger.error(f"Failed to save users database: {str(e)}")
+            raise
+        return
 
     def create_user(self, username, fullname, password):
         """Create a new user and store the user information in a file.
@@ -399,10 +419,8 @@ class FSDB(db.DB):
         batman
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        from datetime import datetime
         username = username.lower()  # Convert the username to lowercase to maintain uniformity.
-        now = datetime.now()  # Get the current timestamp for tracking user creation time.
-        timestamp = now.strftime("%y%m%d_%H%M%S")  # Format the timestamp as 'YYMMDD_HHMMSS'.
+        timestamp = date_now(fmt='%Y-%m-%d_%H:%M:%S')  # Get the current timestamp for tracking user creation time.
 
         # Verify if the login is available
         try:
@@ -425,11 +443,10 @@ class FSDB(db.DB):
         }
 
         # Save all user data (including the newly created user) to 'users.json' file.
-        with open(self.basedir / 'users.json', "w") as f:
-            json.dump(self.users, f, indent=2)
+        self._save_users()
         logger.info(f"Created user '{username}' with fullname '{fullname}'.")
 
-        return f"Welcome {self.users[username]['fullname']}!'"
+        return f"Welcome {self.users[username]['fullname']}, please login...'"
 
     def _lock_db(self):
         """
@@ -489,14 +506,15 @@ class FSDB(db.DB):
         if login is not None and login != "anonymous":
             try:
                 # Validate user credentials
-                self.validate_user(login, password)
+                assert self.validate_user(login, password)
             except AssertionError:
-                # User doesn't exist - log error and suggest creating new user
-                logger.error(f"Unknown user '{login}', cannot connect to the database!")
-                logger.info(f"Create a new user '{login}' with the `create_user` method.")
+                # User doesn't exist or wrong password
+                logger.error(f"Did not connect to database.")
                 return
             else:
                 self.user = login
+                self.users[self.user]['last_login'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
+                self._save_users()
         else:
             # Create and use anonymous user if no login provided
             if 'anonymous' not in self.users:
@@ -544,19 +562,20 @@ class FSDB(db.DB):
             return False
 
         if username not in self.users:
-            logger.warning(f"Login attempt for non-existent user: {username}")
+            logger.error(f"Login attempt for non-existent user: {username}")
             return False
 
         # Verify password
         stored_hash = self.users[username]['password']
         if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
             # Reset failed attempts on successful login
-            self.failed_login_attempts[username] = 0
-            self.users[username]['last_login'] = datetime.now().strftime("%y%m%d_%H%M%S")
+            self.users[username]['failed_attempts'] = 0
+            self.users[username]['last_login'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
             return True
 
         # Handle failed login attempt
         self._record_failed_attempt(username)
+        logger.error(f"Invalid credentials for user '{username}'")
         return False
 
     def user_exists(self, username: str) -> bool:
@@ -576,14 +595,13 @@ class FSDB(db.DB):
         bool
             ``True`` if the account is locked, otherwise ``False``.
         """
-        if username not in self.failed_login_attempts:
-            return False
-
-        attempts = self.failed_login_attempts.get(username, 0)
+        attempts = self.users[username].get('failed_attempts', 0)
         if attempts >= self.max_login_attempts:
-            last_attempt_str = self.users[username].get('last_failed_attempt')
-            last_attempt = datetime.strptime(last_attempt_str, "%y%m%d_%H%M%S")
-            if last_attempt and datetime.now() - last_attempt < self.lockout_duration:
+            last_attempt_str = self.users[username].get('last_failed_attempt', date_now(fmt='%Y-%m-%d_%H:%M:%S'))
+            last_attempt = datetime.strptime(last_attempt_str, '%Y-%m-%d_%H:%M:%S')
+            if datetime.now() - last_attempt < self.lockout_duration:
+                logger.warning(f"Locking account {username} for more than {self.max_login_attempts} consecutive failed login attempts.")
+                logger.info(f"Try logging in after {self.lockout_duration}min.")
                 return True
         return False
 
@@ -595,10 +613,12 @@ class FSDB(db.DB):
         username : str
             The username for which the failed login attempt is being recorded.
         """
-        current = self.failed_login_attempts.get(username, 0)
-        self.failed_login_attempts[username] = current + 1
-        self.users[username]['last_failed_attempt'] = datetime.now()
-        logger.warning(f"Failed login attempt (n={self.failed_login_attempts[username]}) for user: {username}")
+        self.users[username]['failed_attempts'] += 1
+        self.users[username]['last_failed_attempt'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
+        # Save the updated user data to file
+        self._save_users()
+        logger.warning(f"Failed login attempt (n={self.users[username]['failed_attempts']}) for user: {username}")
+        return
 
     def disconnect(self):
         """
@@ -658,6 +678,7 @@ class FSDB(db.DB):
             logger.info("Done!")
         else:
             logger.error(f"You are not connected to the database!")
+        return
 
     def scan_exists(self, scan_id: str) -> bool:
         """Check if a given scan ID exists in the database.
