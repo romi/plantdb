@@ -45,10 +45,23 @@ from enum import Enum
 from typing import Dict
 from typing import Optional
 
+from plantdb.commons.log import get_logger
+
 
 class LockType(Enum):
     SHARED = "shared"  # Read operations
     EXCLUSIVE = "exclusive"  # Write operations
+
+
+class LockError(Exception):
+    """Raised when lock acquisition fails."""
+
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class LockTimeoutError(Exception):
@@ -100,10 +113,10 @@ class ScanLockManager:
     --------
     >>> from plantdb.commons.fsdb.lock import ScanLockManager
     >>> manager = ScanLockManager('/path/to/local/database')
-    >>> lock = manager.acquire_lock('scan_id')
+    >>> lock = manager.acquire_lock('scan123')
     """
 
-    def __init__(self, base_path: str, default_timeout: float = 30.0):
+    def __init__(self, base_path: str, default_timeout: float = 30.0, **kwargs):
         """
         Lock manager constructor.
 
@@ -114,6 +127,11 @@ class ScanLockManager:
         default_timeout : float, optional
             The default timeout duration in seconds when attempting to acquire a lock.
             Default is 30.0 seconds.
+
+        Other Parameters
+        ----------------
+        log_level : str, optional
+            The log level (e.g., `DEBUG`, `INFO`). Default is `INFO`.
         """
         self.base_path = base_path
         self.default_timeout = default_timeout
@@ -121,9 +139,13 @@ class ScanLockManager:
         self._active_locks: Dict[str, Dict] = {}  # Track active locks
         self._lock_files: Dict[str, int] = {}  # File descriptors for locks
         self._thread_lock = threading.RLock()  # Thread-safe operations
+        self.logger = get_logger(__name__ + '.ScanLockManager',
+                                 log_file=kwargs.get("log_file", os.path.join(base_path, '.locks', 'lock_manager.log')),
+                                 log_level=kwargs.get("log_level", "INFO"))
 
         # Ensure locks directory exists
         os.makedirs(self.locks_dir, exist_ok=True)
+        self.logger.debug(f"Initialized ScanLockManager with base path: `{base_path}`")
 
         # Clean up stale locks on initialization
         self._cleanup_stale_locks()
@@ -166,6 +188,8 @@ class ScanLockManager:
         if not os.path.exists(self.locks_dir):
             return
 
+        self.logger.info("Starting cleanup of stale locks...")
+        cleaned_count = 0
         for filename in os.listdir(self.locks_dir):
             if filename.endswith('.lock'):
                 lock_path = os.path.join(self.locks_dir, filename)
@@ -176,9 +200,14 @@ class ScanLockManager:
                         fcntl.flock(f.fileno(), fcntl.LOCK_UN)
                     # If successful, lock was stale - remove it
                     os.unlink(lock_path)
+                    cleaned_count += 1
+                    self.logger.info(f"Removed stale lock file: {filename}")
                 except (OSError, IOError):
+                    self.logger.warning(f"Lock still active: {filename}")
                     # Lock is still active, keep it
                     pass
+        self.logger.info(f"Cleaned up {cleaned_count} stale lock files")
+        return
 
     def _write_lock_info(self, scan_id: str, lock_type: LockType, user: str):
         """Write lock metadata for monitoring and debugging"""
@@ -243,12 +272,15 @@ class ScanLockManager:
         timeout = timeout or self.default_timeout
         lock_key = f"{scan_id}_{lock_type.value}"
 
+        self.logger.debug(f"Attempting to acquire {lock_type.value} lock for scan {scan_id} by user {user}")
+
         with self._thread_lock:
             # Check if we already have this lock
             if lock_key in self._active_locks:
                 # For shared locks, allow multiple acquisitions
                 if lock_type == LockType.SHARED:
                     self._active_locks[lock_key]['count'] += 1
+                    self.logger.debug(f"Incrementing shared lock count for {scan_id}")
                     try:
                         yield
                         return
@@ -257,14 +289,14 @@ class ScanLockManager:
                         if self._active_locks[lock_key]['count'] <= 0:
                             self._release_lock(scan_id, lock_type)
                 else:
-                    raise LockTimeoutError(f"Exclusive lock already held for scan {scan_id}")
+                    raise LockError(f"Exclusive lock already held for scan {scan_id}")
 
         # Acquire new lock
         acquired = False
         start_time = time.time()
 
         try:
-            lock_file_path = self._get_lock_file_path(scan_id, lock_type)
+            lock_file_path = self._get_lock_file_path(scan_id)
 
             while time.time() - start_time < timeout:
                 try:
@@ -292,6 +324,7 @@ class ScanLockManager:
 
                     self._write_lock_info(scan_id, lock_type, user)
                     acquired = True
+                    self.logger.info(f"Successfully acquired {lock_type.value} lock for scan {scan_id}")
                     break
 
                 except (OSError, IOError) as e:
@@ -300,6 +333,7 @@ class ScanLockManager:
                         os.close(lock_fd)
                     except:
                         pass
+                    self.logger.warning(f"Lock acquisition attempt failed for {scan_id}, retrying...")
                     time.sleep(0.1)  # Brief pause before retry
 
             if not acquired:
@@ -346,6 +380,7 @@ class ScanLockManager:
         Improper use might lead to inconsistencies in the lock state or lost locks.
         """
         lock_key = f"{scan_id}_{lock_type.value}"
+        self.logger.info(f"Releasing {lock_type.value} lock for scan {scan_id}")
 
         with self._thread_lock:
             if lock_key in self._active_locks:
@@ -355,8 +390,9 @@ class ScanLockManager:
                         fd = self._lock_files[lock_key]
                         fcntl.flock(fd, fcntl.LOCK_UN)
                         os.close(fd)
-                    except:
-                        pass
+                        self.logger.debug(f"Closed file descriptor for {scan_id}")
+                    except Exception as e:
+                        self.logger.error(f"Error closing lock file for {scan_id}: {str(e)}")
                     del self._lock_files[lock_key]
 
                 # Remove from active locks
@@ -366,11 +402,14 @@ class ScanLockManager:
                 lock_file_path = self._get_lock_file_path(scan_id)
                 try:
                     os.unlink(lock_file_path)
-                except OSError:
-                    pass
+                    self.logger.debug(f"Removed lock file for {scan_id}")
+                except OSError as e:
+                    self.logger.error(f"Error removing lock file for {scan_id}: {str(e)}")
 
                 # Remove lock info
                 self._remove_lock_info(scan_id)
+                self.logger.info(f"Successfully released lock for scan {scan_id}")
+
 
     def get_lock_status(self, scan_id: str) -> Dict:
         """
@@ -402,7 +441,10 @@ class ScanLockManager:
 
         Examples
         --------
-        >>> status = get_lock_status("scan123")
+        >>> from plantdb.commons.fsdb.lock import ScanLockManager
+        >>> manager = ScanLockManager('/path/to/local/database')
+        >>> lock = manager.acquire_lock('scan123')
+        >>> status = manager.get_lock_status("scan123")
         >>> print(status)
         {'exclusive': None, 'shared': [{'user': 'user1', 'timestamp': '2023-01-01T12:00:00', 'count': 1}]}
         """
@@ -426,8 +468,10 @@ class ScanLockManager:
 
     def cleanup_all_locks(self):
         """Emergency cleanup of all locks (use with caution)"""
+        self.logger.warning("Cleaning up all active locks...")
         with self._thread_lock:
             for lock_key in list(self._active_locks.keys()):
                 scan_id, lock_type_str = lock_key.split('_', 1)
                 lock_type = LockType(lock_type_str)
                 self._release_lock(scan_id, lock_type)
+        return
