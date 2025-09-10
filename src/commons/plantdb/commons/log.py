@@ -35,8 +35,8 @@ LOG_LEVELS = set(logging._nameToLevel.keys()) - {"FATAL", "WARN"}
 DEFAULT_LOG_LEVEL = 'INFO'
 
 # Define the log message format for non-colored logs.
-# Includes the log level name, the logger name, the line number, and the log message itself.
-LOG_FMT = "{levelname:<8} [{name}] l.{lineno} {message}"
+# Includes the log time, log level name, the logger name, the line number, and the log message itself.
+LOG_FMT = "{asctime} {levelname:<8} [{name}] l.{lineno} {message}"
 
 # Define the log message format for colored logs.
 # The color is dynamically applied using `log_color` and `bg_blue` and reset after styling.
@@ -47,6 +47,7 @@ COLOR_LOG_FMT = "{log_color}{levelname:<8}{reset} {bg_blue}[{name}]{reset} {mess
 FORMATTER = logging.Formatter(
     LOG_FMT,
     style="{",
+    datefmt='%Y-%m-%d_%H:%M:%S',
 )
 
 # Create a colored logging formatter instance for enhanced log readability in terminal outputs.
