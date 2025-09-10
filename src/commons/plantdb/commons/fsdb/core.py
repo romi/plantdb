@@ -110,7 +110,6 @@ import bcrypt
 
 from plantdb.commons import db
 from plantdb.commons.log import get_logger
-from .exceptions import NotAnFSDBError
 from .file_ops import _delete_file
 from .file_ops import _delete_fileset
 from .file_ops import _delete_scan
@@ -130,7 +129,6 @@ from .path_helpers import _file_path
 from .path_helpers import _fileset_path
 from .path_helpers import _get_filename
 from .path_helpers import _scan_path
-from .validation import _is_fsdb
 from .validation import _is_valid_id
 from ..utils import date_now
 
@@ -332,9 +330,6 @@ class FSDB(db.DB):
         # Check the given path to root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
-        # Check the given path to root directory of the database is a "romi DB", i.e. have the `MARKER_FILE_NAME`:
-        if not _is_fsdb(basedir):
-            raise NotAnFSDBError(f"Not an FSDB! Check that there is a file named {MARKER_FILE_NAME} in {basedir}")
 
         self.basedir = Path(basedir).resolve()
         self.dummy = dummy
