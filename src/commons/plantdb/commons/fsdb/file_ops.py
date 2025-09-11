@@ -115,7 +115,6 @@ def _load_scan(db, scan_id):
     """
     from plantdb.commons.fsdb import Scan
     required_fs = db.required_filesets
-    req_files_json = db.required_files_json
 
     scan = Scan(db, scan_id)
     scan_path = _scan_path(scan)
@@ -126,15 +125,9 @@ def _load_scan(db, scan_id):
     else:
         req_subdir = True
 
-    # If the `files.json` associated to the scan is required, test if it exists:
-    if req_files_json:
-        req_file = _scan_json_file(scan).is_file()
-    else:
-        req_file = True
-
     if db.dummy and scan_path.is_dir():
         return scan
-    elif scan_path.is_dir() and req_subdir and req_file:
+    elif scan_path.is_dir() and req_subdir:
         # Parse the fileset, metadata and measure if:
         #  - path to scan directory exists
         #  - required subdirectories exists, if any

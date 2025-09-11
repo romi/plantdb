@@ -290,7 +290,7 @@ class FSDB(db.DB):
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
 
-    def __init__(self, basedir, required_filesets=['metadata'], required_files_json=True, dummy=False):
+    def __init__(self, basedir, required_filesets=['metadata'], dummy=False):
         """Database constructor.
 
         Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
@@ -303,9 +303,6 @@ class FSDB(db.DB):
             A list of required filesets to consider a scan valid.
             Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
             Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
-        required_files_json : bool, optional
-            Require the `files.json` file to exist in the `Scan` directory to consider it valid.
-            Defaults to ``True``.
         dummy : bool, optional
             If ``True``, deactivate any requirements `required_filesets` & `required_files_json`.
 
@@ -344,7 +341,6 @@ class FSDB(db.DB):
 
         # Configuration
         self.required_filesets = required_filesets if not dummy else None
-        self.required_files_json = required_files_json if not dummy else False
 
         # Initialize scan lock manager
         self.lock_manager = ScanLockManager(basedir)
