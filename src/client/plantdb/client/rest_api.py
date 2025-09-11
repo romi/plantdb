@@ -802,7 +802,7 @@ def scan_preview_image_url(scan_id, size="thumb", **kwargs):
     if scan_id not in scan_names:
         return None
 
-    thumb_uri = get_scan_data(scan_id)["thumbnailUri"]
+    thumb_uri = get_scan_data(scan_id, **kwargs)["thumbnailUri"]
     if size != "thumb":
         thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
     url = base_url(host=kwargs.get("host", REST_API_URL),
