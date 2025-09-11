@@ -587,7 +587,8 @@ class FSDB(db.DB):
             last_attempt_str = self.users[username].get('last_failed_attempt', date_now(fmt='%Y-%m-%d_%H:%M:%S'))
             last_attempt = datetime.strptime(last_attempt_str, '%Y-%m-%d_%H:%M:%S')
             if datetime.now() - last_attempt < self.lockout_duration:
-                logger.warning(f"Locking account {username} for more than {self.max_login_attempts} consecutive failed login attempts.")
+                logger.warning(
+                    f"Locking account {username} for more than {self.max_login_attempts} consecutive failed login attempts.")
                 logger.info(f"Try logging in after {self.lockout_duration}min.")
                 return True
         return False
@@ -834,14 +835,19 @@ class FSDB(db.DB):
 
             # Set initial metadata including owner
             initial_metadata = metadata or {}
-            initial_metadata['owner'] = self.user
-            initial_metadata['created'] = date_now('%Y-%m-%d_%H:%M:%S')
+            initial_metadata['owner'] = self.user  # owner is always set to the connected user
+            now = date_now('%Y-%m-%d_%H:%M:%S')
+            initial_metadata['created'] = now  # creation timestamp
+            initial_metadata['last_modified'] = now  # modification timestamp
             initial_metadata['created_by'] = self.user
 
-            scan.set_metadata(metadata)  # add metadata dictionary to the new scan
+            # Cannot use scan.set_metadata(initial_metadata) here as ownership is not granted yet!
+            _set_metadata(scan.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
+            _store_scan_metadata(scan)
 
-            # Reload scans to include the new one
-            self.reload(scan_id)
+            scan.store()  # store the new scan in the local database
+            # Update scans dictionary with newly created
+            self.scans[scan_id] = scan
 
             logger.info(f"Created scan '{scan_id}' for user '{self.user}'")
             return scan
@@ -956,7 +962,12 @@ class FSDB(db.DB):
         if query is None and not owner_only:
             return list(self.scans.keys())
         else:
-            return [scan.id for scan in self.get_scans(query, fuzzy, owner_only)]
+            if owner_only:
+                if query is None:
+                    query = {'owner': self.user}
+                else:
+                    query.update({'owner': self.user})
+            return [scan.id for scan in _filter_query(list(self.scans.values()), query, fuzzy)]
 
     def get_scan_lock_status(self, scan_id: str) -> Dict:
         """
@@ -1097,7 +1108,7 @@ class Scan(db.Scan):
         """
         super().__init__(db, scan_id)
         # Defines attributes:
-        self.metadata = None
+        self.metadata = {}
         self.filesets = {}
         self.measures = None
 
@@ -1105,7 +1116,7 @@ class Scan(db.Scan):
         """Erase the filesets and metadata associated to this scan."""
         for fs_id, fs in self.filesets.items():
             fs._erase()
-        self.metadata = None
+        self.metadata = {}
         self.filesets = {}
         self.measures = None
         return
@@ -1114,7 +1125,9 @@ class Scan(db.Scan):
     def owner(self):
         # If no owner is defined, set it to the anonymous user
         if 'owner' not in self.metadata:
-            self.set_metadata('owner', "anonymous")
+            _set_metadata(self.metadata, 'owner', 'anonymous')
+            _store_scan_metadata(self)
+            self.db.reload(self.id)
         return self.metadata.get('owner')
 
     def fileset_exists(self, fileset_id: str) -> bool:
@@ -1289,18 +1302,16 @@ class Scan(db.Scan):
             raise ValueError("No user authenticated")
 
         # Check ownership for metadata changes
-        current_owner = self.owner()
+        current_owner = self.owner
         if current_owner and current_owner != self.db.user:
             raise PermissionError(f"Only the owner can modify metadata for scan '{self.id}'")
 
         # Use exclusive lock for metadata updates
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, self.db.user):
-            if self.metadata == None:
-                self.metadata = {}
             # Update metadata
             _set_metadata(self.metadata, data, value)
             # Ensure modification timestamp
-            self.metadata['last_modified'] = date_now('%Y-%m-%d_%H:%M:%S')
+            _set_metadata(self.metadata, 'last_modified', date_now('%Y-%m-%d_%H:%M:%S'))
             _store_scan_metadata(self)
 
             logger.info(f"Updated metadata for scan '{self.id}' by user '{self.db.user}'")
@@ -1353,7 +1364,7 @@ class Scan(db.Scan):
         if not self.db.user:
             raise ValueError("No user authenticated")
         # Check ownership
-        if self.owner() != self.db.user:
+        if self.owner != self.db.user:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(fs_id):
@@ -1368,16 +1379,22 @@ class Scan(db.Scan):
             # Create the new fileset
             fileset = Fileset(self, fs_id)  # Initialize fileset instance
             _make_fileset(fileset)  # Create directory structure
-            self.store()  # Store fileset instance to the
-            self.filesets.update({fs_id: fileset})  # Update scan's filesets dictionary
 
             # Set initial metadata
             initial_metadata = metadata or {}
-            initial_metadata['created'] = date_now('%Y-%m-%d_%H:%M:%S')
+            now = date_now('%Y-%m-%d_%H:%M:%S')
+            initial_metadata['created'] = now  # creation timestamp
+            initial_metadata['last_modified'] = now  # modification timestamp
             initial_metadata['created_by'] = self.db.user
-            fileset.set_metadata(initial_metadata)
 
-            logger.info(f"Created new fileset '{fs_id}' in scan  '{self.id}' for user '{self.db.user}'")
+            # Cannot use fileset.set_metadata(initial_metadata) here as ownership is not granted yet!
+            _set_metadata(fileset.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
+            _store_fileset_metadata(fileset)
+
+            fileset.store()  # Store fileset instance to the JSON
+            self.filesets[fs_id] = fileset  # Update scan's filesets dictionary
+
+            logger.info(f"Created new fileset '{fs_id}' in scan '{self.id}' for user '{self.db.user}'")
 
         return fileset
 
@@ -1410,7 +1427,7 @@ class Scan(db.Scan):
         if not self.db.user:
             raise ValueError("No user authenticated")
         # Check ownership
-        if self.owner() != self.db.user:
+        if self.owner != self.db.user:
             raise PermissionError(f"Only the owner can delete filesets from scan '{self.id}'")
 
         # Use exclusive lock for fileset deletion
@@ -1471,7 +1488,7 @@ class Scan(db.Scan):
         if query == None:
             return list(self.filesets.keys())
         else:
-            return [fs.id for fs in self.get_filesets(query, fuzzy)]
+            return [fs.id for fs in _filter_query(list(self.filesets.values()), query, fuzzy)]
 
 
 class Fileset(db.Fileset):
@@ -1512,7 +1529,7 @@ class Fileset(db.Fileset):
         """
         super().__init__(scan, fs_id)
         # Defines attributes:
-        self.metadata = None
+        self.metadata = {}
         self.files = {}
 
     def _erase(self):
@@ -1520,7 +1537,7 @@ class Fileset(db.Fileset):
         for f_id, f in self.files.items():
             f._erase()
         # Reinitialize the attributes
-        self.metadata = None
+        self.metadata = {}
         self.files = {}
         return
 
@@ -1680,8 +1697,6 @@ class Fileset(db.Fileset):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if self.metadata == None:
-            self.metadata = {}
         _set_metadata(self.metadata, data, value)
         # Ensure modification timestamp
         self.metadata['last_modified'] = date_now('%Y-%m-%d_%H:%M:%S')
@@ -1729,7 +1744,7 @@ class Fileset(db.Fileset):
             raise IOError(f"Given file identifier '{f_id}' already exists!")
 
         file = File(self, f_id)
-        self.files.update({f_id: file})
+        self.files[f_id] = file
         self.store()
         return file
 
@@ -1827,7 +1842,7 @@ class Fileset(db.Fileset):
         if query is None:
             return list(self.files.keys())
         else:
-            return [f.id for f in self.get_files(query, fuzzy)]
+            return [f.id for f in _filter_query(list(self.files.values()), query, fuzzy)]
 
 
 class File(db.File):
@@ -1860,11 +1875,11 @@ class File(db.File):
 
     def __init__(self, fileset, f_id, **kwargs):
         super().__init__(fileset, f_id, **kwargs)
-        self.metadata = None
+        self.metadata = {}
 
     def _erase(self):
         self.id = None
-        self.metadata = None
+        self.metadata = {}
         return
 
     def get_metadata(self, key=None, default={}):
@@ -1926,8 +1941,6 @@ class File(db.File):
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if self.metadata == None:
-            self.metadata = {}
         _set_metadata(self.metadata, data, value)
         # Ensure modification timestamp
         self.metadata['last_modified'] = date_now('%Y-%m-%d_%H:%M:%S')
