@@ -43,7 +43,7 @@ This module provides a robust synchronization mechanism for File System Database
 ### Local Path to Local Path
 Create two test databases, a source with a dataset and a target without dataset, then sync them.
 ```python
->>> from plantdb.commons.sync import FSDBSync
+>>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database
 >>> db_source = test_database()
@@ -72,7 +72,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 
 ### FSDB instance to Local Path
 ```python
->>> from plantdb.commons.sync import FSDBSync
+>>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database
 >>> db_source = test_database()
@@ -91,7 +91,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 
 ### Local path to HTTP REST API
 ```python
->>> from plantdb.commons.sync import FSDBSync
+>>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.server.test_rest_api import TestRestApiServer
 >>> from plantdb.client.rest_api import list_scan_names
 >>> from plantdb.commons.test_database import test_database
@@ -159,7 +159,6 @@ import urllib3
 from plantdb.client.rest_api import download_scan_archive
 from plantdb.client.rest_api import upload_scan_archive
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.fsdb.core import LOCK_FILE_NAME
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 
@@ -195,7 +194,7 @@ class FSDBSync():
 
     Examples
     --------
-    >>> from plantdb.commons.sync import FSDBSync
+    >>> from plantdb.client.sync import FSDBSync
     >>> from plantdb.commons.test_database import test_database
     >>> # Example: Create two test databases, a source with a dataset and a target without dataset, then sync them.
     >>> # Create a test source database
@@ -273,46 +272,17 @@ class FSDBSync():
     def lock(self):
         """Lock both source and target databases prior to sync."""
         for db in [self.source, self.target]:
-            if db["type"] == "fsdb":
-                self._lock_fsdb(db)
-            elif db["type"] == "local":
-                self._lock_local(db)
-            elif db["type"] == "ssh":
+            if db["type"] == "ssh":
                 self._lock_remote(db)
             # HTTP databases don't need locking
+            # FSDB databases don't need locking
 
     def unlock(self):
         """Unlock both source and target databases after sync."""
         for db in [self.source, self.target]:
-            if db["type"] == "fsdb":
-                self._unlock_fsdb(db)
-            elif db["type"] == "local":
-                self._unlock_local(db)
-            elif db["type"] == "ssh":
+            if db["type"] == "ssh":
                 self._unlock_remote(db)
             # HTTP databases don't need locking
-
-    def _lock_fsdb(self, db):
-        """Lock an FSDB instance."""
-        fsdb = db["fsdb"]
-        if not fsdb.is_connected:
-            fsdb.connect()
-
-    def _unlock_fsdb(self, db):
-        """Unlock an FSDB instance."""
-        fsdb = db["fsdb"]
-        if fsdb.is_connected:
-            fsdb.disconnect()
-
-    def _lock_local(self, db):
-        """Create a local lock file."""
-        lock_path = db["lock_path"]
-        try:
-            # Use 'x' mode for exclusive creation
-            with lock_path.open(mode="x") as _:
-                pass
-        except FileExistsError:
-            raise IOError(f"Could not secure lock, {lock_path.name} is present in DB path.")
 
     def _lock_remote(self, db):
         """Create a remote lock file using SFTP."""
@@ -1009,7 +979,7 @@ def config_from_url(url):
 
     Examples
     --------
-    >>> from plantdb.commons.sync import config_from_url
+    >>> from plantdb.client.sync import config_from_url
     >>> config = config_from_url("http://localhost:5014/api/")
     >>> print(config)
     {'protocol': 'http', 'host': 'localhost', 'port': 5014, 'prefix': '/api/', 'ssl': False}
@@ -1064,7 +1034,7 @@ def _parse_database_spec(spec):
 
     Examples
     --------
-    >>> from plantdb.commons.sync import _parse_database_spec
+    >>> from plantdb.client.sync import _parse_database_spec
     >>> from plantdb.commons.fsdb import FSDB
     >>>
     >>> # FSDB instance
@@ -1104,7 +1074,6 @@ def _parse_database_spec(spec):
             "type": "fsdb",
             "fsdb": spec,
             "path": spec.path(),
-            "lock_path": spec.path() / LOCK_FILE_NAME,
             "marker_path": spec.path() / MARKER_FILE_NAME,
         }
 
@@ -1133,7 +1102,6 @@ def _parse_database_spec(spec):
             "type": "ssh",
             "host": host,
             "path": path,
-            "lock_path": path / LOCK_FILE_NAME,
             "marker_path": path / MARKER_FILE_NAME,
         }
 
@@ -1146,6 +1114,5 @@ def _parse_database_spec(spec):
         "type": "local",
         "host": '',
         "path": path,
-        "lock_path": path / LOCK_FILE_NAME,
         "marker_path": path / MARKER_FILE_NAME,
     }
