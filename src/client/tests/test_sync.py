@@ -16,8 +16,8 @@ class TestSyncDummy(DummyDBTestCase):
         db.dummy = False
         db.disconnect()
         with tempfile.TemporaryDirectory() as tmpdir:
-            lock_path = Path(tmpdir) / MARKER_FILE_NAME
-            with lock_path.open(mode="x") as _:
+            marker_path = Path(tmpdir) / MARKER_FILE_NAME
+            with marker_path.open(mode="x") as _:
                 x = FSDBSync(db.path(), tmpdir)
                 x.sync()
     # How to test remote sync?
