@@ -49,6 +49,12 @@ class FilesetNotFoundError(Exception):
         super().__init__(f"Unknown fileset id '{fs_id}' in scan '{scan.id}'!")
 
 
+class FileNotFoundError(Exception):
+    """Could not find the file."""
+    def __init__(self, fs, f_id: str):
+        super().__init__(f"Unknown file id '{f_id}' in scan/fileset '{fs.scan.id}/{fs.id}'!")
+
+
 class FilesetNoIDError(Exception):
     """No 'id' entry could be found for this fileset."""
 
