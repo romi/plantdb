@@ -226,7 +226,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
     # Connect to the database:
     db = FSDB(db_location)
     logger.info(f"Connecting to local plant database located at '{db.path()}'...")
-    db.connect(unsafe=True)  # to avoid locking the database
+    db.connect()
     logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
 
     # Initialize RESTful resources to serve:
