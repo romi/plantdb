@@ -1076,7 +1076,7 @@ class Scan(db.Scan):
     >>> from os import environ
     >>> from plantdb.commons.fsdb import FSDB
     >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
-    >>> db.connect(unsafe=True)
+    >>> db.connect()
     >>> scan = db.get_scan('sango_90_300_36')
     >>> scan.get_metadata()
     """
