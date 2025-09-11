@@ -29,7 +29,7 @@ between different database types (local, SSH, HTTP).
 >>> from plantdb.server.test_rest_api import TestRestApiServer
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database
->>> db_source = test_database()
+>>> db_source = test_database("all")
 >>> # Create a test target database
 >>> db_target = TestRestApiServer(test=True, empty=True)
 >>> db_target.start()
