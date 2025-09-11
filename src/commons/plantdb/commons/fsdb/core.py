@@ -51,7 +51,6 @@ Assuming that the `FSDB` root database directory is `dbroot/`, there is a `Scan`
     ├── myscan_002/                    # scan dataset directory, id=`myscan_002`
     :
     ├── users.json                     # user registry
-    ├── (LOCK_FILE_NAME)               # "lock file", present if DB is connected
     └── MARKER_FILE_NAME               # ROMI DB marker file
 ```
 
@@ -110,6 +109,9 @@ import bcrypt
 
 from plantdb.commons import db
 from plantdb.commons.log import get_logger
+from .exceptions import FileNotFoundError
+from .exceptions import FilesetNotFoundError
+from .exceptions import ScanNotFoundError
 from .file_ops import _delete_file
 from .file_ops import _delete_fileset
 from .file_ops import _delete_scan
@@ -242,7 +244,6 @@ class FSDB(db.DB):
     Implement as a simple local file structure with following directory structure and marker files:
       * directory ``${FSDB.basedir}`` as database root directory;
       * marker file ``MARKER_FILE_NAME`` at database root directory;
-      * (OPTIONAL) lock file ``LOCK_FILE_NAME`` at database root directory when connected;
 
     Attributes
     ----------
@@ -256,13 +257,11 @@ class FSDB(db.DB):
     Notes
     -----
     Requires the marker file ``MARKER_FILE_NAME`` at the given ``basedir``.
-    Lock file ``LOCK_FILE_NAME`` is found only when connecting an FSBD instance to the given ``basedir``.
 
     See Also
     --------
     plantdb.commons.db.DB
     plantdb.commons.fsdb.core.MARKER_FILE_NAME
-    plantdb.commons.fsdb.core.LOCK_FILE_NAME
 
     Examples
     --------
@@ -340,7 +339,7 @@ class FSDB(db.DB):
         self.scans = {}
 
         # Configuration
-        self.required_filesets = required_filesets if not dummy else None
+        self.required_filesets = required_filesets
 
         # Initialize scan lock manager
         self.lock_manager = ScanLockManager(basedir)
@@ -454,23 +453,11 @@ class FSDB(db.DB):
     def connect(self, login=None, password=""):
         """Connect to the local database.
 
-        Handle DB "locking" system by adding a `LOCK_FILE_NAME` file in the DB.
-
         Parameters
         ----------
         login : str, optional
             The user login, if not defined, use the ``'anonymous'`` user.
             If defined, it should match a known user.
-
-        Raises
-        ------
-        plantdb.commons.db.DBBusyError
-            If the database is already used by another process.
-            This is achieved by searching for a `LOCK_FILE_NAME` lock file in the `basedir`.
-
-        See Also
-        --------
-        plantdb.commons.fsdb.LOCK_FILE_NAME
 
         Examples
         --------
@@ -764,9 +751,9 @@ class FSDB(db.DB):
         # Use shared lock for read operations
         with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, self.user or "anonymous"):
             if not self.scan_exists(scan_id):
-                raise ValueError(f"Scan '{scan_id}' does not exist")
+                raise ScanNotFoundError(self, scan_id)
 
-            return Scan(self, scan_id)
+            return self.scans[scan_id]
 
     def create_scan(self, scan_id, metadata=None):
         """Create a new ``Scan`` instance in the local database.
@@ -899,14 +886,13 @@ class FSDB(db.DB):
                 return
 
             # Get the Scan instance from database
-            scan = self.get_scan(scan_id)
+            scan = self.scans[scan_id]
             # Check ownership
-            if scan.owner() != self.user:
+            if scan.owner != self.user:
                 raise PermissionError(f"Only the owner can delete scan '{scan_id}'")
 
             _delete_scan(scan)  # delete the scan directory
             self.scans.pop(scan_id)  # remove the scan from the scan list
-
             logger.info(f"Deleted scan '{scan_id}' by user '{self.user}'")
 
         return
@@ -1068,7 +1054,7 @@ class Scan(db.Scan):
 
     >>> # Example #2: Get it from an `FSDB` object:
     >>> db = dummy_db()
-    >>> scan = db.get_scan('007', create=True)
+    >>> scan = db.create_scan('007')
     >>> print(type(scan))
     <class 'plantdb.commons.fsdb.Scan'>
     >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
@@ -1211,7 +1197,7 @@ class Scan(db.Scan):
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
         ['fileset_001']
-        >>> new_fileset = scan.get_fileset('007', create=True)
+        >>> new_fileset = scan.create_fileset('007')
         >>> print(new_fileset)
         <plantdb.commons.fsdb.Fileset object at **************>
         >>> scan.list_filesets()
@@ -1225,9 +1211,9 @@ class Scan(db.Scan):
         # Use shared lock for read operations
         with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, self.db.user or "anonymous"):
             if not self.fileset_exists(fs_id):
-                raise ValueError(f"Fileset '{fs_id}' does not exist in scan '{self.id}'")
+                raise FilesetNotFoundError(self, fs_id)
 
-            return Fileset(self, fs_id)
+            return self.filesets[fs_id]
 
     def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a scan.
@@ -1436,7 +1422,8 @@ class Scan(db.Scan):
             if not self.fileset_exists(fs_id):
                 raise ValueError(f"Fileset '{fs_id}' does not exist in scan '{self.id}'")
 
-            _delete_fileset(self.get_fileset(fs_id, create=False))  # delete the fileset
+            fs = self.filesets[fs_id]
+            _delete_fileset(fs)  # delete the fileset
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
             self.store()  # save the changes to the scan main JSON FILE (``files.json``)
 
@@ -1626,10 +1613,12 @@ class Fileset(db.Fileset):
         >>> img = read_image(f)
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if self.file_exists(f_id):
+        # Use shared lock for read operations
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, self.db.user or "anonymous"):
+            if not self.file_exists(f_id):
+                raise FileNotFoundError(self, f_id)
+
             return self.files[f_id]
-        else:
-            raise FileNotFoundError(f_id)
 
     def get_metadata(self, key=None, default={}):
         """Get the metadata associated to a fileset.
@@ -1800,7 +1789,8 @@ class Fileset(db.Fileset):
             logging.warning(f"Given file identifier '{f_id}' does NOT exists!")
             return
 
-        _delete_file(self.get_file(f_id, create=False))  # delete the file
+        f = self.files[f_id]
+        _delete_file(f)  # delete the file
         self.files.pop(f_id)  # remove the File instance from the fileset
         self.store()  # save the changes to the scan main JSON FILE (``files.json``)
         return
