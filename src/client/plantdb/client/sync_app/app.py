@@ -572,7 +572,7 @@ def get_scans_for_db(config):
         if config["type"] == "local":
             path = Path(config["spec"])
             db = FSDB(path)
-            db.connect(unsafe=True)
+            db.connect()
             return db.list_scans(owner_only=False)
         elif config["type"] == "http":
             from plantdb.client.rest_api import refresh_url
