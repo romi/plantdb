@@ -819,19 +819,19 @@ class FSDB(db.DB):
         # Verify if a user is authenticated
         if not self.user:
             raise ValueError("No user authenticated")
+        # Verify if the given `scan_id` is valid
+        if not _is_valid_id(scan_id):
+            raise IOError(f"Invalid scan identifier '{scan_id}'!")
 
         # Use exclusive lock for scan creation
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, self.user):
-            # Verify if the given `scan_id` is valid
-            if not _is_valid_id(scan_id):
-                raise IOError(f"Invalid scan identifier '{scan_id}'!")
             # Verify if the given `scan_id` already exists in the local database
             if self.scan_exists(scan_id):
                 raise IOError(f"Given scan identifier '{scan_id}' already exists!")
 
             # Initialize scan object
-            scan = Scan(self, scan_id)
-            _make_scan(scan)
+            scan = Scan(self, scan_id)  # Initialize a new Scan instance
+            _make_scan(scan)  # Create directory structure
 
             # Set initial metadata including owner
             initial_metadata = metadata or {}
@@ -846,8 +846,7 @@ class FSDB(db.DB):
             _store_scan_metadata(scan)
 
             scan.store()  # store the new scan in the local database
-            # Update scans dictionary with newly created
-            self.scans[scan_id] = scan
+            self.scans[scan_id] = scan  # Update scans dictionary with newly created
 
             logger.info(f"Created scan '{scan_id}' for user '{self.user}'")
             return scan
@@ -1371,13 +1370,14 @@ class Scan(db.Scan):
             raise IOError(f"Invalid fileset identifier '{fs_id}'!")
 
         # Use exclusive lock for fileset creation
+        logger.info(f"Creating fileset '{fs_id}' from scan '{self.id}'")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, self.db.user):
             # Verify if the given `fs_id` already exists in the local database
             if self.fileset_exists(fs_id):
                 raise ValueError(f"Fileset '{fs_id}' already exists in scan '{self.id}'")
 
-            # Create the new fileset
-            fileset = Fileset(self, fs_id)  # Initialize fileset instance
+            # Create the new Fileset
+            fileset = Fileset(self, fs_id)  # Initialize a new Fileset instance
             _make_fileset(fileset)  # Create directory structure
 
             # Set initial metadata
@@ -1388,11 +1388,11 @@ class Scan(db.Scan):
             initial_metadata['created_by'] = self.db.user
 
             # Cannot use fileset.set_metadata(initial_metadata) here as ownership is not granted yet!
-            _set_metadata(fileset.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
+            _set_metadata(fileset.metadata, initial_metadata, None)  # add metadata dictionary to the new fileset
             _store_fileset_metadata(fileset)
 
-            fileset.store()  # Store fileset instance to the JSON
-            self.filesets[fs_id] = fileset  # Update scan's filesets dictionary
+            self.filesets.update({fs_id: fileset})  # Update scan's filesets dictionary
+            self.store()  # Store fileset instance to the JSON
 
             logger.info(f"Created new fileset '{fs_id}' in scan '{self.id}' for user '{self.db.user}'")
 
@@ -1703,7 +1703,7 @@ class Fileset(db.Fileset):
         _store_fileset_metadata(self)
         return
 
-    def create_file(self, f_id):
+    def create_file(self, f_id, metadata=None):
         """Create a new `File` instance in the local database attached to the current `Fileset` instance.
 
         Parameters
@@ -1736,16 +1736,38 @@ class Fileset(db.Fileset):
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        # Check authentication for file creation
+        if not self.db.user:
+            raise ValueError("No user authenticated")
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(f_id):
             raise IOError(f"Invalid file identifier '{f_id}'!")
-        # Verify if the given `fs_id` already exists in the local database
-        if self.file_exists(f_id):
-            raise IOError(f"Given file identifier '{f_id}' already exists!")
 
-        file = File(self, f_id)
-        self.files[f_id] = file
-        self.store()
+        # Use exclusive lock for file creation
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, self.db.user):
+            # Verify if the given `fs_id` already exists in the local database
+            if self.file_exists(f_id):
+                raise IOError(f"Given file identifier '{f_id}' already exists!")
+
+            # Create the new File
+            file = File(self, f_id)  # Initialize a new File instance
+
+            # Set initial metadata
+            initial_metadata = metadata or {}
+            now = date_now('%Y-%m-%d_%H:%M:%S')
+            initial_metadata['created'] = now  # creation timestamp
+            initial_metadata['last_modified'] = now  # modification timestamp
+            initial_metadata['created_by'] = self.db.user
+
+            # Cannot use fileset.set_metadata(initial_metadata) here as ownership is not granted yet!
+            _set_metadata(file.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
+            _store_file_metadata(file)
+
+            self.files.update({f_id: file})  # Update filesets's files dictionary
+            self.store()  # Store fileset instance to the JSON
+
+            logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{self.db.user}'")
+
         return file
 
     def delete_file(self, f_id):
