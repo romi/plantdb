@@ -551,10 +551,12 @@ def test_availability(url):
     """Verifies the connectivity to a given host and port from a URL-like string.
     This function parses a URL string into host and port components, attempts to establish a
     socket connection to check its availability, and raises appropriate exceptions on failure.
+
     Parameters
     ----------
     url : str
         A URL string in various formats like 'http://host:port', 'https://host/path/', etc.
+
     Raises
     ------
     ValueError
@@ -564,6 +566,12 @@ def test_availability(url):
         be unavailable.
     RuntimeError
         If an unexpected error occurs during the verification process.
+
+    Returns
+    -------
+    bool
+        `True` if the server is available, raise an error otherwise.
+
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
@@ -597,7 +605,7 @@ def test_availability(url):
         raise e
     except Exception as e:
         raise RuntimeError(f"Unexpected error during connection check: {e}")
-
+    return True
 
 def list_scan_names(**kwargs):
     """List the names of the scan datasets served by the PlantDB REST API.
