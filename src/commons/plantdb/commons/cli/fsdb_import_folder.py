@@ -40,7 +40,7 @@ def main():
     db = FSDB(db_path)
     db.connect()
 
-    scan = db.get_scan(scan_id, create=True)
+    scan = db.create_scan(scan_id)
 
     folder_path = args.folder.rstrip('/')
     path = folder_path.split('/')

@@ -39,8 +39,8 @@ def main():
     db = FSDB(db_path)
     db.connect()
 
-    scan = db.get_scan(scan_id, create=True)
-    fileset = scan.get_fileset(fileset_id, create=True)
+    scan = db.create_scan(scan_id)
+    fileset = scan.create_fileset(fileset_id)
     file = fileset.create_file(file_id)
     file.import_file(args.file)
 

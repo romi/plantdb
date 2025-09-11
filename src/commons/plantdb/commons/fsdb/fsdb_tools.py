@@ -77,7 +77,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
         )
         return None
     # Get or create the scan instance
-    scan = db.get_scan(scan_id, create=False)
+    scan = db.get_scan(scan_id)
     # Add metadata to the scan
     scan.set_metadata(metadata)
     # Return the updated scan instance
