@@ -106,9 +106,9 @@ def __file_path(db, scan_id, fileset_id, file_id):
     pathlib.Path
         The path to the file.
     """
-    scan = db.get_scan(scan_id, create=False)
-    fs = scan.get_fileset(fileset_id, create=False)
-    f = fs.get_file(file_id, create=False)
+    scan = db.get_scan(scan_id)
+    fs = scan.get_fileset(fileset_id)
+    f = fs.get_file(file_id)
     return db.basedir / scan.id / fs.id / f.filename
 
 

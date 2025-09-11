@@ -1239,7 +1239,7 @@ class ScansTable(Resource):
 
         scans_info = []
         for scan_id in scans_list:
-            scans_info.append(get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger))
+            scans_info.append(get_scan_info(self.db.get_scan(scan_id), logger=self.logger))
         return scans_info
 
 
@@ -1326,7 +1326,7 @@ class Scan(Resource):
         """
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
-        return get_scan_info(self.db.get_scan(scan_id, create=False), logger=self.logger)
+        return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
 
     @rate_limit(max_requests=15, window_seconds=60)
     def post(self, scan_id):
@@ -1362,7 +1362,7 @@ class Scan(Resource):
         scan_id = sanitize_name(scan_id)
         try:
             # Attempt to create a new scan in the database with the given scan_id
-            scan = self.db.get_scan(scan_id, create=True)
+            scan = self.db.create_scan(scan_id)
             # Check if scan creation was successful
             if scan is None:
                 self.logger.error(f"Failed to create scan: {scan_id}")
@@ -2651,7 +2651,7 @@ class Archive(Resource):
 
         # Proceed with processing the valid ZIP file
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
-        scan_path = Path(self.db.get_scan(scan_id, create=True).path())
+        scan_path = Path(self.db.create_scan(scan_id).path())
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
 
         if is_directory_in_archive(temp_path, scan_id):
@@ -2842,7 +2842,7 @@ class ScanMetadata(Resource):
         key = request.args.get('key', default=None, type=str)
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -2909,7 +2909,7 @@ class ScanMetadata(Resource):
                 return {'message': 'Metadata must be a dictionary'}, 400
 
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -2991,7 +2991,7 @@ class ScanFilesets(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -3088,7 +3088,7 @@ class FilesetCreate(Resource):
             # Sanitize the name
             fs_id = sanitize_name(data['fileset_id'])
             # Get the scan
-            scan = self.db.get_scan(data['scan_id'], create=False)
+            scan = self.db.get_scan(data['scan_id'])
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Create the fileset
@@ -3183,7 +3183,7 @@ class FilesetMetadata(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3271,7 +3271,7 @@ class FilesetMetadata(Resource):
                 return {'message': 'Metadata must be a dictionary'}, 400
 
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -3349,7 +3349,7 @@ class FilesetFiles(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3478,7 +3478,7 @@ class FileCreate(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3575,7 +3575,7 @@ class FileMetadata(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3647,7 +3647,7 @@ class FileMetadata(Resource):
                 return {'message': 'Metadata must be a dictionary'}, 400
 
             # Get the scan
-            scan = self.db.get_scan(scan_id, create=False)
+            scan = self.db.get_scan(scan_id)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
