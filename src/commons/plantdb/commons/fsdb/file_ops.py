@@ -169,7 +169,6 @@ def _load_scans(db):
     >>> from plantdb.commons.fsdb import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scans
     >>> db = dummy_db()
-    >>> db.connect()
     >>> db.create_scan("007")
     >>> db.create_scan("111")
     >>> scans = _load_scans(db)
@@ -192,8 +191,12 @@ def _load_scans(db):
     # Loop through the directories and load them as scan if they meet the criteria
     scans = {}
     for dir_name in tqdm(dir_names, unit="scan"):
-        scan_name = dir_name.name
+        scan_name = dir_name.name  # get the scan name from the directory
+        if scan_name.startswith('.'):
+            continue  # ignore dot-folders (hidden)
+        # Try to load each scan directory as a `Scan` instance with:
         scan = _load_scan(db, scan_name)
+        # If the scan could be loaded, add it to the dictionary of scans
         if scan is not None:
             scans[scan_name] = scan
     return scans
