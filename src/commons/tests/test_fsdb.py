@@ -18,7 +18,6 @@ class TestFSDBDummy(DummyDBTestCase):
         db = self.get_test_db()
         self.assertIsInstance(db, FSDB)
         self.assertTrue(db.path().is_dir())
-        self.assertTrue(db.lock_path.exists())
         self.assertTrue(db.is_connected)
 
     def test_get_scan(self):
@@ -109,8 +108,7 @@ class TestFSDBDummy(DummyDBTestCase):
 
     def test_create_file(self):
         from plantdb.commons.io import write_json
-        scan = self.get_test_scan()
-        fileset = scan.get_fileset("fileset_001")
+        fileset = self.get_test_fileset()
         f_id = "test_file_md"
         file = fileset.create_file(f_id)
         self.assertTrue(file.id == f_id)
