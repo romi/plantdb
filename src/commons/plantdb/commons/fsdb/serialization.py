@@ -145,9 +145,9 @@ def _file_to_dict(file):
     Returns
     -------
     dict
-        ``{"id": file.get_id(), "file": file.filename}``
+        ``{"id": file.id, "file": file.filename}``
     """
-    return {"id": file.get_id(), "file": file.filename}
+    return {"id": file.id, "file": file.filename}
 
 
 def _fileset_to_dict(fileset):
@@ -161,16 +161,16 @@ def _fileset_to_dict(fileset):
     Returns
     -------
     dict
-        ``{"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}``
+        ``{"id": fileset.id, "files": {"id": file.id, "file": file.filename}}``
 
     See Also
     --------
     plantdb.commons.fsdb._file_to_dict
     """
     files = []
-    for f in fileset.get_files():
+    for f in fileset.files.values():
         files.append(_file_to_dict(f))
-    return {"id": fileset.get_id(), "files": files}
+    return {"id": fileset.id, "files": files}
 
 
 def _scan_to_dict(scan):
@@ -184,7 +184,7 @@ def _scan_to_dict(scan):
     Returns
     -------
     dict
-        ``{"filesets": {"id": fileset.get_id(), "files": {"id": file.get_id(), "file": file.filename}}}``
+        ``{"filesets": {"id": fileset.id, "files": {"id": file.id, "file": file.filename}}}``
 
     See Also
     --------
@@ -192,6 +192,6 @@ def _scan_to_dict(scan):
     plantdb.commons.fsdb._file_to_dict
     """
     filesets = []
-    for fileset in scan.get_filesets():
+    for fileset in scan.filesets.values():
         filesets.append(_fileset_to_dict(fileset))
     return {"filesets": filesets}
