@@ -136,8 +136,6 @@ logger = get_logger(__name__)
 
 #: This file must exist in the root of a folder for it to be considered a valid DB
 MARKER_FILE_NAME = "romidb"
-#: This file prevents opening the DB if it is present in the root folder of a DB
-LOCK_FILE_NAME = "lock"
 
 
 def dummy_db(with_scan=False, with_fileset=False, with_file=False):
@@ -250,8 +248,6 @@ class FSDB(db.DB):
     ----------
     basedir : pathlib.Path
         The absolute path to the base directory hosting the database.
-    lock_path : pathlib.Path
-        The absolute path to the lock file.
     scans : dict[str, plantdb.commons.fsdb.Scan]
         The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool

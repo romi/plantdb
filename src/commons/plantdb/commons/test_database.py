@@ -404,9 +404,6 @@ def setup_empty_database(out_path=None):
     # Make sure the marker file exists:
     marker_path = out_path / MARKER_FILE_NAME
     marker_path.touch(exist_ok=True)
-    # Make sure the locking file does NOT exist:
-    lock_path = out_path / LOCK_FILE_NAME
-    lock_path.unlink(missing_ok=True)
 
     return out_path
 
