@@ -865,6 +865,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../commons/fsdb/lock/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    lock
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../commons/fsdb/metadata/" class="md-nav__link">
         
   
@@ -2077,7 +2100,7 @@ between different database types (local, SSH, HTTP).</p>
 <div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> test_database
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test source database</span>
-<span style="color: #666">&gt;&gt;&gt;</span> db_source <span style="color: #666">=</span> test_database()
+<span style="color: #666">&gt;&gt;&gt;</span> db_source <span style="color: #666">=</span> test_database(<span style="color: #BA2121">&quot;all&quot;</span>)
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a test target database</span>
 <span style="color: #666">&gt;&gt;&gt;</span> db_target <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #666">&gt;&gt;&gt;</span> db_target<span style="color: #666">.</span>start()
@@ -2630,7 +2653,7 @@ between different database types (local, SSH, HTTP).</p>
         <span style="color: #008000; font-weight: bold">if</span> config[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
             path <span style="color: #666">=</span> Path(config[<span style="color: #BA2121">&quot;spec&quot;</span>])
             db <span style="color: #666">=</span> FSDB(path)
-            db<span style="color: #666">.</span>connect(unsafe<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+            db<span style="color: #666">.</span>connect()
             <span style="color: #008000; font-weight: bold">return</span> db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
         <span style="color: #008000; font-weight: bold">elif</span> config[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span>:
             <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> refresh_url
