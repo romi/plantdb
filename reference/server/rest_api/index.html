@@ -4264,7 +4264,7 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
 
     <span style="color: #3D7B7B; font-style: italic"># Proceed with processing the valid ZIP file</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;REST API path to fsdb is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
-    scan_path <span style="color: #666">=</span> Path(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)<span style="color: #666">.</span>path())
+    scan_path <span style="color: #666">=</span> Path(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>create_scan(scan_id)<span style="color: #666">.</span>path())
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Exporting archive contents to &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
 
     <span style="color: #008000; font-weight: bold">if</span> is_directory_in_archive(temp_path, scan_id):
@@ -6152,7 +6152,7 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
 
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
         <span style="color: #3D7B7B; font-style: italic"># Get the fileset</span>
@@ -6517,7 +6517,7 @@ If key is provided, returns the value for that key.</p>
 
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
         <span style="color: #3D7B7B; font-style: italic"># Get the fileset</span>
@@ -6816,7 +6816,7 @@ If key is provided, returns the value for that key.</p>
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Metadata must be a dictionary&#39;</span>}, <span style="color: #666">400</span>
 
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
 
@@ -7202,7 +7202,7 @@ returned as 500 error responses.</p>
         <span style="color: #3D7B7B; font-style: italic"># Sanitize the name</span>
         fs_id <span style="color: #666">=</span> sanitize_name(data[<span style="color: #BA2121">&#39;fileset_id&#39;</span>])
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(data[<span style="color: #BA2121">&#39;scan_id&#39;</span>], create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(data[<span style="color: #BA2121">&#39;scan_id&#39;</span>])
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
         <span style="color: #3D7B7B; font-style: italic"># Create the fileset</span>
@@ -7492,7 +7492,7 @@ returned as 500 error responses.</p>
 
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
         <span style="color: #3D7B7B; font-style: italic"># Get the fileset</span>
@@ -7885,7 +7885,7 @@ If key is provided, returns the value for that key.</p>
 
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
         <span style="color: #3D7B7B; font-style: italic"># Get the fileset</span>
@@ -8237,7 +8237,7 @@ logged, and returned as a 500 error response.</p>
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Metadata must be a dictionary&#39;</span>}, <span style="color: #666">400</span>
 
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
 
@@ -12599,7 +12599,7 @@ characters, underscores, dashes, or periods.</p>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     scan_id <span style="color: #666">=</span> sanitize_name(scan_id)
     <span style="color: #3D7B7B; font-style: italic"># return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)</span>
-    <span style="color: #008000; font-weight: bold">return</span> get_scan_info(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>), logger<span style="color: #666">=</span><span style="color: #008000">self</span><span style="color: #666">.</span>logger)
+    <span style="color: #008000; font-weight: bold">return</span> get_scan_info(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id), logger<span style="color: #666">=</span><span style="color: #008000">self</span><span style="color: #666">.</span>logger)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -12803,7 +12803,7 @@ Must contain only alphanumeric characters, underscores, dashes, or periods.</p>
     scan_id <span style="color: #666">=</span> sanitize_name(scan_id)
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Attempt to create a new scan in the database with the given scan_id</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>create_scan(scan_id)
         <span style="color: #3D7B7B; font-style: italic"># Check if scan creation was successful</span>
         <span style="color: #008000; font-weight: bold">if</span> scan <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:
             <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to create scan: </span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
@@ -13401,7 +13401,7 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
 
@@ -13763,7 +13763,7 @@ If key is provided, returns the value for that key.</p>
     key <span style="color: #666">=</span> request<span style="color: #666">.</span>args<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;key&#39;</span>, default<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>)
     <span style="color: #008000; font-weight: bold">try</span>:
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
 
@@ -14021,7 +14021,7 @@ If key is provided, returns the value for that key.</p>
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Metadata must be a dictionary&#39;</span>}, <span style="color: #666">400</span>
 
         <span style="color: #3D7B7B; font-style: italic"># Get the scan</span>
-        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id)
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> scan:
             <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Scan not found&#39;</span>}, <span style="color: #666">404</span>
 
@@ -14806,7 +14806,7 @@ matching scans.</p>
 
     scans_info <span style="color: #666">=</span> []
     <span style="color: #008000; font-weight: bold">for</span> scan_id <span style="color: #A2F; font-weight: bold">in</span> scans_list:
-        scans_info<span style="color: #666">.</span>append(get_scan_info(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>), logger<span style="color: #666">=</span><span style="color: #008000">self</span><span style="color: #666">.</span>logger))
+        scans_info<span style="color: #666">.</span>append(get_scan_info(<span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id), logger<span style="color: #666">=</span><span style="color: #008000">self</span><span style="color: #666">.</span>logger))
     <span style="color: #008000; font-weight: bold">return</span> scans_info
 </code></pre></div></td></tr></table></div>
             </details>

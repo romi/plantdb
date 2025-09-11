@@ -2233,7 +2233,7 @@ db<span style="color: #666">.</span>disconnect()
         )
         <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">None</span>
     <span style="color: #3D7B7B; font-style: italic"># Get or create the scan instance</span>
-    scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(scan_id)
     <span style="color: #3D7B7B; font-style: italic"># Add metadata to the scan</span>
     scan<span style="color: #666">.</span>set_metadata(metadata)
     <span style="color: #3D7B7B; font-style: italic"># Return the updated scan instance</span>

@@ -8915,7 +8915,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">os</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> environ
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> FSDB(environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;ROMI_DB&#39;</span>, <span style="color: #BA2121">&quot;/data/ROMI/DB/&quot;</span>))
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect(unsafe<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&#39;sango_90_300_36&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>get_metadata()
 </code></pre></div>
