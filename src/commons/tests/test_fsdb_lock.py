@@ -10,6 +10,7 @@ import time
 import unittest
 from unittest.mock import patch
 
+from plantdb.commons.fsdb.lock import LockError
 from plantdb.commons.fsdb.lock import LockTimeoutError
 from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.lock import ScanLockManager
@@ -80,12 +81,12 @@ class TestScanLockManager(unittest.TestCase):
         scan_id = "test_scan"
         # Test for shared lock
         expected_path = os.path.join(self.temp_dir, ".locks", f"{scan_id}.lock")
-        actual_path = self.lock_manager._get_lock_file_path(scan_id, LockType.SHARED)
+        actual_path = self.lock_manager._get_lock_file_path(scan_id)
         self.assertEqual(actual_path, expected_path)
 
         # Test for exclusive lock
         expected_path = os.path.join(self.temp_dir, ".locks", f"{scan_id}.lock")
-        actual_path = self.lock_manager._get_lock_file_path(scan_id, LockType.EXCLUSIVE)
+        actual_path = self.lock_manager._get_lock_file_path(scan_id)
         self.assertEqual(actual_path, expected_path)
 
     def test_get_lock_info_path(self):
@@ -272,8 +273,8 @@ class TestScanLockManager(unittest.TestCase):
 
         # Acquire an exclusive lock with user1
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1):
-            # Try to acquire another exclusive lock with user2 (should time out)
-            with self.assertRaises(LockTimeoutError):
+            # Try to acquire another exclusive lock with user2 (should raise a LockError)
+            with self.assertRaises(LockError):
                 with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, timeout=0.5):
                     pass
 
