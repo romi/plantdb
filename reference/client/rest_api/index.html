@@ -9685,7 +9685,7 @@ Defaults to <code>None</code>.</p>
     <span style="color: #008000; font-weight: bold">if</span> scan_id <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #A2F; font-weight: bold">in</span> scan_names:
         <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">None</span>
 
-    thumb_uri <span style="color: #666">=</span> get_scan_data(scan_id)[<span style="color: #BA2121">&quot;thumbnailUri&quot;</span>]
+    thumb_uri <span style="color: #666">=</span> get_scan_data(scan_id, <span style="color: #666">**</span>kwargs)[<span style="color: #BA2121">&quot;thumbnailUri&quot;</span>]
     <span style="color: #008000; font-weight: bold">if</span> size <span style="color: #666">!=</span> <span style="color: #BA2121">&quot;thumb&quot;</span>:
         thumb_uri <span style="color: #666">=</span> thumb_uri<span style="color: #666">.</span>replace(<span style="color: #BA2121">&quot;size=thumb&quot;</span>, <span style="color: #BA2121">f&quot;size=</span><span style="color: #A45A77; font-weight: bold">{</span>size<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
     url <span style="color: #666">=</span> base_url(host<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;host&quot;</span>, REST_API_URL),
