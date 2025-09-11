@@ -865,29 +865,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commons/fsdb/lock/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    lock
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../commons/fsdb/metadata/" class="md-nav__link">
         
   
@@ -2653,7 +2630,7 @@ between different database types (local, SSH, HTTP).</p>
         <span style="color: #008000; font-weight: bold">if</span> config[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;local&quot;</span>:
             path <span style="color: #666">=</span> Path(config[<span style="color: #BA2121">&quot;spec&quot;</span>])
             db <span style="color: #666">=</span> FSDB(path)
-            db<span style="color: #666">.</span>connect()
+            db<span style="color: #666">.</span>connect(unsafe<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
             <span style="color: #008000; font-weight: bold">return</span> db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
         <span style="color: #008000; font-weight: bold">elif</span> config[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;http&quot;</span>:
             <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> refresh_url

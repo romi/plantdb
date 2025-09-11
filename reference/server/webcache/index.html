@@ -867,29 +867,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../commons/fsdb/lock/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    lock
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../commons/fsdb/metadata/" class="md-nav__link">
         
   
@@ -2368,9 +2345,9 @@ The downsized versions are cached in the <code>'webcache'</code> directory in th
 <span style="color: #BA2121; font-style: italic">    pathlib.Path</span>
 <span style="color: #BA2121; font-style: italic">        The path to the file.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(scan_id)
-    fs <span style="color: #666">=</span> scan<span style="color: #666">.</span>get_fileset(fileset_id)
-    f <span style="color: #666">=</span> fs<span style="color: #666">.</span>get_file(file_id)
+    scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(scan_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    fs <span style="color: #666">=</span> scan<span style="color: #666">.</span>get_fileset(fileset_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    f <span style="color: #666">=</span> fs<span style="color: #666">.</span>get_file(file_id, create<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
     <span style="color: #008000; font-weight: bold">return</span> db<span style="color: #666">.</span>basedir <span style="color: #666">/</span> scan<span style="color: #666">.</span>id <span style="color: #666">/</span> fs<span style="color: #666">.</span>id <span style="color: #666">/</span> f<span style="color: #666">.</span>filename
 </code></pre></div></td></tr></table></div>
             </details>

@@ -871,29 +871,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb/lock/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    lock
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../fsdb/metadata/" class="md-nav__link">
         
   
@@ -2176,34 +2153,34 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">334</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">335</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">336</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">337</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">338</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">339</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">340</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">341</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">342</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">381</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the pipeline configurations from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2347,34 +2324,34 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">305</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">306</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">312</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">329</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">330</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">334</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">335</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">336</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">337</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">338</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">339</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">340</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">341</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">342</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_models_dataset</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_models_dataset</span>(out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the trained CNN model from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2534,36 +2511,36 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">273</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">300</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">305</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">306</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">312</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">322</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">323</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract a test dataset from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2683,7 +2660,32 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">386</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">381</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">384</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">385</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">386</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">387</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">388</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">389</span>
@@ -2708,28 +2710,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">423</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">424</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">425</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">427</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">428</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">429</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">430</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">431</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">432</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sets up an empty ROMI database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Sets up necessary marker file and ensures the absence of a lock file.</span>
@@ -2755,6 +2736,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    [&#39;romidb&#39;]</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> MARKER_FILE_NAME
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> LOCK_FILE_NAME
 
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(out_path, <span style="color: #008000">str</span>):
         out_path <span style="color: #666">=</span> Path(out_path)
@@ -2774,6 +2756,9 @@ Defaults to <code>None</code>.</p>
     <span style="color: #3D7B7B; font-style: italic"># Make sure the marker file exists:</span>
     marker_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> MARKER_FILE_NAME
     marker_path<span style="color: #666">.</span>touch(exist_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+    <span style="color: #3D7B7B; font-style: italic"># Make sure the locking file does NOT exist:</span>
+    lock_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> LOCK_FILE_NAME
+    lock_path<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 
     <span style="color: #008000; font-weight: bold">return</span> out_path
 </code></pre></div></td></tr></table></div>
@@ -2957,7 +2942,28 @@ See the notes below for a list of dataset names and their meanings.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">435</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">423</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">424</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">425</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">427</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">428</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">429</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">430</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">431</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">432</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">435</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">436</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">437</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">438</span>
@@ -3013,28 +3019,7 @@ See the notes below for a list of dataset names and their meanings.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">501</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">502</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">503</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">504</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">505</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">506</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">507</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">508</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">509</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">510</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">511</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">512</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the test database from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3279,7 +3264,28 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">515</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">501</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">502</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">503</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">504</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">505</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">510</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">511</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">512</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">515</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">516</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">517</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">518</span>
@@ -3302,28 +3308,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">539</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">540</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">541</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">542</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">543</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">544</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">545</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">546</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">547</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">548</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">549</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">550</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">551</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">552</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">553</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">554</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">555</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">556</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">557</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">558</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">559</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and return an FSDB test database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
