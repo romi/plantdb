@@ -139,14 +139,13 @@ class ScanLockManager:
         self._active_locks: Dict[str, Dict] = {}  # Track active locks
         self._lock_files: Dict[str, int] = {}  # File descriptors for locks
         self._thread_lock = threading.RLock()  # Thread-safe operations
+        # Ensure locks directory exists
+        os.makedirs(self.locks_dir, exist_ok=True)
+        # Initialize lock manager logger
         self.logger = get_logger(__name__ + '.ScanLockManager',
                                  log_file=kwargs.get("log_file", os.path.join(base_path, '.locks', 'lock_manager.log')),
                                  log_level=kwargs.get("log_level", "INFO"))
-
-        # Ensure locks directory exists
-        os.makedirs(self.locks_dir, exist_ok=True)
         self.logger.debug(f"Initialized ScanLockManager with base path: `{base_path}`")
-
         # Clean up stale locks on initialization
         self._cleanup_stale_locks()
 
