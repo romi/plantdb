@@ -183,7 +183,7 @@ class FSDBTestCase(unittest.TestCase):
         scan = db.get_scan("real_plant_analyzed")
         return scan
 
-    def get_test_fileset(self, fs_id, create=False):
+    def get_test_fileset(self, fs_id):
         """Return the default test ``Fileset`` object named 'fileset_001'.
 
         Returns
