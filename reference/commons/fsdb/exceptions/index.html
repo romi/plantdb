@@ -911,6 +911,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.commons.fsdb.exceptions.FileNotFoundError" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;FileNotFoundError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.commons.fsdb.exceptions.FilesetNoIDError" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;FilesetNoIDError
@@ -1998,6 +2007,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#plantdb.commons.fsdb.exceptions.FileNotFoundError" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;FileNotFoundError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#plantdb.commons.fsdb.exceptions.FilesetNoIDError" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;FilesetNoIDError
@@ -2163,6 +2181,61 @@
 
 
 
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="plantdb.commons.fsdb.exceptions.FileNotFoundError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">FileNotFoundError</span>
+
+
+<a href="#plantdb.commons.fsdb.exceptions.FileNotFoundError" class="headerlink" title="Permanent link">Link</a></h3>
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #CB3F38; font-weight: bold">FileNotFoundError</span>(fs, f_id)
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+        <p>Could not find the file.</p>
+
+
+
+
+
+
+
+
+                  <details class="quote">
+                    <summary>Source code in <code>plantdb/commons/fsdb/exceptions.py</code></summary>
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">54</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">55</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, fs, f_id: <span style="color: #008000">str</span>):
+    <span style="color: #008000">super</span>()<span style="color: #666">.</span><span style="color: #00F">__init__</span>(<span style="color: #BA2121">f&quot;Unknown file id &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>f_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; in scan/fileset &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>fs<span style="color: #666">.</span>scan<span style="color: #666">.</span>id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">/</span><span style="color: #A45A77; font-weight: bold">{</span>fs<span style="color: #666">.</span>id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;!&quot;</span>)
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
 
     </div>
 
