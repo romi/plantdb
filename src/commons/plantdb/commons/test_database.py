@@ -222,6 +222,38 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
+def _get_archive(archive, force=False):
+    """
+    Download and verify an archive file from a given URL.
+
+    This function retrieves an archive file from a specified URL.
+    If the file already exists locally and `force` is not set to ``True``, it skips downloading again,
+    otherwise it downloads the file afresh.
+    The downloaded file's hash is then tested against a known value for verification.
+
+    Parameters
+    ----------
+    archive : str
+        The name of the archive to download.
+    force : bool, optional
+        If ``True``, forces re-downloading even if the file already exists locally. Defaults to ``False``.
+
+    Returns
+    -------
+    Path
+        The path to the downloaded and verified archive file.
+    """
+    url = ZIP_URLS[archive]
+    tmp_fname = _tmp_fpath_from_url(url)
+    if tmp_fname.exists() and not force:
+        logger.info(f"File '{tmp_fname.name}' exists locally. Skipping download.")
+    else:
+        tmp_fname = _save_file_from_url(url)
+    # Test the downloaded file hash against a known value:
+    _test_hash(tmp_fname, ZIP_MD5S[archive], "md5")
+    return tmp_fname
+
+
 def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False):
     """Download and extract an archive from ZENODO.
 
@@ -249,14 +281,7 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
     if isinstance(out_path, str):
         out_path = Path(out_path)
 
-    url = ZIP_URLS[archive]
-    tmp_fname = _tmp_fpath_from_url(url)
-    if tmp_fname.exists() and not force:
-        logger.info(f"File '{tmp_fname.name}' exists locally. Skipping download.")
-    else:
-        tmp_fname = _save_file_from_url(url)
-    # Test the downloaded file hash against a known value:
-    _test_hash(tmp_fname, ZIP_MD5S[archive], "md5")
+    tmp_fname = _get_archive(archive, force=force)
     # Extract to the given destination if no error was raised:
     ZipFile(tmp_fname).extractall(path=out_path)
     # Remove the temporary file if not explicitly requested to keep it:
