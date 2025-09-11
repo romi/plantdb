@@ -384,7 +384,6 @@ def setup_empty_database(out_path=None):
     ['romidb']
     """
     from plantdb.commons.fsdb.core import MARKER_FILE_NAME
-    from plantdb.commons.fsdb.core import LOCK_FILE_NAME
 
     if isinstance(out_path, str):
         out_path = Path(out_path)
