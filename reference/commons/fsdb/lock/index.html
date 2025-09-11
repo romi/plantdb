@@ -2485,8 +2485,7 @@ Default is 30.0 seconds.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">149</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, base_path: <span style="color: #008000">str</span>, default_timeout: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">30.0</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, base_path: <span style="color: #008000">str</span>, default_timeout: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">30.0</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Lock manager constructor.</span>
 
@@ -2509,14 +2508,13 @@ Default is 30.0 seconds.</p>
     <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks: Dict[<span style="color: #008000">str</span>, Dict] <span style="color: #666">=</span> {}  <span style="color: #3D7B7B; font-style: italic"># Track active locks</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>_lock_files: Dict[<span style="color: #008000">str</span>, <span style="color: #008000">int</span>] <span style="color: #666">=</span> {}  <span style="color: #3D7B7B; font-style: italic"># File descriptors for locks</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>_thread_lock <span style="color: #666">=</span> threading<span style="color: #666">.</span>RLock()  <span style="color: #3D7B7B; font-style: italic"># Thread-safe operations</span>
+    <span style="color: #3D7B7B; font-style: italic"># Ensure locks directory exists</span>
+    os<span style="color: #666">.</span>makedirs(<span style="color: #008000">self</span><span style="color: #666">.</span>locks_dir, exist_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+    <span style="color: #3D7B7B; font-style: italic"># Initialize lock manager logger</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> get_logger(<span style="color: #19177C">__name__</span> <span style="color: #666">+</span> <span style="color: #BA2121">&#39;.ScanLockManager&#39;</span>,
                              log_file<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;log_file&quot;</span>, os<span style="color: #666">.</span>path<span style="color: #666">.</span>join(base_path, <span style="color: #BA2121">&#39;.locks&#39;</span>, <span style="color: #BA2121">&#39;lock_manager.log&#39;</span>)),
                              log_level<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;log_level&quot;</span>, <span style="color: #BA2121">&quot;INFO&quot;</span>))
-
-    <span style="color: #3D7B7B; font-style: italic"># Ensure locks directory exists</span>
-    os<span style="color: #666">.</span>makedirs(<span style="color: #008000">self</span><span style="color: #666">.</span>locks_dir, exist_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Initialized ScanLockManager with base path: `</span><span style="color: #A45A77; font-weight: bold">{</span>base_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">`&quot;</span>)
-
     <span style="color: #3D7B7B; font-style: italic"># Clean up stale locks on initialization</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>_cleanup_stale_locks()
 </code></pre></div></td></tr></table></div>
@@ -2687,7 +2685,8 @@ lock is already held.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/fsdb/lock.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
@@ -2801,7 +2800,19 @@ lock is already held.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">346</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@contextmanager</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">353</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">354</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">356</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">358</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@contextmanager</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">acquire_lock</span>(<span style="color: #008000">self</span>, scan_id: <span style="color: #008000">str</span>, lock_type: LockType, user: <span style="color: #008000">str</span>, timeout: Optional[<span style="color: #008000">float</span>] <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Acquire a lock for a specific scan and lock type.</span>
@@ -2858,7 +2869,20 @@ lock is already held.</p>
                     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks[lock_key][<span style="color: #BA2121">&#39;count&#39;</span>] <span style="color: #666">&lt;=</span> <span style="color: #666">0</span>:
                         <span style="color: #008000">self</span><span style="color: #666">.</span>_release_lock(scan_id, lock_type)
             <span style="color: #008000; font-weight: bold">else</span>:
-                <span style="color: #008000; font-weight: bold">raise</span> LockError(<span style="color: #BA2121">f&quot;Exclusive lock already held for scan </span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+                <span style="color: #3D7B7B; font-style: italic"># For exclusive locks, allow reentrant acquisition by the same user/thread</span>
+                current_lock_user <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks[lock_key]<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;user&#39;</span>)
+                <span style="color: #008000; font-weight: bold">if</span> current_lock_user <span style="color: #666">==</span> user:
+                    <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks[lock_key][<span style="color: #BA2121">&#39;count&#39;</span>] <span style="color: #666">+=</span> <span style="color: #666">1</span>
+                    <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Incrementing exclusive lock count for </span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> by same user </span><span style="color: #A45A77; font-weight: bold">{</span>user<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+                    <span style="color: #008000; font-weight: bold">try</span>:
+                        <span style="color: #008000; font-weight: bold">yield</span>
+                        <span style="color: #008000; font-weight: bold">return</span>
+                    <span style="color: #008000; font-weight: bold">finally</span>:
+                        <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks[lock_key][<span style="color: #BA2121">&#39;count&#39;</span>] <span style="color: #666">-=</span> <span style="color: #666">1</span>
+                        <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">self</span><span style="color: #666">.</span>_active_locks[lock_key][<span style="color: #BA2121">&#39;count&#39;</span>] <span style="color: #666">&lt;=</span> <span style="color: #666">0</span>:
+                            <span style="color: #008000">self</span><span style="color: #666">.</span>_release_lock(scan_id, lock_type)
+                <span style="color: #008000; font-weight: bold">else</span>:
+                    <span style="color: #008000; font-weight: bold">raise</span> LockError(<span style="color: #BA2121">f&quot;Exclusive lock already held for scan </span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
 
     <span style="color: #3D7B7B; font-style: italic"># Acquire new lock</span>
     acquired <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>
@@ -2940,15 +2964,15 @@ lock is already held.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/fsdb/lock.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">469</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">470</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">471</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">472</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">473</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">474</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">476</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">477</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">cleanup_all_locks</span>(<span style="color: #008000">self</span>):
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">482</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">483</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">484</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">cleanup_all_locks</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Emergency cleanup of all locks (use with caution)&quot;&quot;&quot;</span>
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>warning(<span style="color: #BA2121">&quot;Cleaning up all active locks...&quot;</span>)
     <span style="color: #008000; font-weight: bold">with</span> <span style="color: #008000">self</span><span style="color: #666">.</span>_thread_lock:
@@ -3059,19 +3083,7 @@ It distinguishes between exclusive and shared locks based on their type.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/fsdb/lock.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">423</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">424</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">425</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">427</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">428</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">429</span>
@@ -3112,7 +3124,19 @@ It distinguishes between exclusive and shared locks based on their type.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">464</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">465</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">466</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">467</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_lock_status</span>(<span style="color: #008000">self</span>, scan_id: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> Dict:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">467</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">468</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">469</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">470</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">471</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">472</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">473</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">474</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">475</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">476</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">477</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">478</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">479</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_lock_status</span>(<span style="color: #008000">self</span>, scan_id: <span style="color: #008000">str</span>) <span style="color: #666">-&gt;</span> Dict:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Retrieve the current lock status for a given scan ID.</span>
 

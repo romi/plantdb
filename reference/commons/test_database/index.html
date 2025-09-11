@@ -2730,10 +2730,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Sets up an empty ROMI database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Sets up necessary marker file and ensures the absence of a lock file.</span>
@@ -2779,9 +2776,6 @@ Defaults to <code>None</code>.</p>
     <span style="color: #3D7B7B; font-style: italic"># Make sure the marker file exists:</span>
     marker_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> MARKER_FILE_NAME
     marker_path<span style="color: #666">.</span>touch(exist_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
-    <span style="color: #3D7B7B; font-style: italic"># Make sure the locking file does NOT exist:</span>
-    lock_path <span style="color: #666">=</span> out_path <span style="color: #666">/</span> LOCK_FILE_NAME
-    lock_path<span style="color: #666">.</span>unlink(missing_ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 
     <span style="color: #008000; font-weight: bold">return</span> out_path
 </code></pre></div></td></tr></table></div>
@@ -2965,7 +2959,10 @@ See the notes below for a list of dataset names and their meanings.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
@@ -3039,10 +3036,7 @@ See the notes below for a list of dataset names and their meanings.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">485</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">486</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">487</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">489</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">488</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset, out_path<span style="color: #666">=</span>TEST_DIR, keep_tmp<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, with_models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, force<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Download and extract the test database from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3287,7 +3281,10 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 
             <details class="quote">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">495</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
@@ -3328,10 +3325,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset<span style="color: #666">=</span><span style="color: #BA2121">&#39;real_plant_analyzed&#39;</span>, out_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and return an FSDB test database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
