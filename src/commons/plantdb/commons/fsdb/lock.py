@@ -288,7 +288,20 @@ class ScanLockManager:
                         if self._active_locks[lock_key]['count'] <= 0:
                             self._release_lock(scan_id, lock_type)
                 else:
-                    raise LockError(f"Exclusive lock already held for scan {scan_id}")
+                    # For exclusive locks, allow reentrant acquisition by the same user/thread
+                    current_lock_user = self._active_locks[lock_key].get('user')
+                    if current_lock_user == user:
+                        self._active_locks[lock_key]['count'] += 1
+                        self.logger.debug(f"Incrementing exclusive lock count for {scan_id} by same user {user}")
+                        try:
+                            yield
+                            return
+                        finally:
+                            self._active_locks[lock_key]['count'] -= 1
+                            if self._active_locks[lock_key]['count'] <= 0:
+                                self._release_lock(scan_id, lock_type)
+                    else:
+                        raise LockError(f"Exclusive lock already held for scan {scan_id}")
 
         # Acquire new lock
         acquired = False
