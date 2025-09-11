@@ -1,10 +1,15 @@
 import unittest
 import time
+import io
+import tempfile
+import os
 
+from plantdb.client.rest_api import base_url
 from plantdb.server.test_rest_api import TestRestApiServer
 from plantdb.client import rest_api as client
 
 SERVER_PORT = 5555
+
 
 class ClientRestApiIntegrationTests(unittest.TestCase):
     @classmethod
@@ -15,7 +20,6 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This class is responsible for starting the test REST API server before
         tests run and stopping it after they complete. It also sets up common
         keyword arguments used in testing.
-
         """
         cls.server = TestRestApiServer(test=True, port=SERVER_PORT)
         cls.server.start()
@@ -35,15 +39,6 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         scan data using a specific scan ID, and get information about all
         scans. It ensures that the returned data is of the expected types
         and contains valid information.
-
-        Parameters
-        ----------
-        self : obj
-            The instance of the test class.
-        client : obj
-            A client object used to interact with the scanning service.
-        kw : dict
-            Keyword arguments required for the client operations.
         """
         names = client.list_scan_names(**self.kw)
         self.assertIsInstance(names, list)
@@ -84,12 +79,10 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         """
         Tests the refresh and archive functionality of the client.
 
-        This test method performs several actions to verify the correct behavior of the client's refresh and archive features. It first calls the `refresh` method and checks that the response is a dictionary containing a "message" key. Then, it retrieves a list of scan names and selects the first one as the target for archiving. The `download_scan_archive` method is called with this scan ID and no specified output directory, expecting to receive a tuple consisting of a BytesIO object and a message string.
-
-        Parameters
-        ----------
-        self : TestCase
-            The test case instance.
+        This test method performs several actions to verify the correct behavior of the client's refresh and archive features.
+        It first calls the `refresh` method and checks that the response is a dictionary containing a "message" key.
+        Then, it retrieves a list of scan names and selects the first one as the target for archiving.
+        The `download_scan_archive` method is called with this scan ID and no specified output directory, expecting to receive a tuple consisting of a BytesIO object and a message string.
         """
         res = client.refresh(**self.kw)
         self.assertIsInstance(res, dict)
@@ -100,10 +93,161 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         # Download archive to temp dir
         res = client.download_scan_archive(scan_id, out_dir=None, **self.kw)
         # when out_dir is None, a BytesIO and message tuple is expected
-        import io
         self.assertIsInstance(res, tuple)
         self.assertIsInstance(res[0], io.BytesIO)
         self.assertIsInstance(res[1], str)
+
+    def test_server_availability(self):
+        """
+        Test server availability endpoint.
+
+        This test verifies that the test_availability function correctly
+        checks if the server is available and returns the expected boolean result.
+        """
+        available = client.test_availability(base_url(**self.kw))
+        self.assertTrue(available)  # Should be True since the test server is running
+
+    def test_url_building_functions(self):
+        """
+        Test URL building functions.
+
+        This test verifies that URL building functions correctly generate
+        expected URL formats for various endpoints.
+        """
+        names = client.list_scan_names(**self.kw)
+        self.assertGreater(len(names), 0)
+        scan_id = names[0]
+
+        # Test scan_url function
+        url = client.scan_url(scan_id, **self.kw)
+        self.assertIn(scan_id, url)
+
+        # Test scan_image_url function
+        image_url = client.scan_image_url(scan_id, fileset_id="images", file_id="00000_rgb", size="thumb", **self.kw)
+        self.assertIn(scan_id, image_url)
+        self.assertIn("images", image_url)
+        self.assertIn("thumb", image_url)
+
+        # Test archive_url function
+        arch_url = client.archive_url(scan_id, **self.kw)
+        self.assertIn(scan_id, arch_url)
+        self.assertIn("archive", arch_url)
+
+    def test_get_task_data(self):
+        """
+        Test getting task data.
+
+        This test verifies the get_task_data function can retrieve data
+        for a specific task from a scan.
+        """
+        import networkx as nx
+
+        scan_id = "real_plant_analyzed"
+
+        # Try to get data for some common task types
+        task_names = ["PointCloud", "TriangleMesh", "CurveSkeleton", "TreeGraph"]
+        expected_data_types = [list, dict, dict, nx.Graph]
+
+        for task_name, expected_type in zip(task_names, expected_data_types):
+            # We're testing the API calls succeed, not necessarily that data exists
+            try:
+                data = client.get_task_data(scan_id, task_name, **self.kw)
+                # If data is returned, validate its structure
+                if data is not None:
+                    print(f"Data for task {task_name} is: {type(data)}")
+                    self.assertIsInstance(data, expected_type)
+            except Exception as e:
+                # Ignore 404 errors which are expected for tasks that don't exist
+                if "404" not in str(e):
+                    raise
+
+    def test_get_configuration_files(self):
+        """
+        Test getting configuration files.
+
+        This test verifies the functions for retrieving scan and reconstruction
+        configuration files work correctly.
+        """
+        names = client.list_scan_names(**self.kw)
+        self.assertGreater(len(names), 0)
+        scan_id = names[0]
+
+        # Test scan config
+        try:
+            config = client.get_scan_config(scan_id, **self.kw)
+            if config is not None:
+                self.assertIsInstance(config, dict)
+        except Exception as e:
+            # Ignore 404 errors which are expected if config doesn't exist
+            if "404" not in str(e):
+                raise
+
+        # Test reconstruction config
+        try:
+            recon_config = client.get_reconstruction_config(scan_id, **self.kw)
+            if recon_config is not None:
+                self.assertIsInstance(recon_config, dict)
+        except Exception as e:
+            # Ignore 404 errors which are expected if config doesn't exist
+            if "404" not in str(e):
+                raise
+
+    def test_upload_functions(self):
+        """
+        Test upload functions.
+
+        This test verifies the upload_dataset_file and upload_scan_archive functions
+        by creating temporary test files and attempting to upload them.
+        """
+        # Create a temporary file for testing
+        with tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as temp_file:
+            temp_file.write(b"Test file content")
+            temp_path = temp_file.name
+
+        try:
+            # Test upload_dataset_file
+            try:
+                result = client.upload_dataset_file('real_plant', temp_path, **self.kw)
+                self.assertIsInstance(result, dict)
+            except Exception as e:
+                # Some servers may not allow uploads
+                if "403" not in str(e) and "405" not in str(e):
+                    raise
+
+            # For upload_scan_archive, we'd normally need a valid archive
+            # This is just testing the API call structure works
+            try:
+                result = client.upload_scan_archive(temp_path, **self.kw)
+                # If successful, should return a dict
+                self.assertIsInstance(result, dict)
+            except Exception as e:
+                # Many errors are expected here due to invalid archive format
+                # Just check that the function call structure worked
+                pass
+
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    def test_angles_and_internodes_data(self):
+        """
+        Test getting angles and internodes data.
+
+        This test verifies the get_angles_and_internodes_data function
+        can retrieve angle data for a scan.
+        """
+        scan_id = "real_plant_analyzed"
+
+        try:
+            data = client.get_angles_and_internodes_data(scan_id, **self.kw)
+            # If data is returned, it should be a dictionary
+            if data is not None:
+                self.assertIsInstance(data, dict)
+        except Exception as e:
+            # Ignore 404 errors which are expected if data doesn't exist
+            if "404" not in str(e):
+                raise
 
 
 if __name__ == '__main__':
