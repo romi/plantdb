@@ -697,6 +697,34 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
+def requires_jwt_auth(f):
+    """Decorator to require JWT authentication via HttpOnly cookie."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Get JWT token from HttpOnly cookie
+        jwt_token = request.cookies.get('access_token')
+
+        if not jwt_token:
+            return {'message': 'Authentication required'}, 401
+
+        # Get database instance
+        db = args[0].db if hasattr(args[0], 'db') else None
+        if not db:
+            return {'message': 'Database not available'}, 500
+
+        # Validate JWT token
+        session_data = db.session_manager.validate_session(jwt_token)
+        if not session_data:
+            return {'message': 'Invalid or expired token'}, 401
+
+        # Add user info to request context
+        request.current_user = session_data
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 # Home page resource
 class Home(Resource):
 
@@ -955,7 +983,7 @@ class Login(Resource):
         if not username:
             return {'error': 'Missing username parameter'}, 400
         # Query database to check if user exists
-        user_exists = self.db.user_exists(username)
+        user_exists = self.db.rbac_manager.users.exists(username)
         return {'username': username, 'exists': user_exists}, 200
 
     @rate_limit(max_requests=20, window_seconds=60)
@@ -1017,37 +1045,126 @@ class Login(Resource):
         # Extract credentials from request data
         username = data['username']
         password = data['password']
+
         # Attempt to authenticate user with provided credentials
-        is_authenticated = self.check_credentials(username, password)
+        is_authenticated = self.db.login(username, password)
 
         # Prepare response based on authentication result
         if is_authenticated:
-            # Get user's full name from database for welcome message
-            fullname = self.db.users[username]['fullname']
-            message = f"Login successful. Welcome, {self.db.users[username]['fullname']}!"
+            user = self.db.rbac_manager.users.get_user(username)
+            # Create JWT session
+            jwt_token = self.db.session_manager.create_session(user.username)
+
+            if jwt_token:
+                # Create response with user info
+                response_data = {
+                    'message': 'Login successful',
+                    'user': {
+                        'username': user.username,
+                        'fullname': user.fullname,
+                    }
+                }
+
+                response = make_response(jsonify(response_data), 200)
+
+                # Set JWT token in HttpOnly cookie
+                response.set_cookie(
+                    'access_token',  # Cookie name
+                    jwt_token,  # JWT token value
+                    max_age=self.db.session_manager.session_timeout,  # Cookie lifetime
+                    httponly=True,  # Prevent JavaScript access
+                    secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
+                    # Only send over HTTPS (set False for development)
+                    samesite='Strict'  # CSRF protection
+                )
+
+                return response
+
+            else:
+                return {'message': 'Session creation failed'}, 500
         else:
-            fullname = "None"
-            message = f"Login failed. Please check your username and password!"
+            return {'message': 'Invalid credentials'}, 401
 
-        # Return authentication result and appropriate message with 200 status code
-        return {'authenticated': is_authenticated, 'fullname': fullname, 'message': message}, 200
 
-    def check_credentials(self, username, password):
-        """Validates user credentials against the database.
+class Logout(Resource):
+    def __init__(self, db, logger):
+        """Initialize the Logout resource.
 
         Parameters
         ----------
-        username : str
-            The username provided by the user or client for authentication.
-        password : str
-            The password corresponding to the username for authentication.
-
-        Returns
-        -------
-        bool
-            ``True`` if the credentials are valid, ``False`` otherwise.
+        db : plantdb.commons.fsdb.FSDB
+            Database connection object for accessing scan data.
         """
-        return self.db.validate_user(username, password)
+        self.db = db
+        self.logger = logger
+
+    @requires_jwt_auth
+    def post(self):
+        """Handle user logout and clear cookie."""
+        try:
+            # Get token from cookie
+            jwt_token = request.cookies.get('access_token')
+
+            if jwt_token:
+                # Invalidate session
+                self.db.session_manager.invalidate_session(jwt_token)
+
+            response_data = {'message': 'Logout successful'}
+            response = make_response(jsonify(response_data), 200)
+
+            # Clear the authentication cookie
+            response.set_cookie(
+                'access_token',
+                '',  # Empty value
+                expires=0,  # Expire immediately
+                httponly=True,
+                secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
+                # Match original cookie settings
+                samesite='Strict'
+            )
+
+            return response
+
+        except Exception as e:
+            self.logger.error(f"Logout error: {str(e)}")
+            return {'message': 'Logout failed'}, 500
+
+
+class TokenRefresh(Resource):
+    def __init__(self):
+        self.db = None
+
+    @requires_jwt_auth
+    def post(self):
+        """Refresh JWT token in HttpOnly cookie."""
+        try:
+            current_token = request.cookies.get('access_token')
+            if not current_token:
+                return {'message': 'No authentication token found'}, 401
+
+            new_token = self.db.session_manager.refresh_token(current_token)
+
+            if new_token:
+                response_data = {'message': 'Token refreshed successfully'}
+                response = make_response(jsonify(response_data), 200)
+
+                # Update cookie with new token
+                response.set_cookie(
+                    'access_token',
+                    new_token,
+                    max_age=self.db.session_manager.session_timeout,
+                    httponly=True,
+                    secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
+                    # Match original cookie settings
+                    samesite='Strict'
+                )
+
+                return response
+            else:
+                return {'message': 'Token refresh failed'}, 401
+
+        except Exception as e:
+            return {'message': 'Token refresh failed'}, 500
 
 
 class ScansList(Resource):
@@ -1790,7 +1907,7 @@ class Image(Resource):
         """
         self.db = db
 
-    @rate_limit(max_requests=120, window_seconds=60)
+    @rate_limit(max_requests=600, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve an image from the database.
 
@@ -2601,6 +2718,7 @@ class Archive(Resource):
 
         return send_file(zpath, mimetype='application/zip')
 
+    @requires_jwt_auth
     @rate_limit(max_requests=5, window_seconds=60)
     def post(self, scan_id):
         """Handle ZIP file upload and extraction for a scan dataset.
@@ -2743,6 +2861,7 @@ class ScanCreate(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt_auth
     def post(self):
         """Create a new scan in the database.
 
@@ -2886,6 +3005,7 @@ class ScanMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
+    @requires_jwt_auth
     def post(self, scan_id):
         """Update metadata for a specified scan.
 
@@ -3052,6 +3172,7 @@ class FilesetCreate(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt_auth
     def post(self):
         """Create a new fileset associated with a scan.
 
@@ -3229,6 +3350,7 @@ class FilesetMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
+    @requires_jwt_auth
     def post(self, scan_id, fileset_id):
         """Update metadata for a specified fileset.
 
@@ -3417,6 +3539,7 @@ class FileCreate(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt_auth
     def post(self):
         """Create a new file in a fileset and write data to it.
 
@@ -3625,6 +3748,7 @@ class FileMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
+    @requires_jwt_auth
     def post(self, scan_id, fileset_id, file_id):
         """Update metadata for a specified file.
 
