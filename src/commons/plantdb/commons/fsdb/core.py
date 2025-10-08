@@ -99,8 +99,6 @@ import os
 import pathlib
 import shutil
 from collections.abc import Iterable
-from datetime import datetime
-from datetime import timedelta
 from pathlib import Path
 from shutil import copyfile
 from typing import Dict
@@ -132,7 +130,7 @@ from .path_helpers import _fileset_path
 from .path_helpers import _get_filename
 from .path_helpers import _scan_path
 from .validation import _is_valid_id
-from ..utils import date_now
+from ..utils import iso_date_now
 
 logger = get_logger(__name__)
 
@@ -1296,7 +1294,7 @@ class Scan(db.Scan):
             # Update metadata
             _set_metadata(self.metadata, data, value)
             # Ensure modification timestamp
-            _set_metadata(self.metadata, 'last_modified', date_now('%Y-%m-%d_%H:%M:%S'))
+            _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
             logger.info(f"Updated metadata for scan '{self.id}' by user '{self.db.user}'")
@@ -1368,7 +1366,7 @@ class Scan(db.Scan):
 
             # Set initial metadata
             initial_metadata = metadata or {}
-            now = date_now('%Y-%m-%d_%H:%M:%S')
+            now = iso_date_now()
             initial_metadata['created'] = now  # creation timestamp
             initial_metadata['last_modified'] = now  # modification timestamp
             initial_metadata['created_by'] = self.db.user
@@ -1688,7 +1686,7 @@ class Fileset(db.Fileset):
         """
         _set_metadata(self.metadata, data, value)
         # Ensure modification timestamp
-        self.metadata['last_modified'] = date_now('%Y-%m-%d_%H:%M:%S')
+        self.metadata['last_modified'] = iso_date_now()
         _store_fileset_metadata(self)
         return
 
@@ -1743,7 +1741,7 @@ class Fileset(db.Fileset):
 
             # Set initial metadata
             initial_metadata = metadata or {}
-            now = date_now('%Y-%m-%d_%H:%M:%S')
+            now = iso_date_now()
             initial_metadata['created'] = now  # creation timestamp
             initial_metadata['last_modified'] = now  # modification timestamp
             initial_metadata['created_by'] = self.db.user
@@ -1955,7 +1953,7 @@ class File(db.File):
         """
         _set_metadata(self.metadata, data, value)
         # Ensure modification timestamp
-        self.metadata['last_modified'] = date_now('%Y-%m-%d_%H:%M:%S')
+        self.metadata['last_modified'] = iso_date_now()
         _store_file_metadata(self)
         return
 
