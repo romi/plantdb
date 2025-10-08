@@ -16,7 +16,7 @@ dependencies = [
 ]
 description = "Server-side component of the ROMI plant database system."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.13"  # no Python3.13 Open3D (yet)
 license = { 'text' = "LGPL-3.0-or-later" }   # to replace by "LGPL-3.0-or-later" only in next release, pending deprecation
 authors = [
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
