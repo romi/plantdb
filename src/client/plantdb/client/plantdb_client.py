@@ -35,12 +35,13 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 ... )
 ```
 """
-
 import mimetypes
 import os
 
 import requests
 from requests import RequestException
+
+from plantdb.commons.log import get_logger
 
 
 def get_mime_type(extension):
@@ -113,12 +114,108 @@ class PlantDBClient:
             prefix = api_prefix()
         self.base_url = f"{base_url}{prefix}"
         self.session = requests.Session()
+        self.jwt_token = None
+        self.username = None
+        self.logger = get_logger(__class__.__name__)
+
+    def login(self, username: str, password: str) -> bool:
+        """
+        Authenticate user with the PlantDB API.
+
+        Parameters
+        ----------
+        username : str
+            Username for authentication
+        password : str
+            Password for authentication
+
+        Returns
+        -------
+        bool
+            True if login successful, False otherwise
+        """
+        url = f"{self.base_url}/login"
+        data = {
+            'username': username,
+            'password': password
+        }
+
+        try:
+            response = self.session.post(url, json=data)
+            if response.status_code == 200:
+                result = response.json()
+                self.jwt_token = result.get('access_token')
+                self.username = username
+
+                # Cookie is automatically stored in session
+                # No need to manually handle JWT token
+                return True
+            else:
+                error_msg = response.json().get('message', 'Login failed')
+                self.logger.error(f"Login failed: {error_msg}")
+                return False
+
+        except RequestException as e:
+            self.logger.error(f"Login request failed: {e}")
+            return False
+
+    def logout(self) -> bool:
+        """
+        Logout user from the PlantDB API.
+
+        Returns
+        -------
+        bool
+            True if logout successful
+        """
+        url = f"{self.base_url}/logout"
+        try:
+            response = self.session.post(url)
+            if response.status_code == 200:
+                self.username = None
+                # Cookie is automatically cleared by server
+                return True
+            return False
+        except Exception:
+            return False
+
+    def refresh_token(self) -> bool:
+        """
+        Refresh the JWT token (cookie updated automatically).
+        """
+        url = f"{self.base_url}/refresh"
+        try:
+            response = self.session.post(url)
+            if response.status_code == 200:
+                # Cookie is automatically updated by server
+                return True
+            return False
+        except Exception:
+            return False
+
+    def _make_authenticated_request(self, method, url, **kwargs):
+        """
+        Make an authenticated request with automatic token refresh.
+        """
+        response = getattr(self.session, method.lower())(url, **kwargs)
+
+        # Handle authentication errors
+        if response.status_code == 401:
+            # Try to refresh token
+            if self.refresh_token():
+                # Retry the original request
+                response = getattr(self.session, method.lower())(url, **kwargs)
+            else:
+                self.username = None
+                raise Exception("Authentication failed. Please login again.")
+
+        return response
 
     def _handle_http_errors(self, response):
         """
         Handles HTTP errors by raising a custom exception with an error message obtained
         from the HTTP response. This function intercepts the original exception, extracts
-        the error message from the response JSON, and raises a new exception of the same
+        the error message from the response JSON, and raises a new exception to the same
         type with the extracted message.
 
         Parameters
