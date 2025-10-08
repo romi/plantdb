@@ -69,6 +69,7 @@ import argparse
 import atexit
 import logging
 import os
+import secrets
 import shutil
 import sys
 from time import sleep
@@ -93,9 +94,11 @@ from plantdb.server.rest_api import FileMetadata
 from plantdb.server.rest_api import FilesetCreate
 from plantdb.server.rest_api import FilesetFiles
 from plantdb.server.rest_api import FilesetMetadata
+from plantdb.server.rest_api import HealthCheck
 from plantdb.server.rest_api import Home
 from plantdb.server.rest_api import Image
 from plantdb.server.rest_api import Login
+from plantdb.server.rest_api import Logout
 from plantdb.server.rest_api import Mesh
 from plantdb.server.rest_api import PointCloud
 from plantdb.server.rest_api import PointCloudGroundTruth
@@ -108,7 +111,7 @@ from plantdb.server.rest_api import ScanMetadata
 from plantdb.server.rest_api import ScansList
 from plantdb.server.rest_api import ScansTable
 from plantdb.server.rest_api import Sequence
-from plantdb.server.rest_api import HealthCheck
+from plantdb.server.rest_api import TokenRefresh
 
 
 def parsing():
@@ -187,13 +190,16 @@ def rest_api(db_location, proxy=False, url_prefix="",
         logger.info(f"Using prefix '{url_prefix}' for all RESTful endpoints.")
         # App is behind one proxy that sets the -For and -Host headers.
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
-        # Set secure cookies
-        app.config.update(
-            SESSION_COOKIE_SECURE=True,
-            SESSION_COOKIE_SAMESITE='Lax'
-        )
     else:
         api = Api(app)  # Initialize API without proxy settings
+
+    # Set secure cookies
+    app.config.update(
+        SECRET_KEY=os.environ.get('FLASK_SECRET_KEY', secrets.token_urlsafe(32)),
+        SESSION_COOKIE_SECURE=True,  # Only send cookies over HTTPS
+        SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access
+        SESSION_COOKIE_SAMESITE='Strict'  # CSRF protection
+    )
 
     if test:
         if empty:
@@ -264,6 +270,10 @@ def rest_api(db_location, proxy=False, url_prefix="",
                      resource_class_args=tuple([db]))
     api.add_resource(Login, '/login',
                      resource_class_args=tuple([db]))
+    api.add_resource(Logout, '/logout',
+                     resource_class_args=tuple([db]))
+    api.add_resource(TokenRefresh, '/token-refresh',
+                     resource_class_args=tuple([db]))
     # API endpoints for `plantdb.commons.fsdb.Scan`:
     api.add_resource(ScanCreate, '/api/scan',
                      resource_class_args=tuple([db, logger]))
@@ -295,6 +305,12 @@ def main():
     """
     parser = parsing()
     args = parser.parse_args()
+
+    if args.debug:
+        os.environ['PLANTDB_ENV'] = "development"
+    else:
+        os.environ['PLANTDB_ENV'] = "production"
+
     app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level,
                    test=args.test, empty=args.empty, models=args.models)
     # Start the Flask application:
