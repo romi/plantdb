@@ -3101,7 +3101,7 @@ See the notes below for a list of dataset names and their meanings.</p>
     <span style="color: #3D7B7B; font-style: italic"># --- Backward compatibility ---</span>
     <span style="color: #3D7B7B; font-style: italic"># If the database was set up under a previous version, the Scan may not have an &#39;owner&#39; entry in their metadata.</span>
     <span style="color: #3D7B7B; font-style: italic"># -----------------------------</span>
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
     <span style="color: #3D7B7B; font-style: italic"># Connect to the database and iterate over scans to get the owner of each scan:</span>
     db <span style="color: #666">=</span> FSDB(out_path)
     db<span style="color: #666">.</span>connect()
@@ -3253,7 +3253,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="FSDB (plantdb.commons.fsdb.FSDB)" href="../fsdb/#plantdb.commons.fsdb.FSDB">FSDB</a></code>
+                  <code><span title="plantdb.commons.fsdb.FSDB">FSDB</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3363,7 +3363,7 @@ Defaults to the temporary directory under 'ROMI_DB', as defined by <code>TMP_TES
 <span style="color: #BA2121; font-style: italic">    PosixPath(&#39;/tmp/ROMI_DB_********&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
     <span style="color: #008000; font-weight: bold">if</span> dataset <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:
         <span style="color: #008000; font-weight: bold">return</span> FSDB(setup_empty_database(out_path<span style="color: #666">=</span>out_path))
     <span style="color: #008000; font-weight: bold">else</span>:
