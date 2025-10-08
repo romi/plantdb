@@ -1035,7 +1035,7 @@ def _parse_database_spec(spec):
     Examples
     --------
     >>> from plantdb.client.sync import _parse_database_spec
-    >>> from plantdb.commons.fsdb import FSDB
+    >>> from plantdb.commons.fsdb.core import FSDB
     >>>
     >>> # FSDB instance
     >>> db = FSDB('/path/to/db')

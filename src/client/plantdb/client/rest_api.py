@@ -522,9 +522,9 @@ def get_file_uri(scan, fileset, file):
     ----------
     scan : plantdb.commons.fsdb.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.File or str
+    file : plantdb.commons.fsdb.core.File or str
         A ``File`` instance or the name of the file.
 
     Returns
@@ -538,9 +538,9 @@ def get_file_uri(scan, fileset, file):
     >>> get_file_uri('real_plant', 'images', '00000_rgb')
     'files/real_plant/images/00000_rgb'
     """
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file

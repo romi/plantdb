@@ -3,10 +3,10 @@
 
 import unittest
 
-from plantdb.commons.fsdb import FSDB
-from plantdb.commons.fsdb import File
-from plantdb.commons.fsdb import Fileset
-from plantdb.commons.fsdb import Scan
+from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.fsdb.core import File
+from plantdb.commons.fsdb.core import Fileset
+from plantdb.commons.fsdb.core import Scan
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError

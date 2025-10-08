@@ -59,7 +59,7 @@ from dash import dcc
 from dash import html
 
 from plantdb.client.rest_api import list_scan_names
-from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.client.sync import FSDBSync
 from plantdb.client.sync import config_from_url
 

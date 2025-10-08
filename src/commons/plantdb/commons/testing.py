@@ -31,8 +31,8 @@ import shutil
 import tempfile
 import unittest
 
-from plantdb.commons.fsdb import FSDB
-from plantdb.commons.fsdb import dummy_db
+from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.fsdb.core import dummy_db
 from plantdb.commons.test_database import test_database
 from plantdb.commons.utils import locate_task_filesets
 
@@ -221,7 +221,7 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.commons.fsdb.Fileset
+        plantdb.commons.fsdb.core.Fileset
             The ``Fileset`` corresponding to the given task.
         """
         scan = self.get_test_scan()

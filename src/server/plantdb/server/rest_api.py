@@ -116,7 +116,7 @@ def compute_fileset_matches(scan):
     Examples
     --------
     >>> from plantdb.server.rest_api import compute_fileset_matches
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
@@ -135,7 +135,7 @@ def get_path(f, db_prefix="/files/"):
 
     Parameters
     ----------
-    f : plantdb.commons.fsdb.File
+    f : plantdb.commons.fsdb.core.File
         The file to get the path for.
     db_prefix : str, optional
         A prefix to use... ???
@@ -373,9 +373,9 @@ def get_file_uri(scan, fileset, file):
     ----------
     scan : plantdb.commons.fsdb.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.File or str
+    file : plantdb.commons.fsdb.core.File or str
         A ``File`` instance or the name of the file.
 
     Returns
@@ -397,9 +397,9 @@ def get_file_uri(scan, fileset, file):
     >>> get_file_uri(scan, fs, f)
     '/files/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'
     """
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
@@ -413,9 +413,9 @@ def get_image_uri(scan, fileset, file, size="orig"):
     ----------
     scan : plantdb.commons.fsdb.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.File or str
+    file : plantdb.commons.fsdb.core.File or str
         A ``File`` instance or the name of the file.
     size : {'orig', 'large', 'thumb'} or int, optional
         If an integer, use  it as the size of the cached image to create and return.
@@ -443,9 +443,9 @@ def get_image_uri(scan, fileset, file, size="orig"):
     >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb')
     '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb'
     """
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
@@ -3343,7 +3343,7 @@ class FilesetFiles(Resource):
         """List all files in a specified fileset.
 
         This method retrieves the list of files contained in a fileset using the
-        `list_files()` method from `plantdb.commons.fsdb.Fileset`.
+        `list_files()` method from `plantdb.commons.fsdb.core.Fileset`.
 
         Parameters
         ----------

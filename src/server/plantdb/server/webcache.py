@@ -39,7 +39,7 @@ Examples
 --------
 >>> from plantdb.server import webcache
 >>> from os import environ
->>> from plantdb.commons.fsdb import FSDB
+>>> from plantdb.commons.fsdb.core import FSDB
 >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
 >>> db.connect()
 >>> # Get the path to the original image:

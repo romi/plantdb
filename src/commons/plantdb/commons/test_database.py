@@ -499,7 +499,7 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     # --- Backward compatibility ---
     # If the database was set up under a previous version, the Scan may not have an 'owner' entry in their metadata.
     # -----------------------------
-    from plantdb.commons.fsdb import FSDB
+    from plantdb.commons.fsdb.core import FSDB
     # Connect to the database and iterate over scans to get the owner of each scan:
     db = FSDB(out_path)
     db.connect()
@@ -552,7 +552,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
-    from plantdb.commons.fsdb import FSDB
+    from plantdb.commons.fsdb.core import FSDB
     if dataset is None:
         return FSDB(setup_empty_database(out_path=out_path))
     else:

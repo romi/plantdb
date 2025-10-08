@@ -78,7 +78,7 @@ from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
@@ -271,14 +271,14 @@ def rest_api(db_location, proxy=False, url_prefix="",
                      resource_class_args=tuple([db, logger]))
     api.add_resource(ScanFilesets, '/api/scan/<string:scan_id>/filesets',
                      resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.commons.fsdb.Fileset`:
+    # API endpoints for `plantdb.commons.fsdb.core.Fileset`:
     api.add_resource(FilesetCreate, '/api/fileset',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_id>/metadata',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_id>/files',
                      resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.commons.fsdb.File`:
+    # API endpoints for `plantdb.commons.fsdb.core.File`:
     api.add_resource(FileCreate, '/api/file',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata',

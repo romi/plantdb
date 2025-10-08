@@ -18,7 +18,7 @@ This module provides functionality for serializing and deserializing filesystem 
 
 ```python
 # Example of converting a scan to a dictionary representation
-from plantdb.commons.fsdb import Scan
+from plantdb.commons.fsdb.core import Scan
 
 # Assuming we have a scan object
 scan = Scan(...)
@@ -54,6 +54,7 @@ from .path_helpers import _file_path
 from .path_helpers import _fileset_path
 from .exceptions import FileNoFileNameError
 from .exceptions import FileNoIDError
+from .exceptions import FileNotFoundError
 from .exceptions import FilesetNoIDError
 from .exceptions import FilesetNotFoundError
 from ..log import get_logger
@@ -72,10 +73,10 @@ def _parse_fileset(scan, fileset_info):
 
     Returns
     -------
-    plantdb.commons.fsdb.Fileset
+    plantdb.commons.fsdb.core.Fileset
         The ``Fileset`` instance from parsed JSON.
     """
-    from plantdb.commons.fsdb import Fileset
+    from plantdb.commons.fsdb.core import Fileset
     fsid = fileset_info.get("id", None)
     if fsid is None:
         raise FilesetNoIDError("Fileset: No ID")
@@ -94,14 +95,14 @@ def _parse_file(fileset, file_info):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The fileset instance to associate the returned ``File`` to.
     file_info : dict
         The file dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
 
     Returns
     -------
-    plantdb.commons.fsdb.File
+    plantdb.commons.fsdb.core.File
         The ``File`` instance from parsed JSON.
 
     Raises
@@ -113,7 +114,7 @@ def _parse_file(fileset, file_info):
     FileNotFoundError
         If the file is not found on drive.
     """
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import File
     fid = file_info.get("id", None)
     if fid is None:
         logger.debug(f"Input `file_info`: {file_info}")
@@ -139,7 +140,7 @@ def _file_to_dict(file):
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         A file to get "id" and "filename" from.
 
     Returns
@@ -155,7 +156,7 @@ def _fileset_to_dict(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         A fileset to get "id" and "files" dictionary from.
 
     Returns

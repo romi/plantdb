@@ -20,7 +20,7 @@ A utility module for managing metadata in a plant database system, providing fun
 ## Usage Examples
 
 ```python
-from plantdb.commons.fsdb import dummy_db
+from plantdb.commons.fsdb.core import dummy_db
 from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
 
 # Create a dummy database with a scan
@@ -60,7 +60,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import dummy_db
     >>> from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
     >>> db = dummy_db(with_scan=True)
     >>> scan = db.get_scan("myscan_001")

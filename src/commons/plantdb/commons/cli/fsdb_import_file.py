@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb.core import FSDB
 
 
 def parsing():
