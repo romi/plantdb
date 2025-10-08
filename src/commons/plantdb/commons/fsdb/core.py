@@ -102,11 +102,13 @@ from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
 from typing import Dict
-
-import bcrypt
+from typing import Union
 
 from plantdb.commons import db
 from plantdb.commons.log import get_logger
+from .auth import JWTSessionManager
+from .auth import Permission
+from .auth import RBACManager
 from .exceptions import FileNotFoundError
 from .exceptions import FilesetNotFoundError
 from .exceptions import ScanNotFoundError
@@ -287,7 +289,9 @@ class FSDB(db.DB):
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
 
-    def __init__(self, basedir, required_filesets=['metadata'], dummy=False):
+    def __init__(self, basedir: str | Path, required_filesets=['metadata'],
+                 dummy: bool = False, logger=logger, session_timeout: int = 3600,
+                 max_login_attempts=3, lockout_duration=900, max_concurrent_sessions=10):
         """Database constructor.
 
         Check given ``basedir`` directory exists and load accessible ``Scan`` objects.
@@ -302,6 +306,10 @@ class FSDB(db.DB):
             Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
         dummy : bool, optional
             If ``True``, deactivate any requirements `required_filesets` & `required_files_json`.
+        logger : logging.Logger, optional
+            Logger instance to use for logging. Defaults to the module logger.
+        session_timeout : int, optional
+            Session timeout in seconds. Defaults to 3600 (1 hour).
 
         Raises
         ------
@@ -315,283 +323,42 @@ class FSDB(db.DB):
         plantdb.commons.fsdb.core.MARKER_FILE_NAME
         """
         super().__init__()
+        self.logger = logger or get_logger(__class__.__name__)
+        self.dummy = dummy
 
         basedir = Path(basedir)
         # Check the given path to root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
-
         self.basedir = Path(basedir).resolve()
-        self.dummy = dummy
-
-        # User management attributes
-        self.users = {}  # {username: {password: str, created: timestamp}}
-        self._load_users()
-        # Create or load the users database
-        self.user = None
-        self.max_login_attempts = 5
-        self.lockout_duration = timedelta(minutes=15)
-
-        # Database state
-        self.is_connected = False
         self.scans = {}
-
-        # Configuration
-        self.required_filesets = required_filesets
+        self.is_connected = False
+        self.required_filesets = required_filesets or []
 
         # Initialize scan lock manager
         self.lock_manager = ScanLockManager(basedir)
 
-    def _load_users(self):
-        """Load sers dictionary from file."""
-        users_file = self.basedir / 'users.json'
-        if not users_file.is_file():
-            # Create the users database as a JSON file
-            users_file.touch()
-            self.users = {}
-            with open(users_file, "w") as f:
-                json.dump(self.users, f, indent=2)
-            logger.info(f"Initialized the new database at '{self.basedir}'!")
-        else:
-            # Load the users database
-            with open(users_file, "r") as f:
-                self.users = json.load(f)
-            logger.debug(f"Loaded {len(self.users)} users from '{users_file}'.")
-        return
+        # Initialize session manager
+        self.session_manager = JWTSessionManager(session_timeout, max_concurrent_sessions)
+        self.current_session_id = None
 
-    def _save_users(self):
-        """Save users dictionary to file using an atomic write pattern."""
-        users_file = self.basedir / 'users.json'
-        # Create a temporary file in the same directory
-        temp_file = users_file.with_suffix('.tmp')
+        # Initialize RBAC manager with groups file in basedir
+        users_file = os.path.join(basedir, "users.json")
+        groups_file = os.path.join(basedir, "groups.json")
+        self.rbac_manager = RBACManager(users_file, groups_file, max_login_attempts, lockout_duration)
+
+    def connect(self):
+        """Connect the database by loading the scans' dataset."""
         try:
-            # Write to the temporary file first
-            with open(temp_file, "w") as f:
-                json.dump(self.users, f, indent=2)
-
-            # Rename the temporary file to the final filename (atomic operation on most file systems)
-            os.replace(temp_file, users_file)
-        except Exception as e:
-            # If anything goes wrong, clean up the temporary file
-            if temp_file.exists():
-                temp_file.unlink()
-            logger.error(f"Failed to save users database: {str(e)}")
-            raise
-        return
-
-    def create_user(self, username, fullname, password):
-        """Create a new user and store the user information in a file.
-
-        Parameters
-        ----------
-        username : str
-            The username of the user to be created.
-            This will be converted to lowercase.
-        fullname : str
-            The full name of the user to be created.
-        password : str
-            The password of the user to be created.
-
-        Examples
-        --------
-        >>> from plantdb.commons.fsdb import FSDB
-        >>> from plantdb.commons.fsdb import dummy_db
-        >>> db = dummy_db()
-        >>> db.create_user('batman', "Bruce Wayne", "joker")
-        >>> db.connect('batman', 'joker')
-        >>> print(db.user)
-        batman
-        >>> db.disconnect()  # clean up (delete) the temporary dummy database
-        """
-        username = username.lower()  # Convert the username to lowercase to maintain uniformity.
-        timestamp = date_now(fmt='%Y-%m-%d_%H:%M:%S')  # Get the current timestamp for tracking user creation time.
-
-        # Verify if the login is available
-        try:
-            assert username not in self.users
-        except AssertionError:
-            logger.error(f"User '{username}' already exists!")
-            return
-
-        # Generate salt and hash password
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-
-        # Add the new user's data to the `self.users` dictionary.
-        self.users[username] = {
-            'password': hashed.decode('utf-8'),  # Store the hashed password as a string.
-            'fullname': fullname,  # Store the provided full name of the user.
-            'created': timestamp,  # Store the formatted timestamp to record when the user was created.
-            'last_login': None,  # Store the timestamp of the last login.
-            'failed_attempts': 0,  # Store the number of failed login attempts.
-        }
-
-        # Save all user data (including the newly created user) to 'users.json' file.
-        self._save_users()
-        logger.info(f"Created user '{username}' with fullname '{fullname}'.")
-
-        return f"Welcome {self.users[username]['fullname']}, please login...'"
-
-    def _lock_db(self):
-        """
-        DEPRECATED: Database-level locking replaced by scan-level locking
-        This method is kept for backward compatibility but does nothing
-        """
-        logger.warning("_lock_db is deprecated. Use scan-level locking instead.")
-        pass
-
-    def _unlock_db(self):
-        """
-        DEPRECATED: Database-level locking replaced by scan-level locking
-        This method is kept for backward compatibility but does nothing
-        """
-        logger.warning("_unlock_db is deprecated. Use scan-level locking instead.")
-        pass
-
-    def connect(self, login=None, password=""):
-        """Connect to the local database.
-
-        Parameters
-        ----------
-        login : str, optional
-            The user login, if not defined, use the ``'anonymous'`` user.
-            If defined, it should match a known user.
-
-        Examples
-        --------
-        >>> from plantdb.commons.fsdb import dummy_db
-        >>> db = dummy_db()
-        >>> print(db.is_connected)
-        True
-        >>> db.create_user("batman", "Bruce Wayne", 'joker')
-        >>> db.connect('batman', 'joker')
-        >>> print(db.is_connected)
-        True
-        >>> db.disconnect()  # clean up (delete) the temporary dummy database
-        >>> print(db.is_connected)
-        False
-        """
-        # Store current user before attempting connection
-        prev_user = copy.copy(self.user)
-
-        # Handle user authentication
-        if login is not None and login != "anonymous":
-            try:
-                # Validate user credentials
-                assert self.validate_user(login, password)
-            except AssertionError:
-                # User doesn't exist or wrong password
-                logger.error(f"Did not connect to database.")
-                return
-            else:
-                self.user = login
-                self.users[self.user]['last_login'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
-                self._save_users()
-        else:
-            # Create and use anonymous user if no login provided
-            if 'anonymous' not in self.users:
-                self.create_user("anonymous", "Guy Fawkes", "AlanMoore")
-            self.user = "anonymous"
-            # Warn about anonymous user usage except for dummy databases
-            if not self.dummy:
-                logger.warning("Using anonymous user is discouraged!")
-                logger.info("Use `connect(login='username')` to login as a user.")
-
-        # Handle database connection
-        if not self.is_connected:
+            # Initialize scan discovery
             self.scans = _load_scans(self)
             self.is_connected = True
-        else:
-            # Already connected - log appropriate message based on user change
-            if self.user != prev_user:
-                logger.info(f"Connected as '{self.user}' to the database '{self.path()}'.")
-            else:
-                logger.info(f"Already connected as '{self.user}' to the database '{self.path()}'!")
-        return
+            self.logger.info("Connected to database successfully")
+        except Exception as e:
+            self.logger.error(f"Failed to connect to database: {e}")
+            raise
 
-    def validate_user(self, username: str, password: str) -> bool:
-        """Validate the user login.
-
-        Parameters
-        ----------
-        username : str
-            The username provided by the user attempting to log in.
-        password : str
-            The password provided by the user attempting to log in.
-
-        Returns
-        -------
-        bool
-            ``True`` if the login attempt is successful, ``False`` otherwise.
-
-        Raises
-        ------
-        KeyError
-            If there is an issue accessing necessary user data.
-        """
-        if self._is_account_locked(username):
-            logger.warning(f"Account locked: {username}")
-            return False
-
-        if username not in self.users:
-            logger.error(f"Login attempt for non-existent user: {username}")
-            return False
-
-        # Verify password
-        stored_hash = self.users[username]['password']
-        if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
-            # Reset failed attempts on successful login
-            self.users[username]['failed_attempts'] = 0
-            self.users[username]['last_login'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
-            return True
-
-        # Handle failed login attempt
-        self._record_failed_attempt(username)
-        logger.error(f"Invalid credentials for user '{username}'")
-        return False
-
-    def user_exists(self, username: str) -> bool:
-        """Check if the user exists in the local database."""
-        return username in self.users
-
-    def _is_account_locked(self, username: str) -> bool:
-        """Verify if the account is locked.
-
-        Parameters
-        ----------
-        username : str
-            The username of the account to check for lock status.
-
-        Returns
-        -------
-        bool
-            ``True`` if the account is locked, otherwise ``False``.
-        """
-        attempts = self.users[username].get('failed_attempts', 0)
-        if attempts >= self.max_login_attempts:
-            last_attempt_str = self.users[username].get('last_failed_attempt', date_now(fmt='%Y-%m-%d_%H:%M:%S'))
-            last_attempt = datetime.strptime(last_attempt_str, '%Y-%m-%d_%H:%M:%S')
-            if datetime.now() - last_attempt < self.lockout_duration:
-                logger.warning(
-                    f"Locking account {username} for more than {self.max_login_attempts} consecutive failed login attempts.")
-                logger.info(f"Try logging in after {self.lockout_duration}min.")
-                return True
-        return False
-
-    def _record_failed_attempt(self, username: str) -> None:
-        """Record failed login attempt.
-
-        Parameters
-        ----------
-        username : str
-            The username for which the failed login attempt is being recorded.
-        """
-        self.users[username]['failed_attempts'] += 1
-        self.users[username]['last_failed_attempt'] = date_now(fmt='%Y-%m-%d_%H:%M:%S')
-        # Save the updated user data to file
-        self._save_users()
-        logger.warning(f"Failed login attempt (n={self.users[username]['failed_attempts']}) for user: {username}")
-        return
+        return True
 
     def disconnect(self):
         """
@@ -618,6 +385,7 @@ class FSDB(db.DB):
                 shutil.rmtree(self.basedir)
             self.scans = {}
             self.is_connected = False
+            self.current_session_id = None
             return
 
         if self.is_connected:
@@ -625,6 +393,7 @@ class FSDB(db.DB):
                 scan._erase()
             self.scans = {}
             self.is_connected = False
+            self.current_session_id = None
         else:
             logger.info(f"Not connected!")
         return
@@ -678,7 +447,7 @@ class FSDB(db.DB):
         """
         return scan_id in self.scans
 
-    def get_scans(self, query=None, fuzzy=False, owner_only=True):
+    def get_scans(self, query=None, **kwargs):
         """Get the list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
@@ -686,6 +455,9 @@ class FSDB(db.DB):
         query : dict, optional
             A query to use to filter the returned list of scans.
             The metadata must match given ``key`` and ``value`` from the `query` dictionary.
+
+        Other Parameters
+        ----------------
         fuzzy : bool, optional
             Whether to use fuzzy matching or not, that is the use of regular expressions.
         owner_only : bool, optional
@@ -709,12 +481,37 @@ class FSDB(db.DB):
         [<plantdb.commons.fsdb.Scan at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if owner_only:
+        if not self.is_connected:
+            raise ValueError("Database not connected")
+
+        current_user = self.get_current_user()
+        if not current_user:
+            self.logger.warning("No authenticated user for get_scans")
+            return {}
+
+        # Get all scans and filter by access permissions
+        accessible_scans = {}
+
+        for scan_id, scan in self.scans.items():
+            try:
+                metadata = self.rbac_manager.ensure_scan_owner(scan.get_metadata())
+                if self.rbac_manager.can_access_scan(current_user, metadata, Permission.READ):
+                    accessible_scans[scan_id] = scan
+            except Exception as e:
+                self.logger.warning(f"Error checking access for scan {scan_id}: {e}")
+                continue
+
+        if kwargs.get('owner_only', False):
             if query is None:
-                query = {'owner': self.user}
+                query = {'owner': current_user.username}
             else:
-                query.update({'owner': self.user})
-        return [self.get_scan(scan.id) for scan in _filter_query(list(self.scans.values()), query, fuzzy)]
+                query.update({'owner': current_user.username})
+
+        # Apply query filter if provided
+        if query:
+            accessible_scans = _filter_query(list(accessible_scans.values()), query, kwargs.get('fuzzy', False))
+
+        return accessible_scans
 
     def get_scan(self, scan_id):
         """Get or create a `Scan` instance in the local database.
@@ -746,12 +543,26 @@ class FSDB(db.DB):
         if not self.is_connected:
             raise ValueError("Database not connected")
 
-        # Use shared lock for read operations
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, self.user or "anonymous"):
-            if not self.scan_exists(scan_id):
-                raise ScanNotFoundError(self, scan_id)
+        if not self.scan_exists(scan_id):
+            raise ScanNotFoundError(self, scan_id)
 
-            return self.scans[scan_id]
+        current_user = self.get_current_user()
+        if not current_user:
+            self.logger.warning(f"No authenticated user for `get_scan({scan_id})`")
+            # return None
+            current_user = self.get_guest_user()
+            self.logger.info(f"Using guest user account")
+
+        scan = self.scans[scan_id]
+        metadata = self.rbac_manager.ensure_scan_owner(scan.get_metadata())
+        if self.rbac_manager.can_access_scan(current_user, metadata, Permission.READ):
+            # Use shared lock for read operations
+            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
+                return scan
+        else:
+            self.logger.warning(f"User '{current_user.username}' cannot access scan {scan_id}!")
+
+        return None
 
     def create_scan(self, scan_id, metadata=None):
         """Create a new ``Scan`` instance in the local database.
@@ -798,43 +609,67 @@ class FSDB(db.DB):
         OSError: Invalid scan identifier '0/07'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Verify if the connection is established first
-        if not self.is_connected:
-            raise ValueError("Database not connected")
-        # Verify if a user is authenticated
-        if not self.user:
-            raise ValueError("No user authenticated")
-        # Verify if the given `scan_id` is valid
-        if not _is_valid_id(scan_id):
-            raise IOError(f"Invalid scan identifier '{scan_id}'!")
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        # Check CREATE permission
+        if not self.rbac_manager.has_permission(current_user, Permission.CREATE):
+            raise PermissionError("Insufficient permissions to create scan")
+
+        if self.scan_exists(scan_id):
+            raise ValueError(f"Scan {scan_id} already exists")
+
+        # Prepare metadata with ownership
+        if metadata is None:
+            metadata = {}
+
+        # Set current user as owner if not specified
+        if 'owner' not in metadata:
+            metadata['owner'] = current_user.username
+            now = iso_date_now()
+            metadata['created'] = now  # creation timestamp
+            metadata['last_modified'] = now  # modification timestamp
+            metadata['created_by'] = current_user.name
+
+        # Validate sharing groups if specified
+        if 'sharing' in metadata:
+            sharing_groups = metadata['sharing']
+            if not isinstance(sharing_groups, list):
+                raise ValueError("Sharing field must be a list of group names")
+            if not self.rbac_manager.validate_sharing_groups(sharing_groups):
+                raise ValueError("One or more sharing groups do not exist")
 
         # Use exclusive lock for scan creation
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, self.user):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `scan_id` already exists in the local database
             if self.scan_exists(scan_id):
                 raise IOError(f"Given scan identifier '{scan_id}' already exists!")
+            try:
+                # Initialize scan object
+                scan = Scan(self, scan_id)  # Initialize a new Scan instance
+                scan_path = _make_scan(scan)  # Create directory structure
 
-            # Initialize scan object
-            scan = Scan(self, scan_id)  # Initialize a new Scan instance
-            _make_scan(scan)  # Create directory structure
+                # Cannot use scan.set_metadata(initial_metadata) here as ownership is not granted yet!
+                _set_metadata(scan.metadata, metadata, None)  # add metadata dictionary to the new scan
+                _store_scan_metadata(scan)
 
-            # Set initial metadata including owner
-            initial_metadata = metadata or {}
-            initial_metadata['owner'] = self.user  # owner is always set to the connected user
-            now = date_now('%Y-%m-%d_%H:%M:%S')
-            initial_metadata['created'] = now  # creation timestamp
-            initial_metadata['last_modified'] = now  # modification timestamp
-            initial_metadata['created_by'] = self.user
+                scan.store()  # store the new scan in the local database
+                self.scans[scan_id] = scan  # Update scans dictionary with newly created
 
-            # Cannot use scan.set_metadata(initial_metadata) here as ownership is not granted yet!
-            _set_metadata(scan.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
-            _store_scan_metadata(scan)
+                logger.info(f"Created scan '{scan_id}' for user '{current_user.username}'")
+                return scan
 
-            scan.store()  # store the new scan in the local database
-            self.scans[scan_id] = scan  # Update scans dictionary with newly created
-
-            logger.info(f"Created scan '{scan_id}' for user '{self.user}'")
-            return scan
+            except Exception as e:
+                self.logger.error(f"Failed to create scan {scan_id}: {e}")
+                # Cleanup on failure
+                try:
+                    if os.path.exists(scan_path):
+                        import shutil
+                        shutil.rmtree(scan_path)
+                except:
+                    pass
+                return None
 
     def delete_scan(self, scan_id):
         """Delete an existing `Scan` from the local database.
@@ -869,30 +704,38 @@ class FSDB(db.DB):
         OSError: Invalid id
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Verify if the connection is established first
-        if not self.is_connected:
-            raise ValueError("Database not connected")
-        # Verify if a user is authenticated
-        if not self.user:
-            raise ValueError("No user authenticated")
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if not self.scan_exists(scan_id):
+            raise ValueError(f"Scan {scan_id} does not exist")
+
+        # Check DELETE permission for this specific scan
+        scan = self.scans[scan_id]
+        metadata = self.rbac_manager.ensure_scan_owner(scan.get_metadata())
+
+        if not self.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
+            raise PermissionError("Insufficient permissions to delete scan")
+
+        # Check if scan is locked
+        lock_status = self.get_scan_lock_status(scan_id)
+        if lock_status['is_locked'] and lock_status['locked_by'] != current_user.username:
+            raise RuntimeError(f"Scan {scan_id} is locked by another user")
 
         # Use exclusive lock for scan deletion
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, self.user):
-            # Verify if the given `scan_id` exists in the local database
-            if not self.scan_exists(scan_id):
-                logging.warning(f"Given scan identifier '{scan_id}' does NOT exists!")
-                return
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
+            try:
+                # Get the Scan instance from database
+                scan = self.scans[scan_id]
+                _delete_scan(scan)  # delete the scan directory
+                self.scans.pop(scan_id)  # remove the scan from the scan list
+                logger.info(f"Deleted scan '{scan_id}' by user '{current_user.username}'")
+                return True
 
-            # Get the Scan instance from database
-            scan = self.scans[scan_id]
-            # Check ownership
-            if scan.owner != self.user:
-                raise PermissionError(f"Only the owner can delete scan '{scan_id}'")
-
-            _delete_scan(scan)  # delete the scan directory
-            self.scans.pop(scan_id)  # remove the scan from the scan list
-            logger.info(f"Deleted scan '{scan_id}' by user '{self.user}'")
-
+            except Exception as e:
+                self.logger.error(f"Failed to delete scan {scan_id}: {e}")
+                raise
         return
 
     def path(self) -> pathlib.Path:
@@ -934,7 +777,7 @@ class FSDB(db.DB):
         >>> db = dummy_db(with_scan=True)
         >>> db.list_scans()  # list scans owned by the current user
         ['myscan_001']
-        >>> db.create_user("batman", "Bruce Wayne", 'joker')
+        >>> db.create("batman", "Bruce Wayne", 'joker')
         >>> db.connect('batman', 'joker')
         >>> db.list_scans()  # list scans owned by the current user
         >>> []
@@ -942,14 +785,18 @@ class FSDB(db.DB):
         ['myscan_001']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        current_user = self.get_current_user()
+        if not current_user:
+            owner_only = False
+
         if query is None and not owner_only:
             return list(self.scans.keys())
         else:
             if owner_only:
                 if query is None:
-                    query = {'owner': self.user}
+                    query = {'owner': current_user.username}
                 else:
-                    query.update({'owner': self.user})
+                    query.update({'owner': current_user.username})
             return [scan.id for scan in _filter_query(list(self.scans.values()), query, fuzzy)]
 
     def get_scan_lock_status(self, scan_id: str) -> Dict:
@@ -992,6 +839,298 @@ class FSDB(db.DB):
                 active_locks[scan_id] = lock_status
 
         return active_locks
+
+    # User management methods
+
+    def validate_user(self, username: str, password: str) -> bool:
+        """Validate the user credentials.
+
+        Parameters
+        ----------
+        username : str
+            The username provided by the user attempting to log in.
+        password : str
+            The password provided by the user attempting to log in.
+
+        Returns
+        -------
+        bool
+            ``True`` if the login attempt is successful, ``False`` otherwise.
+
+        Raises
+        ------
+        KeyError
+            If there is an issue accessing necessary user data.
+        """
+        return self.rbac_manager.users.validate(username, password)
+
+    def login(self, username: str, password: str) -> Union[str, None]:
+        """Authenticate user and create session.
+
+        Parameters
+        ----------
+        username : str
+            Username for authentication
+        password : str
+            Password for authentication
+
+        Returns
+        -------
+        Union[str, None]
+            Returns the user session ID if successful, ``None`` otherwise.
+        """
+        if not self.is_connected:
+            self.logger.error("Database not connected")
+            return None
+
+        if self.validate_user(username, password):
+            session_id = self.session_manager.create_session(username)
+            try:
+                assert session_id is not None
+            except AssertionError:
+                self.logger.warning(f"User {username} has reached max concurrent sessions")
+            else:
+                # Store current session for this connection
+                self.current_session_id = session_id
+                self.logger.info(f"User {username} logged in successfully")
+            return session_id
+        else:
+            self.logger.error(f"Failed to login user {username}")
+            return None
+
+    def logout(self, session_id: str = None):
+        """Logout current user and invalidate session."""
+        if not session_id:
+            session_id = self.current_session_id
+
+        if session_id and session_id in self.session_manager.sessions:
+            username = self.session_manager.sessions[session_id]['username']
+            del self.session_manager.sessions[session_id]
+            self.session_manager.invalidate_session(session_id)
+
+            if session_id == self.current_session_id:
+                self.current_session_id = None
+
+            self.logger.info(f"User {username} logged out successfully")
+            return True
+
+        return False
+
+    def get_guest_user(self):
+        return self.rbac_manager.get_guest_user()
+
+    def get_current_user(self):
+        """Get the currently authenticated user.
+
+        Returns
+        -------
+        User or None
+            Current user object if authenticated, None otherwise
+        """
+        if not self.current_session_id:
+            return None
+
+        username = self.session_manager.session_username(self.current_session_id)
+        if not username:
+            # Session expired or invalid
+            self.current_session_id = None
+            return None
+        else:
+            return self.rbac_manager.users.get_user(username)
+
+    # Group management methods
+
+    def create_group(self, name, users=None, description=None):
+        """Create a new group.
+
+        Parameters
+        ----------
+        name : str
+            Unique name for the group
+        users : set, optional
+            Initial set of users to add to the group
+        description : str, optional
+            An optional description of the group
+
+        Returns
+        -------
+        Group
+            The created group object
+
+        Raises
+        ------
+        PermissionError
+            If user lacks permission to create groups
+        ValueError
+            If group already exists
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        return self.rbac_manager.create_group(current_user, name, users, description)
+
+    def add_user_to_group(self, group_name, username):
+        """Add a user to a group.
+
+        Parameters
+        ----------
+        group_name : str
+            Name of the group
+        username : str
+            Username to add to the group
+
+        Returns
+        -------
+        bool
+            True if user was added successfully
+
+        Raises
+        ------
+        PermissionError
+            If user lacks permission to modify the group
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if not self.rbac_manager.add_user_to_group(current_user, group_name, username):
+            raise PermissionError("Insufficient permissions or operation failed")
+        return True
+
+    def remove_user_from_group(self, group_name, username):
+        """Remove a user from a group.
+
+        Parameters
+        ----------
+        group_name : str
+            Name of the group
+        username : str
+            Username to remove from the group
+
+        Returns
+        -------
+        bool
+            True if user was removed successfully
+
+        Raises
+        ------
+        PermissionError
+            If user lacks permission to modify the group
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if not self.rbac_manager.remove_user_from_group(current_user, group_name, username):
+            raise PermissionError("Insufficient permissions or operation failed")
+        return True
+
+    def delete_group(self, group_name):
+        """Delete a group.
+
+        Parameters
+        ----------
+        group_name : str
+            Name of the group to delete
+
+        Returns
+        -------
+        bool
+            True if group was deleted successfully
+
+        Raises
+        ------
+        PermissionError
+            If user lacks permission to delete groups
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if not self.rbac_manager.delete_group(current_user, group_name):
+            raise PermissionError("Insufficient permissions or group not found")
+        return True
+
+    def list_groups(self):
+        """List all groups.
+
+        Returns
+        -------
+        list
+            List of Group objects
+
+        Raises
+        ------
+        PermissionError
+            If user is not authenticated
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        groups = self.rbac_manager.list_groups(current_user)
+        return groups if groups is not None else []
+
+    def get_user_groups(self, username=None):
+        """Get groups for a user.
+
+        Parameters
+        ----------
+        username : str, optional
+            Username to query. If None, uses current user.
+
+        Returns
+        -------
+        list
+            List of Group objects the user belongs to
+
+        Raises
+        ------
+        PermissionError
+            If no authenticated user
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if username is None:
+            username = current_user.username
+
+        return self.rbac_manager.get_user_groups(username)
+
+    def get_scan_access_summary(self, scan_id):
+        """Get access summary for current user on a scan.
+
+        Parameters
+        ----------
+        scan_id : str
+            The scan identifier
+
+        Returns
+        -------
+        dict or None
+            Access summary dictionary if scan exists and is accessible
+
+        Raises
+        ------
+        PermissionError
+            If no authenticated user
+        """
+        current_user = self.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        if scan_id not in self.scans:
+            return None
+
+        scan = self.scans[scan_id]
+        try:
+            metadata = self.rbac_manager.ensure_scan_owner(scan.get_metadata())
+            return self.rbac_manager.get_user_scan_role_summary(current_user, metadata)
+        except Exception as e:
+            self.logger.warning(f"Error getting access summary for scan {scan_id}: {e}")
+            return None
 
 
 class Scan(db.Scan):
@@ -1266,6 +1405,13 @@ class Scan(db.Scan):
         value : any, optional
             The value to assign to `data` if the latest is not a dictionary.
 
+        Raises
+        ------
+        PermissionError
+            If user lacks permission to modify metadata
+        ValueError
+            If metadata validation fails
+
         Examples
         --------
         >>> import json
@@ -1284,15 +1430,45 @@ class Scan(db.Scan):
         if not self.db.user:
             raise ValueError("No user authenticated")
 
-        # Check ownership for metadata changes
-        current_owner = self.owner
-        if current_owner and current_owner != self.db.user:
-            raise PermissionError(f"Only the owner can modify metadata for scan '{self.id}'")
+        current_user = self.db.get_current_user()
+        if not current_user:
+            raise PermissionError("No authenticated user")
+
+        # Get current metadata for validation
+        old_metadata = self.db.rbac_manager.ensure_scan_owner(self.get_metadata())
+
+        if isinstance(data, str):
+            if value is None:
+                logger.warning(f"No value given for key '{data}'!")
+            new_metadata = {data: value}
+        else:
+            try:
+                assert isinstance(data, dict)
+            except AssertionError:
+                raise PermissionError(f"Invalid metadata type '{type(data)}'")
+            else:
+                new_metadata = {data: value}
+
+        # Validate metadata changes
+        if not self.db.rbac_manager.validate_scan_metadata_access(current_user, old_metadata, new_metadata):
+            raise PermissionError("Insufficient permissions to modify scan metadata")
+
+        # Validate sharing groups if present
+        if 'sharing' in new_metadata:
+            sharing_groups = new_metadata['sharing']
+            if not isinstance(sharing_groups, list):
+                raise ValueError("Sharing field must be a list of group names")
+            if not self.db.rbac_manager.validate_sharing_groups(sharing_groups):
+                raise ValueError("One or more sharing groups do not exist")
+
+        # Check WRITE permission for this scan
+        if not self.db.rbac_manager.can_access_scan(current_user, old_metadata, Permission.WRITE):
+            raise PermissionError("Insufficient permissions to modify scan")
 
         # Use exclusive lock for metadata updates
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, self.db.user):
             # Update metadata
-            _set_metadata(self.metadata, data, value)
+            _set_metadata(self.metadata, new_metadata, None)
             # Ensure modification timestamp
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
