@@ -916,7 +916,59 @@ class FSDB(db.DB):
 
         return False
 
+    def create_user(self, username, fullname, password, roles=None) -> None:
+        """
+        Create a new user with the specified details.
+
+        Parameters
+        ----------
+        username : str
+            The unique username for the new user.
+        fullname : str
+            The full name of the new user.
+        password : str
+            The password for the new user.
+        roles : list[str], optional
+            A list of roles to assign to the new user. Default is None.
+
+        See Also
+        --------
+        RBACManager.users.create : Method used to actually create the user.
+        """
+        return self.rbac_manager.users.create(username, fullname, password, roles)
+
     def get_guest_user(self):
+        """
+        Retrieve the guest user information from the RBAC manager.
+
+        Returns the guest user object containing all relevant data.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        dict
+            A dictionary representing the guest user with all attributes.
+            For example, it might contain keys like 'id', 'name', etc.
+
+        Examples
+        --------
+        >>> rbac_manager = RBACManager()
+        >>> user_info = rbac_manager.get_guest_user()
+        >>> print(user_info)
+        {'id': 12345, 'name': 'Guest User', 'role': 'Guest'}
+
+        Notes
+        -----
+        This method interacts with the underlying RBAC manager to fetch guest
+        user information. Ensure that the RBAC manager is correctly configured.
+
+        See Also
+        --------
+        rbac_manager.get_guest_user : The underlying method used by this function.
+        """
         return self.rbac_manager.get_guest_user()
 
     def get_current_user(self):
