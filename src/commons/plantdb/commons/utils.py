@@ -29,6 +29,8 @@ This module provides a collection of utility functions for data handling in the 
 
 import tempfile
 from datetime import datetime
+from datetime import timezone
+from datetime import tzinfo
 from pathlib import Path
 
 from PIL import Image
@@ -262,13 +264,8 @@ def partial_match(source, target, fuzzy=False):
         return source == target
 
 
-def date_now(fmt='%Y-%m-%d_%H:%M:%S'):
-    """Get current date and time in specified format.
-
-    Parameters
-    ----------
-    fmt : str, optional
-        The format string for the date and time (default is '%Y-%m-%d_%H:%M:%S').
+def iso_date_now():
+    """Get current date and time in ISO format.
 
     Returns
     -------
@@ -289,10 +286,8 @@ def date_now(fmt='%Y-%m-%d_%H:%M:%S'):
 
     Examples
     --------
-    >>> from plantdb.commons.utils import date_now
-    >>> date_now('%Y-%m-%d')
-    '2025-09-08'
-    >>> date_now()
-    '2025-09-08_15:36:07'
+    >>> from plantdb.commons.utils import iso_date_now
+    >>> iso_date_now()
+    '2025-09-16T23:39:54.132898'
     """
-    return datetime.strftime(datetime.now(), fmt)
+    return datetime.isoformat(datetime.now())
