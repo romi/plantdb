@@ -50,6 +50,7 @@ from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
 
+from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
@@ -1369,10 +1370,7 @@ class Scan(Resource):
                 return {'error': 'Failed to create scan'}, 500
             self.logger.info(f"Successfully created scan: {scan_id}")
             # Return success response with HTTP 201 (Created) status code
-            return {
-                'message': 'Scan created successfully',
-                'scan_id': scan_id
-            }, 201
+            return {'message': 'Scan created successfully', 'scan_id': scan_id}, 201
         except ValueError as e:
             # Handle case where scan_id format is invalid (e.g., wrong characters or length)
             self.logger.warning(f"Invalid scan_id format: {scan_id}")
@@ -1970,9 +1968,20 @@ class PointCloud(Resource):
         # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
-        # Get the path to the pointcloud resource:
-        path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path, mimetype='application/octet-stream')
+
+        try:
+            # Get the path to the pointcloud resource:
+            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
+        except FileNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
+        except FilesetNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
+        except ScanNotFoundError:
+            return {'error': f"No '{scan_id}' scan found!"}, 400
+        except Exception as e:
+            return {'error': f"Unknown error: {e}"}, 400
+        else:
+            return send_file(path, mimetype='application/octet-stream')
 
 
 class PointCloudGroundTruth(Resource):
@@ -2025,7 +2034,7 @@ class PointCloudGroundTruth(Resource):
         HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
-        Notes²
+        Notes
         -----
         - In the URL, you can use the 'size' parameter to specify the size of the point-cloud:
             * 'orig': Original size
@@ -2063,9 +2072,20 @@ class PointCloudGroundTruth(Resource):
         # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
-        # Get the path to the pointcloud resource:
-        path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path, mimetype='application/octet-stream')
+
+        try:
+            # Get the path to the pointcloud resource:
+            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
+        except FileNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
+        except FilesetNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
+        except ScanNotFoundError:
+            return {'error': f"No '{scan_id}' scan found!"}, 400
+        except Exception as e:
+            return {'error': f"Unknown error: {e}"}, 400
+        else:
+            return send_file(path, mimetype='application/octet-stream')
 
 
 class Mesh(Resource):
@@ -2160,9 +2180,20 @@ class Mesh(Resource):
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
         if not size in ['orig']:
             size = 'orig'
-        # Get the path to the mesh resource:
-        path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path, mimetype='application/octet-stream')
+
+        try:
+            # Get the path to the mesh resource:
+            path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size)
+        except FileNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
+        except FilesetNotFoundError:
+            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
+        except ScanNotFoundError:
+            return {'error': f"No '{scan_id}' scan found!"}, 400
+        except Exception as e:
+            return {'error': f"Unknown error: {e}"}, 400
+        else:
+            return send_file(path, mimetype='application/octet-stream')
 
 
 class CurveSkeleton(Resource):
