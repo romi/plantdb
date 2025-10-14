@@ -775,29 +775,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../commons/fsdb/auth/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    auth
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../commons/fsdb/core/" class="md-nav__link">
         
   
@@ -3979,7 +3956,7 @@ Defaults to <code>None</code>.</p>
                 <code>scan</code>
             </td>
             <td>
-                  <code><span title="plantdb.commons.fsdb.Scan">Scan</span> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Scan (plantdb.commons.fsdb.Scan)" href="../../commons/fsdb/#plantdb.commons.fsdb.Scan">Scan</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3995,7 +3972,7 @@ Defaults to <code>None</code>.</p>
                 <code>fileset</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Fileset (plantdb.commons.fsdb.core.Fileset)" href="../../commons/fsdb/core/#plantdb.commons.fsdb.core.Fileset">Fileset</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Fileset (plantdb.commons.fsdb.Fileset)" href="../../commons/fsdb/#plantdb.commons.fsdb.Fileset">Fileset</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4011,7 +3988,7 @@ Defaults to <code>None</code>.</p>
                 <code>file</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="File (plantdb.commons.fsdb.core.File)" href="../../commons/fsdb/core/#plantdb.commons.fsdb.core.File">File</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-internal" title="File (plantdb.commons.fsdb.File)" href="../../commons/fsdb/#plantdb.commons.fsdb.File">File</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4094,9 +4071,9 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    scan : plantdb.commons.fsdb.Scan or str</span>
 <span style="color: #BA2121; font-style: italic">        A ``Scan`` instance or the name of the scan dataset.</span>
-<span style="color: #BA2121; font-style: italic">    fileset : plantdb.commons.fsdb.core.Fileset or str</span>
+<span style="color: #BA2121; font-style: italic">    fileset : plantdb.commons.fsdb.Fileset or str</span>
 <span style="color: #BA2121; font-style: italic">        A ``Fileset`` instance or the name of the fileset.</span>
-<span style="color: #BA2121; font-style: italic">    file : plantdb.commons.fsdb.core.File or str</span>
+<span style="color: #BA2121; font-style: italic">    file : plantdb.commons.fsdb.File or str</span>
 <span style="color: #BA2121; font-style: italic">        A ``File`` instance or the name of the file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -4110,9 +4087,9 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; get_file_uri(&#39;real_plant&#39;, &#39;images&#39;, &#39;00000_rgb&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &#39;files/real_plant/images/00000_rgb&#39;</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Scan
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Fileset
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> File
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Scan
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Fileset
+    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> File
     scan_id <span style="color: #666">=</span> scan<span style="color: #666">.</span>id <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(scan, Scan) <span style="color: #008000; font-weight: bold">else</span> scan
     fileset_id <span style="color: #666">=</span> fileset<span style="color: #666">.</span>id <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(fileset, Fileset) <span style="color: #008000; font-weight: bold">else</span> fileset
     file_id <span style="color: #666">=</span> file<span style="color: #666">.</span>path()<span style="color: #666">.</span>name <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(file, File) <span style="color: #008000; font-weight: bold">else</span> file
