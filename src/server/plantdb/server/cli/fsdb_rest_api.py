@@ -38,6 +38,14 @@ Key Features
 - Run in test mode with optional preconfigured datasets or an empty test database.
 - Lightweight server setup using Flask, with options for debugging and CORS support.
 
+Environment Variables
+---------------------
+- ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
+- ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
+- ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
+- ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (32 bits secret).
+- ``JWT_SECRET_KEY``: The secret key to use with JWT token generator. Default to random (32 bits secret).
+
 Usage Examples
 --------------
 To start the REST API server for a local plant database:
@@ -78,6 +86,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
+from typing import Optional, Union
+from pathlib import Path
 
 from plantdb.commons.fsdb.auth import JWTSessionManager
 from plantdb.commons.fsdb.core import FSDB
@@ -115,9 +125,17 @@ from plantdb.server.rest_api import Sequence
 from plantdb.server.rest_api import TokenRefresh
 
 
-def parsing():
+def parsing() -> argparse.ArgumentParser:
+    """
+    Create and configure an argument parser for a REST API server.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        The configured argument parser capable of parsing and retrieving command-line arguments.
+    """
     parser = argparse.ArgumentParser(description='Serve a local plantdb database (FSDB) through a REST API.')
-    parser.add_argument('-db', '--db_location', type=str, default=os.environ.get("ROMI_DB", "/none"),
+    parser.add_argument('-db', '--db_location', type=str, default=os.environ.get("ROMI_DB", None),
                         help='location of the database to serve.')
 
     app_args = parser.add_argument_group("webserver arguments")
@@ -145,8 +163,9 @@ def parsing():
     return parser
 
 
-def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
-             log_level=DEFAULT_LOG_LEVEL, test=False, empty=False, models=False):
+def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefix: str = "", ssl: bool = False,
+             log_level: str = DEFAULT_LOG_LEVEL, test: bool = False, empty: bool = False,
+             models: bool = False) -> Flask:
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -157,11 +176,12 @@ def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
 
     Parameters
     ----------
-    db_path : str or pathlib.Path
+    db_path : str or pathlib.Path or None
         The path to the local plant database to be served. If set to "/none", the server will raise
         an error and terminate unless the path is appropriately overridden in test mode.
+        If `None`, requires `test=True` and a temporary folder will be created.
     proxy : bool, optional
-        Boolean flag indicating whether the application is behind a reverse proxy, by default ``False``.
+        Boolean flag indicating whether the application is behind a reverse proxy, ``False`` by default.
     url_prefix : str, optional
         Prefix for all endpoints, by default ""
     log_level : str, optional
@@ -176,7 +196,6 @@ def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
     models : bool, optional
         A boolean flag to specify whether the test database should be populated with trained CNN models.
         Defaults to ``False``.
-
     """
     # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
@@ -232,7 +251,7 @@ def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
         sys.exit("Wrong database location!")  # Exit with an error message if no database path is provided
 
     # Connect to the database:
-    db = FSDB(db_path, session_manager=JWTSessionManager())
+    db = FSDB(db_path, session_manager=JWTSessionManager(secret_key=os.environ.get('JWT_SECRET_KEY', None)))
     logger.info(f"Connecting to local plant database located at '{db.path()}'...")
     db.connect()
     logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
@@ -267,7 +286,7 @@ def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
                      resource_class_args=tuple([db]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
-    # User oriented endpoints
+    # User-oriented endpoints
     api.add_resource(Register, '/register',
                      resource_class_args=tuple([db]))
     api.add_resource(Login, '/login',
@@ -307,11 +326,6 @@ def main():
     """
     parser = parsing()
     args = parser.parse_args()
-
-    if args.debug:
-        os.environ['PLANTDB_ENV'] = "development"
-    else:
-        os.environ['PLANTDB_ENV'] = "production"
 
     app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level, test=args.test, empty=args.empty,
                    models=args.models)

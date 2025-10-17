@@ -18,6 +18,8 @@ Environment Variables
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
+- ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (32 bits secret).
+- ``JWT_SECRET_KEY``: The secret key to use with JWT token generator. Default to random (32 bits secret).
 
 Usage Examples
 --------------
