@@ -15,8 +15,9 @@ Key Features
 
 Environment Variables
 ---------------------
-- ``ROMI_DB`` : Path to the directory containing the FSDB. Default: '/myapp/db' (container)
+- ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
+- ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 
 Usage Examples
 --------------
@@ -37,10 +38,11 @@ from plantdb.server.cli.fsdb_rest_api import rest_api
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
 # Get the FSDB REST API URL prefix
 url_prefix = os.environ.get("PLANTDB_API_PREFIX", "")
+enable_ssl = str(os.environ.get("PLANTDB_API_SSL", "false")).lower() == "true"
 
 # Get the Flask application with a Proxy:
-application = rest_api(romi_db, proxy=True, url_prefix=url_prefix,
-                       log_level='INFO', test=False, empty=False, models=False)
+application = rest_api(romi_db, proxy=True, url_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
+                       empty=False, models=False)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=5000, debug=True)
