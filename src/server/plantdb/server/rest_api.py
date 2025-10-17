@@ -66,7 +66,7 @@ def get_scan_date(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get the date & time from.
 
     Returns
@@ -105,7 +105,7 @@ def compute_fileset_matches(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to list the filesets from.
 
     Returns
@@ -192,7 +192,7 @@ def get_scan_info(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get information from.
 
     Other Parameters
@@ -371,7 +371,7 @@ def get_file_uri(scan, fileset, file):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.core.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
     fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
@@ -411,7 +411,7 @@ def get_image_uri(scan, fileset, file, size="orig"):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.core.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
     fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
@@ -465,7 +465,7 @@ def get_scan_data(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get the information and data from.
 
     Other Parameters
@@ -3107,7 +3107,7 @@ class ScanFilesets(Resource):
         """List all filesets in a specified scan.
 
         This method retrieves the list of filesets contained in a scan using the
-        `list_filesets()` method from `plantdb.commons.fsdb.Scan`.
+        `list_filesets()` method from `plantdb.commons.fsdb.core.Scan`.
 
         Parameters
         ----------

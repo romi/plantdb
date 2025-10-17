@@ -109,7 +109,7 @@ def _load_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The dataset to load the metadata for.
 
     Returns
@@ -186,7 +186,7 @@ def _store_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The dataset to save the metadata for.
     """
     _store_metadata(_scan_metadata_path(scan), scan.metadata)

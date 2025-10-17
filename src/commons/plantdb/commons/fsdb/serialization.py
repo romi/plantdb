@@ -66,7 +66,7 @@ def _parse_fileset(scan, fileset_info):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to associate the returned ``Fileset`` to.
     fileset_info : dict
         The fileset dictionary with the fileset 'id' entry
@@ -179,7 +179,7 @@ def _scan_to_dict(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan instance to get underlying filesets and files structure from.
 
     Returns

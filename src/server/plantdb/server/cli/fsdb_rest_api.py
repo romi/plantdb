@@ -274,7 +274,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
                      resource_class_args=tuple([db]))
     api.add_resource(TokenRefresh, '/token-refresh',
                      resource_class_args=tuple([db]))
-    # API endpoints for `plantdb.commons.fsdb.Scan`:
+    # API endpoints for `plantdb.commons.fsdb.core.Scan`:
     api.add_resource(ScanCreate, '/api/scan',
                      resource_class_args=tuple([db, logger]))
     api.add_resource(ScanMetadata, '/api/scan/<string:scan_id>/metadata',

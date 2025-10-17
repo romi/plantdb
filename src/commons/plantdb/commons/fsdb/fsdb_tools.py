@@ -55,7 +55,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Returns
     -------
-    plantdb.commons.fsdb.Scan
+    plantdb.commons.fsdb.core.Scan
         The updated ``Scan`` instance with the new metadata.
 
     Examples

@@ -249,7 +249,7 @@ class FSDB(db.DB):
     ----------
     basedir : pathlib.Path
         The absolute path to the base directory hosting the database.
-    scans : dict[str, plantdb.commons.fsdb.Scan]
+    scans : dict[str, plantdb.commons.fsdb.core.Scan]
         The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
@@ -275,7 +275,7 @@ class FSDB(db.DB):
     >>> # Create a new `Scan`:
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
-    <class 'plantdb.commons.fsdb.Scan'>
+    <class 'plantdb.commons.fsdb.core.Scan'>
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # EXAMPLE 2: Use a local database:
@@ -466,8 +466,8 @@ class FSDB(db.DB):
 
         Returns
         -------
-        list of plantdb.commons.fsdb.Scan
-            List of `Scan`s, filtered by the `query` if any.
+        list of plantdb.commons.fsdb.core.Scan
+            A list of `Scan`s, filtered by the `query` if any.
 
         See Also
         --------
@@ -478,7 +478,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.fsdb.core import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> db.get_scans()
-        [<plantdb.commons.fsdb.Scan at *x************>]
+        [<plantdb.commons.fsdb.core.Scan at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         if not self.is_connected:
@@ -533,7 +533,7 @@ class FSDB(db.DB):
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> print(scan)
-        <plantdb.commons.fsdb.Scan object at **************>
+        <plantdb.commons.fsdb.core.Scan object at **************>
         >>> db.list_scans()
         ['007']
         >>> unknown_scan = db.get_scan('unknown')
@@ -581,7 +581,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        plantdb.commons.fsdb.Scan
+        plantdb.commons.fsdb.core.Scan
             The ``Scan`` instance created in the local database.
 
         Raises
@@ -695,7 +695,7 @@ class FSDB(db.DB):
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007')
         >>> print(new_scan)
-        <plantdb.commons.fsdb.Scan object at 0x7f0730b1e390>
+        <plantdb.commons.fsdb.core.Scan object at 0x7f0730b1e390>
         >>> db.delete_scan('007')
         >>> scan = db.get_scan('007')
         >>> print(scan)
@@ -801,7 +801,7 @@ class FSDB(db.DB):
 
     def get_scan_lock_status(self, scan_id: str) -> Dict:
         """
-        Get current lock status for a specific scan.
+        Get the current lock status for a specific scan.
 
         Parameters
         ----------
@@ -1221,7 +1221,7 @@ class Scan(db.Scan):
     >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
     >>> scan = Scan(db, '007')
     >>> print(type(scan))
-    <class 'plantdb.commons.fsdb.Scan'>
+    <class 'plantdb.commons.fsdb.core.Scan'>
     >>> print(scan.path())  # the obtained path should be different as the path to the created `dummy_db` change...
     /tmp/romidb_j0pbkoo0/007
     >>> print(db.get_scan('007'))  # Note that it did NOT create this `Scan` in the database!
@@ -1245,9 +1245,9 @@ class Scan(db.Scan):
     >>> db = dummy_db()
     >>> scan = db.create_scan('007')
     >>> print(type(scan))
-    <class 'plantdb.commons.fsdb.Scan'>
+    <class 'plantdb.commons.fsdb.core.Scan'>
     >>> print(db.get_scan('007'))  # This time the `Scan` object is found in the `FSBD`
-    <plantdb.commons.fsdb.Scan object at 0x7f34fc860fd0>
+    <plantdb.commons.fsdb.core.Scan object at 0x7f34fc860fd0>
     >>> print(os.listdir(db.path()))  # And it is found under the `basedir` directory
     ['007', 'romidb']
     >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
@@ -1716,7 +1716,7 @@ class Fileset(db.Fileset):
     ----------
     db : plantdb.commons.fsdb.FSDB
         A local database instance hosting the ``Scan`` instance.
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan instance hosting this ``Fileset`` instance.
     id : str
         The identifier of this ``Fileset`` instance in the `scan`.
@@ -1735,7 +1735,7 @@ class Fileset(db.Fileset):
 
         Parameters
         ----------
-        scan : plantdb.commons.fsdb.Scan
+        scan : plantdb.commons.fsdb.core.Scan
             A scan instance containing the fileset.
         fs_id : str
             The identifier of the fileset instance.

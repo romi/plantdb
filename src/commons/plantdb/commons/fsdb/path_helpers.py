@@ -37,7 +37,7 @@ def _scan_path(scan) -> pathlib.Path:
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the path from.
 
     Returns
@@ -53,7 +53,7 @@ def _scan_json_file(scan) -> pathlib.Path:
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the files JSON file path from.
 
     Returns
@@ -69,7 +69,7 @@ def _scan_metadata_path(scan) -> pathlib.Path:
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the metadata JSON file path from.
 
     Returns
@@ -85,7 +85,7 @@ def _scan_measures_path(scan) -> pathlib.Path:
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the measures JSON file path from.
 
     Returns
