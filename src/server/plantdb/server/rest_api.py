@@ -1100,7 +1100,7 @@ class TokenRefresh(Resource):
         # Get token from keyword arguments
         jwt_token = kwargs.get('token', None)
         try:
-            new_token = self.db.session_manager.refresh_token(jwt_token)
+            new_token = self.db.session_manager.refresh_session(jwt_token)
 
             if new_token:
                 response = {'message': 'Token refreshed successfully', 'access_token': new_token}, 200
