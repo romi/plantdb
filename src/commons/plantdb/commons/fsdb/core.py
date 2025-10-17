@@ -215,9 +215,13 @@ def require_authentication(method):
     def wrapper(self, *args, **kwargs):
 
         if isinstance(self.session_manager, SingleSessionManager):
-            # If a Single SessionManager, get the username from the
-            session = list(self.session_manager.sessions.keys())[0]
-            kwargs['username'] = self.session_manager.validate_session(session)['username']
+            # If a Single SessionManager, get the username from thesession manager or use 'guest' user
+            try:
+                session = list(self.session_manager.sessions.keys())[0]
+            except IndexError:
+                kwargs['username'] = "guest"
+            else:
+                kwargs['username'] = self.session_manager.validate_session(session)['username']
 
         elif isinstance(self.session_manager, JWTSessionManager):
             # If a JSON Web Token Session Manager, require the token or default to 'guest' user
@@ -337,7 +341,7 @@ class FSDB(db.DB):
             Logger instance to use for logging. Defaults to the module logger.
         session_manager : {SingleSessionManager, SessionManager, JWTSessionManager}, optional
             The session manager to use for session authentication.
-            Defaults to ``SessionManager()``.
+            Defaults to ``SingleSessionManager``.
         session_timeout : int, optional
             Session timeout in seconds.
             Defaults to 3600 (1 hour).
@@ -377,11 +381,18 @@ class FSDB(db.DB):
         # Initialize scan lock manager
         self.lock_manager = ScanLockManager(basedir)
 
-        # Initialize session manager
-        if isinstance(session_manager, (SessionManager, JWTSessionManager)):
-            self.session_manager = session_manager(session_timeout, max_concurrent_sessions)
+        # Initialize the session manager
+        if session_manager is None:
+            self.session_manager = SingleSessionManager(
+                session_timeout=session_timeout,
+            )
+        elif isinstance(session_manager, (SingleSessionManager, SessionManager, JWTSessionManager)):
+            self.session_manager = session_manager
         else:
-            self.session_manager = SingleSessionManager(session_timeout)
+            raise ValueError(
+                f"session_manager must be an instance of 'SingleSessionManager', 'SessionManager', "
+                f"or 'JWTSessionManager', got {type(session_manager)}"
+            )
 
         # Initialize RBAC manager with groups file in basedir
         users_file = os.path.join(basedir, "users_0.15.json")
@@ -1446,7 +1457,7 @@ class Scan(db.Scan):
         """
         # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
         # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user or "guest"):
+        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username or "guest"):
 
         # Use shared lock for read operations
         with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, "guest"):
@@ -1474,7 +1485,7 @@ class Scan(db.Scan):
         """
         # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
         # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user or "guest"):
+        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username or "guest"):
         #    return _get_metadata(self.metadata, key, default)
 
         # Use shared lock for read operations
@@ -1572,14 +1583,14 @@ class Scan(db.Scan):
             raise PermissionError("Insufficient permissions to modify scan")
 
         # Use exclusive lock for metadata updates
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Update metadata
             _set_metadata(self.metadata, new_metadata, None)
             # Ensure modification timestamp
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
-            self.logger.info(f"Updated metadata for scan '{self.id}' by user '{current_user}'")
+            self.logger.info(f"Updated metadata for scan '{self.id}' by user '{current_user.username}'")
 
         return
 
@@ -1626,12 +1637,12 @@ class Scan(db.Scan):
         OSError: Invalid fileset identifier 'fileset/001'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
+        current_user = self.db.get_user_data(**kwargs)
         if not current_user:
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.owner != current_user:
+        if self.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(fs_id):
@@ -1639,7 +1650,7 @@ class Scan(db.Scan):
 
         # Use exclusive lock for fileset creation
         self.logger.info(f"Creating fileset '{fs_id}' from scan '{self.id}'")
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` already exists in the local database
             if self.fileset_exists(fs_id):
                 raise ValueError(f"Fileset '{fs_id}' already exists in scan '{self.id}'")
@@ -1653,7 +1664,7 @@ class Scan(db.Scan):
             now = iso_date_now()
             initial_metadata['created'] = now  # creation timestamp
             initial_metadata['last_modified'] = now  # modification timestamp
-            initial_metadata['created_by'] = current_user
+            initial_metadata['created_by'] = current_user.username
 
             # Cannot use fileset.set_metadata(initial_metadata) here as ownership is not granted yet!
             _set_metadata(fileset.metadata, initial_metadata, None)  # add metadata dictionary to the new fileset
@@ -1662,7 +1673,7 @@ class Scan(db.Scan):
             self.filesets.update({fs_id: fileset})  # Update scan's filesets dictionary
             self.store()  # Store fileset instance to the JSON
 
-            self.logger.info(f"Created new fileset '{fs_id}' in scan '{self.id}' for user '{current_user}'")
+            self.logger.info(f"Created new fileset '{fs_id}' in scan '{self.id}' for user '{current_user.username}'")
 
         return fileset
 
@@ -1692,16 +1703,16 @@ class Scan(db.Scan):
         []
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
+        current_user = self.db.get_user_data(**kwargs)
         if not current_user:
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.owner != current_user:
+        if self.owner != current_user.username:
             raise PermissionError(f"Only the owner can delete filesets from scan '{self.id}'")
 
         # Use exclusive lock for fileset deletion
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` exists in the local database
             if not self.fileset_exists(fs_id):
                 raise ValueError(f"Fileset '{fs_id}' does not exist in scan '{self.id}'")
@@ -1711,7 +1722,7 @@ class Scan(db.Scan):
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
             self.store()  # save the changes to the scan main JSON FILE (``files.json``)
 
-            self.logger.info(f"Deleted fileset '{fs_id}' from scan '{self.id}' by user '{current_user}'")
+            self.logger.info(f"Deleted fileset '{fs_id}' from scan '{self.id}' by user '{current_user.username}'")
         return
 
     def path(self) -> pathlib.Path:
@@ -1902,7 +1913,7 @@ class Fileset(db.Fileset):
         """
         # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
         # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, current_user or "guest"):
+        # with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, current_user.username or "guest"):
 
         # Use shared lock for read operations
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, "guest"):
@@ -1983,7 +1994,7 @@ class Fileset(db.Fileset):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         _set_metadata(self.metadata, data, value)
@@ -2031,7 +2042,7 @@ class Fileset(db.Fileset):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         # Verify if the given `fs_id` is valid
@@ -2039,7 +2050,7 @@ class Fileset(db.Fileset):
             raise IOError(f"Invalid file identifier '{f_id}'!")
 
         # Use exclusive lock for file creation
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user):
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` already exists in the local database
             if self.file_exists(f_id):
                 raise IOError(f"Given file identifier '{f_id}' already exists!")
@@ -2052,7 +2063,7 @@ class Fileset(db.Fileset):
             now = iso_date_now()
             initial_metadata['created'] = now  # creation timestamp
             initial_metadata['last_modified'] = now  # modification timestamp
-            initial_metadata['created_by'] = current_user
+            initial_metadata['created_by'] = current_user.username
 
             # Cannot use fileset.set_metadata(initial_metadata) here as ownership is not granted yet!
             _set_metadata(file.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
@@ -2061,7 +2072,7 @@ class Fileset(db.Fileset):
             self.files.update({f_id: file})  # Update filesets's files dictionary
             self.store()  # Store fileset instance to the JSON
 
-            self.logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user}'")
+            self.logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user.username}'")
 
         return file
 
@@ -2096,7 +2107,7 @@ class Fileset(db.Fileset):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         # Verify if the given `fs_id` exists in the local database
@@ -2305,7 +2316,7 @@ class File(db.File):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         # Check if the path is a file
@@ -2391,7 +2402,7 @@ class File(db.File):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         self.filename = _get_filename(self, ext)
@@ -2469,7 +2480,7 @@ class File(db.File):
             raise PermissionError("No authenticated user!")
 
         # Check ownership
-        if self.scan.owner != current_user:
+        if self.scan.owner != current_user.username:
             raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
 
         self.filename = _get_filename(self, ext)
