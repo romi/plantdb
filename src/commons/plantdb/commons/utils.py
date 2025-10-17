@@ -73,7 +73,7 @@ def locate_task_filesets(scan, tasks):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A ``Scan`` instance from a local plant database (FSDB).
     tasks : list of str
         A list of task names to look up in the scan's list of filesets.

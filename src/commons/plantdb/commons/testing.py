@@ -176,7 +176,7 @@ class FSDBTestCase(unittest.TestCase):
 
         Returns
         -------
-        plantdb.commons.fsdb.Scan
+        plantdb.commons.fsdb.core.Scan
             The default ``Scan`` instance to test.
         """
         db = self.get_test_db()

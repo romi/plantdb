@@ -84,7 +84,7 @@ class SSHFSDB(fsdb.FSDB):
         >>> # ...allows to create new `Scan` in it:
         >>> new_scan = db.create_scan("007")
         >>> print(type(new_scan))
-        <class 'plantdb.commons.fsdb.Scan'>
+        <class 'plantdb.commons.fsdb.core.Scan'>
         >>> db.disconnect()
         """
         super().__init__(basedir)

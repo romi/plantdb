@@ -520,7 +520,7 @@ def get_file_uri(scan, fileset, file):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.core.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
     fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
