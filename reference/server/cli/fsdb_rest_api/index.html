@@ -2040,8 +2040,7 @@ for configuring and running the REST API server.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">305</span>
@@ -2057,7 +2056,8 @@ for configuring and running the REST API server.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main function to initialize and execute the REST API server.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function utilizes argument parsing to extract user-provided input values</span>
@@ -2236,8 +2236,7 @@ Defaults to <code>False</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">147</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">148</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">149</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
@@ -2387,7 +2386,8 @@ Defaults to <code>False</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_path, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, url_prefix<span style="color: #666">=</span><span style="color: #BA2121">&quot;&quot;</span>, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_path, proxy<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, url_prefix<span style="color: #666">=</span><span style="color: #BA2121">&quot;&quot;</span>, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
              log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, empty<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, models<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize and configure a RESTful API server for Plant Database querying.</span>
 
@@ -2474,7 +2474,7 @@ Defaults to <code>False</code>.</p>
         sys<span style="color: #666">.</span>exit(<span style="color: #BA2121">&quot;Wrong database location!&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Exit with an error message if no database path is provided</span>
 
     <span style="color: #3D7B7B; font-style: italic"># Connect to the database:</span>
-    db <span style="color: #666">=</span> FSDB(db_path)
+    db <span style="color: #666">=</span> FSDB(db_path, session_manager<span style="color: #666">=</span>JWTSessionManager())
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Connecting to local plant database located at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
     db<span style="color: #666">.</span>connect()
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Found </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans dataset to serve in local plant database.&quot;</span>)

@@ -15803,7 +15803,7 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
     <span style="color: #3D7B7B; font-style: italic"># Get token from keyword arguments</span>
     jwt_token <span style="color: #666">=</span> kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;token&#39;</span>, <span style="color: #008000; font-weight: bold">None</span>)
     <span style="color: #008000; font-weight: bold">try</span>:
-        new_token <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>session_manager<span style="color: #666">.</span>refresh_token(jwt_token)
+        new_token <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>session_manager<span style="color: #666">.</span>refresh_session(jwt_token)
 
         <span style="color: #008000; font-weight: bold">if</span> new_token:
             response <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;message&#39;</span>: <span style="color: #BA2121">&#39;Token refreshed successfully&#39;</span>, <span style="color: #BA2121">&#39;access_token&#39;</span>: new_token}, <span style="color: #666">200</span>
