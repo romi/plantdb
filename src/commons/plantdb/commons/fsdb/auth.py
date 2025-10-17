@@ -2120,6 +2120,10 @@ class SessionManager:
         - 'expires_at': datetime - Expiry time of the session.
     session_timeout : int
         Duration in seconds after which a session expires.
+    max_concurrent_sessions : int
+        The maximum number of concurrent sessions to allow.
+    logger : logging.Logger
+        The logger to use for this session manager.
     """
 
     def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10):  # 1 hour default
@@ -2139,213 +2143,6 @@ class SessionManager:
         self.sessions: Dict[str, dict] = {}
         self.session_timeout = session_timeout
         self.max_concurrent_sessions = max_concurrent_sessions
-
-        self.logger = get_logger(__class__.__name__)
-
-    def _user_session_id(self, username: str) -> str:
-        """
-        Check if a user has an active session and return a session ID.
-
-        Parameters
-        ----------
-        username : str
-            The unique identifier for the user whose active session status needs to be checked.
-
-        Returns
-        -------
-        str
-            A string representing the corresponding session ID (or empty string).
-        """
-        for session_id, session in self.sessions.items():
-            if session['username'] == username:
-                return session_id
-        return ""
-
-    def n_active_sessions(self) -> int:
-        """
-        Returns the number of active sessions.
-
-        Cleans up expired sessions before counting and returns the number
-        of remaining active sessions in the collection.
-
-        Returns
-        -------
-        int
-            The number of currently active sessions.
-
-        See Also
-        --------
-        cleanup_expired_sessions : Cleans up the expired sessions in the collection.
-        """
-        self.cleanup_expired_sessions()
-        return len(self.sessions)
-
-    def create_session(self, username: str) -> Union[str, None]:
-        """
-        Create a new session for a user.
-
-        If the user already has an active session, it returns the existing session ID.
-        Otherwise, it creates a new session and returns its ID.
-
-        Parameters
-        ----------
-        username : str
-            The unique identifier of the user for whom to create a session.
-
-        Returns
-        -------
-        session_id : Union[str, None]
-            The ID of the created or existing session.
-
-        Notes
-        -----
-        The session ID is a token generated using `secrets.token_urlsafe`.
-        The session data includes the user ID, creation timestamp, last accessed timestamp, and expiration timestamp.
-        """
-        session_id = self._user_session_id(username)
-        if session_id:
-            self.logger.warning(f"User has already active session: {session_id}")
-            return session_id
-
-        if self.n_active_sessions() >= self.max_concurrent_sessions:
-            self.logger.warning(
-                f"Too any users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
-            return None
-
-        session_id = secrets.token_urlsafe(32)
-        timestamp = datetime.now()
-        self.sessions[session_id] = {
-            'username': username,
-            'created_at': timestamp,
-            'last_accessed': timestamp,
-            'expires_at': timestamp + timedelta(seconds=self.session_timeout)
-        }
-        return session_id
-
-    def validate_session(self, session_id: str) -> Optional[dict]:
-        """
-        Validate a given session by checking its existence and expiration status.
-
-        Parameters
-        ----------
-        session_id : str
-            The unique identifier of the session to be validated.
-
-        Returns
-        -------
-        dict or None
-            A dictionary containing the session details if valid, else None.
-            Return type can be None when session is invalidated.
-
-        Notes
-        -----
-        The `validate_session` method updates the session's last accessed time upon successful validation.
-        """
-        if session_id not in self.sessions:
-            return None
-
-        session = self.sessions[session_id]
-        if datetime.now() > session['expires_at']:
-            self.invalidate_session(session_id)
-            return None
-
-        # Update last accessed time
-        session['last_accessed'] = datetime.now()
-        return session
-
-    def invalidate_session(self, session_id: str) -> bool:
-        """
-        Remove the given session identifier from the active sessions.
-
-        Parameters
-        ----------
-        session_id : str
-            The unique identifier of the session to be removed.
-
-        Returns
-        -------
-        bool
-            `True` if a session with the specified ID was found and removed,
-            `False` otherwise.
-
-        Notes
-        -----
-        The session ID is removed from the internal session dictionary.
-        If the session does not exist, this method has no effect.
-        """
-        return self.sessions.pop(session_id, None) is not None
-
-    def cleanup_expired_sessions(self):
-        """
-        Remove expired sessions from the session dictionary.
-
-        This method iterates through all stored sessions and deletes any that have
-        an expiration time earlier than the current time.
-
-        Notes
-        -----
-        This function modifies the `self.sessions` dictionary in-place.
-        """
-        current_time = datetime.now()
-        expired_sessions = [
-            sid for sid, session in self.sessions.items()
-            if current_time > session['expires_at']
-        ]
-        for sid in expired_sessions:
-            del self.sessions[sid]
-        return
-
-    def session_username(self, session_id: str) -> str:
-        """Return the username associated with a session."""
-        if self.validate_session(session_id):
-            return self.sessions[session_id]['username']
-        else:
-            return None
-
-
-class JWTSessionManager:
-    """
-    Manages user sessions with expiration and validation.
-
-    This class provides methods to create, validate, invalidate,
-    and cleanup expired sessions. Each session is associated with a
-    unique identifier (session_id) and has an expiry time based on the
-    session timeout duration specified during initialization.
-
-    Attributes
-    ----------
-    sessions : Dict[str, dict]
-        A dictionary storing active sessions.
-        Each key is a session ID, and each value is a dictionary containing:
-        - 'username': str - The user associated with this session.
-        - 'created_at': datetime - When the session was created.
-        - 'last_accessed': datetime - Last time the session was accessed.
-        - 'expires_at': datetime - Expiry time of the session.
-    session_timeout : int
-        Duration in seconds after which a session expires.
-    """
-
-    def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10,
-                 secret_key: str = None):  # 1 hour default
-        """
-        Manage user sessions with timeout.
-
-        Parameters
-        ----------
-        session_timeout : int, optional
-            The duration for which the session should be valid in seconds.
-            A session that exceeds this duration will be considered expired and removed.
-            Defaults to ``3600`` seconds.
-        max_concurrent_sessions : int, optional
-            The maximum number of concurrent sessions to allow.
-            Defaults to ``10``.
-        secret_key : str, optional
-            Secret key for JWT signing. If None, generates a random key.
-        """
-        self.sessions: Dict[str, dict] = {}
-        self.session_timeout = session_timeout
-        self.max_concurrent_sessions = max_concurrent_sessions
-        self.secret_key = secret_key or secrets.token_urlsafe(32)
 
         self.logger = get_logger(__class__.__name__)
 
@@ -2389,7 +2186,291 @@ class JWTSessionManager:
         self.cleanup_expired_sessions()
         return len(self.sessions)
 
-    def _create_jwt(self, username, jti, exp_time, now):
+    def _create_token(self, **kwargs) -> str:
+        """
+        Generate a secure random token.
+
+        Returns
+        -------
+        str
+            A securely generated (URL-safe) token.
+        """
+        return secrets.token_urlsafe(32)
+
+    def create_session(self, username: str) -> Union[str, None]:
+        """
+        Create a new session for a user.
+
+        If the user already has an active session, it returns the existing session ID.
+        Otherwise, it creates a new session and returns its ID.
+
+        Parameters
+        ----------
+        username : str
+            The unique identifier of the user for whom to create a session.
+
+        Returns
+        -------
+        Union[str, None]
+            The ID of the created or existing session.
+
+        Notes
+        -----
+        The session ID is a token generated using `secrets.token_urlsafe`.
+        The session data includes the user ID, creation timestamp, last accessed timestamp, and expiration timestamp.
+        """
+        if self._user_has_session(username):
+            self.logger.warning(f"User '{username}' already has an active session!")
+            return None
+
+        if self.n_active_sessions() >= self.max_concurrent_sessions:
+            self.logger.warning(
+                f"Reached max concurrent sessions limit ({self.max_concurrent_sessions})")
+            return None
+
+        now = datetime.now()
+        exp_time = now + timedelta(seconds=self.session_timeout)
+        # Create a session token
+        session_token = secrets.token_urlsafe(32)
+
+        self.sessions[session_token] = {
+            'username': username,
+            'created_at': now,
+            'last_accessed': now,
+            'expires_at': exp_time
+        }
+        return session_token
+
+    def validate_session(self, session_id: str) -> Optional[dict]:
+        """
+        Validate a given session by checking its existence and expiration status.
+
+        Parameters
+        ----------
+        session_id : str
+            The unique identifier of the session to be validated.
+
+        Returns
+        -------
+        dict or None
+            A dictionary with user information if valid, ``None`` if invalid/expired.
+            Returns dictionary with:
+            - username: The authenticated user
+            - created_at: When the session was created
+            - last_accessed: When the session was last validated
+            - expires_at: When the session expires
+
+        Notes
+        -----
+        The `validate_session` method updates the session's last accessed time upon successful validation.
+        """
+        if session_id not in self.sessions:
+            self.logger.warning(f"Provided session does not exist!")
+            return None
+
+        session = self.sessions[session_id]
+        now = datetime.now()
+        if now > session['expires_at']:
+            username = session['username']
+            self.logger.warning(f"The session for user '{username}' has expired. Please log back in!")
+            success, username = self.invalidate_session(session_id)
+            return None
+
+        # Update last accessed time
+        session['last_accessed'] = now
+        return session
+
+    def invalidate_session(self, session_id: str) -> Tuple[bool, str | None]:
+        """
+        Remove the given session identifier from the active sessions.
+
+        Parameters
+        ----------
+        session_id : str
+            The unique identifier of the session to be removed.
+
+        Returns
+        -------
+        bool
+            `True` if the specified session was found and removed, `False` otherwise.
+        str
+            The username corresponding to the invalidated session
+
+        Notes
+        -----
+        The session ID is removed from the internal session dictionary.
+        If the session does not exist, this method has no effect.
+        """
+        if session_id in self.sessions:
+            username = self.sessions[session_id]['username']
+            del self.sessions[session_id]
+            return True, username
+
+        return False, None
+
+    def cleanup_expired_sessions(self) -> None:
+        """
+        Remove expired sessions from the session dictionary.
+
+        This method iterates through all stored sessions and deletes any that have
+        an expiration time earlier than the current time.
+
+        Notes
+        -----
+        This function modifies the `self.sessions` dictionary in-place.
+        """
+        current_time = datetime.now()
+        expired_sessions = [
+            sid for sid, session in self.sessions.items()
+            if current_time > session['expires_at']
+        ]
+        for sid in expired_sessions:
+            del self.sessions[sid]
+        return
+
+    def session_username(self, session_id: str) -> Optional[str]:
+        """Return the username associated with a session."""
+        session_data = self.validate_session(session_id)
+        return session_data['username'] if session_data else None
+
+    def refresh_session(self, session_id: str) -> Optional[str]:
+        """
+        Refresh a session if it's still valid.
+
+        Parameters
+        ----------
+        session_id : str
+            Current session token
+
+        Returns
+        -------
+        str or None
+            New session token if refresh successful
+        """
+        session_data = self.validate_session(session_id)
+        if not session_data:
+            return None
+
+        # Invalidate old session
+        self.invalidate_session(session_id)
+
+        # Create new session
+        username = session_data['username']
+        return self.create_session(username)
+
+
+class SingleSessionManager(SessionManager):
+    """
+    Generate a single-session manager for handling database connections.
+
+    The `SingleSessionManager` class is designed to manage a single active
+    database session at any given time. It inherits from the base `SessionManager`
+    class and overrides its initialization to ensure only one concurrent session
+    is allowed, even if the base class allows more.
+
+    Parameters
+    ----------
+    session_timeout : int, optional
+        The timeout duration for each database session in seconds.
+        If not specified, defaults to 3600 (1 hour).
+
+    Attributes
+    ----------
+    sessions : Dict[str, dict]
+        A dictionary storing active sessions.
+        Each key is a session ID, and each value is a dictionary containing:
+        - 'username': str - The user associated with this session.
+        - 'created_at': datetime - When the session was created.
+        - 'last_accessed': datetime - Last time the session was accessed.
+        - 'expires_at': datetime - Expiry time of the session.
+    session_timeout : int
+        The configured timeout duration for sessions.
+    max_concurrent_sessions : int
+        Always set to 1 to ensure only one concurrent session is allowed.
+    logger : logging.Logger
+        The logger to use for this session manager.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.auth import SingleSessionManager
+    >>> # Initialize the session manager
+    >>> manager = SingleSessionManager()
+    >>> # Create a new session with the username 'test'
+    >>> session_token = manager.create_session('test')
+    >>> # Attempt to create another session with the username 'test2'
+    >>> _ = manager.create_session('test2')
+    WARNING  [SessionManager] Reached max concurrent sessions limit (1)
+    >>> # Validate the session and get its info
+    >>> session = manager.validate_session(session_token)
+    >>> print(session['expires_at'])  # Print the expiration date
+    >>> # Refresh the session using the existing session token
+    >>> new_session_token = manager.refresh_session(session_token)
+    >>> # Validate the session and get its info
+    >>> session = manager.validate_session(new_session_token)
+    >>> print(session['expires_at'])  # Print the expiration date of the refreshed session
+
+    Notes
+    -----
+    The `SingleSessionManager` enforces a single-session policy, which means any
+    attempt to create more than one active session will result in an error or be
+    handled according to the logic defined within this class.
+
+    See Also
+    --------
+    session_manager.SessionManager : Base class for managing database sessions.
+    """
+    def __init__(self, session_timeout: int = 3600, **kwargs) -> None:
+        super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
+
+
+class JWTSessionManager(SessionManager):
+    """
+    Manages user sessions with expiration and validation.
+
+    This class provides methods to create, validate, invalidate,
+    and cleanup expired sessions. Each session is associated with a
+    unique identifier (session_id) and has an expiry time based on the
+    session timeout duration specified during initialization.
+
+    Attributes
+    ----------
+    sessions : Dict[str, dict]
+        A dictionary storing active sessions.
+        Each key is a session ID, and each value is a dictionary containing:
+        - 'username': str - The user associated with this session.
+        - 'created_at': datetime - When the session was created.
+        - 'last_accessed': datetime - Last time the session was accessed.
+        - 'expires_at': datetime - Expiry time of the session.
+    session_timeout : int
+        Duration in seconds after which a session expires.
+    max_concurrent_sessions : int
+        The maximum number of concurrent sessions to allow.
+    secret_key : str
+        The session manager secret key to use for authentication.
+    logger : logging.Logger
+        The logger to use for this session manager.
+    """
+
+    def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10, secret_key: str = None):
+        """
+        Manage user sessions with timeout.
+
+        Parameters
+        ----------
+        session_timeout : int, optional
+            The duration for which the session should be valid in seconds.
+            A session that exceeds this duration will be considered expired and removed.
+            Defaults to ``3600`` seconds.
+        max_concurrent_sessions : int, optional
+            The maximum number of concurrent sessions to allow.
+            Defaults to ``10``.
+        secret_key : str, optional
+            Secret key for JWT signing. If None, generates a random key.
+        """
+        super().__init__(session_timeout, max_concurrent_sessions)
+        self.secret_key = secret_key or secrets.token_urlsafe(32)
+
+    def _create_token(self, username, jti, exp_time, now):
         """
         Create a JSON Web Token (JWT) with registered claims.
 
@@ -2475,25 +2556,50 @@ class JWTSessionManager:
         exp_time = now + timedelta(seconds=self.session_timeout)
         jti = secrets.token_urlsafe(16)  # unique token ID for tracking
 
-        # Generate JWT token
-        jwt_token = self._create_jwt(username, jti, exp_time, now)
-
         try:
-            # Track session for concurrent limit enforcement
-            self.sessions[jti] = {
-                'username': username,
-                'created_at': now,
-                'last_accessed': now,
-                'expires_at': exp_time
-            }
-            self.logger.debug(f"Created JWT token for '{username}'")
-            return jwt_token
-
+            # Generate JWT token
+            jwt_token = self._create_token(username, jti, exp_time, now)
         except Exception as e:
             self.logger.error(f"Failed to create JWT token for {username}: {e}")
             return None
 
-    def _paylod_from_token(self, jwt_token: str) -> dict:
+        # Track session for concurrent limit enforcement
+        self.sessions[jti] = {
+            'username': username,
+            'created_at': now,
+            'last_accessed': now,
+            'expires_at': exp_time
+        }
+        self.logger.debug(f"Created JWT token for '{username}'")
+        return jwt_token
+
+    def _payload_from_token(self, jwt_token: str) -> dict:
+        """
+        Decode the payload from a JWT token.
+
+        This function decodes the JSON Web Token (JWT) using the specified secret key and
+        verifies the token's audience and issuer. It returns the decoded payload as a dictionary.
+
+        Parameters
+        ----------
+        jwt_token : str
+            The JWT token to decode.
+
+        Returns
+        -------
+        dict
+            The decoded payload from the JWT token.
+
+        Notes
+        -----
+        The JWT token must be correctly formatted and signed using the specified secret key.
+        If the token is invalid or the signature does not match, a `jwt.ExpiredSignatureError`,
+        `jwt.InvalidTokenError`, or `jwt.DecodeError` may be raised.
+
+        See Also
+        --------
+        jwt.decode : Decodes the JSON Web Token.
+        """
         return jwt.decode(
             jwt_token,
             self.secret_key,
@@ -2514,7 +2620,7 @@ class JWTSessionManager:
         Returns
         -------
         dict or None
-            User information if valid, None if invalid/expired.
+            User information if valid, ``None`` if invalid/expired.
             Returns dictionary with:
             - username: The authenticated user
             - issued_at: When the token was issued
@@ -2525,21 +2631,7 @@ class JWTSessionManager:
         """
         try:
             # Decode and verify JWT token with proper validation
-            payload = self._paylod_from_token(jwt_token)
-
-            # Update last accessed time in session tracking
-            jti = payload.get('jti')
-            if jti and jti in self.sessions:
-                self.sessions[jti]['last_accessed'] = datetime.now()
-
-            return {
-                'username': payload['sub'],  # subject is the username
-                'issued_at': payload['iat'],  # issued at timestamp
-                'expires_at': payload['exp'],  # expiration timestamp
-                'jti': jti,  # JWT ID
-                'issuer': payload['iss'],  # issuer
-                'audience': payload['aud']  # audience
-            }
+            payload = self._payload_from_token(jwt_token)
 
         except jwt.ExpiredSignatureError:
             self.logger.error("JWT token expired")
@@ -2557,7 +2649,21 @@ class JWTSessionManager:
             self.logger.error(f"Error validating JWT token: {e}")
             return None
 
-    def invalidate_session(self, jwt_token: str = None, jti: str = None) -> Tuple[bool, str|None]:
+        # Update last accessed time in session tracking
+        jti = payload.get('jti')
+        if jti and jti in self.sessions:
+            self.sessions[jti]['last_accessed'] = datetime.now()
+
+        return {
+            'username': payload['sub'],  # subject is the username
+            'issued_at': payload['iat'],  # issued at timestamp
+            'expires_at': payload['exp'],  # expiration timestamp
+            'jti': jti,  # JWT ID
+            'issuer': payload['iss'],  # issuer
+            'audience': payload['aud']  # audience
+        }
+
+    def invalidate_session(self, jwt_token: str = None, jti: str = None) -> Tuple[bool, str | None]:
         """
         Invalidate a session by removing it from tracking.
 
@@ -2571,13 +2677,13 @@ class JWTSessionManager:
         Returns
         -------
         bool
-            True if session was found and removed
+            `True` if the specified session was found and removed, `False` otherwise.
         str
             The username corresponding to the invalidated JWT token
         """
         if jwt_token:
             try:
-                payload = self._paylod_from_token(jwt_token)
+                payload = self._payload_from_token(jwt_token)
                 jti = payload.get('jti')
             except:
                 return False, None
@@ -2589,7 +2695,7 @@ class JWTSessionManager:
 
         return False, None
 
-    def cleanup_expired_sessions(self):
+    def cleanup_expired_sessions(self) -> None:
         """Remove expired sessions from tracking."""
         current_time = datetime.now()
         expired_sessions = [
@@ -2598,6 +2704,7 @@ class JWTSessionManager:
         ]
         for jti in expired_sessions:
             del self.sessions[jti]
+        return
 
     def session_username(self, jwt_token: str) -> Optional[str]:
         """
@@ -2616,9 +2723,9 @@ class JWTSessionManager:
         session_data = self.validate_session(jwt_token)
         return session_data['username'] if session_data else None
 
-    def refresh_token(self, jwt_token: str) -> Optional[str]:
+    def refresh_session(self, jwt_token: str) -> Optional[str]:
         """
-        Refresh a JWT token if it's still valid but close to expiration.
+        Refresh a JWT token if it's still valid.
 
         Parameters
         ----------
@@ -2634,18 +2741,10 @@ class JWTSessionManager:
         if not session_data:
             return None
 
-        # Check if token needs refresh (e.g., within 5 minutes of expiration)
-        exp_time = datetime.fromtimestamp(session_data['expires_at'])
-        if datetime.now() + timedelta(minutes=5) < exp_time:
-            return jwt_token  # Token is still fresh
-
-        # Create new token
-        username = session_data['username']
-        old_jti = session_data['jti']
-
         # Invalidate old session
-        if old_jti:
-            self.invalidate_session(jti=old_jti)
+        old_jti = session_data['jti']
+        self.invalidate_session(jti=old_jti)
 
         # Create new session
+        username = session_data['username']
         return self.create_session(username)
