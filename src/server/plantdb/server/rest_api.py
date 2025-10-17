@@ -2105,17 +2105,6 @@ class PointCloudGroundTruth(Resource):
         - All identifiers are sanitized before use
         - Invalid size parameters default to 'preview'
         - Response mimetype is 'application/octet-stream'
-
-        Examples
-        --------
-        >>> # Request original size point-cloud
-        >>> response = get('/api/scan123/fileset1/cloud1?size=orig')
-        >>>
-        >>> # Request preview size
-        >>> response = get('/api/scan123/fileset1/cloud1?size=preview')
-        >>>
-        >>> # Request custom voxel size
-        >>> response = get('/api/scan123/fileset1/cloud1?size=0.01')
         """
 
         # Sanitize identifiers
@@ -2682,17 +2671,15 @@ class Archive(Resource):
         Examples
         --------
         >>> import os
-import shutil
-import tempfile
-from io import BytesIO
-from pathlib import Path
-from zipfile import ZipFile
-
-import requests
-
-from plantdb.client.rest_api import list_scan_names
-from plantdb.server.test_rest_api import TestRestApiServer
-# Create a test database and start the Flask App serving a REST API
+        >>> import requests
+        >>> import shutil
+        >>> import tempfile
+        >>> from io import BytesIO
+        >>> from pathlib import Path
+        >>> from zipfile import ZipFile
+        >>> from plantdb.client.rest_api import list_scan_names
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
         >>> server.start()
         >>> # Get the archive for the 'real_plant' dataset with
