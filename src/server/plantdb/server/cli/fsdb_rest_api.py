@@ -144,7 +144,7 @@ def parsing():
     return parser
 
 
-def rest_api(db_location, proxy=False, url_prefix="",
+def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
              log_level=DEFAULT_LOG_LEVEL, test=False, empty=False, models=False):
     """Initialize and configure a RESTful API server for Plant Database querying.
 
@@ -156,7 +156,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
 
     Parameters
     ----------
-    db_location : str or pathlib.Path
+    db_path : str or pathlib.Path
         The path to the local plant database to be served. If set to "/none", the server will raise
         an error and terminate unless the path is appropriately overridden in test mode.
     proxy : bool, optional
@@ -196,7 +196,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
     # Set secure cookies
     app.config.update(
         SECRET_KEY=os.environ.get('FLASK_SECRET_KEY', secrets.token_urlsafe(32)),
-        SESSION_COOKIE_SECURE=True,  # Only send cookies over HTTPS
+        SESSION_COOKIE_SECURE=ssl,  # Only send cookies over HTTPS if `ssl=True` (useful during tests)
         SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access
         SESSION_COOKIE_SAMESITE='Strict'  # CSRF protection
     )
@@ -205,24 +205,25 @@ def rest_api(db_location, proxy=False, url_prefix="",
         if empty:
             logger.info(f"Setting up a temporary test database without any datasets or configurations...")
             # Create an empty test database
-            db_location = test_database(None).path()
+            db_path = test_database(None, db_path=db_path).path()
         else:
             logger.info(f"Setting up a temporary test database with sample datasets and configurations...")
             # Create a populated test database
-            db_location = test_database(DATASET, with_configs=True, with_models=models).path()
+            db_path = test_database(DATASET, db_path=db_path, with_configs=True, with_models=models).path()
 
         # Register cleanup if a temporary database was created
         def cleanup():
-            logger.info(f"Cleaning up temporary database directory at '{db_location}'...")
+            logger.info(f"Cleaning up temporary database directory at '{db_path}'...")
             try:
-                shutil.rmtree(db_location)  # Remove the temporary database directory
-                logger.info(f"Successfully removed temporary directory at '{db_location}'.")
+                shutil.rmtree(db_path)  # Remove the temporary database directory
+                logger.info(f"Successfully removed temporary directory at '{db_path}'.")
             except OSError as e:
                 logger.error(f"Error removing temporary directory: {e}.")  # Log any errors during cleanup
 
         atexit.register(cleanup)
 
-    if db_location == "/none":
+    # Make sure we can serve a DB at this location
+    if not db_path:
         logger.error("Can't serve a local PlantDB as no path to the database was specified!")
         logger.info(
             "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
@@ -230,7 +231,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
         sys.exit("Wrong database location!")  # Exit with an error message if no database path is provided
 
     # Connect to the database:
-    db = FSDB(db_location)
+    db = FSDB(db_path)
     logger.info(f"Connecting to local plant database located at '{db.path()}'...")
     db.connect()
     logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
@@ -271,7 +272,7 @@ def rest_api(db_location, proxy=False, url_prefix="",
     api.add_resource(Login, '/login',
                      resource_class_args=tuple([db]))
     api.add_resource(Logout, '/logout',
-                     resource_class_args=tuple([db]))
+                     resource_class_args=tuple([db, logger]))
     api.add_resource(TokenRefresh, '/token-refresh',
                      resource_class_args=tuple([db]))
     # API endpoints for `plantdb.commons.fsdb.core.Scan`:
@@ -311,8 +312,8 @@ def main():
     else:
         os.environ['PLANTDB_ENV'] = "production"
 
-    app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level,
-                   test=args.test, empty=args.empty, models=args.models)
+    app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level, test=args.test, empty=args.empty,
+                   models=args.models)
     # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
 
