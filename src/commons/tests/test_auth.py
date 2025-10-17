@@ -11,7 +11,6 @@ from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 
-# Assuming the auth module is imported
 from plantdb.commons.fsdb.auth import Group
 from plantdb.commons.fsdb.auth import GroupManager
 from plantdb.commons.fsdb.auth import Permission
@@ -577,11 +576,11 @@ class TestSessionManager(unittest.TestCase):
         self.assertEqual(self.session_manager.session_timeout, 3600)
         self.assertIsNotNone(self.session_manager.logger)
 
-    def test_user_session_id_generates_consistent_id(self):
-        """Test that _user_session_id generates consistent session IDs for same user."""
+    def test_user_has_session_returns_consistent_id(self):
+        """Test that _user_has_session returns consistent session IDs for same user."""
         # Test session ID generation
-        session_id1 = self.session_manager._user_session_id("testuser")
-        session_id2 = self.session_manager._user_session_id("testuser")
+        session_id1 = self.session_manager._user_has_session("testuser")
+        session_id2 = self.session_manager._user_has_session("testuser")
 
         # Session IDs should be consistent for same user at same time
         self.assertEqual(session_id1, session_id2)

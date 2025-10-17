@@ -97,7 +97,6 @@ import json
 import logging
 import os
 import pathlib
-import shutil
 from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
@@ -140,104 +139,6 @@ logger = get_logger(__name__)
 
 #: This file must exist in the root of a folder for it to be considered a valid DB
 MARKER_FILE_NAME = "romidb"
-
-
-def dummy_db(with_scan=False, with_fileset=False, with_file=False):
-    """Create a dummy temporary database.
-
-    Parameters
-    ----------
-    with_scan : bool, optional
-        If ``True`` (default to ``False``), add a ``Scan``, named ``"myscan_001"``, to the database.
-    with_fileset : bool, optional
-        If ``True`` (default to ``False``), add a ``Fileset``, named ``"fileset_001"``, to the scan ``"myscan_001"``.
-    with_file : bool, optional
-        If ``True`` (default to ``False``), add three ``File``, to the fileset ``"fileset_001"``:
-
-        - a dummy PNG array, named ``"dummy_image"``;
-        - a dummy RGB image, named ``"test_image"``;
-        - a dummy JSON file, named ``"test_json"``;
-
-    Returns
-    -------
-    plantdb.commons.fsdb.FSDB
-        The dummy database.
-
-    Notes
-    -----
-    - Returns a 'connected' database, no need to call the `connect()` method.
-    - Uses the 'anonymous' user to login.
-
-    Examples
-    --------
-    >>> from plantdb.commons.fsdb.core import dummy_db
-    >>> db = dummy_db(with_file=True)
-    >>> db.connect()
-    INFO     [plantdb.commons.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
-    >>> print(db.path())  # the database directory
-    /tmp/romidb_********
-    >>> print(db.list_scans())
-    ['myscan_001']
-    >>> scan = db.get_scan("myscan_001")  # get the existing scan
-    >>> print(scan.list_filesets())
-    ['fileset_001']
-    >>> fs = scan.get_fileset("fileset_001")
-    >>> print(list(fs.list_files()))
-    ['dummy_image', 'test_image', 'test_json']
-    >>> f = fs.get_file("test_image")
-    >>> print(f.path())
-    /tmp/romidb_********/myscan_001/fileset_001/test_image.png
-    >>> db.disconnect()  # clean up (delete) the temporary dummy database
-    >>> print(db.path().exists())
-    False
-    """
-    from tempfile import mkdtemp
-    from plantdb.commons import io
-
-    mydb = Path(mkdtemp(prefix='romidb_'))
-    marker_file = mydb / MARKER_FILE_NAME
-    marker_file.open(mode='w').close()
-    db = FSDB(mydb, dummy=True)
-    db.connect()
-
-    if with_file:
-        # To create a `File`, existing `Scan` & `Fileset` are required
-        with_scan, with_fileset = True, True
-    if with_fileset:
-        # To create a `Fileset`, an existing `Scan` is required
-        with_scan = True
-
-    # Create a `Scan` object if required:
-    if with_scan:
-        scan = db.create_scan("myscan_001")
-        scan.set_metadata("test", 1)
-
-    # Create a `Fileset` object if required:
-    if with_fileset:
-        fs = scan.create_fileset("fileset_001")
-        fs.set_metadata("test_fileset", 1)
-
-    # Create a `Fileset` object if required:
-    if with_file:
-        import numpy as np
-        # -- Create a fixed dummy image:
-        f = fs.create_file("dummy_image")
-        img = np.array([[255, 0], [0, 255]]).astype('uint8')
-        io.write_image(f, img, "png")
-        f.set_metadata("dummy image", True)
-        # -- Create a random RGB image:
-        f = fs.create_file("test_image")
-        rng = np.random.default_rng()
-        img = np.array(255 * rng.random((50, 50, 3)), dtype='uint8')
-        io.write_image(f, img, "png")
-        f.set_metadata("random image", True)
-        # -- Create a dummy JSON
-        f = fs.create_file("test_json")
-        md = {"Who you gonna call?": "Ghostbuster"}
-        io.write_json(f, md, "json")
-        f.set_metadata("random json", True)
-
-    return db
 
 
 def require_connected_db(method):
@@ -323,8 +224,7 @@ class FSDB(db.DB):
 
     Examples
     --------
-    >>> # EXAMPLE 1: Use a temporary dummy local database:
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db    >>> # EXAMPLE 1: Use a temporary dummy local database:
     >>> db = dummy_db()
     >>> print(type(db))
     <class 'plantdb.commons.fsdb.FSDB'>
@@ -365,8 +265,6 @@ class FSDB(db.DB):
             A list of required filesets to consider a scan valid.
             Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
             Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
-        dummy : bool, optional
-            If ``True``, deactivate any requirements `required_filesets` & `required_files_json`.
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
         session_timeout : int, optional
@@ -385,7 +283,6 @@ class FSDB(db.DB):
         """
         super().__init__()
         self.logger = logger or get_logger(__class__.__name__)
-        self.dummy = dummy
 
         basedir = Path(basedir)
         # Check the given path to root directory of the database is a directory:
@@ -412,7 +309,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> print(db.path())
         /tmp/romidb_********
@@ -436,15 +333,14 @@ class FSDB(db.DB):
     @require_connected_db
     def disconnect(self) -> None:
         """
-        Disconnect from the database and perform cleanup tasks.
+        Disconnect from the database.
 
-        This method disconnects from the database if currently connected.
-        If a dummy database is in use, it cleans up by deleting the temporary directory.
-        Otherwise, it erases all scans (from memory) and resets the connection status.
+        This method disconnects from the database, if currently connected, by erasing all scans (from memory)
+        and reseting the connection status.
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> print(db.is_connected)
         True
@@ -452,15 +348,6 @@ class FSDB(db.DB):
         >>> print(db.is_connected)
         False
         """
-        if self.dummy:
-            logger.info(f"Cleaning up the temporary dummy database at '{self.basedir}'...")
-            # Check if directory exists before deleting it
-            if os.path.exists(self.basedir):
-                shutil.rmtree(self.basedir)
-            self.scans = {}
-            self.is_connected = False
-            return
-
         for s_id, scan in self.scans.items():
             scan._erase()
         self.scans = {}
@@ -508,7 +395,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> db.scan_exists("myscan_001")
         True
@@ -548,7 +435,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> db.get_scans()
         [<plantdb.commons.fsdb.core.Scan at *x************>]
@@ -608,7 +495,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> print(scan)
@@ -671,7 +558,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
         >>> print(new_scan.get_metadata('owner'))  # default user 'anonymous' for dummy database
@@ -768,7 +655,7 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.fsdb.core import FSDB
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007')
         >>> print(new_scan)
@@ -837,7 +724,7 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> db.list_scans()  # list scans owned by the current user
         ['myscan_001']
@@ -887,7 +774,7 @@ class FSDB(db.DB):
         Use with caution - only call when you're sure no operations are in progress.
         """
         self.lock_manager.cleanup_all_locks()
-        logger.warning("All scan locks have been cleaned up")
+        self.logger.warning("All scan locks have been cleaned up")
 
     @require_connected_db
     def list_active_locks(self) -> Dict[str, Dict]:
@@ -1288,7 +1175,7 @@ class Scan(db.Scan):
     --------
     >>> import os
     >>> from plantdb.commons.fsdb.core import Scan
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db()
     >>> # Example #1: Initialize a `Scan` object using an `FSBD` object:
     >>> scan = Scan(db, '007')
@@ -1391,7 +1278,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.fileset_exists("myfileset_001")
@@ -1425,7 +1312,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.get_filesets()
@@ -1453,7 +1340,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -1539,7 +1426,7 @@ class Scan(db.Scan):
         Examples
         --------
         >>> import json
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> from plantdb.commons.fsdb.path_helpers import _scan_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
@@ -1629,7 +1516,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -1697,7 +1584,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.list_filesets()
@@ -1733,7 +1620,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
@@ -1763,7 +1650,7 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> scan.list_filesets()
@@ -1841,7 +1728,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.file_exists("myfile_001")
@@ -1874,7 +1761,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
@@ -1901,7 +1788,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -1938,7 +1825,7 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> import json
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
@@ -1971,7 +1858,7 @@ class Fileset(db.Fileset):
         Examples
         --------
         >>> import json
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> from plantdb.commons.fsdb.path_helpers import _fileset_metadata_json_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
@@ -2005,7 +1892,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
@@ -2067,7 +1954,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
@@ -2103,7 +1990,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> [scan.id for scan in db.get_scans()]  # list scan ids found in database
         ['myscan_001']
@@ -2141,7 +2028,7 @@ class Fileset(db.Fileset):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2211,7 +2098,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> from plantdb.commons.fsdb.path_helpers import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
@@ -2237,7 +2124,7 @@ class File(db.File):
         Examples
         --------
         >>> import json
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> from plantdb.commons.fsdb.path_helpers import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
@@ -2267,7 +2154,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> from plantdb.commons.fsdb.path_helpers import _file_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
@@ -2303,7 +2190,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2335,7 +2222,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2367,7 +2254,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2402,7 +2289,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2431,7 +2318,7 @@ class File(db.File):
 
         Examples
         --------
-        >>> from plantdb.commons.fsdb.core import dummy_db
+        >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True, with_file=True)
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset("fileset_001")
@@ -2471,7 +2358,7 @@ def _filter_query(obj_list, query=None, fuzzy=False, debug=False):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.core import _filter_query
     >>> db = dummy_db(with_scan=True, with_file=True)
     >>> db.connect()

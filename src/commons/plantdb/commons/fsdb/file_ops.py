@@ -99,7 +99,7 @@ def _load_scan(db, scan_id):
     Examples
     --------
     >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scans
     >>> db = dummy_db()
     >>> db.connect()
@@ -167,7 +167,7 @@ def _load_scans(db):
     Examples
     --------
     >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scans
     >>> db = dummy_db()
     >>> db.create_scan("007")
@@ -290,7 +290,7 @@ def _load_scan_filesets(scan):
     Examples
     --------
     >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scan_filesets
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
@@ -345,7 +345,7 @@ def _load_fileset(scan, fileset_info):
     Examples
     --------
     >>> import json
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_fileset
     >>> from plantdb.commons.fsdb.file_ops import _scan_json_file
     >>> db = dummy_db(with_file=True)
@@ -395,7 +395,7 @@ def _load_fileset_files(fileset, fileset_info):
     >>> import json
     >>> from plantdb.commons.fsdb.serialization import _parse_fileset
     >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _scan_json_file,  _load_fileset_files
     >>> db = dummy_db(with_fileset=True, with_file=True)
     >>> db.connect()

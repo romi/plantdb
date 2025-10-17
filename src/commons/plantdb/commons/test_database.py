@@ -557,3 +557,107 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
         return FSDB(setup_empty_database(db_path=db_path))
     else:
         return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs))
+
+
+def dummy_db(with_scan=False, with_fileset=False, with_file=False):
+    """Create a dummy temporary database.
+
+    Parameters
+    ----------
+    with_scan : bool, optional
+        If ``True`` (default to ``False``), add a ``Scan``, named ``"myscan_001"``, to the database.
+    with_fileset : bool, optional
+        If ``True`` (default to ``False``), add a ``Fileset``, named ``"fileset_001"``, to the scan ``"myscan_001"``.
+    with_file : bool, optional
+        If ``True`` (default to ``False``), add three ``File``, to the fileset ``"fileset_001"``:
+
+        - a dummy PNG array, named ``"dummy_image"``;
+        - a dummy RGB image, named ``"test_image"``;
+        - a dummy JSON file, named ``"test_json"``;
+
+    Returns
+    -------
+    plantdb.commons.fsdb.FSDB
+        The dummy database.
+
+    Notes
+    -----
+    - Returns a 'connected' database, no need to call the `connect()` method.
+    - Uses the 'anonymous' user to login.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> db = dummy_db(with_file=True)
+    >>> db.connect()
+    INFO     [plantdb.commons.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
+    >>> print(db.path())  # the database directory
+    /tmp/romidb_********
+    >>> print(db.list_scans())
+    ['myscan_001']
+    >>> scan = db.get_scan("myscan_001")  # get the existing scan
+    >>> print(scan.list_filesets())
+    ['fileset_001']
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> print(list(fs.list_files()))
+    ['dummy_image', 'test_image', 'test_json']
+    >>> f = fs.get_file("test_image")
+    >>> print(f.path())
+    /tmp/romidb_********/myscan_001/fileset_001/test_image.png
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
+    >>> print(db.path().exists())
+    False
+    """
+    from plantdb.commons import io
+    from plantdb.commons.fsdb.core import FSDB
+    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+
+    # Create a temporary folder to host the dummy database
+    db_path = _mkdtemp_romidb()
+    # Add the necessary marker file
+    marker_file = db_path / MARKER_FILE_NAME
+    marker_file.open(mode='w').close()
+    # Create the FSDB instance and connect
+    db = FSDB(db_path)
+    db.connect()
+    # Login as adin to get all the rights (to create and edit)
+    _ = db.login('admin', 'admin')
+
+    if with_file:
+        # To create a `File`, existing `Scan` & `Fileset` are required
+        with_scan, with_fileset = True, True
+    if with_fileset:
+        # To create a `Fileset`, an existing `Scan` is required
+        with_scan = True
+
+    # Create a `Scan` object if required:
+    if with_scan:
+        scan = db.create_scan("myscan_001")
+        scan.set_metadata("test", 1)
+
+    # Create a `Fileset` object if required:
+    if with_fileset:
+        fs = scan.create_fileset("fileset_001")
+        fs.set_metadata("test_fileset", 1)
+
+    # Create a `Fileset` object if required:
+    if with_file:
+        import numpy as np
+        # -- Create a fixed dummy image:
+        f = fs.create_file("dummy_image")
+        img = np.array([[255, 0], [0, 255]]).astype('uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("dummy image", True)
+        # -- Create a random RGB image:
+        f = fs.create_file("test_image")
+        rng = np.random.default_rng()
+        img = np.array(255 * rng.random((50, 50, 3)), dtype='uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("random image", True)
+        # -- Create a dummy JSON
+        f = fs.create_file("test_json")
+        md = {"Who you gonna call?": "Ghostbuster"}
+        io.write_json(f, md, "json")
+        f.set_metadata("random json", True)
+
+    return db

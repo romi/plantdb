@@ -193,7 +193,7 @@ def read_json(file, **kwargs):
     Examples
     --------
     >>> from plantdb.commons.io import read_json, write_json
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -249,7 +249,7 @@ def write_json(file, data, ext="json", **kwargs):
     Examples
     --------
     >>> from plantdb.commons.io import write_json
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -278,7 +278,7 @@ def read_toml(file, **kwargs):
     Examples
     --------
     >>> from plantdb.commons.io import read_toml, write_toml
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -332,7 +332,7 @@ def write_toml(file, data, ext="toml", **kwargs):
     Examples
     --------
     >>> from plantdb.commons.io import write_toml
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -362,7 +362,7 @@ def read_image(file, **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import read_image, write_image
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -396,7 +396,7 @@ def _write_image(fname, data, **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import write_image
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -436,7 +436,7 @@ def write_image(file, data, ext="png", **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import write_image
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -469,7 +469,7 @@ def read_volume(file, ext="tiff", **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import read_volume, write_volume
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -550,7 +550,7 @@ def write_volume(file, data, ext="tiff", **kwargs):
     >>> from plantdb.commons.fsdb.core import FSDB
     >>> from plantdb.commons.io import write_volume
     >>> from plantdb.commons.fsdb.core import Scan, Fileset, File
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -586,7 +586,7 @@ def read_npz(file, **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import read_npz, write_npz
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -636,7 +636,7 @@ def write_npz(file, data, **kwargs):
     --------
     >>> import numpy as np
     >>> from plantdb.commons.io import read_npz, write_npz
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -668,7 +668,7 @@ def read_point_cloud(file, **kwargs):
     >>> import open3d as o3d
     >>> import numpy as np
     >>> from plantdb.commons.io import read_point_cloud, write_point_cloud
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -724,7 +724,7 @@ def write_point_cloud(file, data, ext="ply", **kwargs):
     >>> import open3d as o3d
     >>> import numpy as np
     >>> from plantdb.commons.io import write_point_cloud
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -863,7 +863,7 @@ def read_graph(file, **kwargs):
     --------
     >>> import networkx as nx
     >>> from plantdb.commons.io import read_graph, write_graph
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
@@ -925,7 +925,7 @@ def write_graph(file, data, ext="p", **kwargs):
     --------
     >>> import networkx as nx
     >>> from plantdb.commons.io import write_graph
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")

@@ -117,7 +117,7 @@ def compute_fileset_matches(scan):
     Examples
     --------
     >>> from plantdb.server.rest_api import compute_fileset_matches
-    >>> from plantdb.commons.fsdb.core import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
