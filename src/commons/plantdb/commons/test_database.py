@@ -69,6 +69,7 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
+from plantdb.commons.fsdb.auth import SingleSessionManager
 from plantdb.commons.log import get_logger
 
 DATASET = ["real_plant", "real_plant_analyzed",
@@ -618,7 +619,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     marker_file = db_path / MARKER_FILE_NAME
     marker_file.open(mode='w').close()
     # Create the FSDB instance and connect
-    db = FSDB(db_path)
+    db = FSDB(db_path, required_filesets=[], session_manager=SingleSessionManager())
     db.connect()
     # Login as adin to get all the rights (to create and edit)
     _ = db.login('admin', 'admin')

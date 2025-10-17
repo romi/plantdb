@@ -294,7 +294,8 @@ class FSDB(db.DB):
 
     Examples
     --------
-    >>> from plantdb.commons.test_database import dummy_db    >>> # EXAMPLE 1: Use a temporary dummy local database:
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> # EXAMPLE 1: Use a temporary dummy local database:
     >>> db = dummy_db()
     >>> print(type(db))
     <class 'plantdb.commons.fsdb.FSDB'>
@@ -320,7 +321,7 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
-                 required_filesets: List[str] = ['metadata'],
+                 required_filesets: Optional[List[str]] = None,
                  logger: Optional[logging.Logger] = None,
                  session_manager: Union[SingleSessionManager, SessionManager, JWTSessionManager] = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -335,8 +336,8 @@ class FSDB(db.DB):
             The path to the root directory of the database.
         required_filesets : list of str, optional
             A list of required filesets to consider a scan valid.
-            Set it to ``None`` to accept any subdirectory of `basedir` as a valid scan.
-            Defaults to ``['metadata']`` to limit scans to the `basedir` subdirectories that have an 'metadata' directory.
+            By default, ``None``,  will set it to ``['metadata']`` to defines as a Scan the subdirectories with a 'metadata' directory.
+            Use `[]`  to accept any subdirectory of `basedir` as a valid scan
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
         session_manager : {SingleSessionManager, SessionManager, JWTSessionManager}, optional
@@ -376,7 +377,7 @@ class FSDB(db.DB):
         self.basedir = Path(basedir).resolve()
         self.scans = {}
         self.is_connected: bool = False
-        self.required_filesets = required_filesets or []
+        self.required_filesets = required_filesets or ['metadata']
 
         # Initialize scan lock manager
         self.lock_manager = ScanLockManager(basedir)
@@ -778,9 +779,8 @@ class FSDB(db.DB):
             raise PermissionError("Insufficient permissions to delete scan")
 
         # Check if scan is locked
-        lock_status = self.get_scan_lock_status(scan_id)
-        if lock_status['is_locked'] and lock_status['locked_by'] != current_user.username:
-            raise RuntimeError(f"Scan {scan_id} is locked by another user")
+        if self.is_scan_locked(scan_id):
+            self.logger.error(f"Scan {scan_id} is locked by another user")
 
         # Use exclusive lock for scan deletion
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
@@ -863,6 +863,37 @@ class FSDB(db.DB):
         """
         return self.lock_manager.get_lock_status(scan_id)
 
+    @require_connected_db
+    def is_scan_locked(self, scan_id: str) -> bool:
+        """
+        Check if a scan is locked in the system.
+
+        This method determines whether the specified scan is currently locked by
+        fetching its lock status. A scan is considered locked if it does not have
+        an exclusive lock and there are no shared locks. This can be useful for
+        ensuring that certain operations are not performed on scans that are not
+        yet locked.
+
+        Parameters
+        ----------
+        scan_id : str
+            The unique identifier of the scan whose lock status is to be checked.
+
+        Returns
+        -------
+        bool
+            True if the scan is locked (having neither an exclusive lock nor any
+            shared locks), False otherwise.
+
+        See Also
+        --------
+        ScanManager.lock_manager : Component responsible for managing scan locks.
+        """
+        lock_status = self.lock_manager.get_lock_status(scan_id)
+        if lock_status['exclusive'] is None and len(lock_status['shared']) == 0:
+            return True
+        return False
+
     def cleanup_scan_locks(self):
         """
         Emergency cleanup of all scan locks.
@@ -913,6 +944,7 @@ class FSDB(db.DB):
         """
         return self.rbac_manager.users.validate(username, password)
 
+    @require_connected_db
     def login(self, username: str, password: str) -> Union[str, None]:
         """Authenticate user and create session.
 
@@ -928,10 +960,6 @@ class FSDB(db.DB):
         Union[str, None]
             Returns the user session ID if successful, ``None`` otherwise.
         """
-        if not self.is_connected:
-            self.logger.error("Database not connected")
-            return None
-
         if self.validate_user(username, password):
             session_token = self.session_manager.create_session(username)
             try:
@@ -1072,14 +1100,14 @@ class FSDB(db.DB):
         return self.rbac_manager.create_group(current_user, name, users, description)
 
     @require_authentication
-    def add_user_to_group(self, group_name, username, **kwargs):
+    def add_user_to_group(self, group_name, user, **kwargs):
         """Add a user to a group.
 
         Parameters
         ----------
         group_name : str
             Name of the group
-        username : str
+        user : str
             Username to add to the group
 
         Returns
@@ -1096,19 +1124,19 @@ class FSDB(db.DB):
         if not current_user:
             raise PermissionError("No authenticated user")
 
-        if not self.rbac_manager.add_user_to_group(current_user, group_name, username):
+        if not self.rbac_manager.add_user_to_group(current_user, group_name, user):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
     @require_authentication
-    def remove_user_from_group(self, group_name, username, **kwargs):
+    def remove_user_from_group(self, group_name, user, **kwargs):
         """Remove a user from a group.
 
         Parameters
         ----------
         group_name : str
             Name of the group
-        username : str
+        user : str
             Username to remove from the group
 
         Returns
@@ -1125,7 +1153,7 @@ class FSDB(db.DB):
         if not current_user:
             raise PermissionError("No authenticated user")
 
-        if not self.rbac_manager.remove_user_from_group(current_user, group_name, username):
+        if not self.rbac_manager.remove_user_from_group(current_user, group_name, user):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
@@ -1163,7 +1191,7 @@ class FSDB(db.DB):
         Returns
         -------
         list
-            List of Group objects
+            A list of Group objects
 
         Raises
         ------
@@ -1189,7 +1217,7 @@ class FSDB(db.DB):
         Returns
         -------
         list
-            List of Group objects the user belongs to
+            A list of Group objects the user belongs to
 
         Raises
         ------
@@ -1217,7 +1245,7 @@ class FSDB(db.DB):
         Returns
         -------
         dict or None
-            Access summary dictionary if scan exists and is accessible
+            An access summary dictionary if scan exists and is accessible
 
         Raises
         ------
@@ -1361,6 +1389,22 @@ class Scan(db.Scan):
             _store_scan_metadata(self)
             self.db.reload(self.id)
         return self.metadata.get('owner')
+
+    def is_locked(self):
+        """
+        Check if a scan is locked in the system.
+
+        Returns
+        -------
+        bool
+            True if the scan is locked (having neither an exclusive lock nor any
+            shared locks), False otherwise.
+
+        See Also
+        --------
+        ScanManager.lock_manager : Component responsible for managing scan locks.
+        """
+        return self.db.is_scan_locked(self.id)
 
     def fileset_exists(self, fileset_id: str) -> bool:
         """Check if a given fileset ID exists in the database.
@@ -1564,7 +1608,7 @@ class Scan(db.Scan):
             except AssertionError:
                 raise PermissionError(f"Invalid metadata type '{type(data)}'")
             else:
-                new_metadata = {data: value}
+                new_metadata = data
 
         # Validate metadata changes
         if not self.db.rbac_manager.validate_scan_metadata_access(current_user, old_metadata, new_metadata):

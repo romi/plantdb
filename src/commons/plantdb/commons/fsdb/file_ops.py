@@ -126,9 +126,7 @@ def _load_scan(db, scan_id):
     else:
         req_subdir = True
 
-    if db.dummy and scan_path.is_dir():
-        return scan
-    elif scan_path.is_dir() and req_subdir:
+    if scan_path.is_dir() and req_subdir:
         # Parse the fileset, metadata and measure if:
         #  - path to scan directory exists
         #  - required subdirectories exists, if any

@@ -2748,3 +2748,4 @@ class JWTSessionManager(SessionManager):
         # Create new session
         username = session_data['username']
         return self.create_session(username)
+
