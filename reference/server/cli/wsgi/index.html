@@ -1938,6 +1938,8 @@ allowing web servers like Gunicorn, uWSGI, or Apache with mod_wsgi to interact w
 <li><code>ROMI_DB</code>: Path to the directory containing the FSDB. Default: '/myapp/db' (container)</li>
 <li><code>PLANTDB_API_PREFIX</code>: Prefix for the REST API URL. Default is empty.</li>
 <li><code>PLANTDB_API_SSL</code>: Enable SSL to use an HTTPS scheme. Default is <code>False</code>.</li>
+<li><code>FLASK_SECRET_KEY</code>: The secret key to use with flask. Default to random (32 bits secret).</li>
+<li><code>JWT_SECRET_KEY</code>: The secret key to use with JWT token generator. Default to random (32 bits secret).</li>
 </ul>
 </details>
 
