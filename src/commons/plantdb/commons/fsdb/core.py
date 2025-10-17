@@ -166,6 +166,33 @@ def require_connected_db(method):
     return wrapper
 
 
+def require_token(method):
+    """Decorator that passes the token to the decorated method depending on the session manager."""
+    def wrapper(self, *args, **kwargs):
+
+        if isinstance(self.session_manager, SingleSessionManager):
+            # If a Single SessionManager, get the token from the session manager
+            session = list(self.session_manager.sessions.keys())[0]
+            kwargs['token'] = session
+
+        elif isinstance(self.session_manager, JWTSessionManager):
+            # If a JSON Web Token Session Manager, require the token
+            if not 'token' in kwargs:
+                self.logger.warning("The 'token' argument is required when using JWTSessionManager")
+
+        elif isinstance(self.session_manager, SessionManager):
+            # If a regular Session Manager, require the session token
+            if not 'token' in kwargs:
+                self.logger.warning("The 'token' argument is required when using JWTSessionManager")
+
+        else:
+            self.logger.error("Can't serve a local PlantDB without a session manager!")
+
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 def require_authentication(method):
     """
     Decorator that extracts the username using the session manager and passes it to the decorated method.
@@ -907,9 +934,10 @@ class FSDB(db.DB):
             self.logger.error(f"Failed to login user {username}")
             return None
 
-    def logout(self, session_token):
+    @require_token
+    def logout(self, **kwargs):
         """Logout user and by invalidating its session."""
-        success, username = self.session_manager.invalidate_session(jwt_token=session_token)
+        success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
         if success:
             self.logger.info(f"User {username} logged out successfully")
             return True
