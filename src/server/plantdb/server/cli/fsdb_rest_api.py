@@ -79,6 +79,7 @@ from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from plantdb.commons.fsdb.auth import JWTSessionManager
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
@@ -231,7 +232,7 @@ def rest_api(db_path, proxy=False, url_prefix="", ssl=False,
         sys.exit("Wrong database location!")  # Exit with an error message if no database path is provided
 
     # Connect to the database:
-    db = FSDB(db_path)
+    db = FSDB(db_path, session_manager=JWTSessionManager())
     logger.info(f"Connecting to local plant database located at '{db.path()}'...")
     db.connect()
     logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
