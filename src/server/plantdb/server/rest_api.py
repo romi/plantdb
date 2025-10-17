@@ -28,8 +28,10 @@ This module regroup the classes and methods used to serve a REST API using ``fsd
 """
 
 import datetime
+import hashlib
 import json
 import os
+import shutil
 import threading
 import time
 from collections import defaultdict
@@ -37,7 +39,6 @@ from functools import wraps
 from io import BytesIO
 from math import radians
 from pathlib import Path
-from tempfile import mkdtemp
 from tempfile import mkstemp
 from zipfile import ZipFile
 
@@ -697,29 +698,18 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
-def requires_jwt_auth(f):
-    """Decorator to require JWT authentication via HttpOnly cookie."""
+def requires_jwt(f):
+    """Decorator to require JWT validation."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Get JWT token from HttpOnly cookie
-        jwt_token = request.cookies.get('access_token')
-
+        # Try to get JWT token from request header
+        jwt_token = request.headers.get('Authorization', "").replace('Bearer ', '')
+        # Verify we actually got a token (do not test its validity, this is done by the database)
         if not jwt_token:
-            return {'message': 'Authentication required'}, 401
-
-        # Get database instance
-        db = args[0].db if hasattr(args[0], 'db') else None
-        if not db:
-            return {'message': 'Database not available'}, 500
-
-        # Validate JWT token
-        session_data = db.session_manager.validate_session(jwt_token)
-        if not session_data:
-            return {'message': 'Invalid or expired token'}, 401
-
-        # Add user info to request context
-        request.current_user = session_data
+            return {'message': 'Authentication required, JSON Web Token missing!'}, 401
+        # Add token to keyword arguments (for later use by FSD methods)
+        kwargs['token'] = jwt_token
         return f(*args, **kwargs)
 
     return decorated_function
@@ -1047,41 +1037,22 @@ class Login(Resource):
         password = data['password']
 
         # Attempt to authenticate user with provided credentials
-        is_authenticated = self.db.login(username, password)
+        jwt_token = self.db.login(username, password)
 
         # Prepare response based on authentication result
-        if is_authenticated:
-            user = self.db.rbac_manager.users.get_user(username)
-            # Create JWT session
-            jwt_token = self.db.session_manager.create_session(user.username)
-
-            if jwt_token:
-                # Create response with user info
-                response_data = {
-                    'message': 'Login successful',
-                    'user': {
-                        'username': user.username,
-                        'fullname': user.fullname,
-                    }
-                }
-
-                response = make_response(jsonify(response_data), 200)
-
-                # Set JWT token in HttpOnly cookie
-                response.set_cookie(
-                    'access_token',  # Cookie name
-                    jwt_token,  # JWT token value
-                    max_age=self.db.session_manager.session_timeout,  # Cookie lifetime
-                    httponly=True,  # Prevent JavaScript access
-                    secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
-                    # Only send over HTTPS (set False for development)
-                    samesite='Strict'  # CSRF protection
-                )
-
-                return response
-
-            else:
-                return {'message': 'Session creation failed'}, 500
+        if jwt_token:
+            user = self.db.get_user_data(session_token=jwt_token)
+            # Create response with user info & access token
+            response_data = {
+                'message': 'Login successful',
+                'user': {
+                    'username': user.username,
+                    'fullname': user.fullname,
+                },
+                'access_token': jwt_token
+            }
+            response = make_response(jsonify(response_data), 200)
+            return response
         else:
             return {'message': 'Invalid credentials'}, 401
 
@@ -1098,30 +1069,19 @@ class Logout(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt_auth
-    def post(self):
+    @requires_jwt
+    def post(self, **kwargs):
         """Handle user logout and clear cookie."""
+        # Get token from keyword arguments
+        jwt_token = kwargs.get('token', None)
         try:
-            # Get token from cookie
-            jwt_token = request.cookies.get('access_token')
-
             if jwt_token:
                 # Invalidate session
                 self.db.session_manager.invalidate_session(jwt_token)
-
-            response_data = {'message': 'Logout successful'}
-            response = make_response(jsonify(response_data), 200)
-
-            # Clear the authentication cookie
-            response.set_cookie(
-                'access_token',
-                '',  # Empty value
-                expires=0,  # Expire immediately
-                httponly=True,
-                secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
-                # Match original cookie settings
-                samesite='Strict'
-            )
+                response = {'message': 'Logout successful'}, 200
+            else:
+                self.logger.error(f"Logout error: no active session!")
+                response = {'message': 'Logout failed'}, 401
 
             return response
 
@@ -1134,31 +1094,16 @@ class TokenRefresh(Resource):
     def __init__(self):
         self.db = None
 
-    @requires_jwt_auth
-    def post(self):
+    @requires_jwt
+    def post(self, **kwargs):
         """Refresh JWT token in HttpOnly cookie."""
+        # Get token from keyword arguments
+        jwt_token = kwargs.get('token', None)
         try:
-            current_token = request.cookies.get('access_token')
-            if not current_token:
-                return {'message': 'No authentication token found'}, 401
-
-            new_token = self.db.session_manager.refresh_token(current_token)
+            new_token = self.db.session_manager.refresh_token(jwt_token)
 
             if new_token:
-                response_data = {'message': 'Token refreshed successfully'}
-                response = make_response(jsonify(response_data), 200)
-
-                # Update cookie with new token
-                response.set_cookie(
-                    'access_token',
-                    new_token,
-                    max_age=self.db.session_manager.session_timeout,
-                    httponly=True,
-                    secure=False if os.environ.get('PLANTDB_ENV') == 'development' else True,
-                    # Match original cookie settings
-                    samesite='Strict'
-                )
-
+                response = {'message': 'Token refreshed successfully', 'access_token': new_token}, 200
                 return response
             else:
                 return {'message': 'Token refresh failed'}, 401
@@ -2558,9 +2503,9 @@ def is_within_directory(directory, target):
 
     Parameters
     ----------
-    directory : str
+    directory : str or pathlib.Path
         The path to the directory to check against.
-    target : str
+    target : str or pathlib.Path
         The path to the target to check if it resides within the directory.
 
     Returns
@@ -2598,6 +2543,88 @@ def is_directory_in_archive(archive_path, target_dir):
         return f"{target_dir}/" in top_level_members or target_dir in top_level_members
 
 
+def is_valid_archive(archive_path):
+    """
+    Validate if a given archive meets specific directory and file requirements.
+
+    This function checks if the provided archive contains certain required directories and files,
+    and verifies that the directory structure does not exceed a specified depth.
+
+    Parameters
+    ----------
+    archive_path : str or pathlib.Path
+        The path to the archive file (zip) to be validated.
+
+    Returns
+    -------
+    bool
+        Returns `True` if the archive meets all requirements, otherwise `False`.
+
+    Examples
+    --------
+    >>> import os
+    >>> from zipfile import ZipFile
+    >>> from plantdb.server.rest_api import is_valid_archive
+    >>> # Creating a valid archive for demonstration purposes
+    >>> with ZipFile('test_archive.zip', 'w') as zip_ref:
+    ...    zip_ref.writestr('images/', '')
+    ...    zip_ref.writestr('images/test1.jpg', '')
+    ...    zip_ref.writestr('metadata/', '')
+    ...    zip_ref.writestr('metadata/data.json', '')
+    ...    zip_ref.writestr('files.json', '')
+    >>> # Validate the archive
+    >>> is_valid_archive('test_archive.zip')
+    True
+    >>> is_valid_archive('/tmp/real_plant.zip')
+    True
+    >>> is_valid_archive('/tmp/real_plant_analyzed.zip')
+    True
+
+    Notes
+    -----
+    - The function currently assumes that the required directories and files are all at or above a specified depth in the archive.
+    - Make sure that the provided `archive_path` points to a valid zip file.
+
+    See Also
+    --------
+    zipfile.ZipFile : Python's built-in module for reading and writing ZIP files.
+    """
+    req_dirs = ['images/', 'metadata/']
+    req_files = ['files.json']
+
+    top_dir = ''
+    max_dir_dept = 2
+    with ZipFile(archive_path, 'r') as zip_ref:
+        zip_files = zip_ref.namelist()
+
+    # List all top-level members in the zip file
+    top_level_dirs = {name for name in zip_files if name.count('/') == 1 and name.endswith('/')}
+    top_level_dirs |= {name.split('/')[0] + '/' for name in zip_files if name.count('/') == 1 and name.split('/')[0]}
+
+    # If a lone directory is found at the top, move one step down
+    if len(top_level_dirs) == 1:
+        top_dir = next(iter(top_level_dirs))
+        top_level_dirs = {name.replace(top_dir, '') for name in zip_files if name.count('/') == 2 and name.endswith('/') }
+        top_level_dirs |= {name.split('/')[1] + '/' for name in zip_files if
+                           name.count('/') == 2 and '/'.join(name.split('/')[:-1])}
+
+    # Check if the required file and directories are among them
+    has_req_dirs = [rd in top_level_dirs for rd in req_dirs]
+    has_req_files = [f'{top_dir}{rf}' in zip_files for rf in req_files]
+    req_dir_depth = all(
+        name.count('/') <= max_dir_dept + 1 if 'metadata' in name else name.count('/') <= max_dir_dept for name in
+        zip_files)
+
+    if all(has_req_dirs) and all(has_req_files) and req_dir_depth:
+        return True
+    else:
+        #if not all(has_req_dirs):
+        #    print(f"Missing required directories: {list(zip(req_dirs, [not r for r in has_req_dirs]))}")
+        #if not all(has_req_files):
+        #    print(f"Missing required files: {list(zip(req_files, [not r for r in has_req_files]))}")
+        return False
+
+
 class Archive(Resource):
     """A RESTful resource class for managing dataset archives.
 
@@ -2627,7 +2654,7 @@ class Archive(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id):
+    def get(self, scan_id, **kwargs):
         """Create and serve a ZIP archive for the specified scan dataset.
 
         This method creates a temporary ZIP archive containing all files from the specified
@@ -2654,52 +2681,73 @@ class Archive(Resource):
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
-        >>> import requests
-        >>> import tempfile
-        >>> from io import BytesIO
-        >>> from pathlib import Path
-        >>> from zipfile import ZipFile
-        >>> # Get the archive for the 'real_plant_analyzed' dataset with:
-        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant_analyzed", stream=True)
-        >>> # - Extract the archive:
-        >>> # Read the zip file data into a BytesIO object
-        >>> zip_data = BytesIO(zip_file.content)
-        >>> # Create a temporary path to extract the archived data:
-        >>> tmp_dir = Path(tempfile.mkdtemp())
-        >>> # Open the zip file and extract non-existing files:
-        >>> extracted_files = []
-        >>> with ZipFile(zip_data, 'r') as zip_obj:
-        >>>     for file in zip_obj.namelist():
-        >>>         file_path = tmp_dir / file
-        >>>         zip_obj.extract(file, path=tmp_dir)
-        >>>         extracted_files.append(file)
-        >>> # Print the list of extracted files:
-        >>> extracted_files
+        >>> import os
+import shutil
+import tempfile
+from io import BytesIO
+from pathlib import Path
+from zipfile import ZipFile
 
+import requests
+
+from plantdb.client.rest_api import list_scan_names
+from plantdb.server.test_rest_api import TestRestApiServer
+# Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+        >>> # Get the archive for the 'real_plant' dataset with
+        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant", stream=True)
+        >>> # EXAMPLE 1 - Write the archive to disk:
+        >>> # Create a unique temporary file name with .zip extension
+        >>> temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix='.zip')
+        >>> os.close(temp_zip_handle)  # Close the file handle immediately
+        >>> # Write to disk
+        >>> with open(temp_zip_path, 'wb') as zip_f: zip_f.write(zip_file.content)
+        >>> print(f"Successfully wrote to {temp_zip_path}")
+        >>> # EXAMPLE 2 - Extract the archive:
+        >>> # Create a temporary path to extract the archived data
+        >>> tmp_dir = Path(tempfile.mkdtemp())
+        >>> # Open the zip file and extract non-existing files
+        >>> extracted_files = []
+        >>> with ZipFile(BytesIO(zip_file.content), 'r') as zip_obj:
+        ...     for file in zip_obj.namelist():
+        ...         file_path = tmp_dir / file
+        ...         zip_obj.extract(file, path=tmp_dir)
+        ...         extracted_files.append(file)
+        ...
+        >>> # Print the list of extracted files
+        >>> print(extracted_files)
+        >>> shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)
+        >>> # Stop the test server
+        >>> server.stop()
         """
         scan_id = sanitize_name(scan_id)
 
         try:
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
         except ScanNotFoundError:
             return {'error': f'Could not find a scan named `{scan_id}`!'}, 400
 
-        tmp_dir = Path(mkdtemp(prefix='fsdb_rest_api_'))
-        zpath = tmp_dir / f'{scan_id}.zip'
+        # Create a unique temporary file name with .zip extension
+        temp_zip_handle, temp_zip_path = mkstemp(suffix='.zip')
+        os.close(temp_zip_handle)  # Close the file handle immediately
+        temp_zip_path = Path(temp_zip_path)
 
         self.logger.info(f"Creating archive for `{scan_id}` dataset.")
         try:
-            with ZipFile(zpath, 'w') as zf:
+            with ZipFile(temp_zip_path, 'w') as zf:
                 path = str(scan.path())
                 for root, _dirs, files in os.walk(path):
                     # Exclude 'webcache' from the archive:
                     if 'webcache' in root:
                         continue
                     for file in files:
+                        # Get the relative path from the scan directory
+                        full_path = os.path.join(root, file)
+                        relative_path = os.path.relpath(full_path, path)
                         zf.write(
-                            os.path.join(root, file),
-                            os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
+                            full_path,
+                            arcname=relative_path  # Use arcname to control the path in the ZIP
                         )
         except Exception as e:
             self.logger.error(f"Failed to create archive for `{scan_id}` dataset: {e}")
@@ -2709,18 +2757,18 @@ class Archive(Resource):
         @after_this_request
         def cleanup_temp_file(response):
             try:
-                if zpath.exists():
-                    zpath.unlink()
-                    self.logger.info(f"Temporary archive `{zpath}` deleted.")
+                if temp_zip_path.exists():
+                    temp_zip_path.unlink()
+                    self.logger.info(f"Temporary archive `{temp_zip_path}` deleted.")
             except Exception as e:
-                self.logger.error(f"Failed to delete temporary file `{zpath}`: {e}")
+                self.logger.error(f"Failed to delete temporary file `{temp_zip_path}`: {e}")
             return response
 
-        return send_file(zpath, mimetype='application/zip')
+        return send_file(temp_zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
 
-    @requires_jwt_auth
+    @requires_jwt
     @rate_limit(max_requests=5, window_seconds=60)
-    def post(self, scan_id):
+    def post(self, scan_id, **kwargs):
         """Handle ZIP file upload and extraction for a scan dataset.
 
         This method processes an uploaded ZIP file, validates its contents and structure,
@@ -2754,12 +2802,40 @@ class Archive(Resource):
 
         Examples
         --------
-        >>> # Using requests to upload a ZIP file:
         >>> import requests
-        >>> files = {'zip_file': open('dataset.zip', 'rb')}
-        >>> response = requests.post("http://127.0.0.1:5000/archive/my_scan", files=files)
+        >>> from pathlib import Path
+        >>> from tempfile import gettempdir
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> from plantdb.client.rest_api import list_scan_names
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+        >>> zip_file = Path(gettempdir()) / 'real_plant.zip'  # should be in the temporary directory from the TestRestApiServer setup
+        >>> print(zip_file.exists())
+        True
+        >>> # You need to be logged to be able to POST archives
+        >>> r = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> jwt_token = r.json()['access_token']  # get the JSON Web Token
+        >>> # Upload it as a new dataset named 'real_plant_test'
+        >>> new_dataset = 'real_plant_test'
+        >>> with open(zip_file, 'rb') as zip_f:
+        ...    files = {'zip_file': (str(zip_file), zip_f, 'application/zip')}
+        ...    response = requests.post(f'http://127.0.0.1:5000/archive/{new_dataset}', files=files, headers={'Authorization': 'Bearer ' + jwt_token})
         >>> print(response.json())
+        >>> _ = requests.get(f"http://127.0.0.1:5000/refresh?scan_id={new_dataset}")
+        >>> r = requests.get("http://127.0.0.1:5000/scans")
+        >>> scans_list = r.json()
+        >>> print(new_dataset in scans_list)
+        True
+        >>> server.stop()
         """
+        # TODO: add scan_id name sanitization
+        try:
+            assert not self.db.scan_exists(scan_id)
+        except AssertionError as e:
+            self.logger.error(f"Given scan dataset `{scan_id}` already exists in the database.")
+            return {'error': f'Given scan dataset `{scan_id}` already exists!'}, 400
+
         # Get the zip file from the request
         zip_file = request.files.get('zip_file')
         # Check if a file was provided
@@ -2778,10 +2854,10 @@ class Archive(Resource):
 
         # Create a temporary file to save the uploaded ZIP file to disk
         try:
-            _, temp_path = mkstemp(prefix='tmp_file.name', suffix='.zip')
-            temp_path = Path(temp_path)
-            self.logger.debug(f"Saving uploaded ZIP temporary file to: '{temp_path}'")
-            zip_file.save(temp_path)
+            _, temp_zip_path = mkstemp(prefix='tmp_file.name', suffix='.zip')
+            temp_zip_path = Path(temp_zip_path)
+            self.logger.debug(f"Saving uploaded ZIP temporary file to: '{temp_zip_path}'")
+            zip_file.save(temp_zip_path)
         except Exception as e:
             self.logger.error(f"Error saving file to temporary location: {e}")
             return {'error': 'Failed to save file to disk.'}, 500
@@ -2789,56 +2865,105 @@ class Archive(Resource):
         # Verify the file is a valid ZIP archive before proceeding
         from zipfile import BadZipFile
         try:
-            with ZipFile(temp_path, 'r') as zip_obj:
+            with ZipFile(temp_zip_path, 'r') as zip_obj:
                 # Test the ZIP file to ensure it's valid (raises an exception if corrupt)
                 zip_obj.testzip()
-        except BadZipFile:
+        except BadZipFile as e:
             self.logger.error("The provided file is not a valid ZIP archive.")
-            # Cleanup temporary file before returning
-            Path(temp_path).unlink(missing_ok=True)
-            return {'error': 'Invalid ZIP file provided.'}, 400
+            # Cleanup temporary ZIP file before returning
+            Path(temp_zip_path).unlink(missing_ok=True)
+            return {'error': f'Invalid ZIP file provided: {e}'}, 400
 
-        # Proceed with processing the valid ZIP file
+        if not is_valid_archive(temp_zip_path):
+            return {'error': f'Invalid Scan dataset archive provided!'}, 400
+
+        # Create the new scan dataset that will receive the files from the archive
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
-        scan_path = Path(self.db.create_scan(scan_id).path())
+        scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
 
-        if is_directory_in_archive(temp_path, scan_id):
-            extract_to_path = scan_path.parent  # move up to db path as the archive contain the top level
-        else:
-            extract_to_path = scan_path
+        # Detect a lone top level dir to remove from later file extraction
+        has_top_level_dir = False
+        with ZipFile(temp_zip_path, 'r') as zip_obj:
+            # List all top-level members in the zip file
+            top_level_dirs = [name for name in zip_obj.namelist() if name.endswith('/') and name.count('/') == 1]
+        if len(top_level_dirs) == 1:
+            has_top_level_dir = True
 
         # Open the zip file and extract non-existing files:
         extracted_files = []
+        file_verification = {}  # Dictionary to store hash comparisons
         try:
-            with ZipFile(temp_path, 'r') as zip_obj:
-                for file in zip_obj.namelist():
+            with ZipFile(temp_zip_path, 'r') as zip_obj:
+                for zip_file in zip_obj.namelist():
                     # Ensure that filenames are properly encoded
                     try:
-                        file = file.encode('utf-8').decode('utf-8')
+                        zip_file = zip_file.encode('utf-8').decode('utf-8')
                     except UnicodeDecodeError:
-                        self.logger.error(f"Filename encoding issue detected in ZIP: '{file}'")
-                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                        self.logger.error(f"Filename encoding issue detected in ZIP: '{zip_file}'")
+                        Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Filename encoding error in zip archive'}, 400
 
-                    file_path = extract_to_path / file
+                    if has_top_level_dir:
+                        # Remove the first part (top-level dir) of the zip_file
+                        file_path = scan_path / '/'.join(Path(zip_file).parts[1:])
+                    else:
+                        file_path = scan_path / zip_file
+                    file_path = file_path.resolve()  # make the path absolute
                     # Ensure the extracted files remain within the target directory
-                    if not is_within_directory(extract_to_path, file_path):
-                        self.logger.error(f"Invalid file path detected in ZIP: '{file}'")
-                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                    if not is_within_directory(scan_path, file_path):
+                        self.logger.error(f"Invalid file path detected in ZIP: '{zip_file}'")
+                        Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Invalid file paths in zip archive'}, 400
 
-                    # Extract only if the file does not already exist
-                    if not file_path.exists():
-                        zip_obj.extract(file, path=extract_to_path)
-                        extracted_files.append(file)
+                    # Extract zip_file only if a file
+                    if str(zip_file).endswith('/'):
+                        continue  # skip directories
+
+                    # Create parent directories if they don't exist
+                    file_path.parent.mkdir(parents=True, exist_ok=True)
+                    self.logger.debug(f"Extracting {zip_file} to '{file_path.relative_to(scan_path.parent)}'...")
+
+                    # Compute hash of the file inside the ZIP before extraction
+                    with zip_obj.open(zip_file) as source:
+                        zip_file_hash = hashlib.sha256()
+                        while chunk := source.read(8192):
+                            zip_file_hash.update(chunk)
+                        zip_file_content_hash = zip_file_hash.hexdigest()
+
+                        # Extract the file
+                        with zip_obj.open(zip_file) as source, file_path.open('wb') as target:
+                            # Compute hash during extraction
+                            file_hash = hashlib.sha256()
+                            while chunk := source.read(8192):
+                                file_hash.update(chunk)
+                                target.write(chunk)
+
+                        # Verify the hash of the extracted file
+                        extracted_file_hash = file_hash.hexdigest()
+
+                        # Store hash verification result
+                        file_verification[str(file_path)] = {
+                            'original_hash': zip_file_content_hash,
+                            'extracted_hash': extracted_file_hash,
+                            'verified': zip_file_content_hash == extracted_file_hash
+                        }
+
+                        # If hashes don't match, log an error
+                        if not file_verification[str(file_path)]['verified']:
+                            self.logger.error(f"Hash mismatch for file: {file_path}")
+
+                        extracted_files.append(str(file_path))
+
         except Exception as e:
             self.logger.error(f"Failed to extract ZIP archive: {e}")
-            Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+            Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
             return {'error': f'Failed to extract ZIP archive: {e}'}, 500
         finally:
             # Always clean up the temporary ZIP file after processing
-            Path(temp_path).unlink(missing_ok=True)
+            Path(temp_zip_path).unlink(missing_ok=True)
+            # Trigger a refresh for that dataset
+            self.db.reload(scan_id)
 
         # Return a success response
         return {'message': 'Zip file processed successfully', 'files': extracted_files}, 200
@@ -2861,8 +2986,8 @@ class ScanCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt_auth
-    def post(self):
+    @requires_jwt
+    def post(self, **kwargs):
         """Create a new scan in the database.
 
         This method handles POST requests to create a new scan. It validates the input data,
@@ -2912,7 +3037,7 @@ class ScanCreate(Resource):
             # Sanitize the name
             scan_id = sanitize_name(data['name'])
             # Create the scan
-            scan = self.db.create_scan(scan_id)
+            scan = self.db.create_scan(scan_id, **kwargs)
             # Set metadata if provided
             if metadata:
                 scan.set_metadata(metadata)
@@ -3005,8 +3130,8 @@ class ScanMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt_auth
-    def post(self, scan_id):
+    @requires_jwt
+    def post(self, scan_id, **kwargs):
         """Update metadata for a specified scan.
 
         Parameters
@@ -3060,7 +3185,7 @@ class ScanMetadata(Resource):
                 return {'message': 'Metadata must be a dictionary'}, 400
 
             # Get the scan
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -3172,7 +3297,7 @@ class FilesetCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt_auth
+    @requires_jwt
     def post(self):
         """Create a new fileset associated with a scan.
 
@@ -3350,7 +3475,7 @@ class FilesetMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt_auth
+    @requires_jwt
     def post(self, scan_id, fileset_id):
         """Update metadata for a specified fileset.
 
@@ -3539,7 +3664,7 @@ class FileCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt_auth
+    @requires_jwt
     def post(self):
         """Create a new file in a fileset and write data to it.
 
@@ -3748,7 +3873,7 @@ class FileMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt_auth
+    @requires_jwt
     def post(self, scan_id, fileset_id, file_id):
         """Update metadata for a specified file.
 
