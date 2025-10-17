@@ -15,6 +15,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Set
+from typing import Tuple
 from typing import Union
 
 import jwt
@@ -784,14 +785,14 @@ class UserManager():
                 password=admin_password,
                 roles={Role.ADMIN},
             )
-            # Print identifiers to console to avoid logging it to a file
+            # Print identifiers to the terminal
             print(f"Created admin user '{self.ADMIN_USERNAME}' with password '{admin_password}'")
             print("Change it as soon as possible!")
         return
 
     def get_user(self, username: str) -> Union[User, None]:
         """
-        Retrieve a user object based on the provided username.
+        Retrieve a User object based on the provided username.
 
         Parameters
         ----------
@@ -805,13 +806,13 @@ class UserManager():
             If it does not exist, `None` is returned.
         """
         if not self.exists(username):
-            self.logger.error("User does not exist")
+            self.logger.error(f"User '{username}' does not exist!")
             return None
         return self.users[username]
 
     def is_locked_out(self, username) -> bool:
         """
-        Check if a user account is locked.
+        Check if an account is locked.
 
         Parameters
         ----------
@@ -2348,9 +2349,9 @@ class JWTSessionManager:
 
         self.logger = get_logger(__class__.__name__)
 
-    def _user_session_id(self, username: str) -> str:
+    def _user_has_session(self, username) -> bool:
         """
-        Check if a user has an active session and return a session ID.
+        Check if a user has an active session.
 
         Parameters
         ----------
@@ -2359,13 +2360,15 @@ class JWTSessionManager:
 
         Returns
         -------
-        str
-            A string representing the corresponding session ID (or empty string).
+        bool
+            ``True`` if the user has an active session, ``False`` otherwise.
         """
-        for session_id, session in self.sessions.items():
-            if session['username'] == username:
-                return session_id
-        return ""
+        self.cleanup_expired_sessions()
+        if username is not None:
+            for _, session in self.sessions.items():
+                if session['username'] == username:
+                    return True
+        return False
 
     def n_active_sessions(self) -> int:
         """
@@ -2386,6 +2389,51 @@ class JWTSessionManager:
         self.cleanup_expired_sessions()
         return len(self.sessions)
 
+    def _create_jwt(self, username, jti, exp_time, now):
+        """
+        Create a JSON Web Token (JWT) with registered claims.
+
+        Generates and encodes a JWT using the provided username, unique identifier
+        (jti), expiration time, and current time. The token includes standard
+        registered claims as defined in RFC 7519.
+
+        Parameters
+        ----------
+        username : str
+            The subject of the JWT (user identifier).
+        jti : str
+            Unique identifier for the JWT.
+        exp_time : datetime.datetime
+            Expiration time of the JWT.
+        now : datetime.datetime
+            Current time when the JWT is issued.
+
+        Returns
+        -------
+        str
+            A string representation of the encoded JWT.
+
+        See Also
+        --------
+        jwt.encode : Encode a payload into a JWT.
+        """
+        # Create a JWT payload with registered claims
+        payload = {
+            # Registered claims (RFC 7519)
+            'iss': 'plantdb-api',  # issuer
+            'sub': username,  # subject (user identifier)
+            'aud': 'plantdb-client',  # audience
+            'exp': int(exp_time.timestamp()),  # expiration time (Unix timestamp)
+            'iat': int(now.timestamp()),  # issued at (Unix timestamp)
+            'jti': jti  # JWT ID (unique identifier)
+        }
+        return jwt.encode(
+            payload,
+            self.secret_key,
+            algorithm='HS512',
+            headers={'typ': 'JWT', 'alg': 'HS512'}
+        )
+
     def create_session(self, username: str) -> Union[str, None]:
         """
         Create a new session for a user.
@@ -2405,45 +2453,54 @@ class JWTSessionManager:
 
         Notes
         -----
-        The session ID is a token generated using `secrets.token_urlsafe`.
-        The session data includes the user ID, creation timestamp, last accessed timestamp, and expiration timestamp.
+        Creates a JWT token following RFC 7519 standards with registered claims:
+        - iss (issuer): Identifies the token issuer
+        - sub (subject): The username of the authenticated user
+        - aud (audience): Intended audience for the token
+        - exp (expiration time): Token expiration timestamp
+        - iat (issued at): Token creation timestamp
+        - jti (JWT ID): Unique identifier for the token generated using `secrets.token_urlsafe`.
         """
-        session_id = self._user_session_id(username)
-        if session_id:
-            self.logger.warning(f"User has already active session: {session_id}")
-            return session_id
+        if self._user_has_session(username):
+            self.logger.warning(f"User '{username}' already has an active session!")
+            return None
 
         if self.n_active_sessions() >= self.max_concurrent_sessions:
             self.logger.warning(
                 f"Too any users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
             return None
 
-        # Create JWT payload
+        # Create a JWT payload with registered claims
         now = datetime.now()
-        payload = {
-            'username': username,
-            'iat': now,  # issued at
-            'exp': now + timedelta(seconds=self.session_timeout),  # expiration
-            'jti': secrets.token_urlsafe(16)  # unique token ID for tracking
-        }
+        exp_time = now + timedelta(seconds=self.session_timeout)
+        jti = secrets.token_urlsafe(16)  # unique token ID for tracking
 
         # Generate JWT token
-        try:
-            jwt_token = jwt.encode(payload, self.secret_key, algorithm='HS256')
+        jwt_token = self._create_jwt(username, jti, exp_time, now)
 
+        try:
             # Track session for concurrent limit enforcement
-            self.sessions[payload['jti']] = {
+            self.sessions[jti] = {
                 'username': username,
                 'created_at': now,
                 'last_accessed': now,
-                'expires_at': payload['exp']
+                'expires_at': exp_time
             }
-
+            self.logger.debug(f"Created JWT token for '{username}'")
             return jwt_token
 
         except Exception as e:
             self.logger.error(f"Failed to create JWT token for {username}: {e}")
             return None
+
+    def _paylod_from_token(self, jwt_token: str) -> dict:
+        return jwt.decode(
+            jwt_token,
+            self.secret_key,
+            algorithms=['HS512'],
+            audience='plantdb-client',  # Verify audience
+            issuer='plantdb-api'  # Verify issuer
+        )
 
     def validate_session(self, jwt_token: str) -> Optional[Dict[str, Any]]:
         """
@@ -2458,10 +2515,17 @@ class JWTSessionManager:
         -------
         dict or None
             User information if valid, None if invalid/expired.
+            Returns dictionary with:
+            - username: The authenticated user
+            - issued_at: When the token was issued
+            - expires_at: When the token expires
+            - jti: Unique token identifier
+            - issuer: Token issuer
+            - audience: Token audience
         """
         try:
-            # Decode and verify JWT token
-            payload = jwt.decode(jwt_token, self.secret_key, algorithms=['HS256'])
+            # Decode and verify JWT token with proper validation
+            payload = self._paylod_from_token(jwt_token)
 
             # Update last accessed time in session tracking
             jti = payload.get('jti')
@@ -2469,23 +2533,31 @@ class JWTSessionManager:
                 self.sessions[jti]['last_accessed'] = datetime.now()
 
             return {
-                'username': payload['username'],
-                'created_at': payload['iat'],
-                'expires_at': payload['exp'],
-                'jti': jti
+                'username': payload['sub'],  # subject is the username
+                'issued_at': payload['iat'],  # issued at timestamp
+                'expires_at': payload['exp'],  # expiration timestamp
+                'jti': jti,  # JWT ID
+                'issuer': payload['iss'],  # issuer
+                'audience': payload['aud']  # audience
             }
 
         except jwt.ExpiredSignatureError:
-            self.logger.debug("JWT token expired")
+            self.logger.error("JWT token expired")
+            return None
+        except jwt.InvalidAudienceError:
+            self.logger.error("JWT token has invalid audience")
+            return None
+        except jwt.InvalidIssuerError:
+            self.logger.error("JWT token has invalid issuer")
             return None
         except jwt.InvalidTokenError as e:
-            self.logger.debug(f"Invalid JWT token: {e}")
+            self.logger.error(f"Invalid JWT token: {e}")
             return None
         except Exception as e:
             self.logger.error(f"Error validating JWT token: {e}")
             return None
 
-    def invalidate_session(self, jwt_token: str = None, jti: str = None) -> bool:
+    def invalidate_session(self, jwt_token: str = None, jti: str = None) -> Tuple[bool, str|None]:
         """
         Invalidate a session by removing it from tracking.
 
@@ -2500,20 +2572,22 @@ class JWTSessionManager:
         -------
         bool
             True if session was found and removed
+        str
+            The username corresponding to the invalidated JWT token
         """
         if jwt_token:
             try:
-                payload = jwt.decode(jwt_token, self.secret_key, algorithms=['HS256'],
-                                     options={"verify_exp": False})  # Don't verify expiration for logout
+                payload = self._paylod_from_token(jwt_token)
                 jti = payload.get('jti')
             except:
-                return False
+                return False, None
 
         if jti and jti in self.sessions:
+            username = self.sessions[jti]['username']
             del self.sessions[jti]
-            return True
+            return True, username
 
-        return False
+        return False, None
 
     def cleanup_expired_sessions(self):
         """Remove expired sessions from tracking."""
