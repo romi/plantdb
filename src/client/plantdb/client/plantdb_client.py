@@ -97,15 +97,22 @@ class PlantDBClient:
 
     Examples
     --------
-    >>> # Start a test REST API server first:
-    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.server.test_rest_api import TestRestApiServer
+    >>> # Start a test PlantDB REST API server first:
+    >>> server = TestRestApiServer(test=True)
+    >>> server.start()
+    >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import base_url
     >>> client = PlantDBClient(base_url())
-    >>> client.base_url
+    >>> client.login('admin', 'admin')
+    >>> print(client.jwt_token)
+    >>> print(client.base_url)
     >>> scans = client.list_scans()
     >>> print(scans)
     ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+    >>> # Finally, stop the server
+    >>> server.stop()
     """
 
     def __init__(self, base_url, prefix=None):
@@ -120,7 +127,7 @@ class PlantDBClient:
 
     def login(self, username: str, password: str) -> bool:
         """
-        Authenticate user with the PlantDB API.
+        Authenticate the user with the PlantDB API.
 
         Parameters
         ----------
@@ -132,7 +139,7 @@ class PlantDBClient:
         Returns
         -------
         bool
-            True if login successful, False otherwise
+            ``True`` if login successful, ``False`` otherwise
         """
         url = f"{self.base_url}/login"
         data = {
@@ -146,9 +153,8 @@ class PlantDBClient:
                 result = response.json()
                 self.jwt_token = result.get('access_token')
                 self.username = username
-
-                # Cookie is automatically stored in session
-                # No need to manually handle JWT token
+                # Add the JWT to the header
+                self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
@@ -173,7 +179,21 @@ class PlantDBClient:
             response = self.session.post(url)
             if response.status_code == 200:
                 self.username = None
-                # Cookie is automatically cleared by server
+                # Remove the Authorization with the JWT from the header
+                self.session.headers.pop('Authorization')
+                return True
+            return False
+        except Exception:
+            return False
+
+    def refresh(self) -> bool:
+        """
+        Refresh the database.
+        """
+        url = f"{self.base_url}/refresh"
+        try:
+            response = self.session.get(url)
+            if response.status_code == 200:
                 return True
             return False
         except Exception:
@@ -183,7 +203,7 @@ class PlantDBClient:
         """
         Refresh the JWT token (cookie updated automatically).
         """
-        url = f"{self.base_url}/refresh"
+        url = f"{self.base_url}/token-refresh"
         try:
             response = self.session.post(url)
             if response.status_code == 200:
