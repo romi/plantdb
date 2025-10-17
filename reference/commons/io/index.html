@@ -2473,7 +2473,7 @@
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">networkx</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">nx</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_graph, write_graph
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -2548,7 +2548,7 @@
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import networkx as nx</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_graph, write_graph</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -2650,7 +2650,7 @@
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_image, write_image
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -2718,7 +2718,7 @@
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_image, write_image</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -2814,7 +2814,7 @@
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_json, write_json
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -2881,7 +2881,7 @@
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_json, write_json</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -2980,7 +2980,7 @@
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_npz, write_npz
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -3048,7 +3048,7 @@
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_npz, write_npz</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -3146,7 +3146,7 @@
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">open3d</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">o3d</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_point_cloud, write_point_cloud
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -3222,7 +3222,7 @@
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import open3d as o3d</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_point_cloud, write_point_cloud</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -3321,7 +3321,7 @@
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_toml, write_toml
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -3388,7 +3388,7 @@
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_toml, write_toml</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -3783,7 +3783,7 @@
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_volume, write_volume
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -3855,7 +3855,7 @@
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_volume, write_volume</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4075,7 +4075,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">networkx</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">nx</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_graph
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4132,7 +4132,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import networkx as nx</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_graph</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4232,7 +4232,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_image
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4291,7 +4291,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_image</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4391,7 +4391,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_json
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4446,7 +4446,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_json</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4530,7 +4530,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> read_npz, write_npz
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4585,7 +4585,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import read_npz, write_npz</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4687,7 +4687,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">open3d</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">o3d</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">numpy</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">as</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">np</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_point_cloud
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4748,7 +4748,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import open3d as o3d</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import numpy as np</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_point_cloud</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -4848,7 +4848,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_toml
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -4903,7 +4903,7 @@ Else, write the <code>data</code> to the given file path, ignoring the extension
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_toml</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
@@ -5264,7 +5264,7 @@ Defaults to <code>True</code>.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> write_volume
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Scan, Fileset, File
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>connect()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
@@ -5347,7 +5347,7 @@ Defaults to <code>True</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import FSDB</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.io import write_volume</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import Scan, Fileset, File</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.connect()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>

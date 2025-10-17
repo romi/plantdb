@@ -1434,21 +1434,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Archive.get--create-a-test-database-and-start-the-flask-app-serving-a-rest-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      Create a test database and start the Flask App serving a REST API
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2767,21 +2752,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.server.rest_api.Archive.get--create-a-test-database-and-start-the-flask-app-serving-a-rest-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      Create a test database and start the Flask App serving a REST API
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -3786,18 +3756,18 @@ of temporary files.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2613</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2614</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2615</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2616</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2617</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2618</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2619</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2620</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2621</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2622</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2623</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2624</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2602</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2603</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2604</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2605</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2606</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2607</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2608</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2609</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2610</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2611</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2612</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2613</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize the Archive resource.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3839,87 +3809,131 @@ of temporary files.</p>
     <div class="doc doc-contents ">
 
         <p>Create and serve a ZIP archive for the specified scan dataset.</p>
-<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="n">This</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="n">creates</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">temporary</span><span class="w"> </span><span class="n">ZIP</span><span class="w"> </span><span class="n">archive</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">specified</span>
-<span class="w">    </span><span class="n">scan</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="p">(</span><span class="n">excluding</span><span class="w"> </span><span class="s1">&#39;webcache&#39;</span><span class="w"> </span><span class="n">directories</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">serves</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">downloadable</span><span class="w"> </span><span class="n">file</span><span class="o">.</span>
-</code></pre></div>
+<p>This method creates a temporary ZIP archive containing all files from the specified
+scan directory (excluding 'webcache' directories) and serves it as a downloadable file.</p>
 
 
-<details class="--------parameters" open>
-  <summary><div class="codehilite"><pre><span></span><code>    Parameters
-</code></pre></div></summary>
-  <div class="codehilite"><pre><span></span><code>    scan_id : str
-        Unique identifier for the scan dataset to be archived.
-</code></pre></div>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>scan_id</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Unique identifier for the scan dataset to be archived.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="flask.Response" href="https://flask.palletsprojects.com/en/latest/api/#flask.Response">Response</a> or <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If successful, returns a Flask response object with the ZIP file for download.
+If unsuccessful, returns a tuple (dict, int) containing an error message and
+HTTP status code <code>400</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <ul>
+<li>The scan_id is sanitized before processing</li>
+<li>'webcache' directories are automatically excluded from the archive</li>
+<li>Temporary files are created with 'fsdb_rest_api_' prefix</li>
+<li>Clean-up is handled automatically after the request</li>
+</ul>
 </details>
 
-<details class="--------returns" open>
-  <summary><div class="codehilite"><pre><span></span><code>    Returns
-</code></pre></div></summary>
-  <div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="n">flask</span><span class="o">.</span><span class="n">Response</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">tuple</span>
-<span class="w">        </span><span class="n">If</span><span class="w"> </span><span class="n">successful</span><span class="p">,</span><span class="w"> </span><span class="n">returns</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">Flask</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="n">object</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">ZIP</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">download</span><span class="o">.</span>
-<span class="w">        </span><span class="n">If</span><span class="w"> </span><span class="n">unsuccessful</span><span class="p">,</span><span class="w"> </span><span class="n">returns</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">tuple</span><span class="w"> </span><span class="p">(</span><span class="n">dict</span><span class="p">,</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="p">)</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">an</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="ow">and</span>
-<span class="w">        </span><span class="n">HTTP</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="err">``</span><span class="mi">400</span><span class="err">``</span><span class="o">.</span>
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">os</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">requests</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">shutil</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">tempfile</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">io</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> BytesIO
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">pathlib</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Path
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">zipfile</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> ZipFile
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> list_scan_names
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Create a test database and start the Flask App serving a REST API</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get the archive for the &#39;real_plant&#39; dataset with</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>zip_file <span style="color: #666">=</span> requests<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;http://127.0.0.1:5000/archive/real_plant&quot;</span>, stream<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Write the archive to disk:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Create a unique temporary file name with .zip extension</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>temp_zip_handle, temp_zip_path <span style="color: #666">=</span> tempfile<span style="color: #666">.</span>mkstemp(suffix<span style="color: #666">=</span><span style="color: #BA2121">&#39;.zip&#39;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>os<span style="color: #666">.</span>close(temp_zip_handle)  <span style="color: #3D7B7B; font-style: italic"># Close the file handle immediately</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Write to disk</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">with</span> <span style="color: #008000">open</span>(temp_zip_path, <span style="color: #BA2121">&#39;wb&#39;</span>) <span style="color: #008000; font-weight: bold">as</span> zip_f: zip_f<span style="color: #666">.</span>write(zip_file<span style="color: #666">.</span>content)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(<span style="color: #BA2121">f&quot;Successfully wrote to </span><span style="color: #A45A77; font-weight: bold">{</span>temp_zip_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2 - Extract the archive:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Create a temporary path to extract the archived data</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>tmp_dir <span style="color: #666">=</span> Path(tempfile<span style="color: #666">.</span>mkdtemp())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Open the zip file and extract non-existing files</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>extracted_files <span style="color: #666">=</span> []
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">with</span> ZipFile(BytesIO(zip_file<span style="color: #666">.</span>content), <span style="color: #BA2121">&#39;r&#39;</span>) <span style="color: #008000; font-weight: bold">as</span> zip_obj:
+<span style="color: #000080; font-weight: bold">... </span>    <span style="color: #008000; font-weight: bold">for</span> file <span style="color: #A2F; font-weight: bold">in</span> zip_obj<span style="color: #666">.</span>namelist():
+<span style="color: #000080; font-weight: bold">... </span>        file_path <span style="color: #666">=</span> tmp_dir <span style="color: #666">/</span> file
+<span style="color: #000080; font-weight: bold">... </span>        zip_obj<span style="color: #666">.</span>extract(file, path<span style="color: #666">=</span>tmp_dir)
+<span style="color: #000080; font-weight: bold">... </span>        extracted_files<span style="color: #666">.</span>append(file)
+<span style="color: #000080; font-weight: bold">...</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Print the list of extracted files</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(extracted_files)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>shutil<span style="color: #666">.</span>rmtree(tmp_dir)  <span style="color: #3D7B7B; font-style: italic"># Remove the temporary directory (and its contents)</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Stop the test server</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>stop()
 </code></pre></div>
-</details>
 
-<details class="--------notes" open>
-  <summary><div class="codehilite"><pre><span></span><code>    Notes
-</code></pre></div></summary>
-  <div class="codehilite"><pre><span></span><code>    <span class="k">-</span> The scan_id is sanitized before processing
-    <span class="k">-</span> &#39;webcache&#39; directories are automatically excluded from the archive
-    <span class="k">-</span> Temporary files are created with &#39;fsdb_rest_api_&#39; prefix
-    <span class="k">-</span> Clean-up is handled automatically after the request
-</code></pre></div>
-</details>
-
-<details class="--------examples" open>
-  <summary><div class="codehilite"><pre><span></span><code>    Examples
-</code></pre></div></summary>
-  <div class="codehilite"><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</code></pre></div>
-
-<p>import shutil
-import tempfile
-from io import BytesIO
-from pathlib import Path
-from zipfile import ZipFile</p>
-<p>import requests</p>
-<p>from plantdb.client.rest_api import list_scan_names
-from plantdb.server.test_rest_api import TestRestApiServer</p>
-<h5 id="plantdb.server.rest_api.Archive.get--create-a-test-database-and-start-the-flask-app-serving-a-rest-api">Create a test database and start the Flask App serving a REST API<a class="headerlink" href="#plantdb.server.rest_api.Archive.get--create-a-test-database-and-start-the-flask-app-serving-a-rest-api" title="Permanent link">Link</a></h5>
-<div class="codehilite"><pre><span></span><code>    &gt;&gt;&gt; server = TestRestApiServer(test=True)
-    &gt;&gt;&gt; server.start()
-    &gt;&gt;&gt; # Get the archive for the &#39;real_plant&#39; dataset with
-    &gt;&gt;&gt; zip_file = requests.get(&quot;http://127.0.0.1:5000/archive/real_plant&quot;, stream=True)
-    &gt;&gt;&gt; # EXAMPLE 1 - Write the archive to disk:
-    &gt;&gt;&gt; # Create a unique temporary file name with .zip extension
-    &gt;&gt;&gt; temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix=&#39;.zip&#39;)
-    &gt;&gt;&gt; os.close(temp_zip_handle)  # Close the file handle immediately
-    &gt;&gt;&gt; # Write to disk
-    &gt;&gt;&gt; with open(temp_zip_path, &#39;wb&#39;) as zip_f: zip_f.write(zip_file.content)
-    &gt;&gt;&gt; print(f&quot;Successfully wrote to {temp_zip_path}&quot;)
-    &gt;&gt;&gt; # EXAMPLE 2 - Extract the archive:
-    &gt;&gt;&gt; # Create a temporary path to extract the archived data
-    &gt;&gt;&gt; tmp_dir = Path(tempfile.mkdtemp())
-    &gt;&gt;&gt; # Open the zip file and extract non-existing files
-    &gt;&gt;&gt; extracted_files = []
-    &gt;&gt;&gt; with ZipFile(BytesIO(zip_file.content), &#39;r&#39;) as zip_obj:
-    <span class="k">...</span>     for file in zip_obj.namelist():
-    <span class="k">...</span>         file_path = tmp_dir / file
-    <span class="k">...</span>         zip_obj.extract(file, path=tmp_dir)
-    <span class="k">...</span>         extracted_files.append(file)
-    ...
-    &gt;&gt;&gt; # Print the list of extracted files
-    &gt;&gt;&gt; print(extracted_files)
-    &gt;&gt;&gt; shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)
-    &gt;&gt;&gt; # Stop the test server
-    &gt;&gt;&gt; server.stop()
-</code></pre></div>
-</details>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2626</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2615</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2616</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2617</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2618</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2619</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2620</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2621</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2622</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2623</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2624</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2625</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2626</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2627</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2628</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2629</span>
@@ -4017,131 +4031,116 @@ from plantdb.server.test_rest_api import TestRestApiServer</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2721</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2722</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2723</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2724</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2725</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2726</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2727</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2728</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2729</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2730</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2731</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2732</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2733</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2734</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2735</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2736</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2737</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>    <span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
-    <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, <span style="color: #666">**</span>kwargs):
-<span style="color: #BBB">        </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and serve a ZIP archive for the specified scan dataset.</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2724</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, <span style="color: #666">**</span>kwargs):
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create and serve a ZIP archive for the specified scan dataset.</span>
 
-<span style="color: #BA2121; font-style: italic">        This method creates a temporary ZIP archive containing all files from the specified</span>
-<span style="color: #BA2121; font-style: italic">        scan directory (excluding &#39;webcache&#39; directories) and serves it as a downloadable file.</span>
+<span style="color: #BA2121; font-style: italic">    This method creates a temporary ZIP archive containing all files from the specified</span>
+<span style="color: #BA2121; font-style: italic">    scan directory (excluding &#39;webcache&#39; directories) and serves it as a downloadable file.</span>
 
-<span style="color: #BA2121; font-style: italic">        Parameters</span>
-<span style="color: #BA2121; font-style: italic">        ----------</span>
-<span style="color: #BA2121; font-style: italic">        scan_id : str</span>
-<span style="color: #BA2121; font-style: italic">            Unique identifier for the scan dataset to be archived.</span>
+<span style="color: #BA2121; font-style: italic">    Parameters</span>
+<span style="color: #BA2121; font-style: italic">    ----------</span>
+<span style="color: #BA2121; font-style: italic">    scan_id : str</span>
+<span style="color: #BA2121; font-style: italic">        Unique identifier for the scan dataset to be archived.</span>
 
-<span style="color: #BA2121; font-style: italic">        Returns</span>
-<span style="color: #BA2121; font-style: italic">        -------</span>
-<span style="color: #BA2121; font-style: italic">        flask.Response or tuple</span>
-<span style="color: #BA2121; font-style: italic">            If successful, returns a Flask response object with the ZIP file for download.</span>
-<span style="color: #BA2121; font-style: italic">            If unsuccessful, returns a tuple (dict, int) containing an error message and</span>
-<span style="color: #BA2121; font-style: italic">            HTTP status code ``400``.</span>
+<span style="color: #BA2121; font-style: italic">    Returns</span>
+<span style="color: #BA2121; font-style: italic">    -------</span>
+<span style="color: #BA2121; font-style: italic">    flask.Response or tuple</span>
+<span style="color: #BA2121; font-style: italic">        If successful, returns a Flask response object with the ZIP file for download.</span>
+<span style="color: #BA2121; font-style: italic">        If unsuccessful, returns a tuple (dict, int) containing an error message and</span>
+<span style="color: #BA2121; font-style: italic">        HTTP status code ``400``.</span>
 
-<span style="color: #BA2121; font-style: italic">        Notes</span>
-<span style="color: #BA2121; font-style: italic">        -----</span>
-<span style="color: #BA2121; font-style: italic">        - The scan_id is sanitized before processing</span>
-<span style="color: #BA2121; font-style: italic">        - &#39;webcache&#39; directories are automatically excluded from the archive</span>
-<span style="color: #BA2121; font-style: italic">        - Temporary files are created with &#39;fsdb_rest_api_&#39; prefix</span>
-<span style="color: #BA2121; font-style: italic">        - Clean-up is handled automatically after the request</span>
+<span style="color: #BA2121; font-style: italic">    Notes</span>
+<span style="color: #BA2121; font-style: italic">    -----</span>
+<span style="color: #BA2121; font-style: italic">    - The scan_id is sanitized before processing</span>
+<span style="color: #BA2121; font-style: italic">    - &#39;webcache&#39; directories are automatically excluded from the archive</span>
+<span style="color: #BA2121; font-style: italic">    - Temporary files are created with &#39;fsdb_rest_api_&#39; prefix</span>
+<span style="color: #BA2121; font-style: italic">    - Clean-up is handled automatically after the request</span>
 
-<span style="color: #BA2121; font-style: italic">        Examples</span>
-<span style="color: #BA2121; font-style: italic">        --------</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; import os</span>
-<span style="color: #BA2121; font-style: italic">import shutil</span>
-<span style="color: #BA2121; font-style: italic">import tempfile</span>
-<span style="color: #BA2121; font-style: italic">from io import BytesIO</span>
-<span style="color: #BA2121; font-style: italic">from pathlib import Path</span>
-<span style="color: #BA2121; font-style: italic">from zipfile import ZipFile</span>
+<span style="color: #BA2121; font-style: italic">    Examples</span>
+<span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import os</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import requests</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import shutil</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import tempfile</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from io import BytesIO</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from pathlib import Path</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from zipfile import ZipFile</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import list_scan_names</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.server.test_rest_api import TestRestApiServer</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Create a test database and start the Flask App serving a REST API</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server = TestRestApiServer(test=True)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.start()</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Get the archive for the &#39;real_plant&#39; dataset with</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; zip_file = requests.get(&quot;http://127.0.0.1:5000/archive/real_plant&quot;, stream=True)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 1 - Write the archive to disk:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Create a unique temporary file name with .zip extension</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix=&#39;.zip&#39;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; os.close(temp_zip_handle)  # Close the file handle immediately</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Write to disk</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; with open(temp_zip_path, &#39;wb&#39;) as zip_f: zip_f.write(zip_file.content)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(f&quot;Successfully wrote to {temp_zip_path}&quot;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 2 - Extract the archive:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Create a temporary path to extract the archived data</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; tmp_dir = Path(tempfile.mkdtemp())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Open the zip file and extract non-existing files</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; extracted_files = []</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; with ZipFile(BytesIO(zip_file.content), &#39;r&#39;) as zip_obj:</span>
+<span style="color: #BA2121; font-style: italic">    ...     for file in zip_obj.namelist():</span>
+<span style="color: #BA2121; font-style: italic">    ...         file_path = tmp_dir / file</span>
+<span style="color: #BA2121; font-style: italic">    ...         zip_obj.extract(file, path=tmp_dir)</span>
+<span style="color: #BA2121; font-style: italic">    ...         extracted_files.append(file)</span>
+<span style="color: #BA2121; font-style: italic">    ...</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Print the list of extracted files</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(extracted_files)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Stop the test server</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.stop()</span>
+<span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
+    scan_id <span style="color: #666">=</span> sanitize_name(scan_id)
 
-<span style="color: #BA2121; font-style: italic">import requests</span>
+    <span style="color: #008000; font-weight: bold">try</span>:
+        scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, <span style="color: #666">**</span>kwargs)
+    <span style="color: #008000; font-weight: bold">except</span> ScanNotFoundError:
+        <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">f&#39;Could not find a scan named `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">`!&#39;</span>}, <span style="color: #666">400</span>
 
-<span style="color: #BA2121; font-style: italic">from plantdb.client.rest_api import list_scan_names</span>
-<span style="color: #BA2121; font-style: italic">from plantdb.server.test_rest_api import TestRestApiServer</span>
-<span style="color: #BA2121; font-style: italic"># Create a test database and start the Flask App serving a REST API</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; server = TestRestApiServer(test=True)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; server.start()</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Get the archive for the &#39;real_plant&#39; dataset with</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; zip_file = requests.get(&quot;http://127.0.0.1:5000/archive/real_plant&quot;, stream=True)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # EXAMPLE 1 - Write the archive to disk:</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Create a unique temporary file name with .zip extension</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix=&#39;.zip&#39;)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; os.close(temp_zip_handle)  # Close the file handle immediately</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Write to disk</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; with open(temp_zip_path, &#39;wb&#39;) as zip_f: zip_f.write(zip_file.content)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; print(f&quot;Successfully wrote to {temp_zip_path}&quot;)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # EXAMPLE 2 - Extract the archive:</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Create a temporary path to extract the archived data</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; tmp_dir = Path(tempfile.mkdtemp())</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Open the zip file and extract non-existing files</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; extracted_files = []</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; with ZipFile(BytesIO(zip_file.content), &#39;r&#39;) as zip_obj:</span>
-<span style="color: #BA2121; font-style: italic">        ...     for file in zip_obj.namelist():</span>
-<span style="color: #BA2121; font-style: italic">        ...         file_path = tmp_dir / file</span>
-<span style="color: #BA2121; font-style: italic">        ...         zip_obj.extract(file, path=tmp_dir)</span>
-<span style="color: #BA2121; font-style: italic">        ...         extracted_files.append(file)</span>
-<span style="color: #BA2121; font-style: italic">        ...</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Print the list of extracted files</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; print(extracted_files)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; # Stop the test server</span>
-<span style="color: #BA2121; font-style: italic">        &gt;&gt;&gt; server.stop()</span>
-<span style="color: #BA2121; font-style: italic">        &quot;&quot;&quot;</span>
-        scan_id <span style="color: #666">=</span> sanitize_name(scan_id)
+    <span style="color: #3D7B7B; font-style: italic"># Create a unique temporary file name with .zip extension</span>
+    temp_zip_handle, temp_zip_path <span style="color: #666">=</span> mkstemp(suffix<span style="color: #666">=</span><span style="color: #BA2121">&#39;.zip&#39;</span>)
+    os<span style="color: #666">.</span>close(temp_zip_handle)  <span style="color: #3D7B7B; font-style: italic"># Close the file handle immediately</span>
+    temp_zip_path <span style="color: #666">=</span> Path(temp_zip_path)
 
+    <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Creating archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset.&quot;</span>)
+    <span style="color: #008000; font-weight: bold">try</span>:
+        <span style="color: #008000; font-weight: bold">with</span> ZipFile(temp_zip_path, <span style="color: #BA2121">&#39;w&#39;</span>) <span style="color: #008000; font-weight: bold">as</span> zf:
+            path <span style="color: #666">=</span> <span style="color: #008000">str</span>(scan<span style="color: #666">.</span>path())
+            <span style="color: #008000; font-weight: bold">for</span> root, _dirs, files <span style="color: #A2F; font-weight: bold">in</span> os<span style="color: #666">.</span>walk(path):
+                <span style="color: #3D7B7B; font-style: italic"># Exclude &#39;webcache&#39; from the archive:</span>
+                <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;webcache&#39;</span> <span style="color: #A2F; font-weight: bold">in</span> root:
+                    <span style="color: #008000; font-weight: bold">continue</span>
+                <span style="color: #008000; font-weight: bold">for</span> file <span style="color: #A2F; font-weight: bold">in</span> files:
+                    <span style="color: #3D7B7B; font-style: italic"># Get the relative path from the scan directory</span>
+                    full_path <span style="color: #666">=</span> os<span style="color: #666">.</span>path<span style="color: #666">.</span>join(root, file)
+                    relative_path <span style="color: #666">=</span> os<span style="color: #666">.</span>path<span style="color: #666">.</span>relpath(full_path, path)
+                    zf<span style="color: #666">.</span>write(
+                        full_path,
+                        arcname<span style="color: #666">=</span>relative_path  <span style="color: #3D7B7B; font-style: italic"># Use arcname to control the path in the ZIP</span>
+                    )
+    <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
+        <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to create archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">f&#39;Failed to create archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;</span>}, <span style="color: #666">400</span>
+
+    <span style="color: #3D7B7B; font-style: italic"># Schedule the temporary file for cleanup after request completion</span>
+    <span style="color: #A2F">@after_this_request</span>
+    <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">cleanup_temp_file</span>(response):
         <span style="color: #008000; font-weight: bold">try</span>:
-            scan <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>db<span style="color: #666">.</span>get_scan(scan_id, <span style="color: #666">**</span>kwargs)
-        <span style="color: #008000; font-weight: bold">except</span> ScanNotFoundError:
-            <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">f&#39;Could not find a scan named `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">`!&#39;</span>}, <span style="color: #666">400</span>
-
-        <span style="color: #3D7B7B; font-style: italic"># Create a unique temporary file name with .zip extension</span>
-        temp_zip_handle, temp_zip_path <span style="color: #666">=</span> mkstemp(suffix<span style="color: #666">=</span><span style="color: #BA2121">&#39;.zip&#39;</span>)
-        os<span style="color: #666">.</span>close(temp_zip_handle)  <span style="color: #3D7B7B; font-style: italic"># Close the file handle immediately</span>
-        temp_zip_path <span style="color: #666">=</span> Path(temp_zip_path)
-
-        <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Creating archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset.&quot;</span>)
-        <span style="color: #008000; font-weight: bold">try</span>:
-            <span style="color: #008000; font-weight: bold">with</span> ZipFile(temp_zip_path, <span style="color: #BA2121">&#39;w&#39;</span>) <span style="color: #008000; font-weight: bold">as</span> zf:
-                path <span style="color: #666">=</span> <span style="color: #008000">str</span>(scan<span style="color: #666">.</span>path())
-                <span style="color: #008000; font-weight: bold">for</span> root, _dirs, files <span style="color: #A2F; font-weight: bold">in</span> os<span style="color: #666">.</span>walk(path):
-                    <span style="color: #3D7B7B; font-style: italic"># Exclude &#39;webcache&#39; from the archive:</span>
-                    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;webcache&#39;</span> <span style="color: #A2F; font-weight: bold">in</span> root:
-                        <span style="color: #008000; font-weight: bold">continue</span>
-                    <span style="color: #008000; font-weight: bold">for</span> file <span style="color: #A2F; font-weight: bold">in</span> files:
-                        <span style="color: #3D7B7B; font-style: italic"># Get the relative path from the scan directory</span>
-                        full_path <span style="color: #666">=</span> os<span style="color: #666">.</span>path<span style="color: #666">.</span>join(root, file)
-                        relative_path <span style="color: #666">=</span> os<span style="color: #666">.</span>path<span style="color: #666">.</span>relpath(full_path, path)
-                        zf<span style="color: #666">.</span>write(
-                            full_path,
-                            arcname<span style="color: #666">=</span>relative_path  <span style="color: #3D7B7B; font-style: italic"># Use arcname to control the path in the ZIP</span>
-                        )
+            <span style="color: #008000; font-weight: bold">if</span> temp_zip_path<span style="color: #666">.</span>exists():
+                temp_zip_path<span style="color: #666">.</span>unlink()
+                <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Temporary archive `</span><span style="color: #A45A77; font-weight: bold">{</span>temp_zip_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` deleted.&quot;</span>)
         <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
-            <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to create archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-            <span style="color: #008000; font-weight: bold">return</span> {<span style="color: #BA2121">&#39;error&#39;</span>: <span style="color: #BA2121">f&#39;Failed to create archive for `</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` dataset: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;</span>}, <span style="color: #666">400</span>
+            <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to delete temporary file `</span><span style="color: #A45A77; font-weight: bold">{</span>temp_zip_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">`: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
+        <span style="color: #008000; font-weight: bold">return</span> response
 
-        <span style="color: #3D7B7B; font-style: italic"># Schedule the temporary file for cleanup after request completion</span>
-        <span style="color: #A2F">@after_this_request</span>
-        <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">cleanup_temp_file</span>(response):
-            <span style="color: #008000; font-weight: bold">try</span>:
-                <span style="color: #008000; font-weight: bold">if</span> temp_zip_path<span style="color: #666">.</span>exists():
-                    temp_zip_path<span style="color: #666">.</span>unlink()
-                    <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Temporary archive `</span><span style="color: #A45A77; font-weight: bold">{</span>temp_zip_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">` deleted.&quot;</span>)
-            <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">Exception</span> <span style="color: #008000; font-weight: bold">as</span> e:
-                <span style="color: #008000">self</span><span style="color: #666">.</span>logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Failed to delete temporary file `</span><span style="color: #A45A77; font-weight: bold">{</span>temp_zip_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">`: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-            <span style="color: #008000; font-weight: bold">return</span> response
-
-        <span style="color: #008000; font-weight: bold">return</span> send_file(temp_zip_path, download_name<span style="color: #666">=</span><span style="color: #BA2121">f&#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.zip&#39;</span>, mimetype<span style="color: #666">=</span><span style="color: #BA2121">&#39;application/zip&#39;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> send_file(temp_zip_path, download_name<span style="color: #666">=</span><span style="color: #BA2121">f&#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.zip&#39;</span>, mimetype<span style="color: #666">=</span><span style="color: #BA2121">&#39;application/zip&#39;</span>)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4273,7 +4272,20 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2739</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2726</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2727</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2728</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2729</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2730</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2731</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2732</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2733</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2734</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2735</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2736</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2737</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2738</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2739</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2740</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2741</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2742</span>
@@ -4460,20 +4472,7 @@ The integer represents the HTTP status code (<code>200</code> for success, <code
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2923</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2924</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2925</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2926</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2927</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2928</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2929</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2930</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2931</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2932</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2933</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2934</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2935</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2936</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2937</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2938</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2939</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2926</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Handle ZIP file upload and extraction for a scan dataset.</span>
@@ -4776,15 +4775,15 @@ format. It handles GET requests to retrieve skeleton data for a specific scan ID
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2243</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2244</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2245</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2246</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2247</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2248</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2249</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2250</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2251</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2232</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2233</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2234</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2235</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2236</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2237</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2238</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2239</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2240</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize the CurveSkeleton resource.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4969,7 +4968,18 @@ On failure: Tuple of (error_dict, http_status_code)</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2253</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2242</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2243</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2244</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2245</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2246</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2247</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2248</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2249</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2250</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2251</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2252</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2253</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2254</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2255</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2256</span>
@@ -5045,18 +5055,7 @@ On failure: Tuple of (error_dict, http_status_code)</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2326</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2327</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2328</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2329</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2330</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2331</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2332</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2333</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2334</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2335</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2336</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2337</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2338</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2339</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2340</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2329</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve the curve skeleton data for a specific scan.</span>
 
@@ -6186,9 +6185,9 @@ which prevents directory traversal attacks and handles file access permissions.<
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3633</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3634</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3635</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3620</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3621</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3622</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -6306,7 +6305,20 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3637</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3624</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3625</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3626</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3627</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3628</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3629</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3630</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3631</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3632</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3633</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3634</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3635</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3636</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3637</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3638</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3639</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3640</span>
@@ -6416,20 +6428,7 @@ If successful, also returns the created file ID under 'id' key, as sanitization 
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3744</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3745</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3746</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3747</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3748</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3749</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3750</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3751</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3752</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3753</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3754</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3755</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3756</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3757</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3758</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3759</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3760</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3747</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new file in a fileset and write data to it.</span>
 
@@ -6638,9 +6637,9 @@ files within a scan's fileset.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3781</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3782</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3783</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3768</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3769</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3770</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -6786,7 +6785,20 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3785</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3772</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3773</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3774</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3775</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3776</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3777</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3778</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3779</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3780</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3781</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3782</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3783</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3784</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3785</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3786</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3787</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3788</span>
@@ -6832,20 +6844,7 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3828</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3829</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3830</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3831</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3832</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3833</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3834</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3835</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3836</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3837</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3838</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3839</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3840</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3841</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3842</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3843</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3844</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3831</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7048,7 +7047,20 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3846</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3833</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3834</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3835</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3836</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3837</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3838</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3839</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3840</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3841</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3842</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3843</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3844</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3845</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3846</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3847</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3848</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3849</span>
@@ -7121,20 +7133,7 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3916</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3917</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3918</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3919</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3920</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3921</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3922</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3923</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3924</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3925</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3926</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3927</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3928</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3929</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3930</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3931</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3932</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3919</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified file.</span>
 
@@ -7300,9 +7299,9 @@ If key is provided, returns the value for that key.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3266</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3267</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3268</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3253</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3254</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3255</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -7426,7 +7425,20 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3270</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3257</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3258</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3259</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3260</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3261</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3262</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3263</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3264</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3265</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3266</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3267</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3268</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3269</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3270</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3271</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3272</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3273</span>
@@ -7495,20 +7507,7 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3336</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3337</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3338</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3339</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3340</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3341</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3342</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3343</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3344</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3345</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3346</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3347</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3348</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3349</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3350</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3351</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3352</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3339</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new fileset associated with a scan.</span>
 
@@ -7633,9 +7632,9 @@ returned as 500 error responses.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3555</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3556</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3557</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3542</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3543</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3544</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -7771,7 +7770,20 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3559</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3546</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3547</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3548</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3549</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3550</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3551</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3552</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3553</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3554</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3555</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3556</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3557</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3558</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3559</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3560</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3561</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3562</span>
@@ -7812,20 +7824,7 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3597</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3598</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3600</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3601</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3602</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3603</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3604</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3605</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3606</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3607</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3608</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3609</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3610</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3611</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3612</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3613</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3600</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all files in a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the list of files contained in a fileset using the</span>
@@ -7967,9 +7966,9 @@ alphanumeric characters, underscores, dashes, or periods.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3375</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3376</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3377</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3364</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -8138,7 +8137,20 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3379</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3367</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3374</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3375</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3376</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3377</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3378</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3379</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3380</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3381</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3382</span>
@@ -8192,20 +8204,7 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3430</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3431</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3432</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3433</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3434</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3435</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3436</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3437</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3438</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3439</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3440</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3441</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3442</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3443</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3444</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3445</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3446</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3433</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified fileset.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the metadata dictionary for a fileset. Optionally, it can</span>
@@ -8438,7 +8437,20 @@ logged, and returned as a 500 error response.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3448</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3435</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3436</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3441</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3442</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3443</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3448</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3449</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3450</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3451</span>
@@ -8526,20 +8538,7 @@ logged, and returned as a 500 error response.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3533</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3534</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3535</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3537</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3538</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3539</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3540</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3541</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3542</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3543</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3544</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3545</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3546</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3547</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3548</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3549</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3536</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, fileset_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified fileset.</span>
 
@@ -10322,15 +10321,15 @@ size parameters.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2151</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2152</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2153</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2154</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2155</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2156</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2157</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2158</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2159</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2140</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2141</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2142</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2143</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2144</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2145</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2146</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2147</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2148</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize the Mesh resource.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -10527,7 +10526,18 @@ plantdb.server.webcache.mesh_path : Function to retrieve mesh file path</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2161</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2150</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2151</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2152</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2153</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2154</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2155</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2156</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2157</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2158</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2159</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2160</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2161</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2162</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2163</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2164</span>
@@ -10583,18 +10593,7 @@ plantdb.server.webcache.mesh_path : Function to retrieve mesh file path</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2214</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2215</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2216</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2217</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2218</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2219</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2220</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2221</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2222</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2223</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2224</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2225</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2226</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2227</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2228</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2217</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve and serve a triangular mesh file.</span>
 
@@ -11411,8 +11410,8 @@ downsampling it based on the size parameter provided in the query string.</p>
     </table>
 
 
-<details class="notes²" open>
-  <summary>Notes²</summary>
+<details class="note" open>
+  <summary>Notes</summary>
   <ul>
 <li>In the URL, you can use the 'size' parameter to specify the size of the point-cloud:<ul>
 <li>'orig': Original size</li>
@@ -11425,18 +11424,6 @@ downsampling it based on the size parameter provided in the query string.</p>
 <li>Response mimetype is 'application/octet-stream'</li>
 </ul>
 </details>
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Request original size point-cloud</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> get(<span style="color: #BA2121">&#39;/api/scan123/fileset1/cloud1?size=orig&#39;</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt;</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Request preview size</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> get(<span style="color: #BA2121">&#39;/api/scan123/fileset1/cloud1?size=preview&#39;</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt;</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Request custom voxel size</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> get(<span style="color: #BA2121">&#39;/api/scan123/fileset1/cloud1?size=0.01&#39;</span>)
-</code></pre></div>
-
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
@@ -11497,18 +11484,7 @@ downsampling it based on the size parameter provided in the query string.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2117</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2118</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2119</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2120</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2121</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2122</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2123</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2124</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2125</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2126</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2127</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2128</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2129</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2130</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2131</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2120</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve and serve a ground-truth point-cloud file.</span>
 
@@ -11536,7 +11512,7 @@ downsampling it based on the size parameter provided in the query string.</p>
 <span style="color: #BA2121; font-style: italic">    HTTPException</span>
 <span style="color: #BA2121; font-style: italic">         If the rate limit is exceeded, it returns an HTTP 429 (&quot;Too Many Requests&quot;) response to the client.</span>
 
-<span style="color: #BA2121; font-style: italic">    Notes²</span>
+<span style="color: #BA2121; font-style: italic">    Notes</span>
 <span style="color: #BA2121; font-style: italic">    -----</span>
 <span style="color: #BA2121; font-style: italic">    - In the URL, you can use the &#39;size&#39; parameter to specify the size of the point-cloud:</span>
 <span style="color: #BA2121; font-style: italic">        * &#39;orig&#39;: Original size</span>
@@ -11545,17 +11521,6 @@ downsampling it based on the size parameter provided in the query string.</p>
 <span style="color: #BA2121; font-style: italic">    - All identifiers are sanitized before use</span>
 <span style="color: #BA2121; font-style: italic">    - Invalid size parameters default to &#39;preview&#39;</span>
 <span style="color: #BA2121; font-style: italic">    - Response mimetype is &#39;application/octet-stream&#39;</span>
-
-<span style="color: #BA2121; font-style: italic">    Examples</span>
-<span style="color: #BA2121; font-style: italic">    --------</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Request original size point-cloud</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = get(&#39;/api/scan123/fileset1/cloud1?size=orig&#39;)</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt;</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Request preview size</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = get(&#39;/api/scan123/fileset1/cloud1?size=preview&#39;)</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt;</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Request custom voxel size</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = get(&#39;/api/scan123/fileset1/cloud1?size=0.01&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
 
     <span style="color: #3D7B7B; font-style: italic"># Sanitize identifiers</span>
@@ -13331,9 +13296,9 @@ Must contain only alphanumeric characters, underscores, dashes, or periods.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2955</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2956</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2957</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2942</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2943</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2944</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -13422,7 +13387,20 @@ returned as 500 error responses.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2959</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2946</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2947</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2948</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2949</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2950</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2951</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2952</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2953</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2954</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2955</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2956</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2957</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2958</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2959</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2960</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2961</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2962</span>
@@ -13467,20 +13445,7 @@ returned as 500 error responses.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3001</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3002</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3003</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3004</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3005</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3006</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3007</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3008</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3009</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3010</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3011</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3012</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3013</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3014</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3015</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3016</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3017</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3004</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Create a new scan in the database.</span>
 
@@ -13619,9 +13584,9 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3197</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3198</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3199</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3184</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3185</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3186</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -13741,7 +13706,20 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3201</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3188</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3189</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3190</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3191</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3192</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3193</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3194</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3195</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3196</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3197</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3198</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3199</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3200</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3201</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3202</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3203</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3204</span>
@@ -13777,20 +13755,7 @@ listing filesets with optional query filtering and fuzzy matching capabilities.<
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3234</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3235</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3236</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3237</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3238</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3239</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3240</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3241</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3242</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3243</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3244</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3245</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3246</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3247</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3248</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3249</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3250</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3237</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;List all filesets in a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the list of filesets contained in a scan using the</span>
@@ -13920,9 +13885,9 @@ a RESTful interface. It handles both complete metadata operations and individual
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3034</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3035</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3036</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3021</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3022</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3023</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db, logger):
     <span style="color: #008000">self</span><span style="color: #666">.</span>db <span style="color: #666">=</span> db
     <span style="color: #008000">self</span><span style="color: #666">.</span>logger <span style="color: #666">=</span> logger
 </code></pre></div></td></tr></table></div>
@@ -14076,7 +14041,20 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3038</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3025</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3026</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3027</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3028</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3029</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3030</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3031</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3032</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3033</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3034</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3035</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3036</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3037</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3038</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3039</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3040</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3041</span>
@@ -14126,20 +14104,7 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3085</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3086</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3087</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3088</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3089</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3090</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3091</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3092</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3093</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3094</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3095</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3096</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3097</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3098</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3099</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3100</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3101</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3088</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve metadata for a specified scan.</span>
 
 <span style="color: #BA2121; font-style: italic">    This method retrieves the metadata dictionary for a scan. Optionally, it can</span>
@@ -14319,7 +14284,20 @@ If key is provided, returns the value for that key.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3103</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3090</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3091</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3092</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3093</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3094</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3095</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3096</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3097</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3098</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3099</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3100</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3101</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3102</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3103</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3104</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3105</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3106</span>
@@ -14383,20 +14361,7 @@ If key is provided, returns the value for that key.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3164</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3165</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3166</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3167</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3168</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3169</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3170</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3171</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3172</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3173</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3174</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3175</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3176</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3177</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3178</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3179</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3180</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3167</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@requires_jwt</span>
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">post</span>(<span style="color: #008000">self</span>, scan_id, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Update metadata for a specified scan.</span>
 
@@ -15341,15 +15306,15 @@ by sequence type (angles, internodes, or fruit_points).</p>
 
                   <details class="quote">
                     <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2356</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2357</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2358</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2359</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2360</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2361</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2362</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2363</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2364</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
+                    <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2345</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2346</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2349</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2350</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2351</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2352</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2353</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">__init__</span>(<span style="color: #008000">self</span>, db):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize the Sequence resource.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -15543,7 +15508,18 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2366</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2355</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2356</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2357</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2358</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2359</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2360</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2366</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2367</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2368</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2369</span>
@@ -15630,18 +15606,7 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2450</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2451</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2452</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2453</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2454</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2455</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2456</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2457</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2458</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2459</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2460</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2461</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2462</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2463</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2464</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2453</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=5</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve angle and internode sequences data for a given scan.</span>
 
@@ -15935,7 +15900,7 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> compute_fileset_matches
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">&quot;myscan_001&quot;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>compute_fileset_matches(scan)
@@ -15989,7 +15954,7 @@ plantdb.server.rest_api.compute_fileset_matches : Function to match filesets wit
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.server.rest_api import compute_fileset_matches</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.fsdb.core import dummy_db</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan(&quot;myscan_001&quot;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; compute_fileset_matches(scan)</span>
@@ -17656,7 +17621,18 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2491</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2480</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2481</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2482</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2483</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2484</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2485</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2486</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2487</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2488</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2489</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2490</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2492</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2493</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2494</span>
@@ -17667,18 +17643,7 @@ Otherwise, should be one of the following strings, default to <code>'orig'</code
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2499</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2500</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2501</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2502</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2503</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2504</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2505</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2506</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2507</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2508</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2509</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2510</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2511</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2512</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2513</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_directory_in_archive</span>(archive_path, target_dir):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2502</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_directory_in_archive</span>(archive_path, target_dir):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Check if a specific directory exists within an archive file.</span>
 
@@ -17815,7 +17780,18 @@ and verifies that the directory structure does not exceed a specified depth.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2516</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2505</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2506</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2507</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2508</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2509</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2510</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2511</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2512</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2513</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2514</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2515</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2516</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2517</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2518</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2519</span>
@@ -17883,18 +17859,7 @@ and verifies that the directory structure does not exceed a specified depth.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2581</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2582</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2583</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2584</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2585</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2586</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2587</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2588</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2589</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2590</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2591</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2592</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2593</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2594</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2595</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_valid_archive</span>(archive_path):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2584</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_valid_archive</span>(archive_path):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Validate if a given archive meets specific directory and file requirements.</span>
 
@@ -18071,7 +18036,18 @@ to perform the comparison.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2467</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2456</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2457</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2458</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2459</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2460</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2461</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2462</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2463</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2464</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2465</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2466</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2467</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2468</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2469</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2470</span>
@@ -18081,18 +18057,7 @@ to perform the comparison.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2474</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2475</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2476</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2477</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2478</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2479</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2480</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2481</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2482</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2483</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2484</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2485</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2486</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2487</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2488</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_within_directory</span>(directory, target):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2477</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_within_directory</span>(directory, target):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Check if a target path is within a directory.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function determines if the absolute path of the target is located</span>
