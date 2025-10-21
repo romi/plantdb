@@ -40,29 +40,6 @@ This client handles various operations related to scan management, image process
 - **Task Management**: Retrieve and process task-related data and file sets
 - **URL Generation**: Automated URL construction for various API endpoints
 
-## Usage Examples
-
-```python
->>> from plantdb.client.rest_api import configure_requests_with_certificate
->>> from plantdb.client.rest_api import test_availability
->>> from plantdb.client.rest_api import list_scan_names
-
->>> # Configure the client with certificates
->>> configure_requests_with_certificate('path/to/cert.pem')
-
->>> # Test API availability
->>> is_available = test_availability()
->>> if is_available:
-...     print("API service is available")
-
->>> # List available scans
->>> scans = list_scan_names()
->>> print(f"Available scans: {scans}")
-
->>> # Get scan data
->>> scan_name = "example_scan"
->>> scan_data = get_scan_data(scan_name)
-```
 """
 
 import json
@@ -71,7 +48,6 @@ import os
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import urljoin
-from urllib.parse import urlparse
 
 import requests
 from PIL import Image
@@ -309,9 +285,11 @@ def make_api_request(url, method="GET", params=None, json_data=None,
         if method.upper() == "GET":
             response = requests.get(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
         elif method.upper() == "POST":
-            response = requests.post(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects, **kwargs)
+            response = requests.post(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects,
+                                     **kwargs)
         elif method.upper() == "PUT":
-            response = requests.put(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects, **kwargs)
+            response = requests.put(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects,
+                                    **kwargs)
         elif method.upper() == "DELETE":
             response = requests.delete(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
         else:
@@ -546,66 +524,6 @@ def get_file_uri(scan, fileset, file):
     file_id = file.path().name if isinstance(file, File) else file
     return f"files/{scan_id}/{fileset_id}/{file_id}"
 
-
-def test_availability(url):
-    """Verifies the connectivity to a given host and port from a URL-like string.
-    This function parses a URL string into host and port components, attempts to establish a
-    socket connection to check its availability, and raises appropriate exceptions on failure.
-
-    Parameters
-    ----------
-    url : str
-        A URL string in various formats like 'http://host:port', 'https://host/path/', etc.
-
-    Raises
-    ------
-    ValueError
-        If the input URL is not a valid URL format.
-    ConnectionError
-        If the specified host cannot be connected, indicating that the server might
-        be unavailable.
-    RuntimeError
-        If an unexpected error occurs during the verification process.
-
-    Returns
-    -------
-    bool
-        `True` if the server is available, raise an error otherwise.
-
-    Examples
-    --------
-    >>> # Start a test PlantDB REST API server first, in a terminal:
-    >>> # $ fsdb_rest_api --test
-    >>> from plantdb.client.rest_api import test_availability
-    >>> test_availability('http://127.0.0.1:5000')
-    >>> test_availability('https://127.0.0.1/plantdb/')
-    >>> test_availability('https://mellitus.biologie.ens-lyon.fr/plantdb/')
-    """
-    import socket
-    try:
-        parsed_url = urlparse(url)
-
-        # Validate URL has at least a scheme and hostname
-        if not parsed_url.scheme or not parsed_url.netloc:
-            raise ValueError(f"Invalid URL format: '{url}'. Must include scheme (http/https) and hostname.")
-
-        host = parsed_url.hostname
-        # Use default port based on scheme if not specified
-        port = parsed_url.port
-        if port is None:
-            port = 443 if parsed_url.scheme == 'https' else 80
-
-        socket.setdefaulttimeout(2)  # Set a timeout for the connection check
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            if s.connect_ex((host, port)) != 0:
-                raise ConnectionError(f"Cannot connect to {host}:{port}. Server might be unavailable.")
-    except ValueError as e:
-        raise ValueError(f"{e}")
-    except ConnectionError as e:
-        raise e
-    except Exception as e:
-        raise RuntimeError(f"Unexpected error during connection check: {e}")
-    return True
 
 def list_scan_names(**kwargs):
     """List the names of the scan datasets served by the PlantDB REST API.
@@ -1012,7 +930,8 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
     """
     images = []
     for img_uri in list_task_images_uri(dataset_name, task_name, size, **kwargs):
-        images.append(Image.open(BytesIO(make_api_request(url=img_uri, cert_path=kwargs.get('cert_path', None)).content)))
+        images.append(
+            Image.open(BytesIO(make_api_request(url=img_uri, cert_path=kwargs.get('cert_path', None)).content)))
     return images
 
 
@@ -1603,7 +1522,8 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
                                 "response": response.json()}
             else:
                 # Upload the entire file
-                response = make_api_request(url, method='POST', headers=headers, data=f, cert_path=kwargs.get('cert_path', None))
+                response = make_api_request(url, method='POST', headers=headers, data=f,
+                                            cert_path=kwargs.get('cert_path', None))
 
         # Return the server's response
         if response.status_code in (200, 201):

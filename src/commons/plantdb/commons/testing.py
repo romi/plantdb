@@ -192,7 +192,7 @@ class FSDBTestCase(unittest.TestCase):
             The default fileset instance to test.
         """
         scan = self.get_test_scan()
-        fileset = scan.get_fileset(fs_id, create=create)
+        fileset = scan.get_fileset(fs_id)
         return fileset
 
     def get_task_fileset_id(self, task_name):

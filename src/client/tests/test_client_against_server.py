@@ -101,10 +101,10 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         """
         Test server availability endpoint.
 
-        This test verifies that the test_availability function correctly
+        This test verifies that the is_server_available function correctly
         checks if the server is available and returns the expected boolean result.
         """
-        available = client.test_availability(base_url(**self.kw))
+        available = client.is_server_available(base_url(**self.kw))
         self.assertTrue(available)  # Should be True since the test server is running
 
     def test_url_building_functions(self):

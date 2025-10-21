@@ -66,19 +66,19 @@ For example:
 import argparse
 import re
 from pathlib import Path
-from requests.exceptions import HTTPError
 from urllib.parse import urlparse
 
+from requests.exceptions import HTTPError
 from tqdm import tqdm
 
-from plantdb.commons.log import DEFAULT_LOG_LEVEL
-from plantdb.commons.log import LOG_LEVELS
-from plantdb.commons.log import get_logger
 from plantdb.client.rest_api import download_scan_archive
 from plantdb.client.rest_api import list_scan_names
 from plantdb.client.rest_api import refresh
-from plantdb.client.rest_api import test_availability
 from plantdb.client.rest_api import upload_scan_archive
+from plantdb.client.url import is_server_available
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
 
 
 def parsing():
@@ -89,7 +89,8 @@ def parsing():
     argparse.ArgumentParser
         An argument parser configured for FSDB synchronization.
     """
-    parser = argparse.ArgumentParser(description='Transfer dataset from an origin FSDB database towards a target using REST API.')
+    parser = argparse.ArgumentParser(
+        description='Transfer dataset from an origin FSDB database towards a target using REST API.')
     parser.add_argument('origin', type=str,
                         help='source database URL, as "host:port".')
     parser.add_argument('target', type=str,
@@ -218,8 +219,8 @@ def main():
     args = parser.parse_args()
 
     # Validate the availability of origin and target database URLs
-    test_availability(args.origin)
-    test_availability(args.target)
+    is_server_available(args.origin)
+    is_server_available(args.target)
 
     # Synchronize scan archives between the origin and target databases
     sync_scan_archives(args.origin, args.target, args.filter, args.log_level)  # Perform synchronization

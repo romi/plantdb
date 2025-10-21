@@ -127,7 +127,7 @@ def _reader(file, reader, **kwargs):
     # Get path to file if in a database:
     if isinstance(file, fsdb.core.File):
         file = file.path()
-    # Load the file with selected reader:
+    # Load the file with the selected reader:
     with open(file, 'r') as f:
         data = reader(f, **kwargs)
     return data

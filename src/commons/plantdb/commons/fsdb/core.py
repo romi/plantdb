@@ -215,7 +215,7 @@ def require_authentication(method):
     def wrapper(self, *args, **kwargs):
 
         if isinstance(self.session_manager, SingleSessionManager):
-            # If a Single SessionManager, get the username from thesession manager or use 'guest' user
+            # If a Single SessionManager, get the username from the session manager or use 'guest' user
             try:
                 session = list(self.session_manager.sessions.keys())[0]
             except IndexError:
