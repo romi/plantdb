@@ -13867,7 +13867,7 @@ If a dictionary, update the metadata dictionary with <code>data</code> (<code>va
     <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">wrapper</span>(<span style="color: #008000">self</span>, <span style="color: #666">*</span>args, <span style="color: #666">**</span>kwargs):
 
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">isinstance</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>session_manager, SingleSessionManager):
-            <span style="color: #3D7B7B; font-style: italic"># If a Single SessionManager, get the username from thesession manager or use &#39;guest&#39; user</span>
+            <span style="color: #3D7B7B; font-style: italic"># If a Single SessionManager, get the username from the session manager or use &#39;guest&#39; user</span>
             <span style="color: #008000; font-weight: bold">try</span>:
                 session <span style="color: #666">=</span> <span style="color: #008000">list</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>session_manager<span style="color: #666">.</span>sessions<span style="color: #666">.</span>keys())[<span style="color: #666">0</span>]
             <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">IndexError</span>:
