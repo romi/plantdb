@@ -26,11 +26,8 @@
 """
 This module provides a collection of utility functions for data handling in the ROMI project.
 """
-
 import tempfile
 from datetime import datetime
-from datetime import timezone
-from datetime import tzinfo
 from pathlib import Path
 
 from PIL import Image
@@ -252,12 +249,13 @@ def partial_match(source, target, fuzzy=False):
     # Check if both are lists
     elif isinstance(source, list) and isinstance(target, list):
         return len(source) <= len(target) and all(  # Ensure source list is shorter or equal length to target list
-            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)  # Use any() to check at least one match per item
+            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)
+            # Use any() to check at least one match per item
             for ref_item in source
         )
     # Check if both are strings for fuzzy matching
     elif fuzzy and isinstance(source, str) and isinstance(target, str):
-         # Return True if the source regex pattern matches the target string
+        # Return True if the source regex pattern matches the target string
         return bool(match(source, target))
     else:
         # Direct comparison of values
