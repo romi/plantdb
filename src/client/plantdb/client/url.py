@@ -29,7 +29,6 @@ logger = get_logger(__name__)
 # --------------------------------------------------------------------------- #
 
 ALLOWED_SCHEMES: set[str] = {"http", "https"}  # Only HTTP(S)
-ALLOWED_PORTS: set[int] = {80, 443}  # Optional – restrict to common ports
 BLACKLIST_CACHE_FILE = pathlib.Path(tempfile.gettempdir()) / "github_blacklist_cache.txt"
 
 # Private / non‑routable IP ranges – we refuse to connect to any of them
@@ -363,6 +362,10 @@ def _validate_host(hostname: str, allow_private_ip: bool = False) -> bool:
     _resolve_public_ips : Resolve public IPs for a given hostname.
 
     """
+    # Allow localhost/127.0.0.1 during development when private IPs are allowed
+    if allow_private_ip and hostname.lower() in ("localhost", "127.0.0.1"):
+        return True
+
     if WHITELIST:
         if hostname not in WHITELIST:
             return False
@@ -406,6 +409,7 @@ def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.pars
     ParseResult(scheme='http', netloc='example.com', path='', params='', query='', fragment='')
     >>> _parse_url("file:///etc/passwd", allow_private_ip=True)
     None
+    >>> _parse_url("http://127.0.0.1:5000", allow_private_ip=True)
 
     Notes
     -----
@@ -433,10 +437,6 @@ def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.pars
     if not parsed.hostname:
         return None
 
-    # Optional port check
-    if parsed.port and parsed.port not in ALLOWED_PORTS:
-        return None
-
     # Host validation (whitelist/blacklist + DNS resolution)
     if not _validate_host(parsed.hostname, allow_private_ip=allow_private_ip):
         return None
@@ -455,6 +455,7 @@ class ServerCheckResult:
     status_code: int
     ok: bool
     final_url: str
+    message: str
 
 
 def is_server_available(
@@ -497,17 +498,24 @@ def is_server_available(
 
     Examples
     --------
+    >>> from plantdb.server.test_rest_api import TestRestApiServer
     >>> from plantdb.client.url import is_server_available
+    >>> # EXAMPLE 1: Test with a valid online server
     >>> result = is_server_available("https://example.com")
     >>> print(result.ok)
     True
     >>> print(result.url)
     https://example.com
-    >>> result = is_server_available("https://127.0.0.1/plantdb")
+    >>> # EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server
+    >>> server = TestRestApiServer(test=True, ssl=False)  # initialize the server
+    >>> server.start()  # start the server
+    >>> result = is_server_available("http://127.0.0.1:5000", allow_private_ip=True)
     >>> print(result.ok)
-    False
-    >>> result = is_server_available("https://127.0.0.1/plantdb", allow_private_ip=True)
-    >>> print(result.ok)
+    True
+    >>> print(result.message)
+    Valid URL.
+    >>> server.stop()  # stop the server
+
     Notes
     -----
     This function uses the `requests` library to perform HTTP requests. It handles
@@ -520,8 +528,9 @@ def is_server_available(
     """
     parsed = _parse_url(url, allow_private_ip=allow_private_ip)
     if not parsed:
-        logger.warning(f"Invalid URL detected: {url}")
-        return ServerCheckResult(url=url, status_code=0, ok=False, final_url=url)
+        message = f"URL '{url}' is not a valid URL."
+        logger.warning(message)
+        return ServerCheckResult(url=url, status_code=0, ok=False, final_url=url, message=message)
 
     session = requests.Session()
     retry = Retry(
@@ -546,21 +555,24 @@ def is_server_available(
                 allow_redirects=False,  # We handle redirects manually
                 stream=True,  # Do not download the body unless we need to
             )
-        except requests.RequestException:
-            return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url)
+        except requests.RequestException as err:
+            message = f"Request to {current_url} failed with: {err}"
+            return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url, message=message)
 
         # If we get a redirect, validate the target URL
         if 300 <= resp.status_code < 400:
             location = resp.headers.get("Location")
             if not location:
-                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=current_url)
+                message = f"Request to {current_url} (redirect) failed to determine next location."
+                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=current_url, message=message)
 
             # Resolve relative URLs
             next_url = urllib.parse.urljoin(current_url, location)
 
             # Safety check on the next hop
             if not _parse_url(next_url, allow_private_ip=allow_private_ip):
-                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=next_url)
+                message = f"Request to {current_url} (redirect) is not a valid URL."
+                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=next_url, message=message)
 
             current_url = next_url
             continue
@@ -571,7 +583,9 @@ def is_server_available(
             status_code=resp.status_code,
             ok=200 <= resp.status_code < 400,
             final_url=current_url,
+            message="Valid URL.",
         )
 
     # Too many redirects
-    return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url)
+    message = f"URL '{url}' has too many redirects to follow (>= {max_redirects})."
+    return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url, message=message)
