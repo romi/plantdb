@@ -2018,7 +2018,7 @@
   </span>
 
 <a href="#plantdb.client.url.ServerCheckResult" class="headerlink" title="Permanent link">Link</a></h3>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>ServerCheckResult(url, status_code, ok, final_url)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>ServerCheckResult(url, status_code, ok, final_url, message)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2220,23 +2220,31 @@ Default is False.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.url</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> is_server_available
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.url</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> is_server_available
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1: Test with a valid online server</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;https://example.com&quot;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>ok)
 <span style="color: #717171">True</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>url)
 <span style="color: #717171">https://example.com</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;https://127.0.0.1/plantdb&quot;</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)  <span style="color: #3D7B7B; font-style: italic"># initialize the server</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()  <span style="color: #3D7B7B; font-style: italic"># start the server</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;http://127.0.0.1:5000&quot;</span>, allow_private_ip<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>ok)
-<span style="color: #717171">False</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;https://127.0.0.1/plantdb&quot;</span>, allow_private_ip<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>ok)
-<span style="color: #717171">Notes</span>
-<span style="color: #717171">-----</span>
-<span style="color: #717171">This function uses the `requests` library to perform HTTP requests. It handles</span>
-<span style="color: #717171">retries and redirects according to the parameters provided.</span>
+<span style="color: #717171">True</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>message)
+<span style="color: #717171">Valid URL.</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>stop()  <span style="color: #3D7B7B; font-style: italic"># stop the server</span>
 </code></pre></div>
 
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This function uses the <code>requests</code> library to perform HTTP requests. It handles
+retries and redirects according to the parameters provided.</p>
+</details>
 
 <details class="see-also" open>
   <summary>See Also</summary>
@@ -2246,8 +2254,7 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/url.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">460</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">462</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">463</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">464</span>
@@ -2363,7 +2370,21 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">574</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">579</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">590</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
         url: <span style="color: #008000">str</span>,
         timeout: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">5.0</span>,
         max_redirects: <span style="color: #008000">int</span> <span style="color: #666">=</span> <span style="color: #666">2</span>,
@@ -2403,17 +2424,24 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.server.test_rest_api import TestRestApiServer</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.url import is_server_available</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 1: Test with a valid online server</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;https://example.com&quot;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.ok)</span>
 <span style="color: #BA2121; font-style: italic">    True</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.url)</span>
 <span style="color: #BA2121; font-style: italic">    https://example.com</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;https://127.0.0.1/plantdb&quot;)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server = TestRestApiServer(test=True, ssl=False)  # initialize the server</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.start()  # start the server</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;http://127.0.0.1:5000&quot;, allow_private_ip=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.ok)</span>
-<span style="color: #BA2121; font-style: italic">    False</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;https://127.0.0.1/plantdb&quot;, allow_private_ip=True)</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.ok)</span>
+<span style="color: #BA2121; font-style: italic">    True</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.message)</span>
+<span style="color: #BA2121; font-style: italic">    Valid URL.</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.stop()  # stop the server</span>
+
 <span style="color: #BA2121; font-style: italic">    Notes</span>
 <span style="color: #BA2121; font-style: italic">    -----</span>
 <span style="color: #BA2121; font-style: italic">    This function uses the `requests` library to perform HTTP requests. It handles</span>
@@ -2426,8 +2454,9 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     parsed <span style="color: #666">=</span> _parse_url(url, allow_private_ip<span style="color: #666">=</span>allow_private_ip)
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> parsed:
-        logger<span style="color: #666">.</span>warning(<span style="color: #BA2121">f&quot;Invalid URL detected: </span><span style="color: #A45A77; font-weight: bold">{</span>url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
-        <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>url)
+        message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;URL &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; is not a valid URL.&quot;</span>
+        logger<span style="color: #666">.</span>warning(message)
+        <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>url, message<span style="color: #666">=</span>message)
 
     session <span style="color: #666">=</span> requests<span style="color: #666">.</span>Session()
     retry <span style="color: #666">=</span> Retry(
@@ -2452,21 +2481,24 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
                 allow_redirects<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,  <span style="color: #3D7B7B; font-style: italic"># We handle redirects manually</span>
                 stream<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,  <span style="color: #3D7B7B; font-style: italic"># Do not download the body unless we need to</span>
             )
-        <span style="color: #008000; font-weight: bold">except</span> requests<span style="color: #666">.</span>RequestException:
-            <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url)
+        <span style="color: #008000; font-weight: bold">except</span> requests<span style="color: #666">.</span>RequestException <span style="color: #008000; font-weight: bold">as</span> err:
+            message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> failed with: </span><span style="color: #A45A77; font-weight: bold">{</span>err<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
+            <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url, message<span style="color: #666">=</span>message)
 
         <span style="color: #3D7B7B; font-style: italic"># If we get a redirect, validate the target URL</span>
         <span style="color: #008000; font-weight: bold">if</span> <span style="color: #666">300</span> <span style="color: #666">&lt;=</span> resp<span style="color: #666">.</span>status_code <span style="color: #666">&lt;</span> <span style="color: #666">400</span>:
             location <span style="color: #666">=</span> resp<span style="color: #666">.</span>headers<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;Location&quot;</span>)
             <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> location:
-                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status_code, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url)
+                message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> (redirect) failed to determine next location.&quot;</span>
+                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status_code, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url, message<span style="color: #666">=</span>message)
 
             <span style="color: #3D7B7B; font-style: italic"># Resolve relative URLs</span>
             next_url <span style="color: #666">=</span> urllib<span style="color: #666">.</span>parse<span style="color: #666">.</span>urljoin(current_url, location)
 
             <span style="color: #3D7B7B; font-style: italic"># Safety check on the next hop</span>
             <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> _parse_url(next_url, allow_private_ip<span style="color: #666">=</span>allow_private_ip):
-                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status_code, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>next_url)
+                message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> (redirect) is not a valid URL.&quot;</span>
+                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status_code, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>next_url, message<span style="color: #666">=</span>message)
 
             current_url <span style="color: #666">=</span> next_url
             <span style="color: #008000; font-weight: bold">continue</span>
@@ -2477,10 +2509,12 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
             status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status_code,
             ok<span style="color: #666">=200</span> <span style="color: #666">&lt;=</span> resp<span style="color: #666">.</span>status_code <span style="color: #666">&lt;</span> <span style="color: #666">400</span>,
             final_url<span style="color: #666">=</span>current_url,
+            message<span style="color: #666">=</span><span style="color: #BA2121">&quot;Valid URL.&quot;</span>,
         )
 
     <span style="color: #3D7B7B; font-style: italic"># Too many redirects</span>
-    <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url)
+    message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;URL &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; has too many redirects to follow (&gt;= </span><span style="color: #A45A77; font-weight: bold">{</span>max_redirects<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">).&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(url<span style="color: #666">=</span>url, status_code<span style="color: #666">=0</span>, ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, final_url<span style="color: #666">=</span>current_url, message<span style="color: #666">=</span>message)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
