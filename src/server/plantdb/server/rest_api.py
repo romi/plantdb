@@ -1090,13 +1090,97 @@ class Logout(Resource):
             return {'message': 'Logout failed'}, 500
 
 
+class TokenValidation(Resource):
+    """
+    Validate a JSON Web Token (JWT) and retrieve associated user data.
+
+    The resource exposes a POST endpoint that accepts a JWT token, verifies its
+    validity against the database session manager, and returns the authenticated
+    user’s basic profile information.  On success a 200 response is returned
+    containing the user’s ``username`` and ``fullname``; on failure a 401
+    response is returned with an error message.
+
+    Attributes
+    ----------
+    db : Any
+        Database handler with a ``session_manager`` attribute.
+    logger : Any
+        Logger used to log validation attempts.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+    logger : Any
+        Logger instance used for recording authentication events.
+
+    Examples
+    --------
+    >>> from flask import Flask
+    >>> from flask_restful import Api
+    >>> app = Flask(__name__)
+    >>> api = Api(app)
+    >>> # Assume `db` and `logger` are pre‑configured objects
+    >>> api.add_resource(TokenValidation, '/validate')
+    >>> # In a test client
+    >>> with app.test_client() as client:
+    ...     response = client.post('/validate', json={'token': 'valid.jwt.token'})
+    ...     print(response.status_code)          # 200
+    ...     print(response.json)
+    ...     # {'message': 'Token validation successful',
+    ...     #  'user': {'username': 'jdoe', 'fullname': 'John Doe'}}
+    """
+    def __init__(self, db, logger):
+        """Initialize the TokenValidation resource."""
+        self.db = db
+        self.logger = logger
+
+    def post(self, **kwargs):
+        """Handle token validation."""
+        jwt_token = kwargs.get('token', None)
+
+        try:
+            user = self.db.session_manager.get_user_data(session_token=jwt_token)
+        except Exception as e:
+            response = {'message': f'Token validation failed: {e}'}, 401
+        else:
+            response = {'message': 'Token validation successful',
+                        'user': {
+                            'username': user.username,
+                            'fullname': user.fullname,
+                        },
+                        }, 200
+
+        return response
+
 class TokenRefresh(Resource):
+    """
+    Refresh JWT token for an authenticated user.
+
+    The :class:`TokenRefresh` resource provides an endpoint that accepts an
+    existing JSON Web Token, validates the current session, and issues a new
+    access token when the refresh is successful.  The resource interacts
+    with a database session manager that exposes a ``refresh_session`` method
+    to perform the actual token renewal.
+
+    Attributes
+    ----------
+    db : object
+        Database handler with a ``session_manager`` attribute.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+
+    """
     def __init__(self):
+        """Initialize the TokenRefresh resource."""
         self.db = None
 
     @requires_jwt
     def post(self, **kwargs):
-        """Refresh JWT token in HttpOnly cookie."""
+        """Refresh JWT token."""
         # Get token from keyword arguments
         jwt_token = kwargs.get('token', None)
         try:
@@ -1109,7 +1193,7 @@ class TokenRefresh(Resource):
                 return {'message': 'Token refresh failed'}, 401
 
         except Exception as e:
-            return {'message': 'Token refresh failed'}, 500
+            return {'message': f'Token refresh failed: {e}'}, 500
 
 
 class ScansList(Resource):
@@ -1124,19 +1208,18 @@ class ScansList(Resource):
     db : plantdb.commons.fsdb.FSDB
         Database connection object used to interact with the scan datasets.
 
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.FSDB
+        Database connection object for accessing scan data.
+
     See Also
     --------
     flask_restful.Resource : Base class for RESTful resources
     """
 
     def __init__(self, db):
-        """Initialize the ScansList resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.FSDB
-            Database connection object for accessing scan data.
-        """
+        """Initialize the ScansList resource."""
         self.db = db
 
     @rate_limit(max_requests=30, window_seconds=60)

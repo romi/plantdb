@@ -123,6 +123,7 @@ from plantdb.server.rest_api import ScansList
 from plantdb.server.rest_api import ScansTable
 from plantdb.server.rest_api import Sequence
 from plantdb.server.rest_api import TokenRefresh
+from plantdb.server.rest_api import TokenValidation
 
 
 def parsing() -> argparse.ArgumentParser:
@@ -295,6 +296,8 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
                      resource_class_args=tuple([db, logger]))
     api.add_resource(TokenRefresh, '/token-refresh',
                      resource_class_args=tuple([db]))
+    api.add_resource(TokenValidation, '/token-validation',
+                     resource_class_args=tuple([db, logger]))
     # API endpoints for `plantdb.commons.fsdb.core.Scan`:
     api.add_resource(ScanCreate, '/api/scan',
                      resource_class_args=tuple([db, logger]))
