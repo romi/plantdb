@@ -43,7 +43,6 @@ This client handles various operations related to scan management, image process
 """
 
 import json
-import logging
 import os
 from io import BytesIO
 from pathlib import Path
@@ -92,6 +91,11 @@ def sanitize_name(name):
         raise ValueError(
             f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
     return sanitized_name
+
+
+# -----------------------------------------------------------------------------
+# URL construction methods
+# -----------------------------------------------------------------------------
 
 
 def base_url(host=REST_API_URL, port=REST_API_PORT, prefix=None, ssl=False) -> str:
@@ -163,14 +167,14 @@ def scans_url(**kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -194,118 +198,6 @@ def scans_url(**kwargs):
     return urljoin(url, "scans")
 
 
-def configure_requests_with_certificate(cert_path, logger=None):
-    """
-    Configure the Requests library to use a specific SSL certificate.
-
-    This function sets up the Requests library to use a given SSL certificate by
-    modifying the environment variable `REQUESTS_CA_BUNDLE`. It also ensures that
-    the specified certificate file exists. If the file does not exist, it raises
-    a FileNotFoundError.
-
-    Parameters
-    ----------
-    cert_path : str
-        The path to the SSL certificate file.
-    logger : logging.Logger, optional
-        A logger instance to use. Defaults to ``None``.
-
-    Raises
-    ------
-    FileNotFoundError
-        If `cert_path` does not point to a valid certificate file.
-    """
-    if not os.path.exists(cert_path):
-        raise FileNotFoundError(f"Certificate file not found: {cert_path}")
-
-    os.environ['REQUESTS_CA_BUNDLE'] = cert_path
-    if logger is not None and isinstance(logger, logging.Logger):
-        logger.debug(f"Requests configured to use certificate: {cert_path}")
-
-
-def make_api_request(url, method="GET", params=None, json_data=None,
-                     cert_path=None, allow_redirects=True, **kwargs):
-    """
-    Function to make an API request with various HTTP methods and options.
-
-    Parameters
-    ----------
-    url : str
-        The URL for the API endpoint.
-    method : {'GET', 'POST', 'PUT', 'DELETE'}, optional
-        The HTTP method to use. Default is 'GET'.
-    params : dict, optional
-        Dictionary of query parameters to append to the URL.
-    json_data : dict, optional
-        JSON payload to send in the body of the request for 'POST' and 'PUT' methods.
-    cert_path : str or None, optional
-        Path to a certificate file for SSL verification. If None, default SSL verification is used.
-    allow_redirects : bool, optional
-        Whether to allow redirects. Default is True.
-
-    Other Parameters
-    ----------------
-    header : dict, optional
-        The HTTP headers to send in the request. Default is None.
-    files : dict, optional
-        Additional files to send in the request. Default is None.
-    data : dict, list, or bytes, optional
-        The data to send in the request. Default is None.
-    timeout : int, optional
-        Timeout to use for the request. Default is 5 seconds.
-    stream : bool, optional
-        Flag indicating whether to stream the request. Default is False.
-
-    Returns
-    -------
-    response : requests.Response
-        The response object from the API request.
-
-    Raises
-    ------
-    ValueError
-        If an unsupported HTTP method is provided.
-    requests.exceptions.SSLError
-        If there's an SSL error during the request.
-    requests.exceptions.RequestException
-        For any other exception raised by the underlying `requests` library.
-
-    Notes
-    -----
-    This function is designed to handle various HTTP methods (GET, POST, PUT, DELETE) and provides a unified interface for making API requests. It supports SSL verification and allows for custom parameters and JSON data to be sent with the request.
-    It passes keyword arguments to the underlying `requests` library.
-    """
-    # Add a default timeout of 5 seconds if not provided
-    if 'timeout' not in kwargs:
-        kwargs['timeout'] = 5.0
-
-    try:
-        verify = cert_path if cert_path else True
-
-        if method.upper() == "GET":
-            response = requests.get(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
-        elif method.upper() == "POST":
-            response = requests.post(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects,
-                                     **kwargs)
-        elif method.upper() == "PUT":
-            response = requests.put(url, params=params, json=json_data, verify=verify, allow_redirects=allow_redirects,
-                                    **kwargs)
-        elif method.upper() == "DELETE":
-            response = requests.delete(url, params=params, verify=verify, allow_redirects=allow_redirects, **kwargs)
-        else:
-            raise ValueError(f"Unsupported HTTP method: {method}")
-
-        response.raise_for_status()  # Raise exception for 4XX/5XX responses
-        return response
-    except requests.exceptions.SSLError as e:
-        print(f"SSL Error: {e}")
-        print("Try providing the specific certificate path with cert_path parameter")
-        raise
-    except requests.exceptions.RequestException as e:
-        print(f"Request Error: {e}")
-        raise
-
-
 def scan_url(scan_id, **kwargs):
     """Generates the URL pointing to the scan JSON from the PlantDB REST API.
 
@@ -316,14 +208,14 @@ def scan_url(scan_id, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -366,14 +258,14 @@ def scan_image_url(scan_id, fileset_id, file_id, size='orig', **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str,
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str,
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str,
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool,
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -411,14 +303,14 @@ def refresh_url(dataset_name=None, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -456,14 +348,14 @@ def archive_url(dataset_name, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -525,19 +417,267 @@ def get_file_uri(scan, fileset, file):
     return f"files/{scan_id}/{fileset_id}/{file_id}"
 
 
+def scan_file_url(dataset_name, file_path, **kwargs):
+    """Build the URL for accessing a dataset file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    file_path : str
+        The path to the file.
+    **kwargs
+        Keyword arguments passed to base_url().
+
+    Returns
+    -------
+    str
+        The complete URL for the dataset file.
+    """
+    url = base_url(
+        host=kwargs.get("host", REST_API_URL),
+        port=kwargs.get("port", REST_API_PORT),
+        prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+        ssl=kwargs.get("ssl", False)
+    )
+    return urljoin(url, f"files/{dataset_name}/{file_path}")
+
+
+def scan_config_url(dataset_name, cfg_fname='scan.toml', **kwargs):
+    """Return the scan URL to access the scanning configuration file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the TOML scan file, defaults to ``'scan.toml'``.
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
+    prefix : str
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The URL to the scanning configuration file.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import scan_config_url
+    >>> scan_config_url('real_plant')
+    'http://127.0.0.1:5000/files/real_plant/scan.toml'
+    >>> scan_config_url('real_plant', prefix='/plantdb')
+    'http://127.0.0.1/plantdb/files/real_plant/scan.toml'
+    """
+    return scan_file_url(dataset_name, cfg_fname, **kwargs)
+
+
+def scan_reconstruction_url(dataset_name, cfg_fname='pipeline.toml', **kwargs):
+    """Return the scan URL to access the reconstruction configuration file.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset.
+    cfg_fname : str, optional
+        The name of the TOML scan file, defaults to ``'pipeline.toml'``.
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
+    prefix : str
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The URL to the reconstruction configuration file.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import scan_reconstruction_url
+    >>> scan_reconstruction_url('real_plant')
+    'http://127.0.0.1:5000/files/real_plant/pipeline.toml'
+    >>> scan_reconstruction_url('real_plant', prefix='/plantdb')
+    'http://127.0.0.1/plantdb/files/real_plant/pipeline.toml'
+    """
+    return scan_file_url(dataset_name, cfg_fname, **kwargs)
+
+
+def list_task_images_uri(dataset_name, task_name='images', size='orig', **kwargs):
+    """Get the list of images URI for a given dataset and task name.
+
+    Parameters
+    ----------
+    dataset_name : str
+        The name of the dataset to retrieve the images for.
+    task_name : str, optional
+        The name of the task to retrieve the images from. Defaults to 'images'.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string, defaulting to `'orig'`, and it works as follows:
+           * `'thumb'`: image max width and height to `150`.
+           * `'large'`: image max width and height to `1500`;
+           * `'orig'`: original image, no cache;
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str
+        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
+    prefix : str
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    list of str
+        The list of image URI strings for the PlantDB REST API.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import list_task_images_uri
+    >>> print(list_task_images_uri('real_plant')[2])
+    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=orig
+    >>> print(list_task_images_uri('real_plant', size=100)[2])
+    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=100
+    """
+    dataset_name = sanitize_name(dataset_name)
+    task_name = sanitize_name(task_name)
+    scan_info = get_scan_data(dataset_name, **kwargs)
+    tasks_fileset = scan_info["tasks_fileset"]
+    images = scan_info["images"]
+    url = base_url(host=kwargs.get("host", REST_API_URL),
+                   port=kwargs.get("port", REST_API_PORT),
+                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
+                   ssl=kwargs.get("ssl", False))
+    return [urljoin(url, f"image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}") for img in
+            images]
+
+
+# -----------------------------------------------------------------------------
+# REQUEST methods
+# -----------------------------------------------------------------------------
+
+def make_api_request(url, method="GET", params=None, json_data=None,
+                     allow_redirects=True, **kwargs):
+    """
+    Function to make an API request with various HTTP methods and options.
+
+    Parameters
+    ----------
+    url : str
+        The URL for the API endpoint.
+    method : {'GET', 'POST', 'PUT', 'DELETE'}, optional
+        The HTTP method to use. Default is 'GET'.
+    params : dict, optional
+        Dictionary of query parameters to append to the URL.
+    json_data : dict, optional
+        JSON payload to send in the body of the request for 'POST' and 'PUT' methods.
+    allow_redirects : bool, optional
+        Whether to allow redirects. Default is True.
+
+    Other Parameters
+    ----------------
+    header : dict
+        The HTTP headers to send in the request. Default is None.
+    files : dict
+        Additional files to send in the request. Default is None.
+    data : dict, list, or bytes
+        The data to send in the request. Default is None.
+    timeout : int
+        Timeout to use for the request. Default is 5 seconds.
+    stream : bool
+        Flag indicating whether to stream the request. Default is False.
+    session_token : str
+        The PlantDB REST API session token of the user.
+
+    Returns
+    -------
+    response : requests.Response
+        The response object from the API request.
+
+    Raises
+    ------
+    ValueError
+        If an unsupported HTTP method is provided.
+    requests.exceptions.SSLError
+        If there's an SSL error during the request.
+    requests.exceptions.RequestException
+        For any other exception raised by the underlying `requests` library.
+
+    Notes
+    -----
+    This function is designed to handle various HTTP methods (GET, POST, PUT, DELETE) and provides a unified interface for making API requests. It supports SSL verification and allows for custom parameters and JSON data to be sent with the request.
+    It passes keyword arguments to the underlying `requests` library.
+    """
+    # Add a default timeout of 5 seconds if not provided
+    if 'timeout' not in kwargs:
+        kwargs['timeout'] = 5.0
+
+    session_token = kwargs.pop('session_token')
+    if session_token:
+        kwargs['headers'].update({'Authorization': f'Bearer {session_token}'})
+
+    try:
+        if method.upper() == "GET":
+            response = requests.get(url, params=params, allow_redirects=allow_redirects,
+                                    **kwargs)
+        elif method.upper() == "POST":
+            response = requests.post(url, params=params, allow_redirects=allow_redirects,
+                                     json=json_data, **kwargs)
+        elif method.upper() == "PUT":
+            response = requests.put(url, params=params, allow_redirects=allow_redirects,
+                                    json=json_data, **kwargs)
+        elif method.upper() == "DELETE":
+            response = requests.delete(url, params=params, allow_redirects=allow_redirects,
+                                       **kwargs)
+        else:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+
+        response.raise_for_status()  # Raise exception for 4XX/5XX responses
+        return response
+    except requests.exceptions.SSLError as e:
+        print(f"SSL Error: {e}")
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
+        raise
+
+
 def list_scan_names(**kwargs):
     """List the names of the scan datasets served by the PlantDB REST API.
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -555,7 +695,10 @@ def list_scan_names(**kwargs):
     >>> print(list_scan_names(host='mellitus.biologie.ens-lyon.fr', port=433, prefix='/plantdb/', ssl=True))
     """
     url = scans_url(**kwargs)
-    response = make_api_request(url=url, cert_path=kwargs.get('cert_path', None))
+    print(f"Scan URL: {url}")
+    response = make_api_request(url=url)
+    print(f"Response OK: {response.ok}")
+    print(f"Response JSON: {response.json()}")
     return sorted(response.json())
 
 
@@ -564,14 +707,14 @@ def get_scans_info(**kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -587,8 +730,7 @@ def get_scans_info(**kwargs):
     >>> get_scans_info()
     """
     scan_list = list_scan_names(**kwargs)
-    return [make_api_request(url=scan_url(scan, **kwargs), cert_path=kwargs.get('cert_path', None)).json() for scan in
-            scan_list]
+    return [make_api_request(url=scan_url(scan, **kwargs)).json() for scan in scan_list]
 
 
 def parse_scans_info(**kwargs):
@@ -596,14 +738,14 @@ def parse_scans_info(**kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -638,14 +780,14 @@ def get_scan_data(scan_id, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -668,7 +810,7 @@ def get_scan_data(scan_id, **kwargs):
     scan_names = list_scan_names(**kwargs)
     if scan_id in scan_names:
         url = scan_url(scan_id, **kwargs)
-        return make_api_request(url=url, cert_path=kwargs.get('cert_path', None)).json()
+        return make_api_request(url=url).json()
     else:
         return {}
 
@@ -689,14 +831,14 @@ def scan_preview_image_url(scan_id, size="thumb", **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -758,14 +900,14 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -788,7 +930,7 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
     >>> image.show()  # Display the image
     """
     url = scan_image_url(scan_id, fileset_id, file_id, size, **kwargs)
-    return make_api_request(url=url, cert_path=kwargs.get('cert_path', None))
+    return make_api_request(url=url)
 
 
 def get_tasks_fileset_from_api(dataset_name, **kwargs):
@@ -801,14 +943,14 @@ def get_tasks_fileset_from_api(dataset_name, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -825,62 +967,6 @@ def get_tasks_fileset_from_api(dataset_name, **kwargs):
     {'images': 'images'}
     """
     return get_scan_data(dataset_name, **kwargs).get('tasks_fileset', dict())
-
-
-def list_task_images_uri(dataset_name, task_name='images', size='orig', **kwargs):
-    """Get the list of images URI for a given dataset and task name.
-
-    Parameters
-    ----------
-    dataset_name : str
-        The name of the dataset to retrieve the images for.
-    task_name : str, optional
-        The name of the task to retrieve the images from. Defaults to 'images'.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string, defaulting to `'orig'`, and it works as follows:
-           * `'thumb'`: image max width and height to `150`.
-           * `'large'`: image max width and height to `1500`;
-           * `'orig'`: original image, no cache;
-
-    Other Parameters
-    ----------------
-    host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
-        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
-        Defaults to ``None``.
-    ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
-
-    Returns
-    -------
-    list of str
-        The list of image URI strings for the PlantDB REST API.
-
-    Examples
-    --------
-    >>> # Start a test PlantDB REST API server first, in a terminal:
-    >>> # $ fsdb_rest_api --test
-    >>> from plantdb.client.rest_api import list_task_images_uri
-    >>> print(list_task_images_uri('real_plant')[2])
-    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=orig
-    >>> print(list_task_images_uri('real_plant', size=100)[2])
-    http://127.0.0.1:5000/image/real_plant/images/00002_rgb?size=100
-    """
-    dataset_name = sanitize_name(dataset_name)
-    task_name = sanitize_name(task_name)
-    scan_info = get_scan_data(dataset_name, **kwargs)
-    tasks_fileset = scan_info["tasks_fileset"]
-    images = scan_info["images"]
-    url = base_url(host=kwargs.get("host", REST_API_URL),
-                   port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
-                   ssl=kwargs.get("ssl", False))
-    return [urljoin(url, f"image/{dataset_name}/{tasks_fileset[task_name]}/{Path(img).stem}?size={size}") for img in
-            images]
 
 
 def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs):
@@ -901,14 +987,14 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -931,7 +1017,7 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
     images = []
     for img_uri in list_task_images_uri(dataset_name, task_name, size, **kwargs):
         images.append(
-            Image.open(BytesIO(make_api_request(url=img_uri, cert_path=kwargs.get('cert_path', None)).content)))
+            Image.open(BytesIO(make_api_request(url=img_uri).content)))
     return images
 
 
@@ -1075,7 +1161,62 @@ EXT_PARSER_DICT = {
 
 
 def parse_task_requests_data(task, data, extension=None):
-    """The task data parser, behave according to the source and default to JSON parser."""
+    """
+    Parse raw request data for a specified task.
+
+    The function selects an appropriate parser based on the provided
+    *extension* (if any) or the *task* name, then applies that parser
+    to the raw *data* payload.  This is a small dispatcher that
+    centralises the logic for choosing between the generic
+    :func:`parse_requests_json` parser and any custom parsers defined
+    in :data:`PARSER_DICT` and :data:`EXT_PARSER_DICT`.
+
+    Parameters
+    ----------
+    task : str
+        Identifier for the task whose data is being parsed.  Used as a
+        key to look up the default parser in :data:`PARSER_DICT`.
+    data : str or bytes
+        Raw payload that contains the request data.  The parser returned
+        by the dispatcher is expected to accept this type and convert it
+        into a Python object (e.g. a dictionary).
+    extension : str, optional
+        File‑extension or MIME‑type hint.  If supplied, the parser is
+        taken from :data:`EXT_PARSER_DICT`; otherwise the default parser
+        for *task* is used.
+
+    Returns
+    -------
+    Any
+        The result of the chosen parser applied to *data*.  The exact
+        type depends on the parser implementation (commonly a dict).
+
+    Examples
+    --------
+    >>> # Assume the following parsers are defined
+    >>> def parse_json(data): return {"parsed": data}
+    >>> PARSER_DICT = {"task1": parse_json}
+    >>> EXT_PARSER_DICT = {"txt": parse_json}
+    >>> # Example with task-based parser
+    >>> result = parse_task_requests_data("task1", '{"key": "value"}')
+    >>> print(result)
+    {'parsed': '{"key": "value"}'}
+    >>> # Example with extension-based parser
+    >>> result = parse_task_requests_data("unknown", "raw data", extension="txt")
+    >>> print(result)
+    {'parsed': 'raw data'}
+
+    Notes
+    -----
+    - The function does not perform any validation of *data*; it
+      delegates all parsing logic to the chosen parser.
+    - If *task* is not found in :data:`PARSER_DICT` and *extension* is
+      ``None``, the fallback parser :func:`parse_requests_json` is used.
+
+    See Also
+    --------
+    parse_requests_json : Default JSON parser used when no task matches.
+    """
     if extension is not None:
         data_parser = EXT_PARSER_DICT[extension]
     else:
@@ -1109,14 +1250,14 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -1153,110 +1294,8 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
                    port=kwargs.get("port", REST_API_PORT),
                    prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
                    ssl=kwargs.get("ssl", False))
-    data = make_api_request(url + file_uri, cert_path=kwargs.get('cert_path', None)).content
+    data = make_api_request(url + file_uri).content
     return parse_task_requests_data(task, data, ext)
-
-
-def scan_file_url(dataset_name, file_path, **kwargs):
-    """Build the URL for accessing a dataset file.
-
-    Parameters
-    ----------
-    dataset_name : str
-        The name of the dataset.
-    file_path : str
-        The path to the file.
-    **kwargs
-        Keyword arguments passed to base_url().
-
-    Returns
-    -------
-    str
-        The complete URL for the dataset file.
-    """
-    url = base_url(
-        host=kwargs.get("host", REST_API_URL),
-        port=kwargs.get("port", REST_API_PORT),
-        prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
-        ssl=kwargs.get("ssl", False)
-    )
-    return urljoin(url, f"files/{dataset_name}/{file_path}")
-
-
-def scan_config_url(dataset_name, cfg_fname='scan.toml', **kwargs):
-    """Return the scan URL to access the scanning configuration file.
-
-    Parameters
-    ----------
-    dataset_name : str
-        The name of the dataset.
-    cfg_fname : str, optional
-        The name of the TOML scan file, defaults to ``'scan.toml'``.
-
-    Other Parameters
-    ----------------
-    host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
-        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
-        Defaults to ``None``.
-    ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
-
-    Returns
-    -------
-    str
-        The URL to the scanning configuration file.
-
-    Examples
-    --------
-    >>> from plantdb.client.rest_api import scan_config_url
-    >>> scan_config_url('real_plant')
-    'http://127.0.0.1:5000/files/real_plant/scan.toml'
-    >>> scan_config_url('real_plant', prefix='/plantdb')
-    'http://127.0.0.1/plantdb/files/real_plant/scan.toml'
-    """
-    return scan_file_url(dataset_name, cfg_fname, **kwargs)
-
-
-def scan_reconstruction_url(dataset_name, cfg_fname='pipeline.toml', **kwargs):
-    """Return the scan URL to access the reconstruction configuration file.
-
-    Parameters
-    ----------
-    dataset_name : str
-        The name of the dataset.
-    cfg_fname : str, optional
-        The name of the TOML scan file, defaults to ``'pipeline.toml'``.
-
-    Other Parameters
-    ----------------
-    host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
-        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
-        Defaults to ``None``.
-    ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
-
-    Returns
-    -------
-    str
-        The URL to the reconstruction configuration file.
-
-    Examples
-    --------
-    >>> from plantdb.client.rest_api import scan_reconstruction_url
-    >>> scan_reconstruction_url('real_plant')
-    'http://127.0.0.1:5000/files/real_plant/pipeline.toml'
-    >>> scan_reconstruction_url('real_plant', prefix='/plantdb')
-    'http://127.0.0.1/plantdb/files/real_plant/pipeline.toml'
-    """
-    return scan_file_url(dataset_name, cfg_fname, **kwargs)
 
 
 def _load_toml_from_url(url, **kwargs):
@@ -1273,7 +1312,7 @@ def _load_toml_from_url(url, **kwargs):
         The parsed TOML data as a dictionary, or None if the request fails.
     """
     import toml
-    response = make_api_request(url, cert_path=kwargs.get('cert_path', None))
+    response = make_api_request(url, **kwargs)
     if response.ok:
         return toml.loads(response.content.decode('utf-8'))
     return None
@@ -1288,16 +1327,17 @@ def get_toml_file(dataset_name, file_path, **kwargs):
         The name of the dataset.
     file_path : str
         The path to the TOML file.
+
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -1327,16 +1367,17 @@ def get_scan_config(dataset_name, cfg_fname='scan.toml', **kwargs):
         The name of the dataset.
     cfg_fname : str, optional
         The name of the configuration file.
+
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -1366,16 +1407,17 @@ def get_reconstruction_config(dataset_name, cfg_fname='pipeline.toml', **kwargs)
         The name of the dataset.
     cfg_fname : str, optional
         The name of the configuration file.
+
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -1406,14 +1448,14 @@ def get_angles_and_internodes_data(dataset_name, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
 
     Returns
@@ -1436,7 +1478,7 @@ def get_angles_and_internodes_data(dataset_name, **kwargs):
                    port=kwargs.get("port", REST_API_PORT),
                    prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
                    ssl=kwargs.get("ssl", False))
-    response = make_api_request(urljoin(url, f"sequence/{dataset_name}"), cert_path=kwargs.get('cert_path', None))
+    response = make_api_request(urljoin(url, f"sequence/{dataset_name}"))
     if response.ok:
         data = json.loads(response.content.decode('utf-8'))
         return {seq: data[seq] for seq in ['angles', 'internodes']}
@@ -1458,15 +1500,17 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
 
     Other Parameters
     ----------------
-    host : str, optional
+    host : str
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str, optional
+    port : int or str
         The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str, optional
+    prefix : str
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
-    ssl : bool, optional
+    ssl : bool
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1513,7 +1557,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
                         method="POST",
                         headers=headers,
                         data=chunk,
-                        cert_path=kwargs.get('cert_path', None)
+                        session_token=kwargs.get('session_token', None)
                     )
                     bytes_sent += len(chunk)
                     # Check if the request was successful
@@ -1523,7 +1567,7 @@ def upload_dataset_file(scan_id, file_path, chunk_size=0, **kwargs):
             else:
                 # Upload the entire file
                 response = make_api_request(url, method='POST', headers=headers, data=f,
-                                            cert_path=kwargs.get('cert_path', None))
+                                            session_token=kwargs.get('session_token', None))
 
         # Return the server's response
         if response.status_code in (200, 201):
@@ -1576,7 +1620,7 @@ def refresh(dataset_name=None, **kwargs):
     {'message': "Successfully reloaded scan 'arabidopsis000'."}
     """
     url = refresh_url(dataset_name, **kwargs)
-    response = make_api_request(url, cert_path=kwargs.get('cert_path', None))
+    response = make_api_request(url)
     if response.ok:
         return response.json()
     else:
@@ -1633,8 +1677,7 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     start_time = time.time()  # Start timing
     # Make streaming API request with configurable timeout and optional certificate
     response = make_api_request(url, stream=True,
-                                timeout=kwargs.get("timeout", 10),
-                                cert_path=kwargs.get('cert_path', None))
+                                timeout=kwargs.get("timeout", 10))
     end_time = time.time()  # End timing
     duration = end_time - start_time
     msg = f"Download completed in {duration:.2f} seconds."
@@ -1681,6 +1724,8 @@ def upload_scan_archive(dataset_name, path, **kwargs):
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the upload request. Defaults to ``120``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1729,7 +1774,7 @@ def upload_scan_archive(dataset_name, path, **kwargs):
                                    files={"zip_file": (path.name, f, "application/zip")},
                                    stream=True,
                                    timeout=kwargs.get("timeout", 120),
-                                   cert_path=kwargs.get("cert_path", None))
+                                   session_token=kwargs.get("session_token", None))
         except requests.exceptions.Timeout:
             timeout = kwargs.get("timeout", 120)
             raise RuntimeError(f"The upload request timed out after {timeout} seconds.")
