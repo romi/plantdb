@@ -81,6 +81,8 @@ class PlantDBClient:
     ----------
     base_url : str
         The base URL of the PlantDB REST API.
+    prefix : str, optional
+        The URL prefix used by the PlantDB REST API.
 
     Attributes
     ----------
@@ -88,6 +90,12 @@ class PlantDBClient:
         The base URL of the PlantDB REST API.
     session : requests.Session
         HTTP session that maintains cookies and connection pooling.
+    jwt_token : str
+        The JWT token to authenticate with the PlantDB REST API.
+    username :str
+        The login username.
+    logger : logging.Logger
+        The logger to use.
 
     Notes
     -----
@@ -125,6 +133,27 @@ class PlantDBClient:
         self.username = None
         self.logger = get_logger(__class__.__name__)
 
+    def validate_session_token(self, token):
+        """
+        Sets the JWT token for the HTTP session and updates the Authorization header.
+
+        Parameters
+        ----------
+        token : str
+            The JWT token to be used for authentication.
+        """
+        url = f"{self.base_url}/token-validation"
+        response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
+        if response.status_code == 200:
+            self.jwt_token = token
+            self.username = response.json().get('username')
+            # Add the JWT to the header
+            self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
+        else:
+            self.logger.error(f"Token validation failed!")
+            self.logger.error(response.json())
+        return
+
     def login(self, username: str, password: str) -> bool:
         """
         Authenticate the user with the PlantDB API.
@@ -151,10 +180,8 @@ class PlantDBClient:
             response = self.session.post(url, json=data)
             if response.status_code == 200:
                 result = response.json()
-                self.jwt_token = result.get('access_token')
+                self.validate_session_token(result.get('access_token'))
                 self.username = username
-                # Add the JWT to the header
-                self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
@@ -187,9 +214,7 @@ class PlantDBClient:
             return False
 
     def refresh(self) -> bool:
-        """
-        Refresh the database.
-        """
+        """Refresh the database."""
         url = f"{self.base_url}/refresh"
         try:
             response = self.session.get(url)
@@ -200,36 +225,18 @@ class PlantDBClient:
             return False
 
     def refresh_token(self) -> bool:
-        """
-        Refresh the JWT token (cookie updated automatically).
-        """
+        """Refresh the JWT token."""
         url = f"{self.base_url}/token-refresh"
         try:
             response = self.session.post(url)
             if response.status_code == 200:
-                # Cookie is automatically updated by server
+                result = response.json()
+                self.jwt_token = result.get('access_token')
+                self.username = result.get('username')
                 return True
             return False
         except Exception:
             return False
-
-    def _make_authenticated_request(self, method, url, **kwargs):
-        """
-        Make an authenticated request with automatic token refresh.
-        """
-        response = getattr(self.session, method.lower())(url, **kwargs)
-
-        # Handle authentication errors
-        if response.status_code == 401:
-            # Try to refresh token
-            if self.refresh_token():
-                # Retry the original request
-                response = getattr(self.session, method.lower())(url, **kwargs)
-            else:
-                self.username = None
-                raise Exception("Authentication failed. Please login again.")
-
-        return response
 
     def _handle_http_errors(self, response):
         """
