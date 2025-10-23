@@ -180,7 +180,7 @@ class PlantDBClient:
             response = self.session.post(url, json=data)
             if response.status_code == 200:
                 result = response.json()
-                self.validate_session_token(result.get('access_token'))
+                self.jwt_token = result.get('access_token')
                 self.username = username
                 return True
             else:
