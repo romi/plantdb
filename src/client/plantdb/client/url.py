@@ -465,6 +465,7 @@ def is_server_available(
         max_retries: int = 3,
         backoff_factor: float = 0.3,
         allow_private_ip: bool = False,
+        cert_path: Optional[str] = None,
 ) -> ServerCheckResult:
     """
     Check if a server is available by making an HTTP request to the given URL.
@@ -484,6 +485,8 @@ def is_server_available(
     allow_private_ip : bool, optional
         If True, the checker will accept URLs whose resolved IPs are private or non‑routable.
         Default is False.
+    cert_path : str or pathlib.Path, optional
+        Path to a CA bundle to use. Default is None.
 
     Returns
     -------
@@ -545,13 +548,18 @@ def is_server_available(
     session.mount("http://", adapter)
     session.mount("https://", adapter)
 
+    if cert_path is not None:
+        verify_flag = cert_path
+    else:
+        verify_flag = True
+
     current_url = url
     for _ in range(max_redirects + 1):
         try:
             resp = session.get(
                 current_url,
                 timeout=timeout,
-                verify=True,  # TLS cert verification
+                verify=verify_flag,  # TLS cert verification
                 allow_redirects=False,  # We handle redirects manually
                 stream=True,  # Do not download the body unless we need to
             )
