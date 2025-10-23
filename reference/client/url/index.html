@@ -2064,7 +2064,7 @@
 
 
 <a href="#plantdb.client.url.is_server_available" class="headerlink" title="Permanent link">Link</a></h3>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>is_server_available(url, timeout<span style="color: #666">=5.0</span>, max_redirects<span style="color: #666">=2</span>, max_retries<span style="color: #666">=3</span>, backoff_factor<span style="color: #666">=0.3</span>, allow_private_ip<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>is_server_available(url, timeout<span style="color: #666">=5.0</span>, max_redirects<span style="color: #666">=2</span>, max_retries<span style="color: #666">=3</span>, backoff_factor<span style="color: #666">=0.3</span>, allow_private_ip<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, cert_path<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2178,6 +2178,22 @@ Default is False.</p>
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cert_path</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to a CA bundle to use. Default is None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2384,13 +2400,22 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">590</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">592</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">593</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">594</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">595</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
         url: <span style="color: #008000">str</span>,
         timeout: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">5.0</span>,
         max_redirects: <span style="color: #008000">int</span> <span style="color: #666">=</span> <span style="color: #666">2</span>,
         max_retries: <span style="color: #008000">int</span> <span style="color: #666">=</span> <span style="color: #666">3</span>,
         backoff_factor: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">0.3</span>,
         allow_private_ip: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
+        cert_path: Optional[<span style="color: #008000">str</span>] <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>,
 ) <span style="color: #666">-&gt;</span> ServerCheckResult:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Check if a server is available by making an HTTP request to the given URL.</span>
@@ -2410,6 +2435,8 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
 <span style="color: #BA2121; font-style: italic">    allow_private_ip : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        If True, the checker will accept URLs whose resolved IPs are private or non‑routable.</span>
 <span style="color: #BA2121; font-style: italic">        Default is False.</span>
+<span style="color: #BA2121; font-style: italic">    cert_path : str or pathlib.Path, optional</span>
+<span style="color: #BA2121; font-style: italic">        Path to a CA bundle to use. Default is None.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
@@ -2471,13 +2498,18 @@ urllib.parse.urljoin : Used to resolve relative URLs in redirects.</p>
     session<span style="color: #666">.</span>mount(<span style="color: #BA2121">&quot;http://&quot;</span>, adapter)
     session<span style="color: #666">.</span>mount(<span style="color: #BA2121">&quot;https://&quot;</span>, adapter)
 
+    <span style="color: #008000; font-weight: bold">if</span> cert_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
+        verify_flag <span style="color: #666">=</span> cert_path
+    <span style="color: #008000; font-weight: bold">else</span>:
+        verify_flag <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">True</span>
+
     current_url <span style="color: #666">=</span> url
     <span style="color: #008000; font-weight: bold">for</span> _ <span style="color: #A2F; font-weight: bold">in</span> <span style="color: #008000">range</span>(max_redirects <span style="color: #666">+</span> <span style="color: #666">1</span>):
         <span style="color: #008000; font-weight: bold">try</span>:
             resp <span style="color: #666">=</span> session<span style="color: #666">.</span>get(
                 current_url,
                 timeout<span style="color: #666">=</span>timeout,
-                verify<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,  <span style="color: #3D7B7B; font-style: italic"># TLS cert verification</span>
+                verify<span style="color: #666">=</span>verify_flag,  <span style="color: #3D7B7B; font-style: italic"># TLS cert verification</span>
                 allow_redirects<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,  <span style="color: #3D7B7B; font-style: italic"># We handle redirects manually</span>
                 stream<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,  <span style="color: #3D7B7B; font-style: italic"># Do not download the body unless we need to</span>
             )
