@@ -171,6 +171,30 @@ def base_url(host=PLANTDB_API_HOST, port=PLANTDB_API_PORT, prefix=None, ssl=Fals
     return f"http{'s' if ssl else ''}://{host}{prefix if prefix else port}"
 
 
+def login_endpoint():
+    return "/login"
+
+
+def login_url(**kwargs):
+    url = base_url(host=kwargs.get("host", PLANTDB_API_HOST),
+                   port=kwargs.get("port", PLANTDB_API_PORT),
+                   prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
+                   ssl=kwargs.get("ssl", False))
+    return urljoin(url, login_endpoint())
+
+
+def logout_endpoint():
+    return "/logout"
+
+
+def logout_url(**kwargs):
+    url = base_url(host=kwargs.get("host", PLANTDB_API_HOST),
+                   port=kwargs.get("port", PLANTDB_API_PORT),
+                   prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
+                   ssl=kwargs.get("ssl", False))
+    return urljoin(url, logout_endpoint())
+
+
 def scans_url(**kwargs):
     """Generates the URL listing the scans from the PlantDB REST API.
 
@@ -245,6 +269,71 @@ def scan_url(scan_id, **kwargs):
                    prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
                    ssl=kwargs.get("ssl", False))
     return urljoin(url, f"scans/{sanitize_name(scan_id)}")
+
+
+def scan_preview_image_url(scan_id, size="thumb", **kwargs):
+    """Get the URL to the preview image for a scan dataset served by the PlantDB REST API.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset to be retrieved.
+    size : {'orig', 'large', 'thumb'} or int, optional
+        If an integer, use  it as the size of the cached image to create and return.
+        Else, should be a string, defaulting to ``'thumb'``, and it works as follows:
+           * ``'thumb'``: image max width and height to `150`.
+           * ``'large'``: image max width and height to `1500`;
+           * ``'orig'``: original image, no cache;
+
+    Other Parameters
+    ----------------
+    host : str
+        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    port : int or str
+        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_API_PORT``.
+    prefix : str
+        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
+        Defaults to ``None``.
+    ssl : bool
+        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The URL to the preview image for a scan dataset.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import scan_preview_image_url
+    >>> img_url = scan_preview_image_url('real_plant')
+    >>> print(img_url)
+    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=thumb
+    >>> img_url = scan_preview_image_url('real_plant', size=100)
+    >>> print(img_url)
+    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=100
+    >>> # Download and display the image
+    >>> import requests
+    >>> from PIL import Image
+    >>> from io import BytesIO
+    >>> response = requests.get(img_url)  # Send a GET request to the URL
+    >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
+    >>> image.show()  # Display the image
+    """
+    scan_id = sanitize_name(scan_id)
+    scan_names = list_scan_names(**kwargs)
+    if scan_id not in scan_names:
+        return None
+
+    thumb_uri = get_scan_data(scan_id, **kwargs)["thumbnailUri"]
+    if size != "thumb":
+        thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
+    url = base_url(host=kwargs.get("host", PLANTDB_API_HOST),
+                   port=kwargs.get("port", PLANTDB_API_PORT),
+                   prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
+                   ssl=kwargs.get("ssl", False))
+    return urljoin(url, thumb_uri.lstrip("/"))
 
 
 def scan_image_url(scan_id, fileset_id, file_id, size='orig', **kwargs):
@@ -674,6 +763,20 @@ def make_api_request(url, method="GET", params=None, json_data=None,
         raise
 
 
+def request_login(username, password, **kwargs):
+    url = login_url(**kwargs)
+    data = {
+        'username': username,
+        'password': password
+    }
+    return make_api_request(url, method="POST", json_data=data)
+
+
+def request_logout(**kwargs):
+    url = logout_url(**kwargs)
+    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+
+
 def list_scan_names(**kwargs):
     """List the names of the scan datasets served by the PlantDB REST API.
 
@@ -826,71 +929,6 @@ def get_scan_data(scan_id, **kwargs):
         return make_api_request(url=url).json()
     else:
         return {}
-
-
-def scan_preview_image_url(scan_id, size="thumb", **kwargs):
-    """Get the URL to the preview image for a scan dataset served by the PlantDB REST API.
-
-    Parameters
-    ----------
-    scan_id : str
-        The name of the scan dataset to be retrieved.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string, defaulting to ``'thumb'``, and it works as follows:
-           * ``'thumb'``: image max width and height to `150`.
-           * ``'large'``: image max width and height to `1500`;
-           * ``'orig'``: original image, no cache;
-
-    Other Parameters
-    ----------------
-    host : str
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
-    port : int or str
-        The port number of the PlantDB REST API server. Defaults to ``REST_API_PORT``.
-    prefix : str
-        The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
-        Defaults to ``None``.
-    ssl : bool
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
-
-    Returns
-    -------
-    str
-        The URL to the preview image for a scan dataset.
-
-    Examples
-    --------
-    >>> # Start a test PlantDB REST API server first, in a terminal:
-    >>> # $ fsdb_rest_api --test
-    >>> from plantdb.client.rest_api import scan_preview_image_url
-    >>> img_url = scan_preview_image_url('real_plant')
-    >>> print(img_url)
-    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=thumb
-    >>> img_url = scan_preview_image_url('real_plant', size=100)
-    >>> print(img_url)
-    http://127.0.0.1:5000/image/real_plant/images/00000_rgb?size=100
-    >>> # Download and display the image
-    >>> import requests
-    >>> from PIL import Image
-    >>> from io import BytesIO
-    >>> response = requests.get(img_url)  # Send a GET request to the URL
-    >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
-    >>> image.show()  # Display the image
-    """
-    scan_id = sanitize_name(scan_id)
-    scan_names = list_scan_names(**kwargs)
-    if scan_id not in scan_names:
-        return None
-
-    thumb_uri = get_scan_data(scan_id, **kwargs)["thumbnailUri"]
-    if size != "thumb":
-        thumb_uri = thumb_uri.replace("size=thumb", f"size={size}")
-    url = base_url(host=kwargs.get("host", REST_API_URL),
-                   port=kwargs.get("port", REST_API_PORT),
-                   prefix=kwargs.get('prefix', os.environ.get('PLANTDB_API_PREFIX', None)),
-                   ssl=kwargs.get("ssl", False))
-    return urljoin(url, thumb_uri.lstrip("/"))
 
 
 def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
