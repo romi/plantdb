@@ -729,28 +729,40 @@ def make_api_request(url, method="GET", params=None, json_data=None,
     This function is designed to handle various HTTP methods (GET, POST, PUT, DELETE) and provides a unified interface for making API requests. It supports SSL verification and allows for custom parameters and JSON data to be sent with the request.
     It passes keyword arguments to the underlying `requests` library.
     """
-    # Add a default timeout of 5 seconds if not provided
-    if 'timeout' not in kwargs:
-        kwargs['timeout'] = 5.0
+    requests_kwargs = {}
+    requests_kwargs['params'] = params
+    requests_kwargs['allow_redirects'] = allow_redirects
 
-    session_token = kwargs.pop('session_token')
-    if session_token:
-        kwargs['headers'].update({'Authorization': f'Bearer {session_token}'})
+    # Add a default timeout of 5 seconds if not provided
+    requests_kwargs['timeout'] = kwargs.get('timeout', 5.0)
+
+    # Prepare SSL/TLS verification; if CERT_PATH is supplied, use it,
+    # otherwise default to requests' built‑in verification
+    requests_kwargs['verify'] = os.environ.get('CERT_PATH', True)
+
+    # If a session token is supplied, add it to the Authorization header
+    requests_kwargs['headers'] = kwargs.get('headers', {})
+    if 'session_token' in kwargs:
+        requests_kwargs['headers'].update({'Authorization': f'Bearer {kwargs.get('session_token')}'})
+
+    # Normalise the HTTP method name to uppercase for comparison
+    method = method.upper()
 
     try:
         if method.upper() == "GET":
-            response = requests.get(url, params=params, allow_redirects=allow_redirects,
-                                    **kwargs)
+            # GET: retrieve a resource, may include query params
+            response = requests.get(url, **requests_kwargs)
         elif method.upper() == "POST":
-            response = requests.post(url, params=params, allow_redirects=allow_redirects,
-                                     json=json_data, **kwargs)
+            # POST: send data (json_data or raw binary)
+            response = requests.post(url, json=json_data, **requests_kwargs)
         elif method.upper() == "PUT":
-            response = requests.put(url, params=params, allow_redirects=allow_redirects,
-                                    json=json_data, **kwargs)
+            # PUT: replace or update a resource
+            response = requests.put(url, json=json_data, **requests_kwargs)
         elif method.upper() == "DELETE":
-            response = requests.delete(url, params=params, allow_redirects=allow_redirects,
-                                       **kwargs)
+            # DELETE: remove a resource
+            response = requests.delete(url, **requests_kwargs)
         else:
+            # Unsupported HTTP method
             raise ValueError(f"Unsupported HTTP method: {method}")
 
         response.raise_for_status()  # Raise exception for 4XX/5XX responses
