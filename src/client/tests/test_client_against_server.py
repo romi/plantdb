@@ -1,12 +1,13 @@
-import unittest
-import time
 import io
-import tempfile
 import os
+import tempfile
+import time
+import unittest
 
-from plantdb.client.rest_api import base_url
-from plantdb.server.test_rest_api import TestRestApiServer
 from plantdb.client import rest_api as client
+from plantdb.client.rest_api import base_url
+from plantdb.client.url import is_server_available
+from plantdb.server.test_rest_api import TestRestApiServer
 
 SERVER_PORT = 5555
 
@@ -104,7 +105,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This test verifies that the is_server_available function correctly
         checks if the server is available and returns the expected boolean result.
         """
-        available = client.is_server_available(base_url(**self.kw))
+        available = is_server_available(base_url(**self.kw))
         self.assertTrue(available)  # Should be True since the test server is running
 
     def test_url_building_functions(self):
