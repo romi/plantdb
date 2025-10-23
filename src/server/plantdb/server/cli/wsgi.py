@@ -29,7 +29,7 @@ When deploying with uWSGI:
 
    uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
 
-Should then be accessible under: http://localhost:5000/plantdb/scans
+Should then be accessible under: http://localhost:5000/scans
 """
 
 import os
@@ -38,7 +38,7 @@ from plantdb.server.cli.fsdb_rest_api import rest_api
 
 # Get the path to the FSDB to serve using `ROMI_DB` environment variable, use '/myapp/db' as default (container)
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
-# Get the FSDB REST API URL prefix
+# Get the PlantDB REST API URL prefix
 url_prefix = os.environ.get("PLANTDB_API_PREFIX", "")
 enable_ssl = str(os.environ.get("PLANTDB_API_SSL", "false")).lower() == "true"
 
