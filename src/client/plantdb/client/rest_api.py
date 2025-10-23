@@ -821,10 +821,7 @@ def list_scan_names(**kwargs):
     >>> print(list_scan_names(host='mellitus.biologie.ens-lyon.fr', port=433, prefix='/plantdb/', ssl=True))
     """
     url = scans_url(**kwargs)
-    print(f"Scan URL: {url}")
-    response = make_api_request(url=url)
-    print(f"Response OK: {response.ok}")
-    print(f"Response JSON: {response.json()}")
+    response = make_api_request(url=url, session_token=kwargs.get('session_token', None))
     return sorted(response.json())
 
 
@@ -858,7 +855,8 @@ def get_scans_info(**kwargs):
     >>> get_scans_info()
     """
     scan_list = list_scan_names(**kwargs)
-    return [make_api_request(url=scan_url(scan, **kwargs)).json() for scan in scan_list]
+    return [make_api_request(url=scan_url(scan, **kwargs), session_token=kwargs.get('session_token', None)).json() for
+            scan in scan_list]
 
 
 def parse_scans_info(**kwargs):
@@ -938,7 +936,7 @@ def get_scan_data(scan_id, **kwargs):
     scan_names = list_scan_names(**kwargs)
     if scan_id in scan_names:
         url = scan_url(scan_id, **kwargs)
-        return make_api_request(url=url).json()
+        return make_api_request(url=url, session_token=kwargs.get('session_token', None)).json()
     else:
         return {}
 
@@ -993,7 +991,7 @@ def get_scan_image(scan_id, fileset_id, file_id, size='orig', **kwargs):
     >>> image.show()  # Display the image
     """
     url = scan_image_url(scan_id, fileset_id, file_id, size, **kwargs)
-    return make_api_request(url=url)
+    return make_api_request(url=url, session_token=kwargs.get('session_token', None))
 
 
 def get_tasks_fileset_from_api(dataset_name, **kwargs):
@@ -1080,7 +1078,7 @@ def get_images_from_task(dataset_name, task_name='images', size='orig', **kwargs
     images = []
     for img_uri in list_task_images_uri(dataset_name, task_name, size, **kwargs):
         images.append(
-            Image.open(BytesIO(make_api_request(url=img_uri).content)))
+            Image.open(BytesIO(make_api_request(url=img_uri, session_token=kwargs.get('session_token', None)).content)))
     return images
 
 
@@ -1357,7 +1355,8 @@ def get_task_data(dataset_name, task, filename=None, api_data=None, **kwargs):
                    port=kwargs.get("port", PLANTDB_API_PORT),
                    prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
                    ssl=kwargs.get("ssl", False))
-    data = make_api_request(url + file_uri).content
+
+    data = make_api_request(url + file_uri, session_token=kwargs.get('session_token', None)).content
     return parse_task_requests_data(task, data, ext)
 
 
@@ -1541,7 +1540,9 @@ def get_angles_and_internodes_data(dataset_name, **kwargs):
                    port=kwargs.get("port", PLANTDB_API_PORT),
                    prefix=kwargs.get('prefix', PLANTDB_API_PREFIX),
                    ssl=kwargs.get("ssl", False))
-    response = make_api_request(urljoin(url, f"sequence/{dataset_name}"))
+
+    response = make_api_request(urljoin(url, f"sequence/{dataset_name}"),
+                                session_token=kwargs.get('session_token', None))
     if response.ok:
         data = json.loads(response.content.decode('utf-8'))
         return {seq: data[seq] for seq in ['angles', 'internodes']}
@@ -1683,7 +1684,8 @@ def refresh(dataset_name=None, **kwargs):
     {'message': "Successfully reloaded scan 'arabidopsis000'."}
     """
     url = refresh_url(dataset_name, **kwargs)
-    response = make_api_request(url)
+
+    response = make_api_request(url, session_token=kwargs.get('session_token', None))
     if response.ok:
         return response.json()
     else:
@@ -1736,11 +1738,15 @@ def download_scan_archive(dataset_name, out_dir=None, **kwargs):
     # Construct API URL for archive download using dataset name and optional parameters
     url = archive_url(dataset_name, **kwargs)
 
+    request_kwargs = {
+        'session_token': kwargs.get('session_token', None),
+        'timeout': kwargs.get('timeout', 10),
+    }
+
     # Track download duration for performance monitoring
     start_time = time.time()  # Start timing
     # Make streaming API request with configurable timeout and optional certificate
-    response = make_api_request(url, stream=True,
-                                timeout=kwargs.get("timeout", 10))
+    response = make_api_request(url, stream=True, **request_kwargs)
     end_time = time.time()  # End timing
     duration = end_time - start_time
     msg = f"Download completed in {duration:.2f} seconds."
@@ -1829,6 +1835,11 @@ def upload_scan_archive(dataset_name, path, **kwargs):
     # Construct the URL for the archive upload:
     url = archive_url(dataset_name, **kwargs)
 
+    request_kwargs = {
+        'session_token': kwargs.get('session_token', None),
+        'timeout': kwargs.get('timeout', 120),
+    }
+
     start_time = time.time()  # Start timing
     with open(path, "rb") as f:
         try:
@@ -1836,8 +1847,7 @@ def upload_scan_archive(dataset_name, path, **kwargs):
                                    method="POST",
                                    files={"zip_file": (path.name, f, "application/zip")},
                                    stream=True,
-                                   timeout=kwargs.get("timeout", 120),
-                                   session_token=kwargs.get("session_token", None))
+                                   **request_kwargs)
         except requests.exceptions.Timeout:
             timeout = kwargs.get("timeout", 120)
             raise RuntimeError(f"The upload request timed out after {timeout} seconds.")
