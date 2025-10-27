@@ -379,6 +379,7 @@ def _validate_host(hostname: str, allow_private_ip: bool = False) -> bool:
     public_ips = _resolve_public_ips(hostname)
     return bool(public_ips)  # at least one public IP
 
+
 def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.parse.ParseResult]:
     """
     Parse a URL string into components and validate it according to specified rules.
@@ -533,7 +534,13 @@ def is_server_available(
     if not parsed:
         message = f"URL '{url}' is not a valid URL."
         logger.warning(message)
-        return ServerCheckResult(url=url, status_code=0, ok=False, final_url=url, message=message)
+        return ServerCheckResult(
+            url=url,
+            status_code=0,
+            ok=False,
+            final_url=url,
+            message=message,
+        )
 
     session = requests.Session()
     retry = Retry(
@@ -565,14 +572,26 @@ def is_server_available(
             )
         except requests.RequestException as err:
             message = f"Request to {current_url} failed with: {err}"
-            return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url, message=message)
+            return ServerCheckResult(
+                url=url,
+                status_code=0,
+                ok=False,
+                final_url=current_url,
+                message=message,
+            )
 
         # If we get a redirect, validate the target URL
         if 300 <= resp.status_code < 400:
             location = resp.headers.get("Location")
             if not location:
                 message = f"Request to {current_url} (redirect) failed to determine next location."
-                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=current_url, message=message)
+                return ServerCheckResult(
+                    url=url,
+                    status_code=resp.status_code,
+                    ok=False,
+                    final_url=current_url,
+                    message=message,
+                )
 
             # Resolve relative URLs
             next_url = urllib.parse.urljoin(current_url, location)
@@ -580,7 +599,13 @@ def is_server_available(
             # Safety check on the next hop
             if not _parse_url(next_url, allow_private_ip=allow_private_ip):
                 message = f"Request to {current_url} (redirect) is not a valid URL."
-                return ServerCheckResult(url=url, status_code=resp.status_code, ok=False, final_url=next_url, message=message)
+                return ServerCheckResult(
+                    url=url,
+                    status_code=resp.status_code,
+                    ok=False,
+                    final_url=next_url,
+                    message=message,
+                )
 
             current_url = next_url
             continue
@@ -596,4 +621,10 @@ def is_server_available(
 
     # Too many redirects
     message = f"URL '{url}' has too many redirects to follow (>= {max_redirects})."
-    return ServerCheckResult(url=url, status_code=0, ok=False, final_url=current_url, message=message)
+    return ServerCheckResult(
+        url=url,
+        status_code=0,
+        ok=False,
+        final_url=current_url,
+        message=message
+    )
