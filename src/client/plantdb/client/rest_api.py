@@ -60,9 +60,17 @@ from PIL import Image
 from plyfile import PlyData
 
 #: Default hostname to PlantDB REST API is 'localhost':
-PLANTDB_API_HOST = os.environ.get('PLANTDB_API_HOST', "127.0.0.1")
+PLANTDB_API_HOST = os.environ.get('PLANTDB_API_HOST', "localhost")
 #: Default port to PlantDB REST API:
-PLANTDB_API_PORT = os.environ.get('PLANTDB_API_PORT', 5000)
+PLANTDB_API_PORT = os.environ.get('PLANTDB_API_PORT', '')
+if PLANTDB_API_PORT.strip() == '' or PLANTDB_API_PORT.lower() == 'none':
+    PLANTDB_API_PORT = None               # explicit “no‑port” requested
+else:
+    try:
+        PLANTDB_API_PORT = int(PLANTDB_API_PORT)  # normal integer port
+    except ValueError:
+        # the value is something unexpected – fall back to the default
+        PLANTDB_API_PORT = None
 #: Default URL prefix for the plantdb REST API
 PLANTDB_API_PREFIX = os.environ.get('PLANTDB_API_PREFIX', None)
 
@@ -107,22 +115,21 @@ def sanitize_name(name):
 # -----------------------------------------------------------------------------
 
 
-def base_url(host=PLANTDB_API_HOST, port=PLANTDB_API_PORT, prefix=None, ssl=False) -> str:
+def base_url(host, port=None, prefix=None, ssl=False) -> str:
     """
     Generates the URL for the PlantDB REST API using the specified host and port.
 
     This function constructs a URL by combining the provided host, port, prefix, and SSL settings.
-    The default values are used if no arguments are supplied.
 
     Parameters
     ----------
-    host : str, optional
-        The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
     port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_API_PORT``.
+        The port number of the PlantDB REST API server. Defaults to ``None``.
     prefix : str, optional
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
-        If provided, it will be added to the end of the URL, excluding the port number.
+        If provided, it will be added to the end of the URL.
         Defaults to ``None``.
     ssl : bool, optional
         Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
@@ -140,12 +147,12 @@ def base_url(host=PLANTDB_API_HOST, port=PLANTDB_API_PORT, prefix=None, ssl=Fals
     Examples
     --------
     >>> from plantdb.client.rest_api import base_url
-    >>> base_url()
-    'http://127.0.0.1:5000'
-    >>> base_url(host='api.example.com', port=8443, ssl=True)
+    >>> base_url('localhost')
+    'http://localhost'
+    >>> base_url('api.example.com', port=8443, ssl=True)
     'https://api.example.com:8443'
-    >>> base_url(port=5000, prefix='/plantdb', ssl=True)
-    'https://127.0.0.1/plantdb/'
+    >>> base_url('localhost', port=5000, prefix='/plantdb', ssl=True)
+    'https://localhost:5000/plantdb/'
     """
     # Attempt to split the host to check for an existing scheme (http/https)
     try:
@@ -160,15 +167,19 @@ def base_url(host=PLANTDB_API_HOST, port=PLANTDB_API_PORT, prefix=None, ssl=Fals
     # Format the prefix by stripping leading and trailing slashes and adding a leading slash
     if prefix:
         prefix = '/' + prefix.lstrip('/').rstrip('/') + '/'
+    else:
+        prefix = ''
 
     # Ensure port is converted to string and has no leading colon
     if port:
         if isinstance(port, int):
             port = str(port)
         port = ':' + port.lstrip(':')
+    else:
+        port = ''
 
     # Construct the final URL using f-string for clarity and formatting
-    return f"http{'s' if ssl else ''}://{host}{prefix if prefix else port}"
+    return f"http{'s' if ssl else ''}://{host}{port}{prefix}"
 
 
 def login_endpoint():
