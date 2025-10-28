@@ -14,9 +14,10 @@ from pathlib import Path
 from typing import List
 from typing import Optional
 
-import requests
-from requests.adapters import HTTPAdapter
+import urllib3
 from ada_url import URL
+from ada_url import check_url
+from ada_url import join_url
 from tqdm import tqdm
 from urllib3.util.retry import Retry
 
@@ -101,10 +102,22 @@ def _load_whitelist_from_file() -> Optional[set[str]]:
 WHITELIST: Optional[set[str]] = _load_whitelist_from_file()
 
 
-def _download_and_cache_blacklist() -> Optional[pathlib.Path]:
+def _download_and_cache_blacklist(force: bool = False) -> Optional[Path]:
     """
     Ensure the blacklist file is present locally and up‑to‑date.
     Returns the path to the cached file or ``None`` on failure.
+
+    Parameters
+    ----------
+    force : bool, optional
+        Force download of the blacklist file, even if present.
+
+    Examples
+    --------
+    >>> from plantdb.client.url import _download_and_cache_blacklist
+    >>> blacklist_path = _download_and_cache_blacklist(force=True)
+    >>> print(blacklist_path)
+    /tmp/github_blacklist_cache.txt
     """
     cache_path = BLACKLIST_CACHE_FILE
     download_needed = True
@@ -115,16 +128,36 @@ def _download_and_cache_blacklist() -> Optional[pathlib.Path]:
                 download_needed = False
         except Exception:
             download_needed = True
+
+    if force:
+        download_needed = True
+
     if download_needed:
         # Use the GitHub API to fetch the list of split files (plain text)
         api_url = (
             "https://api.github.com/repos/Ultimate-Hosts-Blacklist/"
             "Ultimate.Hosts.Blacklist/contents/hosts"
         )
+
+        # Create a PoolManager instance
+        http = urllib3.PoolManager()
+
         try:
-            api_resp = requests.get(api_url, timeout=10, headers={"Accept": "application/vnd.github.v3+json"})
-            api_resp.raise_for_status()
-            file_list = api_resp.json()
+            # Fetch the API response
+            api_resp = http.request(
+                'GET',
+                api_url,
+                headers={"Accept": "application/vnd.github.v3+json"},
+                timeout=urllib3.Timeout(total=10)
+            )
+
+            # Check response status
+            if api_resp.status != 200:
+                raise ValueError(f"API request failed with status {api_resp.status}")
+
+            # Parse JSON response
+            file_list = json.loads(api_resp.data.decode('utf-8'))
+
             if not isinstance(file_list, list):
                 raise ValueError("Unexpected API response format")
 
@@ -143,20 +176,32 @@ def _download_and_cache_blacklist() -> Optional[pathlib.Path]:
                     dl_url = part.get("download_url")
                     if not dl_url:
                         continue
-                    part_resp = requests.get(dl_url, timeout=10, stream=True)
-                    part_resp.raise_for_status()
-                    for chunk in part_resp.iter_content(chunk_size=8192):
-                        if chunk:
+
+                    # Download each part
+                    part_resp = http.request('GET', dl_url, preload_content=False, timeout=urllib3.Timeout(total=10))
+
+                    try:
+                        for chunk in part_resp.stream(8192):
                             out_f.write(chunk)
                             if pbar:
                                 pbar.update(len(chunk))
+                    finally:
+                        part_resp.release_conn()
 
             if pbar:
+                pbar.clear()  # clear the space allocated to the progress bar
                 pbar.close()
 
-        except Exception as e:
+        except (HTTPError, URLError) as e:
+            logger.error(f"Error downloading GitHub blacklist: {e}")
+            return None
+        except (json.JSONDecodeError) as e:
             logger.error(f"Error loading GitHub blacklist: {e}")
             return None
+        except Exception as e:
+            logger.error(f"Unexpected error loading GitHub blacklist: {e}")
+            return None
+
     return cache_path if cache_path.is_file() else None
 
 
