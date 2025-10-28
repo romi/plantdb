@@ -9,6 +9,7 @@ dependencies = [
     "plantdb.commons",
     "requests",
     "tqdm",
+    "ada-url",
     "urllib3"
 ]
 description = "Client-side database library for the ROMI plant database ecosystem."
