@@ -459,15 +459,14 @@ def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool:
     return bool(public_ips)  # at least one public IP
 
 
-def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.parse.ParseResult]:
+def _parse_url(url: str, allow_private_ip: bool = False, validate_host: bool = True) -> Optional[str]:
     """
     Parse a URL string into components and validate it according to specified rules.
 
-    This function attempts to parse the given URL string using Python's
-    ``urllib.parse.urlparse`` method. It then applies several checks on
-    the parsed result, including scheme validation, hostname presence,
-    optional port validation, and host validation with optional private IP
-    allowance.
+    This function attempts to parse the given URL string using Ada-url.
+    It then applies several checks on the parsed result, including scheme
+    validation, hostname presence, optional port validation, and host
+    validation with optional private IP allowance.
 
     Parameters
     ----------
@@ -475,21 +474,27 @@ def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.pars
         The URL string to be parsed.
     allow_private_ip : bool, optional
         Whether to allow private IP addresses. Default is False.
+    validate_host : bool, optional
+        Whether to validate the hostname against a whitelist & blacklist. Default is True.
 
     Returns
     -------
-    parsed : Optional[urllib.parse.ParseResult]
-        A ``ParseResult`` object representing the components of the URL,
-        or None if any validation step fails.
+    str
+        The parsed URL, or None if any validation step fails.
 
     Examples
     --------
     >>> from plantdb.client.url import _parse_url
-    >>> _parse_url("http://example.com")
-    ParseResult(scheme='http', netloc='example.com', path='', params='', query='', fragment='')
-    >>> _parse_url("file:///etc/passwd", allow_private_ip=True)
-    None
-    >>> _parse_url("http://127.0.0.1:5000", allow_private_ip=True)
+    >>> url = _parse_url("http://example.com")
+    >>> print(url)
+    http://example.com/
+    >>> url = _parse_url("file:///etc/passwd", allow_private_ip=True)
+    ERROR    [url] URL 'file:///etc/passwd' is not an allowed protocol!
+    >>> url = _parse_url("http://127.0.0.1:5000", allow_private_ip=False)
+    ERROR    [url] URL 'http://127.0.0.1:5000' is not an allowed hostname!
+    >>> url = _parse_url("http://127.0.0.1:5000", allow_private_ip=True)
+    >>> print(url)
+    http://127.0.0.1:5000/
 
     Notes
     -----
@@ -498,30 +503,35 @@ def _parse_url(url: str, allow_private_ip: bool = False) -> Optional[urllib.pars
 
     See Also
     --------
-    urllib.parse.urlparse : Parse a URL string into components.
+    plantdb.client.url._validate_hostname: the url validation method used if `validate_host` is True.
     """
     try:
-        parsed = urllib.parse.urlparse(url)
+        parsed_url = URL(url)
     except Exception:
         return None
 
-    # Scheme check
-    if parsed.scheme not in ALLOWED_SCHEMES:
+    # Validate URL structure with Ada-url
+    if not check_url(parsed_url.href):
+        logger.error(f"URL '{url}' is not a valid URL!")
         return None
 
-    # No file:// or other dangerous schemes
-    if parsed.scheme == "file":
+    # Scheme check
+    if parsed_url.protocol.rstrip(":") not in ALLOWED_SCHEMES:
+        logger.error(f"URL '{url}' is not an allowed protocol!")
         return None
 
     # Hostname must exist
-    if not parsed.hostname:
+    if not parsed_url.hostname:
+        logger.error(f"URL '{url}' is not a valid hostname!")
         return None
 
     # Host validation (whitelist/blacklist + DNS resolution)
-    if not _validate_host(parsed.hostname, allow_private_ip=allow_private_ip):
-        return None
+    if validate_host:
+        if not _validate_hostname(parsed_url.hostname, allow_private_ip=allow_private_ip):
+            logger.error(f"URL '{url}' is not an allowed hostname!")
+            return None
 
-    return parsed
+    return parsed_url.href
 
 
 # --------------------------------------------------------------------------- #
