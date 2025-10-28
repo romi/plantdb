@@ -401,7 +401,7 @@ def _resolve_public_ips(hostname: str) -> List[str]:
     return list(public_ips)
 
 
-def _validate_host(hostname: str, allow_private_ip: bool = False) -> bool:
+def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool:
     """
     Validate the hostname based on given criteria.
 
@@ -423,11 +423,11 @@ def _validate_host(hostname: str, allow_private_ip: bool = False) -> bool:
 
     Examples
     --------
-    >>> from plantdb.client.url import _validate_host
-    >>> _validate_host("example.com")
+    >>> from plantdb.client.url import _validate_hostname
+    >>> _validate_hostname("example.com")
     True
-    >>> _validate_host("localhost")
-    >>> _validate_host("localhost", allow_private_ip=True)
+    >>> _validate_hostname("localhost")
+    >>> _validate_hostname("localhost", allow_private_ip=True)
     True
 
     Notes
