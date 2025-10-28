@@ -5,6 +5,7 @@
 Robust server‑availability checker with built‑in SSRF / safety guards.
 """
 import ipaddress
+import json
 import os
 import socket
 import tempfile
@@ -13,12 +14,18 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 from typing import Optional
+from urllib.error import URLError
 
 import urllib3
 from ada_url import URL
 from ada_url import check_url
 from ada_url import join_url
 from tqdm import tqdm
+from urllib3.exceptions import HTTPError
+from urllib3.exceptions import MaxRetryError
+from urllib3.exceptions import NewConnectionError
+from urllib3.exceptions import TimeoutError
+from urllib3.util import create_urllib3_context
 from urllib3.util.retry import Retry
 
 from plantdb.commons.log import get_logger
@@ -163,7 +170,6 @@ def _download_and_cache_blacklist(force: bool = False) -> Optional[Path]:
 
             # Sort files by name to preserve order
             file_list.sort(key=lambda f: f.get("name", ""))
-
             total_size = sum(f.get("size", 0) for f in file_list)
 
             start_time = time.time()
@@ -247,7 +253,7 @@ def _is_host_blacklisted(hostname: str) -> bool:
     """
     cache_path = _download_and_cache_blacklist()
     if not cache_path:
-        return False  # Cannot verify, assume safe
+        return False
 
     host_lower = hostname.lower()
     if host_lower.startswith("www."):
@@ -315,13 +321,14 @@ def _resolve_public_ips(hostname: str) -> List[str]:
     -------
     List[str]
         A list of public IPv4 addresses associated with the given hostname.
+        May also contain IPv6 addresses if using the system DNS resolver.
         If no valid public IPs are found, an empty list is returned.
 
     Examples
     --------
     >>> from plantdb.client.url import _resolve_public_ips
     >>> _resolve_public_ips('google.com')
-    ['2a00:1450:4007:813::200e', '142.250.201.174']
+    ['142.250.201.174']
 
     Notes
     -----
@@ -333,40 +340,64 @@ def _resolve_public_ips(hostname: str) -> List[str]:
     socket.getaddrinfo : Get address information for a given hostname and service.
     """
     # Attempt DNS over HTTPS first using the provided resolver endpoint.
-    try:
-        # DNS over HTTPS endpoint that accepts DNS queries via HTTP GET
-        doh_url = "https://protective.joindns4.eu/dns-query"
-        headers = {
-            "Accept": "application/dns-json",
+    # Create a PoolManager for HTTP requests
+    http = urllib3.PoolManager(
+        headers={
+            "Accept": "application/dns-json",  # Request DNS response in JSON format
             "User-Agent": "plantdb-client/1.0",
-        }
-        params = {"name": hostname, "type": "A"}
-        resp = requests.get(doh_url, headers=headers, params=params, timeout=5)
-        resp.raise_for_status()
-        data = resp.json()
+        },
+        retries=urllib3.Retry(total=1, backoff_factor=0.1)  # Single retry with 0.1s delay
+    )
+
+    # Primary resolution method: DNS over HTTPS (DoH) for enhanced security & privacy
+    try:
+        # Use Cloudflare DNS over HTTPS resolver [[1]](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/)
+        doh_url = "https://cloudflare-dns.com/dns-query"
+        url = f"{doh_url}?name={hostname}&type=A"
+        # Execute DNS query with 5 second timeout
+        resp = http.request('GET', url, timeout=5.0)
+
+        # Validate HTTP response status
+        if resp.status != 200:
+            raise ValueError(f"HTTP request failed with status {resp.status}")
+
+        # Deserialize JSON response from DoH server
+        data = json.loads(resp.data.decode('utf-8'))
+
+        # Extract IP addresses from DNS answers
         ips = []
         for answer in data.get("Answer", []):
-            # The answer data for type A is an IPv4 address
-            if answer.get("type") == 1:  # A record
+            # Type 1 indicates A record (IPv4 address)
+            if answer.get("type") == 1:
                 ips.append(answer.get("data"))
-        # Filter out private IPs
+
+        # Remove private/internal IP addresses from results
         public_ips = [ip for ip in ips if not _is_private_ip(ip)]
+        # Return immediately if DoH found public IPs
         if public_ips:
             return public_ips
     except Exception:
-        # Fall back to the system resolver if DOH fails
+        logger.error(f"Error resolving public IPs with DNS over HTTPS for: '{hostname}'.")
+        # Fallback to system resolver
         pass
 
+    # Fallback resolution method: system DNS resolver
     try:
+        logger.info("Fallback to system DNS resolver...")
+        # Query all TCP-compatible addresses for hostname
         addrinfo = socket.getaddrinfo(hostname, None, proto=socket.IPPROTO_TCP)
     except socket.gaierror:
+        # Return empty list if hostname cannot be resolved
         return []
+    else:
+        # Remove private/internal IP addresses from results
+        public_ips = set()
+        # Iterate through resolved address information
+        for entry in addrinfo:
+            ip = entry[4][0]  # Extract IP address from socket address tuple
+            if not _is_private_ip(ip):
+                public_ips.add(ip)  # Add only non-private IPs
 
-    public_ips = set()
-    for entry in addrinfo:
-        ip = entry[4][0]
-        if not _is_private_ip(ip):
-            public_ips.add(ip)
     return list(public_ips)
 
 
