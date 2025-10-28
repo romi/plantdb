@@ -6,17 +6,17 @@ Robust server‑availability checker with built‑in SSRF / safety guards.
 """
 import ipaddress
 import os
-import pathlib
 import socket
 import tempfile
 import time
-import urllib.parse
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 from typing import Optional
 
 import requests
 from requests.adapters import HTTPAdapter
+from ada_url import URL
 from tqdm import tqdm
 from urllib3.util.retry import Retry
 
@@ -29,7 +29,7 @@ logger = get_logger(__name__)
 # --------------------------------------------------------------------------- #
 
 ALLOWED_SCHEMES: set[str] = {"http", "https"}  # Only HTTP(S)
-BLACKLIST_CACHE_FILE = pathlib.Path(tempfile.gettempdir()) / "github_blacklist_cache.txt"
+BLACKLIST_CACHE_FILE = Path(tempfile.gettempdir()) / "github_blacklist_cache.txt"
 
 # Private / non‑routable IP ranges – we refuse to connect to any of them
 PRIVATE_NETWORKS: List[ipaddress._BaseNetwork] = [
@@ -67,29 +67,32 @@ def _load_whitelist_from_file() -> Optional[set[str]]:
 
     Notes
     -----
-    - The function uses `urllib.parse.urlparse` to extract hostnames from URLs.
-    - Lines starting with `#` are treated as comments and ignored.
-    - Empty lines or lines without a valid hostname return an empty set.
+    - Empty lines or comment lines (starting with `#`) are ignored.
+    - Lines without a valid hostname (according to Ada) are ignored.
     """
-    env_var = "WHITELIST_URLS"
-    file_path = os.getenv(env_var)
-    if not file_path:
+    env_var = "WHITELIST_URLS"  # Environment variable name containing the file path
+    file_path = os.getenv(env_var)  # Get the file path from environment variable
+    if not file_path:  # If no file path is provided, return None
         return None
-    path = pathlib.Path(file_path)
-    if not path.is_file():
+
+    path = Path(file_path)  # Create a Path object for the file
+    if not path.is_file():  # Check if the path is an existing file
         return None
+
     try:
-        hosts = set()
+        hosts = set()  # Initialize an empty set to store hostnames
+        # Read and process each line of the file
         for line in path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
-            if not line or line.startswith("#"):
+            if not line or line.startswith("#"):  # Skip empty lines and comments
                 continue
-            parsed = urllib.parse.urlparse(line)
-            # Fallback: if no scheme, try to parse as if it were a hostname.
-            hostname = parsed.hostname or parsed.path
+
+            parsed = URL(line)  # Parse the line as a URL object
+            hostname = parsed.hostname  # Extract hostname from URL
             if hostname:
-                hosts.add(hostname.lower())
+                hosts.add(hostname.lower())  # Add lowercase hostname to set
         return hosts or None
+
     except Exception:
         # Any error loading the file should default to no whitelist
         return None
