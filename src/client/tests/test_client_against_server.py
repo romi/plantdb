@@ -105,7 +105,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This test verifies that the is_server_available function correctly
         checks if the server is available and returns the expected boolean result.
         """
-        available = is_server_available(base_url(**self.kw))
+        available = is_server_available(base_url(**self.kw), verify_ssl=False)
         self.assertTrue(available)  # Should be True since the test server is running
 
     def test_url_building_functions(self):
