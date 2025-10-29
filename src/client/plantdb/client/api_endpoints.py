@@ -22,6 +22,7 @@ Usage Examples
 '/api/v1/scans/plant1'
 """
 
+
 def sanitize_name(name):
     """Sanitizes and validates the provided name.
 
@@ -56,6 +57,7 @@ def sanitize_name(name):
             f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
     return sanitized_name
 
+
 def url_prefix(endpoint_path):
     """
     Wrap an endpoint path generator with an optional URL prefix.
@@ -73,6 +75,7 @@ def url_prefix(endpoint_path):
     >>> prefixed(42, prefix='/api/')
     '/api/users/42'
     """
+
     def wrapper(*args, **kwargs):
         if "prefix" in kwargs and kwargs["prefix"]:
             prefix = kwargs["prefix"]
@@ -80,7 +83,32 @@ def url_prefix(endpoint_path):
             return prefix + endpoint_path(*args, **kwargs)
         else:
             return endpoint_path(*args, **kwargs)
+
     return wrapper
+
+
+@url_prefix
+def register(**kwargs) -> str:
+    """Return the URL path to the register endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the register endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.register(prefix='/api/v1')
+    '/api/v1/register'
+    """
+    return "/register"
+
 
 @url_prefix
 def login(**kwargs) -> str:
@@ -126,6 +154,52 @@ def logout(**kwargs) -> str:
     '/api/v1/logout'
     """
     return "/logout"
+
+
+@url_prefix
+def token_refresh(**kwargs) -> str:
+    """Return the URL path to the token refresh endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the token refresh endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.token_refresh(prefix='/api/v1')
+    '/api/v1/token-refresh'
+    """
+    return "/token-refresh"
+
+
+@url_prefix
+def token_validation(**kwargs) -> str:
+    """Return the URL path to the token validation endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the token validation endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.token_validation(prefix='/api/v1')
+    '/api/v1/token-validation'
+    """
+    return "/token-validation"
 
 
 @url_prefix
