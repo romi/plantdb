@@ -58,7 +58,7 @@ from dash import ctx
 from dash import dcc
 from dash import html
 
-from plantdb.client.rest_api import list_scan_names
+from plantdb.client.rest_api import request_scan_names_list
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.client.sync import FSDBSync
 from plantdb.client.sync import config_from_url
@@ -586,7 +586,7 @@ def get_scans_for_db(config):
                 n_attempts += 1
                 time.sleep(5)
                 refreshed = _try_refresh(url)
-            return list_scan_names(**config)
+            return request_scan_names_list(**config)
         elif config["type"] == "ssh":
             # For SSH, we'll need to use the sync instance's SSH methods
             # This is a simplified version - in practice you'd use the FSDBSync methods

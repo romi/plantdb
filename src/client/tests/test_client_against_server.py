@@ -5,7 +5,7 @@ import time
 import unittest
 
 from plantdb.client import rest_api as client
-from plantdb.client.rest_api import base_url
+from plantdb.client.rest_api import plantdb_url
 from plantdb.client.url import is_server_available
 from plantdb.server.test_rest_api import TestRestApiServer
 
@@ -26,7 +26,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         cls.server.start()
         # small delay to be ready
         time.sleep(0.3)
-        cls.kw = dict(host=cls.server.host, port=cls.server.port, prefix=cls.server.prefix, ssl=cls.server.ssl)
+        cls.kw = dict(port=cls.server.port, prefix=cls.server.prefix, ssl=cls.server.ssl)
 
     @classmethod
     def tearDownClass(cls):
@@ -41,15 +41,15 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         scans. It ensures that the returned data is of the expected types
         and contains valid information.
         """
-        names = client.list_scan_names(**self.kw)
+        names = client.request_scan_names_list(self.server.host, **self.kw)
         self.assertIsInstance(names, list)
         self.assertGreater(len(names), 0)
         scan_id = names[0]
 
-        info = client.get_scan_data(scan_id, **self.kw)
+        info = client.request_scan_data(self.server.host, scan_id, **self.kw)
         self.assertEqual(info.get("id"), scan_id)
 
-        scans_info = client.get_scans_info(**self.kw)
+        scans_info = client.request_scans_info(self.server.host, **self.kw)
         self.assertIsInstance(scans_info, list)
 
     def test_preview_and_images_helpers(self):
@@ -61,19 +61,19 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         It ensures that URL building is correct and requests complete successfully
         with status codes 200 or 404 depending on the dataset.
         """
-        names = client.list_scan_names(**self.kw)
+        names = client.request_scan_names_list(self.server.host, **self.kw)
         scan_id = names[0]
         print(f"Selected scan ID: {scan_id}")
         # just ensure URL builds and request completes (200 or 404 acceptable depending on dataset)
-        url = client.scan_preview_image_url(scan_id, size="thumb", **self.kw)
+        url = client.scan_preview_image_url(self.server.host, scan_id, size="thumb", **self.kw)
         print(f"URL: {url}")
         self.assertIn("/image/", url)
 
         # list task images
-        uris = client.list_task_images_uri(scan_id, task_name='images', size='orig', **self.kw)
+        uris = client.list_task_images_uri(self.server.host, scan_id, task_name='images', size='orig', **self.kw)
         self.assertIsInstance(uris, list)
         # download images if any
-        imgs = client.get_images_from_task(scan_id, task_name='images', size='orig', **self.kw)
+        imgs = client.parse_task_images(self.server.host, scan_id, task_name='images', size='orig', **self.kw)
         self.assertIsInstance(imgs, list)
 
     def test_refresh_and_archive(self):
@@ -85,18 +85,18 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         Then, it retrieves a list of scan names and selects the first one as the target for archiving.
         The `download_scan_archive` method is called with this scan ID and no specified output directory, expecting to receive a tuple consisting of a BytesIO object and a message string.
         """
-        res = client.refresh(**self.kw)
-        self.assertIsInstance(res, dict)
-        self.assertIn("message", res)
+        res_data = client.request_refresh(self.server.host, **self.kw).json()
+        self.assertIsInstance(res_data, dict)
+        self.assertIn("message", res_data)
 
-        names = client.list_scan_names(**self.kw)
+        names = client.request_scan_names_list(self.server.host, **self.kw)
         scan_id = names[0]
         # Download archive to temp dir
-        res = client.download_scan_archive(scan_id, out_dir=None, **self.kw)
+        res_data = client.request_archive_download(self.server.host, scan_id, out_dir=None, **self.kw)
         # when out_dir is None, a BytesIO and message tuple is expected
-        self.assertIsInstance(res, tuple)
-        self.assertIsInstance(res[0], io.BytesIO)
-        self.assertIsInstance(res[1], str)
+        self.assertIsInstance(res_data, tuple)
+        self.assertIsInstance(res_data[0], io.BytesIO)
+        self.assertIsInstance(res_data[1], str)
 
     def test_server_availability(self):
         """
@@ -105,8 +105,8 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This test verifies that the is_server_available function correctly
         checks if the server is available and returns the expected boolean result.
         """
-        available = is_server_available(base_url(**self.kw), verify_ssl=False)
-        self.assertTrue(available)  # Should be True since the test server is running
+        available = is_server_available(plantdb_url(self.server.host, **self.kw), allow_private_ip=True, verify_ssl=False)
+        self.assertTrue(available.ok)  # Should be True since the test server is running
 
     def test_url_building_functions(self):
         """
@@ -115,22 +115,22 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This test verifies that URL building functions correctly generate
         expected URL formats for various endpoints.
         """
-        names = client.list_scan_names(**self.kw)
+        names = client.request_scan_names_list(self.server.host, **self.kw)
         self.assertGreater(len(names), 0)
         scan_id = names[0]
 
         # Test scan_url function
-        url = client.scan_url(scan_id, **self.kw)
+        url = client.scan_url(self.server.host, scan_id, **self.kw)
         self.assertIn(scan_id, url)
 
         # Test scan_image_url function
-        image_url = client.scan_image_url(scan_id, fileset_id="images", file_id="00000_rgb", size="thumb", **self.kw)
+        image_url = client.scan_image_url(self.server.host, scan_id, fileset_id="images", file_id="00000_rgb", size="thumb", **self.kw)
         self.assertIn(scan_id, image_url)
         self.assertIn("images", image_url)
         self.assertIn("thumb", image_url)
 
         # Test archive_url function
-        arch_url = client.archive_url(scan_id, **self.kw)
+        arch_url = client.archive_url(self.server.host, scan_id, **self.kw)
         self.assertIn(scan_id, arch_url)
         self.assertIn("archive", arch_url)
 
@@ -152,7 +152,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         for task_name, expected_type in zip(task_names, expected_data_types):
             # We're testing the API calls succeed, not necessarily that data exists
             try:
-                data = client.get_task_data(scan_id, task_name, **self.kw)
+                data = client.get_task_data(self.server.host, scan_id, task_name, **self.kw)
                 # If data is returned, validate its structure
                 if data is not None:
                     print(f"Data for task {task_name} is: {type(data)}")
@@ -169,13 +169,13 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         This test verifies the functions for retrieving scan and reconstruction
         configuration files work correctly.
         """
-        names = client.list_scan_names(**self.kw)
+        names = client.request_scan_names_list(self.server.host, **self.kw)
         self.assertGreater(len(names), 0)
         scan_id = names[0]
 
         # Test scan config
         try:
-            config = client.get_scan_config(scan_id, **self.kw)
+            config = client.get_scan_config(self.server.host, scan_id, **self.kw)
             if config is not None:
                 self.assertIsInstance(config, dict)
         except Exception as e:
@@ -185,7 +185,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
 
         # Test reconstruction config
         try:
-            recon_config = client.get_reconstruction_config(scan_id, **self.kw)
+            recon_config = client.get_reconstruction_config(self.server.host, scan_id, **self.kw)
             if recon_config is not None:
                 self.assertIsInstance(recon_config, dict)
         except Exception as e:
@@ -208,7 +208,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         try:
             # Test upload_dataset_file
             try:
-                result = client.upload_dataset_file('real_plant', temp_path, **self.kw)
+                result = client.request_dataset_file_upload(self.server.host, 'real_plant', temp_path, **self.kw)
                 self.assertIsInstance(result, dict)
             except Exception as e:
                 # Some servers may not allow uploads
@@ -218,7 +218,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
             # For upload_scan_archive, we'd normally need a valid archive
             # This is just testing the API call structure works
             try:
-                result = client.upload_scan_archive(temp_path, **self.kw)
+                result = client.request_archive_upload(self.server.host, temp_path, **self.kw)
                 # If successful, should return a dict
                 self.assertIsInstance(result, dict)
             except Exception as e:
@@ -240,15 +240,10 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         """
         scan_id = "real_plant_analyzed"
 
-        try:
-            data = client.get_angles_and_internodes_data(scan_id, **self.kw)
-            # If data is returned, it should be a dictionary
-            if data is not None:
-                self.assertIsInstance(data, dict)
-        except Exception as e:
-            # Ignore 404 errors which are expected if data doesn't exist
-            if "404" not in str(e):
-                raise
+        data = client.get_angles_and_internodes_data(self.server.host, scan_id, **self.kw)
+        # If data is returned, it should be a dictionary
+        if data is not None:
+            self.assertIsInstance(data, dict)
 
 
 if __name__ == '__main__':

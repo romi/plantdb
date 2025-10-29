@@ -1472,7 +1472,10 @@ class Scan(Resource):
         """
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
-        return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+        if self.db.scan_exists(scan_id):
+            return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+        else:
+            return {'message': f"Scan id '{scan_id}' does not exist"}, 404
 
     @rate_limit(max_requests=15, window_seconds=60)
     def post(self, scan_id):
@@ -2760,7 +2763,7 @@ class Archive(Resource):
         >>> from io import BytesIO
         >>> from pathlib import Path
         >>> from zipfile import ZipFile
-        >>> from plantdb.client.rest_api import list_scan_names
+        >>> from plantdb.client.rest_api import request_scan_names_list
         >>> from plantdb.server.test_rest_api import TestRestApiServer
         >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
@@ -2796,7 +2799,7 @@ class Archive(Resource):
         try:
             scan = self.db.get_scan(scan_id, **kwargs)
         except ScanNotFoundError:
-            return {'error': f'Could not find a scan named `{scan_id}`!'}, 400
+            return {'error': f'Could not find a scan named `{scan_id}`!'}, 404
 
         # Create a unique temporary file name with .zip extension
         temp_zip_handle, temp_zip_path = mkstemp(suffix='.zip')
@@ -2876,7 +2879,7 @@ class Archive(Resource):
         >>> from pathlib import Path
         >>> from tempfile import gettempdir
         >>> from plantdb.server.test_rest_api import TestRestApiServer
-        >>> from plantdb.client.rest_api import list_scan_names
+        >>> from plantdb.client.rest_api import request_scan_names_list
         >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
         >>> server.start()
@@ -3083,10 +3086,10 @@ class ScanCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3169,13 +3172,13 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
@@ -3230,13 +3233,13 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Update scan metadata:
-        >>> url = f"{base_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
         >>> data = {"metadata": {"description": "Updated scan description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
@@ -3323,9 +3326,9 @@ class ScanFilesets(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # List filesets in a scan:
-        >>> url = f"{base_url()}/api/scan/real_plant/filesets"
+        >>> url = f"{plantdb_url()}/api/scan/real_plant/filesets"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3403,10 +3406,10 @@ class FilesetCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> response = requests.post(url, json={'fileset_id': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3511,13 +3514,13 @@ class FilesetMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> response = requests.post(url, json={'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/fileset/real_plant/my_fileset/metadata"
+        >>> url = f"{plantdb_url()}/api/fileset/real_plant/my_fileset/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3584,14 +3587,14 @@ class FilesetMetadata(Resource):
         Examples
         --------
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> data = {'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata}
         >>> response = requests.post(url, json=data)
         >>> # Get the original metadata:
-        >>> url = f"{base_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
+        >>> url = f"{plantdb_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3683,9 +3686,9 @@ class FilesetFiles(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # List files in a fileset:
-        >>> url = f"{base_url()}/api/fileset/real_plant/images/files"
+        >>> url = f"{plantdb_url()}/api/fileset/real_plant/images/files"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3766,12 +3769,12 @@ class FileCreate(Resource):
         >>> import requests
         >>> import json
         >>> from tempfile import NamedTemporaryFile
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
         >>> # Create a new file with metadata in the database:
-        >>> url = f"{base_url()}/api/file"
+        >>> url = f"{plantdb_url()}/api/file"
         >>> # Open the file separately for sending
         >>> with open(file_path, 'rb') as file_handle:
         ...     files = {
@@ -3909,9 +3912,9 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
@@ -3977,8 +3980,8 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
-        >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())

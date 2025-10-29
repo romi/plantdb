@@ -71,10 +71,10 @@ from urllib.parse import urlparse
 from requests.exceptions import HTTPError
 from tqdm import tqdm
 
-from plantdb.client.rest_api import download_scan_archive
-from plantdb.client.rest_api import list_scan_names
-from plantdb.client.rest_api import refresh
-from plantdb.client.rest_api import upload_scan_archive
+from plantdb.client.rest_api import request_archive_download
+from plantdb.client.rest_api import request_scan_names_list
+from plantdb.client.rest_api import request_refresh
+from plantdb.client.rest_api import request_archive_upload
 from plantdb.client.url import is_server_available
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
@@ -174,8 +174,8 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
     logger.info(f"Origin URL is '{origin_host}' on port '{origin_port}'.")
     logger.info(f"Target URL is '{target_host}' on port '{target_port}'.")
 
-    origin_scan_list = list_scan_names(host=origin_host, port=origin_port)
-    target_scan_list = list_scan_names(host=target_host, port=target_port)
+    origin_scan_list = request_scan_names_list(host=origin_host, port=origin_port)
+    target_scan_list = request_scan_names_list(host=target_host, port=target_port)
     if filter_pattern:
         origin_scan_list = filter_scan(origin_scan_list, filter_pattern, logger)
         logger.info(f"{len(origin_scan_list)} scans match the filter pattern '{filter_pattern}'.")
@@ -188,16 +188,16 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
             continue
         logger.debug(f"Transferring scan '{scan_id}'...")
         # Download from origin DB via REST API
-        f_path, msg = download_scan_archive(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
+        f_path, msg = request_archive_download(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
         logger.debug(msg)
         # Upload to target DB via REST API
-        msg = upload_scan_archive(scan_id, f_path, host=target_host, port=target_port)
+        msg = request_archive_upload(scan_id, f_path, host=target_host, port=target_port)
         logger.debug(msg)
         # Delete the temporary file
         Path(f_path).unlink()
         # Refresh the scan in the target to load its infos:
         try:
-            msg = refresh(scan_id, host=target_host, port=target_port)
+            msg = request_refresh(scan_id, host=target_host, port=target_port)
         except HTTPError as e:
             logger.error(f"Error refreshing target database for scan '{scan_id}': {e}")
             continue

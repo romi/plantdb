@@ -47,12 +47,12 @@ class TestRestApiServer:
     Examples
     --------
     >>> from plantdb.server.test_rest_api import TestRestApiServer
-    >>> from plantdb.client.rest_api import list_scan_names
+    >>> from plantdb.client.rest_api import request_scan_names_list
     >>>
     >>> # EXAMPLE 1 - Create a test database and start the Flask App serving a REST API
     >>> server = TestRestApiServer(test=True)
     >>> server.start()
-    >>> scans_list = list_scan_names(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> scans_list = request_scan_names_list(server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
     >>> print(scans_list)
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     >>> server.stop()
@@ -64,7 +64,7 @@ class TestRestApiServer:
     /tmp/ROMI_DB_********
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
-    >>> list_scan_names(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> request_scan_names_list(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
     >>> print(scans_list)
     ['real_plant_analyzed']
     >>> server.stop()
