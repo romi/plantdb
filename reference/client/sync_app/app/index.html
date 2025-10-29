@@ -1535,6 +1535,29 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../api_endpoints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    api_endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1547,7 +1570,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_2" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1564,14 +1587,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_1" id="__nav_4_3_1_1_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_2" id="__nav_4_3_1_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_1">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_2">
             <span class="md-nav__icon md-icon"></span>
             cli
           </label>
@@ -1720,7 +1743,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_6" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -1737,14 +1760,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_5" id="__nav_4_3_1_5_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_6" id="__nav_4_3_1_6_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_3_1_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3_1_6">
             <span class="md-nav__icon md-icon"></span>
             sync_app
           </label>
@@ -2715,7 +2738,7 @@ between different database types (local, SSH, HTTP).</p>
                 n_attempts <span style="color: #666">+=</span> <span style="color: #666">1</span>
                 time<span style="color: #666">.</span>sleep(<span style="color: #666">5</span>)
                 refreshed <span style="color: #666">=</span> _try_refresh(url)
-            <span style="color: #008000; font-weight: bold">return</span> list_scan_names(<span style="color: #666">**</span>config)
+            <span style="color: #008000; font-weight: bold">return</span> request_scan_names_list(<span style="color: #666">**</span>config)
         <span style="color: #008000; font-weight: bold">elif</span> config[<span style="color: #BA2121">&quot;type&quot;</span>] <span style="color: #666">==</span> <span style="color: #BA2121">&quot;ssh&quot;</span>:
             <span style="color: #3D7B7B; font-style: italic"># For SSH, we&#39;ll need to use the sync instance&#39;s SSH methods</span>
             <span style="color: #3D7B7B; font-style: italic"># This is a simplified version - in practice you&#39;d use the FSDBSync methods</span>

@@ -1675,6 +1675,29 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../client/api_endpoints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    api_endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1687,7 +1710,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_2" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1704,14 +1727,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_1" id="__nav_4_3_1_1_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_2" id="__nav_4_3_1_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_1">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_2">
             <span class="md-nav__icon md-icon"></span>
             cli
           </label>
@@ -1858,7 +1881,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_6" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1875,14 +1898,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_5" id="__nav_4_3_1_5_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_6" id="__nav_4_3_1_6_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_6">
             <span class="md-nav__icon md-icon"></span>
             sync_app
           </label>
@@ -2300,12 +2323,12 @@ it in a separate thread so it doesn't block the current interpreter.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> list_scan_names
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> request_scan_names_list
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Create a test database and start the Flask App serving a REST API</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scans_list <span style="color: #666">=</span> list_scan_names(host<span style="color: #666">=</span>server<span style="color: #666">.</span>host, port<span style="color: #666">=</span>server<span style="color: #666">.</span>port, prefix<span style="color: #666">=</span>server<span style="color: #666">.</span>prefix, ssl<span style="color: #666">=</span>server<span style="color: #666">.</span>ssl)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scans_list <span style="color: #666">=</span> request_scan_names_list(server<span style="color: #666">.</span>host, port<span style="color: #666">=</span>server<span style="color: #666">.</span>port, prefix<span style="color: #666">=</span>server<span style="color: #666">.</span>prefix, ssl<span style="color: #666">=</span>server<span style="color: #666">.</span>ssl)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scans_list)
 <span style="color: #717171">[&#39;arabidopsis000&#39;, &#39;real_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;virtual_plant&#39;, &#39;virtual_plant_analyzed&#39;]</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>stop()
@@ -2317,7 +2340,7 @@ it in a separate thread so it doesn't block the current interpreter.</p>
 <span style="color: #717171">/tmp/ROMI_DB_********</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server <span style="color: #666">=</span> TestRestApiServer(db_path<span style="color: #666">=</span>test_db<span style="color: #666">.</span>path())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>list_scan_names(host<span style="color: #666">=</span>server<span style="color: #666">.</span>host, port<span style="color: #666">=</span>server<span style="color: #666">.</span>port, prefix<span style="color: #666">=</span>server<span style="color: #666">.</span>prefix, ssl<span style="color: #666">=</span>server<span style="color: #666">.</span>ssl)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>request_scan_names_list(host<span style="color: #666">=</span>server<span style="color: #666">.</span>host, port<span style="color: #666">=</span>server<span style="color: #666">.</span>port, prefix<span style="color: #666">=</span>server<span style="color: #666">.</span>prefix, ssl<span style="color: #666">=</span>server<span style="color: #666">.</span>ssl)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scans_list)
 <span style="color: #717171">[&#39;real_plant_analyzed&#39;]</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>stop()

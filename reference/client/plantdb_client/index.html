@@ -1535,6 +1535,29 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../api_endpoints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    api_endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1547,7 +1570,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_2" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1564,14 +1587,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_1" id="__nav_4_3_1_1_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_2" id="__nav_4_3_1_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_1">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_2">
             <span class="md-nav__icon md-icon"></span>
             cli
           </label>
@@ -1990,7 +2013,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_6" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2007,14 +2030,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_5" id="__nav_4_3_1_5_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_6" id="__nav_4_3_1_6_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_6">
             <span class="md-nav__icon md-icon"></span>
             sync_app
           </label>
@@ -2402,8 +2425,8 @@
 <div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #666">&gt;&gt;&gt;</span> client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #666">&gt;&gt;&gt;</span> client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># Create a new scan</span>
 <span style="color: #666">&gt;&gt;&gt;</span> scan_id <span style="color: #666">=</span> client<span style="color: #666">.</span>create_scan(
 <span style="color: #666">...</span>     name<span style="color: #666">=</span><span style="color: #BA2121">&quot;Plant Sample 001&quot;</span>,
@@ -2587,11 +2610,11 @@ descriptive messages when API requests fail.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Use the client against the server</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client<span style="color: #666">.</span>login(<span style="color: #BA2121">&#39;admin&#39;</span>, <span style="color: #BA2121">&#39;admin&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(client<span style="color: #666">.</span>jwt_token)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(client<span style="color: #666">.</span>base_url)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(client<span style="color: #666">.</span>plantdb_url)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scans <span style="color: #666">=</span> client<span style="color: #666">.</span>list_scans()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scans)
 <span style="color: #717171">[&#39;virtual_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;real_plant&#39;, &#39;virtual_plant_analyzed&#39;, &#39;arabidopsis000&#39;]</span>
@@ -2832,8 +2855,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">tempfile</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">import</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">yaml</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example 1 - Existing YAML file path as string</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Test document&#39;</span>, <span style="color: #BA2121">&#39;author&#39;</span>: <span style="color: #BA2121">&#39;John Doe&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>dummy_data <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;name&#39;</span>: <span style="color: #BA2121">&#39;Test Plant&#39;</span>, <span style="color: #BA2121">&#39;species&#39;</span>: <span style="color: #BA2121">&#39;Arabidopsis thaliana&#39;</span>}
@@ -3008,8 +3031,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import tempfile</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; import yaml</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Example 1 - Existing YAML file path as string</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = {&#39;description&#39;: &#39;Test document&#39;, &#39;author&#39;: &#39;John Doe&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; dummy_data = {&#39;name&#39;: &#39;Test Plant&#39;, &#39;species&#39;: &#39;Arabidopsis thaliana&#39;}</span>
@@ -3217,8 +3240,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;This is a test fileset&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_fileset(<span style="color: #BA2121">&#39;my_fileset&#39;</span>, <span style="color: #BA2121">&#39;real_plant&#39;</span>, metadata<span style="color: #666">=</span>metadata)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
@@ -3300,8 +3323,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = {&#39;description&#39;: &#39;This is a test fileset&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_fileset(&#39;my_fileset&#39;, &#39;real_plant&#39;, metadata=metadata)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
@@ -3438,8 +3461,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Test plant scan&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>create_scan(<span style="color: #BA2121">&#39;test_plant&#39;</span>, metadata<span style="color: #666">=</span>metadata)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
@@ -3514,8 +3537,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = {&#39;description&#39;: &#39;Test plant scan&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.create_scan(&#39;test_plant&#39;, metadata=metadata)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
@@ -3681,8 +3704,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get all metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> client<span style="color: #666">.</span>get_file_metadata(<span style="color: #BA2121">&#39;test_plant&#39;</span>, <span style="color: #BA2121">&#39;images&#39;</span>, <span style="color: #BA2121">&#39;image_001&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(metadata)
@@ -3771,8 +3794,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Get all metadata</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = client.get_file_metadata(&#39;test_plant&#39;, &#39;images&#39;, &#39;image_001&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(metadata)</span>
@@ -3924,8 +3947,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get all metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> client<span style="color: #666">.</span>get_fileset_metadata(<span style="color: #BA2121">&#39;real_plant&#39;</span>, <span style="color: #BA2121">&#39;my_fileset&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(metadata)
@@ -4010,8 +4033,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Get all metadata</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = client.get_fileset_metadata(&#39;real_plant&#39;, &#39;my_fileset&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(metadata)</span>
@@ -4147,8 +4170,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Get all metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>metadata <span style="color: #666">=</span> client<span style="color: #666">.</span>get_scan_metadata(<span style="color: #BA2121">&#39;test_plant&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(metadata)
@@ -4229,8 +4252,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Get all metadata</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; metadata = client.get_scan_metadata(&#39;test_plant&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(metadata)</span>
@@ -4398,8 +4421,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>list_fileset_files(<span style="color: #BA2121">&#39;real_plant&#39;</span>, <span style="color: #BA2121">&#39;images&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
 <span style="color: #717171">{&#39;files&#39;: [&#39;00000_rgb&#39;, &#39;00001_rgb&#39;, &#39;00002_rgb&#39;, ...]}</span>
@@ -4482,8 +4505,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.list_fileset_files(&#39;real_plant&#39;, &#39;images&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
 <span style="color: #BA2121; font-style: italic">    {&#39;files&#39;: [&#39;00000_rgb&#39;, &#39;00001_rgb&#39;, &#39;00002_rgb&#39;, ...]}</span>
@@ -4634,8 +4657,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>list_scan_filesets(<span style="color: #BA2121">&#39;real_plant&#39;</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
 <span style="color: #717171">{&#39;filesets&#39;: [&#39;images&#39;]}</span>
@@ -4714,8 +4737,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.list_scan_filesets(&#39;real_plant&#39;)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
 <span style="color: #BA2121; font-style: italic">    {&#39;filesets&#39;: [&#39;images&#39;]}</span>
@@ -4850,8 +4873,8 @@ descriptive messages when API requests fail.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>list_scans()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
 <span style="color: #717171">[&#39;virtual_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;real_plant&#39;, &#39;virtual_plant_analyzed&#39;, &#39;arabidopsis000&#39;]</span>
@@ -4926,8 +4949,8 @@ descriptive messages when API requests fail.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.list_scans()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
 <span style="color: #BA2121; font-style: italic">    [&#39;virtual_plant&#39;, &#39;real_plant_analyzed&#39;, &#39;real_plant&#39;, &#39;virtual_plant_analyzed&#39;, &#39;arabidopsis000&#39;]</span>
@@ -5099,7 +5122,7 @@ descriptive messages when API requests fail.</p>
         response <span style="color: #666">=</span> <span style="color: #008000">self</span><span style="color: #666">.</span>session<span style="color: #666">.</span>post(url, json<span style="color: #666">=</span>data)
         <span style="color: #008000; font-weight: bold">if</span> response<span style="color: #666">.</span>status_code <span style="color: #666">==</span> <span style="color: #666">200</span>:
             result <span style="color: #666">=</span> response<span style="color: #666">.</span>json()
-            <span style="color: #008000">self</span><span style="color: #666">.</span>validate_session_token(result<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;access_token&#39;</span>))
+            <span style="color: #008000">self</span><span style="color: #666">.</span>jwt_token <span style="color: #666">=</span> result<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;access_token&#39;</span>)
             <span style="color: #008000">self</span><span style="color: #666">.</span>username <span style="color: #666">=</span> username
             <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">True</span>
         <span style="color: #008000; font-weight: bold">else</span>:
@@ -5456,8 +5479,8 @@ updates only specified keys.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Update metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Updated description&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>update_file_metadata(
@@ -5559,8 +5582,8 @@ updates only specified keys.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Update metadata</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; new_metadata = {&#39;description&#39;: &#39;Updated description&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.update_file_metadata(</span>
@@ -5734,8 +5757,8 @@ updates only specified keys.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Update metadata</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Updated fileset description&#39;</span>, <span style="color: #BA2121">&#39;author&#39;</span>: <span style="color: #BA2121">&#39;John Doe&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>update_fileset_metadata(<span style="color: #BA2121">&#39;real_plant&#39;</span>, <span style="color: #BA2121">&#39;my_fileset&#39;</span>, new_metadata)
@@ -5823,8 +5846,8 @@ updates only specified keys.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Update metadata</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; new_metadata = {&#39;description&#39;: &#39;Updated fileset description&#39;, &#39;author&#39;: &#39;John Doe&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.update_fileset_metadata(&#39;real_plant&#39;, &#39;my_fileset&#39;, new_metadata)</span>
@@ -5977,8 +6000,8 @@ updates only specified keys.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Start a test REST API server first:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># $ fsdb_rest_api --test</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> PlantDBClient
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> base_url
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(base_url())
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> plantdb_url
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>client <span style="color: #666">=</span> PlantDBClient(plantdb_url())
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_metadata <span style="color: #666">=</span> {<span style="color: #BA2121">&#39;description&#39;</span>: <span style="color: #BA2121">&#39;Updated scan description&#39;</span>}
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>response <span style="color: #666">=</span> client<span style="color: #666">.</span>update_scan_metadata(<span style="color: #BA2121">&#39;test_plant&#39;</span>, new_metadata)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(response)
@@ -6060,8 +6083,8 @@ updates only specified keys.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Start a test REST API server first:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # $ fsdb_rest_api --test</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import PlantDBClient</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import base_url</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(base_url())</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.rest_api import plantdb_url</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; client = PlantDBClient(plantdb_url())</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; new_metadata = {&#39;description&#39;: &#39;Updated scan description&#39;}</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; response = client.update_scan_metadata(&#39;test_plant&#39;, new_metadata)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(response)</span>
