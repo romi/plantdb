@@ -231,6 +231,46 @@ def logout_url(host, **kwargs):
     return join_url(url, api_endpoints.logout(**kwargs))
 
 
+def register_url(host, **kwargs):
+    """
+    Generate the full URL for the PlantDB API register endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to `None`.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to `None`.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The fully qualified register URL as a string.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import logout_url
+    >>> # Basic usage with default configuration
+    >>> url = logout_url('localhost')
+    >>> print(url)
+    http://localhost/logout
+    >>> # Specify a custom prefix and enable SSL
+    >>> url = logout_url('dev.romi.local', prefix="/plantdb", ssl=True)
+    >>> print(url)
+    https://dev.romi.local/plantdb/logout
+    """
+    url = origin_url(host, **kwargs)
+    return join_url(url, api_endpoints.register(**kwargs))
+
+
+
 def scans_url(host, **kwargs):
     """Generates the URL listing the scans from the PlantDB REST API.
 
@@ -804,6 +844,55 @@ def request_login(host, username, password, **kwargs):
     return make_api_request(url, method="POST", json_data=data).json()
 
 
+def request_check_username(host, username, **kwargs):
+    """
+    Send a username availability request to the authentication service.
+
+    This helper function constructs a GET request to the login endpoint
+    and forwards any additional keyword arguments to the URL generator
+    function.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+    username : str
+        The user identifier for authentication.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to `None`.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to `None`.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+
+    Returns
+    -------
+    dict
+        The parsed JSON response from the authentication API.
+        In successful cases this will include tokens or user metadata.
+
+    Notes
+    -----
+    * The password is transmitted as plain JSON in the request body;
+      ensure the endpoint is served over HTTPS to protect credentials.
+    * The function does not perform any client‑side validation of the credentials;
+      errors are reported by the API response.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import request_check_username
+    >>> username_exists = request_check_username('localhost', 'admin', port=5000)
+    >>> print(username_exists)
+    """
+    url = login_url(host, **kwargs)
+    return make_api_request(url, method="GET", params={'username': username}).json()
+
+
 def request_logout(host, **kwargs):
     """
     Send a logout request to the authentication service.
@@ -850,6 +939,65 @@ def request_logout(host, **kwargs):
     """
     url = logout_url(host, **kwargs)
     return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None)).ok
+
+
+def request_new_user(host, username, password, fullname, **kwargs):
+    """
+    Send a registration request to the authentication service.
+
+    This helper function constructs a POST request to the register endpoint
+    and forwards any additional keyword arguments to the URL generator
+    function.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+    username : str
+        The user identifier to add.
+    password : str
+        The user's secret password to use. It is sent in the request body and
+        should be handled securely (e.g., over HTTPS).
+    fullname : str
+        The user's full name to use.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to `None`.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to `None`.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
+
+    Returns
+    -------
+    bool
+        Indicate if the logout was successful.
+
+    Notes
+    -----
+    * The session_token is transmitted as plain JSON in the request header;
+      ensure the endpoint is served over HTTPS to protect credentials.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import request_login
+    >>> from plantdb.client.rest_api import request_logout
+    >>> from plantdb.client.rest_api import request_new_user
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> user_added = request_new_user('localhost', 'testuser', 'fake_password', 'Test User', port=5000, session_token=login_data['access_token'])
+    >>> print(user_added)
+    True
+    >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
+    """
+    url = register_url(host, **kwargs)
+    data = {'username': username, 'fullname': fullname, 'password': password}
+    return make_api_request(url, method="POST", json_data=data, session_token=kwargs.get('session_token', None)).ok
 
 
 def request_scan_names_list(host, **kwargs):
