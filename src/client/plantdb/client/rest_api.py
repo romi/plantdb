@@ -756,7 +756,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
     # If a session token is supplied, add it to the Authorization header
     requests_kwargs['headers'] = kwargs.get('headers', {})
     if 'session_token' in kwargs:
-        requests_kwargs['headers'].update({'Authorization': f'Bearer {kwargs.get('session_token')}'})
+        requests_kwargs['headers'].update({'Authorization': f"Bearer {kwargs.get('session_token')}"})
 
     # Normalise the HTTP method name to uppercase for comparison
     method = method.upper()
