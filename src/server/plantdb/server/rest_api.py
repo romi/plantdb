@@ -31,7 +31,6 @@ import datetime
 import hashlib
 import json
 import os
-import shutil
 import threading
 import time
 from collections import defaultdict
@@ -1130,6 +1129,7 @@ class TokenValidation(Resource):
     ...     # {'message': 'Token validation successful',
     ...     #  'user': {'username': 'jdoe', 'fullname': 'John Doe'}}
     """
+
     def __init__(self, db, logger):
         """Initialize the TokenValidation resource."""
         self.db = db
@@ -1153,6 +1153,7 @@ class TokenValidation(Resource):
 
         return response
 
+
 class TokenRefresh(Resource):
     """
     Refresh JWT token for an authenticated user.
@@ -1174,6 +1175,7 @@ class TokenRefresh(Resource):
         Database handler providing access to the session manager.
 
     """
+
     def __init__(self):
         """Initialize the TokenRefresh resource."""
         self.db = None
@@ -2456,19 +2458,23 @@ class Sequence(Resource):
     ----------
     db : plantdb.commons.fsdb.FSDB
         The database instance used for retrieving scan data.
+    logger : Logger
+        The logger instance for this resource.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.FSDB
+        A database instance used for retrieving scan data.
+    logger : logging.Logger
+        A logger instance for this resource.
     """
 
-    def __init__(self, db):
-        """Initialize the Sequence resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.FSDB
-            A database instance containing plant scan data and related measurements.
-        """
+    def __init__(self, db, logger):
+        """Initialize the Sequence resource."""
         self.db = db
+        self.logger = logger
 
-    @rate_limit(max_requests=5, window_seconds=60)
+    @rate_limit(max_requests=60, window_seconds=60)
     def get(self, scan_id):
         """Retrieve angle and internode sequences data for a given scan.
 
@@ -2486,9 +2492,9 @@ class Sequence(Resource):
         -------
         Union[dict, list, tuple[dict, int]]
             If successful and type='all' (default):
-                Dictionary containing all sequence data with keys 'angles', 'internodes',
-                and 'fruit_points'
-            If successful and type in ['angles', 'internodes', 'fruit_points']:
+                Dictionary containing all sequence data with the following keys: 'angles', 'internodes',
+                'fruit_points', 'manual_angles', 'manual_internodes'
+            If successful and type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
                 List of sequence values for the specified type
             If error:
                 Tuple of (error_dict, HTTP_status_code)
@@ -2561,9 +2567,21 @@ class Sequence(Resource):
             measures = read_json(file.path())
         except Exception as e:
             return json.dumps({'error': str(e)}), 400
+        # Load the manual 'measures.json' JSON file:
+        manual_measures_file = scan.path() / 'measures.json'
+        try:
+            manual_measures = read_json(manual_measures_file)
+        except Exception as e:
+            if manual_measures_file.exists():
+                self.logger.warning(f"Failed to load manual measures file: {manual_measures_file}")
+                self.logger.warning(e)
+            pass
+        else:
+            measures['manual_angles'] = manual_measures['angles']
+            measures['manual_internodes'] = manual_measures['internodes']
 
         # Make sure that the 'type' argument we got is a valid option, else default to 'all':
-        if type in ['angles', 'internodes', 'fruit_points']:
+        if type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
             return measures[type]
         else:
             return measures
@@ -2679,7 +2697,8 @@ def is_valid_archive(archive_path):
     # If a lone directory is found at the top, move one step down
     if len(top_level_dirs) == 1:
         top_dir = next(iter(top_level_dirs))
-        top_level_dirs = {name.replace(top_dir, '') for name in zip_files if name.count('/') == 2 and name.endswith('/') }
+        top_level_dirs = {name.replace(top_dir, '') for name in zip_files if
+                          name.count('/') == 2 and name.endswith('/')}
         top_level_dirs |= {name.split('/')[1] + '/' for name in zip_files if
                            name.count('/') == 2 and '/'.join(name.split('/')[:-1])}
 
@@ -2693,9 +2712,9 @@ def is_valid_archive(archive_path):
     if all(has_req_dirs) and all(has_req_files) and req_dir_depth:
         return True
     else:
-        #if not all(has_req_dirs):
+        # if not all(has_req_dirs):
         #    print(f"Missing required directories: {list(zip(req_dirs, [not r for r in has_req_dirs]))}")
-        #if not all(has_req_files):
+        # if not all(has_req_files):
         #    print(f"Missing required files: {list(zip(req_files, [not r for r in has_req_files]))}")
         return False
 

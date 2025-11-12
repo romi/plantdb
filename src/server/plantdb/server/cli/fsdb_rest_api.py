@@ -284,7 +284,7 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
     api.add_resource(CurveSkeleton, '/skeleton/<string:scan_id>',
                      resource_class_args=tuple([db]))
     api.add_resource(Sequence, '/sequence/<string:scan_id>',
-                     resource_class_args=tuple([db]))
+                     resource_class_args=tuple([db, logger]))
     api.add_resource(Archive, '/archive/<string:scan_id>',
                      resource_class_args=tuple([db, logger]))
     # User-oriented endpoints
