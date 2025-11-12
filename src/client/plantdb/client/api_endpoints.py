@@ -345,6 +345,35 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, **kwargs) -> s
 
 
 @url_prefix
+def sequence(scan_id: str, type: str, **kwargs) -> str:
+    """Return the URL path to the sequence endpoint.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset containing the angles and internodes sequence.
+    type : str or int
+        The type of measure to reques, in ['all', 'angles', 'internodes', 'fruit_points',
+         'manual_angles', 'manual_internodes'].
+
+    Returns
+    -------
+    str
+        The URL path to the angles and internodes sequences endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.sequence('real_plant', 'all')
+    '/sequence/real_plant?type=all'
+    """
+    valid_types = ['all', 'angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
+    type = 'all' if type not in valid_types else type
+    scan_id = sanitize_name(scan_id)
+    return f"/sequence/{scan_id}?type={type}"
+
+
+@url_prefix
 def archive(scan_id: str, **kwargs) -> str:
     """Return the URL path to the dataset archive endpoint.
 
