@@ -200,7 +200,7 @@ class ScanLockManager:
                     # If successful, lock was stale - remove it
                     os.unlink(lock_path)
                     cleaned_count += 1
-                    self.logger.info(f"Removed stale lock file: {filename}")
+                    self.logger.debug(f"Removed stale lock file: {filename}")
                 except (OSError, IOError):
                     self.logger.warning(f"Lock still active: {filename}")
                     # Lock is still active, keep it
@@ -336,7 +336,7 @@ class ScanLockManager:
 
                     self._write_lock_info(scan_id, lock_type, user)
                     acquired = True
-                    self.logger.info(f"Successfully acquired {lock_type.value} lock for scan {scan_id}")
+                    self.logger.debug(f"Successfully acquired {lock_type.value} lock for scan {scan_id}")
                     break
 
                 except (OSError, IOError) as e:
@@ -392,7 +392,7 @@ class ScanLockManager:
         Improper use might lead to inconsistencies in the lock state or lost locks.
         """
         lock_key = f"{scan_id}_{lock_type.value}"
-        self.logger.info(f"Releasing {lock_type.value} lock for scan {scan_id}")
+        self.logger.debug(f"Releasing {lock_type.value} lock for scan {scan_id}")
 
         with self._thread_lock:
             if lock_key in self._active_locks:
@@ -420,7 +420,7 @@ class ScanLockManager:
 
                 # Remove lock info
                 self._remove_lock_info(scan_id)
-                self.logger.info(f"Successfully released lock for scan {scan_id}")
+                self.logger.debug(f"Successfully released lock for scan {scan_id}")
 
 
     def get_lock_status(self, scan_id: str) -> Dict:

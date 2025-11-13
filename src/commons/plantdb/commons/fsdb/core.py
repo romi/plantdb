@@ -1755,7 +1755,7 @@ class Fileset(db.Fileset):
             self.files.update({f_id: file})  # Update filesets's files dictionary
             self.store()  # Store fileset instance to the JSON
 
-            logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{self.db.user}'")
+            logger.debug(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{self.db.user}'")
 
         return file
 
