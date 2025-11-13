@@ -113,7 +113,9 @@ from .auth import RBACManager
 from .auth import SessionManager
 from .auth import SingleSessionManager
 from .exceptions import FileNotFoundError
+from .exceptions import FilesetExistsError
 from .exceptions import FilesetNotFoundError
+from .exceptions import ScanExistsError
 from .exceptions import ScanNotFoundError
 from .file_ops import _delete_file
 from .file_ops import _delete_fileset
@@ -676,7 +678,7 @@ class FSDB(db.DB):
             raise PermissionError(f"Insufficient permissions to create scan with user '{current_user.username}'")
 
         if self.scan_exists(scan_id):
-            raise ValueError(f"Scan {scan_id} already exists")
+            raise ScanExistsError(scan_id)
 
         # Prepare metadata with ownership
         if metadata is None:
@@ -1697,7 +1699,7 @@ class Scan(db.Scan):
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` already exists in the local database
             if self.fileset_exists(fs_id):
-                raise ValueError(f"Fileset '{fs_id}' already exists in scan '{self.id}'")
+                raise FilesetExistsError(self, fs_id)
 
             # Create the new Fileset
             fileset = Fileset(self, fs_id)  # Initialize a new Fileset instance
@@ -2097,7 +2099,7 @@ class Fileset(db.Fileset):
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` already exists in the local database
             if self.file_exists(f_id):
-                raise IOError(f"Given file identifier '{f_id}' already exists!")
+                raise FileExistsError(self, f_id)
 
             # Create the new File
             file = File(self, f_id)  # Initialize a new File instance
