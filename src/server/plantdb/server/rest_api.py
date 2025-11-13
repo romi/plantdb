@@ -1940,7 +1940,7 @@ class Image(Resource):
         """
         self.db = db
 
-    @rate_limit(max_requests=600, window_seconds=60)
+    @rate_limit(max_requests=3000, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve an image from the database.
 
