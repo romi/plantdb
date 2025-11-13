@@ -867,34 +867,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commons/fsdb/auth/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    auth
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../commons/fsdb/core/" class="md-nav__link">
         
   
@@ -1775,34 +1747,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../../api_endpoints/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    api_endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1819,7 +1763,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_1" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -1841,14 +1785,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_2" id="__nav_4_3_1_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_1" id="__nav_4_3_1_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_3_1_2">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3_1_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2128,7 +2072,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_5" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2150,14 +2094,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_6" id="__nav_4_3_1_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_5" id="__nav_4_3_1_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_6">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2198,34 +2142,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../url/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    url
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2553,7 +2469,8 @@ regular expression pattern, or None if the pattern is invalid.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">111</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">112</span>
@@ -2576,8 +2493,7 @@ regular expression pattern, or None if the pattern is invalid.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">filter_scan</span>(scan_list, filter_pattern, logger):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">filter_scan</span>(scan_list, filter_pattern, logger):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Filters a list of scan identifiers based on a regular expression pattern.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -2629,7 +2545,8 @@ and target databases.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
@@ -2645,8 +2562,7 @@ and target databases.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main execution function.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function orchestrates the parsing of command-line arguments, validation of the</span>
@@ -2659,8 +2575,8 @@ and target databases.</p>
     args <span style="color: #666">=</span> parser<span style="color: #666">.</span>parse_args()
 
     <span style="color: #3D7B7B; font-style: italic"># Validate the availability of origin and target database URLs</span>
-    is_server_available(args<span style="color: #666">.</span>origin)
-    is_server_available(args<span style="color: #666">.</span>target)
+    test_availability(args<span style="color: #666">.</span>origin)
+    test_availability(args<span style="color: #666">.</span>target)
 
     <span style="color: #3D7B7B; font-style: italic"># Synchronize scan archives between the origin and target databases</span>
     sync_scan_archives(args<span style="color: #666">.</span>origin, args<span style="color: #666">.</span>target, args<span style="color: #666">.</span>filter, args<span style="color: #666">.</span>log_level)  <span style="color: #3D7B7B; font-style: italic"># Perform synchronization</span>
@@ -2732,8 +2648,7 @@ and target databases.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">102</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">103</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">104</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>():
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">105</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>():
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Parses command line arguments for database synchronization.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
@@ -2741,8 +2656,7 @@ and target databases.</p>
 <span style="color: #BA2121; font-style: italic">    argparse.ArgumentParser</span>
 <span style="color: #BA2121; font-style: italic">        An argument parser configured for FSDB synchronization.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    parser <span style="color: #666">=</span> argparse<span style="color: #666">.</span>ArgumentParser(
-        description<span style="color: #666">=</span><span style="color: #BA2121">&#39;Transfer dataset from an origin FSDB database towards a target using REST API.&#39;</span>)
+    parser <span style="color: #666">=</span> argparse<span style="color: #666">.</span>ArgumentParser(description<span style="color: #666">=</span><span style="color: #BA2121">&#39;Transfer dataset from an origin FSDB database towards a target using REST API.&#39;</span>)
     parser<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;origin&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>,
                         help<span style="color: #666">=</span><span style="color: #BA2121">&#39;source database URL, as &quot;host:port&quot;.&#39;</span>)
     parser<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;target&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>,
@@ -2897,7 +2811,8 @@ Defaults to <code>DEFAULT_LOG_LEVEL</code>, which is 'INFO'.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/cli/fsdb_rest_api_sync.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">135</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">136</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">137</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">138</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">139</span>
@@ -2966,8 +2881,7 @@ Defaults to <code>DEFAULT_LOG_LEVEL</code>, which is 'INFO'.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">203</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">204</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync_scan_archives</span>(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">sync_scan_archives</span>(origin_url, target_url, filter_pattern<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, log_level<span style="color: #666">=</span>DEFAULT_LOG_LEVEL):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Synchronizes scan archives between an origin and a target database.</span>
 
 <span style="color: #BA2121; font-style: italic">    This function retrieves a list of scan archives from an origin database and transfers each</span>
@@ -3008,8 +2922,8 @@ Defaults to <code>DEFAULT_LOG_LEVEL</code>, which is 'INFO'.</p>
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Origin URL is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>origin_host<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; on port &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>origin_port<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Target URL is &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>target_host<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; on port &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>target_port<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
 
-    origin_scan_list <span style="color: #666">=</span> request_scan_names_list(host<span style="color: #666">=</span>origin_host, port<span style="color: #666">=</span>origin_port)
-    target_scan_list <span style="color: #666">=</span> request_scan_names_list(host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
+    origin_scan_list <span style="color: #666">=</span> list_scan_names(host<span style="color: #666">=</span>origin_host, port<span style="color: #666">=</span>origin_port)
+    target_scan_list <span style="color: #666">=</span> list_scan_names(host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
     <span style="color: #008000; font-weight: bold">if</span> filter_pattern:
         origin_scan_list <span style="color: #666">=</span> filter_scan(origin_scan_list, filter_pattern, logger)
         logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;</span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(origin_scan_list)<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans match the filter pattern &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>filter_pattern<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
@@ -3022,16 +2936,16 @@ Defaults to <code>DEFAULT_LOG_LEVEL</code>, which is 'INFO'.</p>
             <span style="color: #008000; font-weight: bold">continue</span>
         logger<span style="color: #666">.</span>debug(<span style="color: #BA2121">f&quot;Transferring scan &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
         <span style="color: #3D7B7B; font-style: italic"># Download from origin DB via REST API</span>
-        f_path, msg <span style="color: #666">=</span> request_archive_download(scan_id, out_dir<span style="color: #666">=</span><span style="color: #BA2121">&#39;/tmp&#39;</span>, host<span style="color: #666">=</span>origin_host, port<span style="color: #666">=</span>origin_port)
+        f_path, msg <span style="color: #666">=</span> download_scan_archive(scan_id, out_dir<span style="color: #666">=</span><span style="color: #BA2121">&#39;/tmp&#39;</span>, host<span style="color: #666">=</span>origin_host, port<span style="color: #666">=</span>origin_port)
         logger<span style="color: #666">.</span>debug(msg)
         <span style="color: #3D7B7B; font-style: italic"># Upload to target DB via REST API</span>
-        msg <span style="color: #666">=</span> request_archive_upload(scan_id, f_path, host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
+        msg <span style="color: #666">=</span> upload_scan_archive(scan_id, f_path, host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
         logger<span style="color: #666">.</span>debug(msg)
         <span style="color: #3D7B7B; font-style: italic"># Delete the temporary file</span>
         Path(f_path)<span style="color: #666">.</span>unlink()
         <span style="color: #3D7B7B; font-style: italic"># Refresh the scan in the target to load its infos:</span>
         <span style="color: #008000; font-weight: bold">try</span>:
-            msg <span style="color: #666">=</span> request_refresh(scan_id, host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
+            msg <span style="color: #666">=</span> refresh(scan_id, host<span style="color: #666">=</span>target_host, port<span style="color: #666">=</span>target_port)
         <span style="color: #008000; font-weight: bold">except</span> HTTPError <span style="color: #008000; font-weight: bold">as</span> e:
             logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Error refreshing target database for scan &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>scan_id<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>)
             <span style="color: #008000; font-weight: bold">continue</span>

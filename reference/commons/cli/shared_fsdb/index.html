@@ -927,34 +927,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fsdb/auth/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    auth
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../fsdb/core/" class="md-nav__link">
         
   
@@ -1833,34 +1805,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../../client/api_endpoints/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    api_endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -1873,7 +1817,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_1" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1895,14 +1839,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_2" id="__nav_4_3_1_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_1" id="__nav_4_3_1_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_2">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2078,7 +2022,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_1_5" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2100,14 +2044,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_3_1_6" id="__nav_4_3_1_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_3_1_5" id="__nav_4_3_1_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3_1_6">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_3_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_1_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2148,34 +2092,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../client/url/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    url
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2274,29 +2190,7 @@
     <div class="doc doc-contents first">
 
         <p>Create a local plantdb database (FSDB) using shared datasets.</p>
-<p>This module provides a command-line interface for setting up a local plantdb database by cloning shared datasets.
-It is useful for users who need to work with specific test datasets without downloading them individually.</p>
 
-
-<details class="key-features" open>
-  <summary>Key Features</summary>
-  <ul>
-<li>Supports cloning of multiple datasets, including all available ones or a specified subset.</li>
-<li>Optional flags to clone configuration files and trained CNN model files.</li>
-<li>Force download option to refresh the archive regardless of existing data.</li>
-<li>Configurable logging levels for tracking setup progress and debugging.</li>
-</ul>
-</details>
-
-<details class="usage" open>
-  <summary>Usage</summary>
-  <p>To create a local database with the default 'real_plant' dataset at <code>/path/to/db</code>:</p>
-<p>.. code-block:: bash
-   $ shared_fsdb /path/to/db</p>
-<p>To clone all available datasets along with configuration files to <code>/path/to/db</code>:</p>
-<p>.. code-block:: bash
-   $ shared_fsdb --dataset all --config /path/to/db</p>
-</details>
 
 
 
