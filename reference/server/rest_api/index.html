@@ -10093,7 +10093,7 @@ plantdb.server.webcache.image_path : Image path resolution function with caching
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2013</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2014</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2015</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2016</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=600</span>, window_seconds<span style="color: #666">=60</span>)
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2016</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@rate_limit</span>(max_requests<span style="color: #666">=3000</span>, window_seconds<span style="color: #666">=60</span>)
 <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get</span>(<span style="color: #008000">self</span>, scan_id, fileset_id, file_id):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve and serve an image from the database.</span>
 
