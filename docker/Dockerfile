@@ -32,6 +32,7 @@ RUN python3 -m pip install --no-cache-dir --user \
     python3 -m pip install --no-cache-dir --user \
         uwsgi \
         commons/.[io] \
+        open3d \
         server/. && \
     # Remove pip cache and unnecessary files
     python3 -m pip cache purge
