@@ -60,6 +60,7 @@ from ada_url import join_url
 from plyfile import PlyData
 
 from plantdb.client import api_endpoints
+from plantdb.client.api_endpoints import sanitize_name
 
 #: Default hostname to PlantDB REST API is 'localhost':
 PLANTDB_API_HOST = os.environ.get('PLANTDB_API_HOST', "localhost")
@@ -1105,7 +1106,6 @@ def request_scan_data(host, scan_id, **kwargs):
     >>> print(scan_data['hasColmap'])
     False
     """
-    from plantdb.server.rest_api import sanitize_name
     scan_id = sanitize_name(scan_id)
     url = scan_url(host, scan_id, **kwargs)
     response = make_api_request(url=url, session_token=kwargs.get('session_token', None))
@@ -1857,7 +1857,6 @@ def get_task_data(host, scan_id, task, filename=None, api_data=None, **kwargs):
 
     See Also
     --------
-    plantdb.server.rest_api.filesUri_task_mapping
     plantdb.client.rest_api.parse_task_requests_data
 
     Examples
