@@ -80,14 +80,15 @@ import os
 import secrets
 import shutil
 import sys
+from pathlib import Path
 from time import sleep
+from typing import Optional
+from typing import Union
 
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
-from typing import Optional, Union
-from pathlib import Path
 
 from plantdb.commons.fsdb.auth import JWTSessionManager
 from plantdb.commons.fsdb.core import FSDB
@@ -141,27 +142,218 @@ def parsing() -> argparse.ArgumentParser:
 
     app_args = parser.add_argument_group("webserver arguments")
     app_args.add_argument('--host', type=str, default="0.0.0.0",
-                          help="the hostname to listen on, defaults to '0.0.0.0'.")
+                          help="hostname to listen on; defaults to '0.0.0.0'.")
     app_args.add_argument('--port', type=int, default=5000,
-                          help="the port of the webserver, defaults to '5000'.")
+                          help="port of the webserver; defaults to '5000'.")
     app_args.add_argument('--debug', action='store_true',
                           help="enable debug mode.")
     app_args.add_argument('--proxy', action='store_true',
-                          help="use this flag when this server sits behind a reverse proxy")
+                          help="use when the server sits behind a reverse proxy.")
 
     misc_args = parser.add_argument_group("other arguments")
     misc_args.add_argument("--test", action='store_true',
-                           help="set up a temporary test database prior to starting the REST API.")
+                           help="set up a temporary test database before starting the REST API.")
     misc_args.add_argument("--empty", action='store_true',
-                           help="the test database will not be populated with toy dataset.")
+                           help="do not populate the test database with toy datasets.")
     misc_args.add_argument("--models", action='store_true',
-                           help="the test database will contain the trained CNN model.")
+                           help="include trained CNN model in the test database.")
 
     log_opt = parser.add_argument_group("logging options")
     log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
-                         help="level of message logging, defaults to 'INFO'.")
+                         help="logging level; defaults to 'INFO'.")
 
     return parser
+
+def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
+    """
+    Retrieve a secret from the environment or generate a new one if missing.
+
+    Parameters
+    ----------
+    var_name : str
+        Name of the environment variable holding the secret.
+    logger : logging.Logger
+        Logger used to emit warnings when the secret is missing.
+
+    Returns
+    -------
+    str
+        The secret value, either read from the environment or newly generated.
+    """
+    secret = os.environ.get(var_name)
+    if secret is None:
+        logger.warning(f"No secret key was provided for {var_name}.")
+        logger.info(f"Set one with the '{var_name}' environment variable or let the server generate a random one.")
+        secret = secrets.token_urlsafe(32)
+    return secret
+
+def _configure_app(secret_key: str | None = None, ssl: bool = False) -> Flask:
+    """
+    Create and configure a Flask application instance.
+
+    Parameters
+    ----------
+    secret_key : str | None, optional
+        Secret key used for session signing. If ``None`` a random key is generated.
+    ssl : bool, optional
+        Whether the app should enforce HTTPS for secure cookies.
+
+    Returns
+    -------
+    Flask
+        The configured Flask application.
+    """
+    app = Flask(__name__)
+    CORS(app)  # Enable Cross-Origin Resource Sharing
+    app.config.update(
+        SECRET_KEY=secret_key,
+        SESSION_COOKIE_SECURE=ssl,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Strict",
+    )
+    return app
+
+
+def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger) -> Api:
+    """
+    Attach a :class:`flask_restful.Api` to *app* and configure proxy handling.
+
+    Parameters
+    ----------
+    app : Flask
+        The Flask application to extend.
+    proxy : bool
+        Whether the server is behind a reverse proxy.
+    url_prefix : str
+        URL prefix for all endpoints when using a proxy.
+
+    Returns
+    -------
+    Api
+        The configured API instance.
+    """
+    if proxy:
+        logger.info("Setting up Flask application with proxy support...")
+        api = Api(app, prefix=url_prefix)
+        logger.info(f"Using prefix '{url_prefix}' for all RESTful endpoints.")
+        # App is behind one proxy that sets the X-Forwarded-* headers.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
+    else:
+        api = Api(app)
+    return api
+
+
+def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str, Path]],
+                         logger: logging.Logger) -> Path:
+    """
+    Create a temporary test database, optionally populated with toy data.
+
+    Parameters
+    ----------
+    empty : bool
+        If ``True`` create an empty database.
+    models : bool
+        If ``True`` include pretrained CNN models.
+    db_path : Optional[Union[str, Path]]
+        Existing database location or ``None`` to let :func:`test_database` create a temp folder.
+
+    Returns
+    -------
+    Path
+        Path to the created test database.
+
+    Raises
+    ------
+    RuntimeError
+        If the test database could not be created.
+    """
+    if empty:
+        logger.info("Setting up a temporary test database without any datasets or configurations...")
+        db_path = test_database(None, db_path=db_path).path()
+    else:
+        logger.info("Setting up a temporary test database with sample datasets and configurations...")
+        db_path = test_database(
+            DATASET,
+            db_path=db_path,
+            with_configs=True,
+            with_models=models,
+        ).path()
+    return Path(db_path)
+
+
+def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
+    """
+    Register all RESTful resources with the Flask-RESTful API.
+
+    Parameters
+    ----------
+    api : Api
+        The Flask-RESTful API instance.
+    db : FSDB
+        The database connection.
+    logger : logging.Logger
+        Logger instance for debugging.
+    """
+    api.add_resource(Home, "/")
+    api.add_resource(HealthCheck, "/health", resource_class_args=(db,))
+    api.add_resource(ScansList, "/scans", resource_class_args=(db,))
+    api.add_resource(ScansTable, "/scans_info", resource_class_args=(db, logger))
+    api.add_resource(Scan, "/scans/<string:scan_id>", resource_class_args=(db, logger))
+    api.add_resource(File, "/files/<path:path>", resource_class_args=(db,))
+    api.add_resource(DatasetFile, "/files/<string:scan_id>", resource_class_args=(db,))
+    api.add_resource(Refresh, "/refresh", resource_class_args=(db,))
+    api.add_resource(
+        Image,
+        "/image/<string:scan_id>/<string:fileset_id>/<string:file_id>",
+        resource_class_args=(db,),
+    )
+    api.add_resource(
+        PointCloud,
+        "/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>",
+        resource_class_args=(db,),
+    )
+    api.add_resource(
+        PointCloudGroundTruth,
+        "/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>",
+        resource_class_args=(db,),
+    )
+    api.add_resource(
+        Mesh,
+        "/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>",
+        resource_class_args=(db,),
+    )
+    api.add_resource(CurveSkeleton, "/skeleton/<string:scan_id>", resource_class_args=(db,))
+    api.add_resource(Sequence, "/sequence/<string:scan_id>", resource_class_args=(db, logger))
+    api.add_resource(Archive, "/archive/<string:scan_id>", resource_class_args=(db, logger))
+    # User-oriented endpoints
+    api.add_resource(Register, "/register", resource_class_args=(db,))
+    api.add_resource(Login, "/login", resource_class_args=(db,))
+    api.add_resource(Logout, "/logout", resource_class_args=(db, logger))
+    api.add_resource(TokenRefresh, "/token-refresh", resource_class_args=(db,))
+    api.add_resource(TokenValidation, "/token-validation", resource_class_args=(db, logger))
+    # Scan CRUD
+    api.add_resource(ScanCreate, "/api/scan", resource_class_args=(db, logger))
+    api.add_resource(ScanMetadata, "/api/scan/<string:scan_id>/metadata", resource_class_args=(db, logger))
+    api.add_resource(ScanFilesets, "/api/scan/<string:scan_id>/filesets", resource_class_args=(db, logger))
+    # Fileset CRUD
+    api.add_resource(FilesetCreate, "/api/fileset", resource_class_args=(db, logger))
+    api.add_resource(
+        FilesetMetadata,
+        "/api/fileset/<string:scan_id>/<string:fileset_id>/metadata",
+        resource_class_args=(db, logger),
+    )
+    api.add_resource(
+        FilesetFiles,
+        "/api/fileset/<string:scan_id>/<string:fileset_id>/files",
+        resource_class_args=(db, logger),
+    )
+    # File CRUD
+    api.add_resource(FileCreate, "/api/file", resource_class_args=(db, logger))
+    api.add_resource(
+        FileMetadata,
+        "/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
+        resource_class_args=(db, logger),
+    )
 
 
 def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefix: str = "", ssl: bool = False,
@@ -198,140 +390,74 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
         A boolean flag to specify whether the test database should be populated with trained CNN models.
         Defaults to ``False``.
     """
-    # Instantiate the logger:
     wlogger = logging.getLogger('werkzeug')
-    logger = get_logger('fsdb_rest_api', log_level=log_level)
+    logger = get_logger("fsdb_rest_api", log_level=log_level)
 
-    # Instantiate the Flask application:
-    app = Flask(__name__)
-    CORS(app)  # Enable Cross-Origin Resource Sharing for the app
-    if proxy:
-        logger.info(f"Setting up Flask application with proxy support...")
-        api = Api(app, prefix=url_prefix)
-        logger.info(f"Using prefix '{url_prefix}' for all RESTful endpoints.")
-        # App is behind one proxy that sets the -For and -Host headers.
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
-    else:
-        api = Api(app)  # Initialize API without proxy settings
+    # 1 - Application and API configuration
+    secret_key = _get_env_secret("FLASK_SECRET_KEY", logger)
+    app = _configure_app(secret_key, ssl=ssl)
+    api = _configure_api(app, proxy, url_prefix, logger)
 
-    # Set secure cookies
-    app.config.update(
-        SECRET_KEY=os.environ.get('FLASK_SECRET_KEY', secrets.token_urlsafe(32)),
-        SESSION_COOKIE_SECURE=ssl,  # Only send cookies over HTTPS if `ssl=True` (useful during tests)
-        SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access
-        SESSION_COOKIE_SAMESITE='Strict'  # CSRF protection
+    # 2 - Handle test mode
+    if test:
+        db_path = _setup_test_database(empty=empty, models=models, db_path=db_path, logger=logger)
+
+        def _cleanup() -> None:
+            logger.info(f"Cleaning up temporary database directory at '{db_path}'.")
+            try:
+                shutil.rmtree(db_path)
+                logger.info("Temporary directory removed.")
+            except OSError as exc:
+                logger.error(f"Error removing temporary directory: {exc!s}")
+
+        atexit.register(_cleanup)
+
+    # 3 - Validate path
+    if not db_path:
+        logger.error(
+            "No path to the local PlantDB was specified; aborting startup."
+        )
+        logger.info(
+            "Set the environment variable 'ROMI_DB' or use the '--db_location' CLI argument."
+        )
+        sleep(1)
+        sys.exit("Wrong database location!")
+
+    # 4 - Database connection
+    jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
+    db = FSDB(
+        db_path,
+        session_manager=JWTSessionManager(secret_key=jwt_key),
+    )
+    logger.info(f"Connecting to local plant database at '{db.path()}'.")
+    db.connect()
+    logger.info(
+        f"Found {len(db.list_scans(owner_only=False))} scans to serve in the local database."
     )
 
-    if test:
-        if empty:
-            logger.info(f"Setting up a temporary test database without any datasets or configurations...")
-            # Create an empty test database
-            db_path = test_database(None, db_path=db_path).path()
-        else:
-            logger.info(f"Setting up a temporary test database with sample datasets and configurations...")
-            # Create a populated test database
-            db_path = test_database(DATASET, db_path=db_path, with_configs=True, with_models=models).path()
-
-        # Register cleanup if a temporary database was created
-        def cleanup():
-            logger.info(f"Cleaning up temporary database directory at '{db_path}'...")
-            try:
-                shutil.rmtree(db_path)  # Remove the temporary database directory
-                logger.info(f"Successfully removed temporary directory at '{db_path}'.")
-            except OSError as e:
-                logger.error(f"Error removing temporary directory: {e}.")  # Log any errors during cleanup
-
-        atexit.register(cleanup)
-
-    # Make sure we can serve a DB at this location
-    if not db_path:
-        logger.error("Can't serve a local PlantDB as no path to the database was specified!")
-        logger.info(
-            "To specify the location of the local database to serve, either set the environment variable 'ROMI_DB' or use the `-db` or `--db_location` option.")
-        sleep(1)
-        sys.exit("Wrong database location!")  # Exit with an error message if no database path is provided
-
-    # Connect to the database:
-    db = FSDB(db_path, session_manager=JWTSessionManager(secret_key=os.environ.get('JWT_SECRET_KEY', None)))
-    logger.info(f"Connecting to local plant database located at '{db.path()}'...")
-    db.connect()
-    logger.info(f"Found {len(db.list_scans(owner_only=False))} scans dataset to serve in local plant database.")
-
-    # Initialize RESTful resources to serve:
-    api.add_resource(Home, '/')
-    api.add_resource(HealthCheck, '/health',
-                     resource_class_args=tuple([db]))
-    api.add_resource(ScansList, '/scans',
-                     resource_class_args=tuple([db]))
-    api.add_resource(ScansTable, '/scans_info',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(Scan, '/scans/<string:scan_id>',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(File, '/files/<path:path>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(DatasetFile, '/files/<string:scan_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Refresh, '/refresh',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Image, '/image/<string:scan_id>/<string:fileset_id>/<string:file_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(PointCloud, '/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(PointCloudGroundTruth, '/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Mesh, '/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(CurveSkeleton, '/skeleton/<string:scan_id>',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Sequence, '/sequence/<string:scan_id>',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(Archive, '/archive/<string:scan_id>',
-                     resource_class_args=tuple([db, logger]))
-    # User-oriented endpoints
-    api.add_resource(Register, '/register',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Login, '/login',
-                     resource_class_args=tuple([db]))
-    api.add_resource(Logout, '/logout',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(TokenRefresh, '/token-refresh',
-                     resource_class_args=tuple([db]))
-    api.add_resource(TokenValidation, '/token-validation',
-                     resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.commons.fsdb.core.Scan`:
-    api.add_resource(ScanCreate, '/api/scan',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(ScanMetadata, '/api/scan/<string:scan_id>/metadata',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(ScanFilesets, '/api/scan/<string:scan_id>/filesets',
-                     resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.commons.fsdb.core.Fileset`:
-    api.add_resource(FilesetCreate, '/api/fileset',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(FilesetMetadata, '/api/fileset/<string:scan_id>/<string:fileset_id>/metadata',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(FilesetFiles, '/api/fileset/<string:scan_id>/<string:fileset_id>/files',
-                     resource_class_args=tuple([db, logger]))
-    # API endpoints for `plantdb.commons.fsdb.core.File`:
-    api.add_resource(FileCreate, '/api/file',
-                     resource_class_args=tuple([db, logger]))
-    api.add_resource(FileMetadata, '/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata',
-                     resource_class_args=tuple([db, logger]))
+    # 5 - Register resources
+    _register_resources(api, db, logger)
 
     return app
 
 
 def main():
-    """Main function to initialize and execute the REST API server.
+    """Entry point for the REST API server.
 
-    This function utilizes argument parsing to extract user-provided input values
-    for configuring and running the REST API server.
+    Parses command line arguments, builds the Flask application, and starts the development server
+    with the supplied host/port and debug settings.
     """
     parser = parsing()
     args = parser.parse_args()
 
-    app = rest_api(args.db_location, proxy=args.proxy, log_level=args.log_level, test=args.test, empty=args.empty,
-                   models=args.models)
+    app = rest_api(
+        db_path=args.db_location,
+        proxy=args.proxy,
+        log_level=args.log_level,
+        test=args.test,
+        empty=args.empty,
+        models=args.models,
+    )
     # Start the Flask application:
     app.run(host=args.host, port=args.port, debug=args.debug)
 
