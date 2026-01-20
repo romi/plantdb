@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -3453,8 +3453,7 @@ This client handles various operations related to scan management, image process
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
@@ -3490,7 +3489,8 @@ This client handles various operations related to scan management, image process
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">532</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">archive_url</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">533</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">archive_url</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Generates a formatted URL for accessing the archive of a specific dataset.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3681,7 +3681,8 @@ This client handles various operations related to scan management, image process
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2020</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2019</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2020</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2021</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2022</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2023</span>
@@ -3723,8 +3724,7 @@ This client handles various operations related to scan management, image process
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2059</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2060</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2061</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2062</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2063</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_angles_and_internodes_data</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2062</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_angles_and_internodes_data</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return a dictionary with &#39;angles&#39; and &#39;internodes&#39; data for selected dataset, if it exists.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -3919,7 +3919,8 @@ This client handles various operations related to scan management, image process
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1983</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1982</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1983</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1984</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1985</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1986</span>
@@ -3952,8 +3953,7 @@ This client handles various operations related to scan management, image process
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2013</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2014</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2015</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2016</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2017</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_reconstruction_config</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;pipeline.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2016</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_reconstruction_config</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;pipeline.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the reconstruction configuration for selected dataset, if it exists.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4139,7 +4139,8 @@ This client handles various operations related to scan management, image process
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1946</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1945</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1946</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1947</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1948</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1949</span>
@@ -4172,8 +4173,7 @@ This client handles various operations related to scan management, image process
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1976</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1977</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1978</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1979</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1980</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan_config</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;scan.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1979</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_scan_config</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;scan.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the scan configuration for selected dataset, if it exists.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4399,8 +4399,7 @@ If not specified, fetch it from the REST API.</p>
 
 <details class="see-also" open>
   <summary>See Also</summary>
-  <p>plantdb.server.rest_api.filesUri_task_mapping
-plantdb.client.rest_api.parse_task_requests_data</p>
+  <p>plantdb.client.rest_api.parse_task_requests_data</p>
 </details>
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4475,8 +4474,7 @@ plantdb.client.rest_api.parse_task_requests_data</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1882</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1883</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1884</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1885</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1886</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_data</span>(host, scan_id, task, filename<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, api_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1885</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_task_data</span>(host, scan_id, task, filename<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, api_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the data corresponding to a `dataset/task/filename`.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4510,7 +4508,6 @@ plantdb.client.rest_api.parse_task_requests_data</p>
 
 <span style="color: #BA2121; font-style: italic">    See Also</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
-<span style="color: #BA2121; font-style: italic">    plantdb.server.rest_api.filesUri_task_mapping</span>
 <span style="color: #BA2121; font-style: italic">    plantdb.client.rest_api.parse_task_requests_data</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
@@ -4688,7 +4685,8 @@ plantdb.client.rest_api.parse_task_requests_data</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1909</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1908</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1909</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1910</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1911</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1912</span>
@@ -4721,8 +4719,7 @@ plantdb.client.rest_api.parse_task_requests_data</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1939</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1940</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1941</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1942</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1943</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_toml_file</span>(host, scan_id, file_path, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1942</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_toml_file</span>(host, scan_id, file_path, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return a loaded TOML file for selected dataset, if it exists.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4945,8 +4942,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">638</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">639</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">639</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">640</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">641</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">642</span>
@@ -4993,7 +4989,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">683</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">684</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">685</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">686</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_task_images_uri</span>(host, scan_id, task_name<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">686</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">687</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">list_task_images_uri</span>(host, scan_id, task_name<span style="color: #666">=</span><span style="color: #BA2121">&#39;images&#39;</span>, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of images URI for a given dataset and task name.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -5180,8 +5177,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">156</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">157</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">158</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">159</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">160</span>
@@ -5216,7 +5212,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">191</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">login_url</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">login_url</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Generate the full URL for the PlantDB API login endpoint.</span>
 
@@ -5391,8 +5388,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
@@ -5427,7 +5423,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">logout_url</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">232</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">logout_url</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Generate the full URL for the PlantDB API logoutn endpoint.</span>
 
@@ -5735,8 +5732,7 @@ It passes keyword arguments to the underlying <code>requests</code> library.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">693</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">694</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">694</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">695</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">696</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">697</span>
@@ -5830,7 +5826,8 @@ It passes keyword arguments to the underlying <code>requests</code> library.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">785</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">786</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">787</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">788</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">make_api_request</span>(url, method<span style="color: #666">=</span><span style="color: #BA2121">&quot;GET&quot;</span>, params<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, json_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">788</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">789</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">make_api_request</span>(url, method<span style="color: #666">=</span><span style="color: #BA2121">&quot;GET&quot;</span>, params<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, json_data<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>,
                      allow_redirects<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Function to make an API request with various HTTP methods and options.</span>
@@ -7398,8 +7395,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">106</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">107</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">108</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">109</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">110</span>
@@ -7445,7 +7441,8 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">150</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">151</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">152</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">plantdb_url</span>(host, port<span style="color: #666">=</span>PLANTDB_API_PORT, prefix<span style="color: #666">=</span>PLANTDB_API_PREFIX, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">str</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">153</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">154</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">plantdb_url</span>(host, port<span style="color: #666">=</span>PLANTDB_API_PORT, prefix<span style="color: #666">=</span>PLANTDB_API_PREFIX, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> <span style="color: #008000">str</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Generates the URL for the PlantDB REST API using the specified host and port.</span>
 
@@ -7645,8 +7642,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">457</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">458</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">458</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">459</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">460</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
@@ -7681,7 +7677,8 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">refresh_url</span>(host, scan_id<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">refresh_url</span>(host, scan_id<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Generates a formatted URL for refreshing a specific dataset or the entire database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -7856,8 +7853,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
@@ -7892,7 +7888,8 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">267</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">register_url</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">register_url</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Generate the full URL for the PlantDB API register endpoint.</span>
 
@@ -8857,8 +8854,7 @@ In successful cases this will include tokens or user metadata.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">847</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">848</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">848</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">849</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">850</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">851</span>
@@ -8903,7 +8899,8 @@ In successful cases this will include tokens or user metadata.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">890</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">891</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">892</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">893</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_check_username</span>(host, username, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">893</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">894</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_check_username</span>(host, username, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Send a username availability request to the authentication service.</span>
 
@@ -9492,8 +9489,7 @@ In successful cases this will include tokens or user metadata.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">791</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">792</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">792</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">793</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">794</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">795</span>
@@ -9545,7 +9541,8 @@ In successful cases this will include tokens or user metadata.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">841</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">842</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">843</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">844</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_login</span>(host, username, password, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">844</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">845</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_login</span>(host, username, password, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Send a login request to the authentication service.</span>
 
@@ -9757,8 +9754,7 @@ function.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">896</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">897</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">897</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">898</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">899</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">900</span>
@@ -9802,7 +9798,8 @@ function.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">938</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">939</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">940</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">941</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_logout</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">941</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">942</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_logout</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Send a logout request to the authentication service.</span>
 
@@ -10058,8 +10055,7 @@ should be handled securely (e.g., over HTTPS).</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 944</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 945</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 945</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 946</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 947</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 948</span>
@@ -10114,7 +10110,8 @@ should be handled securely (e.g., over HTTPS).</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 997</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 998</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;"> 999</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1000</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_new_user</span>(host, username, password, fullname, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1000</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1001</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_new_user</span>(host, username, password, fullname, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Send a registration request to the authentication service.</span>
 
@@ -10598,8 +10595,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1073</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1074</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1074</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1075</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1076</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1077</span>
@@ -10679,7 +10675,6 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(scan_data[&#39;hasColmap&#39;])</span>
 <span style="color: #BA2121; font-style: italic">    False</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> sanitize_name
     scan_id <span style="color: #666">=</span> sanitize_name(scan_id)
     url <span style="color: #666">=</span> scan_url(host, scan_id, <span style="color: #666">**</span>kwargs)
     response <span style="color: #666">=</span> make_api_request(url<span style="color: #666">=</span>url, session_token<span style="color: #666">=</span>kwargs<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;session_token&#39;</span>, <span style="color: #008000; font-weight: bold">None</span>))
@@ -11143,8 +11138,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1003</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1004</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1004</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1005</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1006</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1007</span>
@@ -11177,7 +11171,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1034</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1035</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1036</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1037</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_scan_names_list</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1037</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1038</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_scan_names_list</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the list of the scan datasets names served by the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -11574,8 +11569,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1040</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1041</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1041</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1042</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1043</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1044</span>
@@ -11604,7 +11598,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1067</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1068</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1069</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1070</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_scans_info</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1070</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1071</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">request_scans_info</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Retrieve the information dictionary for all scans from the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Other Parameters</span>
@@ -11801,8 +11796,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">566</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">567</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">567</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">568</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">569</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">570</span>
@@ -11835,7 +11829,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_config_url</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;scan.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_config_url</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;scan.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the scan URL to access the scanning configuration file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -12027,8 +12022,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">539</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">540</span>
@@ -12054,7 +12048,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">560</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">561</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">562</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">563</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_file_url</span>(host, scan_id, file_path, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">563</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">564</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_file_url</span>(host, scan_id, file_path, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Build the URL for accessing a dataset file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -12284,8 +12279,7 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
@@ -12328,7 +12322,8 @@ Else, should be a string, defaulting to <code>'orig'</code>, and it works as fol
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">453</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">454</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_image_url</span>(host, scan_id, fileset_id, file_id, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">454</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">455</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_image_url</span>(host, scan_id, fileset_id, file_id, size<span style="color: #666">=</span><span style="color: #BA2121">&#39;orig&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the URL to the image for a scan dataset and task fileset served by the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -12554,8 +12549,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
@@ -12614,7 +12608,8 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_preview_image_url</span>(host, scan_id, size<span style="color: #666">=</span><span style="color: #BA2121">&quot;thumb&quot;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_preview_image_url</span>(host, scan_id, size<span style="color: #666">=</span><span style="color: #BA2121">&quot;thumb&quot;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Get the URL to the preview image for a scan dataset served by the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -12825,8 +12820,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">605</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">607</span>
@@ -12857,7 +12851,8 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">632</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">633</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">634</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">635</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_reconstruction_url</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;pipeline.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">635</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">636</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_reconstruction_url</span>(host, scan_id, cfg_fname<span style="color: #666">=</span><span style="color: #BA2121">&#39;pipeline.toml&#39;</span>, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Return the scan URL to access the reconstruction configuration file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -13024,8 +13019,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
@@ -13055,7 +13049,8 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">341</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">342</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">343</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_url</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">344</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">345</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scan_url</span>(host, scan_id, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Generates the URL pointing to the scan JSON from the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -13223,8 +13218,7 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 
             <details class="quote">
               <summary>Source code in <code>plantdb/client/rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
@@ -13259,7 +13253,8 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scans_url</span>(host, <span style="color: #666">**</span>kwargs):
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">scans_url</span>(host, <span style="color: #666">**</span>kwargs):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Generates the URL listing the scans from the PlantDB REST API.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -13411,10 +13406,10 @@ Else, should be a string, defaulting to <code>'thumb'</code>, and it works as fo
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="../../../assets/_markdown_exec_pyodide.js"></script>
       

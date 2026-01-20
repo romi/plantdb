@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -2430,36 +2430,48 @@ The server enables users to query and manage plant scans, images, point clouds, 
 
     <div class="doc doc-contents ">
 
-        <p>Main function to initialize and execute the REST API server.</p>
-<p>This function utilizes argument parsing to extract user-provided input values
-for configuring and running the REST API server.</p>
+        <p>Entry point for the REST API server.</p>
+<p>Parses command line arguments, builds the Flask application, and starts the development server
+with the supplied host/port and debug settings.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">324</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">325</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">326</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">327</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">328</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">329</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">330</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">331</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">332</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">333</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">334</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">335</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">336</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Main function to initialize and execute the REST API server.</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">446</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">452</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">453</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">454</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">455</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">456</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">457</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">458</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">459</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">460</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">461</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">462</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>():
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Entry point for the REST API server.</span>
 
-<span style="color: #BA2121; font-style: italic">    This function utilizes argument parsing to extract user-provided input values</span>
-<span style="color: #BA2121; font-style: italic">    for configuring and running the REST API server.</span>
+<span style="color: #BA2121; font-style: italic">    Parses command line arguments, builds the Flask application, and starts the development server</span>
+<span style="color: #BA2121; font-style: italic">    with the supplied host/port and debug settings.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     parser <span style="color: #666">=</span> parsing()
     args <span style="color: #666">=</span> parser<span style="color: #666">.</span>parse_args()
 
-    app <span style="color: #666">=</span> rest_api(args<span style="color: #666">.</span>db_location, proxy<span style="color: #666">=</span>args<span style="color: #666">.</span>proxy, log_level<span style="color: #666">=</span>args<span style="color: #666">.</span>log_level, test<span style="color: #666">=</span>args<span style="color: #666">.</span>test, empty<span style="color: #666">=</span>args<span style="color: #666">.</span>empty,
-                   models<span style="color: #666">=</span>args<span style="color: #666">.</span>models)
+    app <span style="color: #666">=</span> rest_api(
+        db_path<span style="color: #666">=</span>args<span style="color: #666">.</span>db_location,
+        proxy<span style="color: #666">=</span>args<span style="color: #666">.</span>proxy,
+        log_level<span style="color: #666">=</span>args<span style="color: #666">.</span>log_level,
+        test<span style="color: #666">=</span>args<span style="color: #666">.</span>test,
+        empty<span style="color: #666">=</span>args<span style="color: #666">.</span>empty,
+        models<span style="color: #666">=</span>args<span style="color: #666">.</span>models,
+    )
     <span style="color: #3D7B7B; font-style: italic"># Start the Flask application:</span>
     app<span style="color: #666">.</span>run(host<span style="color: #666">=</span>args<span style="color: #666">.</span>host, port<span style="color: #666">=</span>args<span style="color: #666">.</span>port, debug<span style="color: #666">=</span>args<span style="color: #666">.</span>debug)
 </code></pre></div></td></tr></table></div>
@@ -2509,8 +2521,7 @@ for configuring and running the REST API server.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">129</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">130</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">131</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">132</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">133</span>
@@ -2544,7 +2555,8 @@ for configuring and running the REST API server.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">161</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">162</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">163</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>() <span style="color: #666">-&gt;</span> argparse<span style="color: #666">.</span>ArgumentParser:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">164</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">165</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">parsing</span>() <span style="color: #666">-&gt;</span> argparse<span style="color: #666">.</span>ArgumentParser:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
 <span style="color: #BA2121; font-style: italic">    Create and configure an argument parser for a REST API server.</span>
 
@@ -2559,25 +2571,25 @@ for configuring and running the REST API server.</p>
 
     app_args <span style="color: #666">=</span> parser<span style="color: #666">.</span>add_argument_group(<span style="color: #BA2121">&quot;webserver arguments&quot;</span>)
     app_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;--host&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>, default<span style="color: #666">=</span><span style="color: #BA2121">&quot;0.0.0.0&quot;</span>,
-                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;the hostname to listen on, defaults to &#39;0.0.0.0&#39;.&quot;</span>)
+                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;hostname to listen on; defaults to &#39;0.0.0.0&#39;.&quot;</span>)
     app_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;--port&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">int</span>, default<span style="color: #666">=5000</span>,
-                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;the port of the webserver, defaults to &#39;5000&#39;.&quot;</span>)
+                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;port of the webserver; defaults to &#39;5000&#39;.&quot;</span>)
     app_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;--debug&#39;</span>, action<span style="color: #666">=</span><span style="color: #BA2121">&#39;store_true&#39;</span>,
                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;enable debug mode.&quot;</span>)
     app_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&#39;--proxy&#39;</span>, action<span style="color: #666">=</span><span style="color: #BA2121">&#39;store_true&#39;</span>,
-                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;use this flag when this server sits behind a reverse proxy&quot;</span>)
+                          help<span style="color: #666">=</span><span style="color: #BA2121">&quot;use when the server sits behind a reverse proxy.&quot;</span>)
 
     misc_args <span style="color: #666">=</span> parser<span style="color: #666">.</span>add_argument_group(<span style="color: #BA2121">&quot;other arguments&quot;</span>)
     misc_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&quot;--test&quot;</span>, action<span style="color: #666">=</span><span style="color: #BA2121">&#39;store_true&#39;</span>,
-                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;set up a temporary test database prior to starting the REST API.&quot;</span>)
+                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;set up a temporary test database before starting the REST API.&quot;</span>)
     misc_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&quot;--empty&quot;</span>, action<span style="color: #666">=</span><span style="color: #BA2121">&#39;store_true&#39;</span>,
-                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;the test database will not be populated with toy dataset.&quot;</span>)
+                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;do not populate the test database with toy datasets.&quot;</span>)
     misc_args<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&quot;--models&quot;</span>, action<span style="color: #666">=</span><span style="color: #BA2121">&#39;store_true&#39;</span>,
-                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;the test database will contain the trained CNN model.&quot;</span>)
+                           help<span style="color: #666">=</span><span style="color: #BA2121">&quot;include trained CNN model in the test database.&quot;</span>)
 
     log_opt <span style="color: #666">=</span> parser<span style="color: #666">.</span>add_argument_group(<span style="color: #BA2121">&quot;logging options&quot;</span>)
     log_opt<span style="color: #666">.</span>add_argument(<span style="color: #BA2121">&quot;--log-level&quot;</span>, dest<span style="color: #666">=</span><span style="color: #BA2121">&quot;log_level&quot;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>, default<span style="color: #666">=</span>DEFAULT_LOG_LEVEL, choices<span style="color: #666">=</span>LOG_LEVELS,
-                         help<span style="color: #666">=</span><span style="color: #BA2121">&quot;level of message logging, defaults to &#39;INFO&#39;.&quot;</span>)
+                         help<span style="color: #666">=</span><span style="color: #BA2121">&quot;logging level; defaults to &#39;INFO&#39;.&quot;</span>)
 
     <span style="color: #008000; font-weight: bold">return</span> parser
 </code></pre></div></td></tr></table></div>
@@ -2742,161 +2754,89 @@ Defaults to <code>False</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">167</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">168</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">169</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">170</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">171</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">172</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">173</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">174</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">175</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">176</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">177</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">178</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">179</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">180</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">181</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">182</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">183</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">184</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">185</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">186</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">187</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">188</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">189</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">190</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">191</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">192</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">193</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">194</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">195</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">196</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">197</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">198</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">199</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">200</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">201</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">202</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">203</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">204</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">205</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">206</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">207</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">208</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">209</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">210</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">211</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">212</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">213</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">214</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">215</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">216</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">217</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">218</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">219</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">220</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">221</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">222</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">223</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">224</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">225</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">226</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">227</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">228</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">229</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">230</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">231</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">232</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">233</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">234</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">235</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">236</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">237</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">238</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">239</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">240</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">241</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">242</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">243</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">244</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">245</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">246</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">247</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">248</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">249</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">250</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">251</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">252</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">253</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">254</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">255</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">256</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">257</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">258</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">259</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">260</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">261</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">262</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">263</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">264</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">265</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">266</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">267</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">268</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">269</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">270</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">271</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">272</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">273</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">274</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">275</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">276</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">277</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">278</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">279</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">280</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">281</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">282</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">283</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">284</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">285</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">286</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">287</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">288</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">289</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">290</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">291</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">292</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">293</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">294</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">295</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">296</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">297</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">298</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">299</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">300</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">301</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">302</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">303</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">304</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">305</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">306</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">307</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">308</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">309</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">310</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">311</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">312</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">313</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">314</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">315</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">316</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">317</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">318</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">319</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">320</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">321</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_path: Optional[Union[<span style="color: #008000">str</span>, Path]], proxy: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, url_prefix: <span style="color: #008000">str</span> <span style="color: #666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, ssl: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">359</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">360</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">361</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">362</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">363</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">364</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">365</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">366</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">367</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">368</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">369</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">370</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">371</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">372</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">373</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">374</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">375</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">381</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">384</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">385</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">386</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">387</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">388</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">389</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">390</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">391</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">392</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">393</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">394</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">395</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">396</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">397</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">398</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">399</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">400</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">401</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">402</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">403</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">404</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">405</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">406</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">407</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">408</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">409</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">410</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">411</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">412</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">413</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">414</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">415</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">416</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">417</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">418</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">419</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">420</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">421</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">422</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">423</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">424</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">425</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">426</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">427</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">428</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">429</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">430</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">431</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">432</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">433</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">434</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">435</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">436</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">437</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">438</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">439</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">440</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">441</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(db_path: Optional[Union[<span style="color: #008000">str</span>, Path]], proxy: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, url_prefix: <span style="color: #008000">str</span> <span style="color: #666">=</span> <span style="color: #BA2121">&quot;&quot;</span>, ssl: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
              log_level: <span style="color: #008000">str</span> <span style="color: #666">=</span> DEFAULT_LOG_LEVEL, test: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, empty: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
              models: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> Flask:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Initialize and configure a RESTful API server for Plant Database querying.</span>
@@ -2930,125 +2870,53 @@ Defaults to <code>False</code>.</p>
 <span style="color: #BA2121; font-style: italic">        A boolean flag to specify whether the test database should be populated with trained CNN models.</span>
 <span style="color: #BA2121; font-style: italic">        Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    <span style="color: #3D7B7B; font-style: italic"># Instantiate the logger:</span>
     wlogger <span style="color: #666">=</span> logging<span style="color: #666">.</span>getLogger(<span style="color: #BA2121">&#39;werkzeug&#39;</span>)
-    logger <span style="color: #666">=</span> get_logger(<span style="color: #BA2121">&#39;fsdb_rest_api&#39;</span>, log_level<span style="color: #666">=</span>log_level)
+    logger <span style="color: #666">=</span> get_logger(<span style="color: #BA2121">&quot;fsdb_rest_api&quot;</span>, log_level<span style="color: #666">=</span>log_level)
 
-    <span style="color: #3D7B7B; font-style: italic"># Instantiate the Flask application:</span>
-    app <span style="color: #666">=</span> Flask(<span style="color: #19177C">__name__</span>)
-    CORS(app)  <span style="color: #3D7B7B; font-style: italic"># Enable Cross-Origin Resource Sharing for the app</span>
-    <span style="color: #008000; font-weight: bold">if</span> proxy:
-        logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up Flask application with proxy support...&quot;</span>)
-        api <span style="color: #666">=</span> Api(app, prefix<span style="color: #666">=</span>url_prefix)
-        logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Using prefix &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>url_prefix<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; for all RESTful endpoints.&quot;</span>)
-        <span style="color: #3D7B7B; font-style: italic"># App is behind one proxy that sets the -For and -Host headers.</span>
-        app<span style="color: #666">.</span>wsgi_app <span style="color: #666">=</span> ProxyFix(app<span style="color: #666">.</span>wsgi_app, x_for<span style="color: #666">=1</span>, x_host<span style="color: #666">=1</span>, x_proto<span style="color: #666">=1</span>)
-    <span style="color: #008000; font-weight: bold">else</span>:
-        api <span style="color: #666">=</span> Api(app)  <span style="color: #3D7B7B; font-style: italic"># Initialize API without proxy settings</span>
+    <span style="color: #3D7B7B; font-style: italic"># 1 - Application and API configuration</span>
+    secret_key <span style="color: #666">=</span> _get_env_secret(<span style="color: #BA2121">&quot;FLASK_SECRET_KEY&quot;</span>, logger)
+    app <span style="color: #666">=</span> _configure_app(secret_key, ssl<span style="color: #666">=</span>ssl)
+    api <span style="color: #666">=</span> _configure_api(app, proxy, url_prefix, logger)
 
-    <span style="color: #3D7B7B; font-style: italic"># Set secure cookies</span>
-    app<span style="color: #666">.</span>config<span style="color: #666">.</span>update(
-        SECRET_KEY<span style="color: #666">=</span>os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;FLASK_SECRET_KEY&#39;</span>, secrets<span style="color: #666">.</span>token_urlsafe(<span style="color: #666">32</span>)),
-        SESSION_COOKIE_SECURE<span style="color: #666">=</span>ssl,  <span style="color: #3D7B7B; font-style: italic"># Only send cookies over HTTPS if `ssl=True` (useful during tests)</span>
-        SESSION_COOKIE_HTTPONLY<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,  <span style="color: #3D7B7B; font-style: italic"># Prevent JavaScript access</span>
-        SESSION_COOKIE_SAMESITE<span style="color: #666">=</span><span style="color: #BA2121">&#39;Strict&#39;</span>  <span style="color: #3D7B7B; font-style: italic"># CSRF protection</span>
+    <span style="color: #3D7B7B; font-style: italic"># 2 - Handle test mode</span>
+    <span style="color: #008000; font-weight: bold">if</span> test:
+        db_path <span style="color: #666">=</span> _setup_test_database(empty<span style="color: #666">=</span>empty, models<span style="color: #666">=</span>models, db_path<span style="color: #666">=</span>db_path, logger<span style="color: #666">=</span>logger)
+
+        <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">_cleanup</span>() <span style="color: #666">-&gt;</span> <span style="color: #008000; font-weight: bold">None</span>:
+            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Cleaning up temporary database directory at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
+            <span style="color: #008000; font-weight: bold">try</span>:
+                shutil<span style="color: #666">.</span>rmtree(db_path)
+                logger<span style="color: #666">.</span>info(<span style="color: #BA2121">&quot;Temporary directory removed.&quot;</span>)
+            <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">OSError</span> <span style="color: #008000; font-weight: bold">as</span> exc:
+                logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Error removing temporary directory: </span><span style="color: #A45A77; font-weight: bold">{</span>exc<span style="color: #A45A77; font-weight: bold">!s}</span><span style="color: #BA2121">&quot;</span>)
+
+        atexit<span style="color: #666">.</span>register(_cleanup)
+
+    <span style="color: #3D7B7B; font-style: italic"># 3 - Validate path</span>
+    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> db_path:
+        logger<span style="color: #666">.</span>error(
+            <span style="color: #BA2121">&quot;No path to the local PlantDB was specified; aborting startup.&quot;</span>
+        )
+        logger<span style="color: #666">.</span>info(
+            <span style="color: #BA2121">&quot;Set the environment variable &#39;ROMI_DB&#39; or use the &#39;--db_location&#39; CLI argument.&quot;</span>
+        )
+        sleep(<span style="color: #666">1</span>)
+        sys<span style="color: #666">.</span>exit(<span style="color: #BA2121">&quot;Wrong database location!&quot;</span>)
+
+    <span style="color: #3D7B7B; font-style: italic"># 4 - Database connection</span>
+    jwt_key <span style="color: #666">=</span> _get_env_secret(<span style="color: #BA2121">&quot;JWT_SECRET_KEY&quot;</span>, logger)
+    db <span style="color: #666">=</span> FSDB(
+        db_path,
+        session_manager<span style="color: #666">=</span>JWTSessionManager(secret_key<span style="color: #666">=</span>jwt_key),
+    )
+    logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Connecting to local plant database at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
+    db<span style="color: #666">.</span>connect()
+    logger<span style="color: #666">.</span>info(
+        <span style="color: #BA2121">f&quot;Found </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans to serve in the local database.&quot;</span>
     )
 
-    <span style="color: #008000; font-weight: bold">if</span> test:
-        <span style="color: #008000; font-weight: bold">if</span> empty:
-            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up a temporary test database without any datasets or configurations...&quot;</span>)
-            <span style="color: #3D7B7B; font-style: italic"># Create an empty test database</span>
-            db_path <span style="color: #666">=</span> test_database(<span style="color: #008000; font-weight: bold">None</span>, db_path<span style="color: #666">=</span>db_path)<span style="color: #666">.</span>path()
-        <span style="color: #008000; font-weight: bold">else</span>:
-            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Setting up a temporary test database with sample datasets and configurations...&quot;</span>)
-            <span style="color: #3D7B7B; font-style: italic"># Create a populated test database</span>
-            db_path <span style="color: #666">=</span> test_database(DATASET, db_path<span style="color: #666">=</span>db_path, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, with_models<span style="color: #666">=</span>models)<span style="color: #666">.</span>path()
-
-        <span style="color: #3D7B7B; font-style: italic"># Register cleanup if a temporary database was created</span>
-        <span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">cleanup</span>():
-            logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Cleaning up temporary database directory at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
-            <span style="color: #008000; font-weight: bold">try</span>:
-                shutil<span style="color: #666">.</span>rmtree(db_path)  <span style="color: #3D7B7B; font-style: italic"># Remove the temporary database directory</span>
-                logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Successfully removed temporary directory at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db_path<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;.&quot;</span>)
-            <span style="color: #008000; font-weight: bold">except</span> <span style="color: #CB3F38; font-weight: bold">OSError</span> <span style="color: #008000; font-weight: bold">as</span> e:
-                logger<span style="color: #666">.</span>error(<span style="color: #BA2121">f&quot;Error removing temporary directory: </span><span style="color: #A45A77; font-weight: bold">{</span>e<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">.&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Log any errors during cleanup</span>
-
-        atexit<span style="color: #666">.</span>register(cleanup)
-
-    <span style="color: #3D7B7B; font-style: italic"># Make sure we can serve a DB at this location</span>
-    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> db_path:
-        logger<span style="color: #666">.</span>error(<span style="color: #BA2121">&quot;Can&#39;t serve a local PlantDB as no path to the database was specified!&quot;</span>)
-        logger<span style="color: #666">.</span>info(
-            <span style="color: #BA2121">&quot;To specify the location of the local database to serve, either set the environment variable &#39;ROMI_DB&#39; or use the `-db` or `--db_location` option.&quot;</span>)
-        sleep(<span style="color: #666">1</span>)
-        sys<span style="color: #666">.</span>exit(<span style="color: #BA2121">&quot;Wrong database location!&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Exit with an error message if no database path is provided</span>
-
-    <span style="color: #3D7B7B; font-style: italic"># Connect to the database:</span>
-    db <span style="color: #666">=</span> FSDB(db_path, session_manager<span style="color: #666">=</span>JWTSessionManager(secret_key<span style="color: #666">=</span>os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;JWT_SECRET_KEY&#39;</span>, <span style="color: #008000; font-weight: bold">None</span>)))
-    logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Connecting to local plant database located at &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;...&quot;</span>)
-    db<span style="color: #666">.</span>connect()
-    logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f&quot;Found </span><span style="color: #A45A77; font-weight: bold">{</span><span style="color: #008000">len</span>(db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>))<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> scans dataset to serve in local plant database.&quot;</span>)
-
-    <span style="color: #3D7B7B; font-style: italic"># Initialize RESTful resources to serve:</span>
-    api<span style="color: #666">.</span>add_resource(Home, <span style="color: #BA2121">&#39;/&#39;</span>)
-    api<span style="color: #666">.</span>add_resource(HealthCheck, <span style="color: #BA2121">&#39;/health&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(ScansList, <span style="color: #BA2121">&#39;/scans&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(ScansTable, <span style="color: #BA2121">&#39;/scans_info&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(Scan, <span style="color: #BA2121">&#39;/scans/&lt;string:scan_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(File, <span style="color: #BA2121">&#39;/files/&lt;path:path&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(DatasetFile, <span style="color: #BA2121">&#39;/files/&lt;string:scan_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Refresh, <span style="color: #BA2121">&#39;/refresh&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Image, <span style="color: #BA2121">&#39;/image/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/&lt;string:file_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(PointCloud, <span style="color: #BA2121">&#39;/pointcloud/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/&lt;string:file_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(PointCloudGroundTruth, <span style="color: #BA2121">&#39;/pcGroundTruth/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/&lt;string:file_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Mesh, <span style="color: #BA2121">&#39;/mesh/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/&lt;string:file_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(CurveSkeleton, <span style="color: #BA2121">&#39;/skeleton/&lt;string:scan_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Sequence, <span style="color: #BA2121">&#39;/sequence/&lt;string:scan_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(Archive, <span style="color: #BA2121">&#39;/archive/&lt;string:scan_id&gt;&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    <span style="color: #3D7B7B; font-style: italic"># User-oriented endpoints</span>
-    api<span style="color: #666">.</span>add_resource(Register, <span style="color: #BA2121">&#39;/register&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Login, <span style="color: #BA2121">&#39;/login&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(Logout, <span style="color: #BA2121">&#39;/logout&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(TokenRefresh, <span style="color: #BA2121">&#39;/token-refresh&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db]))
-    api<span style="color: #666">.</span>add_resource(TokenValidation, <span style="color: #BA2121">&#39;/token-validation&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    <span style="color: #3D7B7B; font-style: italic"># API endpoints for `plantdb.commons.fsdb.core.Scan`:</span>
-    api<span style="color: #666">.</span>add_resource(ScanCreate, <span style="color: #BA2121">&#39;/api/scan&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(ScanMetadata, <span style="color: #BA2121">&#39;/api/scan/&lt;string:scan_id&gt;/metadata&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(ScanFilesets, <span style="color: #BA2121">&#39;/api/scan/&lt;string:scan_id&gt;/filesets&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    <span style="color: #3D7B7B; font-style: italic"># API endpoints for `plantdb.commons.fsdb.core.Fileset`:</span>
-    api<span style="color: #666">.</span>add_resource(FilesetCreate, <span style="color: #BA2121">&#39;/api/fileset&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(FilesetMetadata, <span style="color: #BA2121">&#39;/api/fileset/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/metadata&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(FilesetFiles, <span style="color: #BA2121">&#39;/api/fileset/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/files&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    <span style="color: #3D7B7B; font-style: italic"># API endpoints for `plantdb.commons.fsdb.core.File`:</span>
-    api<span style="color: #666">.</span>add_resource(FileCreate, <span style="color: #BA2121">&#39;/api/file&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
-    api<span style="color: #666">.</span>add_resource(FileMetadata, <span style="color: #BA2121">&#39;/api/file/&lt;string:scan_id&gt;/&lt;string:fileset_id&gt;/&lt;string:file_id&gt;/metadata&#39;</span>,
-                     resource_class_args<span style="color: #666">=</span><span style="color: #008000">tuple</span>([db, logger]))
+    <span style="color: #3D7B7B; font-style: italic"># 5 - Register resources</span>
+    _register_resources(api, db, logger)
 
     <span style="color: #008000; font-weight: bold">return</span> app
 </code></pre></div></td></tr></table></div>
@@ -3166,10 +3034,10 @@ Defaults to <code>False</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       
