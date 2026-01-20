@@ -164,6 +164,7 @@ def parsing() -> argparse.ArgumentParser:
 
     return parser
 
+
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     """
     Retrieve a secret from the environment or generate a new one if missing.
@@ -173,7 +174,7 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     var_name : str
         Name of the environment variable holding the secret.
     logger : logging.Logger
-        Logger used to emit warnings when the secret is missing.
+        Logger instance for warning and debugging.
 
     Returns
     -------
@@ -187,14 +188,15 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
         secret = secrets.token_urlsafe(32)
     return secret
 
-def _configure_app(secret_key: str | None = None, ssl: bool = False) -> Flask:
+
+def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
     """
     Create and configure a Flask application instance.
 
     Parameters
     ----------
-    secret_key : str | None, optional
-        Secret key used for session signing. If ``None`` a random key is generated.
+    secret_key : str
+        Secret key used for session signing.
     ssl : bool, optional
         Whether the app should enforce HTTPS for secure cookies.
 
@@ -208,15 +210,14 @@ def _configure_app(secret_key: str | None = None, ssl: bool = False) -> Flask:
     app.config.update(
         SECRET_KEY=secret_key,
         SESSION_COOKIE_SECURE=ssl,
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE="Strict",
+        # SESSION_COOKIE_HTTPONLY=True,
+        # SESSION_COOKIE_SAMESITE="Strict",
     )
     return app
 
 
 def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger) -> Api:
-    """
-    Attach a :class:`flask_restful.Api` to *app* and configure proxy handling.
+    """Attach a `flask_restful.Api` to the `app` and configure proxy handling.
 
     Parameters
     ----------
@@ -226,10 +227,12 @@ def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Log
         Whether the server is behind a reverse proxy.
     url_prefix : str
         URL prefix for all endpoints when using a proxy.
+    logger : logging.Logger
+        Logger instance for warning and debugging.
 
     Returns
     -------
-    Api
+    flask_restful.Api
         The configured API instance.
     """
     if proxy:
@@ -245,8 +248,7 @@ def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Log
 
 def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str, Path]],
                          logger: logging.Logger) -> Path:
-    """
-    Create a temporary test database, optionally populated with toy data.
+    """Create a temporary test database, optionally populated with toy data.
 
     Parameters
     ----------
@@ -255,17 +257,14 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
     models : bool
         If ``True`` include pretrained CNN models.
     db_path : Optional[Union[str, Path]]
-        Existing database location or ``None`` to let :func:`test_database` create a temp folder.
+        Existing database location or ``None`` to create a temp folder.
+    logger : logging.Logger
+        Logger instance for warning and debugging.
 
     Returns
     -------
     Path
         Path to the created test database.
-
-    Raises
-    ------
-    RuntimeError
-        If the test database could not be created.
     """
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
@@ -282,8 +281,7 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
 
 
 def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
-    """
-    Register all RESTful resources with the Flask-RESTful API.
+    """Register all RESTful resources with the Flask-RESTful API.
 
     Parameters
     ----------
@@ -292,16 +290,47 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     db : FSDB
         The database connection.
     logger : logging.Logger
-        Logger instance for debugging.
+        Logger instance for warning and debugging.
     """
-    api.add_resource(Home, "/")
-    api.add_resource(HealthCheck, "/health", resource_class_args=(db,))
-    api.add_resource(ScansList, "/scans", resource_class_args=(db,))
-    api.add_resource(ScansTable, "/scans_info", resource_class_args=(db, logger))
-    api.add_resource(Scan, "/scans/<string:scan_id>", resource_class_args=(db, logger))
-    api.add_resource(File, "/files/<path:path>", resource_class_args=(db,))
-    api.add_resource(DatasetFile, "/files/<string:scan_id>", resource_class_args=(db,))
-    api.add_resource(Refresh, "/refresh", resource_class_args=(db,))
+    api.add_resource(
+        Home,
+        "/"
+    )
+    api.add_resource(
+        HealthCheck,
+        "/health",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        ScansList,
+        "/scans",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        ScansTable,
+        "/scans_info",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        Scan,
+        "/scans/<string:scan_id>",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        File,
+        "/files/<path:path>",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        DatasetFile,
+        "/files/<string:scan_id>",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        Refresh,
+        "/refresh",
+        resource_class_args=(db,)
+    )
     api.add_resource(
         Image,
         "/image/<string:scan_id>/<string:fileset_id>/<string:file_id>",
@@ -322,21 +351,69 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
         "/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>",
         resource_class_args=(db,),
     )
-    api.add_resource(CurveSkeleton, "/skeleton/<string:scan_id>", resource_class_args=(db,))
-    api.add_resource(Sequence, "/sequence/<string:scan_id>", resource_class_args=(db, logger))
-    api.add_resource(Archive, "/archive/<string:scan_id>", resource_class_args=(db, logger))
+    api.add_resource(
+        CurveSkeleton,
+        "/skeleton/<string:scan_id>",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        Sequence,
+        "/sequence/<string:scan_id>",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        Archive,
+        "/archive/<string:scan_id>",
+        resource_class_args=(db, logger)
+    )
     # User-oriented endpoints
-    api.add_resource(Register, "/register", resource_class_args=(db,))
-    api.add_resource(Login, "/login", resource_class_args=(db,))
-    api.add_resource(Logout, "/logout", resource_class_args=(db, logger))
-    api.add_resource(TokenRefresh, "/token-refresh", resource_class_args=(db,))
-    api.add_resource(TokenValidation, "/token-validation", resource_class_args=(db, logger))
+    api.add_resource(
+        Register,
+        "/register",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        Login,
+        "/login",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        Logout,
+        "/logout",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        TokenRefresh,
+        "/token-refresh",
+        resource_class_args=(db,)
+    )
+    api.add_resource(
+        TokenValidation,
+        "/token-validation",
+        resource_class_args=(db, logger)
+    )
     # Scan CRUD
-    api.add_resource(ScanCreate, "/api/scan", resource_class_args=(db, logger))
-    api.add_resource(ScanMetadata, "/api/scan/<string:scan_id>/metadata", resource_class_args=(db, logger))
-    api.add_resource(ScanFilesets, "/api/scan/<string:scan_id>/filesets", resource_class_args=(db, logger))
+    api.add_resource(
+        ScanCreate,
+        "/api/scan",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        ScanMetadata,
+        "/api/scan/<string:scan_id>/metadata",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        ScanFilesets,
+        "/api/scan/<string:scan_id>/filesets",
+        resource_class_args=(db, logger)
+    )
     # Fileset CRUD
-    api.add_resource(FilesetCreate, "/api/fileset", resource_class_args=(db, logger))
+    api.add_resource(
+        FilesetCreate,
+        "/api/fileset",
+        resource_class_args=(db, logger)
+    )
     api.add_resource(
         FilesetMetadata,
         "/api/fileset/<string:scan_id>/<string:fileset_id>/metadata",
@@ -348,7 +425,11 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
         resource_class_args=(db, logger),
     )
     # File CRUD
-    api.add_resource(FileCreate, "/api/file", resource_class_args=(db, logger))
+    api.add_resource(
+        FileCreate,
+        "/api/file",
+        resource_class_args=(db, logger)
+    )
     api.add_resource(
         FileMetadata,
         "/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
