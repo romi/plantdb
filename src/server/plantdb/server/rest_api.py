@@ -2010,7 +2010,7 @@ class Image(Resource):
         size = request.args.get('size', default='thumb', type=str)
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path, mimetype='image/jpeg')
+        return send_file(path)
 
 
 class PointCloud(Resource):
