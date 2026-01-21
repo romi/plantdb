@@ -10312,7 +10312,7 @@ plantdb.server.webcache.image_path : Image path resolution function with caching
     size <span style="color: #666">=</span> request<span style="color: #666">.</span>args<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;size&#39;</span>, default<span style="color: #666">=</span><span style="color: #BA2121">&#39;thumb&#39;</span>, <span style="color: #008000">type</span><span style="color: #666">=</span><span style="color: #008000">str</span>)
     <span style="color: #3D7B7B; font-style: italic"># Get the path to the image resource:</span>
     path <span style="color: #666">=</span> webcache<span style="color: #666">.</span>image_path(<span style="color: #008000">self</span><span style="color: #666">.</span>db, scan_id, fileset_id, file_id, size)
-    <span style="color: #008000; font-weight: bold">return</span> send_file(path, mimetype<span style="color: #666">=</span><span style="color: #BA2121">&#39;image/jpeg&#39;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> send_file(path)
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
