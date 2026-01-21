@@ -12,28 +12,28 @@
         <meta name="author" content="ROMI Team">
       
       
-        <link rel="canonical" href="https://romi.github.io/plantdb/reference/commons/fsdb/serialization/">
+        <link rel="canonical" href="https://romi.github.io/plantdb/reference/commons/auth/">
       
       
-        <link rel="prev" href="../path_helpers/">
+        <link rel="prev" href="../">
       
       
-        <link rel="next" href="../validation/">
+        <link rel="next" href="manager/">
       
       
         
       
       
-      <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
+      <link rel="icon" href="../../../assets/images/ROMI_ICON_green.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>serialization - PlantDB</title>
+        <title>auth - PlantDB</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -52,15 +52,15 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/_markdown_exec_pyodide.css">
+      <link rel="stylesheet" href="../../../assets/_markdown_exec_pyodide.css">
     
-      <link rel="stylesheet" href="../../../../assets/_markdown_exec_ansi.css">
+      <link rel="stylesheet" href="../../../assets/_markdown_exec_ansi.css">
     
-      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../../../assets/css/extra.css">
+      <link rel="stylesheet" href="../../../assets/css/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#plantdb.commons.fsdb.serialization" class="md-skip">
+        <a href="#plantdb.commons.auth" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="https://romi.github.io/plantdb/" title="PlantDB" class="md-header__button md-logo" aria-label="PlantDB" data-md-component="logo">
       
-  <img src="../../../../assets/images/ROMI_logo_white.svg" alt="logo">
+  <img src="../../../assets/images/ROMI_logo_white.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              serialization
+              auth
             
           </span>
         </div>
@@ -192,7 +192,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -211,7 +211,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../plantdb_sync/" class="md-tabs__link">
+      <a href="../../../plantdb_sync/" class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../rest_api/" class="md-tabs__link">
+      <a href="../../../rest_api/" class="md-tabs__link">
         
   
   
@@ -262,7 +262,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../" class="md-tabs__link">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -307,7 +307,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="https://romi.github.io/plantdb/" title="PlantDB" class="md-nav__button md-logo" aria-label="PlantDB" data-md-component="logo">
       
-  <img src="../../../../assets/images/ROMI_logo_white.svg" alt="logo">
+  <img src="../../../assets/images/ROMI_logo_white.svg" alt="logo">
 
     </a>
     PlantDB
@@ -334,7 +334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -361,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plantdb_sync/" class="md-nav__link">
+      <a href="../../../plantdb_sync/" class="md-nav__link">
         
   
   
@@ -388,7 +388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../rest_api/" class="md-nav__link">
+      <a href="../../../rest_api/" class="md-nav__link">
         
   
   
@@ -539,7 +539,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -578,6 +578,8 @@
                 
   
   
+    
+  
   
   
     
@@ -588,15 +590,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_1" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../auth/" class="md-nav__link ">
+            <a href="./" class="md-nav__link md-nav__link--active">
               
   
   
@@ -614,13 +616,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_1_1_1" id="__nav_4_1_1_1_label" tabindex="0">
+              <label class="md-nav__link md-nav__link--active" for="__nav_4_1_1_1" id="__nav_4_1_1_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_1_1_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -638,7 +640,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../auth/manager/" class="md-nav__link">
+      <a href="manager/" class="md-nav__link">
         
   
   
@@ -666,7 +668,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../auth/models/" class="md-nav__link">
+      <a href="models/" class="md-nav__link">
         
   
   
@@ -694,7 +696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../auth/rbac/" class="md-nav__link">
+      <a href="rbac/" class="md-nav__link">
         
   
   
@@ -722,7 +724,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../auth/session/" class="md-nav__link">
+      <a href="session/" class="md-nav__link">
         
   
   
@@ -773,7 +775,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../cli/" class="md-nav__link ">
+            <a href="../cli/" class="md-nav__link ">
               
   
   
@@ -815,7 +817,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/fsdb_check/" class="md-nav__link">
+      <a href="../cli/fsdb_check/" class="md-nav__link">
         
   
   
@@ -843,7 +845,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/fsdb_import_file/" class="md-nav__link">
+      <a href="../cli/fsdb_import_file/" class="md-nav__link">
         
   
   
@@ -871,7 +873,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/fsdb_import_folder/" class="md-nav__link">
+      <a href="../cli/fsdb_import_folder/" class="md-nav__link">
         
   
   
@@ -899,7 +901,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/fsdb_import_images/" class="md-nav__link">
+      <a href="../cli/fsdb_import_images/" class="md-nav__link">
         
   
   
@@ -927,7 +929,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/shared_fsdb/" class="md-nav__link">
+      <a href="../cli/shared_fsdb/" class="md-nav__link">
         
   
   
@@ -963,7 +965,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../db/" class="md-nav__link">
+      <a href="../db/" class="md-nav__link">
         
   
   
@@ -988,8 +990,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1000,15 +1000,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_4" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../fsdb/" class="md-nav__link ">
               
   
   
@@ -1032,7 +1032,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_1_1_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1050,7 +1050,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
+      <a href="../fsdb/core/" class="md-nav__link">
         
   
   
@@ -1078,7 +1078,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../exceptions/" class="md-nav__link">
+      <a href="../fsdb/exceptions/" class="md-nav__link">
         
   
   
@@ -1106,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../file_ops/" class="md-nav__link">
+      <a href="../fsdb/file_ops/" class="md-nav__link">
         
   
   
@@ -1134,7 +1134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fsdb_tools/" class="md-nav__link">
+      <a href="../fsdb/fsdb_tools/" class="md-nav__link">
         
   
   
@@ -1162,7 +1162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lock/" class="md-nav__link">
+      <a href="../fsdb/lock/" class="md-nav__link">
         
   
   
@@ -1190,7 +1190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../metadata/" class="md-nav__link">
+      <a href="../fsdb/metadata/" class="md-nav__link">
         
   
   
@@ -1218,7 +1218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../path_helpers/" class="md-nav__link">
+      <a href="../fsdb/path_helpers/" class="md-nav__link">
         
   
   
@@ -1243,35 +1243,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    serialization
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../fsdb/serialization/" class="md-nav__link">
         
   
   
@@ -1287,80 +1262,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;serialization
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" serialization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--filesystem-database-serialization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Filesystem Database Serialization
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Filesystem Database Serialization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--key-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Features
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--usage-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage Examples
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1373,7 +1274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../validation/" class="md-nav__link">
+      <a href="../fsdb/validation/" class="md-nav__link">
         
   
   
@@ -1409,7 +1310,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../io/" class="md-nav__link">
+      <a href="../io/" class="md-nav__link">
         
   
   
@@ -1437,7 +1338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../log/" class="md-nav__link">
+      <a href="../log/" class="md-nav__link">
         
   
   
@@ -1465,7 +1366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sshfsdb/" class="md-nav__link">
+      <a href="../sshfsdb/" class="md-nav__link">
         
   
   
@@ -1493,7 +1394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../test_database/" class="md-nav__link">
+      <a href="../test_database/" class="md-nav__link">
         
   
   
@@ -1521,7 +1422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../testing/" class="md-nav__link">
+      <a href="../testing/" class="md-nav__link">
         
   
   
@@ -1549,7 +1450,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utils/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   
@@ -1658,7 +1559,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../server/" class="md-nav__link ">
+            <a href="../../server/" class="md-nav__link ">
               
   
   
@@ -1715,7 +1616,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../server/cli/" class="md-nav__link ">
+            <a href="../../server/cli/" class="md-nav__link ">
               
   
   
@@ -1757,7 +1658,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../server/cli/fsdb_rest_api/" class="md-nav__link">
+      <a href="../../server/cli/fsdb_rest_api/" class="md-nav__link">
         
   
   
@@ -1785,7 +1686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../server/cli/wsgi/" class="md-nav__link">
+      <a href="../../server/cli/wsgi/" class="md-nav__link">
         
   
   
@@ -1821,7 +1722,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../server/rest_api/" class="md-nav__link">
+      <a href="../../server/rest_api/" class="md-nav__link">
         
   
   
@@ -1849,7 +1750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../server/test_rest_api/" class="md-nav__link">
+      <a href="../../server/test_rest_api/" class="md-nav__link">
         
   
   
@@ -1877,7 +1778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../server/webcache/" class="md-nav__link">
+      <a href="../../server/webcache/" class="md-nav__link">
         
   
   
@@ -1986,7 +1887,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../client/" class="md-nav__link ">
+            <a href="../../client/" class="md-nav__link ">
               
   
   
@@ -2028,7 +1929,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/api_endpoints/" class="md-nav__link">
+      <a href="../../client/api_endpoints/" class="md-nav__link">
         
   
   
@@ -2071,7 +1972,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../client/cli/" class="md-nav__link ">
+            <a href="../../client/cli/" class="md-nav__link ">
               
   
   
@@ -2113,7 +2014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/cli/fsdb_rest_api_sync/" class="md-nav__link">
+      <a href="../../client/cli/fsdb_rest_api_sync/" class="md-nav__link">
         
   
   
@@ -2141,7 +2042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/cli/fsdb_sync/" class="md-nav__link">
+      <a href="../../client/cli/fsdb_sync/" class="md-nav__link">
         
   
   
@@ -2177,7 +2078,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/plantdb_client/" class="md-nav__link">
+      <a href="../../client/plantdb_client/" class="md-nav__link">
         
   
   
@@ -2205,7 +2106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/rest_api/" class="md-nav__link">
+      <a href="../../client/rest_api/" class="md-nav__link">
         
   
   
@@ -2233,7 +2134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/sync/" class="md-nav__link">
+      <a href="../../client/sync/" class="md-nav__link">
         
   
   
@@ -2276,7 +2177,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../client/sync_app/" class="md-nav__link ">
+            <a href="../../client/sync_app/" class="md-nav__link ">
               
   
   
@@ -2318,7 +2219,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/sync_app/app/" class="md-nav__link">
+      <a href="../../client/sync_app/app/" class="md-nav__link">
         
   
   
@@ -2354,7 +2255,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../client/url/" class="md-nav__link">
+      <a href="../../client/url/" class="md-nav__link">
         
   
   
@@ -2423,34 +2324,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization" class="md-nav__link">
+  <a href="#plantdb.commons.auth" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;serialization
+        <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;auth
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" serialization">
+    <nav class="md-nav" aria-label=" auth">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--filesystem-database-serialization" class="md-nav__link">
+  <a href="#plantdb.commons.auth--create-a-jwt-session-manager" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Filesystem Database Serialization
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Filesystem Database Serialization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--key-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Features
+        Create a JWT session manager
       
     </span>
   </a>
@@ -2458,18 +2347,24 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#plantdb.commons.fsdb.serialization--usage-examples" class="md-nav__link">
+  <a href="#plantdb.commons.auth--manage-users-and-groups" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Usage Examples
+        Manage users and groups
       
     </span>
   </a>
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#plantdb.commons.auth--rbac-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RBAC operations
+      
+    </span>
+  </a>
   
 </li>
         
@@ -2498,63 +2393,66 @@
   
 
 
-  <h1>serialization</h1>
+  <h1>auth</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="plantdb.commons.fsdb.serialization" class="doc doc-heading">
-            <span class="doc doc-object-name doc-module-name">plantdb.commons.fsdb.serialization</span>
+<h2 id="plantdb.commons.auth" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">plantdb.commons.auth</span>
 
 
-<a href="#plantdb.commons.fsdb.serialization" class="headerlink" title="Permanent link">Link</a></h2>
+<a href="#plantdb.commons.auth" class="headerlink" title="Permanent link">Link</a></h2>
 
     <div class="doc doc-contents first">
 
-        <h3 id="plantdb.commons.fsdb.serialization--filesystem-database-serialization">Filesystem Database Serialization<a class="headerlink" href="#plantdb.commons.fsdb.serialization--filesystem-database-serialization" title="Permanent link">Link</a></h3>
-<p>This module provides functionality for serializing and deserializing filesystem database (FSDB) objects, facilitating the structured management and manipulation of files and filesets within a scan-based hierarchical storage system.</p>
-<h4 id="plantdb.commons.fsdb.serialization--key-features">Key Features<a class="headerlink" href="#plantdb.commons.fsdb.serialization--key-features" title="Permanent link">Link</a></h4>
-<ul>
-<li>Parsing and conversion of filesystem database components (Scans, Filesets, and Files)</li>
-<li>Validation of filesystem entries and their required attributes</li>
-<li>Hierarchical data structure serialization to dictionary format</li>
-<li>Error handling for missing IDs, filenames, and non-existent files</li>
-<li>Path validation and verification for filesystem integrity</li>
+        <p>Authentication and Authorization Utilities</p>
+<p>Provides a unified set of tools for managing sessions, users, groups, and fine‑grained permissions
+within the PlantDB ecosystem. By consolidating session handling, file‑based persistence, RBAC logic,
+and core authentication models, it simplifies the integration of authentication flows across services.</p>
+
+
+<details class="key-features" open>
+  <summary>Key Features</summary>
+  <ul>
+<li>Flexible session management with optional JWT support and automatic expiration handling</li>
+<li>File‑based user and group persistence with Argon2 password hashing and atomic JSON updates</li>
+<li>Full role‑based access control (ADMIN, CONTRIBUTOR, READER) for scans and user accounts</li>
+<li>Serializable Permission, Role, User, and Group dataclasses with helper utilities</li>
 </ul>
-<h4 id="plantdb.commons.fsdb.serialization--usage-examples">Usage Examples<a class="headerlink" href="#plantdb.commons.fsdb.serialization--usage-examples" title="Permanent link">Link</a></h4>
-<div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #3D7B7B; font-style: italic"># Example of converting a scan to a dictionary representation</span>
-<span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> Scan
+</details>
 
-<span style="color: #3D7B7B; font-style: italic"># Assuming we have a scan object</span>
-scan <span style="color: #666">=</span> Scan(<span style="color: #666">...</span>)
-
-<span style="color: #3D7B7B; font-style: italic"># Convert scan structure to dictionary</span>
-scan_dict <span style="color: #666">=</span> _scan_to_dict(scan)
-<span style="color: #3D7B7B; font-style: italic"># Result format:</span>
-<span style="color: #3D7B7B; font-style: italic"># {</span>
-<span style="color: #3D7B7B; font-style: italic">#     &quot;filesets&quot;: [</span>
-<span style="color: #3D7B7B; font-style: italic">#         {</span>
-<span style="color: #3D7B7B; font-style: italic">#             &quot;id&quot;: &quot;fileset_id&quot;,</span>
-<span style="color: #3D7B7B; font-style: italic">#             &quot;files&quot;: [</span>
-<span style="color: #3D7B7B; font-style: italic">#                 {</span>
-<span style="color: #3D7B7B; font-style: italic">#                     &quot;id&quot;: &quot;file_id&quot;,</span>
-<span style="color: #3D7B7B; font-style: italic">#                     &quot;file&quot;: &quot;filename.ext&quot;</span>
-<span style="color: #3D7B7B; font-style: italic">#                 }</span>
-<span style="color: #3D7B7B; font-style: italic">#             ]</span>
-<span style="color: #3D7B7B; font-style: italic">#         }</span>
-<span style="color: #3D7B7B; font-style: italic">#     ]</span>
-<span style="color: #3D7B7B; font-style: italic"># }</span>
-
-<span style="color: #3D7B7B; font-style: italic"># Parse a fileset from dictionary</span>
-fileset_info <span style="color: #666">=</span> {<span style="color: #BA2121">&quot;id&quot;</span>: <span style="color: #BA2121">&quot;fileset_id&quot;</span>}
-fileset <span style="color: #666">=</span> _parse_fileset(scan, fileset_info)
-
-<span style="color: #3D7B7B; font-style: italic"># Parse a file from dictionary</span>
-file_info <span style="color: #666">=</span> {<span style="color: #BA2121">&quot;id&quot;</span>: <span style="color: #BA2121">&quot;file_id&quot;</span>, <span style="color: #BA2121">&quot;file&quot;</span>: <span style="color: #BA2121">&quot;example.txt&quot;</span>}
-file <span style="color: #666">=</span> _parse_file(fileset, file_info)
-</code></pre></div>
-
+<details class="usage-examples" open>
+  <summary>Usage Examples</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>from pathlib import Path
+from plantdb.commons.auth import session, manager, rbac, models</p>
+<h3 id="plantdb.commons.auth--create-a-jwt-session-manager">Create a JWT session manager<a class="headerlink" href="#plantdb.commons.auth--create-a-jwt-session-manager" title="Permanent link">Link</a></h3>
+<p 1769011058_="1769011058," 1769012858_="1769012858," _HVaAR4XHmIJgCKbZMDqmwg_="'HVaAR4XHmIJgCKbZMDqmwg'," _alice_="'alice'," _expires_at_:="'expires_at':" _issued_at_:="'issued_at':" _jti_:="'jti':" _username_:="'username':" class="..">jwt_mgr = session.JWTSessionManager(secret_key="my_secret")
+token = jwt_mgr.create_session("alice")
+user_info = jwt_mgr.validate_session(token)
+print(user_info)</p>
+<h3 id="plantdb.commons.auth--manage-users-and-groups">Manage users and groups<a class="headerlink" href="#plantdb.commons.auth--manage-users-and-groups" title="Permanent link">Link</a></h3>
+<p>um = manager.UserManager(users_file=Path("users.json"))
+gm = manager.GroupManager(groups_file=Path("groups.json"))
+um.create("alice", "Alice Smith", "secure123", roles={manager.Role.ADMIN})
+gm.create_group("admins", creator="alice", users={"alice"}, description="Admin group")</p>
+<h3 id="plantdb.commons.auth--rbac-operations">RBAC operations<a class="headerlink" href="#plantdb.commons.auth--rbac-operations" title="Permanent link">Link</a></h3>
+<p>rbac_mgr = rbac.RBACManager()
+user = rbac_mgr.users.create_user("alice", roles={rbac.Role.CONTRIBUTOR})
+rbac_mgr.create_group(user, "researchers")
+rbac_mgr.add_user_to_group(user, "researchers", "alice")
+scan_meta = {"owner": "bob", "sharing": ["researchers"]}
+can_read = rbac_mgr.can_access_scan(user, scan_meta, rbac.Permission.READ)
+print(can_read)
+True</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
 
 
 
@@ -2684,12 +2582,12 @@ file <span style="color: #666">=</span> _parse_file(fileset, file_info)
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
+        <script src="../../../assets/_markdown_exec_pyodide.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
