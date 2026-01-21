@@ -11,14 +11,14 @@ from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 
-from plantdb.commons.auth import Group
-from plantdb.commons.auth import GroupManager
-from plantdb.commons.auth import Permission
-from plantdb.commons.auth import RBACManager
-from plantdb.commons.auth import Role
-from plantdb.commons.auth import SessionManager
-from plantdb.commons.auth import User
-from plantdb.commons.auth import UserManager
+from plantdb.commons.auth.manager import GroupManager
+from plantdb.commons.auth.manager import UserManager
+from plantdb.commons.auth.models import Group
+from plantdb.commons.auth.models import Permission
+from plantdb.commons.auth.models import Role
+from plantdb.commons.auth.models import User
+from plantdb.commons.auth.rbac import RBACManager
+from plantdb.commons.auth.session import SessionManager
 
 
 class TestPermission(unittest.TestCase):
