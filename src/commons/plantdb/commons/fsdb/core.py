@@ -106,38 +106,38 @@ from typing import Optional
 from typing import Union
 
 from plantdb.commons import db
+from plantdb.commons.auth.models import Permission
+from plantdb.commons.auth.rbac import RBACManager
+from plantdb.commons.auth.session import JWTSessionManager
+from plantdb.commons.auth.session import SessionManager
+from plantdb.commons.auth.session import SingleSessionManager
+from plantdb.commons.fsdb.exceptions import FileNotFoundError
+from plantdb.commons.fsdb.exceptions import FilesetExistsError
+from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import ScanExistsError
+from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.fsdb.file_ops import _delete_file
+from plantdb.commons.fsdb.file_ops import _delete_fileset
+from plantdb.commons.fsdb.file_ops import _delete_scan
+from plantdb.commons.fsdb.file_ops import _load_scan
+from plantdb.commons.fsdb.file_ops import _load_scans
+from plantdb.commons.fsdb.file_ops import _make_fileset
+from plantdb.commons.fsdb.file_ops import _make_scan
+from plantdb.commons.fsdb.file_ops import _store_scan
+from plantdb.commons.fsdb.lock import LockType
+from plantdb.commons.fsdb.lock import ScanLockManager
+from plantdb.commons.fsdb.metadata import _get_metadata
+from plantdb.commons.fsdb.metadata import _set_metadata
+from plantdb.commons.fsdb.metadata import _store_file_metadata
+from plantdb.commons.fsdb.metadata import _store_fileset_metadata
+from plantdb.commons.fsdb.metadata import _store_scan_metadata
+from plantdb.commons.fsdb.path_helpers import _file_path
+from plantdb.commons.fsdb.path_helpers import _fileset_path
+from plantdb.commons.fsdb.path_helpers import _get_filename
+from plantdb.commons.fsdb.path_helpers import _scan_path
+from plantdb.commons.fsdb.validation import _is_valid_id
 from plantdb.commons.log import get_logger
-from .auth import JWTSessionManager
-from .auth import Permission
-from .auth import RBACManager
-from .auth import SessionManager
-from .auth import SingleSessionManager
-from .exceptions import FileNotFoundError
-from .exceptions import FilesetExistsError
-from .exceptions import FilesetNotFoundError
-from .exceptions import ScanExistsError
-from .exceptions import ScanNotFoundError
-from .file_ops import _delete_file
-from .file_ops import _delete_fileset
-from .file_ops import _delete_scan
-from .file_ops import _load_scan
-from .file_ops import _load_scans
-from .file_ops import _make_fileset
-from .file_ops import _make_scan
-from .file_ops import _store_scan
-from .lock import LockType
-from .lock import ScanLockManager
-from .metadata import _get_metadata
-from .metadata import _set_metadata
-from .metadata import _store_file_metadata
-from .metadata import _store_fileset_metadata
-from .metadata import _store_scan_metadata
-from .path_helpers import _file_path
-from .path_helpers import _fileset_path
-from .path_helpers import _get_filename
-from .path_helpers import _scan_path
-from .validation import _is_valid_id
-from ..utils import iso_date_now
+from plantdb.commons.utils import iso_date_now
 
 #: This file must exist in the root of a folder for it to be considered a valid FSDB
 MARKER_FILE_NAME = "romidb"
@@ -170,6 +170,7 @@ def require_connected_db(method):
 
 def require_token(method):
     """Decorator that passes the token to the decorated method depending on the session manager."""
+
     def wrapper(self, *args, **kwargs):
 
         if isinstance(self.session_manager, SingleSessionManager):
@@ -2118,7 +2119,8 @@ class Fileset(db.Fileset):
             self.files.update({f_id: file})  # Update filesets's files dictionary
             self.store()  # Store fileset instance to the JSON
 
-            self.logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user.username}'")
+            self.logger.info(
+                f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user.username}'")
 
         return file
 

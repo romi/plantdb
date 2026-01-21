@@ -69,7 +69,7 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
-from plantdb.commons.fsdb.auth import SingleSessionManager
+from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
 
 DATASET = ["real_plant", "real_plant_analyzed",

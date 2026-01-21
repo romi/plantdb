@@ -11,14 +11,14 @@ from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 
-from plantdb.commons.fsdb.auth import Group
-from plantdb.commons.fsdb.auth import GroupManager
-from plantdb.commons.fsdb.auth import Permission
-from plantdb.commons.fsdb.auth import RBACManager
-from plantdb.commons.fsdb.auth import Role
-from plantdb.commons.fsdb.auth import SessionManager
-from plantdb.commons.fsdb.auth import User
-from plantdb.commons.fsdb.auth import UserManager
+from plantdb.commons.auth import Group
+from plantdb.commons.auth import GroupManager
+from plantdb.commons.auth import Permission
+from plantdb.commons.auth import RBACManager
+from plantdb.commons.auth import Role
+from plantdb.commons.auth import SessionManager
+from plantdb.commons.auth import User
+from plantdb.commons.auth import UserManager
 
 
 class TestPermission(unittest.TestCase):

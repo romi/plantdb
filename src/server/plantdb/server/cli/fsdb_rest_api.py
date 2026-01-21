@@ -90,7 +90,7 @@ from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from plantdb.commons.fsdb.auth import JWTSessionManager
+from plantdb.commons.auth.session import JWTSessionManager
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
