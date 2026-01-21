@@ -91,7 +91,7 @@ class ScanLockManager:
     Attributes
     ----------
     base_path : str
-            The base directory of the database.
+        The base directory of the database.
     default_timeout : float
         The default timeout duration in seconds when attempting to acquire a lock.
         Default is 30.0 seconds.
