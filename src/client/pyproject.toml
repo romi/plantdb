@@ -61,6 +61,10 @@ sync = [
     "dash-bootstrap-components",
     "paramiko"
 ]
+test = [
+    'plantdb.server',
+    'open3d',
+]
 
 [tool.setuptools.package-data]
 "plantdb.client.sync_app" = ["assets/custom.css"]
