@@ -5508,7 +5508,7 @@ plantdb.commons.fsdb._make_scan</p>
         <span style="color: #008000; font-weight: bold">raise</span> <span style="color: #CB3F38; font-weight: bold">PermissionError</span>(<span style="color: #BA2121">f&quot;Insufficient permissions to create scan with user &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>current_user<span style="color: #666">.</span>username<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39;&quot;</span>)
 
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #008000">self</span><span style="color: #666">.</span>scan_exists(scan_id):
-        <span style="color: #008000; font-weight: bold">raise</span> ScanExistsError(scan_id)
+        <span style="color: #008000; font-weight: bold">raise</span> ScanExistsError(<span style="color: #008000">self</span>, scan_id)
 
     <span style="color: #3D7B7B; font-style: italic"># Prepare metadata with ownership</span>
     <span style="color: #008000; font-weight: bold">if</span> metadata <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:

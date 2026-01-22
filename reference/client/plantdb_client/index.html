@@ -6812,7 +6812,7 @@ updates only specified keys.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.plantdb_client</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> api_prefix
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>api_prefix()
 <span style="color: #717171">&#39;&#39;</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>os<span style="color: #666">.</span>environ[<span style="color: #BA2121">&#39;PLANTDB_API_PREFIX&#39;</span>] <span style="color: #666">=</span> <span style="color: #BA2121">&quot;/plantdb&quot;</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>os<span style="color: #666">.</span>environ[<span style="color: #BA2121">&#39;PLANTDB_PREFIX&#39;</span>] <span style="color: #666">=</span> <span style="color: #BA2121">&quot;/plantdb&quot;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>api_prefix()
 <span style="color: #717171">&#39;/plantdb&#39;</span>
 </code></pre></div>
@@ -6857,15 +6857,15 @@ updates only specified keys.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.plantdb_client import api_prefix</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; api_prefix()</span>
 <span style="color: #BA2121; font-style: italic">    &#39;&#39;</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; os.environ[&#39;PLANTDB_API_PREFIX&#39;] = &quot;/plantdb&quot;</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; os.environ[&#39;PLANTDB_PREFIX&#39;] = &quot;/plantdb&quot;</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; api_prefix()</span>
 <span style="color: #BA2121; font-style: italic">    &#39;/plantdb&#39;</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
     <span style="color: #008000; font-weight: bold">if</span> prefix <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #A2F; font-weight: bold">or</span> prefix <span style="color: #666">==</span> <span style="color: #BA2121">&quot;&quot;</span>:
-        prefix <span style="color: #666">=</span> os<span style="color: #666">.</span>environ<span style="color: #666">.</span>get(<span style="color: #BA2121">&quot;PLANTDB_API_PREFIX&quot;</span>, <span style="color: #BA2121">&quot;&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Default to no prefix</span>
+        prefix <span style="color: #666">=</span> os<span style="color: #666">.</span>getenv(<span style="color: #BA2121">&quot;PLANTDB_PREFIX&quot;</span>, <span style="color: #BA2121">&quot;&quot;</span>)  <span style="color: #3D7B7B; font-style: italic"># Default to no prefix</span>
 
     prefix <span style="color: #666">=</span> prefix<span style="color: #666">.</span>rstrip(<span style="color: #BA2121">&#39;/&#39;</span>)  <span style="color: #3D7B7B; font-style: italic"># Remove the trailing slash if present</span>
-    os<span style="color: #666">.</span>environ[<span style="color: #BA2121">&#39;PLANTDB_API_PREFIX&#39;</span>] <span style="color: #666">=</span> prefix
+    os<span style="color: #666">.</span>environ[<span style="color: #BA2121">&#39;PLANTDB_PREFIX&#39;</span>] <span style="color: #666">=</span> prefix
     <span style="color: #008000; font-weight: bold">return</span> prefix
 </code></pre></div></td></tr></table></div>
             </details>
