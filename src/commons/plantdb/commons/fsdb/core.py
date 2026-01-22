@@ -679,7 +679,7 @@ class FSDB(db.DB):
             raise PermissionError(f"Insufficient permissions to create scan with user '{current_user.username}'")
 
         if self.scan_exists(scan_id):
-            raise ScanExistsError(scan_id)
+            raise ScanExistsError(self, scan_id)
 
         # Prepare metadata with ownership
         if metadata is None:
