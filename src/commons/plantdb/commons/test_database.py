@@ -67,10 +67,9 @@ from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import requests
-from tqdm import tqdm
-
 from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
+from tqdm import tqdm
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -163,24 +162,33 @@ def _save_file_from_url(url) -> Path:
     PosixPath('/tmp/real_plant_analyzed.zip')
     """
     tmp_fname = _tmp_fpath_from_url(url)
-
     logger.info(f"Downloading {url} to {tmp_fname}...")
-    r = requests.get(url, stream=True)
-    total_size = int(r.headers.get("content-length", 0))  # total size in bytes
-    block_size = 32 * 1024  # block-size reads
-    progress = 0  # progress tracker
-    pbar = tqdm(total=total_size, unit="B", unit_scale=True, unit_divisor=1024)
-    with open(tmp_fname, "wb") as f:
-        for chunk in r.iter_content(block_size):
-            f.write(chunk)
-            progress = progress + len(chunk)
-            pbar.update(block_size)
-    pbar.close()
-    if total_size != 0 and progress != total_size:
-        raise IOError(f"Error downloading file {tmp_fname.name}!")
 
-    # Close HTTP(S) connection:
-    r.close()
+    # Ensure we hit the raw file endpoint
+    if "zenodo.org/records/" in url and "files/" in url and "?download=" not in url:
+        url = url + "?download=1"
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; MyDownloader/1.0)"}
+
+    with requests.get(url, stream=True, headers=headers, timeout=5) as r:
+        r.raise_for_status()  # raise an exception for bad status
+        total_size = int(r.headers.get("content-length", 0))
+        block_size = 32 * 1024
+
+        progress = 0
+        pbar = tqdm(total=total_size, unit="B", unit_scale=True, unit_divisor=1024)
+
+        with open(tmp_fname, "wb") as f:
+            for chunk in r.iter_content(block_size):
+                if not chunk:  # guard against keep‑alive chunks
+                    continue
+                f.write(chunk)
+                progress += len(chunk)
+                pbar.update(len(chunk))
+
+        pbar.close()
+
+        if total_size and progress != total_size:
+            raise IOError(f"Error downloading file {tmp_fname.name}!")
 
     return tmp_fname
 
