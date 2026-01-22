@@ -38,44 +38,61 @@ except FilesetNotFoundError as e:
 ```
 """
 
+# Stores annotations as strings, so the interpreter never evaluates `FSDB`, `Scan`, or `Fileset` at import time.
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # The block is executed only by static type checkers (e.g., mypy, Pyright).
+    # At runtime the imports are skipped, eliminating the circular dependency.
+    from plantdb.commons.fsdb.core import FSDB, Scan, Fileset
+
+
 class NotAnFSDBError(Exception):
-    def __init__(self, message):
+    def __init__(self, message) -> None:
         self.message = message
 
 
 class ScanNotFoundError(Exception):
     """Could not find the scan directory."""
-    def __init__(self, db, scan_id: str):
+
+    def __init__(self, db: 'FSDB', scan_id: str) -> None:
         super().__init__(f"Unknown scan id '{scan_id}' in database '{db.path()}'!")
 
 
 class ScanExistsError(Exception):
     """Could not find the scan directory."""
-    def __init__(self, db, scan_id: str):
+
+    def __init__(self, db: 'FSDB', scan_id: str) -> None:
         super().__init__(f"Scan id '{scan_id}' already exists in database '{db.path()}'!")
 
 
 class FilesetNotFoundError(Exception):
     """Could not find the fileset directory."""
-    def __init__(self, scan, fs_id: str):
+
+    def __init__(self, scan: 'Scan', fs_id: str) -> None:
         super().__init__(f"Unknown fileset id '{fs_id}' in scan '{scan.id}'!")
 
 
 class FilesetExistsError(Exception):
     """The fileset directory already exists."""
-    def __init__(self, scan, fs_id: str):
+
+    def __init__(self, scan: 'Scan', fs_id: str) -> None:
         super().__init__(f"Fileset id '{fs_id}' already exists in scan '{scan.id}'!")
 
 
 class FileNotFoundError(Exception):
     """Could not find the file."""
-    def __init__(self, fs, f_id: str):
+
+    def __init__(self, fs: 'Fileset', f_id: str) -> None:
         super().__init__(f"Unknown file id '{f_id}' in scan/fileset '{fs.scan.id}/{fs.id}'!")
 
 
 class FileExistsError(Exception):
     """The file already exists."""
-    def __init__(self, fs, f_id: str):
+
+    def __init__(self, fs: 'Fileset', f_id: str) -> None:
         super().__init__(f"File id '{f_id}' already exists in scan/fileset '{fs.scan.id}/{fs.id}'!")
 
 
