@@ -20,6 +20,7 @@ import urllib3
 from ada_url import URL
 from ada_url import check_url
 from ada_url import join_url
+from plantdb.commons.log import get_logger
 from tqdm import tqdm
 from urllib3.exceptions import HTTPError
 from urllib3.exceptions import MaxRetryError
@@ -27,8 +28,6 @@ from urllib3.exceptions import NewConnectionError
 from urllib3.exceptions import TimeoutError
 from urllib3.util import create_urllib3_context
 from urllib3.util.retry import Retry
-
-from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)
 
@@ -424,6 +423,7 @@ def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool:
     Examples
     --------
     >>> from plantdb.client.url import _validate_hostname
+    >>> _validate_hostname("google.com")
     >>> _validate_hostname("example.com")
     True
     >>> _validate_hostname("localhost")
@@ -459,28 +459,18 @@ def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool:
     return bool(public_ips)  # at least one public IP
 
 
-def _parse_url(url: str, allow_private_ip: bool = False, validate_host: bool = True) -> Optional[str]:
-    """
-    Parse a URL string into components and validate it according to specified rules.
-
-    This function attempts to parse the given URL string using Ada-url.
-    It then applies several checks on the parsed result, including scheme
-    validation, hostname presence, optional port validation, and host
-    validation with optional private IP allowance.
+def _parse_url(url: str) -> Optional[str]:
+    """Parse a URL string into components.
 
     Parameters
     ----------
     url : str
         The URL string to be parsed.
-    allow_private_ip : bool, optional
-        Whether to allow private IP addresses. Default is False.
-    validate_host : bool, optional
-        Whether to validate the hostname against a whitelist & blacklist. Default is True.
 
     Returns
     -------
-    str
-        The parsed URL, or None if any validation step fails.
+    Optional[str]
+        The parsed URL, or `None` if any validation step fails.
 
     Examples
     --------
@@ -488,22 +478,6 @@ def _parse_url(url: str, allow_private_ip: bool = False, validate_host: bool = T
     >>> url = _parse_url("http://example.com")
     >>> print(url)
     http://example.com/
-    >>> url = _parse_url("file:///etc/passwd", allow_private_ip=True)
-    ERROR    [url] URL 'file:///etc/passwd' is not an allowed protocol!
-    >>> url = _parse_url("http://127.0.0.1:5000", allow_private_ip=False)
-    ERROR    [url] URL 'http://127.0.0.1:5000' is not an allowed hostname!
-    >>> url = _parse_url("http://127.0.0.1:5000", allow_private_ip=True)
-    >>> print(url)
-    http://127.0.0.1:5000/
-
-    Notes
-    -----
-    Private IP addresses are allowed only if ``allow_private_ip`` is set to True.
-    Any URL with a file scheme or an invalid hostname will return None.
-
-    See Also
-    --------
-    plantdb.client.url._validate_hostname: the url validation method used if `validate_host` is True.
     """
     try:
         parsed_url = URL(url)
@@ -525,18 +499,142 @@ def _parse_url(url: str, allow_private_ip: bool = False, validate_host: bool = T
         logger.error(f"URL '{url}' is not a valid hostname!")
         return None
 
-    # Host validation (whitelist/blacklist + DNS resolution)
-    if validate_host:
-        if not _validate_hostname(parsed_url.hostname, allow_private_ip=allow_private_ip):
-            logger.error(f"URL '{url}' is not an allowed hostname!")
-            return None
-
     return parsed_url.href
 
 
 # --------------------------------------------------------------------------- #
 # Main checker
 # --------------------------------------------------------------------------- #
+
+
+def _build_ssl_context(
+        cert_path: Optional[Path],
+        verify_ssl: bool,
+) -> tuple[Optional[urllib3.util.ssl_.SSLContext], Optional[str], str]:
+    """Create an SSL context and determine the certificate requirements for the connection pool.
+
+    Parameters
+    ----------
+    cert_path:
+        Path to a custom CA bundle or directory containing certificates.
+    verify_ssl:
+        Whether SSL verification should be performed.
+
+    Returns
+    -------
+    Optional[urllib3.util.ssl_.SSLContext]
+        ``urllib3.util.ssl_.SSLContext`` instance or ``None`` if no custom context is needed.
+    Optional[str]
+        Path to a CA bundle to be passed to ``urllib3.PoolManager``.
+        ``None`` indicates that the default system certificates should be used.
+    str
+        SSL certificate verification mode accepted by ``urllib3.PoolManager``.
+        ``'CERT_REQUIRED'`` or ``'CERT_NONE'``.
+    """
+    ssl_context: Optional[urllib3.util.ssl_.SSLContext] = None
+    ca_certs: Optional[str] = None
+    cert_reqs = "CERT_REQUIRED"
+
+    # Sets up SSL context and CA certificates for requests
+    if cert_path is not None:
+        ssl_context = create_urllib3_context()
+        if not verify_ssl:
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = urllib3.util.ssl_.CERT_NONE
+            cert_reqs = "CERT_NONE"
+
+        if cert_path.is_file():
+            ssl_context.load_verify_locations(cafile=str(cert_path))
+            ca_certs = str(cert_path)
+        elif cert_path.is_dir():
+            cert_file = cert_path / "cert.pem"
+            if cert_file.exists():
+                ssl_context.load_verify_locations(cafile=str(cert_file))
+                ca_certs = str(cert_file)
+            else:
+                ssl_context.load_verify_locations(capath=str(cert_path))
+                ca_certs = str(cert_path)
+
+    if not verify_ssl:
+        cert_reqs = "CERT_NONE"
+        ca_certs = None
+
+    return ssl_context, ca_certs, cert_reqs
+
+
+def _configure_http_pool(
+        timeout: float,
+        retry_strategy: Retry,
+        ssl_context: Optional[urllib3.util.ssl_.SSLContext],
+        ca_certs: Optional[str],
+        cert_reqs: str,
+) -> urllib3.PoolManager:
+    """Build a reusable ``urllib3.PoolManager`` configured with the given retry strategy, timeout and SSL settings."""
+    return urllib3.PoolManager(
+        retries=retry_strategy,
+        timeout=urllib3.Timeout(total=timeout),
+        cert_reqs=cert_reqs,
+        ca_certs=ca_certs,
+        ssl_context=ssl_context,
+    )
+
+
+def _handle_redirects(
+        http: urllib3.PoolManager,
+        initial_url: str,
+        max_redirects: int,
+        allow_private_ip: bool = False,
+        validate_host: bool = True,
+) -> tuple[urllib3.HTTPResponse, str, int]:
+    """
+    Manually follow HTTP redirects up to ``max_redirects`` and return the final
+    response, the URL that was finally fetched and the number of redirects
+    that were performed.
+    """
+    current_url = initial_url
+    redirect_count = 0
+
+    while True:
+
+        if validate_host:
+            host = URL(current_url).hostname
+            logger.info(f"Validating URL hostname: {host}...")
+            if not _validate_hostname(host, allow_private_ip=allow_private_ip):
+                raise ValueError(f"URL '{host}' is not an allowed hostname!")
+
+        try:
+            response = http.request(
+                "GET",
+                current_url,
+                redirect=False,  # Do not let urllib3 follow redirects
+                preload_content=False,  # Stream the response
+            )
+        except (MaxRetryError, NewConnectionError, TimeoutError) as exc:
+            raise ConnectionError(f"Request to {current_url!r} failed: {exc}") from exc
+
+        # Stop following when we hit a non‑redirect status code
+        if not (300 <= response.status < 400):
+            return response, current_url, redirect_count
+
+        if redirect_count >= max_redirects:
+            raise RuntimeError(
+                f"Maximum redirect limit ({max_redirects}) exceeded at {current_url}"
+            )
+
+        location = response.headers.get("Location")
+        if not location:
+            raise RuntimeError(
+                f"Redirect response from {current_url!r} has no Location header"
+            )
+
+        # Resolve relative redirects
+        next_url = join_url(current_url, location)
+        if not _parse_url(next_url):
+            raise ValueError(f"Redirect target {next_url!r} is not a valid URL")
+
+        current_url = next_url
+        redirect_count += 1
+
 
 @dataclass
 class ServerCheckResult:
@@ -560,74 +658,59 @@ def is_server_available(
         cert_path: Optional[str] = None,
         verify_ssl: bool = True,
 ) -> ServerCheckResult:
-    """
-    Check if a server is available by making an HTTP request to the given URL.
+    """Check if a server is available by making an HTTP request to the given URL.
 
     Parameters
     ----------
     url : str
         The URL of the server to check.
     timeout : float, optional
-        The maximum number of seconds to wait for a response. Default is 5.0.
+        Maximum number of seconds to wait for a response. Default is ``5.0``.
     max_redirects : int, optional
-        The maximum number of redirects to follow. Default is 2.
+        Maximum number of redirects to follow. Default is ``2``.
     max_retries : int, optional
-        The maximum number of retries in case of failure. Default is 3.
+        Maximum number of retries in case of failure. Default is ``3``.
     backoff_factor : float, optional
-        A factor to multiply the delay between retry attempts. Default is 0.3.
+        Multiplier for the delay between retry attempts. Default is ``0.3``.
     allow_private_ip : bool, optional
-        If True, the checker will accept URLs whose resolved IPs are private or non‑routable.
+        If ``True``, private or non‑routable IPs are accepted.
     validate_host : bool, optional
-        Whether to validate the hostname against a whitelist & blacklist. Default is True.
-        Default is False.
+        Whether to validate the hostname against a whitelist/blacklist. Default is ``True``.
     cert_path : str or pathlib.Path, optional
-        Path to a CA bundle to use. Default is None.
+        Path to a CA bundle to use. Default is ``None``.
     verify_ssl : bool, optional
-        Whether to verify SSL certificates. Default is True.
+        Whether to verify SSL certificates. Default is ``True``.
 
     Returns
     -------
-    ServerCheckResult
+    plantdb.client.url.ServerCheckResult
         An object containing details about the server check result.
 
-        - url (str): The original URL that was checked.
-        - status_code (int): The HTTP status code received from the server.
-        - ok (bool): True if the server responded with a successful status code,
-          False otherwise.
-        - final_url (str): The final URL after all redirects have been followed.
+    Raises
+    ------
+    ValueError
+        If the supplied URL is malformed or a redirect target is invalid.
+    RuntimeError
+        If the maximum redirect limit is exceeded.
+    ConnectionError
+        If the HTTP request fails due to network issues.
 
     Examples
     --------
-    >>> from plantdb.server.test_rest_api import TestRestApiServer
     >>> from plantdb.client.url import is_server_available
-    >>> # EXAMPLE 1: Test with a valid online server
-    >>> result = is_server_available("https://example.com")
-    >>> print(result.ok)
+    >>> scr = is_server_available('https://google.com', validate_host=False)
+    >>> print(scr.final_url)
+    https://www.google.com/
+    >>> scr = is_server_available('https://google.com', validate_host=True)
+    INFO     [url] Validating URL hostname: google.com...
+    INFO     [url] Validating URL hostname: www.google.com...
+    print(scr.ok)
     True
-    >>> print(result.url)
-    https://example.com
-    >>> # EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server
-    >>> server = TestRestApiServer(test=True, ssl=False)  # initialize the server
-    >>> server.start()  # start the server
-    >>> result = is_server_available("http://127.0.0.1:5000", allow_private_ip=True)
-    >>> print(result.ok)
-    True
-    >>> print(result.message)
-    Valid URL.
-    >>> server.stop()  # stop the server
-
-    Notes
-    -----
-    This function uses the `requests` library to perform HTTP requests. It handles
-    retries and redirects according to the parameters provided.
-
-    See Also
-    --------
-    requests.Session : The class used for sending HTTP requests.
-    plantdb.client.url._parse_url: the url parsing method.
-    plantdb.client.url._validate_hostname: the url validation method used if `validate_host` is True.
     """
-    parsed = _parse_url(url, allow_private_ip=allow_private_ip, validate_host=validate_host)
+    # ------------------------------------------------------------------ #
+    # 1. Parse the URL
+    # ------------------------------------------------------------------ #
+    parsed = _parse_url(url)
     if not parsed:
         message = f"URL '{url}' is not a valid URL."
         logger.warning(message)
@@ -639,135 +722,54 @@ def is_server_available(
             message=message,
         )
 
-    # Configure retry strategy
+    # ------------------------------------------------------------------ #
+    # 2. Build retry strategy
+    # ------------------------------------------------------------------ #
     retry_strategy = Retry(
         total=max_retries,
         backoff_factor=backoff_factor,
         status_forcelist=[500, 502, 503, 504],
         allowed_methods={"GET", "HEAD"},
-        redirect=max_redirects
+        redirect=max_redirects,
     )
 
-    # Create a custom SSL context to handle self-signed certificates
-    ssl_context = None
-    ca_certs = None
+    # ------------------------------------------------------------------ #
+    # 3. Configure SSL
+    # ------------------------------------------------------------------ #
+    cert_path_obj = Path(cert_path) if cert_path is not None else None
+    ssl_context, ca_certs, cert_reqs = _build_ssl_context(cert_path_obj, verify_ssl)
 
-    if cert_path is not None:
-        ssl_context = create_urllib3_context()
+    # ------------------------------------------------------------------ #
+    # 4. Create HTTP pool manager
+    # ------------------------------------------------------------------ #
+    http = _configure_http_pool(timeout, retry_strategy, ssl_context, ca_certs, cert_reqs)
 
-        # If verify_ssl is False, disable certificate verification
-        if not verify_ssl:
-            from ssl import CERT_NONE
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = CERT_NONE
-
-        # If a custom cert path is provided, load the CA certificates
-        if cert_path is not None:
-            if not isinstance(cert_path, Path):
-                cert_path = Path(cert_path)
-
-            # Load custom CA bundle if it exists
-            if cert_path.is_file():
-                ssl_context.load_verify_locations(cafile=str(cert_path))
-                ca_certs = str(cert_path)
-            elif cert_path.is_dir():
-                # Try to find cert.pem in the directory
-                cert_file = cert_path / 'cert.pem'
-                if cert_file.exists():
-                    ssl_context.load_verify_locations(cafile=str(cert_file))
-                    ca_certs = str(cert_file)
-                else:
-                    ssl_context.load_verify_locations(capath=str(cert_path))
-                    ca_certs = str(cert_path)
-
-    # Determine cert_reqs and ca_certs for PoolManager
-    if not verify_ssl:
-        cert_reqs = 'CERT_NONE'
-        ca_certs = None
-    elif ca_certs is not None:
-        cert_reqs = 'CERT_REQUIRED'
-    else:
-        cert_reqs = 'CERT_REQUIRED'
-        ca_certs = None
-
-    # Create a PoolManager with the retry strategy
-    http = urllib3.PoolManager(
-        retries=retry_strategy,
-        timeout=urllib3.Timeout(total=timeout),
-        cert_reqs=cert_reqs,
-        ca_certs=ca_certs,
-        ssl_context=ssl_context,
-    )
-
-    current_url = URL(url).href
+    # ------------------------------------------------------------------ #
+    # 5. Perform the request and follow redirects manually
+    # ------------------------------------------------------------------ #
     try:
-        # Perform the request
-        resp = http.request(
-            'GET',
-            current_url,
-            redirect=False,  # Manually handle redirects
-            preload_content=False  # Similar to stream=True in requests
-        )
-
-        # Handle redirects manually
-        redirect_count = 0
-        while 300 <= resp.status < 400 and redirect_count < max_redirects:
-            # Get redirect location
-            location = resp.headers.get('Location')
-            if not location:
-                message = f"Request to {current_url} (redirect) failed to determine next location."
-                return ServerCheckResult(
-                    url=URL(url).href,
-                    status_code=resp.status,
-                    ok=False,
-                    final_url=current_url,
-                    message=message,
-                )
-
-            # Resolve relative URLs
-            next_url = join_url(current_url, location)
-
-            # Safety check on the next hop
-            if not _parse_url(next_url, allow_private_ip=allow_private_ip):
-                message = f"Request to {current_url} (redirect) is not a valid URL."
-                return ServerCheckResult(
-                    url=URL(url).href,
-                    status_code=resp.status,
-                    ok=False,
-                    final_url=next_url,
-                    message=message,
-                )
-
-            current_url = next_url
-            redirect_count += 1
-
-            # Perform redirect request
-            resp = http.request(
-                'GET',
-                current_url,
-                redirect=False,
-                preload_content=False
-            )
-
-        # Return the final result
+        response, final_url, n_redirects = _handle_redirects(http, URL(url).href, max_redirects,
+                                                             allow_private_ip, validate_host)
+    except (ConnectionError, RuntimeError, ValueError) as exc:
+        message = f"Request to {url!r} failed: {exc}"
+        logger.error(message)
         return ServerCheckResult(
-            url=URL(url).href,
-            status_code=resp.status,
-            ok=200 <= resp.status < 400,
-            final_url=current_url,
-            message="Valid URL.",
-            n_redirects=redirect_count
-        )
-
-    except (MaxRetryError, NewConnectionError, TimeoutError) as err:
-        message = f"Request to {current_url} failed with: {err}"
-        return ServerCheckResult(
-            url=URL(url).href,
+            url=url,
             status_code=0,
             ok=False,
-            final_url=current_url,
+            final_url=url,
             message=message,
         )
-    finally:
-        # Ensure connection is released
-        resp.release_conn() if 'resp' in locals() else None
+
+    # ------------------------------------------------------------------ #
+    # 6. Build the result object
+    # ------------------------------------------------------------------ #
+    ok = 200 <= response.status < 400
+    return ServerCheckResult(
+        url=url,
+        status_code=response.status,
+        ok=ok,
+        final_url=final_url,
+        message="Valid URL." if ok else f"HTTP {response.status}",
+        n_redirects=n_redirects,
+    )
