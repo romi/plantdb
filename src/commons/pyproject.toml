@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.commons"
-version = "0.14.5"
+version = "0.14.6"
 dependencies = [
     "appdirs",
     "argon2-cffi",
