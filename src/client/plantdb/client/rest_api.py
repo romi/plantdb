@@ -42,9 +42,9 @@ This client handles various operations related to scan management, image process
 
 ## Environment variables
 
-- `PLANTDB_API_HOST`: default hostname to PlantDB REST API
-- `PLANTDB_API_PORT`: default port to PlantDB REST API
-- `PLANTDB_API_PREFIX`: default URL prefix for the plantdb REST API
+- `PLANTDB_HOST`: default hostname to PlantDB REST API
+- `PLANTDB_PORT`: default port to PlantDB REST API
+- `PLANTDB_PREFIX`: default URL prefix for the plantdb REST API
 - `CERT_PATH`: Path to a certificate file for SSL verification. If ``None`` (default), default SSL verification is used.
 
 """
@@ -63,19 +63,19 @@ from plantdb.client import api_endpoints
 from plantdb.client.api_endpoints import sanitize_name
 
 #: Default hostname to PlantDB REST API is 'localhost':
-PLANTDB_API_HOST = os.environ.get('PLANTDB_API_HOST', "localhost")
+PLANTDB_HOST = os.getenv('PLANTDB_HOST', "localhost")
 #: Default port to PlantDB REST API:
-PLANTDB_API_PORT = os.environ.get('PLANTDB_API_PORT', '')
-if PLANTDB_API_PORT.strip() == '' or PLANTDB_API_PORT.lower() == 'none':
-    PLANTDB_API_PORT = None  # explicit “no‑port” requested
+PLANTDB_PORT = os.getenv('PLANTDB_PORT', '')
+if PLANTDB_PORT.strip() == '' or PLANTDB_PORT.lower() == 'none':
+    PLANTDB_PORT = None  # explicit “no‑port” requested
 else:
     try:
-        PLANTDB_API_PORT = int(PLANTDB_API_PORT)  # normal integer port
+        PLANTDB_PORT = int(PLANTDB_PORT)  # normal integer port
     except ValueError:
         # the value is something unexpected – fall back to the default
-        PLANTDB_API_PORT = None
+        PLANTDB_PORT = None
 #: Default URL prefix for the plantdb REST API
-PLANTDB_API_PREFIX = os.environ.get('PLANTDB_API_PREFIX', None)
+PLANTDB_PREFIX = os.getenv('PLANTDB_PREFIX', None)
 
 
 # -----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ def origin_url(host, port=None, ssl=False, **kwargs) -> str:
     return f"http{'s' if ssl else ''}://{host}{port}"
 
 
-def plantdb_url(host, port=PLANTDB_API_PORT, prefix=PLANTDB_API_PREFIX, ssl=False) -> str:
+def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> str:
     """
     Generates the URL for the PlantDB REST API using the specified host and port.
 
@@ -304,10 +304,7 @@ def scans_url(host, **kwargs):
     >>> scans_url('dev.romi.local', prefix='/plantdb/', ssl=True)
     'https://dev.romi.local/plantdb/scans'
     """
-    print(host)
-    print(kwargs)
     url = origin_url(host, **kwargs)
-    print(url)
     return join_url(url, api_endpoints.scans(**kwargs))
 
 
@@ -752,7 +749,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
 
     # Prepare SSL/TLS verification; if CERT_PATH is supplied, use it,
     # otherwise default to requests' built‑in verification
-    requests_kwargs['verify'] = os.environ.get('CERT_PATH', True)
+    requests_kwargs['verify'] = os.getenv('CERT_PATH', True)
 
     # If a session token is supplied, add it to the Authorization header
     requests_kwargs['headers'] = kwargs.get('headers', {})
@@ -1231,7 +1228,7 @@ def request_refresh(host, scan_id=None, **kwargs):
     Other Parameters
     ----------------
     port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_API_PORT``.
+        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_PORT``.
     prefix : str, optional
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
@@ -1284,7 +1281,7 @@ def request_archive_download(host, scan_id, out_dir=None, **kwargs):
     host : str, optional
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
     port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_API_PORT``.
+        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_PORT``.
     prefix : str, optional
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
@@ -1358,7 +1355,7 @@ def request_archive_upload(host, scan_id, path, **kwargs):
     host : str, optional
         The hostname or IP address of the PlantDB REST API server. Defaults to ``REST_API_URL``.
     port : int or str, optional
-        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_API_PORT``.
+        The port number of the PlantDB REST API server. Defaults to ``PLANTDB_PORT``.
     prefix : str, optional
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.

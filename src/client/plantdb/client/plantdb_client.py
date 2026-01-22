@@ -905,13 +905,13 @@ def api_prefix(prefix=""):
     >>> from plantdb.client.plantdb_client import api_prefix
     >>> api_prefix()
     ''
-    >>> os.environ['PLANTDB_API_PREFIX'] = "/plantdb"
+    >>> os.environ['PLANTDB_PREFIX'] = "/plantdb"
     >>> api_prefix()
     '/plantdb'
     """
     if prefix is None or prefix == "":
-        prefix = os.environ.get("PLANTDB_API_PREFIX", "")  # Default to no prefix
+        prefix = os.getenv("PLANTDB_PREFIX", "")  # Default to no prefix
 
     prefix = prefix.rstrip('/')  # Remove the trailing slash if present
-    os.environ['PLANTDB_API_PREFIX'] = prefix
+    os.environ['PLANTDB_PREFIX'] = prefix
     return prefix
