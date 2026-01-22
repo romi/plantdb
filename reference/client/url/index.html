@@ -2598,7 +2598,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum number of seconds to wait for a response. Default is 5.0.</p>
+                <p>Maximum number of seconds to wait for a response. Default is <code>5.0</code>.</p>
               </div>
             </td>
             <td>
@@ -2614,7 +2614,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum number of redirects to follow. Default is 2.</p>
+                <p>Maximum number of redirects to follow. Default is <code>2</code>.</p>
               </div>
             </td>
             <td>
@@ -2630,7 +2630,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum number of retries in case of failure. Default is 3.</p>
+                <p>Maximum number of retries in case of failure. Default is <code>3</code>.</p>
               </div>
             </td>
             <td>
@@ -2646,7 +2646,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A factor to multiply the delay between retry attempts. Default is 0.3.</p>
+                <p>Multiplier for the delay between retry attempts. Default is <code>0.3</code>.</p>
               </div>
             </td>
             <td>
@@ -2662,7 +2662,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If True, the checker will accept URLs whose resolved IPs are private or non‑routable.</p>
+                <p>If <code>True</code>, private or non‑routable IPs are accepted.</p>
               </div>
             </td>
             <td>
@@ -2678,8 +2678,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to validate the hostname against a whitelist &amp; blacklist. Default is True.
-Default is False.</p>
+                <p>Whether to validate the hostname against a whitelist/blacklist. Default is <code>True</code>.</p>
               </div>
             </td>
             <td>
@@ -2695,7 +2694,7 @@ Default is False.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Path to a CA bundle to use. Default is None.</p>
+                <p>Path to a CA bundle to use. Default is <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -2711,7 +2710,7 @@ Default is False.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to verify SSL certificates. Default is True.</p>
+                <p>Whether to verify SSL certificates. Default is <code>True</code>.</p>
               </div>
             </td>
             <td>
@@ -2743,13 +2742,49 @@ Default is False.</p>
             <td>
               <div class="doc-md-description">
                 <p>An object containing details about the server check result.</p>
-<ul>
-<li>url (str): The original URL that was checked.</li>
-<li>status_code (int): The HTTP status code received from the server.</li>
-<li>ok (bool): True if the server responded with a successful status code,
-  False otherwise.</li>
-<li>final_url (str): The final URL after all redirects have been followed.</li>
-</ul>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the supplied URL is malformed or a redirect target is invalid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the maximum redirect limit is exceeded.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ConnectionError">ConnectionError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the HTTP request fails due to network issues.</p>
               </div>
             </td>
           </tr>
@@ -2758,140 +2793,21 @@ Default is False.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.server.test_rest_api</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> TestRestApiServer
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.url</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> is_server_available
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1: Test with a valid online server</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;https://example.com&quot;</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>ok)
+    <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.client.url</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> is_server_available
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scr <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&#39;https://google.com&#39;</span>, validate_host<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scr<span style="color: #666">.</span>final_url)
+<span style="color: #717171">https://www.google.com/</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scr <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&#39;https://google.com&#39;</span>, validate_host<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
+<span style="color: #717171">INFO     [url] Validating URL hostname: google.com...</span>
+<span style="color: #717171">INFO     [url] Validating URL hostname: www.google.com...</span>
+<span style="color: #717171">print(scr.ok)</span>
 <span style="color: #717171">True</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>url)
-<span style="color: #717171">https://example.com</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server <span style="color: #666">=</span> TestRestApiServer(test<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, ssl<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)  <span style="color: #3D7B7B; font-style: italic"># initialize the server</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>start()  <span style="color: #3D7B7B; font-style: italic"># start the server</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>result <span style="color: #666">=</span> is_server_available(<span style="color: #BA2121">&quot;http://127.0.0.1:5000&quot;</span>, allow_private_ip<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>ok)
-<span style="color: #717171">True</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(result<span style="color: #666">.</span>message)
-<span style="color: #717171">Valid URL.</span>
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>server<span style="color: #666">.</span>stop()  <span style="color: #3D7B7B; font-style: italic"># stop the server</span>
 </code></pre></div>
 
 
-<details class="note" open>
-  <summary>Notes</summary>
-  <p>This function uses the <code>requests</code> library to perform HTTP requests. It handles
-retries and redirects according to the parameters provided.</p>
-</details>
-
-<details class="see-also" open>
-  <summary>See Also</summary>
-  <p>requests.Session : The class used for sending HTTP requests.
-plantdb.client.url._parse_url: the url parsing method.
-plantdb.client.url._validate_hostname: the url validation method used if <code>validate_host</code> is True.</p>
-</details>
-
             <details class="quote">
               <summary>Source code in <code>plantdb/client/url.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">552</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">553</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">554</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">555</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">556</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">557</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">558</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">559</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">560</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">561</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">562</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">563</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">564</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">565</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">566</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">567</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">568</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">569</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">570</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">571</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">572</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">573</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">574</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">579</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">586</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">587</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">588</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">589</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">590</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">591</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">592</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">593</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">594</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">595</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">596</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">597</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">598</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">599</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">600</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">605</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">607</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">608</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">609</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">610</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">611</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">612</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">613</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">614</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">615</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">616</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">617</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">618</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">619</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">620</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">621</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">622</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">623</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">624</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">625</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">626</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">627</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">628</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">629</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">630</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">631</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">632</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">633</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">634</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">635</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">636</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">637</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">638</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">639</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">640</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">641</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">642</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">643</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">644</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">645</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">647</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">651</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">652</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">653</span>
@@ -3014,7 +2930,9 @@ plantdb.client.url._validate_hostname: the url validation method used if <code>v
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">770</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">771</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">772</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">773</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">773</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">774</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">775</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">is_server_available</span>(
         url: <span style="color: #008000">str</span>,
         timeout: <span style="color: #008000">float</span> <span style="color: #666">=</span> <span style="color: #666">5.0</span>,
         max_redirects: <span style="color: #008000">int</span> <span style="color: #666">=</span> <span style="color: #666">2</span>,
@@ -3025,74 +2943,59 @@ plantdb.client.url._validate_hostname: the url validation method used if <code>v
         cert_path: Optional[<span style="color: #008000">str</span>] <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>,
         verify_ssl: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">True</span>,
 ) <span style="color: #666">-&gt;</span> ServerCheckResult:
-<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;</span>
-<span style="color: #BA2121; font-style: italic">    Check if a server is available by making an HTTP request to the given URL.</span>
+<span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;Check if a server is available by making an HTTP request to the given URL.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    url : str</span>
 <span style="color: #BA2121; font-style: italic">        The URL of the server to check.</span>
 <span style="color: #BA2121; font-style: italic">    timeout : float, optional</span>
-<span style="color: #BA2121; font-style: italic">        The maximum number of seconds to wait for a response. Default is 5.0.</span>
+<span style="color: #BA2121; font-style: italic">        Maximum number of seconds to wait for a response. Default is ``5.0``.</span>
 <span style="color: #BA2121; font-style: italic">    max_redirects : int, optional</span>
-<span style="color: #BA2121; font-style: italic">        The maximum number of redirects to follow. Default is 2.</span>
+<span style="color: #BA2121; font-style: italic">        Maximum number of redirects to follow. Default is ``2``.</span>
 <span style="color: #BA2121; font-style: italic">    max_retries : int, optional</span>
-<span style="color: #BA2121; font-style: italic">        The maximum number of retries in case of failure. Default is 3.</span>
+<span style="color: #BA2121; font-style: italic">        Maximum number of retries in case of failure. Default is ``3``.</span>
 <span style="color: #BA2121; font-style: italic">    backoff_factor : float, optional</span>
-<span style="color: #BA2121; font-style: italic">        A factor to multiply the delay between retry attempts. Default is 0.3.</span>
+<span style="color: #BA2121; font-style: italic">        Multiplier for the delay between retry attempts. Default is ``0.3``.</span>
 <span style="color: #BA2121; font-style: italic">    allow_private_ip : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        If True, the checker will accept URLs whose resolved IPs are private or non‑routable.</span>
+<span style="color: #BA2121; font-style: italic">        If ``True``, private or non‑routable IPs are accepted.</span>
 <span style="color: #BA2121; font-style: italic">    validate_host : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        Whether to validate the hostname against a whitelist &amp; blacklist. Default is True.</span>
-<span style="color: #BA2121; font-style: italic">        Default is False.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to validate the hostname against a whitelist/blacklist. Default is ``True``.</span>
 <span style="color: #BA2121; font-style: italic">    cert_path : str or pathlib.Path, optional</span>
-<span style="color: #BA2121; font-style: italic">        Path to a CA bundle to use. Default is None.</span>
+<span style="color: #BA2121; font-style: italic">        Path to a CA bundle to use. Default is ``None``.</span>
 <span style="color: #BA2121; font-style: italic">    verify_ssl : bool, optional</span>
-<span style="color: #BA2121; font-style: italic">        Whether to verify SSL certificates. Default is True.</span>
+<span style="color: #BA2121; font-style: italic">        Whether to verify SSL certificates. Default is ``True``.</span>
 
 <span style="color: #BA2121; font-style: italic">    Returns</span>
 <span style="color: #BA2121; font-style: italic">    -------</span>
-<span style="color: #BA2121; font-style: italic">    ServerCheckResult</span>
+<span style="color: #BA2121; font-style: italic">    plantdb.client.url.ServerCheckResult</span>
 <span style="color: #BA2121; font-style: italic">        An object containing details about the server check result.</span>
 
-<span style="color: #BA2121; font-style: italic">        - url (str): The original URL that was checked.</span>
-<span style="color: #BA2121; font-style: italic">        - status_code (int): The HTTP status code received from the server.</span>
-<span style="color: #BA2121; font-style: italic">        - ok (bool): True if the server responded with a successful status code,</span>
-<span style="color: #BA2121; font-style: italic">          False otherwise.</span>
-<span style="color: #BA2121; font-style: italic">        - final_url (str): The final URL after all redirects have been followed.</span>
+<span style="color: #BA2121; font-style: italic">    Raises</span>
+<span style="color: #BA2121; font-style: italic">    ------</span>
+<span style="color: #BA2121; font-style: italic">    ValueError</span>
+<span style="color: #BA2121; font-style: italic">        If the supplied URL is malformed or a redirect target is invalid.</span>
+<span style="color: #BA2121; font-style: italic">    RuntimeError</span>
+<span style="color: #BA2121; font-style: italic">        If the maximum redirect limit is exceeded.</span>
+<span style="color: #BA2121; font-style: italic">    ConnectionError</span>
+<span style="color: #BA2121; font-style: italic">        If the HTTP request fails due to network issues.</span>
 
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.server.test_rest_api import TestRestApiServer</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.client.url import is_server_available</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 1: Test with a valid online server</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;https://example.com&quot;)</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.ok)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scr = is_server_available(&#39;https://google.com&#39;, validate_host=False)</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(scr.final_url)</span>
+<span style="color: #BA2121; font-style: italic">    https://www.google.com/</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scr = is_server_available(&#39;https://google.com&#39;, validate_host=True)</span>
+<span style="color: #BA2121; font-style: italic">    INFO     [url] Validating URL hostname: google.com...</span>
+<span style="color: #BA2121; font-style: italic">    INFO     [url] Validating URL hostname: www.google.com...</span>
+<span style="color: #BA2121; font-style: italic">    print(scr.ok)</span>
 <span style="color: #BA2121; font-style: italic">    True</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.url)</span>
-<span style="color: #BA2121; font-style: italic">    https://example.com</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 2: Test with a valid local IP (allowed for test purposes) and a running server</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server = TestRestApiServer(test=True, ssl=False)  # initialize the server</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.start()  # start the server</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; result = is_server_available(&quot;http://127.0.0.1:5000&quot;, allow_private_ip=True)</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.ok)</span>
-<span style="color: #BA2121; font-style: italic">    True</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(result.message)</span>
-<span style="color: #BA2121; font-style: italic">    Valid URL.</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; server.stop()  # stop the server</span>
-
-<span style="color: #BA2121; font-style: italic">    Notes</span>
-<span style="color: #BA2121; font-style: italic">    -----</span>
-<span style="color: #BA2121; font-style: italic">    This function uses the `requests` library to perform HTTP requests. It handles</span>
-<span style="color: #BA2121; font-style: italic">    retries and redirects according to the parameters provided.</span>
-
-<span style="color: #BA2121; font-style: italic">    See Also</span>
-<span style="color: #BA2121; font-style: italic">    --------</span>
-<span style="color: #BA2121; font-style: italic">    requests.Session : The class used for sending HTTP requests.</span>
-<span style="color: #BA2121; font-style: italic">    plantdb.client.url._parse_url: the url parsing method.</span>
-<span style="color: #BA2121; font-style: italic">    plantdb.client.url._validate_hostname: the url validation method used if `validate_host` is True.</span>
 <span style="color: #BA2121; font-style: italic">    &quot;&quot;&quot;</span>
-    parsed <span style="color: #666">=</span> _parse_url(url, allow_private_ip<span style="color: #666">=</span>allow_private_ip, validate_host<span style="color: #666">=</span>validate_host)
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 1. Parse the URL</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    parsed <span style="color: #666">=</span> _parse_url(url)
     <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> parsed:
         message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;URL &#39;</span><span style="color: #A45A77; font-weight: bold">{</span>url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&#39; is not a valid URL.&quot;</span>
         logger<span style="color: #666">.</span>warning(message)
@@ -3104,138 +3007,57 @@ plantdb.client.url._validate_hostname: the url validation method used if <code>v
             message<span style="color: #666">=</span>message,
         )
 
-    <span style="color: #3D7B7B; font-style: italic"># Configure retry strategy</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 2. Build retry strategy</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
     retry_strategy <span style="color: #666">=</span> Retry(
         total<span style="color: #666">=</span>max_retries,
         backoff_factor<span style="color: #666">=</span>backoff_factor,
         status_forcelist<span style="color: #666">=</span>[<span style="color: #666">500</span>, <span style="color: #666">502</span>, <span style="color: #666">503</span>, <span style="color: #666">504</span>],
         allowed_methods<span style="color: #666">=</span>{<span style="color: #BA2121">&quot;GET&quot;</span>, <span style="color: #BA2121">&quot;HEAD&quot;</span>},
-        redirect<span style="color: #666">=</span>max_redirects
+        redirect<span style="color: #666">=</span>max_redirects,
     )
 
-    <span style="color: #3D7B7B; font-style: italic"># Create a custom SSL context to handle self-signed certificates</span>
-    ssl_context <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>
-    ca_certs <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 3. Configure SSL</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    cert_path_obj <span style="color: #666">=</span> Path(cert_path) <span style="color: #008000; font-weight: bold">if</span> cert_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">None</span>
+    ssl_context, ca_certs, cert_reqs <span style="color: #666">=</span> _build_ssl_context(cert_path_obj, verify_ssl)
 
-    <span style="color: #008000; font-weight: bold">if</span> cert_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
-        ssl_context <span style="color: #666">=</span> create_urllib3_context()
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 4. Create HTTP pool manager</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    http <span style="color: #666">=</span> _configure_http_pool(timeout, retry_strategy, ssl_context, ca_certs, cert_reqs)
 
-        <span style="color: #3D7B7B; font-style: italic"># If verify_ssl is False, disable certificate verification</span>
-        <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> verify_ssl:
-            <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">ssl</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> CERT_NONE
-            ssl_context<span style="color: #666">.</span>check_hostname <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>
-            ssl_context<span style="color: #666">.</span>verify_mode <span style="color: #666">=</span> CERT_NONE
-
-        <span style="color: #3D7B7B; font-style: italic"># If a custom cert path is provided, load the CA certificates</span>
-        <span style="color: #008000; font-weight: bold">if</span> cert_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
-            <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000">isinstance</span>(cert_path, Path):
-                cert_path <span style="color: #666">=</span> Path(cert_path)
-
-            <span style="color: #3D7B7B; font-style: italic"># Load custom CA bundle if it exists</span>
-            <span style="color: #008000; font-weight: bold">if</span> cert_path<span style="color: #666">.</span>is_file():
-                ssl_context<span style="color: #666">.</span>load_verify_locations(cafile<span style="color: #666">=</span><span style="color: #008000">str</span>(cert_path))
-                ca_certs <span style="color: #666">=</span> <span style="color: #008000">str</span>(cert_path)
-            <span style="color: #008000; font-weight: bold">elif</span> cert_path<span style="color: #666">.</span>is_dir():
-                <span style="color: #3D7B7B; font-style: italic"># Try to find cert.pem in the directory</span>
-                cert_file <span style="color: #666">=</span> cert_path <span style="color: #666">/</span> <span style="color: #BA2121">&#39;cert.pem&#39;</span>
-                <span style="color: #008000; font-weight: bold">if</span> cert_file<span style="color: #666">.</span>exists():
-                    ssl_context<span style="color: #666">.</span>load_verify_locations(cafile<span style="color: #666">=</span><span style="color: #008000">str</span>(cert_file))
-                    ca_certs <span style="color: #666">=</span> <span style="color: #008000">str</span>(cert_file)
-                <span style="color: #008000; font-weight: bold">else</span>:
-                    ssl_context<span style="color: #666">.</span>load_verify_locations(capath<span style="color: #666">=</span><span style="color: #008000">str</span>(cert_path))
-                    ca_certs <span style="color: #666">=</span> <span style="color: #008000">str</span>(cert_path)
-
-    <span style="color: #3D7B7B; font-style: italic"># Determine cert_reqs and ca_certs for PoolManager</span>
-    <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> verify_ssl:
-        cert_reqs <span style="color: #666">=</span> <span style="color: #BA2121">&#39;CERT_NONE&#39;</span>
-        ca_certs <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>
-    <span style="color: #008000; font-weight: bold">elif</span> ca_certs <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #A2F; font-weight: bold">not</span> <span style="color: #008000; font-weight: bold">None</span>:
-        cert_reqs <span style="color: #666">=</span> <span style="color: #BA2121">&#39;CERT_REQUIRED&#39;</span>
-    <span style="color: #008000; font-weight: bold">else</span>:
-        cert_reqs <span style="color: #666">=</span> <span style="color: #BA2121">&#39;CERT_REQUIRED&#39;</span>
-        ca_certs <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>
-
-    <span style="color: #3D7B7B; font-style: italic"># Create a PoolManager with the retry strategy</span>
-    http <span style="color: #666">=</span> urllib3<span style="color: #666">.</span>PoolManager(
-        retries<span style="color: #666">=</span>retry_strategy,
-        timeout<span style="color: #666">=</span>urllib3<span style="color: #666">.</span>Timeout(total<span style="color: #666">=</span>timeout),
-        cert_reqs<span style="color: #666">=</span>cert_reqs,
-        ca_certs<span style="color: #666">=</span>ca_certs,
-        ssl_context<span style="color: #666">=</span>ssl_context,
-    )
-
-    current_url <span style="color: #666">=</span> URL(url)<span style="color: #666">.</span>href
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 5. Perform the request and follow redirects manually</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
     <span style="color: #008000; font-weight: bold">try</span>:
-        <span style="color: #3D7B7B; font-style: italic"># Perform the request</span>
-        resp <span style="color: #666">=</span> http<span style="color: #666">.</span>request(
-            <span style="color: #BA2121">&#39;GET&#39;</span>,
-            current_url,
-            redirect<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,  <span style="color: #3D7B7B; font-style: italic"># Manually handle redirects</span>
-            preload_content<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>  <span style="color: #3D7B7B; font-style: italic"># Similar to stream=True in requests</span>
-        )
-
-        <span style="color: #3D7B7B; font-style: italic"># Handle redirects manually</span>
-        redirect_count <span style="color: #666">=</span> <span style="color: #666">0</span>
-        <span style="color: #008000; font-weight: bold">while</span> <span style="color: #666">300</span> <span style="color: #666">&lt;=</span> resp<span style="color: #666">.</span>status <span style="color: #666">&lt;</span> <span style="color: #666">400</span> <span style="color: #A2F; font-weight: bold">and</span> redirect_count <span style="color: #666">&lt;</span> max_redirects:
-            <span style="color: #3D7B7B; font-style: italic"># Get redirect location</span>
-            location <span style="color: #666">=</span> resp<span style="color: #666">.</span>headers<span style="color: #666">.</span>get(<span style="color: #BA2121">&#39;Location&#39;</span>)
-            <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> location:
-                message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> (redirect) failed to determine next location.&quot;</span>
-                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(
-                    url<span style="color: #666">=</span>URL(url)<span style="color: #666">.</span>href,
-                    status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status,
-                    ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
-                    final_url<span style="color: #666">=</span>current_url,
-                    message<span style="color: #666">=</span>message,
-                )
-
-            <span style="color: #3D7B7B; font-style: italic"># Resolve relative URLs</span>
-            next_url <span style="color: #666">=</span> join_url(current_url, location)
-
-            <span style="color: #3D7B7B; font-style: italic"># Safety check on the next hop</span>
-            <span style="color: #008000; font-weight: bold">if</span> <span style="color: #A2F; font-weight: bold">not</span> _parse_url(next_url, allow_private_ip<span style="color: #666">=</span>allow_private_ip):
-                message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> (redirect) is not a valid URL.&quot;</span>
-                <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(
-                    url<span style="color: #666">=</span>URL(url)<span style="color: #666">.</span>href,
-                    status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status,
-                    ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
-                    final_url<span style="color: #666">=</span>next_url,
-                    message<span style="color: #666">=</span>message,
-                )
-
-            current_url <span style="color: #666">=</span> next_url
-            redirect_count <span style="color: #666">+=</span> <span style="color: #666">1</span>
-
-            <span style="color: #3D7B7B; font-style: italic"># Perform redirect request</span>
-            resp <span style="color: #666">=</span> http<span style="color: #666">.</span>request(
-                <span style="color: #BA2121">&#39;GET&#39;</span>,
-                current_url,
-                redirect<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
-                preload_content<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>
-            )
-
-        <span style="color: #3D7B7B; font-style: italic"># Return the final result</span>
+        response, final_url, n_redirects <span style="color: #666">=</span> _handle_redirects(http, URL(url)<span style="color: #666">.</span>href, max_redirects,
+                                                             allow_private_ip, validate_host)
+    <span style="color: #008000; font-weight: bold">except</span> (<span style="color: #CB3F38; font-weight: bold">ConnectionError</span>, <span style="color: #CB3F38; font-weight: bold">RuntimeError</span>, <span style="color: #CB3F38; font-weight: bold">ValueError</span>) <span style="color: #008000; font-weight: bold">as</span> exc:
+        message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>url<span style="color: #A45A77; font-weight: bold">!r}</span><span style="color: #BA2121"> failed: </span><span style="color: #A45A77; font-weight: bold">{</span>exc<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
+        logger<span style="color: #666">.</span>error(message)
         <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(
-            url<span style="color: #666">=</span>URL(url)<span style="color: #666">.</span>href,
-            status_code<span style="color: #666">=</span>resp<span style="color: #666">.</span>status,
-            ok<span style="color: #666">=200</span> <span style="color: #666">&lt;=</span> resp<span style="color: #666">.</span>status <span style="color: #666">&lt;</span> <span style="color: #666">400</span>,
-            final_url<span style="color: #666">=</span>current_url,
-            message<span style="color: #666">=</span><span style="color: #BA2121">&quot;Valid URL.&quot;</span>,
-            n_redirects<span style="color: #666">=</span>redirect_count
-        )
-
-    <span style="color: #008000; font-weight: bold">except</span> (MaxRetryError, NewConnectionError, <span style="color: #CB3F38; font-weight: bold">TimeoutError</span>) <span style="color: #008000; font-weight: bold">as</span> err:
-        message <span style="color: #666">=</span> <span style="color: #BA2121">f&quot;Request to </span><span style="color: #A45A77; font-weight: bold">{</span>current_url<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121"> failed with: </span><span style="color: #A45A77; font-weight: bold">{</span>err<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>
-        <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(
-            url<span style="color: #666">=</span>URL(url)<span style="color: #666">.</span>href,
+            url<span style="color: #666">=</span>url,
             status_code<span style="color: #666">=0</span>,
             ok<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
-            final_url<span style="color: #666">=</span>current_url,
+            final_url<span style="color: #666">=</span>url,
             message<span style="color: #666">=</span>message,
         )
-    <span style="color: #008000; font-weight: bold">finally</span>:
-        <span style="color: #3D7B7B; font-style: italic"># Ensure connection is released</span>
-        resp<span style="color: #666">.</span>release_conn() <span style="color: #008000; font-weight: bold">if</span> <span style="color: #BA2121">&#39;resp&#39;</span> <span style="color: #A2F; font-weight: bold">in</span> <span style="color: #008000">locals</span>() <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">None</span>
+
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    <span style="color: #3D7B7B; font-style: italic"># 6. Build the result object</span>
+    <span style="color: #3D7B7B; font-style: italic"># ------------------------------------------------------------------ #</span>
+    ok <span style="color: #666">=</span> <span style="color: #666">200</span> <span style="color: #666">&lt;=</span> response<span style="color: #666">.</span>status <span style="color: #666">&lt;</span> <span style="color: #666">400</span>
+    <span style="color: #008000; font-weight: bold">return</span> ServerCheckResult(
+        url<span style="color: #666">=</span>url,
+        status_code<span style="color: #666">=</span>response<span style="color: #666">.</span>status,
+        ok<span style="color: #666">=</span>ok,
+        final_url<span style="color: #666">=</span>final_url,
+        message<span style="color: #666">=</span><span style="color: #BA2121">&quot;Valid URL.&quot;</span> <span style="color: #008000; font-weight: bold">if</span> ok <span style="color: #008000; font-weight: bold">else</span> <span style="color: #BA2121">f&quot;HTTP </span><span style="color: #A45A77; font-weight: bold">{</span>response<span style="color: #666">.</span>status<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">&quot;</span>,
+        n_redirects<span style="color: #666">=</span>n_redirects,
+    )
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
