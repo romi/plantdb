@@ -97,6 +97,7 @@ def main():
         ds_name = default_scan_name
 
     # - Create the scan dataset:
+    db.login("admin", "admin")
     scan = db.create_scan(ds_name)
 
     # - Try to load metadata:
