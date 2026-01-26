@@ -58,13 +58,17 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         commons/[test] && \
     echo "\n\n# Installing 'plantdb.server' test dependencies..." && \
     python3 -m pip install --no-cache-dir --user \
-        server/[test]
+        server/[test] && \
+    echo "\n\n# Installing 'plantdb.client' test dependencies..." && \
+    python3 -m pip install --no-cache-dir --user \
+        client/[test]
 # Run tests
-RUN --mount=type=cache,target=/root/.cache/pip \
-    echo "\n\n# Running 'plantdb.commons' tests..." && \
+RUN echo "\n\n# Running 'plantdb.commons' tests..." && \
     nose2 -v -s commons/tests/ && \
-    echo "\n\n# Running 'plantdb.commons' tests..." && \
-    nose2 -v -s server/tests/
+    echo "\n\n# Running 'plantdb.server' tests..." && \
+    nose2 -v -s server/tests/ && \
+    echo "\n\n# Running 'plantdb.client' tests..." && \
+    nose2 -v -s client/tests/
 
 # ============= Final stage =============
 FROM ubuntu:22.04 AS runtime
