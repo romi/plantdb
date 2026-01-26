@@ -1,49 +1,33 @@
-# GitHub workflow that build the Docker image, run python unit tests & clean-up
-
+# pull_request.yml
 name: CI UnitTests
 
-on: pull_request
+on:
+  pull_request:
 
 jobs:
-  # Build a Docker image with the current code
-  docker-build:
-    runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ubuntu-22.04
     steps:
-      # Step 1: Check out repository code including submodules
+      # 1 Checkout the repo (including submodules if you need them)
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      # Step 2: Build the Dockerfile
-      - name: Build Dockerfile
+      # 2 Build the Docker image
+      - name: Build Docker image
         run: |
-          # Clean up any dangling containers before build
           docker container prune -f
-          # Build Docker image using commit SHA as tag with clean cache
           ./docker/build.sh -t ${{ github.sha }} --no-cache
 
-  # Run unit tests in the Docker container
-  unit-tests:
-    runs-on: ubuntu-latest
-    # Ensure Docker image is built before running tests
-    needs: docker-build
-    steps:
-      - name: Run Unit Tests
+      # 3 Run the unit tests inside the image
+      - name: Run unit tests
         run: |
-          # Execute tests using the previously built Docker image
           ./docker/run.sh -t ${{ github.sha }} --unittest
 
-  # Cleanup Docker resources after tests complete
-  docker-clean:
-    runs-on: ubuntu-latest
-    # Run after tests complete, regardless of test outcome
-    needs: unit-tests
-    if: always()
-    steps:
-      - name: Remove Docker Image
+      # 4 Clean up
+      - name: Remove Docker image
+        if: always()
         run: |
-          # Remove any unused containers
           docker container prune -f
-          # Force remove the image created for this workflow run
           docker image rm roboticsmicrofarms/plantdb:${{ github.sha }} --force
