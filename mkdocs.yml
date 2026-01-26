@@ -12,6 +12,8 @@ nav:
   - 'Reference API': reference/
   - 'Developers' :
     - 'Release Guide': developers/releases.md
+    - 'Authentication': developers/authentication.md
+    - 'Locking': developers/locking.md
 
 
 theme:
