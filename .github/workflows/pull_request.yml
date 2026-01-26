@@ -17,7 +17,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker container prune -f
-          docker build --target test -t plantdb-test:${{ github.sha }} .
+          docker build -f docker/Dockerfile --target test -t plantdb-test:${{ github.sha }} .
 
       # Clean up
       - name: Remove Docker image
