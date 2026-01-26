@@ -91,7 +91,7 @@ class ScanLockManager:
     Attributes
     ----------
     base_path : str
-            The base directory of the database.
+        The base directory of the database.
     default_timeout : float
         The default timeout duration in seconds when attempting to acquire a lock.
         Default is 30.0 seconds.
@@ -139,6 +139,20 @@ class ScanLockManager:
         self._active_locks: Dict[str, Dict] = {}  # Track active locks
         self._lock_files: Dict[str, int] = {}  # File descriptors for locks
         self._thread_lock = threading.RLock()  # Thread-safe operations
+
+        # Test write capability in base_path
+        try:
+            test_file = os.path.join(base_path, '.write_test.tmp')
+            with open(test_file, 'w') as f:
+                f.write('test')
+            os.remove(test_file)
+        except PermissionError as e:
+            # Create a logger without the log_file as it will not be writable either
+            logger = get_logger(__name__ + '.ScanLockManager', log_level="DEBUG")
+            logger.error(f"Cannot write to base_path `{base_path}`.")
+            logger.debug(f"Current UID={os.getuid()}, GID={os.getgid()}")
+            raise e
+
         # Ensure locks directory exists
         os.makedirs(self.locks_dir, exist_ok=True)
         # Initialize lock manager logger
@@ -421,7 +435,6 @@ class ScanLockManager:
                 # Remove lock info
                 self._remove_lock_info(scan_id)
                 self.logger.debug(f"Successfully released lock for scan {scan_id}")
-
 
     def get_lock_status(self, scan_id: str) -> Dict:
         """

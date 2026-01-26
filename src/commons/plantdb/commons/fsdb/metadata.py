@@ -58,7 +58,7 @@ def _load_fileset_metadata(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The fileset to load the metadata for.
 
     Returns
@@ -109,7 +109,7 @@ def _load_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The dataset to load the metadata for.
 
     Returns
@@ -136,7 +136,7 @@ def _load_file_metadata(file):
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         The file to load the metadata for.
 
     Returns
@@ -186,7 +186,7 @@ def _store_scan_metadata(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The dataset to save the metadata for.
     """
     _store_metadata(_scan_metadata_path(scan), scan.metadata)
@@ -198,7 +198,7 @@ def _store_fileset_metadata(fileset):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Fileset
+    scan : plantdb.commons.fsdb.core.Fileset
         The fileset to save the metadata for.
     """
     _store_metadata(_fileset_metadata_json_path(fileset), fileset.metadata)
@@ -210,7 +210,7 @@ def _store_file_metadata(file):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.File
+    scan : plantdb.commons.fsdb.core.File
         The file to save the metadata for.
     """
     _store_metadata(_file_metadata_path(file), file.metadata)

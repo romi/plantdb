@@ -2,9 +2,12 @@
 
 name: Build & Deploy documentation
 
-# Triggers workflow on any push to the repository
 on:
-  - push
+  # Automatic trigger on release
+  release:
+    types: [ published ]
+  # Enables manual triggering from the Action tab
+  workflow_dispatch:
 
 jobs:
   docs:

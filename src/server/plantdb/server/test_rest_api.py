@@ -4,11 +4,12 @@
 import socket
 import threading
 import time
-from pathlib import Path
 
 from flask import Flask
 from werkzeug.serving import make_server
 
+from plantdb.commons.log import get_logger
+from plantdb.commons.test_database import _mkdtemp_romidb
 from plantdb.server.cli.fsdb_rest_api import rest_api
 
 
@@ -46,12 +47,12 @@ class TestRestApiServer:
     Examples
     --------
     >>> from plantdb.server.test_rest_api import TestRestApiServer
-    >>> from plantdb.client.rest_api import list_scan_names
+    >>> from plantdb.client.rest_api import request_scan_names_list
     >>>
     >>> # EXAMPLE 1 - Create a test database and start the Flask App serving a REST API
     >>> server = TestRestApiServer(test=True)
     >>> server.start()
-    >>> scans_list = list_scan_names(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> scans_list = request_scan_names_list(server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
     >>> print(scans_list)
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     >>> server.stop()
@@ -63,19 +64,19 @@ class TestRestApiServer:
     /tmp/ROMI_DB_********
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
-    >>> list_scan_names(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> request_scan_names_list(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
     >>> print(scans_list)
     ['real_plant_analyzed']
     >>> server.stop()
     """
 
-    def __init__(self, db_path='/none', port=5000, host='127.0.0.1', prefix='', ssl=False, test=False, empty=False,
+    def __init__(self, db_path=None, port=5000, host='127.0.0.1', prefix='', ssl=False, test=False, empty=False,
                  models=False):
         """Initialize the test REST API server.
 
         Parameters
         ----------
-        db_path : str or pathlib.Path
+        db_path : str or pathlib.Path, optional
             Path to the database directory to serve
         port : int, optional
             Port number for the server (default: 5000)
@@ -92,7 +93,7 @@ class TestRestApiServer:
         models : bool, optional
             Whether to create a database with models (default: False)
         """
-        self.db_path = Path(db_path)
+        self.db_path = db_path if db_path else _mkdtemp_romidb()
         self.port = port
         self.host = host
         self.prefix = prefix
@@ -103,15 +104,15 @@ class TestRestApiServer:
         self.app = None
         self.server = None
         self.thread = None
+        self.logger = get_logger(__name__)
         self._setup_flask_app()
 
     def _setup_flask_app(self):
-        """Setup the Flask application with REST API endpoints."""
-        if self.test:
-            self.db_path = "/none"
+        """Set up the Flask application with REST API endpoints."""
         rest_api_kwargs = {
             'proxy': self.prefix != '',
             'url_prefix': self.prefix,
+            'ssl': self.ssl,
             'test': self.test,
             'empty': self.empty,
             'models': self.models
@@ -130,7 +131,7 @@ class TestRestApiServer:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.settimeout(1)
                 result = sock.connect_ex((self.host, self.port))
-                return result != 0  # Port is available if connection fails
+                return result != 0  # Port is available if the connection fails
         except Exception:
             return False
 
@@ -153,8 +154,7 @@ class TestRestApiServer:
         # Wait a bit for server to start
         time.sleep(0.5)
 
-        print(
-            f"Test REST API server started at {'https' if self.ssl else 'http'}://{self.host}:{self.port}{self.prefix}")
+        self.logger.info(f"Test REST API server started at {self.get_base_url()}")
 
     def stop(self):
         """Stop the REST API server."""
@@ -166,7 +166,7 @@ class TestRestApiServer:
             self.thread.join(timeout=5.0)
             self.thread = None
 
-        print("Test REST API server stopped")
+        self.logger.info("Test REST API server stopped")
 
     def is_running(self):
         """Check if the server is running."""

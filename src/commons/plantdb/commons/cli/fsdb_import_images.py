@@ -8,7 +8,7 @@ import argparse
 import json
 from pathlib import Path
 
-from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
@@ -97,6 +97,7 @@ def main():
         ds_name = default_scan_name
 
     # - Create the scan dataset:
+    db.login("admin", "admin")
     scan = db.create_scan(ds_name)
 
     # - Try to load metadata:

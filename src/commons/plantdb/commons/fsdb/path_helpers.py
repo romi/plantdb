@@ -29,13 +29,15 @@ file_path = _file_path(file_object)
 new_filename = _get_filename(file_object, "jpg")  # Returns: "file_id.jpg"
 ```
 """
+import pathlib
 
-def _scan_path(scan):
+
+def _scan_path(scan) -> pathlib.Path:
     """Get the path to given scan.
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the path from.
 
     Returns
@@ -46,12 +48,12 @@ def _scan_path(scan):
     return (scan.db.basedir / scan.id).resolve()
 
 
-def _scan_json_file(scan):
+def _scan_json_file(scan) -> pathlib.Path:
     """Get the path to scan's "files.json" file.
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the files JSON file path from.
 
     Returns
@@ -62,12 +64,12 @@ def _scan_json_file(scan):
     return _scan_path(scan) / "files.json"
 
 
-def _scan_metadata_path(scan):
+def _scan_metadata_path(scan) -> pathlib.Path:
     """Get the path to scan's "metadata.json" file.
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the metadata JSON file path from.
 
     Returns
@@ -78,12 +80,12 @@ def _scan_metadata_path(scan):
     return _scan_path(scan) / "metadata" / "metadata.json"
 
 
-def _scan_measures_path(scan):
+def _scan_measures_path(scan) -> pathlib.Path:
     """Get the path to scan's "measures.json" file.
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan to get the measures JSON file path from.
 
     Returns
@@ -94,12 +96,12 @@ def _scan_measures_path(scan):
     return _scan_path(scan) / "measures.json"
 
 
-def _fileset_path(fileset):
+def _fileset_path(fileset) -> pathlib.Path:
     """Get the path to given fileset directory.
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         A fileset to get the path from.
 
     Returns
@@ -110,12 +112,12 @@ def _fileset_path(fileset):
     return _scan_path(fileset.scan) / fileset.id
 
 
-def _fileset_metadata_path(fileset):
+def _fileset_metadata_path(fileset) -> pathlib.Path:
     """Get the path to given fileset metadata directory.
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         A fileset to get the metadata directory path from.
 
     Returns
@@ -126,12 +128,12 @@ def _fileset_metadata_path(fileset):
     return _scan_path(fileset.scan) / "metadata" / fileset.id
 
 
-def _fileset_metadata_json_path(fileset):
+def _fileset_metadata_json_path(fileset) -> pathlib.Path:
     """Get the path to `fileset.id` metadata JSON file.
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         A fileset to get the JSON file path from.
 
     Returns
@@ -142,12 +144,12 @@ def _fileset_metadata_json_path(fileset):
     return _scan_path(fileset.scan) / "metadata" / f"{fileset.id}.json"
 
 
-def _file_path(file):
+def _file_path(file) -> pathlib.Path:
     """Get the path to given file.
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         A file to get the path from.
 
     Returns
@@ -158,12 +160,12 @@ def _file_path(file):
     return _fileset_path(file.fileset) / file.filename
 
 
-def _file_metadata_path(file):
+def _file_metadata_path(file) -> pathlib.Path:
     """Get the path to `file.id` metadata JSON file.
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         A file to get the metadata JSON path from.
 
     Returns
@@ -174,12 +176,12 @@ def _file_metadata_path(file):
     return _scan_path(file.fileset.scan) / "metadata" / file.fileset.id / f"{file.id}.json"
 
 
-def _get_filename(file, ext):
+def _get_filename(file, ext) -> str:
     """Returns a `file` name using its ``id`` attribute and given extension.
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         A File object.
     ext : str
         The file extension to use.

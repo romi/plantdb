@@ -20,8 +20,8 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 >>> # Start a test REST API server first:
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
->>> from plantdb.client.rest_api import base_url
->>> client = PlantDBClient(base_url())
+>>> from plantdb.client.rest_api import plantdb_url
+>>> client = PlantDBClient(plantdb_url())
 >>> # Create a new scan
 >>> scan_id = client.create_scan(
 ...     name="Plant Sample 001",
@@ -35,12 +35,13 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 ... )
 ```
 """
-
 import mimetypes
 import os
 
 import requests
 from requests import RequestException
+
+from plantdb.commons.log import get_logger
 
 
 def get_mime_type(extension):
@@ -80,6 +81,8 @@ class PlantDBClient:
     ----------
     base_url : str
         The base URL of the PlantDB REST API.
+    prefix : str, optional
+        The URL prefix used by the PlantDB REST API.
 
     Attributes
     ----------
@@ -87,6 +90,12 @@ class PlantDBClient:
         The base URL of the PlantDB REST API.
     session : requests.Session
         HTTP session that maintains cookies and connection pooling.
+    jwt_token : str
+        The JWT token to authenticate with the PlantDB REST API.
+    username :str
+        The login username.
+    logger : logging.Logger
+        The logger to use.
 
     Notes
     -----
@@ -96,15 +105,22 @@ class PlantDBClient:
 
     Examples
     --------
-    >>> # Start a test REST API server first:
-    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.server.test_rest_api import TestRestApiServer
+    >>> # Start a test PlantDB REST API server first:
+    >>> server = TestRestApiServer(test=True)
+    >>> server.start()
+    >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
-    >>> from plantdb.client.rest_api import base_url
-    >>> client = PlantDBClient(base_url())
-    >>> client.base_url
+    >>> from plantdb.client.rest_api import plantdb_url
+    >>> client = PlantDBClient(plantdb_url())
+    >>> client.login('admin', 'admin')
+    >>> print(client.jwt_token)
+    >>> print(client.plantdb_url)
     >>> scans = client.list_scans()
     >>> print(scans)
     ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+    >>> # Finally, stop the server
+    >>> server.stop()
     """
 
     def __init__(self, base_url, prefix=None):
@@ -113,12 +129,120 @@ class PlantDBClient:
             prefix = api_prefix()
         self.base_url = f"{base_url}{prefix}"
         self.session = requests.Session()
+        self.jwt_token = None
+        self.username = None
+        self.logger = get_logger(__class__.__name__)
+
+    def validate_session_token(self, token):
+        """
+        Sets the JWT token for the HTTP session and updates the Authorization header.
+
+        Parameters
+        ----------
+        token : str
+            The JWT token to be used for authentication.
+        """
+        url = f"{self.base_url}/token-validation"
+        response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
+        if response.status_code == 200:
+            self.jwt_token = token
+            self.username = response.json().get('username')
+            # Add the JWT to the header
+            self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
+        else:
+            self.logger.error(f"Token validation failed!")
+            self.logger.error(response.json())
+        return
+
+    def login(self, username: str, password: str) -> bool:
+        """
+        Authenticate the user with the PlantDB API.
+
+        Parameters
+        ----------
+        username : str
+            Username for authentication
+        password : str
+            Password for authentication
+
+        Returns
+        -------
+        bool
+            ``True`` if login successful, ``False`` otherwise
+        """
+        url = f"{self.base_url}/login"
+        data = {
+            'username': username,
+            'password': password
+        }
+
+        try:
+            response = self.session.post(url, json=data)
+            if response.status_code == 200:
+                result = response.json()
+                self.jwt_token = result.get('access_token')
+                self.username = username
+                return True
+            else:
+                error_msg = response.json().get('message', 'Login failed')
+                self.logger.error(f"Login failed: {error_msg}")
+                return False
+
+        except RequestException as e:
+            self.logger.error(f"Login request failed: {e}")
+            return False
+
+    def logout(self) -> bool:
+        """
+        Logout user from the PlantDB API.
+
+        Returns
+        -------
+        bool
+            True if logout successful
+        """
+        url = f"{self.base_url}/logout"
+        try:
+            response = self.session.post(url)
+            if response.status_code == 200:
+                self.username = None
+                # Remove the Authorization with the JWT from the header
+                self.session.headers.pop('Authorization')
+                return True
+            return False
+        except Exception:
+            return False
+
+    def refresh(self) -> bool:
+        """Refresh the database."""
+        url = f"{self.base_url}/refresh"
+        try:
+            response = self.session.get(url)
+            if response.status_code == 200:
+                return True
+            return False
+        except Exception:
+            return False
+
+    def refresh_token(self) -> bool:
+        """Refresh the JWT token."""
+        url = f"{self.base_url}/token-refresh"
+        try:
+            response = self.session.post(url)
+            if response.status_code == 200:
+                result = response.json()
+                self.jwt_token = result.get('access_token')
+                self.username = result.get('username')
+                return True
+            return False
+        except Exception:
+            return False
 
     def _handle_http_errors(self, response):
         """
         Handles HTTP errors by raising a custom exception with an error message obtained
         from the HTTP response. This function intercepts the original exception, extracts
-        the error message from the response JSON, and raises a new exception of the same
+        the error message from the response JSON, and raises a new exception to the same
         type with the extracted message.
 
         Parameters
@@ -166,8 +290,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> response = client.list_scans()
         >>> print(response)
         ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
@@ -209,8 +333,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> metadata = {'description': 'Test plant scan'}
         >>> response = client.create_scan('test_plant', metadata=metadata)
         >>> print(response)
@@ -251,8 +375,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Get all metadata
         >>> metadata = client.get_scan_metadata('test_plant')
         >>> print(metadata)
@@ -298,8 +422,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> new_metadata = {'description': 'Updated scan description'}
         >>> response = client.update_scan_metadata('test_plant', new_metadata)
         >>> print(response)
@@ -343,8 +467,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> response = client.list_scan_filesets('real_plant')
         >>> print(response)
         {'filesets': ['images']}
@@ -388,8 +512,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> metadata = {'description': 'This is a test fileset'}
         >>> response = client.create_fileset('my_fileset', 'real_plant', metadata=metadata)
         >>> print(response)
@@ -435,8 +559,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Get all metadata
         >>> metadata = client.get_fileset_metadata('real_plant', 'my_fileset')
         >>> print(metadata)
@@ -484,8 +608,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Update metadata
         >>> new_metadata = {'description': 'Updated fileset description', 'author': 'John Doe'}
         >>> response = client.update_fileset_metadata('real_plant', 'my_fileset', new_metadata)
@@ -532,8 +656,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> response = client.list_fileset_files('real_plant', 'images')
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
@@ -587,8 +711,8 @@ class PlantDBClient:
         >>> import tempfile
         >>> import yaml
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Example 1 - Existing YAML file path as string
         >>> metadata = {'description': 'Test document', 'author': 'John Doe'}
         >>> dummy_data = {'name': 'Test Plant', 'species': 'Arabidopsis thaliana'}
@@ -691,8 +815,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Get all metadata
         >>> metadata = client.get_file_metadata('test_plant', 'images', 'image_001')
         >>> print(metadata)
@@ -742,8 +866,8 @@ class PlantDBClient:
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import base_url
-        >>> client = PlantDBClient(base_url())
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url())
         >>> # Update metadata
         >>> new_metadata = {'description': 'Updated description'}
         >>> response = client.update_file_metadata(
@@ -781,13 +905,13 @@ def api_prefix(prefix=""):
     >>> from plantdb.client.plantdb_client import api_prefix
     >>> api_prefix()
     ''
-    >>> os.environ['PLANTDB_API_PREFIX'] = "/plantdb"
+    >>> os.environ['PLANTDB_PREFIX'] = "/plantdb"
     >>> api_prefix()
     '/plantdb'
     """
     if prefix is None or prefix == "":
-        prefix = os.environ.get("PLANTDB_API_PREFIX", "")  # Default to no prefix
+        prefix = os.getenv("PLANTDB_PREFIX", "")  # Default to no prefix
 
     prefix = prefix.rstrip('/')  # Remove the trailing slash if present
-    os.environ['PLANTDB_API_PREFIX'] = prefix
+    os.environ['PLANTDB_PREFIX'] = prefix
     return prefix

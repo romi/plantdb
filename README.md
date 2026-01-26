@@ -73,7 +73,7 @@ The `plantdb` packages are available through:
 
 To create a new conda environment for PlantDB:
 ``` shell
-conda create -n plantdb 'python=3.10' ipython
+conda create -n plantdb 'python<3.13' ipython
 ```
 
 ## Installation
@@ -191,7 +191,7 @@ import os
 
 db_path = os.environ['ROMI_DB']
 # Use it to connect to DB:
-from plantdb.commons.fsdb import FSDB
+from plantdb.commons.fsdb.core import FSDB
 
 db = FSDB(db_path)
 db.connect()

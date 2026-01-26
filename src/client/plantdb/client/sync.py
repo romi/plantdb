@@ -93,7 +93,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 ```python
 >>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.server.test_rest_api import TestRestApiServer
->>> from plantdb.client.rest_api import list_scan_names
+>>> from plantdb.client.rest_api import request_scan_names_list
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database with all 5 test dataset
 >>> db_source = test_database("all")
@@ -103,7 +103,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 Test REST API server started at http://127.0.0.1:5000
 >>> server_cfg = db_target.get_server_config()
 >>> # Use REST API to list scans and verify target DB is empty
->>> scans_list = list_scan_names(**server_cfg)
+>>> scans_list = request_scan_names_list(**server_cfg)
 >>> print(scans_list)
 []
 >>> # Asynchronous sync target database with source
@@ -124,10 +124,10 @@ Test REST API server started at http://127.0.0.1:5000
 >>> else:
 ...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
->>> from plantdb.client.rest_api import refresh
->>> refresh(**server_cfg)
+>>> from plantdb.client.rest_api import request_refresh
+>>> request_refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
->>> scans_list = list_scan_names(**server_cfg)
+>>> scans_list = request_scan_names_list(**server_cfg)
 >>> print(scans_list)
 ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
 >>> db_target.stop()
@@ -156,8 +156,8 @@ import paramiko
 import requests
 import urllib3
 
-from plantdb.client.rest_api import download_scan_archive
-from plantdb.client.rest_api import upload_scan_archive
+from plantdb.client.rest_api import request_archive_download
+from plantdb.client.rest_api import request_archive_upload
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
@@ -508,7 +508,7 @@ class FSDBSync():
             try:
                 self._create_scan_archive(src_scan_path, archive_path)
                 # Upload via REST API
-                response = upload_scan_archive(scan_id, archive_path, **config_from_url(target_url))
+                response = request_archive_upload(scan_id, archive_path, **config_from_url(target_url))
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
@@ -542,7 +542,7 @@ class FSDBSync():
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
                 # Download archive
-                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+                response = request_archive_download(scan_id, dst_path, **config_from_url(src_url))
                 # Extract the downloaded archive
                 self._extract_scan_archive(str(archive_path), dst_path / scan_id)
             finally:
@@ -704,9 +704,9 @@ class FSDBSync():
             archive_path = Path(dst_path) / f"{scan_id}.zip"
             try:
                 # Download archive from source
-                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+                response = request_archive_download(scan_id, dst_path, **config_from_url(src_url))
                 # Upload archive to target
-                response = upload_scan_archive(scan_id, archive_path, **config_from_url(dst_url))
+                response = request_archive_upload(scan_id, archive_path, **config_from_url(dst_url))
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
@@ -742,7 +742,7 @@ class FSDBSync():
                 dst_path = Path(tempfile.gettempdir())
                 archive_path = dst_path / f"{scan_id}.zip"
                 # Download archive from source
-                response = download_scan_archive(scan_id, dst_path, **config_from_url(src_url))
+                response = request_archive_download(scan_id, dst_path, **config_from_url(src_url))
 
                 # Extract to temp directory
                 temp_scan_path = dst_path / scan_id
@@ -794,7 +794,7 @@ class FSDBSync():
                     self._create_scan_archive(temp_scan_path, str(archive_path))
 
                     # Upload archive via REST API
-                    upload_scan_archive(scan_id, str(archive_path), **config_from_url(dst_url))
+                    request_archive_upload(scan_id, str(archive_path), **config_from_url(dst_url))
         finally:
             sftp.close()
 
@@ -1035,7 +1035,7 @@ def _parse_database_spec(spec):
     Examples
     --------
     >>> from plantdb.client.sync import _parse_database_spec
-    >>> from plantdb.commons.fsdb import FSDB
+    >>> from plantdb.commons.fsdb.core import FSDB
     >>>
     >>> # FSDB instance
     >>> db = FSDB('/path/to/db')

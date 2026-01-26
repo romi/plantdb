@@ -28,6 +28,7 @@ This module regroup the classes and methods used to serve a REST API using ``fsd
 """
 
 import datetime
+import hashlib
 import json
 import os
 import threading
@@ -37,7 +38,6 @@ from functools import wraps
 from io import BytesIO
 from math import radians
 from pathlib import Path
-from tempfile import mkdtemp
 from tempfile import mkstemp
 from zipfile import ZipFile
 
@@ -66,7 +66,7 @@ def get_scan_date(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get the date & time from.
 
     Returns
@@ -105,7 +105,7 @@ def compute_fileset_matches(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to list the filesets from.
 
     Returns
@@ -116,7 +116,7 @@ def compute_fileset_matches(scan):
     Examples
     --------
     >>> from plantdb.server.rest_api import compute_fileset_matches
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> scan = db.get_scan("myscan_001")
     >>> compute_fileset_matches(scan)
@@ -135,7 +135,7 @@ def get_path(f, db_prefix="/files/"):
 
     Parameters
     ----------
-    f : plantdb.commons.fsdb.File
+    f : plantdb.commons.fsdb.core.File
         The file to get the path for.
     db_prefix : str, optional
         A prefix to use... ???
@@ -192,7 +192,7 @@ def get_scan_info(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get information from.
 
     Other Parameters
@@ -371,11 +371,11 @@ def get_file_uri(scan, fileset, file):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.core.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.File or str
+    file : plantdb.commons.fsdb.core.File or str
         A ``File`` instance or the name of the file.
 
     Returns
@@ -397,9 +397,9 @@ def get_file_uri(scan, fileset, file):
     >>> get_file_uri(scan, fs, f)
     '/files/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'
     """
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
@@ -411,11 +411,11 @@ def get_image_uri(scan, fileset, file, size="orig"):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan or str
+    scan : plantdb.commons.fsdb.core.Scan or str
         A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.Fileset or str
+    fileset : plantdb.commons.fsdb.core.Fileset or str
         A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.File or str
+    file : plantdb.commons.fsdb.core.File or str
         A ``File`` instance or the name of the file.
     size : {'orig', 'large', 'thumb'} or int, optional
         If an integer, use  it as the size of the cached image to create and return.
@@ -443,9 +443,9 @@ def get_image_uri(scan, fileset, file, size="orig"):
     >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb')
     '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb'
     """
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
@@ -465,7 +465,7 @@ def get_scan_data(scan, **kwargs):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan instance to get the information and data from.
 
     Other Parameters
@@ -695,6 +695,23 @@ def rate_limit(max_requests=5, window_seconds=60):
         return wrapped
 
     return decorator
+
+
+def requires_jwt(f):
+    """Decorator to require JWT validation."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Try to get JWT token from request header
+        jwt_token = request.headers.get('Authorization', "").replace('Bearer ', '')
+        # Verify we actually got a token (do not test its validity, this is done by the database)
+        if not jwt_token:
+            return {'message': 'Authentication required, JSON Web Token missing!'}, 401
+        # Add token to keyword arguments (for later use by FSD methods)
+        kwargs['token'] = jwt_token
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 # Home page resource
@@ -955,7 +972,7 @@ class Login(Resource):
         if not username:
             return {'error': 'Missing username parameter'}, 400
         # Query database to check if user exists
-        user_exists = self.db.user_exists(username)
+        user_exists = self.db.rbac_manager.users.exists(username)
         return {'username': username, 'exists': user_exists}, 200
 
     @rate_limit(max_requests=20, window_seconds=60)
@@ -1017,37 +1034,168 @@ class Login(Resource):
         # Extract credentials from request data
         username = data['username']
         password = data['password']
+
         # Attempt to authenticate user with provided credentials
-        is_authenticated = self.check_credentials(username, password)
+        jwt_token = self.db.login(username, password)
 
         # Prepare response based on authentication result
-        if is_authenticated:
-            # Get user's full name from database for welcome message
-            fullname = self.db.users[username]['fullname']
-            message = f"Login successful. Welcome, {self.db.users[username]['fullname']}!"
+        if jwt_token:
+            user = self.db.get_user_data(session_token=jwt_token)
+            # Create response with user info & access token
+            response_data = {
+                'message': 'Login successful',
+                'user': {
+                    'username': user.username,
+                    'fullname': user.fullname,
+                },
+                'access_token': jwt_token
+            }
+            response = make_response(jsonify(response_data), 200)
+            return response
         else:
-            fullname = "None"
-            message = f"Login failed. Please check your username and password!"
+            return {'message': 'Invalid credentials'}, 401
 
-        # Return authentication result and appropriate message with 200 status code
-        return {'authenticated': is_authenticated, 'fullname': fullname, 'message': message}, 200
 
-    def check_credentials(self, username, password):
-        """Validates user credentials against the database.
+class Logout(Resource):
+    def __init__(self, db, logger):
+        """Initialize the Logout resource.
 
         Parameters
         ----------
-        username : str
-            The username provided by the user or client for authentication.
-        password : str
-            The password corresponding to the username for authentication.
-
-        Returns
-        -------
-        bool
-            ``True`` if the credentials are valid, ``False`` otherwise.
+        db : plantdb.commons.fsdb.FSDB
+            Database connection object for accessing scan data.
         """
-        return self.db.validate_user(username, password)
+        self.db = db
+        self.logger = logger
+
+    @requires_jwt
+    def post(self, **kwargs):
+        """Handle user logout and clear cookie."""
+        # Get token from keyword arguments
+        jwt_token = kwargs.get('token', None)
+        try:
+            if jwt_token:
+                # Invalidate session
+                self.db.session_manager.invalidate_session(jwt_token)
+                response = {'message': 'Logout successful'}, 200
+            else:
+                self.logger.error(f"Logout error: no active session!")
+                response = {'message': 'Logout failed'}, 401
+
+            return response
+
+        except Exception as e:
+            self.logger.error(f"Logout error: {str(e)}")
+            return {'message': 'Logout failed'}, 500
+
+
+class TokenValidation(Resource):
+    """
+    Validate a JSON Web Token (JWT) and retrieve associated user data.
+
+    The resource exposes a POST endpoint that accepts a JWT token, verifies its
+    validity against the database session manager, and returns the authenticated
+    user’s basic profile information.  On success a 200 response is returned
+    containing the user’s ``username`` and ``fullname``; on failure a 401
+    response is returned with an error message.
+
+    Attributes
+    ----------
+    db : Any
+        Database handler with a ``session_manager`` attribute.
+    logger : Any
+        Logger used to log validation attempts.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+    logger : Any
+        Logger instance used for recording authentication events.
+
+    Examples
+    --------
+    >>> from flask import Flask
+    >>> from flask_restful import Api
+    >>> app = Flask(__name__)
+    >>> api = Api(app)
+    >>> # Assume `db` and `logger` are pre‑configured objects
+    >>> api.add_resource(TokenValidation, '/validate')
+    >>> # In a test client
+    >>> with app.test_client() as client:
+    ...     response = client.post('/validate', json={'token': 'valid.jwt.token'})
+    ...     print(response.status_code)          # 200
+    ...     print(response.json)
+    ...     # {'message': 'Token validation successful',
+    ...     #  'user': {'username': 'jdoe', 'fullname': 'John Doe'}}
+    """
+
+    def __init__(self, db, logger):
+        """Initialize the TokenValidation resource."""
+        self.db = db
+        self.logger = logger
+
+    def post(self, **kwargs):
+        """Handle token validation."""
+        jwt_token = kwargs.get('token', None)
+
+        try:
+            user = self.db.session_manager.get_user_data(session_token=jwt_token)
+        except Exception as e:
+            response = {'message': f'Token validation failed: {e}'}, 401
+        else:
+            response = {'message': 'Token validation successful',
+                        'user': {
+                            'username': user.username,
+                            'fullname': user.fullname,
+                        },
+                        }, 200
+
+        return response
+
+
+class TokenRefresh(Resource):
+    """
+    Refresh JWT token for an authenticated user.
+
+    The :class:`TokenRefresh` resource provides an endpoint that accepts an
+    existing JSON Web Token, validates the current session, and issues a new
+    access token when the refresh is successful.  The resource interacts
+    with a database session manager that exposes a ``refresh_session`` method
+    to perform the actual token renewal.
+
+    Attributes
+    ----------
+    db : object
+        Database handler with a ``session_manager`` attribute.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+
+    """
+
+    def __init__(self):
+        """Initialize the TokenRefresh resource."""
+        self.db = None
+
+    @requires_jwt
+    def post(self, **kwargs):
+        """Refresh JWT token."""
+        # Get token from keyword arguments
+        jwt_token = kwargs.get('token', None)
+        try:
+            new_token = self.db.session_manager.refresh_session(jwt_token)
+
+            if new_token:
+                response = {'message': 'Token refreshed successfully', 'access_token': new_token}, 200
+                return response
+            else:
+                return {'message': 'Token refresh failed'}, 401
+
+        except Exception as e:
+            return {'message': f'Token refresh failed: {e}'}, 500
 
 
 class ScansList(Resource):
@@ -1062,19 +1210,18 @@ class ScansList(Resource):
     db : plantdb.commons.fsdb.FSDB
         Database connection object used to interact with the scan datasets.
 
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.FSDB
+        Database connection object for accessing scan data.
+
     See Also
     --------
     flask_restful.Resource : Base class for RESTful resources
     """
 
     def __init__(self, db):
-        """Initialize the ScansList resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.FSDB
-            Database connection object for accessing scan data.
-        """
+        """Initialize the ScansList resource."""
         self.db = db
 
     @rate_limit(max_requests=30, window_seconds=60)
@@ -1327,7 +1474,10 @@ class Scan(Resource):
         """
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
-        return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+        if self.db.scan_exists(scan_id):
+            return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+        else:
+            return {'message': f"Scan id '{scan_id}' does not exist"}, 404
 
     @rate_limit(max_requests=15, window_seconds=60)
     def post(self, scan_id):
@@ -1790,7 +1940,7 @@ class Image(Resource):
         """
         self.db = db
 
-    @rate_limit(max_requests=120, window_seconds=60)
+    @rate_limit(max_requests=3000, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve an image from the database.
 
@@ -1860,7 +2010,7 @@ class Image(Resource):
         size = request.args.get('size', default='thumb', type=str)
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path, mimetype='image/jpeg')
+        return send_file(path)
 
 
 class PointCloud(Resource):
@@ -2043,17 +2193,6 @@ class PointCloudGroundTruth(Resource):
         - All identifiers are sanitized before use
         - Invalid size parameters default to 'preview'
         - Response mimetype is 'application/octet-stream'
-
-        Examples
-        --------
-        >>> # Request original size point-cloud
-        >>> response = get('/api/scan123/fileset1/cloud1?size=orig')
-        >>>
-        >>> # Request preview size
-        >>> response = get('/api/scan123/fileset1/cloud1?size=preview')
-        >>>
-        >>> # Request custom voxel size
-        >>> response = get('/api/scan123/fileset1/cloud1?size=0.01')
         """
 
         # Sanitize identifiers
@@ -2319,19 +2458,23 @@ class Sequence(Resource):
     ----------
     db : plantdb.commons.fsdb.FSDB
         The database instance used for retrieving scan data.
+    logger : Logger
+        The logger instance for this resource.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.FSDB
+        A database instance used for retrieving scan data.
+    logger : logging.Logger
+        A logger instance for this resource.
     """
 
-    def __init__(self, db):
-        """Initialize the Sequence resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.FSDB
-            A database instance containing plant scan data and related measurements.
-        """
+    def __init__(self, db, logger):
+        """Initialize the Sequence resource."""
         self.db = db
+        self.logger = logger
 
-    @rate_limit(max_requests=5, window_seconds=60)
+    @rate_limit(max_requests=60, window_seconds=60)
     def get(self, scan_id):
         """Retrieve angle and internode sequences data for a given scan.
 
@@ -2349,9 +2492,9 @@ class Sequence(Resource):
         -------
         Union[dict, list, tuple[dict, int]]
             If successful and type='all' (default):
-                Dictionary containing all sequence data with keys 'angles', 'internodes',
-                and 'fruit_points'
-            If successful and type in ['angles', 'internodes', 'fruit_points']:
+                Dictionary containing all sequence data with the following keys: 'angles', 'internodes',
+                'fruit_points', 'manual_angles', 'manual_internodes'
+            If successful and type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
                 List of sequence values for the specified type
             If error:
                 Tuple of (error_dict, HTTP_status_code)
@@ -2424,9 +2567,21 @@ class Sequence(Resource):
             measures = read_json(file.path())
         except Exception as e:
             return json.dumps({'error': str(e)}), 400
+        # Load the manual 'measures.json' JSON file:
+        manual_measures_file = scan.path() / 'measures.json'
+        try:
+            manual_measures = read_json(manual_measures_file)
+        except Exception as e:
+            if manual_measures_file.exists():
+                self.logger.warning(f"Failed to load manual measures file: {manual_measures_file}")
+                self.logger.warning(e)
+            pass
+        else:
+            measures['manual_angles'] = manual_measures['angles']
+            measures['manual_internodes'] = manual_measures['internodes']
 
         # Make sure that the 'type' argument we got is a valid option, else default to 'all':
-        if type in ['angles', 'internodes', 'fruit_points']:
+        if type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
             return measures[type]
         else:
             return measures
@@ -2441,9 +2596,9 @@ def is_within_directory(directory, target):
 
     Parameters
     ----------
-    directory : str
+    directory : str or pathlib.Path
         The path to the directory to check against.
-    target : str
+    target : str or pathlib.Path
         The path to the target to check if it resides within the directory.
 
     Returns
@@ -2481,6 +2636,89 @@ def is_directory_in_archive(archive_path, target_dir):
         return f"{target_dir}/" in top_level_members or target_dir in top_level_members
 
 
+def is_valid_archive(archive_path):
+    """
+    Validate if a given archive meets specific directory and file requirements.
+
+    This function checks if the provided archive contains certain required directories and files,
+    and verifies that the directory structure does not exceed a specified depth.
+
+    Parameters
+    ----------
+    archive_path : str or pathlib.Path
+        The path to the archive file (zip) to be validated.
+
+    Returns
+    -------
+    bool
+        Returns `True` if the archive meets all requirements, otherwise `False`.
+
+    Examples
+    --------
+    >>> import os
+    >>> from zipfile import ZipFile
+    >>> from plantdb.server.rest_api import is_valid_archive
+    >>> # Creating a valid archive for demonstration purposes
+    >>> with ZipFile('test_archive.zip', 'w') as zip_ref:
+    ...    zip_ref.writestr('images/', '')
+    ...    zip_ref.writestr('images/test1.jpg', '')
+    ...    zip_ref.writestr('metadata/', '')
+    ...    zip_ref.writestr('metadata/data.json', '')
+    ...    zip_ref.writestr('files.json', '')
+    >>> # Validate the archive
+    >>> is_valid_archive('test_archive.zip')
+    True
+    >>> is_valid_archive('/tmp/real_plant.zip')
+    True
+    >>> is_valid_archive('/tmp/real_plant_analyzed.zip')
+    True
+
+    Notes
+    -----
+    - The function currently assumes that the required directories and files are all at or above a specified depth in the archive.
+    - Make sure that the provided `archive_path` points to a valid zip file.
+
+    See Also
+    --------
+    zipfile.ZipFile : Python's built-in module for reading and writing ZIP files.
+    """
+    req_dirs = ['images/', 'metadata/']
+    req_files = ['files.json']
+
+    top_dir = ''
+    max_dir_dept = 2
+    with ZipFile(archive_path, 'r') as zip_ref:
+        zip_files = zip_ref.namelist()
+
+    # List all top-level members in the zip file
+    top_level_dirs = {name for name in zip_files if name.count('/') == 1 and name.endswith('/')}
+    top_level_dirs |= {name.split('/')[0] + '/' for name in zip_files if name.count('/') == 1 and name.split('/')[0]}
+
+    # If a lone directory is found at the top, move one step down
+    if len(top_level_dirs) == 1:
+        top_dir = next(iter(top_level_dirs))
+        top_level_dirs = {name.replace(top_dir, '') for name in zip_files if
+                          name.count('/') == 2 and name.endswith('/')}
+        top_level_dirs |= {name.split('/')[1] + '/' for name in zip_files if
+                           name.count('/') == 2 and '/'.join(name.split('/')[:-1])}
+
+    # Check if the required file and directories are among them
+    has_req_dirs = [rd in top_level_dirs for rd in req_dirs]
+    has_req_files = [f'{top_dir}{rf}' in zip_files for rf in req_files]
+    req_dir_depth = all(
+        name.count('/') <= max_dir_dept + 1 if 'metadata' in name else name.count('/') <= max_dir_dept for name in
+        zip_files)
+
+    if all(has_req_dirs) and all(has_req_files) and req_dir_depth:
+        return True
+    else:
+        # if not all(has_req_dirs):
+        #    print(f"Missing required directories: {list(zip(req_dirs, [not r for r in has_req_dirs]))}")
+        # if not all(has_req_files):
+        #    print(f"Missing required files: {list(zip(req_files, [not r for r in has_req_files]))}")
+        return False
+
+
 class Archive(Resource):
     """A RESTful resource class for managing dataset archives.
 
@@ -2510,7 +2748,7 @@ class Archive(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id):
+    def get(self, scan_id, **kwargs):
         """Create and serve a ZIP archive for the specified scan dataset.
 
         This method creates a temporary ZIP archive containing all files from the specified
@@ -2537,52 +2775,71 @@ class Archive(Resource):
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> import os
         >>> import requests
+        >>> import shutil
         >>> import tempfile
         >>> from io import BytesIO
         >>> from pathlib import Path
         >>> from zipfile import ZipFile
-        >>> # Get the archive for the 'real_plant_analyzed' dataset with:
-        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant_analyzed", stream=True)
-        >>> # - Extract the archive:
-        >>> # Read the zip file data into a BytesIO object
-        >>> zip_data = BytesIO(zip_file.content)
-        >>> # Create a temporary path to extract the archived data:
+        >>> from plantdb.client.rest_api import request_scan_names_list
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+        >>> # Get the archive for the 'real_plant' dataset with
+        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant", stream=True)
+        >>> # EXAMPLE 1 - Write the archive to disk:
+        >>> # Create a unique temporary file name with .zip extension
+        >>> temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix='.zip')
+        >>> os.close(temp_zip_handle)  # Close the file handle immediately
+        >>> # Write to disk
+        >>> with open(temp_zip_path, 'wb') as zip_f: zip_f.write(zip_file.content)
+        >>> print(f"Successfully wrote to {temp_zip_path}")
+        >>> # EXAMPLE 2 - Extract the archive:
+        >>> # Create a temporary path to extract the archived data
         >>> tmp_dir = Path(tempfile.mkdtemp())
-        >>> # Open the zip file and extract non-existing files:
+        >>> # Open the zip file and extract non-existing files
         >>> extracted_files = []
-        >>> with ZipFile(zip_data, 'r') as zip_obj:
-        >>>     for file in zip_obj.namelist():
-        >>>         file_path = tmp_dir / file
-        >>>         zip_obj.extract(file, path=tmp_dir)
-        >>>         extracted_files.append(file)
-        >>> # Print the list of extracted files:
-        >>> extracted_files
-
+        >>> with ZipFile(BytesIO(zip_file.content), 'r') as zip_obj:
+        ...     for file in zip_obj.namelist():
+        ...         file_path = tmp_dir / file
+        ...         zip_obj.extract(file, path=tmp_dir)
+        ...         extracted_files.append(file)
+        ...
+        >>> # Print the list of extracted files
+        >>> print(extracted_files)
+        >>> shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)
+        >>> # Stop the test server
+        >>> server.stop()
         """
         scan_id = sanitize_name(scan_id)
 
         try:
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
         except ScanNotFoundError:
-            return {'error': f'Could not find a scan named `{scan_id}`!'}, 400
+            return {'error': f'Could not find a scan named `{scan_id}`!'}, 404
 
-        tmp_dir = Path(mkdtemp(prefix='fsdb_rest_api_'))
-        zpath = tmp_dir / f'{scan_id}.zip'
+        # Create a unique temporary file name with .zip extension
+        temp_zip_handle, temp_zip_path = mkstemp(suffix='.zip')
+        os.close(temp_zip_handle)  # Close the file handle immediately
+        temp_zip_path = Path(temp_zip_path)
 
         self.logger.info(f"Creating archive for `{scan_id}` dataset.")
         try:
-            with ZipFile(zpath, 'w') as zf:
+            with ZipFile(temp_zip_path, 'w') as zf:
                 path = str(scan.path())
                 for root, _dirs, files in os.walk(path):
                     # Exclude 'webcache' from the archive:
                     if 'webcache' in root:
                         continue
                     for file in files:
+                        # Get the relative path from the scan directory
+                        full_path = os.path.join(root, file)
+                        relative_path = os.path.relpath(full_path, path)
                         zf.write(
-                            os.path.join(root, file),
-                            os.path.relpath(os.path.join(root, file), os.path.join(path, '..'))
+                            full_path,
+                            arcname=relative_path  # Use arcname to control the path in the ZIP
                         )
         except Exception as e:
             self.logger.error(f"Failed to create archive for `{scan_id}` dataset: {e}")
@@ -2592,17 +2849,18 @@ class Archive(Resource):
         @after_this_request
         def cleanup_temp_file(response):
             try:
-                if zpath.exists():
-                    zpath.unlink()
-                    self.logger.info(f"Temporary archive `{zpath}` deleted.")
+                if temp_zip_path.exists():
+                    temp_zip_path.unlink()
+                    self.logger.info(f"Temporary archive `{temp_zip_path}` deleted.")
             except Exception as e:
-                self.logger.error(f"Failed to delete temporary file `{zpath}`: {e}")
+                self.logger.error(f"Failed to delete temporary file `{temp_zip_path}`: {e}")
             return response
 
-        return send_file(zpath, mimetype='application/zip')
+        return send_file(temp_zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
 
+    @requires_jwt
     @rate_limit(max_requests=5, window_seconds=60)
-    def post(self, scan_id):
+    def post(self, scan_id, **kwargs):
         """Handle ZIP file upload and extraction for a scan dataset.
 
         This method processes an uploaded ZIP file, validates its contents and structure,
@@ -2636,12 +2894,40 @@ class Archive(Resource):
 
         Examples
         --------
-        >>> # Using requests to upload a ZIP file:
         >>> import requests
-        >>> files = {'zip_file': open('dataset.zip', 'rb')}
-        >>> response = requests.post("http://127.0.0.1:5000/archive/my_scan", files=files)
+        >>> from pathlib import Path
+        >>> from tempfile import gettempdir
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> from plantdb.client.rest_api import request_scan_names_list
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+        >>> zip_file = Path(gettempdir()) / 'real_plant.zip'  # should be in the temporary directory from the TestRestApiServer setup
+        >>> print(zip_file.exists())
+        True
+        >>> # You need to be logged to be able to POST archives
+        >>> r = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> jwt_token = r.json()['access_token']  # get the JSON Web Token
+        >>> # Upload it as a new dataset named 'real_plant_test'
+        >>> new_dataset = 'real_plant_test'
+        >>> with open(zip_file, 'rb') as zip_f:
+        ...    files = {'zip_file': (str(zip_file), zip_f, 'application/zip')}
+        ...    response = requests.post(f'http://127.0.0.1:5000/archive/{new_dataset}', files=files, headers={'Authorization': 'Bearer ' + jwt_token})
         >>> print(response.json())
+        >>> _ = requests.get(f"http://127.0.0.1:5000/refresh?scan_id={new_dataset}")
+        >>> r = requests.get("http://127.0.0.1:5000/scans")
+        >>> scans_list = r.json()
+        >>> print(new_dataset in scans_list)
+        True
+        >>> server.stop()
         """
+        # TODO: add scan_id name sanitization
+        try:
+            assert not self.db.scan_exists(scan_id)
+        except AssertionError as e:
+            self.logger.error(f"Given scan dataset `{scan_id}` already exists in the database.")
+            return {'error': f'Given scan dataset `{scan_id}` already exists!'}, 400
+
         # Get the zip file from the request
         zip_file = request.files.get('zip_file')
         # Check if a file was provided
@@ -2660,10 +2946,10 @@ class Archive(Resource):
 
         # Create a temporary file to save the uploaded ZIP file to disk
         try:
-            _, temp_path = mkstemp(prefix='tmp_file.name', suffix='.zip')
-            temp_path = Path(temp_path)
-            self.logger.debug(f"Saving uploaded ZIP temporary file to: '{temp_path}'")
-            zip_file.save(temp_path)
+            _, temp_zip_path = mkstemp(prefix='tmp_file.name', suffix='.zip')
+            temp_zip_path = Path(temp_zip_path)
+            self.logger.debug(f"Saving uploaded ZIP temporary file to: '{temp_zip_path}'")
+            zip_file.save(temp_zip_path)
         except Exception as e:
             self.logger.error(f"Error saving file to temporary location: {e}")
             return {'error': 'Failed to save file to disk.'}, 500
@@ -2671,56 +2957,105 @@ class Archive(Resource):
         # Verify the file is a valid ZIP archive before proceeding
         from zipfile import BadZipFile
         try:
-            with ZipFile(temp_path, 'r') as zip_obj:
+            with ZipFile(temp_zip_path, 'r') as zip_obj:
                 # Test the ZIP file to ensure it's valid (raises an exception if corrupt)
                 zip_obj.testzip()
-        except BadZipFile:
+        except BadZipFile as e:
             self.logger.error("The provided file is not a valid ZIP archive.")
-            # Cleanup temporary file before returning
-            Path(temp_path).unlink(missing_ok=True)
-            return {'error': 'Invalid ZIP file provided.'}, 400
+            # Cleanup temporary ZIP file before returning
+            Path(temp_zip_path).unlink(missing_ok=True)
+            return {'error': f'Invalid ZIP file provided: {e}'}, 400
 
-        # Proceed with processing the valid ZIP file
+        if not is_valid_archive(temp_zip_path):
+            return {'error': f'Invalid Scan dataset archive provided!'}, 400
+
+        # Create the new scan dataset that will receive the files from the archive
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
-        scan_path = Path(self.db.create_scan(scan_id).path())
+        scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
 
-        if is_directory_in_archive(temp_path, scan_id):
-            extract_to_path = scan_path.parent  # move up to db path as the archive contain the top level
-        else:
-            extract_to_path = scan_path
+        # Detect a lone top level dir to remove from later file extraction
+        has_top_level_dir = False
+        with ZipFile(temp_zip_path, 'r') as zip_obj:
+            # List all top-level members in the zip file
+            top_level_dirs = [name for name in zip_obj.namelist() if name.endswith('/') and name.count('/') == 1]
+        if len(top_level_dirs) == 1:
+            has_top_level_dir = True
 
         # Open the zip file and extract non-existing files:
         extracted_files = []
+        file_verification = {}  # Dictionary to store hash comparisons
         try:
-            with ZipFile(temp_path, 'r') as zip_obj:
-                for file in zip_obj.namelist():
+            with ZipFile(temp_zip_path, 'r') as zip_obj:
+                for zip_file in zip_obj.namelist():
                     # Ensure that filenames are properly encoded
                     try:
-                        file = file.encode('utf-8').decode('utf-8')
+                        zip_file = zip_file.encode('utf-8').decode('utf-8')
                     except UnicodeDecodeError:
-                        self.logger.error(f"Filename encoding issue detected in ZIP: '{file}'")
-                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                        self.logger.error(f"Filename encoding issue detected in ZIP: '{zip_file}'")
+                        Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Filename encoding error in zip archive'}, 400
 
-                    file_path = extract_to_path / file
+                    if has_top_level_dir:
+                        # Remove the first part (top-level dir) of the zip_file
+                        file_path = scan_path / '/'.join(Path(zip_file).parts[1:])
+                    else:
+                        file_path = scan_path / zip_file
+                    file_path = file_path.resolve()  # make the path absolute
                     # Ensure the extracted files remain within the target directory
-                    if not is_within_directory(extract_to_path, file_path):
-                        self.logger.error(f"Invalid file path detected in ZIP: '{file}'")
-                        Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+                    if not is_within_directory(scan_path, file_path):
+                        self.logger.error(f"Invalid file path detected in ZIP: '{zip_file}'")
+                        Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
                         return {'error': 'Invalid file paths in zip archive'}, 400
 
-                    # Extract only if the file does not already exist
-                    if not file_path.exists():
-                        zip_obj.extract(file, path=extract_to_path)
-                        extracted_files.append(file)
+                    # Extract zip_file only if a file
+                    if str(zip_file).endswith('/'):
+                        continue  # skip directories
+
+                    # Create parent directories if they don't exist
+                    file_path.parent.mkdir(parents=True, exist_ok=True)
+                    self.logger.debug(f"Extracting {zip_file} to '{file_path.relative_to(scan_path.parent)}'...")
+
+                    # Compute hash of the file inside the ZIP before extraction
+                    with zip_obj.open(zip_file) as source:
+                        zip_file_hash = hashlib.sha256()
+                        while chunk := source.read(8192):
+                            zip_file_hash.update(chunk)
+                        zip_file_content_hash = zip_file_hash.hexdigest()
+
+                        # Extract the file
+                        with zip_obj.open(zip_file) as source, file_path.open('wb') as target:
+                            # Compute hash during extraction
+                            file_hash = hashlib.sha256()
+                            while chunk := source.read(8192):
+                                file_hash.update(chunk)
+                                target.write(chunk)
+
+                        # Verify the hash of the extracted file
+                        extracted_file_hash = file_hash.hexdigest()
+
+                        # Store hash verification result
+                        file_verification[str(file_path)] = {
+                            'original_hash': zip_file_content_hash,
+                            'extracted_hash': extracted_file_hash,
+                            'verified': zip_file_content_hash == extracted_file_hash
+                        }
+
+                        # If hashes don't match, log an error
+                        if not file_verification[str(file_path)]['verified']:
+                            self.logger.error(f"Hash mismatch for file: {file_path}")
+
+                        extracted_files.append(str(file_path))
+
         except Exception as e:
             self.logger.error(f"Failed to extract ZIP archive: {e}")
-            Path(temp_path).unlink(missing_ok=True)  # Cleanup temporary file
+            Path(temp_zip_path).unlink(missing_ok=True)  # Cleanup temporary file
             return {'error': f'Failed to extract ZIP archive: {e}'}, 500
         finally:
             # Always clean up the temporary ZIP file after processing
-            Path(temp_path).unlink(missing_ok=True)
+            Path(temp_zip_path).unlink(missing_ok=True)
+            # Trigger a refresh for that dataset
+            self.db.reload(scan_id)
 
         # Return a success response
         return {'message': 'Zip file processed successfully', 'files': extracted_files}, 200
@@ -2743,7 +3078,8 @@ class ScanCreate(Resource):
         self.db = db
         self.logger = logger
 
-    def post(self):
+    @requires_jwt
+    def post(self, **kwargs):
         """Create a new scan in the database.
 
         This method handles POST requests to create a new scan. It validates the input data,
@@ -2769,10 +3105,10 @@ class ScanCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -2793,7 +3129,7 @@ class ScanCreate(Resource):
             # Sanitize the name
             scan_id = sanitize_name(data['name'])
             # Create the scan
-            scan = self.db.create_scan(scan_id)
+            scan = self.db.create_scan(scan_id, **kwargs)
             # Set metadata if provided
             if metadata:
                 scan.set_metadata(metadata)
@@ -2855,13 +3191,13 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
@@ -2886,7 +3222,8 @@ class ScanMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    def post(self, scan_id):
+    @requires_jwt
+    def post(self, scan_id, **kwargs):
         """Update metadata for a specified scan.
 
         Parameters
@@ -2915,13 +3252,13 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{base_url()}/api/scan"
+        >>> url = f"{plantdb_url()}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Update scan metadata:
-        >>> url = f"{base_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
         >>> data = {"metadata": {"description": "Updated scan description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
@@ -2940,7 +3277,7 @@ class ScanMetadata(Resource):
                 return {'message': 'Metadata must be a dictionary'}, 400
 
             # Get the scan
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
             if not scan:
                 return {'message': 'Scan not found'}, 404
 
@@ -2987,7 +3324,7 @@ class ScanFilesets(Resource):
         """List all filesets in a specified scan.
 
         This method retrieves the list of filesets contained in a scan using the
-        `list_filesets()` method from `plantdb.commons.fsdb.Scan`.
+        `list_filesets()` method from `plantdb.commons.fsdb.core.Scan`.
 
         Parameters
         ----------
@@ -3008,9 +3345,9 @@ class ScanFilesets(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # List filesets in a scan:
-        >>> url = f"{base_url()}/api/scan/real_plant/filesets"
+        >>> url = f"{plantdb_url()}/api/scan/real_plant/filesets"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3052,6 +3389,7 @@ class FilesetCreate(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt
     def post(self):
         """Create a new fileset associated with a scan.
 
@@ -3087,10 +3425,10 @@ class FilesetCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> response = requests.post(url, json={'fileset_id': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3195,13 +3533,13 @@ class FilesetMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> response = requests.post(url, json={'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/fileset/real_plant/my_fileset/metadata"
+        >>> url = f"{plantdb_url()}/api/fileset/real_plant/my_fileset/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3229,6 +3567,7 @@ class FilesetMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
+    @requires_jwt
     def post(self, scan_id, fileset_id):
         """Update metadata for a specified fileset.
 
@@ -3267,14 +3606,14 @@ class FilesetMetadata(Resource):
         Examples
         --------
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{base_url()}/api/fileset"
+        >>> url = f"{plantdb_url()}/api/fileset"
         >>> data = {'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata}
         >>> response = requests.post(url, json=data)
         >>> # Get the original metadata:
-        >>> url = f"{base_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
+        >>> url = f"{plantdb_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3343,7 +3682,7 @@ class FilesetFiles(Resource):
         """List all files in a specified fileset.
 
         This method retrieves the list of files contained in a fileset using the
-        `list_files()` method from `plantdb.commons.fsdb.Fileset`.
+        `list_files()` method from `plantdb.commons.fsdb.core.Fileset`.
 
         Parameters
         ----------
@@ -3366,9 +3705,9 @@ class FilesetFiles(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # List files in a fileset:
-        >>> url = f"{base_url()}/api/fileset/real_plant/images/files"
+        >>> url = f"{plantdb_url()}/api/fileset/real_plant/images/files"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3417,6 +3756,7 @@ class FileCreate(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt
     def post(self):
         """Create a new file in a fileset and write data to it.
 
@@ -3448,12 +3788,12 @@ class FileCreate(Resource):
         >>> import requests
         >>> import json
         >>> from tempfile import NamedTemporaryFile
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
         >>> # Create a new file with metadata in the database:
-        >>> url = f"{base_url()}/api/file"
+        >>> url = f"{plantdb_url()}/api/file"
         >>> # Open the file separately for sending
         >>> with open(file_path, 'rb') as file_handle:
         ...     files = {
@@ -3591,9 +3931,9 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
+        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
-        >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
@@ -3625,6 +3965,7 @@ class FileMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
+    @requires_jwt
     def post(self, scan_id, fileset_id, file_id):
         """Update metadata for a specified file.
 
@@ -3658,8 +3999,8 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import base_url
-        >>> url = f"{base_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())

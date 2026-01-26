@@ -20,7 +20,7 @@ A comprehensive module for managing file system operations in a hierarchical dat
 
 ```python
 >>> # Load all scans from a database
->>> from plantdb.commons.fsdb import FSDB
+>>> from plantdb.commons.fsdb.core import FSDB
 >>> from plantdb.commons.fsdb.file_ops import _load_scans
 
 >>> # Initialize and connect to database
@@ -41,7 +41,8 @@ A comprehensive module for managing file system operations in a hierarchical dat
 """
 
 import json
-import os
+
+import pathlib
 from shutil import rmtree
 
 from tqdm import tqdm
@@ -85,7 +86,7 @@ def _load_scan(db, scan_id):
 
     Returns
     -------
-    list of plantdb.commons.fsdb.Scan
+    list of plantdb.commons.fsdb.core.Scan
          The list of ``fsdb.Scan`` found in the database.
 
     See Also
@@ -97,8 +98,8 @@ def _load_scan(db, scan_id):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scans
     >>> db = dummy_db()
     >>> db.connect()
@@ -111,9 +112,9 @@ def _load_scan(db, scan_id):
     >>> db.connect()
     >>> scans = _load_scans(db)
     >>> print(scans)
-    [<plantdb.commons.fsdb.Scan object at 0x7fa01220bd50>]
+    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
     """
-    from plantdb.commons.fsdb import Scan
+    from plantdb.commons.fsdb.core import Scan
     required_fs = db.required_filesets
 
     scan = Scan(db, scan_id)
@@ -125,9 +126,7 @@ def _load_scan(db, scan_id):
     else:
         req_subdir = True
 
-    if db.dummy and scan_path.is_dir():
-        return scan
-    elif scan_path.is_dir() and req_subdir:
+    if scan_path.is_dir() and req_subdir:
         # Parse the fileset, metadata and measure if:
         #  - path to scan directory exists
         #  - required subdirectories exists, if any
@@ -153,7 +152,7 @@ def _load_scans(db):
 
     Returns
     -------
-    dict of plantdb.commons.fsdb.Scan
+    dict of plantdb.commons.fsdb.core.Scan
          The scan-id indexex dictionary of ``fsdb.Scan`` found in the database.
 
     See Also
@@ -165,8 +164,8 @@ def _load_scans(db):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scans
     >>> db = dummy_db()
     >>> db.create_scan("007")
@@ -178,7 +177,7 @@ def _load_scans(db):
     >>> db.connect()
     >>> scans = _load_scans(db)
     >>> print(scans)
-    [<plantdb.commons.fsdb.Scan object at 0x7fa01220bd50>]
+    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
     """
     # List all subdirectories of the database path:
     dir_names = db.path().iterdir()
@@ -213,7 +212,7 @@ def _load_dummy_fileset(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan object containing filesets to be loaded in dummy mode.
         Used to access the scan's directory path.
 
@@ -234,7 +233,7 @@ def _load_dummy_fileset(scan):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb import Scan
+    >>> from plantdb.commons.fsdb.core import Scan
     >>> scan = Scan(db, "my_scan_id")
     >>> filesets = _load_dummy_fileset(scan)
     >>> # Access files as paths, not as File objects
@@ -243,7 +242,7 @@ def _load_dummy_fileset(scan):
     ...     for file_path in fileset.files:
     ...         print(f"  - {file_path.name}")
     """
-    from plantdb.commons.fsdb import Fileset
+    from plantdb.commons.fsdb.core import Fileset
     filesets = {}  # Dictionary to store filesets indexed by their IDs
 
     # Iterate through directories in the scan path, each directory corresponds to a fileset ID
@@ -268,7 +267,7 @@ def _load_scan_filesets(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The instance to use to get the list of ``Fileset``.
 
     Returns
@@ -288,15 +287,15 @@ def _load_scan_filesets(scan):
 
     Examples
     --------
-    >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_scan_filesets
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> filesets = _load_scan_filesets(scan)
     >>> print(filesets)
-    {'fsid_001': <plantdb.commons.fsdb.Fileset object at 0x7fa0122232d0>}
+    {'fsid_001': <plantdb.commons.fsdb.core.Fileset object at 0x7fa0122232d0>}
     """
     filesets = {}
     # Get the path to the `files.json` associated to the `scan`:
@@ -331,20 +330,20 @@ def _load_fileset(scan, fileset_info):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
-        The scan object to use to get the list of ``fsdb.Fileset``
+    scan : plantdb.commons.fsdb.core.Scan
+        The scan object to use to get the list of ``fsdb.core.Fileset``
     fileset_info: dict
         Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
 
     Returns
     -------
-    plantdb.commons.fsdb.Fileset
+    plantdb.commons.fsdb.core.Fileset
         A fileset with its ``files`` & ``metadata`` attributes restored.
 
     Examples
     --------
     >>> import json
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _load_fileset
     >>> from plantdb.commons.fsdb.file_ops import _scan_json_file
     >>> db = dummy_db(with_file=True)
@@ -371,14 +370,14 @@ def _load_fileset_files(fileset, fileset_info):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The instance to use to get the list of ``File``.
     fileset_info : dict
         Dictionary with the fileset id and listing its files, ``{'files': [], 'id': str}``.
 
     Returns
     -------
-    list of plantdb.commons.fsdb.File
+    list of plantdb.commons.fsdb.core.File
          The list of ``File`` found in the `fileset`.
 
     See Also
@@ -393,8 +392,8 @@ def _load_fileset_files(fileset, fileset_info):
     --------
     >>> import json
     >>> from plantdb.commons.fsdb.serialization import _parse_fileset
-    >>> from plantdb.commons.fsdb import FSDB
-    >>> from plantdb.commons.fsdb import dummy_db
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.file_ops import _scan_json_file,  _load_fileset_files
     >>> db = dummy_db(with_fileset=True, with_file=True)
     >>> db.connect()
@@ -438,14 +437,14 @@ def _load_file(fileset, file_info):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The instance to associate the returned ``File`` to.
     file_info : dict
         Dictionary with the file 'id' and 'file' entries, ``{'file': str, 'id': str}``.
 
     Returns
     -------
-    plantdb.commons.fsdb.File
+    plantdb.commons.fsdb.core.File
         The `File` instance with metadata.
 
     See Also
@@ -484,7 +483,7 @@ def _load_scan_measures(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The dataset to load the measures for.
 
     Returns
@@ -500,7 +499,7 @@ def _delete_file(file):
 
     Parameters
     ----------
-    file : plantdb.commons.fsdb.File
+    file : plantdb.commons.fsdb.core.File
         A file instance to delete.
 
     Raises
@@ -562,7 +561,7 @@ def _delete_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         A fileset instance to delete.
 
     Raises
@@ -631,7 +630,7 @@ def _delete_scan(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan instance to delete.
 
     Raises
@@ -660,13 +659,18 @@ def _delete_scan(scan):
     return
 
 
-def _make_fileset(fileset):
+def _make_fileset(fileset) -> pathlib.Path:
     """Create the fileset directory.
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The fileset to use for directory creation.
+
+    Returns
+    -------
+    pathlib.Path
+        The created fileset directory.
 
     See Also
     --------
@@ -676,16 +680,21 @@ def _make_fileset(fileset):
     # Create the fileset directory if it does not exist:
     if not path.is_dir():
         path.mkdir(parents=True)
-    return
+    return path
 
 
-def _make_scan(scan):
+def _make_scan(scan) -> pathlib.Path:
     """Create the scan directory.
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         The scan to use for directory creation.
+
+    Returns
+    -------
+    pathlib.Path
+        The created scan directory.
 
     See Also
     --------
@@ -695,7 +704,7 @@ def _make_scan(scan):
     # Create the scan directory if it does not exist:
     if not path.is_dir():
         path.mkdir(parents=True)
-    return
+    return path
 
 
 def _store_scan(scan):
@@ -703,7 +712,7 @@ def _store_scan(scan):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A scan instance to save by dumping its underlying structure in its "files.json".
 
     See Also

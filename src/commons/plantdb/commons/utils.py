@@ -26,7 +26,6 @@
 """
 This module provides a collection of utility functions for data handling in the ROMI project.
 """
-
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -71,7 +70,7 @@ def locate_task_filesets(scan, tasks):
 
     Parameters
     ----------
-    scan : plantdb.commons.fsdb.Scan
+    scan : plantdb.commons.fsdb.core.Scan
         A ``Scan`` instance from a local plant database (FSDB).
     tasks : list of str
         A list of task names to look up in the scan's list of filesets.
@@ -88,7 +87,7 @@ def locate_task_filesets(scan, tasks):
     Examples
     --------
     >>> from plantdb.commons.utils import locate_task_filesets
-    >>> from plantdb.commons.fsdb import FSDB
+    >>> from plantdb.commons.fsdb.core import FSDB
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
@@ -140,7 +139,7 @@ def to_file(dbfile, path):
 
     Parameters
     ----------
-    dbfile : plantdb.commons.fsdb.File
+    dbfile : plantdb.commons.fsdb.core.File
         The ``File`` instance to save under given `path`.
     path : pathlib.Path or str
         The file path to use to save the `dbfile`.
@@ -153,7 +152,7 @@ def to_file(dbfile, path):
 
 
 def fsdb_file_from_local_file(path):
-    """Creates a temporary ``fsdb.File`` object from a local file.
+    """Creates a temporary ``fsdb.core.File`` object from a local file.
 
     Parameters
     ----------
@@ -162,13 +161,13 @@ def fsdb_file_from_local_file(path):
 
     Returns
     -------
-    plantdb.commons.fsdb.File
-        The temporary ``fsdb.File``.
+    plantdb.commons.fsdb.core.File
+        The temporary ``fsdb.core.File``.
     """
-    from plantdb.commons.fsdb import FSDB
-    from plantdb.commons.fsdb import Scan
-    from plantdb.commons.fsdb import Fileset
-    from plantdb.commons.fsdb import File
+    from plantdb.commons.fsdb.core import FSDB
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+    from plantdb.commons.fsdb.core import File
     from plantdb.commons.fsdb.core import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
@@ -193,7 +192,7 @@ def tmpdir_from_fileset(fileset):
 
     Parameters
     ----------
-    fileset : plantdb.commons.fsdb.Fileset
+    fileset : plantdb.commons.fsdb.core.Fileset
         The fileset to use to create the temporary local database.
 
     Returns
@@ -250,25 +249,21 @@ def partial_match(source, target, fuzzy=False):
     # Check if both are lists
     elif isinstance(source, list) and isinstance(target, list):
         return len(source) <= len(target) and all(  # Ensure source list is shorter or equal length to target list
-            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)  # Use any() to check at least one match per item
+            any(partial_match(ref_item, target_item, fuzzy) for target_item in target)
+            # Use any() to check at least one match per item
             for ref_item in source
         )
     # Check if both are strings for fuzzy matching
     elif fuzzy and isinstance(source, str) and isinstance(target, str):
-         # Return True if the source regex pattern matches the target string
+        # Return True if the source regex pattern matches the target string
         return bool(match(source, target))
     else:
         # Direct comparison of values
         return source == target
 
 
-def date_now(fmt='%Y-%m-%d_%H:%M:%S'):
-    """Get current date and time in specified format.
-
-    Parameters
-    ----------
-    fmt : str, optional
-        The format string for the date and time (default is '%Y-%m-%d_%H:%M:%S').
+def iso_date_now():
+    """Get current date and time in ISO format.
 
     Returns
     -------
@@ -289,10 +284,8 @@ def date_now(fmt='%Y-%m-%d_%H:%M:%S'):
 
     Examples
     --------
-    >>> from plantdb.commons.utils import date_now
-    >>> date_now('%Y-%m-%d')
-    '2025-09-08'
-    >>> date_now()
-    '2025-09-08_15:36:07'
+    >>> from plantdb.commons.utils import iso_date_now
+    >>> iso_date_now()
+    '2025-09-16T23:39:54.132898'
     """
-    return datetime.strftime(datetime.now(), fmt)
+    return datetime.isoformat(datetime.now())

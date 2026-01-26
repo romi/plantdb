@@ -67,9 +67,9 @@ from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import requests
-from tqdm import tqdm
-
+from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
+from tqdm import tqdm
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -162,24 +162,33 @@ def _save_file_from_url(url) -> Path:
     PosixPath('/tmp/real_plant_analyzed.zip')
     """
     tmp_fname = _tmp_fpath_from_url(url)
-
     logger.info(f"Downloading {url} to {tmp_fname}...")
-    r = requests.get(url, stream=True)
-    total_size = int(r.headers.get("content-length", 0))  # total size in bytes
-    block_size = 32 * 1024  # block-size reads
-    progress = 0  # progress tracker
-    pbar = tqdm(total=total_size, unit="B", unit_scale=True, unit_divisor=1024)
-    with open(tmp_fname, "wb") as f:
-        for chunk in r.iter_content(block_size):
-            f.write(chunk)
-            progress = progress + len(chunk)
-            pbar.update(block_size)
-    pbar.close()
-    if total_size != 0 and progress != total_size:
-        raise IOError(f"Error downloading file {tmp_fname.name}!")
 
-    # Close HTTP(S) connection:
-    r.close()
+    # Ensure we hit the raw file endpoint
+    if "zenodo.org/records/" in url and "files/" in url and "?download=" not in url:
+        url = url + "?download=1"
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; MyDownloader/1.0)"}
+
+    with requests.get(url, stream=True, headers=headers, timeout=5) as r:
+        r.raise_for_status()  # raise an exception for bad status
+        total_size = int(r.headers.get("content-length", 0))
+        block_size = 32 * 1024
+
+        progress = 0
+        pbar = tqdm(total=total_size, unit="B", unit_scale=True, unit_divisor=1024)
+
+        with open(tmp_fname, "wb") as f:
+            for chunk in r.iter_content(block_size):
+                if not chunk:  # guard against keep‑alive chunks
+                    continue
+                f.write(chunk)
+                progress += len(chunk)
+                pbar.update(len(chunk))
+
+        pbar.close()
+
+        if total_size and progress != total_size:
+            raise IOError(f"Error downloading file {tmp_fname.name}!")
 
     return tmp_fname
 
@@ -291,14 +300,14 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
     return out_path / archive
 
 
-def get_test_dataset(dataset, out_path=TEST_DIR, keep_tmp=False, force=False):
+def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False):
     """Download and extract a test dataset from ZENODO.
 
     Parameters
     ----------
     dataset : {'real_plant', 'virtual_plant', 'real_plant_analyzed', 'virtual_plant_analyzed', 'arabidopsis000'}
         The name of the dataset to download.
-    out_path : str or pathlib.Path, optional
+    db_path : str or pathlib.Path, optional
         The path where to extract the test dataset archive. Defaults to ``TEST_DIR``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
@@ -315,20 +324,20 @@ def get_test_dataset(dataset, out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.commons.test_database import get_test_dataset
     >>> get_test_dataset()  # download and extract the test dataset to `plantdb/tests/testdata` directory
     """
-    ds_path = out_path / dataset
+    ds_path = db_path / dataset
     if ds_path.exists() and not force:
-        out_path = ds_path
+        db_path = ds_path
     else:
-        out_path = _get_extract_archive(dataset, out_path=out_path, keep_tmp=keep_tmp, force=force)
-    return out_path
+        db_path = _get_extract_archive(dataset, out_path=db_path, keep_tmp=keep_tmp, force=force)
+    return db_path
 
 
-def get_models_dataset(out_path=TEST_DIR, keep_tmp=False, force=False):
+def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False):
     """Download and extract the trained CNN model from ZENODO.
 
     Parameters
     ----------
-    out_path : str or pathlib.Path, optional
+    db_path : str or pathlib.Path, optional
         The path where to download the trained CNN model. Defaults to ``TEST_DIR``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
@@ -345,20 +354,20 @@ def get_models_dataset(out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.commons.test_database import get_models_dataset
     >>> get_models_dataset()  # download and extract the trained CNN models to `plantdb/tests/testdata` directory
     """
-    ds_path = out_path / "models"
+    ds_path = db_path / "models"
     if ds_path.exists() and not force:
-        out_path = ds_path
+        db_path = ds_path
     else:
-        out_path = _get_extract_archive("models", out_path=out_path, keep_tmp=keep_tmp, force=force)
-    return out_path
+        db_path = _get_extract_archive("models", out_path=db_path, keep_tmp=keep_tmp, force=force)
+    return db_path
 
 
-def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
+def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False):
     """Download and extract the pipeline configurations from ZENODO.
 
     Parameters
     ----------
-    out_path : str or pathlib.Path, optional
+    db_path : str or pathlib.Path, optional
         The path where to download the pipeline configurations. Defaults to ``TEST_DIR``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
@@ -375,22 +384,22 @@ def get_configs(out_path=TEST_DIR, keep_tmp=False, force=False):
     >>> from plantdb.commons.test_database import get_configs
     >>> get_configs()  # download and extract the pipeline configurations to `plantdb/tests/testdata` directory
     """
-    ds_path = out_path / "configs"
+    ds_path = db_path / "configs"
     if ds_path.exists() and not force:
-        out_path = ds_path
+        db_path = ds_path
     else:
-        out_path = _get_extract_archive("configs", out_path=out_path, keep_tmp=keep_tmp, force=force)
-    return out_path
+        db_path = _get_extract_archive("configs", out_path=db_path, keep_tmp=keep_tmp, force=force)
+    return db_path
 
 
-def setup_empty_database(out_path=None):
+def setup_empty_database(db_path=None):
     """Sets up an empty ROMI database.
 
     Sets up necessary marker file and ensures the absence of a lock file.
 
     Parameters
     ----------
-    out_path : str or Path, optional
+    db_path : str or Path, optional
         The directory path where the database should be set up.
         Defaults to ``None``.
 
@@ -410,29 +419,29 @@ def setup_empty_database(out_path=None):
     """
     from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 
-    if isinstance(out_path, str):
-        out_path = Path(out_path)
-    elif out_path is None:
-        out_path = _mkdtemp_romidb()
+    if isinstance(db_path, str):
+        db_path = Path(db_path)
+    elif db_path is None:
+        db_path = _mkdtemp_romidb()
     else:
         try:
-            assert isinstance(out_path, Path)
+            assert isinstance(db_path, Path)
         except AssertionError:
-            logger.critical(f"Invalid pth to set up the database: '{out_path}'.")
+            logger.critical(f"Invalid path to set up the database: '{db_path}'.")
             logger.critical(
                 "Please provide a valid path to set up the database or leave it to None to use a temporary directory.")
-            raise TypeError(f"Invalid type for 'out_path': {type(out_path)}.")
+            raise TypeError(f"Invalid type for 'out_path': {type(db_path)}.")
 
     # Make sure the path to the database exists:
-    out_path.mkdir(parents=True, exist_ok=True)
+    db_path.mkdir(parents=True, exist_ok=True)
     # Make sure the marker file exists:
-    marker_path = out_path / MARKER_FILE_NAME
+    marker_path = db_path / MARKER_FILE_NAME
     marker_path.touch(exist_ok=True)
 
-    return out_path
+    return db_path
 
 
-def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=False, with_models=False, force=False):
+def setup_test_database(dataset, db_path=TEST_DIR, keep_tmp=True, with_configs=False, with_models=False, force=False):
     """Download and extract the test database from ZENODO.
 
     Parameters
@@ -441,7 +450,7 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
         The dataset name or a list of dataset names to download to the test database.
         Using "all" allows downloading all defined datasets.
         See the notes below for a list of dataset names and their meanings.
-    out_path : str or pathlib.Path, optional
+    db_path : str or pathlib.Path, optional
         The path where to set up the database. Defaults to ``TEST_DIR``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
@@ -477,13 +486,13 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     PosixPath('/tmp/ROMI_DB_********')
     """
     # Initialize an empty ROMI database
-    out_path = setup_empty_database(out_path)
+    db_path = setup_empty_database(db_path)
 
     # Get the list of all test dataset if required:
     if isinstance(dataset, str) and dataset.lower() == "all":
         dataset = DATASET
     # Create a dict of keyword arguments to use for download:
-    kwargs = {'out_path': out_path, 'keep_tmp': keep_tmp, 'force': force}
+    kwargs = {'db_path': db_path, 'keep_tmp': keep_tmp, 'force': force}
     # Download the test datasets:
     if isinstance(dataset, list):
         [get_test_dataset(ds, **kwargs) for ds in dataset]
@@ -499,20 +508,20 @@ def setup_test_database(dataset, out_path=TEST_DIR, keep_tmp=True, with_configs=
     # --- Backward compatibility ---
     # If the database was set up under a previous version, the Scan may not have an 'owner' entry in their metadata.
     # -----------------------------
-    from plantdb.commons.fsdb import FSDB
+    from plantdb.commons.fsdb.core import FSDB
     # Connect to the database and iterate over scans to get the owner of each scan:
-    db = FSDB(out_path)
+    db = FSDB(db_path)
     db.connect()
     db.list_scans(owner_only=False)
     for scan_name, scan in db.scans.items():
         _ = scan.owner  # get the owner of the scan, if unknown, it will be set to the anonymous user
     db.disconnect()
 
-    logger.info(f"The test database is set up under '{out_path}'.")
-    return out_path
+    logger.info(f"The test database is set up under '{db_path}'.")
+    return db_path
 
 
-def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
+def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     """Create and return an FSDB test database.
 
     Parameters
@@ -521,7 +530,7 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
         The (list of) test dataset to use, by default 'real_plant_analyzed'.
         Using "all" allows downloading all defined datasets.
         If ``None``, only set up an empty database.
-    out_path : str or pathlib.Path, optional
+    db_path : str or pathlib.Path, optional
         The path where to set up the database.
         Defaults to the temporary directory under 'ROMI_DB', as defined by ``TMP_TEST_DIR``.
 
@@ -552,8 +561,112 @@ def test_database(dataset='real_plant_analyzed', out_path=None, **kwargs):
     PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
-    from plantdb.commons.fsdb import FSDB
+    from plantdb.commons.fsdb.core import FSDB
     if dataset is None:
-        return FSDB(setup_empty_database(out_path=out_path))
+        return FSDB(setup_empty_database(db_path=db_path))
     else:
-        return FSDB(setup_test_database(dataset, out_path=out_path, **kwargs))
+        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs))
+
+
+def dummy_db(with_scan=False, with_fileset=False, with_file=False):
+    """Create a dummy temporary database.
+
+    Parameters
+    ----------
+    with_scan : bool, optional
+        If ``True`` (default to ``False``), add a ``Scan``, named ``"myscan_001"``, to the database.
+    with_fileset : bool, optional
+        If ``True`` (default to ``False``), add a ``Fileset``, named ``"fileset_001"``, to the scan ``"myscan_001"``.
+    with_file : bool, optional
+        If ``True`` (default to ``False``), add three ``File``, to the fileset ``"fileset_001"``:
+
+        - a dummy PNG array, named ``"dummy_image"``;
+        - a dummy RGB image, named ``"test_image"``;
+        - a dummy JSON file, named ``"test_json"``;
+
+    Returns
+    -------
+    plantdb.commons.fsdb.FSDB
+        The dummy database.
+
+    Notes
+    -----
+    - Returns a 'connected' database, no need to call the `connect()` method.
+    - Uses the 'anonymous' user to login.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> db = dummy_db(with_file=True)
+    >>> db.connect()
+    INFO     [plantdb.commons.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
+    >>> print(db.path())  # the database directory
+    /tmp/romidb_********
+    >>> print(db.list_scans())
+    ['myscan_001']
+    >>> scan = db.get_scan("myscan_001")  # get the existing scan
+    >>> print(scan.list_filesets())
+    ['fileset_001']
+    >>> fs = scan.get_fileset("fileset_001")
+    >>> print(list(fs.list_files()))
+    ['dummy_image', 'test_image', 'test_json']
+    >>> f = fs.get_file("test_image")
+    >>> print(f.path())
+    /tmp/romidb_********/myscan_001/fileset_001/test_image.png
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
+    >>> print(db.path().exists())
+    False
+    """
+    from plantdb.commons import io
+    from plantdb.commons.fsdb.core import FSDB
+    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+
+    # Create a temporary folder to host the dummy database
+    db_path = _mkdtemp_romidb()
+    # Add the necessary marker file
+    marker_file = db_path / MARKER_FILE_NAME
+    marker_file.open(mode='w').close()
+    # Create the FSDB instance and connect
+    db = FSDB(db_path, required_filesets=[], session_manager=SingleSessionManager())
+    db.connect()
+    # Login as adin to get all the rights (to create and edit)
+    _ = db.login('admin', 'admin')
+
+    if with_file:
+        # To create a `File`, existing `Scan` & `Fileset` are required
+        with_scan, with_fileset = True, True
+    if with_fileset:
+        # To create a `Fileset`, an existing `Scan` is required
+        with_scan = True
+
+    # Create a `Scan` object if required:
+    if with_scan:
+        scan = db.create_scan("myscan_001")
+        scan.set_metadata("test", 1)
+
+    # Create a `Fileset` object if required:
+    if with_fileset:
+        fs = scan.create_fileset("fileset_001")
+        fs.set_metadata("test_fileset", 1)
+
+    # Create a `Fileset` object if required:
+    if with_file:
+        import numpy as np
+        # -- Create a fixed dummy image:
+        f = fs.create_file("dummy_image")
+        img = np.array([[255, 0], [0, 255]]).astype('uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("dummy image", True)
+        # -- Create a random RGB image:
+        f = fs.create_file("test_image")
+        rng = np.random.default_rng()
+        img = np.array(255 * rng.random((50, 50, 3)), dtype='uint8')
+        io.write_image(f, img, "png")
+        f.set_metadata("random image", True)
+        # -- Create a dummy JSON
+        f = fs.create_file("test_json")
+        md = {"Who you gonna call?": "Ghostbuster"}
+        io.write_json(f, md, "json")
+        f.set_metadata("random json", True)
+
+    return db
