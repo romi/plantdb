@@ -10,6 +10,8 @@ nav:
   - 'PlantDB Sync UI': plantdb_sync.md
   - 'REST API': rest_api.md
   - 'Reference API': reference/
+  - 'Developers' :
+    - 'Release Guide': developers/releases.md
 
 
 theme:
