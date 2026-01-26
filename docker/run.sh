@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# --------------------------------
+# ------------------------------------------
 # Functions for colors and messages
-# --------------------------------
+# ------------------------------------------
 setup_colors() {
   RED="\033[0;31m"    # Define red color code
   GREEN="\033[0;32m"  # Define green color code
@@ -37,9 +37,9 @@ log_debug() {
   fi
 }
 
-# --------------------------------
+# ------------------------------------------
 # Functions for script initialization
-# --------------------------------
+# ------------------------------------------
 initialize_variables() {
   # Image tag to use, 'latest' by default:
   vtag="latest"
@@ -53,6 +53,8 @@ initialize_variables() {
   DEBUG_MODE=false
   # Production mode is disabled by default
   PRODUCTION_MODE=false
+  # Unit‑test mode is disabled by default
+  UNITTEST_MODE=false
 
   # If the `ROMI_DB` variable is set, use it as default database location, else set it to empty:
   if [ -z ${ROMI_DB+x} ]; then
@@ -62,9 +64,9 @@ initialize_variables() {
   fi
 }
 
-# --------------------------------
+# ------------------------------------------
 # Usage information function
-# --------------------------------
+# ------------------------------------------
 show_usage() {
   echo -e "$(bold USAGE):"
   echo "  ./docker/run.sh [OPTIONS]"
@@ -92,13 +94,15 @@ show_usage() {
   # -- Debug option:
   echo "  --debug
     Enable debug mode to print additional debug information."
+  echo "  --unittest
+    Run all unit tests in src/server/tests, src/commons/tests and src/client/tests and exit."
   echo "  -h, --help
     Output a usage message and exit."
 }
 
-# --------------------------------
+# ------------------------------------------
 # Command line parsing function
-# --------------------------------
+# ------------------------------------------
 parse_arguments() {
   while [ "$1" != "" ]; do
     case $1 in
@@ -131,6 +135,9 @@ parse_arguments() {
       DEBUG_MODE=true
       log_debug "Debug mode enabled!"
       ;;
+    --unittest)
+      UNITTEST_MODE=true
+      ;;
     -h | --help)
       show_usage
       exit 0
@@ -144,9 +151,31 @@ parse_arguments() {
   done
 }
 
-# --------------------------------
+# ------------------------------------------
+# Unit‑test helper
+# ------------------------------------------
+run_unittests() {
+  log_info "Running unit tests for src/server/tests, src/commons/tests and src/client/tests"
+  # Use python -m unittest discover for each test directory
+  for test_dir in src/server/tests src/commons/tests src/client/tests; do
+    if [ -d "$test_dir" ]; then
+      log_info "Discovering tests in $test_dir"
+      python -m unittest discover -s "$test_dir"
+      test_status=$?
+      if [ $test_status -ne 0 ]; then
+        log_error "Tests failed in $test_dir (status $test_status)"
+        exit $test_status
+      fi
+    else
+      log_warning "Test directory $test_dir does not exist, skipping."
+    fi
+  done
+  log_info "All tests passed successfully."
+}
+
+# ------------------------------------------
 # Database setup functions
-# --------------------------------
+# ------------------------------------------
 check_database_environment() {
   if [ -z ${ROMI_DB+x} ] ; then
     log_warning "Environment variable 'ROMI_DB' is not defined, set it to use as default database location!"
@@ -176,9 +205,9 @@ setup_user_group() {
   fi
 }
 
-# --------------------------------
+# ------------------------------------------
 # Check if netstat is available
-# --------------------------------
+# ------------------------------------------
 check_netstat_installed() {
   if ! command -v netstat &> /dev/null; then
     log_warning "netstat command not found. This is required to find available ports."
@@ -189,9 +218,9 @@ check_netstat_installed() {
   return 0
 }
 
-# --------------------------------
+# ------------------------------------------
 # Port finder function
-# --------------------------------
+# ------------------------------------------
 find_available_port() {
   if [ ${port_specified} -eq 0 ]; then
     log_info "Finding available port in range 5000-5100..."
@@ -225,9 +254,9 @@ find_available_port() {
   fi
 }
 
-# --------------------------------
+# ------------------------------------------
 # Terminal handling function
-# --------------------------------
+# ------------------------------------------
 check_terminal() {
   if [ -t 1 ]; then
     USE_TTY="-t"
@@ -236,9 +265,9 @@ check_terminal() {
   fi
 }
 
-# --------------------------------
+# ------------------------------------------
 # Docker run functions
-# --------------------------------
+# ------------------------------------------
 create_docker_run_cmd() {
   # Base docker run command
   docker_cmd="docker run"
@@ -270,7 +299,7 @@ create_docker_run_cmd() {
   if [ "$1" = "development" ]; then
     docker_cmd+=" \"fsdb_rest_api --port 5000\""
   elif [ "$1" = "production" ]; then
-  # Run uWSGI to serve the application on port 5000.
+    # Run uWSGI to serve the application on port 5000.
     docker_cmd+=" \"uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master\""
   elif [ "$1" = "command" ]; then
     docker_cmd+=" \"${cmd}\""
@@ -328,7 +357,7 @@ run_docker_command() {
   # Print the full command that will be executed
   log_debug "Executing command: ${docker_cmd}"
 
-  # Get the date to estimate command execution time:
+  # Get date to estimate command execution time:
   start_time=$(date +%s)
 
   # Execute the docker run command
@@ -348,14 +377,18 @@ run_docker_command() {
   exit ${cmd_status}
 }
 
-
-# --------------------------------
+# ------------------------------------------
 # Main script execution
-# --------------------------------
+# ------------------------------------------
 main() {
   setup_colors
   initialize_variables
   parse_arguments "$@"
+
+  if [ "${UNITTEST_MODE}" = true ]; then
+    run_unittests
+    exit 0
+  fi
   check_database_environment
   setup_database_mount
   setup_user_group
