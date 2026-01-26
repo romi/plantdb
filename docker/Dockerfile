@@ -51,6 +51,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         # Install Open3D system dependencies
         libegl1 libgl1 libgomp1
 
+COPY src/client client/
+
 # Install test dependencies
 RUN --mount=type=cache,target=/root/.cache/pip \
     echo "\n\n# Installing 'plantdb.commons' test dependencies..." && \
