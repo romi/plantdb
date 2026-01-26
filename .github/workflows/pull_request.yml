@@ -8,26 +8,19 @@ jobs:
   build-and-test:
     runs-on: ubuntu-22.04
     steps:
-      # 1 Checkout the repo (including submodules if you need them)
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      # 2 Build the Docker image
+      # Build the Docker image, targeting the test stage
       - name: Build Docker image
         run: |
           docker container prune -f
-          ./docker/build.sh -t ${{ github.sha }} --no-cache
+          docker build --target test -t plantdb-test:${{ github.sha }} .
 
-      # 3 Run the unit tests inside the image
-      - name: Run unit tests
-        run: |
-          ./docker/run.sh -t ${{ github.sha }} --unittest
-
-      # 4 Clean up
+      # Clean up
       - name: Remove Docker image
         if: always()
         run: |
-          docker container prune -f
-          docker image rm roboticsmicrofarms/plantdb:${{ github.sha }} --force
+          docker image rm plantdb-test:${{ github.sha }} --force
