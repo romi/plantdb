@@ -8,7 +8,9 @@ ENV PYTHONUNBUFFERED=1
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Install build dependencies
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -yq --no-install-recommends \
         # Install python3.10 & pip
         python3 python3-pip python3-dev \
@@ -27,7 +29,8 @@ COPY src/commons commons/
 COPY src/server server/
 
 # Build uwsgi & Python packages
-RUN python3 -m pip install --no-cache-dir --user \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --no-cache-dir --user \
         wheel setuptools pip --upgrade && \
     python3 -m pip install --no-cache-dir --user \
         uwsgi \
@@ -41,20 +44,24 @@ RUN python3 -m pip install --no-cache-dir --user \
 FROM builder AS test
 
 # Update package manager & install requirements:
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -yq --no-install-recommends \
         # Install Open3D system dependencies
         libegl1 libgl1 libgomp1
 
 # Install test dependencies
-RUN echo "\n\n# Installing 'plantdb.commons' test dependencies..." && \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    echo "\n\n# Installing 'plantdb.commons' test dependencies..." && \
     python3 -m pip install --no-cache-dir --user \
         commons/[test] && \
     echo "\n\n# Installing 'plantdb.server' test dependencies..." && \
     python3 -m pip install --no-cache-dir --user \
         server/[test]
 # Run tests
-RUN echo "\n\n# Running 'plantdb.commons' tests..." && \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    echo "\n\n# Running 'plantdb.commons' tests..." && \
     nose2 -v -s commons/tests/ && \
     echo "\n\n# Running 'plantdb.commons' tests..." && \
     nose2 -v -s server/tests/
@@ -92,7 +99,9 @@ ENV ROMI_DB="/myapp/db"
 SHELL ["/bin/bash", "-c"]
 
 # Update package manager & install requirements:
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -yq --no-install-recommends \
         # Install curl to performs healthcheck
         curl \
@@ -128,7 +137,8 @@ WORKDIR /home/${USER_NAME}
 # Copy Python packages from builder (including uwsgi)
 COPY --chown=${USER_NAME} --from=builder /root/.local /home/${USER_NAME}/.local
 
-RUN echo "\n\n# Installing 'plantdb.commons', 'plantdb.server' & uwsgi..." && \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    echo "\n\n# Installing 'plantdb.commons', 'plantdb.server' & uwsgi..." && \
     python3 -m pip install --no-cache-dir --user plantdb.commons plantdb.server uwsgi && \
     # Clean pip cache:
     python3 -m pip cache purge && \
