@@ -3233,7 +3233,7 @@ class ScanCreate(Resource):
             scan = self.db.create_scan(scan_id, **kwargs)
             # Set metadata if provided
             if metadata:
-                scan.set_metadata(metadata)
+                scan.set_metadata(metadata, **kwargs)
             return {'message': f"Scan '{scan_id}' created successfully."}, 201
 
         except Exception as e:
@@ -3383,7 +3383,7 @@ class ScanMetadata(Resource):
                 return {'message': 'Scan not found'}, 404
 
             # Update the metadata
-            scan.set_metadata(metadata)
+            scan.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary
@@ -3491,7 +3491,7 @@ class FilesetCreate(Resource):
         self.logger = logger
 
     @requires_jwt
-    def post(self):
+    def post(self, **kwargs):
         """Create a new fileset associated with a scan.
 
         This method handles POST requests to create a new fileset. It validates the input data,
@@ -3562,10 +3562,10 @@ class FilesetCreate(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Create the fileset
-            fileset = scan.create_fileset(fs_id, )
+            fileset = scan.create_fileset(fs_id, **kwargs)
             # Set metadata if provided
             if metadata:
-                fileset.set_metadata(metadata)
+                fileset.set_metadata(metadata, **kwargs)
             return {
                 'message': f"Fileset '{fs_id}' created successfully in '{scan.id}'.",
                 "id": fs_id
@@ -3669,7 +3669,7 @@ class FilesetMetadata(Resource):
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
     @requires_jwt
-    def post(self, scan_id, fileset_id):
+    def post(self, scan_id, fileset_id, **kwargs):
         """Update metadata for a specified fileset.
 
         This method handles updating metadata for a fileset within a scan. It supports both
@@ -3752,7 +3752,7 @@ class FilesetMetadata(Resource):
                 return {'message': 'Fileset not found'}, 404
 
             # Update the metadata
-            fileset.set_metadata(metadata)
+            fileset.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary
@@ -3858,7 +3858,7 @@ class FileCreate(Resource):
         self.logger = logger
 
     @requires_jwt
-    def post(self):
+    def post(self, **kwargs):
         """Create a new file in a fileset and write data to it.
 
         This method handles POST requests to create a new file with data. It expects
@@ -3959,7 +3959,7 @@ class FileCreate(Resource):
                 return {'message': 'Fileset not found'}, 404
             # Create the file
             file_id = sanitize_name(file_id)
-            file = fileset.create_file(file_id)
+            file = fileset.create_file(file_id, **kwargs)
             try:
                 # Write the file data with the specified extension
                 if ext in ['.jpg', '.jpeg', '.png', '.tif']:
@@ -3967,12 +3967,12 @@ class FileCreate(Resource):
                 else:
                     file.write(file_data.read().decode(), ext=ext[1:])  # Text mode
             except Exception as e:
-                fileset.delete_file(file_id)
+                fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
                 return {'message': f'Error writing file: {str(e)}'}, 500
             # Set metadata if provided
             if metadata:
-                file.set_metadata(metadata)
+                file.set_metadata(metadata, **kwargs)
             return {
                 'message': f"File '{file_id}{ext}' created and written successfully in fileset '{fileset.id}'.",
                 'id': f"{file_id}",
@@ -4067,7 +4067,7 @@ class FileMetadata(Resource):
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
     @requires_jwt
-    def post(self, scan_id, fileset_id, file_id):
+    def post(self, scan_id, fileset_id, file_id, **kwargs):
         """Update metadata for a specified file.
 
         Parameters
@@ -4135,7 +4135,7 @@ class FileMetadata(Resource):
                 return {'message': 'File not found'}, 404
 
             # Update the metadata
-            file.set_metadata(metadata)
+            file.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary
