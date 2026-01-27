@@ -697,13 +697,17 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
+def jwt_from_header(request):
+    return request.headers.get('Authorization', "").replace('Bearer ', '')
+
+
 def requires_jwt(f):
     """Decorator to require JWT validation."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Try to get JWT token from request header
-        jwt_token = request.headers.get('Authorization', "").replace('Bearer ', '')
+        jwt_token = jwt_from_header(request)
         # Verify we actually got a token (do not test its validity, this is done by the database)
         if not jwt_token:
             return {'message': 'Authentication required, JSON Web Token missing!'}, 401
@@ -1071,8 +1075,9 @@ class Logout(Resource):
     @requires_jwt
     def post(self, **kwargs):
         """Handle user logout and clear cookie."""
-        # Get token from keyword arguments
+        # Get token from keyword arguments (from decorator)
         jwt_token = kwargs.get('token', None)
+
         try:
             if jwt_token:
                 # Invalidate session
@@ -1135,12 +1140,14 @@ class TokenValidation(Resource):
         self.db = db
         self.logger = logger
 
+    @requires_jwt
     def post(self, **kwargs):
         """Handle token validation."""
+        # Get token from keyword arguments (from decorator)
         jwt_token = kwargs.get('token', None)
 
         try:
-            user = self.db.session_manager.get_user_data(session_token=jwt_token)
+            user = self.db.get_user_data(session_token=jwt_token)
         except Exception as e:
             response = {'message': f'Token validation failed: {e}'}, 401
         else:
@@ -1158,7 +1165,7 @@ class TokenRefresh(Resource):
     """
     Refresh JWT token for an authenticated user.
 
-    The :class:`TokenRefresh` resource provides an endpoint that accepts an
+    The `TokenRefresh` resource provides an endpoint that accepts an
     existing JSON Web Token, validates the current session, and issues a new
     access token when the refresh is successful.  The resource interacts
     with a database session manager that exposes a ``refresh_session`` method
@@ -1183,8 +1190,9 @@ class TokenRefresh(Resource):
     @requires_jwt
     def post(self, **kwargs):
         """Refresh JWT token."""
-        # Get token from keyword arguments
+        # Get token from keyword arguments (from decorator)
         jwt_token = kwargs.get('token', None)
+
         try:
             new_token = self.db.session_manager.refresh_session(jwt_token)
 
