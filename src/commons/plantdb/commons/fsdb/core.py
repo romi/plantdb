@@ -685,13 +685,12 @@ class FSDB(db.DB):
         if metadata is None:
             metadata = {}
 
-        # Set current user as owner if not specified
-        if 'owner' not in metadata:
-            metadata['owner'] = current_user.username
-            now = iso_date_now()
-            metadata['created'] = now  # creation timestamp
-            metadata['last_modified'] = now  # modification timestamp
-            metadata['created_by'] = current_user.fullname
+        # Set basic metadata
+        metadata['owner'] = current_user.username
+        now = iso_date_now()
+        metadata['created'] = now  # creation timestamp
+        metadata['last_modified'] = now  # modification timestamp
+        metadata['created_by'] = current_user.fullname
 
         # Validate sharing groups if specified
         if 'sharing' in metadata:
@@ -988,7 +987,7 @@ class FSDB(db.DB):
             return False
 
     @require_authentication
-    def create_user(self, username, fullname, password, roles=None) -> None:
+    def create_user(self, username, fullname, password, roles=None, **kwargs) -> None:
         """
         Create a new user with the specified details.
 
@@ -1007,6 +1006,16 @@ class FSDB(db.DB):
         --------
         RBACManager.users.create : Method used to actually create the user.
         """
+        current_user = self.get_user_data(**kwargs)
+        if not current_user:
+            raise PermissionError("No authenticated user!")
+
+        # Check user creation permissions
+        if not self.rbac_manager.can_create_user(current_user):
+            raise PermissionError(f"Insufficient permissions to create new user with user '{current_user.username}'")
+
+        # TODO: add a maximum role given the current user role
+
         return self.rbac_manager.users.create(username, fullname, password, roles)
 
     def get_guest_user(self):
@@ -1184,7 +1193,7 @@ class FSDB(db.DB):
             raise PermissionError("No authenticated user")
 
         if not self.rbac_manager.delete_group(current_user, group_name):
-            raise PermissionError("Insufficient permissions or group not found")
+            raise PermissionError(f"Insufficient permissions or group '{group_name}' not found")
         return True
 
     @require_authentication
@@ -1615,7 +1624,7 @@ class Scan(db.Scan):
 
         # Validate metadata changes
         if not self.db.rbac_manager.validate_scan_metadata_access(current_user, old_metadata, new_metadata):
-            raise PermissionError("Insufficient permissions to modify scan metadata")
+            raise PermissionError(f"Insufficient permissions to modify scan '{self.id}' metadata!")
 
         # Validate sharing groups if present
         if 'sharing' in new_metadata:
@@ -1627,9 +1636,10 @@ class Scan(db.Scan):
 
         # Check WRITE permission for this scan
         if not self.db.rbac_manager.can_access_scan(current_user, old_metadata, Permission.WRITE):
-            raise PermissionError("Insufficient permissions to modify scan")
+            raise PermissionError(f"Insufficient permissions to modify scan '{self.id}' metadata.")
 
         # Use exclusive lock for metadata updates
+        self.logger.info(f"Updating scan '{self.id}' metadata by user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Update metadata
             _set_metadata(self.metadata, new_metadata, None)
@@ -1637,8 +1647,7 @@ class Scan(db.Scan):
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
-            self.logger.info(f"Updated metadata for scan '{self.id}' by user '{current_user.username}'")
-
+        self.logger.info(f"Done updating the scan '{self.id}' metadata!")
         return
 
     @require_authentication
@@ -1696,7 +1705,7 @@ class Scan(db.Scan):
             raise IOError(f"Invalid fileset identifier '{fs_id}'!")
 
         # Use exclusive lock for fileset creation
-        self.logger.info(f"Creating fileset '{fs_id}' from scan '{self.id}'")
+        self.logger.info(f"Creating a fileset '{fs_id}' from scan '{self.id}'...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Verify if the given `fs_id` already exists in the local database
             if self.fileset_exists(fs_id):
@@ -1720,8 +1729,7 @@ class Scan(db.Scan):
             self.filesets.update({fs_id: fileset})  # Update scan's filesets dictionary
             self.store()  # Store fileset instance to the JSON
 
-            self.logger.info(f"Created new fileset '{fs_id}' in scan '{self.id}' for user '{current_user.username}'")
-
+        self.logger.info(f"Done creating the '{fs_id}' fileset!")
         return fileset
 
     def store(self):
@@ -1756,7 +1764,7 @@ class Scan(db.Scan):
 
         # Check ownership
         if self.owner != current_user.username:
-            raise PermissionError(f"Only the owner can delete filesets from scan '{self.id}'")
+            raise PermissionError(f"Only the owner can delete fileset '{fs_id}' from scan '{self.id}'")
 
         # Use exclusive lock for fileset deletion
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
@@ -1769,7 +1777,7 @@ class Scan(db.Scan):
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
             self.store()  # save the changes to the scan main JSON FILE (``files.json``)
 
-            self.logger.info(f"Deleted fileset '{fs_id}' from scan '{self.id}' by user '{current_user.username}'")
+        self.logger.info(f"Deleted fileset '{fs_id}' from scan '{self.id}' by user '{current_user.username}'")
         return
 
     def path(self) -> pathlib.Path:
@@ -2042,12 +2050,15 @@ class Fileset(db.Fileset):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can set fileset metadata in scan/fileset '{self.scan.id}/{self.id}'")
 
-        _set_metadata(self.metadata, data, value)
-        # Ensure modification timestamp
-        self.metadata['last_modified'] = iso_date_now()
-        _store_fileset_metadata(self)
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            _set_metadata(self.metadata, data, value)
+            # Ensure modification timestamp
+            self.metadata['last_modified'] = iso_date_now()
+            _store_fileset_metadata(self)
+
+        self.logger.info(f"Set fileset '{self.id}' metadata in '{self.scan.id}' by user '{current_user.username}'")
         return
 
     @require_authentication
@@ -2090,7 +2101,7 @@ class Fileset(db.Fileset):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can create a file in scan/fileset '{self.scan.id}/{self.id}'")
 
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(f_id):
@@ -2119,9 +2130,7 @@ class Fileset(db.Fileset):
             self.files.update({f_id: file})  # Update filesets's files dictionary
             self.store()  # Store fileset instance to the JSON
 
-            self.logger.info(
-                f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user.username}'")
-
+        self.logger.info(f"Created new file '{f_id}' in '{self.scan.id}/{self.id}' for user '{current_user.username}'")
         return file
 
     @require_authentication
@@ -2156,17 +2165,22 @@ class Fileset(db.Fileset):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can delete file in scan/fileset '{self.scan.id}/{self.id}'")
 
         # Verify if the given `fs_id` exists in the local database
         if not self.file_exists(f_id):
             logging.warning(f"Given file identifier '{f_id}' does NOT exists!")
             return
 
-        f = self.files[f_id]
-        _delete_file(f)  # delete the file
-        self.files.pop(f_id)  # remove the File instance from the fileset
-        self.store()  # save the changes to the scan main JSON FILE (``files.json``)
+        # Use exclusive lock for fileset creation
+        self.logger.info(f"Deleting file '{f_id}' from scan/fileset '{self.scan.id}/{self.id}'")
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            f = self.files[f_id]
+            _delete_file(f)  # delete the file
+            self.files.pop(f_id)  # remove the File instance from the fileset
+            self.store()  # save the changes to the scan main JSON FILE (``files.json``)
+
+        self.logger.info(f"Deleted file '{f_id}' from scan/fileset '{self.scan.id}/{self.id}' by user '{current_user.username}'")
         return
 
     def store(self):
@@ -2302,7 +2316,8 @@ class File(db.File):
         """
         return _get_metadata(self.metadata, key, default)
 
-    def set_metadata(self, data, value=None):
+    @require_authentication
+    def set_metadata(self, data, value=None, **kwargs):
         """Add a new metadata to the file.
 
         Parameters
@@ -2330,10 +2345,22 @@ class File(db.File):
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        _set_metadata(self.metadata, data, value)
-        # Ensure modification timestamp
-        self.metadata['last_modified'] = iso_date_now()
-        _store_file_metadata(self)
+        current_user = self.db.get_user_data(**kwargs)
+        if not current_user:
+            raise PermissionError("No authenticated user!")
+
+        # Check ownership
+        if self.owner != current_user.username:
+            raise PermissionError(f"Only the owner can set file metadata for scan/fileset/file '{self.scan.id}/{self.fileset.id}/{self.id}'")
+
+        # Use exclusive lock for this operation
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            _set_metadata(self.metadata, data, value)
+            # Ensure modification timestamp
+            self.metadata['last_modified'] = iso_date_now()
+            _store_file_metadata(self)
+
+        self.logger.info(f"Updated file '{self.id}' metadata in '{self.scan.id}/{self.fileset.id}' by user '{current_user.username}'.")
         return
 
     @require_authentication
@@ -2365,21 +2392,26 @@ class File(db.File):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can create file in scan/fileset '{self.scan.id}/{self.fileset.id}'")
 
         # Check if the path is a file
         if isinstance(path, str):
             path = Path(path)
         if not os.path.isfile(path):
             raise ValueError("The provided path is not a file.")
-        # Get the file name and extension
-        ext = path.suffix[1:]
-        self.filename = _get_filename(self, ext)
-        # Get the path to the new `File` instance
-        newpath = _file_path(self)
-        # Copy the file to its new destination
-        copyfile(path, newpath)
-        self.store()  # register it to the scan main JSON FILE
+
+        # Use exclusive lock for this operation
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            # Get the file name and extension
+            ext = path.suffix[1:]
+            self.filename = _get_filename(self, ext)
+            # Get the path to the new `File` instance
+            newpath = _file_path(self)
+            # Copy the file to its new destination
+            copyfile(path, newpath)
+            self.store()  # register it to the scan main JSON FILE
+
+        self.logger.info(f"Imported file '{self.id}' in scan/fileset '{self.scan.id}/{self.fileset.id}' for user '{current_user.username}'")
         return
 
     def store(self):
@@ -2451,13 +2483,17 @@ class File(db.File):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can write file in scan/fileset '{self.scan.id}/{self.fileset.id}'")
 
-        self.filename = _get_filename(self, ext)
-        path = _file_path(self)
-        with path.open(mode="wb") as f:
-            f.write(data)
-        self.store()
+        # Use exclusive lock for this operation
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            self.filename = _get_filename(self, ext)
+            path = _file_path(self)
+            with path.open(mode="wb") as f:
+                f.write(data)
+            self.store()
+
+        self.logger.info(f"Wrote file '{self.id}' in scan/fileset '{self.scan.id}/{self.fileset.id}' for user '{current_user.username}'")
         return
 
     def read(self):
@@ -2529,13 +2565,17 @@ class File(db.File):
 
         # Check ownership
         if self.scan.owner != current_user.username:
-            raise PermissionError(f"Only the owner can create filesets in scan '{self.id}'")
+            raise PermissionError(f"Only the owner can write file in scan/fileset '{self.scan.id}/{self.fileset.id}'")
 
-        self.filename = _get_filename(self, ext)
-        path = _file_path(self)
-        with path.open(mode="w") as f:
-            f.write(data)
-        self.store()
+        # Use exclusive lock for this operation
+        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+            self.filename = _get_filename(self, ext)
+            path = _file_path(self)
+            with path.open(mode="w") as f:
+                f.write(data)
+            self.store()
+
+        self.logger.info(f"Wrote file '{self.id}' in scan/fileset '{self.scan.id}/{self.fileset.id}' for user '{current_user.username}'")
         return
 
     def path(self) -> pathlib.Path:
