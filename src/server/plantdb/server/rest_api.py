@@ -832,7 +832,8 @@ class Register(Resource):
         self.db = db
 
     @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
-    def post(self):
+    @requires_jwt
+    def post(self, **kwargs):
         """Handle HTTP POST request to register a new user.
 
         Processes user registration by validating the input data and creating a new user in the database.
@@ -881,7 +882,6 @@ class Register(Resource):
         """
         # Parse JSON data from request body
         data = request.get_json()
-
         # Check if all required fields are present in the request
         required_fields = ['username', 'fullname', 'password']
         if not data or not all(field in data for field in required_fields):
@@ -891,11 +891,12 @@ class Register(Resource):
             }, 400
 
         try:
-            # Attempt to create new user in database
+            # Attempt to create new user in the database
             self.db.create_user(
                 username=data['username'],
                 fullname=data['fullname'],
-                password=data['password']
+                password=data['password'],
+                **kwargs
             )
             # Return success response if user creation succeeds
             return {
@@ -1044,7 +1045,7 @@ class Login(Resource):
 
         # Prepare response based on authentication result
         if jwt_token:
-            user = self.db.get_user_data(session_token=jwt_token)
+            user = self.db.get_user_data(token=jwt_token)
             # Create response with user info & access token
             response_data = {
                 'message': 'Login successful',
@@ -1074,14 +1075,11 @@ class Logout(Resource):
 
     @requires_jwt
     def post(self, **kwargs):
-        """Handle user logout and clear cookie."""
-        # Get token from keyword arguments (from decorator)
-        jwt_token = kwargs.get('token', None)
-
+        """Handle user logout."""
         try:
-            if jwt_token:
+            if 'token' in kwargs:
                 # Invalidate session
-                self.db.session_manager.invalidate_session(jwt_token)
+                self.db.logout(**kwargs)
                 response = {'message': 'Logout successful'}, 200
             else:
                 self.logger.error(f"Logout error: no active session!")
@@ -1143,11 +1141,8 @@ class TokenValidation(Resource):
     @requires_jwt
     def post(self, **kwargs):
         """Handle token validation."""
-        # Get token from keyword arguments (from decorator)
-        jwt_token = kwargs.get('token', None)
-
         try:
-            user = self.db.get_user_data(session_token=jwt_token)
+            user = self.db.get_user_data(**kwargs)
         except Exception as e:
             response = {'message': f'Token validation failed: {e}'}, 401
         else:
