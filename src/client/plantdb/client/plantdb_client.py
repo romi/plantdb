@@ -39,6 +39,8 @@ import mimetypes
 import os
 
 import requests
+from ada_url import join_url
+from plantdb.client import api_endpoints
 from requests import RequestException
 
 from plantdb.commons.log import get_logger
@@ -107,14 +109,16 @@ class PlantDBClient:
     --------
     >>> from plantdb.server.test_rest_api import TestRestApiServer
     >>> # Start a test PlantDB REST API server first:
-    >>> server = TestRestApiServer(test=True)
+    >>> server = TestRestApiServer(test=True, port=5555)
     >>> server.start()
     >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import plantdb_url
-    >>> client = PlantDBClient(plantdb_url())
+    >>> client = PlantDBClient(plantdb_url('localhost', port=5555))
     >>> client.login('admin', 'admin')
     >>> print(client.jwt_token)
+    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5555))
+    >>> client2.validate_session_token(client.jwt_token)
     >>> print(client.plantdb_url)
     >>> scans = client.list_scans()
     >>> print(scans)
@@ -142,7 +146,7 @@ class PlantDBClient:
         token : str
             The JWT token to be used for authentication.
         """
-        url = f"{self.base_url}/token-validation"
+        url = join_url(self.base_url, api_endpoints.token_validation())
         response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
         if response.status_code == 200:
             self.jwt_token = token
@@ -170,7 +174,7 @@ class PlantDBClient:
         bool
             ``True`` if login successful, ``False`` otherwise
         """
-        url = f"{self.base_url}/login"
+        url = join_url(self.base_url, api_endpoints.login())
         data = {
             'username': username,
             'password': password
@@ -201,7 +205,7 @@ class PlantDBClient:
         bool
             True if logout successful
         """
-        url = f"{self.base_url}/logout"
+        url = join_url(self.base_url, api_endpoints.logout())
         try:
             response = self.session.post(url)
             if response.status_code == 200:
@@ -215,7 +219,7 @@ class PlantDBClient:
 
     def refresh(self) -> bool:
         """Refresh the database."""
-        url = f"{self.base_url}/refresh"
+        url = join_url(self.base_url, api_endpoints.refresh())
         try:
             response = self.session.get(url)
             if response.status_code == 200:
@@ -226,7 +230,7 @@ class PlantDBClient:
 
     def refresh_token(self) -> bool:
         """Refresh the JWT token."""
-        url = f"{self.base_url}/token-refresh"
+        url = join_url(self.base_url, api_endpoints.token_refresh())
         try:
             response = self.session.post(url)
             if response.status_code == 200:
@@ -296,7 +300,7 @@ class PlantDBClient:
         >>> print(response)
         ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
         """
-        url = f"{self.base_url}/scans"
+        url = join_url(self.base_url, api_endpoints.scans())
         params = {}
         if query is not None:
             params['query'] = query
