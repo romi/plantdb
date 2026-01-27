@@ -186,6 +186,8 @@ class PlantDBClient:
                 result = response.json()
                 self.jwt_token = result.get('access_token')
                 self.username = username
+                # Add the JWT to the header
+                self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
