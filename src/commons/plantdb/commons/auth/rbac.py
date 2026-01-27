@@ -564,7 +564,7 @@ class RBACManager:
     def can_access_scan(self, user: User, scan_metadata: dict, operation: Permission) -> bool:
         """Check if a user can perform a specific operation on a scan dataset.
 
-        This method implements the complete access control logic including:
+        This method implements the complete access control logic, including:
         - Owner-based access (owners get CONTRIBUTOR role for their scans)
         - Group-based access (shared group members get CONTRIBUTOR role)
         - Global role-based access (fallback to user's global role)
@@ -587,34 +587,10 @@ class RBACManager:
         scan_permissions = self.get_scan_permissions(user, scan_metadata)
         return operation in scan_permissions
 
-    def can_access_scan_by_owner(self, user: User, scan_owner: str, operation: Permission) -> bool:
-        """Legacy method for checking scan access by owner name only.
-
-        This method provides backward compatibility but doesn't support group sharing.
-        For full RBAC support, use can_access_scan() with full metadata.
-
-        Parameters
-        ----------
-        user : User
-            The user requesting access.
-        scan_owner : str
-            The username of the scan owner.
-        operation : Permission
-            The operation/permission being requested.
-
-        Returns
-        -------
-        bool
-            True if the user can perform the operation, False otherwise.
-        """
-        # Create minimal metadata with just owner
-        scan_metadata = {'owner': scan_owner}
-        return self.can_access_scan(user, scan_metadata, operation)
-
     def can_modify_scan_owner(self, user: User, scan_metadata: dict) -> bool:
         """Check if a user can modify the 'owner' field of a scan.
 
-        Only admins can modify scan ownership.
+        Only users with permission to ``MANAGE_USERS`` can modify scan ownership.
 
         Parameters
         ----------
@@ -626,7 +602,7 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user can modify the owner field, False otherwise.
+            ``True`` if the user can modify the owner field, ``False`` otherwise.
         """
         return self.has_permission(user, Permission.MANAGE_USERS)
 
@@ -634,7 +610,7 @@ class RBACManager:
         """Check if a user can modify the 'sharing' field of a scan.
 
         Users can modify sharing if they have WRITE permission for the scan
-        (i.e., they are the owner, in a shared group, or have global CONTRIBUTOR+ role).
+        (_i.e._, they are the owner, in a shared group, or have a global CONTRIBUTOR+ role).
 
         Parameters
         ----------
@@ -646,7 +622,7 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user can modify the sharing field, False otherwise.
+            ``True`` if the user can modify the sharing field, ``False`` otherwise.
         """
         return self.can_access_scan(user, scan_metadata, Permission.WRITE)
 
@@ -668,9 +644,9 @@ class RBACManager:
         Returns
         -------
         bool
-            True if all proposed changes are allowed, False otherwise.
+            ``True`` if all proposed changes are allowed, ``False`` otherwise.
         """
-        # Check if owner field is being modified
+        # Check if the owner field is being modified
         old_owner = old_metadata.get('owner', self.users.GUEST_USERNAME)
         new_owner = new_metadata.get('owner', self.users.GUEST_USERNAME)
 
@@ -678,7 +654,7 @@ class RBACManager:
             if not self.can_modify_scan_owner(user, old_metadata):
                 return False
 
-        # Check if sharing field is being modified
+        # Check if the sharing field is being modified
         old_sharing = old_metadata.get('sharing', [])
         new_sharing = new_metadata.get('sharing', [])
 
