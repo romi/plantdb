@@ -261,7 +261,7 @@ class UserManager():
         username = username.lower()  # Convert the username to lowercase to maintain uniformity.
         timestamp = datetime.now()  # Get the current timestamp for tracking user creation time.
 
-        # Verify if the login is available
+        # Verify if the username is available
         try:
             assert not self.exists(username)
         except AssertionError:
