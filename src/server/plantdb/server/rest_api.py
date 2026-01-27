@@ -26,10 +26,10 @@
 """
 This module regroup the classes and methods used to serve a REST API using ``fsdb_rest_api`` CLI.
 """
-
 import datetime
 import hashlib
 import json
+import mimetypes
 import os
 import threading
 import time
@@ -41,6 +41,7 @@ from pathlib import Path
 from tempfile import mkstemp
 from zipfile import ZipFile
 
+import pybase64
 from flask import Response
 from flask import after_this_request
 from flask import jsonify
@@ -49,7 +50,6 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
-
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
@@ -1965,10 +1965,25 @@ class Image(Resource):
         file_id : str
             Identifier for the specific image file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * `'thumb'`: image max width and height to `150` (default);
+                * `'large'`: image max width and height to `1500`;
+                * `'orig'`: original image, no chache;
+            If an invalid string is supplied, the default 'thumb' is used.
+        base64 : str
+            Query parameter indicating whether to return the image encoded in base64.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the image file.
+            If set, returns the image in base64 under the 'image' JSON dictionary entry and mimetype under 'content-type'.
+
         Returns
         -------
         flask.Response
-            HTTP response containing the image data with 'image/jpeg' mimetype.
+            HTTP response containing the image data with 'content-type' mimetype.
 
         Raises
         ------
@@ -1980,11 +1995,6 @@ class Image(Resource):
         Notes
         -----
         - All input parameters are sanitized before use.
-        - In the URL, you can use the `size` parameter to retrieve a resized image.
-        - The 'size' parameter defaults to 'thumb' if not specified and can be an integer or one of the following string values:
-            * `'thumb'`: image max width and height to `150`;
-            * `'large'`: image max width and height to `1500`;
-            * `'orig'`: original image, no chache;
 
         See Also
         --------
@@ -2015,10 +2025,22 @@ class Image(Resource):
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='thumb', type=str)
+        # Parse the base64 flag (accepting true/1/yes in any case)
+        base64_flag = request.args.get('base64', default='false', type=str).lower() in ('true', '1', 'yes')
+
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path)
+        mime_type, _ = mimetypes.guess_type(path)
+
+        # If base64_flag is set, read the file, encode it, and return JSON
+        if base64_flag:
+            with open(path, 'rb') as f:
+                encoded = pybase64.b64encode(f.read()).decode('ascii')
+            return jsonify({'image': encoded, 'content-type': mime_type})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype=mime_type)
 
 
 class PointCloud(Resource):
@@ -2067,6 +2089,21 @@ class PointCloud(Resource):
         file_id : str
             Identifier for the specific point cloud file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * 'orig' – serve the original point cloud.
+                * 'preview' – serve a precomputed preview (default).
+                * A float value – perform on‑the‑fly voxel downsampling using the specified voxel size.
+            If an invalid string is supplied, the default 'preview' is used.
+        coords : str
+            Query parameter indicating whether to return the point coordinates as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2081,11 +2118,6 @@ class PointCloud(Resource):
 
         Notes
         -----
-        - In the URL, you can use a 'size' parameter that accepts:
-            * 'orig': original point cloud
-            * 'preview': downsampled preview version
-            * float value: custom voxel size for downsampling
-        - Defaults to 'preview' if size parameter is invalid
         - All input parameters are sanitized before use
 
         See Also
@@ -2108,6 +2140,9 @@ class PointCloud(Resource):
         >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview"})
         >>> # Get custom downsampled version (voxel size 0.01)
         >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "0.01"})
+        >>> # Send the coordinates (read the file on the server-side)
+        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview", 'coords': 'true'})
+        >>> coordinates = np.array(res.json()['coordinates'])
 
         """
         # Sanitize identifiers
@@ -2115,6 +2150,7 @@ class PointCloud(Resource):
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -2127,6 +2163,9 @@ class PointCloud(Resource):
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
 
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+
         try:
             # Get the path to the pointcloud resource:
             path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
@@ -2138,8 +2177,16 @@ class PointCloud(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_point_cloud(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class PointCloudGroundTruth(Resource):
@@ -2180,6 +2227,21 @@ class PointCloudGroundTruth(Resource):
         file_id : str
             Identifier for the specific point-cloud file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * 'orig' – serve the original point cloud.
+                * 'preview' – serve a precomputed preview (default).
+                * A float value – perform on‑the‑fly voxel downsampling using the specified voxel size.
+            If an invalid string is supplied, the default 'preview' is used.
+        coords : str
+            Query parameter indicating whether to return the point coordinates as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2202,12 +2264,12 @@ class PointCloudGroundTruth(Resource):
         - Invalid size parameters default to 'preview'
         - Response mimetype is 'application/octet-stream'
         """
-
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -2220,6 +2282,9 @@ class PointCloudGroundTruth(Resource):
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
 
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+
         try:
             # Get the path to the pointcloud resource:
             path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
@@ -2231,8 +2296,16 @@ class PointCloudGroundTruth(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_point_cloud(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class Mesh(Resource):
@@ -2279,6 +2352,14 @@ class Mesh(Resource):
         file_id : str
             Identifier for the specific mesh file.
 
+        Other Parameters
+        ----------------
+        coords : str
+            Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'vertices' & 'triangles' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2323,10 +2404,14 @@ class Mesh(Resource):
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='orig', type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
         if not size in ['orig']:
             size = 'orig'
+
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
 
         try:
             # Get the path to the mesh resource:
@@ -2339,8 +2424,16 @@ class Mesh(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_triangle_mesh(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'vertices': np.array(pcd.vertices).tolist(), 'triangles': np.array(pcd.triangles).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class CurveSkeleton(Resource):
