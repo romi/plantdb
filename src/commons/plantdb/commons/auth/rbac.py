@@ -219,6 +219,24 @@ class RBACManager:
         user_permissions = self.get_user_permissions(user)
         return permission in user_permissions
 
+    def has_role(self, user: User, role: Role) -> bool:
+        """
+        Check if a user has a specific role.
+
+        Parameters
+        ----------
+        user : User
+            The user object to check for roles.
+        role : Role
+            The role to verify against the user's roles.
+
+        Returns
+        -------
+        bool
+            `True` if the user has the given role, `False` otherwise.
+        """
+        return role in user.roles
+
     def is_guest_user(self, user: User) -> bool:
         """
         Check if the given user is the guest user.
@@ -236,7 +254,31 @@ class RBACManager:
         return user.username == self.users.GUEST_USERNAME
 
     def get_guest_user(self) -> User:
+        """
+        Retrieves the guest user from the user repository.
+
+        Returns
+        -------
+        User
+            The user object corresponding to the guest username.
+        """
         return self.users.get_user(self.users.GUEST_USERNAME)
+
+    def can_create_user(self, user: User) -> bool:
+        """
+        Check if a user can create new users.
+
+        Parameters
+        ----------
+        user : User
+            The user to check.
+
+        Returns
+        -------
+        bool
+            True if the user can create new users, False otherwise.
+        """
+        return self.has_permission(user, Permission.MANAGE_USERS)
 
     def can_manage_groups(self, user: User) -> bool:
         """
