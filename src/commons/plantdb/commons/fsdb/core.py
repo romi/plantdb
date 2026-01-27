@@ -1064,7 +1064,7 @@ class FSDB(db.DB):
         if username:
             return self.rbac_manager.users.get_user(username)
         elif session_token:
-            return self.rbac_manager.users.get_user(self.get_user(session_token))
+            return self.rbac_manager.users.get_user(self.session_manager.session_username(session_token))
         else:
             self.logger.error("No username or session token provided")
             return None
