@@ -750,8 +750,8 @@ class PlantDBClient:
 
         url = f"{self.base_url}/api/file"
 
-        ext = ext.lstrip('.').lower()  # Remove leading dot if present
-        # Prepare form data
+        ext = ext.lstrip('.').lower()  # Remove the leading dot if present
+        # Prepare data
         data = {
             'file_id': file_id,
             'ext': ext,
@@ -777,10 +777,10 @@ class PlantDBClient:
             }
             response = self.session.post(url, files=files, data=data)
         else:
-            # Convert to Path object if it's a string
+            # Convert to a Path object if it's a string
             file_path = Path(file_data) if isinstance(file_data, str) else file_data
 
-            # Handle file from path
+            # Handle file from a path
             with open(file_path, 'rb') as file_handle:
                 filename = os.path.basename(str(file_path))
                 files = {
