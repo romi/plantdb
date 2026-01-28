@@ -3204,7 +3204,7 @@ class ScanCreate(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3290,10 +3290,10 @@ class ScanMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/test_plant/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
@@ -3351,10 +3351,10 @@ class ScanMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Update scan metadata:
-        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/test_plant/metadata"
         >>> data = {"metadata": {"description": "Updated scan description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
@@ -3443,7 +3443,7 @@ class ScanFilesets(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # List filesets in a scan:
-        >>> url = f"{plantdb_url()}/api/scan/real_plant/filesets"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/real_plant/filesets"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3524,7 +3524,7 @@ class FilesetCreate(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> response = requests.post(url, json={'fileset_id': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3632,10 +3632,10 @@ class FilesetMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> response = requests.post(url, json={'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/fileset/real_plant/my_fileset/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/real_plant/my_fileset/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3705,11 +3705,11 @@ class FilesetMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> data = {'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata}
         >>> response = requests.post(url, json=data)
         >>> # Get the original metadata:
-        >>> url = f"{plantdb_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3803,7 +3803,7 @@ class FilesetFiles(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # List files in a fileset:
-        >>> url = f"{plantdb_url()}/api/fileset/real_plant/images/files"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/real_plant/images/files"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3888,8 +3888,10 @@ class FileCreate(Resource):
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
+        >>> login_res = requests.post(f"{plantdb_url('localhost', port=5000)}/login", json={'username': 'admin', 'password': 'admin'})
+        >>> token = login_res.json()['access_token']
         >>> # Create a new file with metadata in the database:
-        >>> url = f"{plantdb_url()}/api/file"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file"
         >>> # Open the file separately for sending
         >>> with open(file_path, 'rb') as file_handle:
         ...     files = {
@@ -3903,7 +3905,7 @@ class FileCreate(Resource):
         ...         'fileset_id': 'images',
         ...         'metadata': metadata
         ...     }
-        ...     response = requests.post(url, files=files, data=data)
+        ...     response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.status_code)
         201
         >>> print(response.json())
@@ -3945,7 +3947,7 @@ class FileCreate(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3958,9 +3960,9 @@ class FileCreate(Resource):
             try:
                 # Write the file data with the specified extension
                 if ext in ['.jpg', '.jpeg', '.png', '.tif']:
-                    file.write_raw(file_data.read(), ext=ext[1:])  # Binary mode
+                    file.write_raw(file_data.read(), ext=ext[1:], **kwargs)  # Binary mode
                 else:
-                    file.write(file_data.read().decode(), ext=ext[1:])  # Text mode
+                    file.write(file_data.read().decode(), ext=ext[1:], **kwargs)  # Text mode
             except Exception as e:
                 fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
@@ -4029,7 +4031,7 @@ class FileMetadata(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
@@ -4096,7 +4098,7 @@ class FileMetadata(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
