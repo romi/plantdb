@@ -266,7 +266,7 @@ def _set_metadata(metadata, data, value):
     """
     if isinstance(data, str):
         if value is None:
-            raise IOError(f"No value given for key '{data}'!")
+            logger.warning(f"Metadata key '{data}' was set to `None`!")
         # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
         metadata[data] = copy.deepcopy(value)
     elif isinstance(data, dict):
