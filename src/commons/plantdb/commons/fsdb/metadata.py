@@ -44,6 +44,7 @@ value = _get_metadata(metadata_dict, "key", default={})
 import copy
 import json
 from pathlib import Path
+from typing import Any
 
 from .path_helpers import _file_metadata_path
 from .path_helpers import _fileset_metadata_json_path
@@ -53,7 +54,7 @@ from ..log import get_logger
 logger = get_logger(__name__)
 
 
-def _load_fileset_metadata(fileset):
+def _load_fileset_metadata(fileset) -> dict:
     """Load the metadata for a fileset.
 
     Parameters
@@ -69,7 +70,7 @@ def _load_fileset_metadata(fileset):
     return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
-def _load_metadata(path):
+def _load_metadata(path) -> dict:
     """Load a metadata dictionary from a JSON file.
 
     Parameters
@@ -104,7 +105,7 @@ def _load_metadata(path):
     return md
 
 
-def _load_scan_metadata(scan):
+def _load_scan_metadata(scan) -> dict:
     """Load the metadata for a scan dataset.
 
     Parameters
@@ -131,7 +132,7 @@ def _load_scan_metadata(scan):
     return scan_md
 
 
-def _load_file_metadata(file):
+def _load_file_metadata(file) -> dict:
     """Load the metadata for a file.
 
     Parameters
@@ -147,8 +148,8 @@ def _load_file_metadata(file):
     return _load_metadata(_file_metadata_path(file))
 
 
-def _mkdir_metadata(path):
-    """Create the parent directories from given path.
+def _mkdir_metadata(path) -> None:
+    """Create the parent directories from a given path.
 
     Parameters
     ----------
@@ -165,7 +166,7 @@ def _mkdir_metadata(path):
     return
 
 
-def _store_metadata(path, metadata):
+def _store_metadata(path, metadata) -> None:
     """Save a metadata dictionary as a JSON file.
 
     Parameters
@@ -181,7 +182,7 @@ def _store_metadata(path, metadata):
     return
 
 
-def _store_scan_metadata(scan):
+def _store_scan_metadata(scan) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -193,7 +194,7 @@ def _store_scan_metadata(scan):
     return
 
 
-def _store_fileset_metadata(fileset):
+def _store_fileset_metadata(fileset) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -205,7 +206,7 @@ def _store_fileset_metadata(fileset):
     return
 
 
-def _store_file_metadata(file):
+def _store_file_metadata(file) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -217,18 +218,18 @@ def _store_file_metadata(file):
     return
 
 
-def _get_metadata(metadata=None, key=None, default={}):
+def _get_metadata(metadata=None, key=None, default={}) -> Any:
     """Get a copy of `metadata[key]`.
 
     Parameters
     ----------
     metadata : dict, optional
-        The metadata dictionary to get the key from.
+        The metadata dictionary to get the `key` from.
     key : str, optional
-        The key to get from the metadata dictionary.
+        The `key` to get from the metadata dictionary.
         By default, return a copy of the whole metadata dictionary.
     default : Any, optional
-        The default value to return if the key do not exist in the metadata.
+        The default value to return if the `key` does not exist in the metadata.
         Default is an empty dictionary ``{}``.
 
     Returns
@@ -245,8 +246,8 @@ def _get_metadata(metadata=None, key=None, default={}):
         return copy.deepcopy(metadata.get(str(key), default))
 
 
-def _set_metadata(metadata, data, value):
-    """Set a `data` `value` in `metadata` dictionary.
+def _set_metadata(metadata, data, value) -> None:
+    """Set a `data` `value` in the ` metadata ` dictionary.
 
     Parameters
     ----------
@@ -261,7 +262,6 @@ def _set_metadata(metadata, data, value):
     Raises
     ------
     IOError
-        If `value` is `None` when `data` is a string.
         If `data` is not of the right type.
     """
     if isinstance(data, str):
