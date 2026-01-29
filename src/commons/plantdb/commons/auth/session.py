@@ -154,10 +154,6 @@ class SessionManager:
         The session ID is a token generated using `secrets.token_urlsafe`.
         The session data includes the user ID, creation timestamp, last accessed timestamp, and expiration timestamp.
         """
-        if self._user_has_session(username):
-            self.logger.warning(f"User '{username}' already has an active session!")
-            return None
-
         if self.n_active_sessions() >= self.max_concurrent_sessions:
             self.logger.warning(
                 f"Reached max concurrent sessions limit ({self.max_concurrent_sessions})")
@@ -508,10 +504,6 @@ class JWTSessionManager(SessionManager):
         - iat (issued at): Token creation timestamp
         - jti (JWT ID): Unique identifier for the token generated using `secrets.token_urlsafe`.
         """
-        if self._user_has_session(username):
-            self.logger.warning(f"User '{username}' already has an active session!")
-            return None
-
         if self.n_active_sessions() >= self.max_concurrent_sessions:
             self.logger.warning(
                 f"Too any users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
