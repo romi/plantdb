@@ -120,7 +120,7 @@ def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> st
         If provided, it will be added to the end of the URL.
         Defaults to ``None``.
     ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -164,11 +164,11 @@ def login_url(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -202,11 +202,11 @@ def logout_url(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -240,11 +240,11 @@ def register_url(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -279,11 +279,11 @@ def scans_url(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -315,11 +315,11 @@ def scan_url(host, scan_id, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -357,11 +357,11 @@ def scan_preview_image_url(host, scan_id, size="thumb", **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
 
     Returns
@@ -424,11 +424,11 @@ def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
 
     Returns
@@ -463,11 +463,11 @@ def refresh_url(host, scan_id=None, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
 
     Returns
@@ -500,11 +500,11 @@ def archive_url(host, scan_id, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -542,11 +542,11 @@ def scan_file_url(host, scan_id, file_path, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -572,11 +572,11 @@ def scan_config_url(host, scan_id, cfg_fname='scan.toml', **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -607,11 +607,11 @@ def scan_reconstruction_url(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -650,11 +650,11 @@ def list_task_images_uri(host, scan_id, task_name='images', size='orig', **kwarg
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -795,17 +795,17 @@ def request_login(host, username, password, **kwargs):
     username : str
         The user identifier for authentication.
     password : str
-        The user's secret password.  It is sent in the request body and
-        should be handled securely (e.g., over HTTPS).
+        The user's secret password. It is sent in the request body and
+        should be handled securely (_e.g._, over HTTPS).
 
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -853,11 +853,11 @@ def request_check_username(host, username, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -899,11 +899,11 @@ def request_logout(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     session_token : str
         The PlantDB REST API session token of the user.
 
@@ -953,11 +953,11 @@ def request_new_user(host, username, password, fullname, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     session_token : str
         The PlantDB REST API session token of the user.
 
@@ -1000,11 +1000,11 @@ def request_scan_names_list(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     session_token : str
         The PlantDB REST API session token of the user.
 
@@ -1032,11 +1032,11 @@ def request_scans_info(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     session_token : str
         The PlantDB REST API session token of the user.
 
@@ -1072,11 +1072,11 @@ def request_scan_data(host, scan_id, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1130,11 +1130,11 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', **kwargs
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1172,11 +1172,11 @@ def request_scan_tasks_fileset(host, scan_id, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1224,7 +1224,7 @@ def request_refresh(host, scan_id=None, **kwargs):
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
     ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the refresh request. Defaults to ``5``.
 
@@ -1277,7 +1277,7 @@ def request_archive_download(host, scan_id, out_dir=None, **kwargs):
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
     ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the download request. Defaults to ``10``.
 
@@ -1351,7 +1351,7 @@ def request_archive_upload(host, scan_id, path, **kwargs):
         The prefix to be prepended to the URL. If provided, it will be stripped of leading and trailing slashes.
         Defaults to ``None``.
     ssl : bool, optional
-        Flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the upload request. Defaults to ``120``.
     session_token : str
@@ -1440,11 +1440,11 @@ def request_dataset_file_upload(host, scan_id, file_path, chunk_size=0, **kwargs
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     session_token : str
         The PlantDB REST API session token of the user.
 
@@ -1521,11 +1521,11 @@ def parse_scans_info(host, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1570,11 +1570,11 @@ def parse_task_images(host, scan_id, task_name='images', size='orig', **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1831,11 +1831,11 @@ def get_task_data(host, scan_id, task, filename=None, api_data=None, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1905,11 +1905,11 @@ def get_toml_file(host, scan_id, file_path, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1942,11 +1942,11 @@ def get_scan_config(host, scan_id, cfg_fname='scan.toml', **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -1979,11 +1979,11 @@ def get_reconstruction_config(host, scan_id, cfg_fname='pipeline.toml', **kwargs
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
@@ -2016,11 +2016,11 @@ def get_angles_and_internodes_data(host, scan_id, **kwargs):
     Other Parameters
     ----------------
     port : int
-        The PlantDB API port number, defaults to `None`.
+        The PlantDB API port number, defaults to ``None``.
     prefix : str
-        A path prefix for the PlantDB API, defaults to `None`.
+        A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
-        A boolean flag indicating whether to use HTTPS (True) or HTTP (False). Defaults to ``False``.
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
