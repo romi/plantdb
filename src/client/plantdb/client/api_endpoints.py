@@ -451,3 +451,22 @@ def scan_file(scan_id: str, file_path: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     return f"/files/{scan_id}/{file_path.lstrip('/')}"
+
+
+
+@url_prefix
+def create_user(**kwargs):
+    """Create the user registration URL.
+
+    Returns
+    -------
+    str
+        The URL path for user registration.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.create_user()
+    '/register'
+    """
+    return f"/register"
