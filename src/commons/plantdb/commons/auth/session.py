@@ -42,8 +42,7 @@ from plantdb.commons.log import get_logger
 
 
 class SessionManager:
-    """
-    Manages user sessions with expiration and validation.
+    """Manages user sessions with expiration and validation.
 
     This class provides methods to create, validate, invalidate,
     and cleanup expired sessions. Each session is associated with a
@@ -68,8 +67,7 @@ class SessionManager:
     """
 
     def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10):  # 1 hour default
-        """
-        Manage user sessions with timeout.
+        """Manage user sessions with timeout.
 
         Parameters
         ----------
@@ -88,8 +86,7 @@ class SessionManager:
         self.logger = get_logger(__class__.__name__)
 
     def _user_has_session(self, username) -> bool:
-        """
-        Check if a user has an active session.
+        """Check if a user has an active session.
 
         Parameters
         ----------
@@ -109,8 +106,7 @@ class SessionManager:
         return False
 
     def n_active_sessions(self) -> int:
-        """
-        Returns the number of active sessions.
+        """Returns the number of active sessions.
 
         Cleans up expired sessions before counting and returns the number
         of remaining active sessions in the collection.
@@ -128,8 +124,7 @@ class SessionManager:
         return len(self.sessions)
 
     def _create_token(self, **kwargs) -> str:
-        """
-        Generate a secure random token.
+        """Generate a secure random token.
 
         Returns
         -------
@@ -139,8 +134,7 @@ class SessionManager:
         return secrets.token_urlsafe(32)
 
     def create_session(self, username: str) -> Union[str, None]:
-        """
-        Create a new session for a user.
+        """Create a new session for a user.
 
         If the user already has an active session, it returns the existing session ID.
         Otherwise, it creates a new session and returns its ID.
@@ -183,8 +177,7 @@ class SessionManager:
         return session_token
 
     def validate_session(self, session_id: str) -> Optional[dict]:
-        """
-        Validate a given session by checking its existence and expiration status.
+        """Validate a given session by checking its existence and expiration status.
 
         Parameters
         ----------
@@ -222,8 +215,7 @@ class SessionManager:
         return session
 
     def invalidate_session(self, session_id: str) -> Tuple[bool, str | None]:
-        """
-        Remove the given session identifier from the active sessions.
+        """Remove the given session identifier from the active sessions.
 
         Parameters
         ----------
@@ -250,8 +242,7 @@ class SessionManager:
         return False, None
 
     def cleanup_expired_sessions(self) -> None:
-        """
-        Remove expired sessions from the session dictionary.
+        """Remove expired sessions from the session dictionary.
 
         This method iterates through all stored sessions and deletes any that have
         an expiration time earlier than the current time.
@@ -270,8 +261,7 @@ class SessionManager:
         return
 
     def session_username(self, session_id: str) -> Optional[str]:
-        """
-        Retrieve the username associated with a given session ID.
+        """Retrieve the username associated with a given session ID.
 
         The method validates the supplied session ID by delegating to `validate_session`.
         If the session is active, the username stored in the session data is returned;
@@ -292,8 +282,7 @@ class SessionManager:
         return session_data['username'] if session_data else None
 
     def session_token(self, username) -> Optional[str]:
-        """
-        Retrieve the active session token, if any, for a given username.
+        """Retrieve the active session token, if any, for a given username.
 
         This method cleans up any expired sessions first and then searches the internal
         ``sessions`` attribute dictionary for a session belonging to the supplied username.
@@ -316,8 +305,7 @@ class SessionManager:
         return None
 
     def refresh_session(self, session_id: str) -> Optional[str]:
-        """
-        Refresh a session if it's still valid.
+        """Refresh a session if it's still valid.
 
         Parameters
         ----------
@@ -342,8 +330,7 @@ class SessionManager:
 
 
 class SingleSessionManager(SessionManager):
-    """
-    Generate a single-session manager for handling database connections.
+    """Generate a single-session manager for handling database connections.
 
     The `SingleSessionManager` class is designed to manage a single active
     database session at any given time. It inherits from the base `SessionManager`
@@ -407,8 +394,7 @@ class SingleSessionManager(SessionManager):
 
 
 class JWTSessionManager(SessionManager):
-    """
-    Manages user sessions with expiration and validation.
+    """Manages user sessions with expiration and validation.
 
     This class provides methods to create, validate, invalidate,
     and cleanup expired sessions. Each session is associated with a
@@ -435,8 +421,7 @@ class JWTSessionManager(SessionManager):
     """
 
     def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10, secret_key: str = None):
-        """
-        Manage user sessions with timeout.
+        """Manage user sessions with timeout.
 
         Parameters
         ----------
@@ -454,8 +439,7 @@ class JWTSessionManager(SessionManager):
         self.secret_key = secret_key or secrets.token_urlsafe(32)
 
     def _create_token(self, username, jti, exp_time, now):
-        """
-        Create a JSON Web Token (JWT) with registered claims.
+        """Create a JSON Web Token (JWT) with registered claims.
 
         Generates and encodes a JWT using the provided username, unique identifier
         (jti), expiration time, and current time. The token includes standard
@@ -499,8 +483,7 @@ class JWTSessionManager(SessionManager):
         )
 
     def create_session(self, username: str) -> Union[str, None]:
-        """
-        Create a new session for a user.
+        """Create a new session for a user.
 
         If the user already has an active session, it returns the existing session ID.
         Otherwise, it creates a new session and returns its ID.
@@ -557,8 +540,7 @@ class JWTSessionManager(SessionManager):
         return jwt_token
 
     def _payload_from_token(self, token: str) -> dict:
-        """
-        Decode the payload from a JSON Web Token.
+        """Decode the payload from a JSON Web Token.
 
         This function decodes the JSON Web Token (JWT) using the specified secret key and
         verifies the token's audience and issuer. It returns the decoded payload as a dictionary.
@@ -592,8 +574,7 @@ class JWTSessionManager(SessionManager):
         )
 
     def validate_session(self, token: str) -> Optional[Dict[str, Any]]:
-        """
-        Validate a JSON Web Token and return user information.
+        """Validate a JSON Web Token and return user information.
 
         Parameters
         ----------
@@ -647,8 +628,7 @@ class JWTSessionManager(SessionManager):
         }
 
     def invalidate_session(self, token: str = None, jti: str = None) -> Tuple[bool, str | None]:
-        """
-        Invalidate a session by removing it from tracking.
+        """Invalidate a session by removing it from tracking.
 
         Parameters
         ----------
@@ -690,8 +670,7 @@ class JWTSessionManager(SessionManager):
         return
 
     def session_username(self, token: str) -> Optional[str]:
-        """
-        Extract username from JSON Web Token.
+        """Extract username from JSON Web Token.
 
         Parameters
         ----------
@@ -707,8 +686,7 @@ class JWTSessionManager(SessionManager):
         return session_data['username'] if session_data else None
 
     def refresh_session(self, token: str) -> Optional[str]:
-        """
-        Refresh a JSON Web Token if it's still valid.
+        """Refresh a JSON Web Token if it's still valid.
 
         Parameters
         ----------
