@@ -108,6 +108,7 @@ from typing import Union
 from plantdb.commons import db
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Permission
+from plantdb.commons.auth.models import Role
 from plantdb.commons.auth.models import User
 from plantdb.commons.auth.rbac import RBACManager
 from plantdb.commons.auth.session import JWTSessionManager
@@ -198,64 +199,95 @@ def require_token(method):
     return wrapper
 
 
-def require_authentication(method):
-    """
-    Decorator that extracts the username using the session manager and passes it to the decorated method.
+def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
+    """Returns the username of the currently logged user based on the session management system.
 
-    The object of the decorated method is expected to have the following attributes:
-    - session_manager: a class managing user session(s)
-    - logger: a logger instance to log messages
+    This function identifies the username of the logged-in user by inspecting the session manager
+    associated with the given `fsdb` object. It supports multiple types of session managers, including
+    ``SingleSessionManager``, ``JWTSessionManager``, and generic ``SessionManager``.
+    If no valid session is found or if necessary arguments for session validation are missing, it
+    falls back to the `default_user`.
 
-    The object of the decorated method is expected to have the following methods:
-    - get_user: a method that returns the username to use for authentication credentials
+    Parameters
+    ----------
+    fsdb : object
+        The filesystem database instance containing configuration, logger, and session manager.
+        The session manager is responsible for handling user sessions.
+    default_user : str, optional
+        A fallback username to use if no valid session or token is found. Defaults to ``None``.
+    token : str
+        The session token or JWT for validating the user's session.
+
+    Returns
+    -------
+    str
+        The username of the logged-in user or the fallback `default_user`.
 
     Notes
     -----
-    - The token should be passed as a 'token' kwarg to the decorated method.
-    - The username will default to 'guest'.
-    - The username should be passed as a 'username' kwarg to the decorated method.
-    - The user data will be passed as a 'username' kwarg to the decorated method.
+    - If no valid session manager is attached to the `fsdb` object, an error will be logged.
+    - Token validation for both JWTSessionManager and SessionManager assumes that `fsdb` implements methods like
+      `get_username` for retrieving usernames based on the provided token.
+
+    See Also
+    --------
+    plantdb.session_managers.SingleSessionManager : Manages single session systems.
+    plantdb.session_managers.JWTSessionManager : Handles JSON Web Token-based authentication.
+    plantdb.session_managers.SessionManager : Manages multiple generic user sessions.
+
+    Examples
+    --------
+    >>> import os
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> from plantdb.commons.fsdb.core import get_logged_username
+    >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+    >>> get_logged_username(db)
+    'admin'
+    >>> db.logout()
+    >>> get_logged_username(db) is None
+    True
+    """
+    logged_user = default_user
+    if isinstance(fsdb.session_manager, SingleSessionManager):
+        # If a Single SessionManager, get the username from the session manager (as only one user can be logged at once)
+        try:
+            session = list(fsdb.session_manager.sessions.keys())[0]
+        except IndexError:
+            logged_user = default_user
+        else:
+            logged_user = fsdb.session_manager.validate_session(session)['username']
+    elif isinstance(fsdb.session_manager, (JWTSessionManager, SessionManager)):
+        # If a JSON Web Token Session Manager or a Session Manager, require the token to retrieve the username
+        if token:
+            if isinstance(fsdb, (Scan, Fileset, File)):
+                username = fsdb.db.get_username(token)
+            else:
+                username = fsdb.get_username(token)
+            logged_user = username
+        else:
+            logged_user = default_user
+    else:
+        fsdb.logger.error("Can't serve a local PlantDB without a session manager!")
+    return logged_user
+
+
+def require_authentication(method):
+    """Decorator enforcing authentication by supplying the username of the logged-in user to the wrapped method.
+
+    This decorator retrieves the logged-in user's username using the
+    `get_logged_user` function, appends it to the keyword arguments, and
+    then calls the wrapped method. It ensures that the method always
+    receives the correct authentication context without needing to manually
+    pass the username.
+
+    See Also
+    --------
+    get_logged_user : Retrieves the username of the currently logged-in user.
     """
 
     def wrapper(self, *args, **kwargs):
 
-        if isinstance(self.session_manager, SingleSessionManager):
-            # If a Single SessionManager, get the username from the session manager or use 'guest' user
-            try:
-                session = list(self.session_manager.sessions.keys())[0]
-            except IndexError:
-                kwargs['username'] = "guest"
-            else:
-                kwargs['username'] = self.session_manager.validate_session(session)['username']
-
-        elif isinstance(self.session_manager, JWTSessionManager):
-            # If a JSON Web Token Session Manager, require the token or default to 'guest' user
-            if 'token' in kwargs:
-                jwt_token = kwargs.pop('token', None)
-                # Get username from JWT
-                if isinstance(self, (Scan, Fileset, File)):
-                    username = self.db.get_username(jwt_token)
-                else:
-                    username = self.get_username(jwt_token)
-                kwargs['username'] = username
-            else:
-                kwargs['username'] = 'guest'
-
-        elif isinstance(self.session_manager, SessionManager):
-            # If a regular Session Manager, require the session token or default to 'guest' user
-            if 'token' in kwargs:
-                token = kwargs.pop('token', None)
-                # Get username from session token
-                if isinstance(self, (Scan, Fileset, File)):
-                    username = self.db.get_username(token)
-                else:
-                    username = self.get_username(token)
-                kwargs['username'] = username
-            else:
-                kwargs['username'] = 'guest'
-
-        else:
-            self.logger.error("Can't serve a local PlantDB without a session manager!")
+        kwargs['username'] = get_logged_username(self, token=kwargs.pop('token', None), **kwargs)
 
         return method(self, *args, **kwargs)
 
@@ -952,7 +984,7 @@ class FSDB(db.DB):
         return self.rbac_manager.users.validate(username, password)
 
     @require_connected_db
-    def login(self, username: str, password: str) -> Optional[str]:
+    def login(self, username: str, password: str, **kwargs) -> Optional[str]:
         """Authenticate user and create session.
 
         Parameters
@@ -968,16 +1000,29 @@ class FSDB(db.DB):
             Returns the user session ID if successful, ``None`` otherwise.
         """
         if self.validate_user(username, password):
+
+            # If a SingleSessionManager and a currently logged user, abort
+            if isinstance(self.session_manager, SingleSessionManager):
+                current_username = get_logged_username(self)
+                if current_username:
+                    if current_username != username:
+                        self.logger.error(f"Failed to login as '{username}'! Another user is logged in.")
+                        return None
+                    else:
+                        self.logger.info(f"Already logged in as '{username}'.")
+                        return
+
+            # Else try to create a new session:
             session_token = self.session_manager.create_session(username)
             try:
                 assert session_token is not None
             except AssertionError:
-                self.logger.warning(f"User {username} has reached max concurrent sessions")
+                self.logger.warning(f"User '{username}' has reached max concurrent sessions")
             else:
-                self.logger.info(f"User {username} logged in successfully")
+                self.logger.info(f"Successfully logged in as '{username}'.")
             return session_token
         else:
-            self.logger.error(f"Failed to login user {username}")
+            self.logger.error(f"Failed to login as '{username}'!")
             return None
 
     @require_token
@@ -985,19 +1030,19 @@ class FSDB(db.DB):
         """Logout a user by invalidating its session."""
         success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
         if success:
-            self.logger.info(f"User {username} logged out successfully")
+            self.logger.info(f"Successfully logged out from '{username}'.")
             return True
         else:
             self.logger.warning(f"Failed to logout!")
             return False
 
     @require_authentication
-    def create_user(self, username, fullname, password, roles=None, **kwargs) -> None:
+    def create_user(self, new_username, fullname, password, roles=None, **kwargs) -> None:
         """Create a new user with the specified details.
 
         Parameters
         ----------
-        username : str
+        new_username : str
             The unique username for the new user.
         fullname : str
             The full name of the new user.
@@ -1024,9 +1069,7 @@ class FSDB(db.DB):
         if not self.rbac_manager.can_create_user(current_user):
             raise PermissionError(f"Insufficient permissions to create new user with user '{current_user.username}'")
 
-        # TODO: add a maximum role given the current user role
-
-        return self.rbac_manager.users.create(username, fullname, password, roles)
+        return self.rbac_manager.users.create(new_username, fullname, password, roles)
 
     def get_guest_user(self) -> User:
         """Retrieve the guest user information from the RBAC manager.
@@ -1076,6 +1119,11 @@ class FSDB(db.DB):
         Optional[User]
             The User object corresponding to the currently authenticated user, if any, ``None`` otherwise.
         """
+        if username and token:
+            self.logger.warning("Trying to retrieve user data from both 'username' and token!")
+            self.logger.info("Using 'token' to access user data.")
+            username=None
+
         if username:
             return self.rbac_manager.users.get_user(username)
         elif token:
@@ -1122,6 +1170,11 @@ class FSDB(db.DB):
         current_user = self.get_user_data(**kwargs)
         if not current_user:
             raise PermissionError("No authenticated user!")
+
+        if isinstance(users, str):
+            users = [users]
+        if isinstance(users, Iterable):
+            users = set(users)
 
         return self.rbac_manager.create_group(current_user, name, users, description)
 
@@ -1281,6 +1334,17 @@ class FSDB(db.DB):
         ------
         PermissionError
             If no user is authenticated.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> print([g.name for g in db.get_user_groups('batman')])
+        ['groupA']
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1316,6 +1380,30 @@ class FSDB(db.DB):
         ------
         PermissionError
             If no user is authenticated.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(dataset="all")
+        >>> db.connect()
+        >>> token = db.login('guest', 'guest')
+        >>> scan_access = db.get_scan_access_summary("real_plant")
+        >>> print(scan_access["effective_role"])
+        contributor
+        >>> print(scan_access["permissions"])
+        ['write', 'create', 'read']
+        >>> print(scan_access["is_owner"])
+        True
+        >>> db.logout()
+        >>> token = db.login('admin', 'admin')
+        >>> scan_access = db.get_scan_access_summary("real_plant")
+        >>> print(scan_access["effective_role"])
+        admin
+        >>> print(scan_access["is_owner"])
+        False
+        >>> print(scan_access["access_reason"])
+        ['admin_role']
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
