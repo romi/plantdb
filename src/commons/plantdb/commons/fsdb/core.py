@@ -285,7 +285,6 @@ def require_authentication(method):
     """
 
     def wrapper(self, *args, **kwargs):
-
         kwargs['username'] = get_logged_username(self, token=kwargs.pop('token', None), **kwargs)
 
         return method(self, *args, **kwargs)
@@ -824,7 +823,8 @@ class FSDB(db.DB):
         # Check DELETE permission for this specific scan
         scan = self.scans[scan_id]
         if not self.rbac_manager.can_access_scan(current_user, scan.get_metadata(), Permission.DELETE):
-            raise PermissionError(f"Insufficient permissions to delete '{scan_id}' scan as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to delete '{scan_id}' scan as '{current_user.username}' user!")
 
         # Use exclusive lock for scan deletion
         self.logger.info(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
@@ -1205,7 +1205,7 @@ class FSDB(db.DB):
         if username and token:
             self.logger.warning("Trying to retrieve user data from both 'username' and token!")
             self.logger.info("Using 'token' to access user data.")
-            username=None
+            username = None
 
         if username:
             return self.rbac_manager.users.get_user(username)
