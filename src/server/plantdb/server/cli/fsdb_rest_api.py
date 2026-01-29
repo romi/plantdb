@@ -44,7 +44,7 @@ Environment Variables
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 - ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (32 bits secret).
-- ``JWT_SECRET_KEY``: The secret key to use with JWT token generator. Default to random (32 bits secret).
+- ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (32 bits secret).
 
 Usage Examples
 --------------
@@ -259,12 +259,12 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
     db_path : Optional[Union[str, Path]]
         Existing database location or ``None`` to create a temp folder.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
 
     Returns
     -------
     Path
-        Path to the created test database.
+        The path to the created test database.
     """
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
     if empty:

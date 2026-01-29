@@ -706,7 +706,7 @@ def requires_jwt(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Try to get JWT token from request header
+        # Try to get JSON Web Token from request header
         jwt_token = jwt_from_header(request)
         # Verify we actually got a token (do not test its validity, this is done by the database)
         if not jwt_token:
@@ -1096,7 +1096,7 @@ class TokenValidation(Resource):
     """
     Validate a JSON Web Token (JWT) and retrieve associated user data.
 
-    The resource exposes a POST endpoint that accepts a JWT token, verifies its
+    The resource exposes a POST endpoint that accepts a JSON Web Token, verifies its
     validity against the database session manager, and returns the authenticated
     user’s basic profile information.  On success a 200 response is returned
     containing the user’s ``username`` and ``fullname``; on failure a 401
@@ -1157,8 +1157,7 @@ class TokenValidation(Resource):
 
 
 class TokenRefresh(Resource):
-    """
-    Refresh JWT token for an authenticated user.
+    """Refresh JSON Web Token for an authenticated user.
 
     The `TokenRefresh` resource provides an endpoint that accepts an
     existing JSON Web Token, validates the current session, and issues a new
@@ -2704,8 +2703,7 @@ def is_within_directory(directory, target):
 
 
 def is_directory_in_archive(archive_path, target_dir):
-    """
-    Check if a specific directory exists within an archive file.
+    """Check if a specific directory exists within an archive file.
 
     This function checks whether a given directory is present at the top level of a ZIP archive.
 
@@ -2729,8 +2727,7 @@ def is_directory_in_archive(archive_path, target_dir):
 
 
 def is_valid_archive(archive_path):
-    """
-    Validate if a given archive meets specific directory and file requirements.
+    """Validate if a given archive meets specific directory and file requirements.
 
     This function checks if the provided archive contains certain required directories and files,
     and verifies that the directory structure does not exceed a specified depth.
