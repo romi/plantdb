@@ -591,15 +591,19 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Notes
     -----
-    - Returns a 'connected' database, no need to call the `connect()` method.
-    - Uses the 'anonymous' user to login.
+    - Returns a 'connected' database, no need to call the ``connect()`` method.
+    - Uses the 'admin' user to login.
+    - Calling the ``disconnect()`` method will clean up the associated temporary directory.
 
     Examples
     --------
     >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
-    INFO     [plantdb.commons.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
+    INFO     [FSDB] Connected to database successfully
+    >>> from plantdb.commons.fsdb.core import get_logged_username
+    >>> get_logged_username(db)  # 'admin' is logged by default
+    'admin'
     >>> print(db.path())  # the database directory
     /tmp/romidb_********
     >>> print(db.list_scans())
@@ -628,6 +632,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     marker_file.open(mode='w').close()
     # Create the FSDB instance and connect
     db = FSDB(db_path, required_filesets=[], session_manager=SingleSessionManager())
+    # Flag this instance as a dummy DB so that disconnect will clean up the temp folder
+    db._is_dummy = True
     db.connect()
     # Login as adin to get all the rights (to create and edit)
     _ = db.login('admin', 'admin')

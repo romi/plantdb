@@ -444,14 +444,27 @@ class FSDB(db.DB):
         >>> db = dummy_db()
         >>> print(db.is_connected)
         True
+        >>> print(db.path().exists())
+        True
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         >>> print(db.is_connected)
+        False
+        >>> print(db.path().exists())
         False
         """
         for s_id, scan in self.scans.items():
             scan._erase()
         self.scans = {}
         self.is_connected = False
+
+        # If this FSDB instance was created by dummy_db, clean up the temp directory
+        if getattr(self, "_is_dummy", False):
+            import shutil
+            try:
+                shutil.rmtree(self.basedir)
+                self.logger.info(f"Removed temporary database directory {self.basedir}")
+            except Exception as e:
+                self.logger.warning(f"Failed to remove temporary directory {self.basedir}: {e}")
         return
 
     @require_connected_db
