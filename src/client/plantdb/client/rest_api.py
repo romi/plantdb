@@ -105,8 +105,7 @@ def origin_url(host, port=None, ssl=False, **kwargs) -> str:
 
 
 def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> str:
-    """
-    Generates the URL for the PlantDB REST API using the specified host and port.
+    """Generates the URL for the PlantDB REST API using the specified host and port.
 
     This function constructs a URL by combining the provided host, port, prefix, and SSL settings.
 
@@ -155,8 +154,7 @@ def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> st
 
 
 def login_url(host, **kwargs):
-    """
-    Generate the full URL for the PlantDB API login endpoint.
+    """Generate the full URL for the PlantDB API login endpoint.
 
     Parameters
     ----------
@@ -194,8 +192,7 @@ def login_url(host, **kwargs):
 
 
 def logout_url(host, **kwargs):
-    """
-    Generate the full URL for the PlantDB API logoutn endpoint.
+    """Generate the full URL for the PlantDB API logoutn endpoint.
 
     Parameters
     ----------
@@ -233,8 +230,7 @@ def logout_url(host, **kwargs):
 
 
 def register_url(host, **kwargs):
-    """
-    Generate the full URL for the PlantDB API register endpoint.
+    """Generate the full URL for the PlantDB API register endpoint.
 
     Parameters
     ----------
@@ -690,8 +686,7 @@ def list_task_images_uri(host, scan_id, task_name='images', size='orig', **kwarg
 
 def make_api_request(url, method="GET", params=None, json_data=None,
                      allow_redirects=True, **kwargs):
-    """
-    Function to make an API request with various HTTP methods and options.
+    """Function to make an API request with various HTTP methods and options.
 
     Parameters
     ----------
@@ -787,8 +782,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
 
 
 def request_login(host, username, password, **kwargs):
-    """
-    Send a login request to the authentication service.
+    """Send a login request to the authentication service.
 
     This helper function constructs a POST request to the login endpoint
     and forwards any additional keyword arguments to the URL generator
@@ -843,8 +837,7 @@ def request_login(host, username, password, **kwargs):
 
 
 def request_check_username(host, username, **kwargs):
-    """
-    Send a username availability request to the authentication service.
+    """Send a username availability request to the authentication service.
 
     This helper function constructs a GET request to the login endpoint
     and forwards any additional keyword arguments to the URL generator
@@ -892,8 +885,7 @@ def request_check_username(host, username, **kwargs):
 
 
 def request_logout(host, **kwargs):
-    """
-    Send a logout request to the authentication service.
+    """Send a logout request to the authentication service.
 
     This helper function constructs a POST request to the logout endpoint
     and forwards any additional keyword arguments to the URL generator
@@ -940,8 +932,7 @@ def request_logout(host, **kwargs):
 
 
 def request_new_user(host, username, password, fullname, **kwargs):
-    """
-    Send a registration request to the authentication service.
+    """Send a registration request to the authentication service.
 
     This helper function constructs a POST request to the register endpoint
     and forwards any additional keyword arguments to the URL generator
@@ -1749,8 +1740,7 @@ EXT_PARSER_DICT = {
 
 
 def parse_task_requests_data(task, data, extension=None):
-    """
-    Parse raw request data for a specified task.
+    """Parse raw request data for a specified task.
 
     The function selects an appropriate parser based on the provided
     *extension* (if any) or the *task* name, then applies that parser
