@@ -891,11 +891,11 @@ class Register(Resource):
             }, 400
 
         try:
-            # Attempt to create new user in the database
+            # Attempt to create a new user in the database
             self.db.create_user(
-                username=data['username'],
-                fullname=data['fullname'],
-                password=data['password'],
+                new_username=data.pop('username'),
+                fullname=data.pop('fullname'),
+                password=data.pop('password'),
                 **kwargs
             )
             # Return success response if user creation succeeds
