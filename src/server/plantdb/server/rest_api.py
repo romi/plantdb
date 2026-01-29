@@ -1380,7 +1380,6 @@ class ScansTable(Resource):
         ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
         >>> res = requests.get('http://127.0.0.1:5000/scans_info?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
         >>> res.content.decode()
-
         """
         query = request.args.get('filterQuery', None)
         fuzzy = request.args.get('fuzzy', False, type=bool)
@@ -1715,7 +1714,6 @@ class DatasetFile(Resource):
         201
         >>> response.json()
         {'message': 'File path/to/data.txt received and saved'}
-
         """
         # Check the header used to pass the filename, or return '400' for "bad request":
         if 'Content-Disposition' not in request.headers:
@@ -2013,7 +2011,6 @@ class Image(Resource):
         >>> img = Image.open(BytesIO(res.content))
         >>> np.asarray(img).shape
         (1080, 1440, 3)
-
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
@@ -2138,7 +2135,6 @@ class PointCloud(Resource):
         >>> # Send the coordinates (read the file on the server-side)
         >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview", 'coords': 'true'})
         >>> coordinates = np.array(res.json()['coordinates'])
-
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
@@ -3722,7 +3718,6 @@ class FilesetMetadata(Resource):
         >>> metadata_update = {"metadata": {"description": "Brand new description", "version": "2.0"}, "replace": True}
         >>> response = requests.post(url, json=metadata_update)
         >>> print(response.json())
-
         """
         try:
             # Get request data

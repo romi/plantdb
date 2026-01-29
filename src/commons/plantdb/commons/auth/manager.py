@@ -20,7 +20,7 @@ Key Features
 - **User activation/deactivation** and role assignment.
 - **Group management**: create, delete, add/remove users, and query memberships.
 - **Atomic JSON persistence** to avoid data corruption.
-- **Minimal dependencies** – relies only on standard library plus `argon2`.
+- **Minimal dependencies** – relies only on the standard library plus `argon2`.
 
 Usage Examples
 --------------
@@ -59,7 +59,7 @@ from plantdb.commons.log import get_logger
 ph = PasswordHasher()
 
 
-class UserManager():
+class UserManager(object):
     """UserManager class for managing user data.
 
     The UserManager class provides methods to create, load,
@@ -155,7 +155,8 @@ class UserManager():
         """Save the user data to a JSON file.
 
         This method serializes the user objects into dictionaries, writes them to a temporary file,
-        and then renames the temporary file to replace the original file. This ensures atomicity of the operation.
+        and then renames the temporary file to replace the original file.
+        This ensures the atomicity of the operation.
 
         Raises
         ------
@@ -225,7 +226,7 @@ class UserManager():
         Notes
         -----
         This function is case-sensitive. For case-insensitive checks, convert both
-        the username and the keys to lower or upper case before comparison.
+        the username and the keys to the lower or upper case before comparison.
         """
         return username in self.users
 
@@ -276,7 +277,7 @@ class UserManager():
             created_at=timestamp,
             password_last_change=timestamp,
         )
-        # Save all user data (including the newly created user) to 'users.json' file.
+        # Save all user data (including the newly created user) to the 'users.json' file.
         self._save_users()
         self.logger.debug(f"Created user '{username}' with fullname '{fullname}'.")
         if not username == self.GUEST_USERNAME:
@@ -410,12 +411,11 @@ class UserManager():
         -------
         bool
             ``True`` if the password is valid, ``False`` otherwise.
-
         """
-        hash = self.get_user(username).password_hash
+        pw_hash = self.get_user(username).password_hash
         try:
             # Verify password, raises exception if wrong.
-            ph.verify(hash, password)
+            ph.verify(pw_hash, password)
         except Exception as e:
             self.logger.error(f"Failed to verify password for {username}: {e}")
             return False
@@ -437,14 +437,13 @@ class UserManager():
         max_failed_attempts : int
             The maximum number of allowed failed login attempts before lockout.
         lockout_duration : timedelta
-            The duration for which the user will be locked out after exceeding
-            `max_failed_attempts`.
+            The duration for which the user will be locked out after exceeding `max_failed_attempts`.
         """
         user = self.get_user(username)
         user._record_failed_attempt()
         if user.failed_attempts >= max_failed_attempts:
             self._lock_user(username, lockout_duration)
-        # Save the updated user data to file
+        # Save the updated user data to a file
         self._save_users()
         self.logger.warning(f"Failed login attempt (n={user.failed_attempts}) for user: {username}")
         return
@@ -479,7 +478,7 @@ class UserManager():
 
         Parameters
         ----------
-        username : plantdb.commons.auth.User
+        user : plantdb.commons.auth.User
             The user to unlock.
         """
         user.locked_until = None
@@ -571,7 +570,7 @@ class UserManager():
         password : str
             The current password of the user to verify their identity.
         new_password : str
-            The new password to set for the user. If None, no change will occur.
+            The new password to set for the user. If ``None``, no change will occur.
         """
         # Verify if the login exists
         try:
@@ -602,18 +601,18 @@ class GroupManager:
 
     Attributes
     ----------
-    groups_file : str
+    groups_file : Union[str, Path]
         Path to the JSON file where groups are stored.
     groups : Dict[str, plantdb.commons.auth.models.Group]
         Dictionary mapping group names to Group objects.
     """
 
-    def __init__(self, groups_file: str = "groups.json"):
+    def __init__(self, groups_file: Union[str, Path] = "groups.json"):
         """Initialize the GroupManager.
 
         Parameters
         ----------
-        groups_file : str, optional
+        groups_file : Union[str, Path]
             Path to the JSON file for storing groups. Defaults to "groups.json".
         """
         self.groups_file = Path(groups_file)
@@ -699,7 +698,7 @@ class GroupManager:
         if name in self.groups:
             raise ValueError(f"Group '{name}' already exists")
 
-        # Initialize users set and ensure creator is included
+        # Initialize users set and ensure the creator is included
         if users is None:
             users = set()
         users.add(creator)
@@ -727,7 +726,7 @@ class GroupManager:
         Returns
         -------
         Optional[Group]
-            The group object if it exists, None otherwise.
+            The group object if it exists, ``None`` otherwise.
         """
         return self.groups.get(name)
 
@@ -742,7 +741,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the group was deleted, False if it didn't exist.
+            ``True`` if the group was deleted, ``False`` if it didn't exist.
         """
         if name not in self.groups:
             return False
@@ -764,7 +763,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the user was added, False if the group doesn't exist or user was already in group.
+            ``True`` if the user was added, ``False`` if the group doesn't exist or the user was already in the group.
         """
         group = self.get_group(group_name)
         if not group:
@@ -788,7 +787,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the user was removed, False if the group doesn't exist or user wasn't in group.
+            ``True`` if the user was removed, ``False`` if the group doesn't exist or the user wasn't in the group.
         """
         group = self.get_group(group_name)
         if not group:

@@ -156,6 +156,17 @@ class RBACManager:
             A set containing all permissions that the specified user has access to,
             including those inherited from roles.
 
+        Notes
+        -----
+        The result depends on the `role_permissions` attribute of the class instance.
+        Ensure that this dictionary is properly initialized before calling this method.
+
+        See Also
+        --------
+        User : Represents a user with permissions and roles.
+        Permission : Represents a permission that can be assigned to users or roles.
+        Role : Represents a role with specific permissions.
+
         Examples
         --------
         >>> from plantdb.commons.auth.models import Permission
@@ -168,18 +179,6 @@ class RBACManager:
         >>> role_permissions = {Role('admin'): {permission_b}}
         >>> user.get_user_permissions(user)  # doctest: +SKIP
         {<__main__.Permission object at 0x...>}
-
-        Notes
-        -----
-        The result depends on the `role_permissions` attribute of the class instance.
-        Ensure that this dictionary is properly initialized before calling this method.
-
-        See Also
-        --------
-        User : Represents a user with permissions and roles.
-        Permission : Represents a permission that can be assigned to users or roles.
-        Role : Represents a role with specific permissions.
-
         """
         permissions = set(user.permissions) if user.permissions else set()
         for role in user.roles:

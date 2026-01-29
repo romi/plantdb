@@ -741,7 +741,6 @@ class PlantDBClient:
         >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
         >>> response = client.create_file(image_data, file_id='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
         >>> print(response)
-
         """
         import os
         import json
