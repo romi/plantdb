@@ -147,8 +147,7 @@ MARKER_FILE_NAME = "romidb"
 
 
 def require_connected_db(method):
-    """
-    Decorator that ensures the method is only called when the database is connected.
+    """Decorator that ensures the method is only called when the database is connected.
 
     This ensures that operations that require a valid database connection are properly guarded against calls when the connection is inactive.
 
@@ -297,9 +296,9 @@ def require_authentication(method):
 class FSDB(db.DB):
     """Implement a local *File System DataBase* version of abstract class ``db.DB``.
 
-    Implement as a simple local file structure with following directory structure and marker files:
-      * directory ``${FSDB.basedir}`` as database root directory;
-      * marker file ``MARKER_FILE_NAME`` at database root directory;
+    Implement as a simple local file structure with the following directory structure and marker files:
+      * directory ``${FSDB.basedir}`` as the database root directory;
+      * marker file ``MARKER_FILE_NAME`` at the database root directory;
 
     Attributes
     ----------
@@ -310,9 +309,9 @@ class FSDB(db.DB):
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
     required_filesets : List[str]
-        A list of required filesets to consider a scan valid. Set it to None to accept any subdirectory of basedir as a valid scan. Defaults to ['metadata'].
+        A list of required filesets to consider a scan valid. Set it to ``None`` to accept any subdirectory of basedir as a valid scan. Defaults to ['metadata'].
     logger : logging.Logger
-        Logger instance to use for logging. Defaults to the module logger.
+        An instance to use for logging. Defaults to the module logger.
     session_manager : Union[SingleSessionManager, SessionManager, JWTSessionManager]
         The session manager to use for session authentication.
     lock_manager : ScanLockManager
@@ -408,7 +407,7 @@ class FSDB(db.DB):
         self.logger = logger or get_logger(__class__.__name__)
 
         basedir = Path(basedir)
-        # Check the given path to root directory of the database is a directory:
+        # Check the given path to the root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
         self.basedir = Path(basedir).resolve()
@@ -620,7 +619,7 @@ class FSDB(db.DB):
     @require_connected_db
     @require_authentication
     def get_scan(self, scan_id, **kwargs):
-        """Get `Scan` instance in the local database.
+        """Get a ` Scan ` instance in the local database.
 
         Parameters
         ----------
@@ -631,7 +630,7 @@ class FSDB(db.DB):
         Raises
         ------
         plantdb.commons.fsdb.ScanNotFoundError
-            If the `scan_id` do not exist in the local database and `create` is ``False``.
+            If the `scan_id` does not exist in the local database and `create` is ``False``.
 
         Returns
         -------
@@ -2088,7 +2087,8 @@ class Scan(db.Scan):
 
         # Check DELETE permission for this fileset
         if not self.db.rbac_manager.can_access_scan(current_user, self.get_metadata(), Permission.DELETE):
-            raise PermissionError(f"Insufficient permissions to delete filesets from the '{self.id}' scan as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to delete filesets from the '{self.id}' scan as '{current_user.username}' user!")
 
         # Verify if the given `fs_id` exists in the local database
         if not self.fileset_exists(fs_id):
@@ -2453,7 +2453,8 @@ class Fileset(db.Fileset):
 
         # Check WRITE permission for this file
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to create a file in the '{self.scan.id}' scan as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to create a file in the '{self.scan.id}' scan as '{current_user.username}' user!")
 
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(f_id):
@@ -2529,7 +2530,8 @@ class Fileset(db.Fileset):
 
         # Check DELETE permission for this fileset
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.DELETE):
-            raise PermissionError(f"Insufficient permissions to delete the files from the '{self.scan.id}' scan as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to delete the files from the '{self.scan.id}' scan as '{current_user.username}' user!")
 
         # Verify if the given `fs_id` exists in the local database
         if not self.file_exists(f_id):
@@ -2714,7 +2716,8 @@ class File(db.File):
 
         # Check WRITE permission for this fileset
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to edit the '{self.scan.id}/{self.fileset.id}/{self.id}' file metadata!")
+            raise PermissionError(
+                f"Insufficient permissions to edit the '{self.scan.id}/{self.fileset.id}/{self.id}' file metadata!")
 
         # Use exclusive lock for this operation
         self.logger.info(f"Editing the '{self.scan.id}/{self.fileset.id}/{self.id}' fileset metadata...")
@@ -2756,7 +2759,8 @@ class File(db.File):
 
         # Check WRITE permission for this file
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
 
         # Check if the path is a file
         if isinstance(path, str):
@@ -2765,7 +2769,8 @@ class File(db.File):
             raise ValueError(f"The provided path is not a file: {path}.")
 
         # Use exclusive lock for this operation
-        self.logger.info(f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
+        self.logger.info(
+            f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             # Get the file name and extension
             ext = path.suffix[1:]
@@ -2848,10 +2853,12 @@ class File(db.File):
 
         # Check WRITE permission for this file
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to write raw '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to write raw '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
 
         # Use exclusive lock for this operation
-        self.logger.info(f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
+        self.logger.info(
+            f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
@@ -2931,10 +2938,12 @@ class File(db.File):
 
         # Check WRITE permission for this file
         if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
+            raise PermissionError(
+                f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
 
         # Use exclusive lock for this operation
-        self.logger.info(f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
+        self.logger.info(
+            f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
