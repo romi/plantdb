@@ -1195,13 +1195,32 @@ class TokenRefresh(Resource):
 
     """
 
-    def __init__(self):
+    def __init__(self, db):
         """Initialize the TokenRefresh resource."""
-        self.db = None
+        self.db = db
 
     @requires_jwt
     def post(self, **kwargs):
-        """Refresh JWT token."""
+        """Refresh JSON Web Token.
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by login as admin
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now refresht the token for the admin user:
+        >>> response = requests.post("http://127.0.0.1:5000/token-refresh", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Token refreshed successfully
+        >>> new_token = response.json()['access_token']
+        >>> # Validate this new token:
+        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + new_token})
+        >>> print(response.json()['user']['username'])
+        admin
+        """
         # Get token from keyword arguments (from decorator)
         jwt_token = kwargs.get('token', None)
 
