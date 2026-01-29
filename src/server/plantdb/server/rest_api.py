@@ -1018,13 +1018,13 @@ class Login(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> # Valid login request
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous', 'password': 'AlanMoore'})
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json())
         {'authenticated': True, 'message': 'Login successful. Welcome, Guy Fawkes!'}
         >>> print(response.status_code)
         200
         >>> # Invalid request (missing credentials)
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous'})
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin'})
         >>> print(response.json())
         {'authenticated': False, 'message': 'Missing username or password'}
         >>> print(response.status_code)
@@ -3289,7 +3289,7 @@ class ScanMetadata(Resource):
         >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/test_plant/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
-        {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
+        {'metadata': {'owner': 'guest', 'description': 'Test plant scan'}}
         >>> # Get specific metadata key:
         >>> response = requests.get(url+"?key=description")
         >>> print(response.json())
@@ -3351,7 +3351,7 @@ class ScanMetadata(Resource):
         >>> data = {"metadata": {"description": "Updated scan description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
-        {'metadata': {'owner': 'anonymous', 'description': 'Updated scan description'}}
+        {'metadata': {'owner': 'guest', 'description': 'Updated scan description'}}
         """
         try:
             # Get request data
