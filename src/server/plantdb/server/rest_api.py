@@ -870,15 +870,20 @@ class Register(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
-        >>> # Create a new user:
+        >>> # Start by login as admin to have permission to create new users
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now create a new user:
         >>> new_user = {"username":"batman", "fullname":"Bruce Wayne", "password":"Alfred123!"}
-        >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user)
+        >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user, headers={'Authorization': 'Bearer ' + token})
         >>> res_dict = response.json()
         >>> res_dict["success"]
         True
         >>> res_dict["message"]
         'User successfully created'
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'batman', 'password': 'Alfred123!'})
+        >>> res_dict["message"]
+        'Login successful'
         """
         # Parse JSON data from request body
         data = request.get_json()
@@ -963,9 +968,9 @@ class Login(Resource):
         >>> import requests
         >>> import json
         >>> # Check if user exists (valid username):
-        >>> response = requests.get("http://127.0.0.1:5000/login?username=anonymous")
+        >>> response = requests.get("http://127.0.0.1:5000/login?username=admin")
         >>> print(response.json())
-        {'username': 'anonymous', 'exists': True}
+        {'username': 'admin', 'exists': True}
         >>> # Check if user exists (invalid username):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=superman")
         >>> print(response.json())
@@ -1075,7 +1080,23 @@ class Logout(Resource):
 
     @requires_jwt
     def post(self, **kwargs):
-        """Handle user logout."""
+        """Handle user logout.
+        
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by log in as 'admin'
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> print(response.json()['message'])
+        Login successful
+        >>> token = response.json()['access_token']
+        >>> # Now try to log out:
+        >>> response = requests.post("http://127.0.0.1:5000/logout", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Logout successful
+        """
         try:
             if 'token' in kwargs:
                 # Invalidate session
@@ -1093,8 +1114,7 @@ class Logout(Resource):
 
 
 class TokenValidation(Resource):
-    """
-    Validate a JSON Web Token (JWT) and retrieve associated user data.
+    """Validate a JSON Web Token (JWT) and retrieve associated user data.
 
     The resource exposes a POST endpoint that accepts a JSON Web Token, verifies its
     validity against the database session manager, and returns the authenticated
@@ -1115,22 +1135,6 @@ class TokenValidation(Resource):
         Database handler providing access to the session manager.
     logger : Any
         Logger instance used for recording authentication events.
-
-    Examples
-    --------
-    >>> from flask import Flask
-    >>> from flask_restful import Api
-    >>> app = Flask(__name__)
-    >>> api = Api(app)
-    >>> # Assume `db` and `logger` are pre‑configured objects
-    >>> api.add_resource(TokenValidation, '/validate')
-    >>> # In a test client
-    >>> with app.test_client() as client:
-    ...     response = client.post('/validate', json={'token': 'valid.jwt.token'})
-    ...     print(response.status_code)          # 200
-    ...     print(response.json)
-    ...     # {'message': 'Token validation successful',
-    ...     #  'user': {'username': 'jdoe', 'fullname': 'John Doe'}}
     """
 
     def __init__(self, db, logger):
@@ -1140,7 +1144,21 @@ class TokenValidation(Resource):
 
     @requires_jwt
     def post(self, **kwargs):
-        """Handle token validation."""
+        """Handle JSON Web Token validation.
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by login as admin
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now create a new user:
+        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Token validation successful
+        """
         try:
             user = self.db.get_user_data(**kwargs)
         except Exception as e:
