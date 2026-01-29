@@ -194,7 +194,7 @@ class RBACManager:
         Parameters
         ----------
         user : User
-            The user object to check for permissions.
+            The User object to check for permissions.
         permission : Permission
             The permission level or type to verify against the user's permissions.
 
@@ -353,7 +353,7 @@ class RBACManager:
 
         return self.has_permission(user, Permission.MANAGE_GROUPS)
 
-    def create_group(self, user: User, name: str, users: Optional[Set[str]] = None,
+    def create_group(self, user: User, group_name: str, users: Optional[Set[str]] = None,
                      description: Optional[str] = None) -> Optional[Group]:
         """Create a new group if the user has permission.
 
@@ -361,17 +361,17 @@ class RBACManager:
         ----------
         user : User
             The user creating the group.
-        name : str
+        group_name : str
             The unique name for the group.
-        users : Optional[Set[str]], optional
+        users : Optional[Set[str]]
             Initial set of users to add to the group.
-        description : Optional[str], optional
+        description : Optional[str]
             Optional description of the group.
 
         Returns
         -------
         Optional[Group]
-            The created group object if successful, None if permission denied.
+            The created group object if successful, ``None`` if the permission was denied.
 
         Raises
         ------
@@ -379,9 +379,10 @@ class RBACManager:
             If a group with the same name already exists.
         """
         if not self.can_manage_groups(user):
+            self.logger.error(f"Insufficient permission to create group '{group_name}' by user '{user.username}!")
             return None
-
-        return self.groups.create_group(name, user.username, users, description)
+        self.logger.info(f"Creating group '{group_name}' by user '{user.username}, with users '{users}'")
+        return self.groups.create_group(group_name, user.username, users, description)
 
     def add_user_to_group(self, user: User, group_name: str, username_to_add: str) -> bool:
         """Add a user to a group if the requesting user has permission.
@@ -398,11 +399,13 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user was added successfully, False if permission denied or operation failed.
+            ``True`` if the user was added successfully.
+            ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):
+            self.logger.error(f"Insufficient permission to add user '{username_to_add}' to group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.info(f"Adding user '{username_to_add}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.add_user_to_group(group_name, username_to_add)
 
     def remove_user_from_group(self, user: User, group_name: str, username_to_remove: str) -> bool:
@@ -420,11 +423,13 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user was removed successfully, False if permission denied or operation failed.
+            ``True`` if the user was removed successfully.
+            ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):  # Same permission as adding
+            self.logger.error(f"Insufficient permission to remove user '{username_to_remove}' from group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.warning(f"Removing user '{username_to_remove}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.remove_user_from_group(group_name, username_to_remove)
 
     def delete_group(self, user: User, group_name: str) -> bool:
@@ -440,11 +445,13 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the group was deleted successfully, False if permission denied or group not found.
+            ``True`` if the group was deleted successfully.
+            ``False`` if the permission was denied or the group is not found.
         """
         if not self.can_delete_group(user):
+            self.logger.error(f"Insufficient permission to delete group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.warning(f"Deleting group '{group_name}' by user '{user.username}'!")
         return self.groups.delete_group(group_name)
 
     def get_user_groups(self, username: str) -> List[Group]:
