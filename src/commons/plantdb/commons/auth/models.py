@@ -120,6 +120,51 @@ class Role(Enum):
     ADMIN = "admin"
 
     @property
+    def rank(self) -> int:
+        """Get the hierarchical rank of the role. Higher is more powerful.
+
+        Returns
+        -------
+        int
+            The rank of the role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.rank
+        1
+        """
+        ranks = {
+            Role.READER: 1,
+            Role.CONTRIBUTOR: 2,
+            Role.ADMIN: 3,
+        }
+        return ranks[self]
+
+    def can_assign(self, target_role: 'Role') -> bool:
+        """Check if this role has the authority to assign the target_role.
+
+        A user can only assign roles that are less than or equal to their own.
+
+        Returns
+        -------
+        bool
+            ``True`` if this role has the authority to assign the target_role; ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.can_assign(Role.CONTRIBUTOR)
+        False
+        >>> user = Role.CONTRIBUTOR
+        >>> user.can_assign(Role.CONTRIBUTOR)
+        True
+        """
+        return self.rank >= target_role.rank
+
+    @property
     def permissions(self) -> Set[Permission]:
         """Get the set of permissions associated with this role.
 
@@ -127,6 +172,18 @@ class Role(Enum):
         -------
         Set[Permission]
             A set containing all permissions granted to this role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.permissions
+        {<Permission.READ: 'read'>}
+        >>> user = Role.CONTRIBUTOR
+        >>> user.permissions
+        {<Permission.CREATE: 'create'>,
+         <Permission.READ: 'read'>,
+         <Permission.WRITE: 'write'>}
         """
         role_permissions = {
             Role.READER: {
