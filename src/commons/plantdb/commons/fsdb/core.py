@@ -980,6 +980,14 @@ class FSDB(db.DB):
         ------
         KeyError
             If there is an issue accessing necessary user data.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+        >>> db.validate_user('guest', 'guest')
+        True
+        >>> db.disconnect()
         """
         return self.rbac_manager.users.validate(username, password)
 
@@ -998,6 +1006,19 @@ class FSDB(db.DB):
         -------
         Optional[str]
             Returns the user session ID if successful, ``None`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+        >>> token = db.login('guest', 'guest')
+        ERROR    [FSDB] Failed to login as 'guest'! Another user is logged in.
+        >>> db.logout()
+        INFO     [FSDB] User 'admin' logged out successfully.
+        True
+        >>> token = db.login('guest', 'guest')
+        [FSDB] Successfully logged in as 'guest'.
+        >>> db.disconnect()
         """
         if self.validate_user(username, password):
 
@@ -1027,7 +1048,18 @@ class FSDB(db.DB):
 
     @require_token
     def logout(self, **kwargs) -> bool:
-        """Logout a user by invalidating its session."""
+        """Log out a user by invalidating its session.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> db.logout()
+        INFO     [FSDB] Successfully logged out from 'admin'.
+        True
+        >>> db.disconnect()
+        """
         success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
         if success:
             self.logger.info(f"Successfully logged out from '{username}'.")
@@ -1060,6 +1092,19 @@ class FSDB(db.DB):
         See Also
         --------
         RBACManager.users.create : Method used to actually create the user.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        INFO     [UserManager] Welcome Bruce Wayne, please log in...'
+        >>> db.logout()
+        >>> token = db.login('batman', 'joker')
+        INFO     [FSDB] Successfully logged in as 'batman'.
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1086,6 +1131,14 @@ class FSDB(db.DB):
         See Also
         --------
         rbac_manager.get_guest_user : The underlying method used by this function.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.get_guest_user()
+        User(username='guest', fullname='PlantDB Guest', password_hash='$argon2id$v=19$m=65536,t=3,p=4$2++/KY75t4qvt5x1fO4dJA$MDmREeceXOJhcupT1G6yuRFvPUJ3SjNpuSga5wkUEYw', roles={<Role.READER: 'reader'>}, created_at=datetime.datetime(2026, 1, 29, 17, 19, 13, 313677), permissions=None, last_login=datetime.datetime(2026, 1, 29, 17, 19, 20, 177023), is_active=True, failed_attempts=0, last_failed_attempt=None, locked_until=None, password_last_change=datetime.datetime(2026, 1, 29, 17, 19, 13, 313677))
+        >>> db.disconnect()
         """
         return self.rbac_manager.get_guest_user()
 
@@ -1101,6 +1154,18 @@ class FSDB(db.DB):
         -------
         Optional[str]
             The ``User.username`` if the token is valid, None otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.logout()
+        INFO     [FSDB] Successfully logged out from 'admin'.
+        >>> token = db.login('guest', 'guest')
+        INFO     [FSDB] Successfully logged in as 'guest'.
+        >>> db.get_username(token)
+        'guest'
+        >>> db.disconnect()
         """
         return self.session_manager.session_username(token)
 
@@ -1118,6 +1183,25 @@ class FSDB(db.DB):
         -------
         Optional[User]
             The User object corresponding to the currently authenticated user, if any, ``None`` otherwise.
+
+        Notes
+        -----
+        If both `username` and `token` are provided, prefer `token` for accessing user data.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.get_user_data(username='admin')
+        User(username='admin', fullname='PlantDB Admin', password_hash='$argon2id$v=19$m=65536,t=3,p=4$zMr0ZhclnHHdOgwWKv3Hbg$SZshbPdNiCdBONb8vgzZAKyWPl5sNIUwB8mQWkzGYOQ', roles={<Role.ADMIN: 'admin'>}, created_at=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163), permissions=None, last_login=datetime.datetime(2026, 1, 29, 17, 22, 49, 770793), is_active=True, failed_attempts=0, last_failed_attempt=None, locked_until=None, password_last_change=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163))
+        >>> db.logout()
+        INFO     [FSDB] Successfully logged out from 'admin'.
+        >>> token = db.login('guest', 'guest')
+        INFO     [FSDB] Successfully logged in as 'guest'.
+        >>> user_data = db.get_user_data(token=token)
+        >>> print(user_data.fullname)
+        PlantDB Guest
+        >>> db.disconnect()
         """
         if username and token:
             self.logger.warning("Trying to retrieve user data from both 'username' and token!")
@@ -1166,6 +1250,17 @@ class FSDB(db.DB):
             If the user lacks permission to create groups.
         ValueError
             If the group already exists.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> prin(group_a.users)
+        {'admin', 'batman'}
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1206,6 +1301,21 @@ class FSDB(db.DB):
         PermissionError
             If no user is authenticated.
             If the authenticated user lacks permission to modify the group.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> print(group_a.users)
+        {'admin', 'batman'}
+        >>> db.create_user('hquinn', 'Harley Quinn', 'joker', roles=Role.READER)
+        >>> db.add_user_to_group('groupA', 'hquinn')
+        >>> print(group_a.users)
+        {'hquinn', 'batman', 'admin'}
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1243,6 +1353,20 @@ class FSDB(db.DB):
         PermissionError
             If no user is authenticated.
             If the authenticated user lacks permission to remove the user from the group.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> print(group_a.users)
+        {'admin', 'batman'}
+        >>> db.remove_user_from_group('groupA', 'batman')
+        >>> print(group_a.users)
+        {'admin'}
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1278,6 +1402,26 @@ class FSDB(db.DB):
         PermissionError
             If no user is authenticated.
             If the authenticated user lacks permission to delete this group.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> print(group_a.users)
+        {'admin', 'batman'}
+        >>> db.logout()
+        >>> token = db.login('batman', 'joker')
+        ERROR    [RBACManager] Insufficient permission to delete group 'groupA' by user 'batman!
+        PermissionError: Insufficient permissions or group 'groupA' not found
+        >>> db.delete_group('groupA')
+        >>> db.logout()
+        >>> token = db.login('admin', 'admin')
+        >>> db.delete_group('groupA')
+        WARNING  [RBACManager] Deleting group 'groupA' by user 'admin'!
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(**kwargs)
         if not current_user:
@@ -1300,6 +1444,17 @@ class FSDB(db.DB):
         ------
         PermissionError
             If no user is authenticated.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
+        >>> print([g.name for g in db.list_groups()])
+        ['groupA']
+        >>> db.disconnect()
         """
         current_user = self.get_user_data(kwargs.get('username', None))
         if not current_user:
