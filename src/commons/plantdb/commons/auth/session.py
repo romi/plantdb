@@ -102,7 +102,7 @@ class SessionManager:
             ``True`` if the user has an active session, ``False`` otherwise.
         """
         self.cleanup_expired_sessions()
-        if username is not None:
+        if username:
             for _, session in self.sessions.items():
                 if session['username'] == username:
                     return True
@@ -270,9 +270,50 @@ class SessionManager:
         return
 
     def session_username(self, session_id: str) -> Optional[str]:
-        """Return the username associated with a session."""
+        """
+        Retrieve the username associated with a given session ID.
+
+        The method validates the supplied session ID by delegating to `validate_session`.
+        If the session is active, the username stored in the session data is returned;
+        otherwise ``None`` is returned.
+
+        Parameters
+        ----------
+        session_id
+            The unique identifier for the session to query.
+
+        Returns
+        -------
+        Optional[str]
+            The username linked to the session, or ``None`` if the
+            session is not found or is invalid.
+        """
         session_data = self.validate_session(session_id)
         return session_data['username'] if session_data else None
+
+    def session_token(self, username) -> Optional[str]:
+        """
+        Retrieve the active session token, if any, for a given username.
+
+        This method cleans up any expired sessions first and then searches the internal
+        ``sessions`` attribute dictionary for a session belonging to the supplied username.
+
+        Parameters
+        ----------
+        username : str
+            The username whose session ID is requested.
+
+        Returns
+        -------
+        Optional[str]
+            The session ID associated with `username` if an active session exists; otherwise, ``None``.
+        """
+        self.cleanup_expired_sessions()
+        if username:
+            for session_id, session in self.sessions.items():
+                if session['username'] == username:
+                    return session_id
+        return None
 
     def refresh_session(self, session_id: str) -> Optional[str]:
         """
