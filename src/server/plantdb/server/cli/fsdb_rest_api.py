@@ -266,9 +266,13 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
     Path
         Path to the created test database.
     """
+    jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
-        db_path = test_database(None, db_path=db_path).path()
+        db_path = test_database(
+            None, db_path=db_path,
+            session_manager=JWTSessionManager(secret_key=jwt_key)
+        ).path()
     else:
         logger.info("Setting up a temporary test database with sample datasets and configurations...")
         db_path = test_database(
@@ -276,6 +280,7 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
             db_path=db_path,
             with_configs=True,
             with_models=models,
+            session_manager=JWTSessionManager(secret_key=jwt_key)
         ).path()
     return Path(db_path)
 
