@@ -562,10 +562,11 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
+    session_manager = kwargs.pop('session_manager', None)
     if dataset is None:
-        return FSDB(setup_empty_database(db_path=db_path))
+        return FSDB(setup_empty_database(db_path=db_path), session_manager=session_manager)
     else:
-        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs))
+        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs), session_manager=session_manager)
 
 
 def dummy_db(with_scan=False, with_fileset=False, with_file=False):
