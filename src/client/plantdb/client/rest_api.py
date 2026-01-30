@@ -1055,8 +1055,7 @@ def request_scans_info(host, **kwargs):
     """
     scan_list = request_scan_names_list(host, **kwargs).json()
     return [make_api_request(url=scan_url(host, scan, **kwargs), session_token=kwargs.get('session_token', None)).json()
-            for
-            scan in scan_list]
+            for scan in scan_list]
 
 
 def request_scan_data(host, scan_id, **kwargs):
@@ -1077,6 +1076,8 @@ def request_scan_data(host, scan_id, **kwargs):
         A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
         A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1135,6 +1136,8 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', **kwargs
         A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
         A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1177,6 +1180,8 @@ def request_scan_tasks_fileset(host, scan_id, **kwargs):
         A path prefix for the PlantDB API, defaults to ``None``.
     ssl : bool
         A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1227,6 +1232,8 @@ def request_refresh(host, scan_id=None, **kwargs):
         Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the refresh request. Defaults to ``5``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
@@ -1280,6 +1287,8 @@ def request_archive_download(host, scan_id, out_dir=None, **kwargs):
         Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
     timeout : int, optional
         A timeout, in seconds, to succeed the download request. Defaults to ``10``.
+    session_token : str
+        The PlantDB REST API session token of the user.
 
     Returns
     -------
