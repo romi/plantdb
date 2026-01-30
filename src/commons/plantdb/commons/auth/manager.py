@@ -374,7 +374,7 @@ class UserManager(object):
         user = self.get_user(username)
         is_locked = user._is_locked_out()
         if is_locked:
-            self.logger.info(f"Account {user} is locked, try logging in after {user.locked_until}.")
+            self.logger.info(f"Account {username} is locked, try logging in after {user.locked_until}.")
         return is_locked
 
     def is_active(self, username) -> bool:
