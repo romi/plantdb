@@ -245,6 +245,7 @@ def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
     >>> db.logout()
     >>> get_logged_username(db) is None
     True
+    >>> get_logged_username(db, default_user='guest')
     """
     logged_user = default_user
     if isinstance(fsdb.session_manager, SingleSessionManager):
@@ -285,8 +286,8 @@ def require_authentication(method):
     """
 
     def wrapper(self, *args, **kwargs):
-        kwargs['username'] = get_logged_username(self, token=kwargs.pop('token', None), **kwargs)
-
+        kwargs['username'] = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
+                                                 token=kwargs.pop('token', None), **kwargs)
         return method(self, *args, **kwargs)
 
     return wrapper
