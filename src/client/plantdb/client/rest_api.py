@@ -718,7 +718,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
 
     Returns
     -------
-    response : requests.Response
+    requests.Response
         The response object from the API request.
 
     Raises
@@ -809,9 +809,8 @@ def request_login(host, username, password, **kwargs):
 
     Returns
     -------
-    dict
-        The parsed JSON response from the authentication API.
-        In successful cases this will include tokens or user metadata.
+    requests.Response
+        The response from the API.
 
     Notes
     -----
@@ -825,7 +824,7 @@ def request_login(host, username, password, **kwargs):
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
     >>> print(login_data)
     """
     url = login_url(host, **kwargs)
@@ -833,7 +832,7 @@ def request_login(host, username, password, **kwargs):
         'username': username,
         'password': password
     }
-    return make_api_request(url, method="POST", json_data=data).json()
+    return make_api_request(url, method="POST", json_data=data)
 
 
 def request_check_username(host, username, **kwargs):
@@ -861,9 +860,8 @@ def request_check_username(host, username, **kwargs):
 
     Returns
     -------
-    dict
-        The parsed JSON response from the authentication API.
-        In successful cases this will include tokens or user metadata.
+    requests.Response
+        The response from the API.
 
     Notes
     -----
@@ -878,10 +876,11 @@ def request_check_username(host, username, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_check_username
     >>> username_exists = request_check_username('localhost', 'admin', port=5000)
-    >>> print(username_exists)
+    >>> print(username_exists.json()['exists'])
+    True
     """
     url = login_url(host, **kwargs)
-    return make_api_request(url, method="GET", params={'username': username}).json()
+    return make_api_request(url, method="GET", params={'username': username})
 
 
 def request_logout(host, **kwargs):
@@ -909,8 +908,8 @@ def request_logout(host, **kwargs):
 
     Returns
     -------
-    bool
-        Indicate if the logout was successful.
+    requests.Response
+        The response from the API.
 
     Notes
     -----
@@ -923,12 +922,13 @@ def request_logout(host, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_logout
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
     >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
-    >>> print(logout)
+    >>> print(logout.ok)
+    True
     """
     url = logout_url(host, **kwargs)
-    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None)).ok
+    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
 
 
 def request_new_user(host, username, password, fullname, **kwargs):
@@ -963,8 +963,8 @@ def request_new_user(host, username, password, fullname, **kwargs):
 
     Returns
     -------
-    bool
-        Indicate if the logout was successful.
+    requests.Response
+        The response from the API.
 
     Notes
     -----
@@ -978,15 +978,15 @@ def request_new_user(host, username, password, fullname, **kwargs):
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_logout
     >>> from plantdb.client.rest_api import request_new_user
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
     >>> user_added = request_new_user('localhost', 'testuser', 'fake_password', 'Test User', port=5000, session_token=login_data['access_token'])
-    >>> print(user_added)
+    >>> print(user_added.ok)
     True
     >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
     """
     url = register_url(host, **kwargs)
     data = {'username': username, 'fullname': fullname, 'password': password}
-    return make_api_request(url, method="POST", json_data=data, session_token=kwargs.get('session_token', None)).ok
+    return make_api_request(url, method="POST", json_data=data, session_token=kwargs.get('session_token', None))
 
 
 def request_scan_names_list(host, **kwargs):
@@ -1010,20 +1010,19 @@ def request_scan_names_list(host, **kwargs):
 
     Returns
     -------
-    list
-        The list of scan dataset names served by the PlantDB REST API.
+    requests.Response
+        The response from the API. The list of scan dataset names should be in the JSON dictionary.
 
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scan_names_list
-    >>> print(request_scan_names_list('localhost', port=5000))
+    >>> print(request_scan_names_list('localhost', port=5000).json())
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
     url = scans_url(host, **kwargs)
-    response = make_api_request(url=url, method="GET", session_token=kwargs.get('session_token', None))
-    return sorted(response.json())
+    return make_api_request(url=url, method="GET", session_token=kwargs.get('session_token', None))
 
 
 def request_scans_info(host, **kwargs):
@@ -1050,10 +1049,11 @@ def request_scans_info(host, **kwargs):
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scans_info
-    >>> scans_info = request_scans_info('localhost', port=5000)
-    >>>
+    >>> from plantdb.client.rest_api import request_login
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
+    >>> scans_info = request_scans_info('localhost', port=5000, session_token=login_data['access_token']).json()
     """
-    scan_list = request_scan_names_list(host, **kwargs)
+    scan_list = request_scan_names_list(host, **kwargs).json()
     return [make_api_request(url=scan_url(host, scan, **kwargs), session_token=kwargs.get('session_token', None)).json()
             for
             scan in scan_list]
