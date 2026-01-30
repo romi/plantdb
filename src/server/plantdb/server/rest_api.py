@@ -1374,7 +1374,8 @@ class ScansTable(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
-    def get(self):
+    @requires_jwt
+    def get(self, **kwargs):
         """Retrieve a list of scan dataset information.
 
         This method handles GET requests to retrieve scan information. It supports
@@ -1425,7 +1426,7 @@ class ScansTable(Resource):
 
         scans_info = []
         for scan_id in scans_list:
-            scans_info.append(get_scan_info(self.db.get_scan(scan_id), logger=self.logger))
+            scans_info.append(get_scan_info(self.db.get_scan(scan_id, **kwargs), logger=self.logger))
         return scans_info
 
 
@@ -1467,7 +1468,8 @@ class Scan(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
-    def get(self, scan_id):
+    @requires_jwt
+    def get(self, scan_id, **kwargs):
         """Retrieve detailed information about a specific scan dataset.
 
         Parameters
@@ -1513,12 +1515,13 @@ class Scan(Resource):
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
         if self.db.scan_exists(scan_id):
-            return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+            return get_scan_info(self.db.get_scan(scan_id, **kwargs), logger=self.logger)
         else:
             return {'message': f"Scan id '{scan_id}' does not exist"}, 404
 
     @rate_limit(max_requests=15, window_seconds=60)
-    def post(self, scan_id):
+    @requires_jwt
+    def post(self, scan_id, **kwargs):
         """Create a new scan dataset.
 
         Parameters
@@ -1551,7 +1554,7 @@ class Scan(Resource):
         scan_id = sanitize_name(scan_id)
         try:
             # Attempt to create a new scan in the database with the given scan_id
-            scan = self.db.create_scan(scan_id)
+            scan = self.db.create_scan(scan_id, **kwargs)
             # Check if scan creation was successful
             if scan is None:
                 self.logger.error(f"Failed to create scan: {scan_id}")
@@ -2984,8 +2987,8 @@ class Archive(Resource):
 
         return send_file(temp_zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
 
-    @requires_jwt
     @rate_limit(max_requests=5, window_seconds=60)
+    @requires_jwt
     def post(self, scan_id, **kwargs):
         """Handle ZIP file upload and extraction for a scan dataset.
 
