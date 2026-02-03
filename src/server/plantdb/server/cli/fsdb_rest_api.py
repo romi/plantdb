@@ -45,6 +45,8 @@ Environment Variables
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 - ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (32 bits secret).
 - ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (32 bits secret).
+- ``SESSION_TIMEOUT``: JWT validity duration in seconds. Default `3600` (1h).
+- ``MAX_SESSION``: The maximum number of concurrent sessions to allow. Default 10.
 
 Usage Examples
 --------------
@@ -59,13 +61,6 @@ To run the server with a temporary test database in debug mode:
 ```shell
 python fsdb_rest_api.py --test --debug
 ```
-
-RESTful endpoints include:
-- `/scans`: List all scans available in the database.
-- `/files/<path:path>`: Retrieve files from the database.
-- `/image/<scan_id>/<fileset_id>/<file_id>`: Access specific images.
-- `/pointcloud/<scan_id>/<fileset_id>/<file_id>`: Access specific point clouds.
-- `/mesh/<scan_id>/<fileset_id>/<file_id>`: Retrieve related meshes.
 
 For detailed command-line parameters, use the `--help` flag:
 ```shell
@@ -267,11 +262,14 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
         The path to the created test database.
     """
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
+    session_timeout=int(_get_env_secret("SESSION_TIMEOUT", 3600))
+    max_sessions=int(_get_env_secret("MAX_SESSION", 10))
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
         db_path = test_database(
             None, db_path=db_path,
-            session_manager=JWTSessionManager(secret_key=jwt_key)
+            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
+                                              max_concurrent_sessions=max_sessions)
         ).path()
     else:
         logger.info("Setting up a temporary test database with sample datasets and configurations...")
@@ -280,7 +278,8 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
             db_path=db_path,
             with_configs=True,
             with_models=models,
-            session_manager=JWTSessionManager(secret_key=jwt_key)
+            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
+                                              max_concurrent_sessions=max_sessions)
         ).path()
     return Path(db_path)
 
@@ -511,9 +510,15 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 4 - Database connection
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
+    session_timeout=int(_get_env_secret("SESSION_TIMEOUT", 3600))
+    max_sessions=int(_get_env_secret("MAX_SESSION", 10))
     db = FSDB(
         db_path,
-        session_manager=JWTSessionManager(secret_key=jwt_key),
+        session_manager=JWTSessionManager(
+            secret_key=jwt_key,
+            session_timeout=session_timeout,
+            max_concurrent_sessions=max_sessions,
+        ),
     )
     logger.info(f"Connecting to local plant database at '{db.path()}'.")
     db.connect()
