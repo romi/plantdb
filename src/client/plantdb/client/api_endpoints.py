@@ -23,7 +23,7 @@ Usage Examples
 """
 
 
-def sanitize_name(name):
+def sanitize_name(name) -> str:
     """Sanitizes and validates the provided name.
 
     The function ensures that the input string adheres to predefined naming rules by:
@@ -283,6 +283,29 @@ def scans(**kwargs) -> str:
 
 
 @url_prefix
+def scans_info(**kwargs) -> str:
+    """Return the URL path to the list of scan dataset information endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the list of scan dataset information endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.scans_info(prefix='/api/v1')
+    '/api/v1/scans_info'
+    """
+    return "/scans_info"
+
+
+@url_prefix
 def scan(scan_id: str, **kwargs) -> str:
     """Return the URL path to the scan endpoint.
 
@@ -453,9 +476,8 @@ def scan_file(scan_id: str, file_path: str, **kwargs) -> str:
     return f"/files/{scan_id}/{file_path.lstrip('/')}"
 
 
-
 @url_prefix
-def create_user(**kwargs):
+def create_user(**kwargs) -> str:
     """Create the user registration URL.
 
     Returns
@@ -470,3 +492,108 @@ def create_user(**kwargs):
     '/register'
     """
     return f"/register"
+
+
+@url_prefix
+def create_scan(**kwargs) -> str:
+    """URL to create a scan.
+    
+    Returns
+    -------
+    str
+        The URL path to scan creation.
+    """
+    return f"/api/scan"
+
+
+@url_prefix
+def create_fileset(**kwargs) -> str:
+    """URL to create a fileset.
+
+    Returns
+    -------
+    str
+        The URL path to fileset creation.
+    """
+    return f"/api/fileset"
+
+
+@url_prefix
+def create_file(**kwargs) -> str:
+    """URL to create a file.
+
+    Returns
+    -------
+    str
+        The URL path to file creation.
+    """
+    return f"/api/file"
+
+
+@url_prefix
+def list_scan_filesets(scan: str, **kwargs) -> str:
+    """URL to list the filesets associated with the given scan name.
+
+    Returns
+    -------
+    str
+        The URL path to filesets.
+    """
+    scan_id = sanitize_name(scan)
+    return f"/api/scan/{scan_id}/filesets"
+
+
+@url_prefix
+def list_fileset_files(scan: str, fileset: str, **kwargs) -> str:
+    """URL to list the file associated with the given scan and filesets names.
+
+    Returns
+    -------
+    str
+        The URL path to filesets.
+    """
+    scan_id = sanitize_name(scan)
+    fileset = sanitize_name(fileset)
+    return f"/api/scan/{scan_id}/{fileset}/files"
+
+
+@url_prefix
+def metadata_scan(scan: str, **kwargs) -> str:
+    """URL to access the metadata associated with the given scan name.
+
+    Returns
+    -------
+    str
+        The URL path to scan metadata.
+    """
+    scan_id = sanitize_name(scan)
+    return f"/api/scan/{scan_id}/metadata"
+
+
+@url_prefix
+def metadata_fileset(scan: str, fileset: str, **kwargs) -> str:
+    """URL to access the fileset metadata associated with the given scan and fileset name.
+
+    Returns
+    -------
+    str
+        The URL path to fileset metadata.
+    """
+    scan_id = sanitize_name(scan)
+    fileset = sanitize_name(fileset)
+    return f"/api/scan/{scan_id}/{fileset}/metadata"
+
+
+@url_prefix
+def metadata_files(scan: str, fileset: str, file: str, **kwargs) -> str:
+    """URL to access the file metadata associated with the given scan and fileset name.
+
+    Returns
+    -------
+    str
+        The URL path to file metadata.
+    """
+    scan_id = sanitize_name(scan)
+    fileset = sanitize_name(fileset)
+    file = sanitize_name(file)
+    return f"/api/scan/{scan_id}/{fileset}/{file}/metadata"
