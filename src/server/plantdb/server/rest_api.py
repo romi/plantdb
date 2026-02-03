@@ -1417,21 +1417,24 @@ class ScansTable(Resource):
         -----
         The method can take direct parameters in the request body with the following fields:
             - filter_query: JSON string representing the filter query, example: ``{"object":{"species":"Arabidopsis.*"}}``.
-            - fuzzy: Boolean indicating whether to perform fuzzy filtering, ``false`` by default.
+            - fuzzy: Boolean indicating whether to perform fuzzy filtering, ``False`` by default.
 
         Examples
         --------
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> # Get an info dict about all dataset:
+        >>> # Get a list of information dictionaries about all datasets:
         >>> response = requests.get("http://127.0.0.1:5000/scans_info")
-        >>> scans_list = response.json()
+        >>> scans_info = response.json()
         >>> # List the known dataset id:
-        >>> print(scans_list)
-        ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
+        >>> print(sorted(scan['id'] for scan in scans_info))
+        ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
+        >>> # Add a metadata filter to the query:
         >>> response = requests.get('http://127.0.0.1:5000/scans_info?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
-        >>> response.content.decode()
+        >>> scans_info = response.json()
+        >>> print(sorted(scan['id'] for scan in scans_info))
+        ['virtual_plant', 'virtual_plant_analyzed']
         """
         query = request.args.get('filterQuery', None)
         fuzzy = request.args.get('fuzzy', False, type=bool)
