@@ -252,6 +252,17 @@ class PlantDBClient:
         except Exception:
             return False
 
+    def token_validation(self):
+        """Validate the JWT token."""
+        url = join_url(self.base_url, api_endpoints.token_validation())
+        try:
+            response = self.session.post(url)
+            if response.ok:
+                return True
+            return False
+        except Exception:
+            return False
+
     def refresh_token(self) -> bool:
         """Refresh the JWT token."""
         url = join_url(self.base_url, api_endpoints.token_refresh())
