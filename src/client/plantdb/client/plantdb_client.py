@@ -21,7 +21,7 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
 >>> from plantdb.client.rest_api import plantdb_url
->>> client = PlantDBClient(plantdb_url())
+>>> client = PlantDBClient(plantdb_url('localhost', port=5000))
 >>> # Create a new scan
 >>> scan_id = client.create_scan(
 ...     name="Plant Sample 001",
@@ -109,16 +109,17 @@ class PlantDBClient:
     --------
     >>> from plantdb.server.test_rest_api import TestRestApiServer
     >>> # Start a test PlantDB REST API server first:
-    >>> server = TestRestApiServer(test=True, port=5555)
+    >>> server = TestRestApiServer(test=True, port=5000)
     >>> server.start()
     >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import plantdb_url
-    >>> client = PlantDBClient(plantdb_url('localhost', port=5555))
+    >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
     >>> client.login('admin', 'admin')
     >>> print(client.jwt_token)
     >>> client2 = PlantDBClient(plantdb_url('localhost', port=5555))
     >>> client2.validate_session_token(client.jwt_token)
+    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000))
     >>> print(client.plantdb_url)
     >>> scans = client.list_scans()
     >>> print(scans)
