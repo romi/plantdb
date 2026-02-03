@@ -700,7 +700,7 @@ def rate_limit(max_requests=5, window_seconds=60):
 
 
 def jwt_from_header(request) -> str:
-    """Extracts the JWT token from the Authorization header of an HTTP request.
+    """Extracts the JSON Web Token from the Authorization header of an HTTP request.
 
     Parameters
     ----------
@@ -710,7 +710,7 @@ def jwt_from_header(request) -> str:
     Returns
     -------
     str
-        The JWT token extracted from the ``Authorization`` header, or an
+        The JSON Web Token extracted from the ``Authorization`` header, or an
         empty string if the header is missing or empty.
 
     Notes

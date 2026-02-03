@@ -93,7 +93,7 @@ class PlantDBClient:
     session : requests.Session
         HTTP session that maintains cookies and connection pooling.
     jwt_token : str
-        The JWT token to authenticate with the PlantDB REST API.
+        The JSON Web Token to authenticate with the PlantDB REST API.
     username :str
         The login username.
     logger : logging.Logger
@@ -139,12 +139,12 @@ class PlantDBClient:
 
     def validate_session_token(self, token):
         """
-        Sets the JWT token for the HTTP session and updates the Authorization header.
+        Sets the JSON Web Token for the HTTP session and updates the Authorization header.
 
         Parameters
         ----------
         token : str
-            The JWT token to be used for authentication.
+            The JSON Web Token to be used for authentication.
         """
         url = join_url(self.base_url, api_endpoints.token_validation())
         response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
@@ -253,7 +253,7 @@ class PlantDBClient:
             return False
 
     def token_validation(self):
-        """Validate the JWT token."""
+        """Validate the JSON Web Token."""
         url = join_url(self.base_url, api_endpoints.token_validation())
         try:
             response = self.session.post(url)
@@ -264,7 +264,7 @@ class PlantDBClient:
             return False
 
     def refresh_token(self) -> bool:
-        """Refresh the JWT token."""
+        """Refresh the JSON Web Token."""
         url = join_url(self.base_url, api_endpoints.token_refresh())
         try:
             response = self.session.post(url)
