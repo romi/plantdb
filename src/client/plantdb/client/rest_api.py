@@ -267,6 +267,39 @@ def register_url(host, **kwargs):
     return join_url(url, api_endpoints.register(**kwargs))
 
 
+def token_validation_url(host, **kwargs):
+    """Generate the full URL for the PlantDB API token validation endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The fully qualified register URL as a string.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import token_validation_url
+    >>> # Basic usage with default configuration
+    >>> url = token_validation_url('localhost')
+    >>> print(url)
+    http://localhost/token-validation
+    """
+    url = origin_url(host, **kwargs)
+    return join_url(url, api_endpoints.token_validation())
+
 
 def scans_url(host, **kwargs):
     """Generates the URL listing the scans from the PlantDB REST API.
@@ -928,6 +961,47 @@ def request_logout(host, **kwargs):
     True
     """
     url = logout_url(host, **kwargs)
+    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+
+
+def request_token_validation(host, **kwargs):
+    """Validate a token by making a POST request to the token validation endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or base URL used to construct the validation endpoint.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
+
+    Returns
+    -------
+    requests.Response
+        The response from the API.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import request_login
+    >>> from plantdb.client.rest_api import request_token_validation
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
+    >>> response = request_token_validation('localhost', port=5000, session_token=login_data['access_token'])
+    >>> print(response.ok)
+    True
+    >>> print(response.json()['user'])
+    {'username': 'admin', 'fullname': 'PlantDB Admin'}
+    """
+    url = token_validation_url(host, **kwargs)
     return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
 
 
