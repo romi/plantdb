@@ -54,8 +54,7 @@ from plantdb.commons.log import get_logger
 
 
 def requires_permission(required_permissions: Union[Permission, List[Permission]]):
-    """
-    Decorator to check if the specified user has the required permission(s).
+    """Decorator to check if the specified user has the required permission(s).
 
     Parameters
     ----------
@@ -121,8 +120,7 @@ class RBACManager:
 
     def __init__(self, users_file: str = 'users.json', groups_file: str = "groups.json", max_login_attempts=3,
                  lockout_duration=900):
-        """
-        Initialize the RBACManager.
+        """Initialize the RBACManager.
 
         Parameters
         ----------
@@ -140,8 +138,7 @@ class RBACManager:
         self.groups = GroupManager(groups_file)
 
     def get_user_permissions(self, user: User) -> Set[Permission]:
-        """
-        Get the set of permissions a user has based on their assigned roles.
+        """Get the set of permissions a user has based on their assigned roles.
 
         This function returns a set containing all permissions directly assigned to
         the user as well as those inherited from any roles they are part of. The
@@ -159,6 +156,17 @@ class RBACManager:
             A set containing all permissions that the specified user has access to,
             including those inherited from roles.
 
+        Notes
+        -----
+        The result depends on the `role_permissions` attribute of the class instance.
+        Ensure that this dictionary is properly initialized before calling this method.
+
+        See Also
+        --------
+        User : Represents a user with permissions and roles.
+        Permission : Represents a permission that can be assigned to users or roles.
+        Role : Represents a role with specific permissions.
+
         Examples
         --------
         >>> from plantdb.commons.auth.models import Permission
@@ -171,18 +179,6 @@ class RBACManager:
         >>> role_permissions = {Role('admin'): {permission_b}}
         >>> user.get_user_permissions(user)  # doctest: +SKIP
         {<__main__.Permission object at 0x...>}
-
-        Notes
-        -----
-        The result depends on the `role_permissions` attribute of the class instance.
-        Ensure that this dictionary is properly initialized before calling this method.
-
-        See Also
-        --------
-        User : Represents a user with permissions and roles.
-        Permission : Represents a permission that can be assigned to users or roles.
-        Role : Represents a role with specific permissions.
-
         """
         permissions = set(user.permissions) if user.permissions else set()
         for role in user.roles:
@@ -190,8 +186,7 @@ class RBACManager:
         return permissions
 
     def has_permission(self, user: User, permission: Permission) -> bool:
-        """
-        Check if a user has a specific permission.
+        """Check if a user has a specific permission.
 
         This function determines whether the given user has the specified permission,
         including administrative privileges.
@@ -199,7 +194,7 @@ class RBACManager:
         Parameters
         ----------
         user : User
-            The user object to check for permissions.
+            The User object to check for permissions.
         permission : Permission
             The permission level or type to verify against the user's permissions.
 
@@ -219,9 +214,25 @@ class RBACManager:
         user_permissions = self.get_user_permissions(user)
         return permission in user_permissions
 
-    def is_guest_user(self, user: User) -> bool:
+    def has_role(self, user: User, role: Role) -> bool:
+        """Check if a user has a specific role.
+
+        Parameters
+        ----------
+        user : User
+            The user object to check for roles.
+        role : Role
+            The role to verify against the user's roles.
+
+        Returns
+        -------
+        bool
+            `True` if the user has the given role, `False` otherwise.
         """
-        Check if the given user is the guest user.
+        return role in user.roles
+
+    def is_guest_user(self, user: User) -> bool:
+        """Check if the given user is the guest user.
 
         Parameters
         ----------
@@ -236,11 +247,34 @@ class RBACManager:
         return user.username == self.users.GUEST_USERNAME
 
     def get_guest_user(self) -> User:
+        """Retrieves the guest user from the user repository.
+
+        Returns
+        -------
+        User
+            The User object corresponding to the guest username.
+        """
         return self.users.get_user(self.users.GUEST_USERNAME)
 
-    def can_manage_groups(self, user: User) -> bool:
+    def can_create_user(self, user: User) -> bool:
+        """Check if a user can create new users.
+
+        Parameters
+        ----------
+        user : User
+            The user to check.
+
+        Returns
+        -------
+        bool
+            True if the user can create new users, False otherwise.
         """
-        Check if a user can manage groups (create/delete groups).
+        return self.has_permission(user, Permission.MANAGE_USERS)
+
+    def can_manage_groups(self, user: User) -> bool:
+        """Check if a user can manage groups (create/delete groups).
+
+        Any user with a role that has a ``MANAGE_GROUPS`` permission can create groups.
 
         Parameters
         ----------
@@ -254,27 +288,8 @@ class RBACManager:
         """
         return self.has_permission(user, Permission.MANAGE_GROUPS)
 
-    def can_create_group(self, user: User) -> bool:
-        """
-        Check if a user can create groups.
-
-        Any user with CONTRIBUTOR role or higher can create groups.
-
-        Parameters
-        ----------
-        user : User
-            The user to check.
-
-        Returns
-        -------
-        bool
-            True if the user can create groups, False otherwise.
-        """
-        return self.has_permission(user, Permission.CREATE)
-
     def can_add_to_group(self, user: User, group_name: str) -> bool:
-        """
-        Check if a user can add members to a specific group.
+        """Check if a user can add members to a specific group.
 
         Users can add members to a group if:
         1. They are an admin (MANAGE_GROUPS permission), OR
@@ -293,16 +308,32 @@ class RBACManager:
             True if the user can add members to the group, False otherwise.
         """
         # Admins can manage any group
-        if self.has_permission(user, Permission.MANAGE_GROUPS):
+        if self.has_role(user, Role.ADMIN):
             return True
 
         # Group members can add users to their groups
         group = self.groups.get_group(group_name)
         return group is not None and group.has_user(user.username)
 
-    def can_delete_group(self, user: User) -> bool:
+    def can_create_group(self, user: User) -> bool:
+        """Check if a user can create groups.
+
+        Any user with a role that has a ``MANAGE_GROUPS`` permission can create groups.
+
+        Parameters
+        ----------
+        user : User
+            The user to check.
+
+        Returns
+        -------
+        bool
+            True if the user can create groups, False otherwise.
         """
-        Check if a user can delete a group.
+        return self.has_permission(user, Permission.MANAGE_GROUPS)
+
+    def can_delete_group(self, user: User) -> bool:
+        """Check if a user can delete a group.
 
         Only users with the `MANAGE_GROUPS` permission can delete groups.
 
@@ -316,42 +347,45 @@ class RBACManager:
         bool
             ``True`` if the user can delete the group, ``False`` otherwise.
         """
+        # Admins can manage any group
+        if self.has_role(user, Role.ADMIN):
+            return True
+
         return self.has_permission(user, Permission.MANAGE_GROUPS)
 
-    def create_group(self, user: User, name: str, users: Optional[Set[str]] = None,
+    def create_group(self, user: User, group_name: str, users: Optional[Set[str]] = None,
                      description: Optional[str] = None) -> Optional[Group]:
-        """
-        Create a new group if the user has permission.
+        """Create a new group if the user has permission.
 
         Parameters
         ----------
         user : User
             The user creating the group.
-        name : str
+        group_name : str
             The unique name for the group.
-        users : Optional[Set[str]], optional
+        users : Optional[Set[str]]
             Initial set of users to add to the group.
-        description : Optional[str], optional
+        description : Optional[str]
             Optional description of the group.
 
         Returns
         -------
         Optional[Group]
-            The created group object if successful, None if permission denied.
+            The created group object if successful, ``None`` if the permission was denied.
 
         Raises
         ------
         ValueError
             If a group with the same name already exists.
         """
-        if not self.can_create_group(user):
+        if not self.can_manage_groups(user):
+            self.logger.error(f"Insufficient permission to create group '{group_name}' by user '{user.username}!")
             return None
-
-        return self.groups.create_group(name, user.username, users, description)
+        self.logger.info(f"Creating group '{group_name}' by user '{user.username}, with users '{users}'")
+        return self.groups.create_group(group_name, user.username, users, description)
 
     def add_user_to_group(self, user: User, group_name: str, username_to_add: str) -> bool:
-        """
-        Add a user to a group if the requesting user has permission.
+        """Add a user to a group if the requesting user has permission.
 
         Parameters
         ----------
@@ -365,16 +399,17 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user was added successfully, False if permission denied or operation failed.
+            ``True`` if the user was added successfully.
+            ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):
+            self.logger.error(f"Insufficient permission to add user '{username_to_add}' to group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.info(f"Adding user '{username_to_add}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.add_user_to_group(group_name, username_to_add)
 
     def remove_user_from_group(self, user: User, group_name: str, username_to_remove: str) -> bool:
-        """
-        Remove a user from a group if the requesting user has permission.
+        """Remove a user from a group if the requesting user has permission.
 
         Parameters
         ----------
@@ -388,16 +423,17 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user was removed successfully, False if permission denied or operation failed.
+            ``True`` if the user was removed successfully.
+            ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):  # Same permission as adding
+            self.logger.error(f"Insufficient permission to remove user '{username_to_remove}' from group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.warning(f"Removing user '{username_to_remove}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.remove_user_from_group(group_name, username_to_remove)
 
     def delete_group(self, user: User, group_name: str) -> bool:
-        """
-        Delete a group if the user has permission.
+        """Delete a group if the user has permission.
 
         Parameters
         ----------
@@ -409,16 +445,17 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the group was deleted successfully, False if permission denied or group not found.
+            ``True`` if the group was deleted successfully.
+            ``False`` if the permission was denied or the group is not found.
         """
         if not self.can_delete_group(user):
+            self.logger.error(f"Insufficient permission to delete group '{group_name}' by user '{user.username}!")
             return False
-
+        self.logger.warning(f"Deleting group '{group_name}' by user '{user.username}'!")
         return self.groups.delete_group(group_name)
 
     def get_user_groups(self, username: str) -> List[Group]:
-        """
-        Get all groups that a user belongs to.
+        """Get all groups that a user belongs to.
 
         Parameters
         ----------
@@ -433,8 +470,7 @@ class RBACManager:
         return self.groups.get_user_groups(username)
 
     def list_groups(self, user: User) -> Optional[List[Group]]:
-        """
-        List all groups if the user has permission.
+        """List all groups if the user has permission.
 
         Parameters
         ----------
@@ -451,8 +487,7 @@ class RBACManager:
         return self.groups.list_groups()
 
     def get_effective_role_for_scan(self, user: User, scan_metadata: dict) -> Role:
-        """
-        Get the effective role a user has for a specific scan dataset.
+        """Get the effective role a user has for a specific scan dataset.
 
         This method determines the user's role based on:
         1. Dataset ownership (owner gets CONTRIBUTOR role)
@@ -512,8 +547,7 @@ class RBACManager:
             return Role.READER
 
     def get_scan_permissions(self, user: User, scan_metadata: dict) -> Set[Permission]:
-        """
-        Get the set of permissions a user has for a specific scan dataset.
+        """Get the set of permissions a user has for a specific scan dataset.
 
         This method considers the user's effective role for the specific scan,
         taking into account ownership and group sharing.
@@ -534,10 +568,9 @@ class RBACManager:
         return effective_role.permissions
 
     def can_access_scan(self, user: User, scan_metadata: dict, operation: Permission) -> bool:
-        """
-        Check if a user can perform a specific operation on a scan dataset.
+        """Check if a user can perform a specific operation on a scan dataset.
 
-        This method implements the complete access control logic including:
+        This method implements the complete access control logic, including:
         - Owner-based access (owners get CONTRIBUTOR role for their scans)
         - Group-based access (shared group members get CONTRIBUTOR role)
         - Global role-based access (fallback to user's global role)
@@ -560,36 +593,10 @@ class RBACManager:
         scan_permissions = self.get_scan_permissions(user, scan_metadata)
         return operation in scan_permissions
 
-    def can_access_scan_by_owner(self, user: User, scan_owner: str, operation: Permission) -> bool:
-        """
-        Legacy method for checking scan access by owner name only.
-
-        This method provides backward compatibility but doesn't support group sharing.
-        For full RBAC support, use can_access_scan() with full metadata.
-
-        Parameters
-        ----------
-        user : User
-            The user requesting access.
-        scan_owner : str
-            The username of the scan owner.
-        operation : Permission
-            The operation/permission being requested.
-
-        Returns
-        -------
-        bool
-            True if the user can perform the operation, False otherwise.
-        """
-        # Create minimal metadata with just owner
-        scan_metadata = {'owner': scan_owner}
-        return self.can_access_scan(user, scan_metadata, operation)
-
     def can_modify_scan_owner(self, user: User, scan_metadata: dict) -> bool:
-        """
-        Check if a user can modify the 'owner' field of a scan.
+        """Check if a user can modify the 'owner' field of a scan.
 
-        Only admins can modify scan ownership.
+        Only users with permission to ``MANAGE_USERS`` can modify scan ownership.
 
         Parameters
         ----------
@@ -601,16 +608,15 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user can modify the owner field, False otherwise.
+            ``True`` if the user can modify the owner field, ``False`` otherwise.
         """
         return self.has_permission(user, Permission.MANAGE_USERS)
 
     def can_modify_scan_sharing(self, user: User, scan_metadata: dict) -> bool:
-        """
-        Check if a user can modify the 'sharing' field of a scan.
+        """Check if a user can modify the 'sharing' field of a scan.
 
         Users can modify sharing if they have WRITE permission for the scan
-        (i.e., they are the owner, in a shared group, or have global CONTRIBUTOR+ role).
+        (_i.e._, they are the owner, in a shared group, or have a global CONTRIBUTOR+ role).
 
         Parameters
         ----------
@@ -622,13 +628,12 @@ class RBACManager:
         Returns
         -------
         bool
-            True if the user can modify the sharing field, False otherwise.
+            ``True`` if the user can modify the sharing field, ``False`` otherwise.
         """
         return self.can_access_scan(user, scan_metadata, Permission.WRITE)
 
     def validate_scan_metadata_access(self, user: User, old_metadata: dict, new_metadata: dict) -> bool:
-        """
-        Validate that a user can make the proposed metadata changes.
+        """Validate that a user can make the proposed metadata changes.
 
         This method checks if the user has permission to modify specific fields
         like 'owner' and 'sharing' based on the RBAC rules.
@@ -645,9 +650,9 @@ class RBACManager:
         Returns
         -------
         bool
-            True if all proposed changes are allowed, False otherwise.
+            ``True`` if all proposed changes are allowed, ``False`` otherwise.
         """
-        # Check if owner field is being modified
+        # Check if the owner field is being modified
         old_owner = old_metadata.get('owner', self.users.GUEST_USERNAME)
         new_owner = new_metadata.get('owner', self.users.GUEST_USERNAME)
 
@@ -655,7 +660,7 @@ class RBACManager:
             if not self.can_modify_scan_owner(user, old_metadata):
                 return False
 
-        # Check if sharing field is being modified
+        # Check if the sharing field is being modified
         old_sharing = old_metadata.get('sharing', [])
         new_sharing = new_metadata.get('sharing', [])
 
@@ -666,8 +671,7 @@ class RBACManager:
         return True
 
     def ensure_scan_owner(self, scan_metadata: dict) -> dict:
-        """
-        Ensure a scan has an owner field, defaulting to guest if missing.
+        """Ensure a scan has an owner field, defaulting to guest if missing.
 
         This method should be called when loading or creating scans to ensure
         the owner field is always present.
@@ -680,7 +684,7 @@ class RBACManager:
         Returns
         -------
         dict
-            The metadata with owner field guaranteed to be present.
+            The metadata updated with the 'owner' field.
         """
         if 'owner' not in scan_metadata:
             scan_metadata = scan_metadata.copy()
@@ -688,8 +692,7 @@ class RBACManager:
         return scan_metadata
 
     def validate_sharing_groups(self, sharing_groups: List[str]) -> bool:
-        """
-        Validate that all groups in the sharing list exist.
+        """Validate that all groups in the sharing list exist.
 
         Parameters
         ----------
@@ -707,8 +710,7 @@ class RBACManager:
         return True
 
     def get_accessible_scans_for_user(self, user: User, all_scan_metadata: Dict[str, dict]) -> Dict[str, dict]:
-        """
-        Filter scans to only include those the user has READ access to.
+        """Filter scans to only include those the user has READ access to.
 
         This method can be used to implement scan listing with proper access control.
 
@@ -737,8 +739,7 @@ class RBACManager:
         return accessible_scans
 
     def get_user_scan_role_summary(self, user: User, scan_metadata: dict) -> dict:
-        """
-        Get a summary of the user's access to a specific scan.
+        """Get a summary of the user's access to a specific scan.
 
         This is useful for debugging and user interfaces to show access levels.
 
@@ -753,9 +754,12 @@ class RBACManager:
         -------
         dict
             A dictionary containing access information including:
-            - effective_role: The user's effective role for this scan
-            - permissions: List of permissions the user has
-            - access_reason: Why the user has this level of access
+
+                - 'effective_role': the user's effective role for this scan
+                - 'permissions': list of permissions the user has
+                - 'access_reason': why the user has this level of access
+                - 'is_owner': a boolean flag indicating if the user is the owner of the scan
+                - 'shared_groups': a list of groups that share this scan, if any
         """
         metadata = self.ensure_scan_owner(scan_metadata)
         effective_role = self.get_effective_role_for_scan(user, metadata)

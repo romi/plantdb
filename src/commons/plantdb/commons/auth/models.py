@@ -120,6 +120,51 @@ class Role(Enum):
     ADMIN = "admin"
 
     @property
+    def rank(self) -> int:
+        """Get the hierarchical rank of the role. Higher is more powerful.
+
+        Returns
+        -------
+        int
+            The rank of the role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.rank
+        1
+        """
+        ranks = {
+            Role.READER: 1,
+            Role.CONTRIBUTOR: 2,
+            Role.ADMIN: 3,
+        }
+        return ranks[self]
+
+    def can_assign(self, target_role: 'Role') -> bool:
+        """Check if this role has the authority to assign the target_role.
+
+        A user can only assign roles that are less than or equal to their own.
+
+        Returns
+        -------
+        bool
+            ``True`` if this role has the authority to assign the target_role; ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.can_assign(Role.CONTRIBUTOR)
+        False
+        >>> user = Role.CONTRIBUTOR
+        >>> user.can_assign(Role.CONTRIBUTOR)
+        True
+        """
+        return self.rank >= target_role.rank
+
+    @property
     def permissions(self) -> Set[Permission]:
         """Get the set of permissions associated with this role.
 
@@ -127,6 +172,18 @@ class Role(Enum):
         -------
         Set[Permission]
             A set containing all permissions granted to this role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.permissions
+        {<Permission.READ: 'read'>}
+        >>> user = Role.CONTRIBUTOR
+        >>> user.permissions
+        {<Permission.CREATE: 'create'>,
+         <Permission.READ: 'read'>,
+         <Permission.WRITE: 'write'>}
         """
         role_permissions = {
             Role.READER: {
@@ -151,13 +208,12 @@ class Role(Enum):
 
 @dataclass
 class User:
-    """
-    Summarize the purpose of the User class.
+    """Represents a user entity in the application.
 
-    The User class represents a user entity in an application. It contains attributes related to user authentication, roles,
-    permissions, and activity timestamps. The class is designed to encapsulate user data and provide methods for user management.
-    Users can have multiple roles and permissions, which are stored as sets. The class also tracks the creation time and last login
-    time of a user.
+    It contains attributes related to user authentication, roles, permissions, and activity timestamps.
+    The class is designed to encapsulate user data and provide methods for user management.
+    Users can have multiple roles and permissions, which are stored as sets.
+    The class also tracks the creation time and last login time of a user.
 
     Attributes
     ----------
@@ -169,20 +225,24 @@ class User:
         A set containing roles assigned to the user.
     created_at : datetime
         The timestamp when the user account was created.
-    permissions : Set[Permission], optional
+    permissions : Optional[Set[Permission]]
         A set containing specific permissions granted to the user.
-    last_login : Optional[datetime], optional
-        The timestamp of the last login. If not provided, defaults to None.
-    is_active : bool, optional
-        Indicates if the user account is active. Defaults to True.
-    failed_attempts : int, optional
-        Number of failed login attempts for the user. Defaults to 0.
-    locked_until : Optional[datetime], optional
-        Timestamp until which the user is locked out due to multiple failed attempts. Defaults to None.
+    last_login : Optional[datetime]
+        The timestamp of the last login. If not provided, defaults to ``None``.
+    is_active : bool
+        Indicates if the user account is active. Defaults to ``True``.
+    failed_attempts : int
+        Number of failed login attempts for the user. Defaults to ``0``.
+    last_failed_attempt: Optional[datetime]
+        The timestamp of the last failed attempts. Defaults to ``None``.
+    locked_until : Optional[datetime]
+        Timestamp until which the user is locked out due to multiple failed attempts. Defaults to ``None``.
+    password_last_change : Optional[datetime]
+        The timestamp of the last password change. Defaults to ``None``.
 
     Notes
     -----
-    Ensure that sensitive data like `password_hash` is handled securely and not exposed in logs or error messages.
+    Ensure that sensitive data like ``password_hash`` is handled securely and not exposed in logs or error messages.
 
     Examples
     --------
@@ -218,10 +278,9 @@ class User:
     password_last_change: Optional[datetime] = None
 
     def __eq__(self, other):
-        """
-        Compare two User objects for equality.
+        """Compare two ``User`` objects for equality.
 
-        Two User objects are considered equal if all their attributes have the same values.
+        Two ``User`` objects are considered equal if all their attributes have the same values.
 
         Parameters
         ----------
@@ -239,13 +298,12 @@ class User:
         return all(self.__dict__[attr] == other.__dict__[attr] for attr in self.__dict__)
 
     def to_dict(self) -> dict:
-        """
-        Convert User object to dictionary for JSON serialization.
+        """Convert a ``User`` object to a dictionary for JSON serialization.
 
         Returns
         -------
         dict
-            Dictionary representation of the user object.
+            Dictionary representation of the ``User`` object.
         """
         return {
             'username': self.username,
@@ -264,8 +322,7 @@ class User:
 
     @classmethod
     def from_dict(cls, data: dict) -> 'User':
-        """
-        Create User object from dictionary (JSON deserialization).
+        """Create a ``User`` object from a dictionary (JSON deserialization).
 
         Parameters
         ----------
@@ -275,7 +332,7 @@ class User:
         Returns
         -------
         User
-            User object created from the dictionary data.
+            The ``User`` object created from the dictionary data.
 
         Raises
         ------
@@ -333,22 +390,18 @@ class User:
             raise ValueError(f"Invalid data format in user data: {e}")
 
     def to_json(self) -> str:
-        """
-        Convert User object to JSON string.
+        """Convert ``User`` object to JSON string.
 
         Returns
         -------
         str
-            JSON string representation of the user object.
-
-
+            JSON string representation of the ``User`` object.
         """
         return json.dumps(self.to_dict(), indent=2)
 
     @classmethod
     def from_json(cls, json_str: str) -> 'User':
-        """
-        Create User object from JSON string.
+        """Create ``User`` object from JSON string.
 
         Parameters
         ----------
@@ -358,7 +411,7 @@ class User:
         Returns
         -------
         User
-            User object created from the JSON data.
+            The ``User`` object created from the JSON data.
 
         Raises
         ------
@@ -413,11 +466,10 @@ class User:
 
 @dataclass
 class Group:
-    """
-    Represents a group of users for sharing scan datasets.
+    """Represents a group of users for sharing scan datasets.
 
     Groups allow multiple users to collaborate on scan datasets. When a scan is shared
-    with a group, all members of that group get CONTRIBUTOR role for that specific dataset.
+    with a group, all members of that group get the `` CONTRIBUTOR `` role for that specific dataset.
 
     Attributes
     ----------
@@ -425,7 +477,7 @@ class Group:
         The unique name of the group.
     users : Set[str]
         A set of usernames that belong to this group.
-    description : Optional[str], optional
+    description : Optional[str]
         An optional description of the group's purpose.
     created_at : datetime
         The timestamp when the group was created.
@@ -455,8 +507,7 @@ class Group:
     description: Optional[str] = None
 
     def add_user(self, username: str) -> bool:
-        """
-        Add a user to the group.
+        """Add a user to the group.
 
         Parameters
         ----------
@@ -474,8 +525,7 @@ class Group:
         return True
 
     def remove_user(self, username: str) -> bool:
-        """
-        Remove a user from the group.
+        """Remove a user from the group.
 
         Parameters
         ----------
@@ -493,8 +543,7 @@ class Group:
         return True
 
     def has_user(self, username: str) -> bool:
-        """
-        Check if a user is a member of the group.
+        """Check if a user is a member of the group.
 
         Parameters
         ----------

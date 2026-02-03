@@ -40,9 +40,9 @@ import os
 
 import requests
 from ada_url import join_url
-from plantdb.client import api_endpoints
 from requests import RequestException
 
+from plantdb.client import api_endpoints
 from plantdb.commons.log import get_logger
 
 
@@ -148,7 +148,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.token_validation())
         response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
-        if response.status_code == 200:
+        if response.ok:
             self.jwt_token = token
             self.username = response.json().get('username')
             # Add the JWT to the header
@@ -182,10 +182,12 @@ class PlantDBClient:
 
         try:
             response = self.session.post(url, json=data)
-            if response.status_code == 200:
+            if response.ok:
                 result = response.json()
                 self.jwt_token = result.get('access_token')
                 self.username = username
+                # Add the JWT to the header
+                self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
@@ -208,7 +210,7 @@ class PlantDBClient:
         url = join_url(self.base_url, api_endpoints.logout())
         try:
             response = self.session.post(url)
-            if response.status_code == 200:
+            if response.ok:
                 self.username = None
                 # Remove the Authorization with the JWT from the header
                 self.session.headers.pop('Authorization')
@@ -217,12 +219,34 @@ class PlantDBClient:
         except Exception:
             return False
 
+    def create_user(self, username: str, password: str, fullname: str) -> bool:
+        """Create a new user in the PlantDB API."""
+        url = join_url(self.base_url, api_endpoints.create_user())
+        data = {
+            'username': username,
+            'password': password,
+            'fullname': fullname,
+        }
+
+        try:
+            response = self.session.post(url, json=data)
+            if response.ok:
+                return True
+            else:
+                error_msg = response.json().get('message', 'Unknown server error.')
+                self.logger.error(f"Failed to create user: {error_msg}")
+                return False
+
+        except RequestException as e:
+            self.logger.error(f"User registration request failed: {e}")
+            return False
+
     def refresh(self) -> bool:
         """Refresh the database."""
         url = join_url(self.base_url, api_endpoints.refresh())
         try:
             response = self.session.get(url)
-            if response.status_code == 200:
+            if response.ok:
                 return True
             return False
         except Exception:
@@ -233,7 +257,7 @@ class PlantDBClient:
         url = join_url(self.base_url, api_endpoints.token_refresh())
         try:
             response = self.session.post(url)
-            if response.status_code == 200:
+            if response.ok:
                 result = response.json()
                 self.jwt_token = result.get('access_token')
                 self.username = result.get('username')
@@ -739,7 +763,6 @@ class PlantDBClient:
         >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
         >>> response = client.create_file(image_data, file_id='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
         >>> print(response)
-
         """
         import os
         import json
@@ -748,8 +771,8 @@ class PlantDBClient:
 
         url = f"{self.base_url}/api/file"
 
-        ext = ext.lstrip('.').lower()  # Remove leading dot if present
-        # Prepare form data
+        ext = ext.lstrip('.').lower()  # Remove the leading dot if present
+        # Prepare data
         data = {
             'file_id': file_id,
             'ext': ext,
@@ -775,10 +798,10 @@ class PlantDBClient:
             }
             response = self.session.post(url, files=files, data=data)
         else:
-            # Convert to Path object if it's a string
+            # Convert to a Path object if it's a string
             file_path = Path(file_data) if isinstance(file_data, str) else file_data
 
-            # Handle file from path
+            # Handle file from a path
             with open(file_path, 'rb') as file_handle:
                 filename = os.path.basename(str(file_path))
                 files = {

@@ -26,10 +26,10 @@
 """
 This module regroup the classes and methods used to serve a REST API using ``fsdb_rest_api`` CLI.
 """
-
 import datetime
 import hashlib
 import json
+import mimetypes
 import os
 import threading
 import time
@@ -39,8 +39,10 @@ from io import BytesIO
 from math import radians
 from pathlib import Path
 from tempfile import mkstemp
+from typing import Optional
 from zipfile import ZipFile
 
+import pybase64
 from flask import Response
 from flask import after_this_request
 from flask import jsonify
@@ -697,20 +699,36 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
-def jwt_from_header(request):
+def jwt_from_header(request) -> str:
+    """Extracts the JWT token from the Authorization header of an HTTP request.
+
+    Parameters
+    ----------
+    request : object
+        An HTTP request object that provides a ``headers`` attribute.
+
+    Returns
+    -------
+    str
+        The JWT token extracted from the ``Authorization`` header, or an
+        empty string if the header is missing or empty.
+
+    Notes
+    -----
+    * The function performs a simple string replacement and does **not**
+      check that the resulting token is a valid JWT.
+    """
     return request.headers.get('Authorization', "").replace('Bearer ', '')
 
 
-def requires_jwt(f):
-    """Decorator to require JWT validation."""
+def add_jwt_from_header(f):
+    """Retrieve the JSON Web Token from the header and add it to keyword arguments, if any."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Try to get JWT token from request header
+        # Try to get JSON Web Token from the request header
         jwt_token = jwt_from_header(request)
-        # Verify we actually got a token (do not test its validity, this is done by the database)
-        if not jwt_token:
-            return {'message': 'Authentication required, JSON Web Token missing!'}, 401
+        # Do not verify we actually got a token or test its validity; this is done by the database)
         # Add token to keyword arguments (for later use by FSD methods)
         kwargs['token'] = jwt_token
         return f(*args, **kwargs)
@@ -832,7 +850,8 @@ class Register(Resource):
         self.db = db
 
     @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
-    def post(self):
+    @add_jwt_from_header
+    def post(self, **kwargs):
         """Handle HTTP POST request to register a new user.
 
         Processes user registration by validating the input data and creating a new user in the database.
@@ -869,19 +888,23 @@ class Register(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
-        >>> # Create a new user:
+        >>> # Start by login as admin to have permission to create new users
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now create a new user:
         >>> new_user = {"username":"batman", "fullname":"Bruce Wayne", "password":"Alfred123!"}
-        >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user)
+        >>> response = requests.post("http://127.0.0.1:5000/register", json=new_user, headers={'Authorization': 'Bearer ' + token})
         >>> res_dict = response.json()
         >>> res_dict["success"]
         True
         >>> res_dict["message"]
         'User successfully created'
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'batman', 'password': 'Alfred123!'})
+        >>> res_dict["message"]
+        'Login successful'
         """
         # Parse JSON data from request body
         data = request.get_json()
-
         # Check if all required fields are present in the request
         required_fields = ['username', 'fullname', 'password']
         if not data or not all(field in data for field in required_fields):
@@ -891,11 +914,12 @@ class Register(Resource):
             }, 400
 
         try:
-            # Attempt to create new user in database
+            # Attempt to create a new user in the database
             self.db.create_user(
-                username=data['username'],
-                fullname=data['fullname'],
-                password=data['password']
+                new_username=data.pop('username'),
+                fullname=data.pop('fullname'),
+                password=data.pop('password'),
+                **kwargs
             )
             # Return success response if user creation succeeds
             return {
@@ -960,11 +984,10 @@ class Login(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
         >>> # Check if user exists (valid username):
-        >>> response = requests.get("http://127.0.0.1:5000/login?username=anonymous")
+        >>> response = requests.get("http://127.0.0.1:5000/login?username=admin")
         >>> print(response.json())
-        {'username': 'anonymous', 'exists': True}
+        {'username': 'admin', 'exists': True}
         >>> # Check if user exists (invalid username):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=superman")
         >>> print(response.json())
@@ -1017,13 +1040,13 @@ class Login(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> # Valid login request
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous', 'password': 'AlanMoore'})
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json())
         {'authenticated': True, 'message': 'Login successful. Welcome, Guy Fawkes!'}
         >>> print(response.status_code)
         200
         >>> # Invalid request (missing credentials)
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'anonymous'})
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin'})
         >>> print(response.json())
         {'authenticated': False, 'message': 'Missing username or password'}
         >>> print(response.status_code)
@@ -1044,7 +1067,7 @@ class Login(Resource):
 
         # Prepare response based on authentication result
         if jwt_token:
-            user = self.db.get_user_data(session_token=jwt_token)
+            user = self.db.get_user_data(token=jwt_token)
             # Create response with user info & access token
             response_data = {
                 'message': 'Login successful',
@@ -1072,16 +1095,29 @@ class Logout(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt
+    @add_jwt_from_header
     def post(self, **kwargs):
-        """Handle user logout and clear cookie."""
-        # Get token from keyword arguments (from decorator)
-        jwt_token = kwargs.get('token', None)
-
+        """Handle user logout.
+        
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by log in as 'admin'
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> print(response.json()['message'])
+        Login successful
+        >>> token = response.json()['access_token']
+        >>> # Now try to log out:
+        >>> response = requests.post("http://127.0.0.1:5000/logout", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Logout successful
+        """
         try:
-            if jwt_token:
+            if 'token' in kwargs:
                 # Invalidate session
-                self.db.session_manager.invalidate_session(jwt_token)
+                self.db.logout(**kwargs)
                 response = {'message': 'Logout successful'}, 200
             else:
                 self.logger.error(f"Logout error: no active session!")
@@ -1095,10 +1131,9 @@ class Logout(Resource):
 
 
 class TokenValidation(Resource):
-    """
-    Validate a JSON Web Token (JWT) and retrieve associated user data.
+    """Validate a JSON Web Token (JWT) and retrieve associated user data.
 
-    The resource exposes a POST endpoint that accepts a JWT token, verifies its
+    The resource exposes a POST endpoint that accepts a JSON Web Token, verifies its
     validity against the database session manager, and returns the authenticated
     user’s basic profile information.  On success a 200 response is returned
     containing the user’s ``username`` and ``fullname``; on failure a 401
@@ -1117,22 +1152,6 @@ class TokenValidation(Resource):
         Database handler providing access to the session manager.
     logger : Any
         Logger instance used for recording authentication events.
-
-    Examples
-    --------
-    >>> from flask import Flask
-    >>> from flask_restful import Api
-    >>> app = Flask(__name__)
-    >>> api = Api(app)
-    >>> # Assume `db` and `logger` are pre‑configured objects
-    >>> api.add_resource(TokenValidation, '/validate')
-    >>> # In a test client
-    >>> with app.test_client() as client:
-    ...     response = client.post('/validate', json={'token': 'valid.jwt.token'})
-    ...     print(response.status_code)          # 200
-    ...     print(response.json)
-    ...     # {'message': 'Token validation successful',
-    ...     #  'user': {'username': 'jdoe', 'fullname': 'John Doe'}}
     """
 
     def __init__(self, db, logger):
@@ -1140,14 +1159,25 @@ class TokenValidation(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt
+    @add_jwt_from_header
     def post(self, **kwargs):
-        """Handle token validation."""
-        # Get token from keyword arguments (from decorator)
-        jwt_token = kwargs.get('token', None)
+        """Handle JSON Web Token validation.
 
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by login as admin
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now create a new user:
+        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Token validation successful
+        """
         try:
-            user = self.db.get_user_data(session_token=jwt_token)
+            user = self.db.get_user_data(**kwargs)
         except Exception as e:
             response = {'message': f'Token validation failed: {e}'}, 401
         else:
@@ -1162,8 +1192,7 @@ class TokenValidation(Resource):
 
 
 class TokenRefresh(Resource):
-    """
-    Refresh JWT token for an authenticated user.
+    """Refresh JSON Web Token for an authenticated user.
 
     The `TokenRefresh` resource provides an endpoint that accepts an
     existing JSON Web Token, validates the current session, and issues a new
@@ -1183,13 +1212,32 @@ class TokenRefresh(Resource):
 
     """
 
-    def __init__(self):
+    def __init__(self, db):
         """Initialize the TokenRefresh resource."""
-        self.db = None
+        self.db = db
 
-    @requires_jwt
+    @add_jwt_from_header
     def post(self, **kwargs):
-        """Refresh JWT token."""
+        """Refresh JSON Web Token.
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> # Start by login as admin
+        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> token = response.json()['access_token']
+        >>> # Now refresht the token for the admin user:
+        >>> response = requests.post("http://127.0.0.1:5000/token-refresh", headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.json()['message'])
+        Token refreshed successfully
+        >>> new_token = response.json()['access_token']
+        >>> # Validate this new token:
+        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + new_token})
+        >>> print(response.json()['user']['username'])
+        admin
+        """
         # Get token from keyword arguments (from decorator)
         jwt_token = kwargs.get('token', None)
 
@@ -1316,16 +1364,15 @@ class ScansTable(Resource):
     >>> # Start a test REST API server first:
     >>> # $ fsdb_rest_api --test
     >>> import requests
-    >>> import json
     >>> # Get all scan datasets
     >>> response = requests.get("http://127.0.0.1:5000/scans_info")
-    >>> scans = json.loads(response.content)
+    >>> scans = response.json()
     >>> print(scans[0]['id'])  # print the id of the first scan dataset
     >>> print(scans[0]['metadata'])  # print the metadata of the first scan dataset
     >>> # Get filtered results using query
     >>> query = {"object": {"species": "Arabidopsis.*"}}
     >>> response = requests.get("http://127.0.0.1:5000/scans_info", params={"filterQuery": json.dumps(query), "fuzzy": "true"})
-    >>> filtered_scans = json.loads(response.content)
+    >>> filtered_scans = response.json()
     >>> print(filtered_scans[0]['id'])  # print the id of the first scan dataset matching the query
     """
 
@@ -1343,7 +1390,8 @@ class ScansTable(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
-    def get(self):
+    @add_jwt_from_header
+    def get(self, **kwargs):
         """Retrieve a list of scan dataset information.
 
         This method handles GET requests to retrieve scan information. It supports
@@ -1376,16 +1424,14 @@ class ScansTable(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
         >>> # Get an info dict about all dataset:
-        >>> res = requests.get("http://127.0.0.1:5000/scans_info")
-        >>> scans_list = json.loads(res.content)
+        >>> response = requests.get("http://127.0.0.1:5000/scans_info")
+        >>> scans_list = response.json()
         >>> # List the known dataset id:
         >>> print(scans_list)
         ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant', 'models']
-        >>> res = requests.get('http://127.0.0.1:5000/scans_info?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
-        >>> res.content.decode()
-
+        >>> response = requests.get('http://127.0.0.1:5000/scans_info?filterQuery={"object":{"species":"Arabidopsis.*"}}&fuzzy="true"')
+        >>> response.content.decode()
         """
         query = request.args.get('filterQuery', None)
         fuzzy = request.args.get('fuzzy', False, type=bool)
@@ -1395,7 +1441,7 @@ class ScansTable(Resource):
 
         scans_info = []
         for scan_id in scans_list:
-            scans_info.append(get_scan_info(self.db.get_scan(scan_id), logger=self.logger))
+            scans_info.append(get_scan_info(self.db.get_scan(scan_id, **kwargs), logger=self.logger))
         return scans_info
 
 
@@ -1437,7 +1483,8 @@ class Scan(Resource):
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
-    def get(self, scan_id):
+    @add_jwt_from_header
+    def get(self, scan_id, **kwargs):
         """Retrieve detailed information about a specific scan dataset.
 
         Parameters
@@ -1469,10 +1516,9 @@ class Scan(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
         >>> # Get detailed information about a specific dataset
         >>> response = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
-        >>> scan_data = json.loads(response.content)
+        >>> scan_data = response.json()
         >>> # Access metadata information
         >>> print(scan_data['metadata']['date'])
         2024-08-19 11:12:25
@@ -1483,12 +1529,13 @@ class Scan(Resource):
         scan_id = sanitize_name(scan_id)
         # return get_scan_data(self.db.get_scan(scan_id), logger=self.logger)
         if self.db.scan_exists(scan_id):
-            return get_scan_info(self.db.get_scan(scan_id), logger=self.logger)
+            return get_scan_info(self.db.get_scan(scan_id, **kwargs), logger=self.logger)
         else:
             return {'message': f"Scan id '{scan_id}' does not exist"}, 404
 
     @rate_limit(max_requests=15, window_seconds=60)
-    def post(self, scan_id):
+    @add_jwt_from_header
+    def post(self, scan_id, **kwargs):
         """Create a new scan dataset.
 
         Parameters
@@ -1521,7 +1568,7 @@ class Scan(Resource):
         scan_id = sanitize_name(scan_id)
         try:
             # Attempt to create a new scan in the database with the given scan_id
-            scan = self.db.create_scan(scan_id)
+            scan = self.db.create_scan(scan_id, **kwargs)
             # Check if scan creation was successful
             if scan is None:
                 self.logger.error(f"Failed to create scan: {scan_id}")
@@ -1610,14 +1657,15 @@ class File(Resource):
         >>> # Request a TOML configuration file
         >>> import requests
         >>> import toml
-        >>> res = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
-        >>> cfg = toml.loads(res.content.decode())
+        >>> response = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
+        >>> cfg = toml.loads(response.content.decode())
         >>> print(cfg['Undistorted'])
         {'upstream_task': 'ImagesFilesetExists'}
         >>> # Request a JSON file
-        >>> import json
-        >>> res = requests.get("http://127.0.0.1:5000/files/Col-0_E1_1/files.json")
-        >>> json.loads(res.content.decode())
+        >>> response = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/files.json")
+        >>> scan_files = response.json()
+        >>> print([fs['id'] for fs in scan_files['filesets']])
+        ['images', 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595', 'TreeGraph__False_CurveSkeleton_c304a2cc71', 'CurveSkeleton__TriangleMesh_0393cb5708', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'Voxels___x____300__450__colmap_camera_False_2a093f0ccc', 'Masks_1__0__1__0____channel____rgb_5619aa428d', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7']
         """
         return send_from_directory(self.db.path(), path)
 
@@ -1720,7 +1768,6 @@ class DatasetFile(Resource):
         201
         >>> response.json()
         {'message': 'File path/to/data.txt received and saved'}
-
         """
         # Check the header used to pass the filename, or return '400' for "bad request":
         if 'Content-Disposition' not in request.headers:
@@ -1965,10 +2012,25 @@ class Image(Resource):
         file_id : str
             Identifier for the specific image file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * `'thumb'`: image max width and height to `150` (default);
+                * `'large'`: image max width and height to `1500`;
+                * `'orig'`: original image, no chache;
+            If an invalid string is supplied, the default 'thumb' is used.
+        base64 : str
+            Query parameter indicating whether to return the image encoded in base64.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the image file.
+            If set, returns the image in base64 under the 'image' JSON dictionary entry and mimetype under 'content-type'.
+
         Returns
         -------
         flask.Response
-            HTTP response containing the image data with 'image/jpeg' mimetype.
+            HTTP response containing the image data with 'content-type' mimetype.
 
         Raises
         ------
@@ -1980,11 +2042,6 @@ class Image(Resource):
         Notes
         -----
         - All input parameters are sanitized before use.
-        - In the URL, you can use the `size` parameter to retrieve a resized image.
-        - The 'size' parameter defaults to 'thumb' if not specified and can be an integer or one of the following string values:
-            * `'thumb'`: image max width and height to `150`;
-            * `'large'`: image max width and height to `1500`;
-            * `'orig'`: original image, no chache;
 
         See Also
         --------
@@ -1999,26 +2056,37 @@ class Image(Resource):
         >>> from io import BytesIO
         >>> from PIL import Image
         >>> # Get the first image as a thumbnail (default):
-        >>> res = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True)
-        >>> img = Image.open(BytesIO(res.content))
+        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True)
+        >>> img = Image.open(BytesIO(response.content))
         >>> np.asarray(img).shape
         (113, 150, 3)
         >>> # Get the first image in original size:
-        >>> res = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig"})
-        >>> img = Image.open(BytesIO(res.content))
+        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig"})
+        >>> img = Image.open(BytesIO(response.content))
         >>> np.asarray(img).shape
         (1080, 1440, 3)
-
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='thumb', type=str)
+        # Parse the base64 flag (accepting true/1/yes in any case)
+        base64_flag = request.args.get('base64', default='false', type=str).lower() in ('true', '1', 'yes')
+
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
-        return send_file(path)
+        mime_type, _ = mimetypes.guess_type(path)
+
+        # If base64_flag is set, read the file, encode it, and return JSON
+        if base64_flag:
+            with open(path, 'rb') as f:
+                encoded = pybase64.b64encode(f.read()).decode('ascii')
+            return jsonify({'image': encoded, 'content-type': mime_type})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype=mime_type)
 
 
 class PointCloud(Resource):
@@ -2067,6 +2135,21 @@ class PointCloud(Resource):
         file_id : str
             Identifier for the specific point cloud file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * 'orig' – serve the original point cloud.
+                * 'preview' – serve a precomputed preview (default).
+                * A float value – perform on‑the‑fly voxel downsampling using the specified voxel size.
+            If an invalid string is supplied, the default 'preview' is used.
+        coords : str
+            Query parameter indicating whether to return the point coordinates as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2081,11 +2164,6 @@ class PointCloud(Resource):
 
         Notes
         -----
-        - In the URL, you can use a 'size' parameter that accepts:
-            * 'orig': original point cloud
-            * 'preview': downsampled preview version
-            * float value: custom voxel size for downsampling
-        - Defaults to 'preview' if size parameter is invalid
         - All input parameters are sanitized before use
 
         See Also
@@ -2100,21 +2178,24 @@ class PointCloud(Resource):
         >>> from plyfile import PlyData
         >>> from io import BytesIO
         >>> # Get original point cloud:
-        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud")
-        >>> pcd_data = PlyData.read(BytesIO(res.content))
+        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud")
+        >>> pcd_data = PlyData.read(BytesIO(response.content))
         >>> # Access point X-coordinates:
         >>> list(pcd_data['vertex']['x'])
         >>> # Get preview (downsampled) version
-        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview"})
+        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview"})
         >>> # Get custom downsampled version (voxel size 0.01)
-        >>> res = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "0.01"})
-
+        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "0.01"})
+        >>> # Send the coordinates (read the file on the server-side)
+        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview", 'coords': 'true'})
+        >>> coordinates = np.array(response.json()['coordinates'])
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -2127,6 +2208,9 @@ class PointCloud(Resource):
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
 
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+
         try:
             # Get the path to the pointcloud resource:
             path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
@@ -2138,8 +2222,16 @@ class PointCloud(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_point_cloud(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class PointCloudGroundTruth(Resource):
@@ -2180,6 +2272,21 @@ class PointCloudGroundTruth(Resource):
         file_id : str
             Identifier for the specific point-cloud file.
 
+        Other Parameters
+        ----------------
+        size : str or float
+            Query parameter controlling downsampling.
+            Accepted values:
+                * 'orig' – serve the original point cloud.
+                * 'preview' – serve a precomputed preview (default).
+                * A float value – perform on‑the‑fly voxel downsampling using the specified voxel size.
+            If an invalid string is supplied, the default 'preview' is used.
+        coords : str
+            Query parameter indicating whether to return the point coordinates as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2202,12 +2309,12 @@ class PointCloudGroundTruth(Resource):
         - Invalid size parameters default to 'preview'
         - Response mimetype is 'application/octet-stream'
         """
-
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
         try:
@@ -2220,6 +2327,9 @@ class PointCloudGroundTruth(Resource):
         if isinstance(size, str) and size not in ['orig', 'preview']:
             size = 'preview'
 
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+
         try:
             # Get the path to the pointcloud resource:
             path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
@@ -2231,8 +2341,16 @@ class PointCloudGroundTruth(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_point_cloud(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class Mesh(Resource):
@@ -2279,6 +2397,14 @@ class Mesh(Resource):
         file_id : str
             Identifier for the specific mesh file.
 
+        Other Parameters
+        ----------------
+        coords : str
+            Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
+            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Defaults to 'false', which streams the PLY file.
+            If set, returns the data as list under the 'vertices' & 'triangles' JSON dictionary entry.
+
         Returns
         -------
         flask.Response
@@ -2323,10 +2449,14 @@ class Mesh(Resource):
         fileset_id = sanitize_name(fileset_id)
         file_id = sanitize_name(file_id)
 
+        # Parse the `size` flag
         size = request.args.get('size', default='orig', type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
         if not size in ['orig']:
             size = 'orig'
+
+        # Parse the coords flag (accepting true/1/yes in any case)
+        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
 
         try:
             # Get the path to the mesh resource:
@@ -2339,8 +2469,16 @@ class Mesh(Resource):
             return {'error': f"No '{scan_id}' scan found!"}, 400
         except Exception as e:
             return {'error': f"Unknown error: {e}"}, 400
-        else:
-            return send_file(path, mimetype='application/octet-stream')
+
+        # If coords_flag is set, read the file and return JSON
+        if coords_flag:
+            import numpy as np
+            from open3d import io
+            pcd = io.read_triangle_mesh(path, print_progress=False)
+            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
+            return jsonify({'vertices': np.array(pcd.vertices).tolist(), 'triangles': np.array(pcd.triangles).tolist()})
+        # Otherwise, return the file directly
+        return send_file(path, mimetype='application/octet-stream')
 
 
 class CurveSkeleton(Resource):
@@ -2407,25 +2545,20 @@ class CurveSkeleton(Resource):
         >>> # Start the REST API server
         >>> # Then in a Python console:
         >>> import requests
-        >>> import json
-        >>>
         >>> # Fetch skeleton data for a valid scan
         >>> response = requests.get("http://127.0.0.1:5000/skeleton/Col-0_E1_1")
-        >>> skeleton_data = json.loads(response.content)
+        >>> skeleton_data = response.json()
         >>> print(list(skeleton_data.keys()))
         ['angles', 'internodes', 'metadata']
-        >>>
         >>> # Example with invalid scan ID
         >>> response = requests.get("http://127.0.0.1:5000/skeleton/invalid_id")
         >>> print(response.status_code)
         400
-        >>> print(json.loads(response.content))
+        >>> print(response.json())
         {'error': "Scan 'invalid_id' not found!"}
         """
-
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
-
         # Get the corresponding `Scan` instance
         try:
             scan = self.db.get_scan(scan_id)
@@ -2534,18 +2667,15 @@ class Sequence(Resource):
         --------
         >>> # Get all sequence data
         >>> import requests
-        >>> import json
         >>> response = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed")
-        >>> data = json.loads(response.content.decode('utf-8'))
-        >>> # Expected output: {'angles': [...], 'internodes': [...], 'fruit_points': [...]}
-
+        >>> data = response.json()  # Expected output: {'angles': [...], 'internodes': [...], 'fruit_points': [...]}
+        >>> print(list(data))
+        ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
         >>> # Get only angles data
-        >>> response = requests.get(
-        ...     "http://127.0.0.1:5000/sequence/real_plant_analyzed",
-        ...     params={'type': 'angles'}
-        ... )
-        >>> angles = json.loads(response.content.decode('utf-8'))
-        >>> # Expected output: [angle1, angle2, ...]
+        >>> response = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed", params={'type': 'angles'})
+        >>> angles = response.json()
+        >>> print(angles[:5])
+        [47.13015345294241, 239.43543078022594, 311.8816488465762, 251.0289289739646, 249.56560354730826]
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
@@ -2620,8 +2750,7 @@ def is_within_directory(directory, target):
 
 
 def is_directory_in_archive(archive_path, target_dir):
-    """
-    Check if a specific directory exists within an archive file.
+    """Check if a specific directory exists within an archive file.
 
     This function checks whether a given directory is present at the top level of a ZIP archive.
 
@@ -2645,8 +2774,7 @@ def is_directory_in_archive(archive_path, target_dir):
 
 
 def is_valid_archive(archive_path):
-    """
-    Validate if a given archive meets specific directory and file requirements.
+    """Validate if a given archive meets specific directory and file requirements.
 
     This function checks if the provided archive contains certain required directories and files,
     and verifies that the directory structure does not exceed a specified depth.
@@ -2866,8 +2994,8 @@ class Archive(Resource):
 
         return send_file(temp_zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
 
-    @requires_jwt
     @rate_limit(max_requests=5, window_seconds=60)
+    @add_jwt_from_header
     def post(self, scan_id, **kwargs):
         """Handle ZIP file upload and extraction for a scan dataset.
 
@@ -3086,7 +3214,7 @@ class ScanCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt
+    @add_jwt_from_header
     def post(self, **kwargs):
         """Create a new scan in the database.
 
@@ -3116,7 +3244,7 @@ class ScanCreate(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3140,7 +3268,7 @@ class ScanCreate(Resource):
             scan = self.db.create_scan(scan_id, **kwargs)
             # Set metadata if provided
             if metadata:
-                scan.set_metadata(metadata)
+                scan.set_metadata(metadata, **kwargs)
             return {'message': f"Scan '{scan_id}' created successfully."}, 201
 
         except Exception as e:
@@ -3202,13 +3330,13 @@ class ScanMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/test_plant/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
-        {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
+        {'metadata': {'owner': 'guest', 'description': 'Test plant scan'}}
         >>> # Get specific metadata key:
         >>> response = requests.get(url+"?key=description")
         >>> print(response.json())
@@ -3230,7 +3358,7 @@ class ScanMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt
+    @add_jwt_from_header
     def post(self, scan_id, **kwargs):
         """Update metadata for a specified scan.
 
@@ -3263,14 +3391,14 @@ class ScanMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new scan with metadata:
         >>> metadata = {'description': 'Test plant scan'}
-        >>> url = f"{plantdb_url()}/api/scan"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan"
         >>> response = requests.post(url, json={'name': 'test_plant', 'metadata': metadata})
         >>> # Update scan metadata:
-        >>> url = f"{plantdb_url()}/api/scan/test_plant/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/test_plant/metadata"
         >>> data = {"metadata": {"description": "Updated scan description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
-        {'metadata': {'owner': 'anonymous', 'description': 'Updated scan description'}}
+        {'metadata': {'owner': 'guest', 'description': 'Updated scan description'}}
         """
         try:
             # Get request data
@@ -3290,7 +3418,7 @@ class ScanMetadata(Resource):
                 return {'message': 'Scan not found'}, 404
 
             # Update the metadata
-            scan.set_metadata(metadata)
+            scan.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary
@@ -3355,7 +3483,7 @@ class ScanFilesets(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # List filesets in a scan:
-        >>> url = f"{plantdb_url()}/api/scan/real_plant/filesets"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/scan/real_plant/filesets"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3397,8 +3525,8 @@ class FilesetCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt
-    def post(self):
+    @add_jwt_from_header
+    def post(self, **kwargs):
         """Create a new fileset associated with a scan.
 
         This method handles POST requests to create a new fileset. It validates the input data,
@@ -3436,7 +3564,7 @@ class FilesetCreate(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> response = requests.post(url, json={'fileset_id': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> print(response.status_code)
         201
@@ -3469,10 +3597,10 @@ class FilesetCreate(Resource):
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Create the fileset
-            fileset = scan.create_fileset(fs_id, )
+            fileset = scan.create_fileset(fs_id, **kwargs)
             # Set metadata if provided
             if metadata:
-                fileset.set_metadata(metadata)
+                fileset.set_metadata(metadata, **kwargs)
             return {
                 'message': f"Fileset '{fs_id}' created successfully in '{scan.id}'.",
                 "id": fs_id
@@ -3544,10 +3672,10 @@ class FilesetMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> response = requests.post(url, json={'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata})
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/fileset/real_plant/my_fileset/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/real_plant/my_fileset/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3575,8 +3703,8 @@ class FilesetMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt
-    def post(self, scan_id, fileset_id):
+    @add_jwt_from_header
+    def post(self, scan_id, fileset_id, **kwargs):
         """Update metadata for a specified fileset.
 
         This method handles updating metadata for a fileset within a scan. It supports both
@@ -3617,11 +3745,11 @@ class FilesetMetadata(Resource):
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a new fileset with metadata:
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"{plantdb_url()}/api/fileset"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset"
         >>> data = {'name': 'my_fileset', 'scan_id': 'real_plant', 'metadata': metadata}
         >>> response = requests.post(url, json=data)
         >>> # Get the original metadata:
-        >>> url = f"{plantdb_url()}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/{data['scan_id']}/{data['name']}/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'This is a test fileset'}}
@@ -3634,7 +3762,6 @@ class FilesetMetadata(Resource):
         >>> metadata_update = {"metadata": {"description": "Brand new description", "version": "2.0"}, "replace": True}
         >>> response = requests.post(url, json=metadata_update)
         >>> print(response.json())
-
         """
         try:
             # Get request data
@@ -3659,7 +3786,7 @@ class FilesetMetadata(Resource):
                 return {'message': 'Fileset not found'}, 404
 
             # Update the metadata
-            fileset.set_metadata(metadata)
+            fileset.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary
@@ -3715,7 +3842,7 @@ class FilesetFiles(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # List files in a fileset:
-        >>> url = f"{plantdb_url()}/api/fileset/real_plant/images/files"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/fileset/real_plant/images/files"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
@@ -3764,8 +3891,8 @@ class FileCreate(Resource):
         self.db = db
         self.logger = logger
 
-    @requires_jwt
-    def post(self):
+    @add_jwt_from_header
+    def post(self, **kwargs):
         """Create a new file in a fileset and write data to it.
 
         This method handles POST requests to create a new file with data. It expects
@@ -3784,7 +3911,7 @@ class FileCreate(Resource):
         Returns
         -------
         dict
-            Response containing success message or error description.
+            Response containing a success message or error description.
             If successful, also returns the created file ID under 'id' key, as sanitization may have happened.
         int
             HTTP status code (201, 400, 404, or 500)
@@ -3794,14 +3921,15 @@ class FileCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> import json
         >>> from tempfile import NamedTemporaryFile
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
+        >>> login_res = requests.post(f"{plantdb_url('localhost', port=5000)}/login", json={'username': 'admin', 'password': 'admin'})
+        >>> token = login_res.json()['access_token']
         >>> # Create a new file with metadata in the database:
-        >>> url = f"{plantdb_url()}/api/file"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file"
         >>> # Open the file separately for sending
         >>> with open(file_path, 'rb') as file_handle:
         ...     files = {
@@ -3815,7 +3943,7 @@ class FileCreate(Resource):
         ...         'fileset_id': 'images',
         ...         'metadata': metadata
         ...     }
-        ...     response = requests.post(url, files=files, data=data)
+        ...     response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.status_code)
         201
         >>> print(response.json())
@@ -3857,7 +3985,7 @@ class FileCreate(Resource):
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
             if not scan:
                 return {'message': 'Scan not found'}, 404
             # Get the fileset
@@ -3866,20 +3994,20 @@ class FileCreate(Resource):
                 return {'message': 'Fileset not found'}, 404
             # Create the file
             file_id = sanitize_name(file_id)
-            file = fileset.create_file(file_id)
+            file = fileset.create_file(file_id, **kwargs)
             try:
                 # Write the file data with the specified extension
                 if ext in ['.jpg', '.jpeg', '.png', '.tif']:
-                    file.write_raw(file_data.read(), ext=ext[1:])  # Binary mode
+                    file.write_raw(file_data.read(), ext=ext[1:], **kwargs)  # Binary mode
                 else:
-                    file.write(file_data.read().decode(), ext=ext[1:])  # Text mode
+                    file.write(file_data.read().decode(), ext=ext[1:], **kwargs)  # Text mode
             except Exception as e:
-                fileset.delete_file(file_id)
+                fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
                 return {'message': f'Error writing file: {str(e)}'}, 500
             # Set metadata if provided
             if metadata:
-                file.set_metadata(metadata)
+                file.set_metadata(metadata, **kwargs)
             return {
                 'message': f"File '{file_id}{ext}' created and written successfully in fileset '{fileset.id}'.",
                 'id': f"{file_id}",
@@ -3941,7 +4069,7 @@ class FileMetadata(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
@@ -3973,8 +4101,8 @@ class FileMetadata(Resource):
             self.logger.error(f'Error retrieving metadata: {str(e)}')
             return {'message': f'Error retrieving metadata: {str(e)}'}, 500
 
-    @requires_jwt
-    def post(self, scan_id, fileset_id, file_id):
+    @add_jwt_from_header
+    def post(self, scan_id, fileset_id, file_id, **kwargs):
         """Update metadata for a specified file.
 
         Parameters
@@ -4008,7 +4136,7 @@ class FileMetadata(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> url = f"{plantdb_url()}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
@@ -4042,7 +4170,7 @@ class FileMetadata(Resource):
                 return {'message': 'File not found'}, 404
 
             # Update the metadata
-            file.set_metadata(metadata)
+            file.set_metadata(metadata, **kwargs)
             # TODO: make this works:
             # if replace:
             #    # Replace entire metadata dictionary

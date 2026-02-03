@@ -20,7 +20,7 @@ Key Features
 - **User activation/deactivation** and role assignment.
 - **Group management**: create, delete, add/remove users, and query memberships.
 - **Atomic JSON persistence** to avoid data corruption.
-- **Minimal dependencies** – relies only on standard library plus `argon2`.
+- **Minimal dependencies** – relies only on the standard library plus `argon2`.
 
 Usage Examples
 --------------
@@ -59,9 +59,8 @@ from plantdb.commons.log import get_logger
 ph = PasswordHasher()
 
 
-class UserManager():
-    """
-    UserManager class for managing user data.
+class UserManager(object):
+    """UserManager class for managing user data.
 
     The UserManager class provides methods to create, load,
     save, and manage users. It uses a JSON file to persist user data.
@@ -124,8 +123,7 @@ class UserManager():
                                                                                   int) else lockout_duration
 
     def _load_users(self) -> None:
-        """
-        Loads the user database from a JSON file and populates the internal dictionary.
+        """Loads the user database from a JSON file and populates the internal dictionary.
 
         This method checks if the users database file exists. If it does not exist, it initializes an empty dictionary,
         creates the file, and logs a warning message. If the file does exist, it loads the user data from the file,
@@ -154,11 +152,11 @@ class UserManager():
         return
 
     def _save_users(self) -> None:
-        """
-        Save the user data to a JSON file.
+        """Save the user data to a JSON file.
 
         This method serializes the user objects into dictionaries, writes them to a temporary file,
-        and then renames the temporary file to replace the original file. This ensures atomicity of the operation.
+        and then renames the temporary file to replace the original file.
+        This ensures the atomicity of the operation.
 
         Raises
         ------
@@ -194,8 +192,7 @@ class UserManager():
 
     @staticmethod
     def _hash_password(password: str) -> str:
-        """
-        Hash a plaintext password using argon2.
+        """Hash a plaintext password using argon2.
 
         Parameters
         ----------
@@ -214,8 +211,7 @@ class UserManager():
         return ph.hash(password)
 
     def exists(self, username: str) -> bool:
-        """
-        Check if a user exists.
+        """Check if a user exists.
 
         Parameters
         ----------
@@ -230,7 +226,7 @@ class UserManager():
         Notes
         -----
         This function is case-sensitive. For case-insensitive checks, convert both
-        the username and the keys to lower or upper case before comparison.
+        the username and the keys to the lower or upper case before comparison.
         """
         return username in self.users
 
@@ -261,7 +257,7 @@ class UserManager():
         username = username.lower()  # Convert the username to lowercase to maintain uniformity.
         timestamp = datetime.now()  # Get the current timestamp for tracking user creation time.
 
-        # Verify if the login is available
+        # Verify if the username is available
         try:
             assert not self.exists(username)
         except AssertionError:
@@ -281,16 +277,15 @@ class UserManager():
             created_at=timestamp,
             password_last_change=timestamp,
         )
-        # Save all user data (including the newly created user) to 'users.json' file.
+        # Save all user data (including the newly created user) to the 'users.json' file.
         self._save_users()
         self.logger.debug(f"Created user '{username}' with fullname '{fullname}'.")
         if not username == self.GUEST_USERNAME:
-            self.logger.info(f"Welcome {fullname}, please login...'")
+            self.logger.info(f"Welcome {fullname}, please log in...'")
         return
 
     def _ensure_guest_user(self) -> None:
-        """
-        Ensure that a guest user exists in the system.
+        """Ensure that a guest user exists in the system.
 
         If the guest user does not already exist, it creates one with a default
         username and password. This method is intended to be used internally by
@@ -314,12 +309,12 @@ class UserManager():
         return
 
     def _ensure_admin_user(self) -> None:
-        """
-        Ensure that an admin user exists in the system.
+        """Ensure that an admin user exists in the system.
 
         If the admin user does not already exist, it creates one with a default username.
         The password is a string of 25 hex digits, printed-out to the terminal.
-        This method is intended to be used internally the class to ensure the presence of an admin account for various operational purposes.
+        This method is intended to be used internally in the class to ensure the presence
+        of an admin account for various operational purposes.
 
         Notes
         -----
@@ -345,8 +340,7 @@ class UserManager():
         return
 
     def get_user(self, username: str) -> Union[User, None]:
-        """
-        Retrieve a User object based on the provided username.
+        """Retrieve a User object based on the provided username.
 
         Parameters
         ----------
@@ -365,8 +359,7 @@ class UserManager():
         return self.users[username]
 
     def is_locked_out(self, username) -> bool:
-        """
-        Check if an account is locked.
+        """Check if an account is locked.
 
         Parameters
         ----------
@@ -381,12 +374,11 @@ class UserManager():
         user = self.get_user(username)
         is_locked = user._is_locked_out()
         if is_locked:
-            self.logger.info(f"Account {user} is locked, try logging in after {user.locked_until}.")
+            self.logger.info(f"Account {username} is locked, try logging in after {user.locked_until}.")
         return is_locked
 
     def is_active(self, username) -> bool:
-        """
-        Check whether a user account is active.
+        """Check whether a user account is active.
 
         Parameters
         ----------
@@ -404,8 +396,7 @@ class UserManager():
         return user.is_active
 
     def validate_user_password(self, username: str, password: str) -> bool:
-        """
-        Validate a user's password.
+        """Validate a user's password.
 
         This function checks if the provided plaintext password matches the hashed password stored for the given username.
 
@@ -420,12 +411,11 @@ class UserManager():
         -------
         bool
             ``True`` if the password is valid, ``False`` otherwise.
-
         """
-        hash = self.get_user(username).password_hash
+        pw_hash = self.get_user(username).password_hash
         try:
             # Verify password, raises exception if wrong.
-            ph.verify(hash, password)
+            ph.verify(pw_hash, password)
         except Exception as e:
             self.logger.error(f"Failed to verify password for {username}: {e}")
             return False
@@ -433,8 +423,7 @@ class UserManager():
             return True
 
     def _record_failed_attempt(self, username: str, max_failed_attempts: int, lockout_duration: timedelta) -> None:
-        """
-        Record a failed login attempt for a user and apply lockout if necessary.
+        """Record a failed login attempt for a user and apply lockout if necessary.
 
         This method logs a failed login attempt for the specified user. If the number of
         failed attempts reaches or exceeds `max_failed_attempts`, the user is locked out
@@ -448,21 +437,19 @@ class UserManager():
         max_failed_attempts : int
             The maximum number of allowed failed login attempts before lockout.
         lockout_duration : timedelta
-            The duration for which the user will be locked out after exceeding
-            `max_failed_attempts`.
+            The duration for which the user will be locked out after exceeding `max_failed_attempts`.
         """
         user = self.get_user(username)
         user._record_failed_attempt()
         if user.failed_attempts >= max_failed_attempts:
             self._lock_user(username, lockout_duration)
-        # Save the updated user data to file
+        # Save the updated user data to a file
         self._save_users()
         self.logger.warning(f"Failed login attempt (n={user.failed_attempts}) for user: {username}")
         return
 
     def _lock_user(self, username: str, lockout_duration: timedelta) -> None:
-        """
-        Locks a user account for a specified duration.
+        """Locks a user account for a specified duration.
 
         This function sets the 'locked_until' attribute of the given user to the current time plus the
         lockout duration. It also logs an informational message about the action taken.
@@ -487,12 +474,11 @@ class UserManager():
     # Admin methods
 
     def unlock_user(self, user: User) -> None:
-        """
-        Unlock a specified user.
+        """Unlock a specified user.
 
         Parameters
         ----------
-        username : plantdb.commons.auth.User
+        user : plantdb.commons.auth.User
             The user to unlock.
         """
         user.locked_until = None
@@ -500,8 +486,7 @@ class UserManager():
         return
 
     def activate(self, user: User) -> None:
-        """
-        Activates a user.
+        """Activates a user.
 
         Parameters
         ----------
@@ -520,8 +505,7 @@ class UserManager():
         return
 
     def deactivate(self, user: User) -> None:
-        """
-        Deactivates a user.
+        """Deactivates a user.
 
         Parameters
         ----------
@@ -577,8 +561,7 @@ class UserManager():
             return False
 
     def update_password(self, username: str, password: str, new_password: str) -> None:
-        """
-        Update the password of an existing user.
+        """Update the password of an existing user.
 
         Parameters
         ----------
@@ -587,7 +570,7 @@ class UserManager():
         password : str
             The current password of the user to verify their identity.
         new_password : str
-            The new password to set for the user. If None, no change will occur.
+            The new password to set for the user. If ``None``, no change will occur.
         """
         # Verify if the login exists
         try:
@@ -611,27 +594,25 @@ class UserManager():
 
 
 class GroupManager:
-    """
-    Manages groups for the RBAC system.
+    """Manages groups for the RBAC system.
 
     This class handles the creation, modification, and persistence of user groups.
     Groups are stored in a JSON file and loaded/saved as needed.
 
     Attributes
     ----------
-    groups_file : str
+    groups_file : Union[str, Path]
         Path to the JSON file where groups are stored.
     groups : Dict[str, plantdb.commons.auth.models.Group]
         Dictionary mapping group names to Group objects.
     """
 
-    def __init__(self, groups_file: str = "groups.json"):
-        """
-        Initialize the GroupManager.
+    def __init__(self, groups_file: Union[str, Path] = "groups.json"):
+        """Initialize the GroupManager.
 
         Parameters
         ----------
-        groups_file : str, optional
+        groups_file : Union[str, Path]
             Path to the JSON file for storing groups. Defaults to "groups.json".
         """
         self.groups_file = Path(groups_file)
@@ -691,8 +672,7 @@ class GroupManager:
 
     def create_group(self, name: str, creator: str, users: Optional[Set[str]] = None,
                      description: Optional[str] = None) -> Group:
-        """
-        Create a new group.
+        """Create a new group.
 
         Parameters
         ----------
@@ -700,9 +680,9 @@ class GroupManager:
             The unique name for the group.
         creator : str
             The username of the user creating the group.
-        users : Optional[Set[str]], optional
+        users : Optional[Set[str]]
             Initial set of users to add to the group. Creator is automatically added.
-        description : Optional[str], optional
+        description : Optional[str]
             Optional description of the group.
 
         Returns
@@ -718,7 +698,7 @@ class GroupManager:
         if name in self.groups:
             raise ValueError(f"Group '{name}' already exists")
 
-        # Initialize users set and ensure creator is included
+        # Initialize users set and ensure the creator is included
         if users is None:
             users = set()
         users.add(creator)
@@ -736,8 +716,7 @@ class GroupManager:
         return group
 
     def get_group(self, name: str) -> Optional[Group]:
-        """
-        Get a group by name.
+        """Get a group by name.
 
         Parameters
         ----------
@@ -747,13 +726,12 @@ class GroupManager:
         Returns
         -------
         Optional[Group]
-            The group object if it exists, None otherwise.
+            The group object if it exists, ``None`` otherwise.
         """
         return self.groups.get(name)
 
     def delete_group(self, name: str) -> bool:
-        """
-        Delete a group.
+        """Delete a group.
 
         Parameters
         ----------
@@ -763,7 +741,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the group was deleted, False if it didn't exist.
+            ``True`` if the group was deleted, ``False`` if it didn't exist.
         """
         if name not in self.groups:
             return False
@@ -773,8 +751,7 @@ class GroupManager:
         return True
 
     def add_user_to_group(self, group_name: str, username: str) -> bool:
-        """
-        Add a user to a group.
+        """Add a user to a group.
 
         Parameters
         ----------
@@ -786,7 +763,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the user was added, False if the group doesn't exist or user was already in group.
+            ``True`` if the user was added, ``False`` if the group doesn't exist or the user was already in the group.
         """
         group = self.get_group(group_name)
         if not group:
@@ -798,8 +775,7 @@ class GroupManager:
         return result
 
     def remove_user_from_group(self, group_name: str, username: str) -> bool:
-        """
-        Remove a user from a group.
+        """Remove a user from a group.
 
         Parameters
         ----------
@@ -811,7 +787,7 @@ class GroupManager:
         Returns
         -------
         bool
-            True if the user was removed, False if the group doesn't exist or user wasn't in group.
+            ``True`` if the user was removed, ``False`` if the group doesn't exist or the user wasn't in the group.
         """
         group = self.get_group(group_name)
         if not group:
@@ -823,8 +799,7 @@ class GroupManager:
         return result
 
     def get_user_groups(self, username: str) -> List[Group]:
-        """
-        Get all groups that a user belongs to.
+        """Get all groups that a user belongs to.
 
         Parameters
         ----------
@@ -843,8 +818,7 @@ class GroupManager:
         return user_groups
 
     def list_groups(self) -> List[Group]:
-        """
-        Get a list of all groups.
+        """Get a list of all groups.
 
         Returns
         -------
@@ -854,8 +828,7 @@ class GroupManager:
         return list(self.groups.values())
 
     def group_exists(self, name: str) -> bool:
-        """
-        Check if a group exists.
+        """Check if a group exists.
 
         Parameters
         ----------
