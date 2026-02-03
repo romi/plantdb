@@ -262,8 +262,8 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
         The path to the created test database.
     """
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
-    session_timeout=int(_get_env_secret("SESSION_TIMEOUT", 3600))
-    max_sessions=int(_get_env_secret("MAX_SESSION", 10))
+    session_timeout=int(os.getenv("SESSION_TIMEOUT", 3600))
+    max_sessions=int(os.getenv("MAX_SESSION", 10))
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
         db_path = test_database(
@@ -510,8 +510,8 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 4 - Database connection
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
-    session_timeout=int(_get_env_secret("SESSION_TIMEOUT", 3600))
-    max_sessions=int(_get_env_secret("MAX_SESSION", 10))
+    session_timeout=int(os.getenv("SESSION_TIMEOUT", 3600))
+    max_sessions=int(os.getenv("MAX_SESSION", 10))
     db = FSDB(
         db_path,
         session_manager=JWTSessionManager(
