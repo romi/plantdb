@@ -21,6 +21,7 @@ Usage Examples
 >>> api_endpoints.scan('plant1', prefix='/api/v1')
 '/api/v1/scans/plant1'
 """
+from urllib import parse
 
 
 def sanitize_name(name) -> str:
@@ -335,7 +336,7 @@ def scan(scan_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def image(scan_id: str, fileset_id: str, file_id: str, size: str, **kwargs) -> str:
+def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64:bool, **kwargs) -> str:
     """Return the URL path to the image endpoint.
 
     Parameters
@@ -348,6 +349,8 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, **kwargs) -> s
         The name of the image.
     size : str or int
         The size parameter of the image request.
+    as_base64 : bool
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Returns
     -------
@@ -357,13 +360,25 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, **kwargs) -> s
     Examples
     --------
     >>> from plantdb.client import api_endpoints
-    >>> api_endpoints.image('real_plant','images','00000_rgb', 'orig')
+    >>> api_endpoints.image('real_plant','images','00000_rgb', 'orig', False)
     '/image/real_plant/images/00000_rgb?size=orig'
+    >>> api_endpoints.image('real_plant','images','00000_rgb', 'thumb', True)
+    '/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if size is not None:
+        query["size"] = str(size)
+    if as_base64 is not None:
+        # Use lower‑case JSON‑style booleans for consistency
+        query["as_base64"] = str(as_base64).lower()
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return f"/image/{scan_id}/{fileset_id}/{file_id}{query_str}"
 
 
 @url_prefix
@@ -392,7 +407,14 @@ def sequence(scan_id: str, type: str, **kwargs) -> str:
     valid_types = ['all', 'angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
     type = 'all' if type not in valid_types else type
     scan_id = sanitize_name(scan_id)
-    return f"/sequence/{scan_id}?type={type}"
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if type is not None:
+        query["type"] = str(type)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return f"/sequence/{scan_id}{query_str}"
 
 
 @url_prefix
