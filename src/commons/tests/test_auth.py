@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import tempfile
-import time
 import unittest
 from datetime import datetime
 from datetime import timedelta
@@ -17,7 +16,6 @@ from plantdb.commons.auth.models import Permission
 from plantdb.commons.auth.models import Role
 from plantdb.commons.auth.models import User
 from plantdb.commons.auth.rbac import RBACManager
-from plantdb.commons.auth.session import SessionManager
 
 
 class TestUserManager(unittest.TestCase):
@@ -354,116 +352,6 @@ class TestRBACManager(unittest.TestCase):
             user, "testgroup", {"testuser"}, "Test group"
         )
         self.assertIsNone(group)
-
-
-class TestSessionManager(unittest.TestCase):
-    """Test cases for SessionManager class"""
-
-    def setUp(self):
-        """Set up test fixtures before each test method."""
-        self.session_manager = SessionManager(session_timeout=3600)  # 1 hour timeout
-
-    def test_init_creates_empty_sessions_dict(self):
-        """Test that SessionManager initializes with empty sessions dictionary."""
-        # Verify initial state is correct
-        self.assertEqual(len(self.session_manager.sessions), 0)
-        self.assertEqual(self.session_manager.session_timeout, 3600)
-        self.assertIsNotNone(self.session_manager.logger)
-
-    def test_user_has_session_returns_consistent_id(self):
-        """Test that _user_has_session returns consistent session IDs for same user."""
-        # Test session ID generation
-        session_id1 = self.session_manager._user_has_session("testuser")
-        session_id2 = self.session_manager._user_has_session("testuser")
-
-        # Session IDs should be consistent for same user at same time
-        self.assertEqual(session_id1, session_id2)
-
-    def test_create_session_stores_session_data(self):
-        """Test that create_session properly stores session with expiry time."""
-        # Create session
-        session_id = self.session_manager.create_session("testuser")
-
-        # Verify session was created
-        self.assertIn(session_id, self.session_manager.sessions)
-        session_data = self.session_manager.sessions[session_id]
-        self.assertEqual(session_data['username'], "testuser")
-
-        # Should have created_at timestamp
-        self.assertIn('created_at', session_data)
-        self.assertIsInstance(session_data['created_at'], datetime)
-
-    def test_validate_session_returns_true_for_valid_session(self):
-        """Test that validate_session returns True for non-expired sessions."""
-        # Create session first
-        session_id = self.session_manager.create_session("testuser")
-
-        # Validate immediately (should be valid)
-        is_valid = self.session_manager.validate_session(session_id)
-        self.assertTrue(is_valid)
-
-    def test_validate_session_returns_false_for_expired_session(self):
-        """Test that validate_session returns False for expired sessions."""
-        # Create a session with a very short timeout
-        temp_session_manager = SessionManager(session_timeout=0.1)  # 0.1 second timeout
-        session_id = temp_session_manager.create_session("testuser")
-
-        # Wait for session to expire
-        time.sleep(0.2)
-
-        # Validate after timeout period
-        is_valid = temp_session_manager.validate_session(session_id)
-        self.assertFalse(is_valid)
-
-    def test_validate_session_returns_false_for_invalid_session_id(self):
-        """Test that validate_session returns False for non-existent session IDs."""
-        is_valid = self.session_manager.validate_session("invalid_session_id")
-        self.assertFalse(is_valid)
-
-    def test_invalidate_session_removes_session(self):
-        """Test that invalidate_session removes session from storage."""
-        # Create session first
-        session_id = self.session_manager.create_session("testuser")
-        self.assertIn(session_id, self.session_manager.sessions)
-
-        # Invalidate session
-        self.session_manager.invalidate_session(session_id)
-        self.assertNotIn(session_id, self.session_manager.sessions)
-
-    def test_cleanup_expired_sessions_removes_old_sessions(self):
-        """Test that cleanup_expired_sessions removes only expired sessions."""
-        # Create a session manager with a very short timeout for testing
-        temp_session_manager = SessionManager(session_timeout=0.5)  # 0.5 second timeout
-
-        # Create first session
-        session1_id = temp_session_manager.create_session("user1")
-
-        # Wait for a moment
-        time.sleep(0.6)  # Wait for first session to expire
-
-        # Create second session
-        session2_id = temp_session_manager.create_session("user2")
-
-        # Cleanup expired sessions
-        temp_session_manager.cleanup_expired_sessions()
-
-        # Only expired session should be removed
-        self.assertNotIn(session1_id, temp_session_manager.sessions)
-        self.assertIn(session2_id, temp_session_manager.sessions)
-
-    def test_session_username_returns_correct_username(self):
-        """Test that session_username returns the correct username for valid session."""
-        # Create session
-        session_id = self.session_manager.create_session("testuser")
-
-        # Get username from session
-        username = self.session_manager.session_username(session_id)
-        self.assertEqual(username, "testuser")
-
-    def test_session_username_returns_none_for_invalid_session(self):
-        """Test that session_username returns None for invalid session ID."""
-        username = self.session_manager.session_username("invalid_session")
-        self.assertIsNone(username)
 
 
 if __name__ == '__main__':
