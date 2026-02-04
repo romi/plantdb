@@ -1139,23 +1139,23 @@ class Logout(Resource):
         try:
             if 'token' in kwargs:
                 # Invalidate session
-                success = self.db.logout(**kwargs)
+                success, username = self.db.logout(**kwargs)
                 if success:
-                    response = {'message': 'Logout successful'}, 200
+                    response = {'message': f'Logout successful from {username}'}, 200
                 else:
-                    response = {'message': 'Logout failed'}, 401
+                    response = {'message': 'Logout failed!'}, 401
             else:
                 self.logger.error(f"Logout error: no active session!")
-                response = {'message': 'Logout failed'}, 401
+                response = {'message': 'Logout failed, no active session!'}, 401
 
             return response
 
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401
+            return {'message': 'Invalid credentials!'}, 401
 
         except Exception as e:
             self.logger.error(f"Logout error: {str(e)}")
-            return {'message': 'Logout failed'}, 500
+            return {'message': 'Logout failed!'}, 500
 
 
 class TokenValidation(Resource):
