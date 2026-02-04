@@ -125,7 +125,7 @@ Test REST API server started at http://127.0.0.1:5000
 ...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
 >>> from plantdb.client.rest_api import request_refresh
->>> request_refresh(**server_cfg)
+>>> success, msg = request_refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
 >>> scans_list = request_scan_names_list(**server_cfg)
 >>> print(scans_list)

@@ -197,7 +197,7 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
         Path(f_path).unlink()
         # Refresh the scan in the target to load its infos:
         try:
-            msg = request_refresh(scan_id, host=target_host, port=target_port)
+            success, msg = request_refresh(scan_id, host=target_host, port=target_port)
         except HTTPError as e:
             logger.error(f"Error refreshing target database for scan '{scan_id}': {e}")
             continue
