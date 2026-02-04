@@ -541,7 +541,7 @@ def scan_preview_image_url(host, scan_id, size="thumb", **kwargs):
     return join_url(url, thumb_uri)
 
 
-def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', **kwargs):
+def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', as_base64=False, **kwargs):
     """Get the URL to the image for a scan dataset and task fileset served by the PlantDB REST API.
 
     Parameters
@@ -555,11 +555,13 @@ def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', **kwargs):
     file_id : str
         The name of the image file to be retrieved.
     size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
+        If an integer, use it as the size of the cached image to create and return.
         Else, should be a string, defaulting to ``'orig'``, and it works as follows:
            * ``'thumb'``: image max width and height to `150`.
            * ``'large'``: image max width and height to `1500`;
            * ``'orig'``: original image, no cache;
+    as_base64 : bool
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Other Parameters
     ----------------
@@ -585,7 +587,7 @@ def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', **kwargs):
     'http://localhost/plantdb/image/real_plant/images/00000_rgb?size=orig'
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.image(scan_id, fileset_id, file_id, size, **kwargs))
+    return join_url(url, api_endpoints.image(scan_id, fileset_id, file_id, size, as_base64, **kwargs))
 
 
 def refresh_url(host, scan_id=None, **kwargs):
