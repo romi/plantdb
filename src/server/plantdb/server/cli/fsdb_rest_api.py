@@ -124,9 +124,8 @@ from plantdb.server.rest_api import TokenRefresh
 from plantdb.server.rest_api import TokenValidation
 
 
-def parsing() -> argparse.ArgumentParser:
-    """
-    Create and configure an argument parser for a REST API server.
+def parsing() -> argparse.ArgumentParser :
+    """Create and configure an argument parser for a REST API server.
 
     Returns
     -------
@@ -162,9 +161,8 @@ def parsing() -> argparse.ArgumentParser:
     return parser
 
 
-def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
-    """
-    Retrieve a secret from the environment or generate a new one if missing.
+def _get_env_secret(var_name: str, logger: logging.Logger) -> str :
+    """Retrieve a secret from the environment or generate a new one if missing.
 
     Parameters
     ----------
@@ -186,9 +184,8 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     return secret
 
 
-def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
-    """
-    Create and configure a Flask application instance.
+def _configure_app(secret_key: str, ssl: bool = False) -> Flask :
+    """Create and configure a Flask application instance.
 
     Parameters
     ----------
