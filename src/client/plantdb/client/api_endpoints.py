@@ -58,9 +58,8 @@ def sanitize_name(name) -> str:
     return sanitized_name
 
 
-def url_prefix(endpoint_path):
-    """
-    Wrap an endpoint path generator with an optional URL prefix.
+def url_prefix(endpoint_path) :
+    """Wrap an endpoint path generator with an optional URL prefix.
 
     Examples
     --------

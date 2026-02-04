@@ -231,9 +231,8 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
-def _get_archive(archive, force=False):
-    """
-    Download and verify an archive file from a given URL.
+def _get_archive(archive, force=False) :
+    """Download and verify an archive file from a given URL.
 
     This function retrieves an archive file from a specified URL.
     If the file already exists locally and `force` is not set to ``True``, it skips downloading again,

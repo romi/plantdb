@@ -75,9 +75,8 @@ class LockTimeoutError(Exception):
         return self.message
 
 
-class ScanLockManager:
-    """
-    Acquires and releases file-based locks for thread-safe resource management.
+class ScanLockManager :
+    """Acquires and releases file-based locks for thread-safe resource management.
 
     This class provides functionality for acquiring and releasing file-based locks,
     ensuring thread-safe operations across multiple threads or processes. Locks are

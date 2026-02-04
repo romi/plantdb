@@ -90,9 +90,8 @@ def requires_permission(required_permissions: Union[Permission, List[Permission]
     return decorator
 
 
-class RBACManager:
-    """
-    Manage Role-Based Access Control (RBAC) for users and permissions.
+class RBACManager :
+    """Manage Role-Based Access Control (RBAC) for users and permissions.
 
     This class provides methods to determine which permissions a user has,
     check if a user has a specific permission, and verify if a user can access

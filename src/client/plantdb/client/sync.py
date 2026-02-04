@@ -994,9 +994,8 @@ def config_from_url(url):
     return config
 
 
-def _parse_database_spec(spec):
-    """
-    Parse and validate a database specification, determining the appropriate synchronization strategy.
+def _parse_database_spec(spec) :
+    """Parse and validate a database specification, determining the appropriate synchronization strategy.
 
     This function analyzes database specifications and returns a structured representation
     suitable for synchronization operations. It supports multiple database types including
