@@ -53,6 +53,9 @@ import json
 import os
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import splitport
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
 import requests
 from PIL import Image
@@ -61,6 +64,7 @@ from plyfile import PlyData
 
 from plantdb.client import api_endpoints
 from plantdb.client.api_endpoints import sanitize_name
+from plantdb.commons.log import get_logger
 
 #: Default hostname to PlantDB REST API is 'localhost':
 PLANTDB_HOST = os.getenv('PLANTDB_HOST', "localhost")
@@ -77,31 +81,100 @@ else:
 #: Default URL prefix for the plantdb REST API
 PLANTDB_PREFIX = os.getenv('PLANTDB_PREFIX', None)
 
+logger = get_logger(__name__)
+
 
 # -----------------------------------------------------------------------------
 # URL construction methods
 # -----------------------------------------------------------------------------
 def origin_url(host, port=None, ssl=False, **kwargs) -> str:
-    # Attempt to split the host to check for an existing scheme (http/https)
-    try:
-        scheme, host = host.split('://')
-    except ValueError:
-        pass  # If no scheme is found, proceed with the default
-    else:
-        # If 's' is in the scheme, it indicates HTTPS
-        if 's' in scheme:
-            ssl = True
+    """Construct a URL string from host, optional port, and SSL flag.
 
-    # Ensure port is converted to string and has no leading colon
-    if port:
-        if isinstance(port, int):
-            port = str(port)
-        port = ':' + port.lstrip(':')
-    else:
-        port = ''
+    Parameters
+    ----------
+    host : str
+        Hostname or URL. May optionally include a scheme (e.g., ``http://`` or
+        ``https://``). If a scheme is present and contains the character ``s``,
+        the function treats it as HTTPS and forces ``ssl`` to ``True``.
+    port : int or str, optional
+        Port number to append to the host. If an ``int`` is supplied, it is
+        converted to a string; a leading colon is stripped before it is added.
+        The default is ``None`` which results in no port being added.
+    ssl : bool, optional
+        When ``True`` the URL will use the ``https`` scheme. The value is
+        overridden to ``True`` if the supplied ``host`` already contains a scheme
+        with an ``s`` character.
 
-    # Construct the final URL
-    return f"http{'s' if ssl else ''}://{host}{port}"
+    Returns
+    -------
+    url
+        The fully‑qualified URL string constructed from the supplied parts.
+
+    Raises
+    ------
+    TypeError
+        If ``host`` is not a string or does not support ``split`` (e.g., ``None``).
+
+    Notes
+    -----
+    The function does **not** validate that the resulting URL points to a
+    reachable endpoint; it only assembles the string. Supplying both a scheme
+    in ``host`` and ``ssl=True`` will result in the scheme dictated by the
+    original ``host`` (HTTPS if the original scheme contains ``s``).
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import origin_url
+    >>> origin_url('example.com')
+    'http://example.com'
+    >>> origin_url('example.com', 8080)
+    'http://example.com:8080'
+    >>> origin_url('https://example.com')
+    'https://example.com'
+    >>> origin_url('https://example.com/api/v1')
+    'https://example.com'
+    >>> origin_url('http://example.com', ssl=True)
+    'https://example.com'
+    >>> origin_url('example.com', port='443', ssl=True)
+    'https://example.com:443'
+    """
+    if not isinstance(host, str):
+        raise TypeError("host must be a string")
+
+    # Parse the incoming host value
+    parsed = urlparse(host)
+
+    # If no scheme was supplied, ``urlparse`` treats the whole string as a
+    # path.  In that case we split the first “/” to obtain the netloc.
+    if not parsed.scheme:
+        # e.g. "example.com/api/v1" -> netloc="example.com", path="/api/v1"
+        first_slash = parsed.path.find("/")
+        if first_slash == -1:
+            netloc, path = parsed.path, ""
+        else:
+            netloc = parsed.path[:first_slash]
+            path = parsed.path[first_slash:]
+        scheme = ""
+    else:
+        scheme = parsed.scheme
+        netloc = parsed.netloc
+        path = parsed.path
+
+    # If the original string already contains a scheme that contains an “s” (i.e. https) it forces ``ssl=True``.
+    if scheme and "s" in scheme.lower():
+        ssl = True
+    final_scheme = "https" if ssl else "http"
+
+    # Apply an explicit ``port`` argument (overwrites any existing one)
+    if port is not None:
+        # ``splitport`` safely separates host from any existing port.
+        hostname, _ = splitport(netloc)
+        # Ensure ``port`` is a clean string without a leading colon.
+        clean_port = str(port).lstrip(":")
+        netloc = f"{hostname}:{clean_port}"
+
+    # Re‑assemble the URL, excluding the original path (if any)
+    return urlunparse((final_scheme, netloc, "", "", "", ""))
 
 
 def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> str:
@@ -299,6 +372,40 @@ def token_validation_url(host, **kwargs):
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.token_validation())
+
+
+def token_refresh_url(host, **kwargs):
+    """Generate the full URL for the PlantDB API token refresh endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The fully qualified register URL as a string.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import token_refresh_url
+    >>> # Basic usage with default configuration
+    >>> url = token_refresh_url('localhost')
+    >>> print(url)
+    http://localhost/token-refresh
+    """
+    url = origin_url(host, **kwargs)
+    return join_url(url, api_endpoints.token_refresh())
 
 
 def scans_url(host, **kwargs):
@@ -748,6 +855,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
         Flag indicating whether to stream the request. Default is False.
     session_token : str
         The PlantDB REST API session token of the user.
+        It should be supplied for every request that requires authentication on the server-side.
 
     Returns
     -------
@@ -767,6 +875,14 @@ def make_api_request(url, method="GET", params=None, json_data=None,
     -----
     This function is designed to handle various HTTP methods (GET, POST, PUT, DELETE) and provides a unified interface for making API requests. It supports SSL verification and allows for custom parameters and JSON data to be sent with the request.
     It passes keyword arguments to the underlying `requests` library.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import make_api_request
+    >>> from plantdb.client.rest_api import login_url
+    >>> response = make_api_request(login_url('localhost', port=5000), "POST", json_data={'username': 'admin', 'password': 'admin'})
+    >>> access_token, refresh_token = response.json()['access_token'], response.json()['refresh_token']
+    >>> user = response.json()['user']
     """
     requests_kwargs = {}
     requests_kwargs['params'] = params
@@ -779,12 +895,12 @@ def make_api_request(url, method="GET", params=None, json_data=None,
     # otherwise default to requests' built‑in verification
     requests_kwargs['verify'] = os.getenv('CERT_PATH', True)
 
-    # If a session token is supplied, add it to the Authorization header
     requests_kwargs['headers'] = kwargs.get('headers', {})
+    # If a session token is supplied, add it to the Authorization header
     if 'session_token' in kwargs:
         requests_kwargs['headers'].update({'Authorization': f"Bearer {kwargs.get('session_token')}"})
 
-    # Normalise the HTTP method name to uppercase for comparison
+    # Normalize the HTTP method name to uppercase for comparison
     method = method.upper()
 
     try:
@@ -807,11 +923,11 @@ def make_api_request(url, method="GET", params=None, json_data=None,
         response.raise_for_status()  # Raise exception for 4XX/5XX responses
         return response
     except requests.exceptions.SSLError as e:
-        print(f"SSL Error: {e}")
-        raise
+        logger.error(f"SSL Error: {e}")
+        raise e from e
     except requests.exceptions.RequestException as e:
-        print(f"Request Error: {e}")
-        raise
+        logger.error(f"Request Error: {e}")
+        raise e from e
 
 
 def request_login(host, username, password, **kwargs):
@@ -1003,6 +1119,47 @@ def request_token_validation(host, **kwargs):
     """
     url = token_validation_url(host, **kwargs)
     return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+
+
+def request_token_refresh(host, **kwargs):
+    """Refresh a token by making a POST request to the token refresh endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or base URL used to construct the refresh endpoint.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
+
+    Returns
+    -------
+    requests.Response
+        The response from the API.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import request_login
+    >>> from plantdb.client.rest_api import request_token_refresh
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
+    >>> response = request_token_refresh('localhost', port=5000, refresh_token=login_data['refresh_token'])
+    >>> print(response.ok)
+    True
+    >>> print([key for key in response.json() if 'token' in key])
+    ['access_token', 'refresh_token']
+    """
+    url = token_refresh_url(host, **kwargs)
+    return make_api_request(url, method="POST", json_data={'refresh_token': kwargs.get('refresh_token', None)})
 
 
 def request_new_user(host, username, password, fullname, **kwargs):
