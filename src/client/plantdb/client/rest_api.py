@@ -53,6 +53,7 @@ import json
 import os
 from io import BytesIO
 from pathlib import Path
+from typing import Union
 from urllib.parse import splitport
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
@@ -771,7 +772,7 @@ def scan_reconstruction_url(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
     return scan_file_url(host, scan_id, cfg_fname, **kwargs)
 
 
-def list_task_images_uri(host, scan_id, task_name='images', size='orig', **kwargs):
+def list_task_images_uri(host, scan_id, task_name='images', size='orig', as_base64=True, **kwargs):
     """Get the list of images URI for a given dataset and task name.
 
     Parameters
@@ -788,6 +789,8 @@ def list_task_images_uri(host, scan_id, task_name='images', size='orig', **kwarg
            * `'thumb'`: image max width and height to `150`.
            * `'large'`: image max width and height to `1500`;
            * `'orig'`: original image, no cache;
+    as_base64 : bool
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Other Parameters
     ----------------
@@ -814,12 +817,11 @@ def list_task_images_uri(host, scan_id, task_name='images', size='orig', **kwarg
     http://localhost/image/real_plant/images/00002_rgb?size=100
     """
     scan_info = request_scan_data(host, scan_id, **kwargs)
-    tasks_fileset = scan_info["tasks_fileset"]
+    tasks_id = scan_info["tasks_fileset"][task_name]
     images = scan_info["images"]
     url = origin_url(host, **kwargs)
-    return [join_url(url, api_endpoints.image(scan_id, tasks_fileset[task_name], Path(img).stem, size, **kwargs)) for
-            img in
-            images]
+    return [join_url(url, api_endpoints.image(scan_id, tasks_id, Path(img).stem, size, as_base64, **kwargs))
+        for img in images]
 
 
 # -----------------------------------------------------------------------------
@@ -932,7 +934,7 @@ def make_api_request(url, method="GET", params=None, json_data=None,
         raise e from e
 
 
-def request_login(host, username, password, **kwargs):
+def request_login(host, username, password, **kwargs) -> dict:
     """Send a login request to the authentication service.
 
     This helper function constructs a POST request to the login endpoint
@@ -960,8 +962,8 @@ def request_login(host, username, password, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    dict
+        The login data from the response if successful.
 
     Notes
     -----
@@ -975,18 +977,19 @@ def request_login(host, username, password, **kwargs):
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
-    >>> print(login_data)
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> print(list(login_data))
+    ['access_token', 'message', 'refresh_token', 'user']
     """
     url = login_url(host, **kwargs)
     data = {
         'username': username,
         'password': password
     }
-    return make_api_request(url, method="POST", json_data=data)
+    return make_api_request(url, method="POST", json_data=data).json()
 
 
-def request_check_username(host, username, **kwargs):
+def request_check_username(host, username, **kwargs) -> bool:
     """Send a username availability request to the authentication service.
 
     This helper function constructs a GET request to the login endpoint
@@ -1011,8 +1014,8 @@ def request_check_username(host, username, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    bool
+        A boolean flag indicating whether the username is valid (``True``) or not (``False``).
 
     Notes
     -----
@@ -1027,14 +1030,14 @@ def request_check_username(host, username, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_check_username
     >>> username_exists = request_check_username('localhost', 'admin', port=5000)
-    >>> print(username_exists.json()['exists'])
+    >>> print(username_exists)
     True
     """
     url = login_url(host, **kwargs)
-    return make_api_request(url, method="GET", params={'username': username})
+    return make_api_request(url, method="GET", params={'username': username}).json()['exists']
 
 
-def request_logout(host, **kwargs):
+def request_logout(host, **kwargs) -> tuple[bool, str]:
     """Send a logout request to the authentication service.
 
     This helper function constructs a POST request to the logout endpoint
@@ -1059,8 +1062,9 @@ def request_logout(host, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    tuple[bool, str]
+        A boolean flag indicating whether the logout request was successful (``True``) or not (``False``).
+        A string with the log out message.
 
     Notes
     -----
@@ -1073,16 +1077,17 @@ def request_logout(host, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_logout
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
     >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
-    >>> print(logout.ok)
+    >>> print(logout)
     True
     """
     url = logout_url(host, **kwargs)
-    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+    response = make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+    return response.ok, response.json()['message']
 
 
-def request_token_validation(host, **kwargs):
+def request_token_validation(host, **kwargs) -> dict:
     """Validate a token by making a POST request to the token validation endpoint.
 
     Parameters
@@ -1103,8 +1108,8 @@ def request_token_validation(host, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    dict
+        The token validation data from the response, if successful.
 
     Examples
     --------
@@ -1112,18 +1117,16 @@ def request_token_validation(host, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_token_validation
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
-    >>> response = request_token_validation('localhost', port=5000, session_token=login_data['access_token'])
-    >>> print(response.ok)
-    True
-    >>> print(response.json()['user'])
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> token_data = request_token_validation('localhost', port=5000, session_token=login_data['access_token'])
+    >>> print(token_data['user'])
     {'username': 'admin', 'fullname': 'PlantDB Admin'}
     """
     url = token_validation_url(host, **kwargs)
-    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None))
+    return make_api_request(url, method="POST", session_token=kwargs.get('session_token', None)).json()
 
 
-def request_token_refresh(host, **kwargs):
+def request_token_refresh(host, **kwargs) -> dict:
     """Refresh a token by making a POST request to the token refresh endpoint.
 
     Parameters
@@ -1144,8 +1147,8 @@ def request_token_refresh(host, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    dict
+        The token refresh data from the response, if successful.
 
     Examples
     --------
@@ -1153,18 +1156,16 @@ def request_token_refresh(host, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_token_refresh
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
-    >>> response = request_token_refresh('localhost', port=5000, refresh_token=login_data['refresh_token'])
-    >>> print(response.ok)
-    True
-    >>> print([key for key in response.json() if 'token' in key])
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> token_refresh = request_token_refresh('localhost', port=5000, refresh_token=login_data['refresh_token'])
+    >>> print([key for key in token_refresh.json() if 'token' in key])
     ['access_token', 'refresh_token']
     """
     url = token_refresh_url(host, **kwargs)
-    return make_api_request(url, method="POST", json_data={'refresh_token': kwargs.get('refresh_token', None)})
+    return make_api_request(url, method="POST", json_data={'refresh_token': kwargs.get('refresh_token', None)}).json()
 
 
-def request_new_user(host, username, password, fullname, **kwargs):
+def request_new_user(host, username, password, fullname, **kwargs) -> bool:
     """Send a registration request to the authentication service.
 
     This helper function constructs a POST request to the register endpoint
@@ -1196,8 +1197,8 @@ def request_new_user(host, username, password, fullname, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API.
+    bool
+        A boolean indicating whether the request was successful (``True``) or not (``False``).
 
     Notes
     -----
@@ -1211,18 +1212,21 @@ def request_new_user(host, username, password, fullname, **kwargs):
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_logout
     >>> from plantdb.client.rest_api import request_new_user
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
     >>> user_added = request_new_user('localhost', 'testuser', 'fake_password', 'Test User', port=5000, session_token=login_data['access_token'])
-    >>> print(user_added.ok)
+    >>> print(user_added)
     True
     >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
+    >>> login_data = request_login('localhost', 'testuser', 'fake_password', port=5000)
+    >>> print(login_data['user']['username'])
+    testuser
     """
     url = register_url(host, **kwargs)
     data = {'username': username, 'fullname': fullname, 'password': password}
-    return make_api_request(url, method="POST", json_data=data, session_token=kwargs.get('session_token', None))
+    return make_api_request(url, method="POST", json_data=data, session_token=kwargs.get('session_token', None)).ok
 
 
-def request_scan_names_list(host, **kwargs):
+def request_scan_names_list(host, **kwargs) -> list[str]:
     """Get the list of the scan datasets names served by the PlantDB REST API.
 
     Parameters
@@ -1243,22 +1247,22 @@ def request_scan_names_list(host, **kwargs):
 
     Returns
     -------
-    requests.Response
-        The response from the API. The list of scan dataset names should be in the JSON dictionary.
+    list[str]
+        The list of the scan datasets names from the response, if successful.
 
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scan_names_list
-    >>> print(request_scan_names_list('localhost', port=5000).json())
+    >>> print(request_scan_names_list('localhost', port=5000)
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
     url = scans_url(host, **kwargs)
-    return make_api_request(url=url, method="GET", session_token=kwargs.get('session_token', None))
+    return make_api_request(url=url, method="GET", session_token=kwargs.get('session_token', None)).json()
 
 
-def request_scans_info(host, **kwargs):
+def request_scans_info(host, **kwargs) -> list[dict]:
     """Retrieve the information dictionary for all scans from the PlantDB REST API.
 
     Other Parameters
@@ -1274,8 +1278,8 @@ def request_scans_info(host, **kwargs):
 
     Returns
     -------
-    list
-        The list of scan information dictionaries.
+    list[dict]
+        The list of scan information dictionaries obtained from the response, if successful.
 
     Examples
     --------
@@ -1283,15 +1287,17 @@ def request_scans_info(host, **kwargs):
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scans_info
     >>> from plantdb.client.rest_api import request_login
-    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000).json()
-    >>> scans_info = request_scans_info('localhost', port=5000, session_token=login_data['access_token']).json()
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> scans_info = request_scans_info('localhost', port=5000, session_token=login_data['access_token'])
+    >>> print(sorted([scan['id'] for scan in scans_info]))
+    ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     """
-    scan_list = request_scan_names_list(host, **kwargs).json()
+    scan_list = request_scan_names_list(host, **kwargs)
     return [make_api_request(url=scan_url(host, scan, **kwargs), session_token=kwargs.get('session_token', None)).json()
             for scan in scan_list]
 
 
-def request_scan_data(host, scan_id, **kwargs):
+def request_scan_data(host, scan_id, **kwargs) -> dict:
     """Retrieve the data dictionary for a given scan dataset from the PlantDB REST API.
 
     Parameters
@@ -1315,14 +1321,16 @@ def request_scan_data(host, scan_id, **kwargs):
     Returns
     -------
     dict
-        The data dictionary for the given scan dataset.
+        The data dictionary for the given scan dataset obtained from the response, if successful.
 
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scan_data
-    >>> scan_data = request_scan_data('localhost', 'real_plant', port=5000)
+    >>> from plantdb.client.rest_api import request_login
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> scan_data = request_scan_data('localhost', 'real_plant', port=5000, session_token=login_data['access_token'])
     >>> print(scan_data['id'])
     real_plant
     >>> print(scan_data['hasColmap'])
@@ -1341,7 +1349,8 @@ def request_scan_data(host, scan_id, **kwargs):
         return {}
 
 
-def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', **kwargs):
+def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', as_base64=False, **kwargs) -> Union[
+    bytes, dict]:
     """Get the image for a scan dataset and task fileset served by the PlantDB REST API.
 
     Parameters
@@ -1360,6 +1369,8 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', **kwargs
            * ``'thumb'``: image max width and height to `150`.
            * ``'large'``: image max width and height to `1500`;
            * ``'orig'``: original image, no cache;
+    as_base64 : bool
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Other Parameters
     ----------------
@@ -1374,28 +1385,35 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', **kwargs
 
     Returns
     -------
-    requests.Response
-        The URL to an image of a scan dataset and task fileset.
+    Union[bytes, dict]
+        If ``as_base64==True``, a dictionary with the 'image' encoded as base64 and the mimetype in 'content-type'.
+        Else the image data as bytes.
 
     Examples
     --------
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scan_image
-    >>> response = request_scan_image('real_plant', 'images', '00000_rgb', port=5000)  # download the image
-    >>> print(response.status_code)
-    200
+    >>> db_img = ['real_plant', 'images', '00000_rgb']
+    >>> img_bytes = request_scan_image('localhost', *db_img, port=5000)  # download the image
     >>> # Display the image
     >>> from PIL import Image
     >>> from io import BytesIO
-    >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
+    >>> image = Image.open(BytesIO(img_bytes))  # Open the image from the bytes data
     >>> image.show()  # Display the image
+    >>> # Get a thumbnail encoded in base64
+    >>> response = request_scan_image('localhost', *db_img, port=5000, size='thumb', as_base64=True)
+
     """
-    url = scan_image_url(host, scan_id, fileset_id, file_id, size, **kwargs)
-    return make_api_request(url=url, session_token=kwargs.get('session_token', None))
+    url = scan_image_url(host, scan_id, fileset_id, file_id, size, as_base64, **kwargs)
+    response = make_api_request(url=url, session_token=kwargs.get('session_token', None))
+    if as_base64:
+        return response.json()
+    else:
+        return response.content
 
 
-def request_scan_tasks_fileset(host, scan_id, **kwargs):
+def request_scan_tasks_fileset(host, scan_id, **kwargs) -> dict:
     """Get the task name to fileset name mapping dictionary from the REST API.
 
     Parameters
@@ -1443,7 +1461,7 @@ def request_scan_tasks_fileset(host, scan_id, **kwargs):
     return request_scan_data(host, scan_id, **kwargs).get('tasks_fileset', dict())
 
 
-def request_refresh(host, scan_id=None, **kwargs):
+def request_refresh(host, scan_id=None, **kwargs) -> tuple[bool, str]:
     """Refreshes the database, potentialy only for a specified dataset.
 
     Parameters
@@ -1470,8 +1488,8 @@ def request_refresh(host, scan_id=None, **kwargs):
 
     Returns
     -------
-    response : requests.Response
-        The response object from the refresh request.
+    tuple[bool, str]
+        A boolean indicating whether the refresh request succeeded.
 
     Raises
     ------
@@ -1483,12 +1501,13 @@ def request_refresh(host, scan_id=None, **kwargs):
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_refresh
-    >>> res = request_refresh('localhost', "arabidopsis000", port = 5000)
-    >>> print(res.json()["message"])
+    >>> success, message = request_refresh('localhost', "arabidopsis000", port = 5000)
+    >>> print(message)
     Successfully reloaded scan 'arabidopsis000'
     """
     url = refresh_url(host, scan_id, **kwargs)
-    return make_api_request(url, session_token=kwargs.get('session_token', None))
+    response = make_api_request(url, session_token=kwargs.get('session_token', None))
+    return response.ok, response.json()["message"]
 
 
 def request_archive_download(host, scan_id, out_dir=None, **kwargs):
@@ -1791,7 +1810,7 @@ def parse_scans_info(host, **kwargs):
     return scan_dict
 
 
-def parse_task_images(host, scan_id, task_name='images', size='orig', **kwargs):
+def parse_task_images(host, scan_id, task_name='images', size='orig', as_base64=False, **kwargs):
     """Get the list of images data for a given dataset and task name.
 
     Parameters
@@ -1808,6 +1827,8 @@ def parse_task_images(host, scan_id, task_name='images', size='orig', **kwargs):
            * `'thumb'`: image max width and height to `150`.
            * `'large'`: image max width and height to `1500`;
            * `'orig'`: original image, no chache;
+    as_base64 : bool
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Other Parameters
     ----------------
@@ -1836,7 +1857,7 @@ def parse_task_images(host, scan_id, task_name='images', size='orig', **kwargs):
     (1440, 1080)
     """
     images = []
-    for img_uri in list_task_images_uri(host, scan_id, task_name, size, **kwargs):
+    for img_uri in list_task_images_uri(host, scan_id, task_name, size, as_base64, **kwargs):
         images.append(
             Image.open(BytesIO(make_api_request(url=img_uri, session_token=kwargs.get('session_token', None)).content)))
     return images
