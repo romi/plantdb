@@ -31,6 +31,8 @@ Usage Examples
 import secrets
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
+from threading import RLock
 from typing import Any
 from typing import Dict
 from typing import Optional
@@ -42,6 +44,37 @@ from argon2 import Type
 from argon2.low_level import hash_secret_raw
 
 from plantdb.commons.log import get_logger
+
+
+# ----------------------------------------------------------------------
+# Custom exception hierarchy for session validation
+# ----------------------------------------------------------------------
+class SessionValidationError(Exception):
+    """Base class for all session‑validation‑related errors."""
+    pass
+
+
+class AccessTokenNotFoundError(SessionValidationError):
+    """Raised when an access token isn’t present in the active‑session store."""
+    pass
+
+
+class RefreshTokenNotFoundError(SessionValidationError):
+    """Raised when a refresh token isn’t present in the active‑refresh‑store."""
+    pass
+
+
+class InvalidTokenProcessingError(SessionValidationError):
+    """Raised for unexpected errors while processing a token (e.g. decoding issues)."""
+    pass
+
+
+class RefreshTokenReuseError(SessionValidationError):
+    pass
+
+
+class WrongTokenType(SessionValidationError):
+    pass
 
 
 class SessionManager:
@@ -69,7 +102,7 @@ class SessionManager:
         The logger to use for this session manager.
     """
 
-    def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10):  # 1 hour default
+    def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10):
         """Manage user sessions with timeout.
 
         Parameters
@@ -162,7 +195,7 @@ class SessionManager:
                 f"Reached max concurrent sessions limit ({self.max_concurrent_sessions})")
             return None
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         exp_time = now + timedelta(seconds=self.session_timeout)
         # Create a session token
         session_token = secrets.token_urlsafe(32)
@@ -175,7 +208,7 @@ class SessionManager:
         }
         return session_token
 
-    def validate_session(self, session_id: str) -> Optional[dict]:
+    def validate_session(self, session_id: str) -> Union[dict, None]:
         """Validate a given session by checking its existence and expiration status.
 
         Parameters
@@ -185,7 +218,7 @@ class SessionManager:
 
         Returns
         -------
-        dict or None
+        Union[dict, None]
             A dictionary with user information if valid, ``None`` if invalid/expired.
             Returns dictionary with:
             - username: The authenticated user
@@ -202,7 +235,7 @@ class SessionManager:
             return None
 
         session = self.sessions[session_id]
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         if now > session['expires_at']:
             username = session['username']
             self.logger.warning(f"The session for user '{username}' has expired. Please log back in!")
@@ -224,8 +257,8 @@ class SessionManager:
         Returns
         -------
         bool
-            `True` if the specified session was found and removed, `False` otherwise.
-        str
+            ``True`` if the specified session was found and removed, ``False`` otherwise.
+        Union[str, None]
             The username corresponding to the invalidated session
 
         Notes
@@ -250,7 +283,7 @@ class SessionManager:
         -----
         This function modifies the `self.sessions` dictionary in-place.
         """
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
         expired_sessions = [
             sid for sid, session in self.sessions.items()
             if current_time > session['expires_at']
@@ -314,7 +347,7 @@ class SessionManager:
         Returns
         -------
         str or None
-            New session token if refresh successful
+            New session token if refresh is successful
         """
         session_data = self.validate_session(session_id)
         if not session_data:
@@ -323,7 +356,7 @@ class SessionManager:
         # Invalidate old session
         self.invalidate_session(session_id)
 
-        # Create new session
+        # Create a new session
         username = session_data['username']
         return self.create_session(username)
 
@@ -393,12 +426,16 @@ class SingleSessionManager(SessionManager):
 
 
 class JWTSessionManager(SessionManager):
-    """Manages user sessions with expiration and validation.
+    """Manage JWT-based user sessions with configurable timeouts and concurrency limits.
 
-    This class provides methods to create, validate, invalidate,
-    and cleanup expired sessions. Each session is associated with a
-    unique identifier (session_id) and has an expiry time based on the
-    session timeout duration specified during initialization.
+    This session manager extends `SessionManager` by issuing JSON Web Tokens (JWT) for authentication.
+    An *access* token is short‑lived and is used for authorizing API calls, while a *refresh* token
+    is long‑lived and can be exchanged for a new access token when the original expires.
+    The manager keeps track of active access tokens to enforce a maximum number of concurrent
+    sessions per application instance. Tokens are signed with a secret key that is either supplied by
+    the caller or generated automatically. All tokens conform to RFC7519 and contain the standard
+    registered claims (`iss`, `sub`, `aud`, `exp`, `iat`, `jti`) plus a custom ``type`` claim that
+    identifies the token as ``'access'`` or ``'refresh'``.
 
     Attributes
     ----------
@@ -411,23 +448,37 @@ class JWTSessionManager(SessionManager):
         - 'expires_at': datetime - Expiry time of the session.
     session_timeout : int
         Duration in seconds after which a session expires.
+        The default value (``900``) corresponds to 15 minutes.
     max_concurrent_sessions : int
         The maximum number of concurrent sessions to allow.
-    secret_key : str
-        The session manager secret key to use for authentication.
     logger : logging.Logger
         The logger to use for this session manager.
+    refresh_timeout : int
+        Lifetime of a refresh token in seconds.
+        The default value (``86400``) corresponds to 24 hours.
+    secret_key : str
+        Secret used for HS512 signing of JWTs.
+        If ``None`` is passed to the constructor, a cryptographically‑secure random key is generated.
+    refresh_tokens : dict
+        Mapping from refresh token identifier (``jti``) to a dictionary containing ``username``,
+        creation and expiration timestamps, token type and the associated access token identifier.
+        Used to validate and rotate refresh tokens.
+    _lock : threading.Lock
+        A locking mechanism to lock `self.session` dict for thread‑safe changes
     """
 
-    def __init__(self, session_timeout: int = 3600, max_concurrent_sessions: int = 10, secret_key: str = None):
+    def __init__(self, session_timeout: int = 900, refresh_timeout: int = 86400, max_concurrent_sessions: int = 10,
+                 secret_key: str = None, leeway: int = 2):
         """Manage user sessions with timeout.
 
         Parameters
         ----------
         session_timeout : int, optional
-            The duration for which the session should be valid in seconds.
-            A session that exceeds this duration will be considered expired and removed.
-            Defaults to ``3600`` seconds.
+            The duration for which the access token should be valid in seconds.
+            Defaults to ``900`` seconds (15 minutes).
+        refresh_timeout : int, optional
+            The duration for which the refresh token should be valid in seconds.
+            Defaults to ``86400`` seconds (24 hours).
         max_concurrent_sessions : int, optional
             The maximum number of concurrent sessions to allow.
             Defaults to ``10``.
@@ -443,7 +494,10 @@ class JWTSessionManager(SessionManager):
             Defaults to ``2``.
         """
         super().__init__(session_timeout, max_concurrent_sessions)
-        self.secret_key = secret_key or secrets.token_urlsafe(32)
+        self.refresh_timeout = refresh_timeout
+        self.leeway = leeway
+        self.refresh_tokens = {}  # Track valid refresh tokens (jti -> session_info)
+        self._lock = RLock()  # to lock `self.session` dict for thread‑safe changes
         self.secret_key = self._init_secret_key(secret_key)
 
     @staticmethod
@@ -476,7 +530,6 @@ class JWTSessionManager(SessionManager):
             type=Type.ID,
         )
 
-    def _create_token(self, username, jti, exp_time, now):
     def _init_secret_key(self, secret_key: str = None) -> bytes:
         if secret_key is None:
             # No key supplied → generate a fresh random 64‑byte key
@@ -491,6 +544,7 @@ class JWTSessionManager(SessionManager):
             secret_key = self._derive_key_argon2(secret_key)
         return secret_key
 
+    def _create_token(self, username, jti, exp_time, now, token_type='access'):
         """Create a JSON Web Token (JWT) with registered claims.
 
         Generates and encodes a JWT using the provided username, unique identifier
@@ -503,10 +557,13 @@ class JWTSessionManager(SessionManager):
             The subject of the JWT (user identifier).
         jti : str
             Unique identifier for the JWT.
-        exp_time : datetime.datetime
+        exp_time : datetime
             Expiration time of the JWT.
-        now : datetime.datetime
+        now : datetime
             Current time when the JWT is issued.
+        token_type : str, optional
+            The type of token to create ('access' or 'refresh').
+            Defaults to 'access'.
 
         Returns
         -------
@@ -525,7 +582,8 @@ class JWTSessionManager(SessionManager):
             'aud': 'plantdb-client',  # audience
             'exp': int(exp_time.timestamp()),  # expiration time (Unix timestamp)
             'iat': int(now.timestamp()),  # issued at (Unix timestamp)
-            'jti': jti  # JWT ID (unique identifier)
+            'jti': jti,  # JWT ID (unique identifier)
+            'type': token_type  # Custom claim for token type
         }
         token_bytes = jwt.encode(
             payload,
@@ -535,7 +593,7 @@ class JWTSessionManager(SessionManager):
         )
         return token_bytes if isinstance(token_bytes, str) else token_bytes.decode('utf-8')
 
-    def create_session(self, username: str) -> Union[str, None]:
+    def create_session(self, username: str) -> Union[Tuple[str, str], None]:
         """Create a new session for a user.
 
         If the user already has an active session, it returns the existing session ID.
@@ -548,12 +606,12 @@ class JWTSessionManager(SessionManager):
 
         Returns
         -------
-        session_id : Union[str, None]
-            The ID of the created or existing session.
+        Tuple[str, str] or None
+            A tuple containing (access_token, refresh_token) if successful, ``None`` otherwise.
 
         Notes
         -----
-        Creates a JSON Web Token following RFC 7519 standards with registered claims:
+        Creates JSON Web Tokens following RFC 7519 standards with registered claims:
         - iss (issuer): Identifies the token issuer
         - sub (subject): The username of the authenticated user
         - aud (audience): Intended audience for the token
@@ -563,30 +621,47 @@ class JWTSessionManager(SessionManager):
         """
         if self.n_active_sessions() >= self.max_concurrent_sessions:
             self.logger.warning(
-                f"Too any users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
+                f"Too many users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
             return None
 
-        # Create a JWT payload with registered claims
-        now = datetime.now()
-        exp_time = now + timedelta(seconds=self.session_timeout)
-        jti = secrets.token_urlsafe(16)  # unique token ID for tracking
+        # Create an access token
+        now = datetime.now(timezone.utc)
+        access_exp = now + timedelta(seconds=self.session_timeout)
+        access_jti = secrets.token_urlsafe(16)
+
+        # Create a refresh token
+        refresh_exp = now + timedelta(seconds=self.refresh_timeout)
+        refresh_jti = secrets.token_urlsafe(16)
 
         try:
-            # Generate JSON Web Token
-            jwt_token = self._create_token(username, jti, exp_time, now)
+            # Generate JSON Web Tokens
+            access_token = self._create_token(username, access_jti, access_exp, now, token_type='access')
+            refresh_token = self._create_token(username, refresh_jti, refresh_exp, now, token_type='refresh')
         except Exception as e:
-            self.logger.error(f"Failed to create JSON Web Token for {username}: {e}")
+            self.logger.error(f"Failed to create JSON Web Tokens for {username}: {e}")
             return None
 
-        # Track session for concurrent limit enforcement
-        self.sessions[jti] = {
-            'username': username,
-            'created_at': now,
-            'last_accessed': now,
-            'expires_at': exp_time
-        }
-        self.logger.debug(f"Created JSON Web Token for '{username}'")
-        return jwt_token
+        with self._lock:
+            # Track access session for concurrent‑limit enforcement
+            self.sessions[access_jti] = {
+                'username': username,
+                'created_at': now,
+                'last_accessed': now,
+                'expires_at': access_exp,
+                'type': 'access'
+            }
+
+            # Track refresh token
+            self.refresh_tokens[refresh_jti] = {
+                'username': username,
+                'created_at': now,
+                'expires_at': refresh_exp,
+                'type': 'refresh',
+                'access_jti': access_jti
+            }
+
+        self.logger.debug(f"Created session for '{username}'")
+        return access_token, refresh_token
 
     def _payload_from_token(self, token: str) -> dict:
         """Decode the payload from a JSON Web Token.
@@ -619,16 +694,21 @@ class JWTSessionManager(SessionManager):
             self.secret_key,
             algorithms=['HS512'],
             audience='plantdb-client',  # Verify audience
-            issuer='plantdb-api'  # Verify issuer
+            issuer='plantdb-api',  # Verify issuer,
+            options={"require": ["exp", "iat", "iss", "aud"]},  # force the presence of these claims
+            leeway=self.leeway  # allowed clock skew, in seconds
         )
 
-    def validate_session(self, token: str) -> Optional[Dict[str, Any]]:
+    def validate_session(self, token: str, token_type: str = 'access') -> Optional[Dict[str, Any]]:
         """Validate a JSON Web Token and return user information.
 
         Parameters
         ----------
         token : str
             The JSON Web Token to validate.
+        token_type : str, optional
+            The expected token type ('access' or 'refresh').
+            Defaults to 'access'.
 
         Returns
         -------
@@ -641,31 +721,46 @@ class JWTSessionManager(SessionManager):
             - jti: Unique token identifier
             - issuer: Token issuer
             - audience: Token audience
+            - type: Token type
         """
+        # Decode and verify JSON Web Token with proper validation
         try:
-            # Decode and verify JSON Web Token with proper validation
             payload = self._payload_from_token(token)
-
-        except jwt.ExpiredSignatureError:
-            self.logger.error("JSON Web Token expired")
-            return None
-        except jwt.InvalidAudienceError:
+        except jwt.ExpiredSignatureError as e:
+            self.logger.error(f"JSON Web Token ({token_type}) expired")
+            raise SessionValidationError(e) from e
+        except jwt.InvalidAudienceError as e:
             self.logger.error("JSON Web Token has invalid audience")
-            return None
-        except jwt.InvalidIssuerError:
+            raise SessionValidationError(e) from e
+        except jwt.InvalidIssuerError as e:
             self.logger.error("JSON Web Token has invalid issuer")
-            return None
+            raise SessionValidationError(e) from e
         except jwt.InvalidTokenError as e:
             self.logger.error(f"Invalid JSON Web Token: {e}")
-            return None
+            raise SessionValidationError(e) from e
         except Exception as e:
             self.logger.error(f"Error validating JSON Web Token: {e}")
-            return None
+            raise InvalidTokenProcessingError(e) from e
 
-        # Update last accessed time in session tracking
+        # Check token type
+        if payload.get('type') != token_type:
+            self.logger.error(f"Invalid token type: expected {token_type}, got {payload.get('type')}")
+            raise WrongTokenType(f"Invalid token type: {token_type}")
+
         jti = payload.get('jti')
-        if jti and jti in self.sessions:
-            self.sessions[jti]['last_accessed'] = datetime.now()
+
+        # Verify it's in our tracking list
+        if token_type == 'access':
+            if jti not in self.sessions:
+                self.logger.error("Access token not found in active sessions")
+                raise AccessTokenNotFoundError(f"Access token jti={jti} not found")
+            # Update last accessed time
+            with self._lock:
+                self.sessions[jti]['last_accessed'] = datetime.now(timezone.utc)
+        elif token_type == 'refresh':
+            if jti not in self.refresh_tokens:
+                self.logger.error("Refresh token not found in active refresh tokens")
+                raise RefreshTokenNotFoundError(f"Refresh token jti={jti} not found")
 
         return {
             'username': payload['sub'],  # subject is the username
@@ -673,7 +768,8 @@ class JWTSessionManager(SessionManager):
             'expires_at': payload['exp'],  # expiration timestamp
             'jti': jti,  # JWT ID
             'issuer': payload['iss'],  # issuer
-            'audience': payload['aud']  # audience
+            'audience': payload['aud'],  # audience
+            'type': payload.get('type')  # type of token, 'access' or 'refresh'
         }
 
     def invalidate_session(self, token: str = None, jti: str = None) -> Tuple[bool, str | None]:
@@ -697,25 +793,57 @@ class JWTSessionManager(SessionManager):
             try:
                 payload = self._payload_from_token(token)
                 jti = payload.get('jti')
-            except:
+                token_type = payload.get('type', 'access')
+            except jwt.PyJWTError as e:
+                self.logger.error(f"Failed to decode token for invalidation: {e}")
                 return False, None
+            except KeyError as e:
+                self.logger.error(f"Failed to access payload key: {e}")
+                return False, None
+        else:
+            # If jti is provided, we need to know its type or check both
+            token_type = None
 
-        if jti and jti in self.sessions:
-            username = self.sessions[jti]['username']
-            del self.sessions[jti]
-            return True, username
+        with self._lock:
+            if token_type == 'access' or token_type is None:
+                if jti and jti in self.sessions:
+                    username = self.sessions[jti]['username']
+                    del self.sessions[jti]
+                    # Also invalidate the linked refresh token if any
+                    refresh_jtis = [rj for rj, rs in self.refresh_tokens.items() if rs.get('access_jti') == jti]
+                    for rj in refresh_jtis:
+                        del self.refresh_tokens[rj]
+                    return True, username
+
+            if token_type == 'refresh' or token_type is None:
+                if jti and jti in self.refresh_tokens:
+                    username = self.refresh_tokens[jti]['username']
+                    # Optionally invalidate the linked access token?
+                    # Usually we just invalidate the refresh token.
+                    del self.refresh_tokens[jti]
+                    return True, username
 
         return False, None
 
     def cleanup_expired_sessions(self) -> None:
         """Remove expired sessions from tracking."""
-        current_time = datetime.now()
-        expired_sessions = [
-            jti for jti, session in self.sessions.items()
-            if current_time > session['expires_at']
-        ]
-        for jti in expired_sessions:
-            del self.sessions[jti]
+        current_time = datetime.now(timezone.utc)
+
+        with self._lock:
+            expired_access = [
+                jti for jti, session in self.sessions.items()
+                if current_time > session['expires_at']
+            ]
+            for jti in expired_access:
+                del self.sessions[jti]
+
+            expired_refresh = [
+                jti for jti, session in self.refresh_tokens.items()
+                if current_time > session['expires_at']
+            ]
+            for jti in expired_refresh:
+                del self.refresh_tokens[jti]
+
         return
 
     def session_username(self, token: str) -> Optional[str]:
@@ -731,30 +859,36 @@ class JWTSessionManager(SessionManager):
         str or None
             Username if token is valid.
         """
-        session_data = self.validate_session(token)
-        return session_data['username'] if session_data else None
+        try:
+            session_data = self.validate_session(token)
+        except SessionValidationError as e:
+            self.logger.warning(f"Provided session does not exist: {e}")
+            return None
+        return session_data['username']
 
-    def refresh_session(self, token: str) -> Optional[str]:
-        """Refresh a JSON Web Token if it's still valid.
+    def refresh_session(self, refresh_token: str) -> Tuple[str, str]:
+        """Refresh a session using a valid refresh token.
 
         Parameters
         ----------
-        token : str
-            Current JSON Web Token.
+        refresh_token : str
+            The refresh token to use.
 
         Returns
         -------
-        str or None
-            New JSON Web Token if refresh is successful.
+        Tuple[str, str]
+            A tuple containing (new_access_token, new_refresh_token) if successful.
         """
-        session_data = self.validate_session(token)
-        if not session_data:
-            return None
+        # Validate the refresh token – will raise if the refresh token is revoked or malformed
+        session_data = self.validate_session(refresh_token, token_type='refresh')
 
-        # Invalidate old session
-        old_jti = session_data['jti']
-        self.invalidate_session(jti=old_jti)
-
-        # Create a new session
         username = session_data['username']
+        old_refresh_jti = session_data['jti']
+        old_access_jti = self.refresh_tokens[old_refresh_jti].get('access_jti')
+        # Invalidate old tokens (Rotation)
+        self.invalidate_session(jti=old_refresh_jti)
+        if old_access_jti:
+            self.invalidate_session(jti=old_access_jti)
+
+        # Create a new session (new access + new refresh)
         return self.create_session(username)
