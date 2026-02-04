@@ -38,6 +38,9 @@ from typing import Tuple
 from typing import Union
 
 import jwt
+from argon2 import Type
+from argon2.low_level import hash_secret_raw
+
 from plantdb.commons.log import get_logger
 
 
@@ -428,13 +431,66 @@ class JWTSessionManager(SessionManager):
         max_concurrent_sessions : int, optional
             The maximum number of concurrent sessions to allow.
             Defaults to ``10``.
-        secret_key : str, optional
-            Secret key for JWT signing. If None, generates a random key.
+       secret_key : Union[bytes, str]
+           Secret used for HS512 signing of JWTs.
+           - If a ``bytes`` object is supplied, it must be ≥ 64 bytes.
+           - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2
+             to produce a 64‑byte key.
+           - If ``None`` a fresh random 64‑byte key is generated.
+        leeway : int, optional
+            Allowed leeway, in seconds, after tokens expiration date, to accommodate for clock-skew.
+            Set it to `0` so that the token is considered expired immediately after its exp claim passes.
+            Defaults to ``2``.
         """
         super().__init__(session_timeout, max_concurrent_sessions)
         self.secret_key = secret_key or secrets.token_urlsafe(32)
+        self.secret_key = self._init_secret_key(secret_key)
+
+    @staticmethod
+    def _derive_key_argon2(password: str) -> bytes:
+        """Derive a 64‑byte (512‑bit) secret using Argon2.
+        
+        Parameters
+        ----------
+        password: str
+            Human‑readable pass‑phrase supplied by the caller.
+        
+        Returns
+        -------
+        bytes
+            64‑byte key suitable for HS512.
+        """
+        # Argon2 parameters – adjust if you need stronger/higher‑memory settings
+        time_cost = 2  # number of iterations
+        memory_cost = 102_400  # KiB (≈100 MiB)
+        parallelism = 8  # CPU lanes
+        salt = secrets.token_bytes(16)  # 128‑bit random salt; stored only in‑memory here
+        # hash_secret_raw returns raw bytes (no encoding)
+        return hash_secret_raw(
+            secret=password.encode('utf‑8'),
+            salt=salt,
+            time_cost=time_cost,
+            memory_cost=memory_cost,
+            parallelism=parallelism,
+            hash_len=64,  # 64 bytes = 512 bits
+            type=Type.ID,
+        )
 
     def _create_token(self, username, jti, exp_time, now):
+    def _init_secret_key(self, secret_key: str = None) -> bytes:
+        if secret_key is None:
+            # No key supplied → generate a fresh random 64‑byte key
+            secret_key = secrets.token_bytes(64)
+        elif isinstance(secret_key, bytes):
+            # Caller supplied raw bytes – just verify length
+            if len(secret_key) < 64:
+                raise ValueError("Binary secret_key must be at least 64 bytes for HS512")
+            secret_key = secret_key
+        else:
+            # Caller supplied a pass‑phrase string → stretch it with Argon2
+            secret_key = self._derive_key_argon2(secret_key)
+        return secret_key
+
         """Create a JSON Web Token (JWT) with registered claims.
 
         Generates and encodes a JWT using the provided username, unique identifier
@@ -471,12 +527,13 @@ class JWTSessionManager(SessionManager):
             'iat': int(now.timestamp()),  # issued at (Unix timestamp)
             'jti': jti  # JWT ID (unique identifier)
         }
-        return jwt.encode(
+        token_bytes = jwt.encode(
             payload,
             self.secret_key,
             algorithm='HS512',
             headers={'typ': 'JWT', 'alg': 'HS512'}
         )
+        return token_bytes if isinstance(token_bytes, str) else token_bytes.decode('utf-8')
 
     def create_session(self, username: str) -> Union[str, None]:
         """Create a new session for a user.
