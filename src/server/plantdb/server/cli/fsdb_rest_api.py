@@ -73,7 +73,6 @@ import argparse
 import atexit
 import logging
 import os
-import secrets
 import shutil
 import sys
 from pathlib import Path
@@ -124,7 +123,7 @@ from plantdb.server.rest_api import TokenRefresh
 from plantdb.server.rest_api import TokenValidation
 
 
-def parsing() -> argparse.ArgumentParser :
+def parsing() -> argparse.ArgumentParser:
     """Create and configure an argument parser for a REST API server.
 
     Returns
@@ -161,7 +160,7 @@ def parsing() -> argparse.ArgumentParser :
     return parser
 
 
-def _get_env_secret(var_name: str, logger: logging.Logger) -> str :
+def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     """Retrieve a secret from the environment or generate a new one if missing.
 
     Parameters
@@ -184,7 +183,7 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str :
     return secret
 
 
-def _configure_app(secret_key: str, ssl: bool = False) -> Flask :
+def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
     """Create and configure a Flask application instance.
 
     Parameters
@@ -196,7 +195,7 @@ def _configure_app(secret_key: str, ssl: bool = False) -> Flask :
 
     Returns
     -------
-    Flask
+    flask.Flask
         The configured Flask application.
     """
     app = Flask(__name__)
@@ -215,7 +214,7 @@ def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Log
 
     Parameters
     ----------
-    app : Flask
+    app : flask.Flask
         The Flask application to extend.
     proxy : bool
         Whether the server is behind a reverse proxy.
@@ -261,8 +260,8 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
         The path to the created test database.
     """
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
-    session_timeout=int(os.getenv("SESSION_TIMEOUT", 3600))
-    max_sessions=int(os.getenv("MAX_SESSION", 10))
+    session_timeout = int(os.getenv("SESSION_TIMEOUT", 3600))
+    max_sessions = int(os.getenv("MAX_SESSION", 10))
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
         db_path = test_database(
@@ -509,9 +508,9 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 4 - Database connection
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
-    session_timeout=int(os.getenv("SESSION_TIMEOUT", 3600))
-    refresh_timeout=int(os.getenv("REFRESH_TIMEOUT", 86400))
-    max_sessions=int(os.getenv("MAX_SESSION", 10))
+    session_timeout = int(os.getenv("SESSION_TIMEOUT", 3600))
+    refresh_timeout = int(os.getenv("REFRESH_TIMEOUT", 86400))
+    max_sessions = int(os.getenv("MAX_SESSION", 10))
     db = FSDB(
         db_path,
         session_manager=JWTSessionManager(
