@@ -14,7 +14,7 @@ dependencies = [
 ]
 description = "Client-side database library for the ROMI plant database ecosystem."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.13"  # 3.13 upper bound for open3d dependency
 license = { 'text' = "LGPL-3.0-or-later" }   # to replace by "LGPL-3.0-or-later" only in next release, pending deprecation
 authors = [
     { name = "Peter Hanappe", email = "peter.hanappe@sony.com" },
@@ -63,7 +63,6 @@ sync = [
 ]
 test = [
     'plantdb.server',
-    'open3d',
 ]
 
 [tool.setuptools.package-data]
