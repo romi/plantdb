@@ -2043,7 +2043,7 @@ class Image(Resource):
                 * `'large'`: image max width and height to `1500`;
                 * `'orig'`: original image, no chache;
             If an invalid string is supplied, the default 'thumb' is used.
-        base64 : str
+        as_base64 : str
             Query parameter indicating whether to return the image encoded in base64.
             Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
             Defaults to 'false', which streams the image file.
@@ -2067,7 +2067,7 @@ class Image(Resource):
 
         See Also
         --------
-        plantdb.server.rest_api.sanitize_name : Input sanitization & validation function.
+        plantdb.server.rest_api.sanitize_name : Input sanitization and validation function.
         plantdb.server.webcache.image_path : Image path resolution function with caching and resizing options.
 
         Examples
@@ -2095,15 +2095,15 @@ class Image(Resource):
 
         # Parse the `size` flag
         size = request.args.get('size', default='thumb', type=str)
-        # Parse the base64 flag (accepting true/1/yes in any case)
-        base64_flag = request.args.get('base64', default='false', type=str).lower() in ('true', '1', 'yes')
+        # Parse the as_base64 flag (accepting true/1/yes in any case)
+        as_base64 = request.args.get('as_base64', default='false', type=str).lower() in ('true', '1', 'yes')
 
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
         mime_type, _ = mimetypes.guess_type(path)
 
-        # If base64_flag is set, read the file, encode it, and return JSON
-        if base64_flag:
+        # If as_base64 is set, read the file, encode it, and return JSON
+        if as_base64:
             with open(path, 'rb') as f:
                 encoded = pybase64.b64encode(f.read()).decode('ascii')
             return jsonify({'image': encoded, 'content-type': mime_type})
