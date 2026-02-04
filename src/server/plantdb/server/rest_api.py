@@ -67,6 +67,7 @@ from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
 
+from plantdb.commons.auth.session import SessionValidationError
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
@@ -941,6 +942,10 @@ class Register(Resource):
                 'success': True,
                 'message': 'User successfully created'
             }, 201
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
+
         except Exception as e:
             # Return error response if user creation fails (e.g., duplicate username)
             return {
@@ -1078,19 +1083,21 @@ class Login(Resource):
         password = data['password']
 
         # Attempt to authenticate user with provided credentials
-        jwt_token = self.db.login(username, password)
+        tokens = self.db.login(username, password)
 
         # Prepare response based on authentication result
-        if jwt_token:
-            user = self.db.get_user_data(token=jwt_token)
-            # Create response with user info & access token
+        if tokens:
+            access_token, refresh_token = tokens
+            user = self.db.get_user_data(token=access_token)
+            # Create response with user info, access token, and refresh token
             response_data = {
                 'message': 'Login successful',
                 'user': {
                     'username': user.username,
                     'fullname': user.fullname,
                 },
-                'access_token': jwt_token
+                'access_token': access_token,
+                'refresh_token': refresh_token
             }
             response = make_response(jsonify(response_data), 200)
             return response
@@ -1132,13 +1139,19 @@ class Logout(Resource):
         try:
             if 'token' in kwargs:
                 # Invalidate session
-                self.db.logout(**kwargs)
-                response = {'message': 'Logout successful'}, 200
+                success = self.db.logout(**kwargs)
+                if success:
+                    response = {'message': 'Logout successful'}, 200
+                else:
+                    response = {'message': 'Logout failed'}, 401
             else:
                 self.logger.error(f"Logout error: no active session!")
                 response = {'message': 'Logout failed'}, 401
 
             return response
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
 
         except Exception as e:
             self.logger.error(f"Logout error: {str(e)}")
@@ -1231,39 +1244,31 @@ class TokenRefresh(Resource):
         """Initialize the TokenRefresh resource."""
         self.db = db
 
-    @add_jwt_from_header
     def post(self, **kwargs):
         """Refresh JSON Web Token.
 
-        Examples
-        --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
-        >>> import requests
-        >>> # Start by login as admin
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
-        >>> token = response.json()['access_token']
-        >>> # Now refresht the token for the admin user:
-        >>> response = requests.post("http://127.0.0.1:5000/token-refresh", headers={'Authorization': 'Bearer ' + token})
-        >>> print(response.json()['message'])
-        Token refreshed successfully
-        >>> new_token = response.json()['access_token']
-        >>> # Validate this new token:
-        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + new_token})
-        >>> print(response.json()['user']['username'])
-        admin
+        This method expects a JSON payload containing a 'refresh_token'.
+        It validates the refresh token and issues a new access/refresh token pair.
         """
-        # Get token from keyword arguments (from decorator)
-        jwt_token = kwargs.get('token', None)
+        data = request.get_json()
+        if not data or 'refresh_token' not in data:
+            return {'message': 'Missing refresh_token'}, 400
+
+        refresh_token = data['refresh_token']
 
         try:
-            new_token = self.db.session_manager.refresh_session(jwt_token)
+            tokens = self.db.session_manager.refresh_session(refresh_token)
 
-            if new_token:
-                response = {'message': 'Token refreshed successfully', 'access_token': new_token}, 200
+            if tokens:
+                access_token, new_refresh_token = tokens
+                response = {
+                    'message': 'Token refreshed successfully',
+                    'access_token': access_token,
+                    'refresh_token': new_refresh_token
+                }, 200
                 return response
             else:
-                return {'message': 'Token refresh failed'}, 401
+                return {'message': 'Invalid or expired refresh token'}, 401
 
         except Exception as e:
             return {'message': f'Token refresh failed: {e}'}, 500
@@ -3125,7 +3130,10 @@ class Archive(Resource):
 
         # Create the new scan dataset that will receive the files from the archive
         self.logger.debug(f"REST API path to fsdb is '{self.db.path()}'...")
-        scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
+        try:
+            scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
+        except PermissionError as e:
+            return {'message': f'Invalid credentials: {str(e)}'}, 401
         self.logger.debug(f"Exporting archive contents to '{scan_path}'...")
 
         # Detect a lone top level dir to remove from later file extraction
@@ -3289,6 +3297,9 @@ class ScanCreate(Resource):
                 scan.set_metadata(metadata, **kwargs)
             return {'message': f"Scan '{scan_id}' created successfully."}, 201
 
+        except SessionValidationError as e:
+            return {'message': f'Invalid credentials: {str(e)}'}, 401
+
         except Exception as e:
             return {'message': f'Error creating scan: {str(e)}'}, 500
 
@@ -3450,6 +3461,9 @@ class ScanMetadata(Resource):
             # Return updated metadata
             updated_metadata = scan.get_metadata()
             return {'metadata': updated_metadata}, 200
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
 
         except Exception as e:
             self.logger.error(f'Error updating metadata: {str(e)}')
@@ -3623,6 +3637,9 @@ class FilesetCreate(Resource):
                 'message': f"Fileset '{fs_id}' created successfully in '{scan.id}'.",
                 "id": fs_id
             }, 201
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
 
         except Exception as e:
             return {'message': f'Error creating fileset: {str(e)}'}, 500
@@ -3818,6 +3835,9 @@ class FilesetMetadata(Resource):
             # Return updated metadata
             updated_metadata = fileset.get_metadata()
             return {'metadata': updated_metadata}, 200
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
 
         except Exception as e:
             self.logger.error(f'Error updating metadata: {str(e)}')
@@ -4031,6 +4051,9 @@ class FileCreate(Resource):
                 'id': f"{file_id}",
             }, 201
 
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
+
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
             return {'message': f'Error creating file: {str(e)}'}, 500
@@ -4078,7 +4101,7 @@ class FileMetadata(Resource):
 
         Notes
         -----
-        In the URL, uou can use the `key` parameter to retrieve specific metadata keys.
+        In the URL, you can use the `key` parameter to retrieve specific metadata keys.
 
         Examples
         --------
@@ -4091,7 +4114,7 @@ class FileMetadata(Resource):
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
-        >>> # Get specific metadata key:
+        >>> # Get a specific metadata key:
         >>> response = requests.get(url+"?key=description")
         >>> print(response.json())
         {'metadata': 'Test file'}
@@ -4202,6 +4225,9 @@ class FileMetadata(Resource):
             # Return updated metadata
             updated_metadata = file.get_metadata()
             return {'metadata': updated_metadata}, 200
+
+        except SessionValidationError as e:
+            return {'message': 'Invalid credentials'}, 401
 
         except Exception as e:
             self.logger.error(f'Error processing request: {str(e)}')
