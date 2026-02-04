@@ -44,7 +44,7 @@ class RestApiServerTests(unittest.TestCase):
         r = requests.post(self.server.get_base_url() + '/login',
                           json={'username': 'anonymous', 'password': 'AlanMoore'})
         self.assertEqual(r.status_code, 401)
-        # First attempt without login should fail
+        # The first attempt without a login should fail
         r = requests.post(self.server.get_base_url() + '/logout')
         self.assertEqual(r.status_code, 401)
 
@@ -85,7 +85,6 @@ class RestApiServerTests(unittest.TestCase):
         r = requests.get(self.server.get_base_url() + f"/api/scan/{scan_id}/metadata")
         self.assertEqual(r.status_code, 200)
         info = r.json()
-        print(info)
         self.assertIn("metadata", info)
         self.assertIn("owner", info['metadata'])
 
@@ -173,7 +172,7 @@ class RestApiServerTests(unittest.TestCase):
             r = requests.post(self.server.get_base_url() + f'/archive/{new_dataset}', files=files)
             self.assertEqual(r.status_code, 401)
 
-            # Ensure file pointer is at the beginning before second request
+            # Ensure the file pointer is at the beginning before the second request
             zip_f.seek(0)
 
             # Test POST with proper authentication
