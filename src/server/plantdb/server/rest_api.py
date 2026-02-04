@@ -1832,7 +1832,6 @@ class DatasetFile(Resource):
         def write_stream(file_path, content_length, chunk_size):
             bytes_received = 0
             with open(file_path, 'wb') as file:
-                print(f"Received: {bytes_received}")
                 while bytes_received < content_length:
                     chunk = request.stream.read(min(chunk_size, content_length - bytes_received))
                     if not chunk:
