@@ -425,6 +425,96 @@ class SingleSessionManager(SessionManager):
         super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
 
 
+def _derive_key_argon2(password: str) -> bytes:
+    """Derive a 64‑byte (512‑bit) secret using Argon2.
+
+    Parameters
+    ----------
+    password: str
+        Human‑readable pass‑phrase supplied by the caller.
+
+    Returns
+    -------
+    bytes
+        64‑byte key suitable for HS512.
+    """
+    # Argon2 parameters – adjust if you need stronger/higher‑memory settings
+    time_cost = 2  # number of iterations
+    memory_cost = 102_400  # KiB (≈100 MiB)
+    parallelism = 8  # CPU lanes
+    salt = secrets.token_bytes(16)  # 128‑bit random salt; stored only in‑memory here
+    # hash_secret_raw returns raw bytes (no encoding)
+    return hash_secret_raw(
+        secret=password.encode('utf‑8'),
+        salt=salt,
+        time_cost=time_cost,
+        memory_cost=memory_cost,
+        parallelism=parallelism,
+        hash_len=64,  # 64 bytes = 512 bits
+        type=Type.ID,
+    )
+
+
+def _init_secret_key(secret_key: str = None) -> bytes:
+    """Generate or derive a 64‑byte secret key for HS512 signing.
+
+    Parameters
+    ----------
+    secret_key: Union[str, bytes, None]
+        Optional secret key.
+
+    Returns
+    -------
+    bytes
+        A 64‑byte key suitable for HS512 HMAC operations.
+
+    Raises
+    ------
+    ValueError
+        When ``secret_key`` is a ``bytes`` object shorter than 64 bytes.
+
+    Notes
+    -----
+    The function always returns exactly 64 bytes.
+    If ``secret_key`` is ``None``, a fresh random 64‑byte key is generated using ``secrets.token_bytes``.
+    If a ``bytes`` object is supplied, it is returned unchanged after verifying that its length is at
+    least 64 bytes; otherwise a ``ValueError`` is raised.
+    If a ``str`` is supplied, it is interpreted as a pass‑phrase and stretched to 64 bytes with Argon2
+    via `_derive_key_argon2`.
+
+    Examples
+    --------
+    >>> from plantdb.commons.auth.session import _init_secret_key
+    >>> # Generate a new random key
+    >>> key = _init_secret_key()
+    >>> len(key)
+    64
+    >>> # Use an existing 64‑byte key
+    >>> raw = b'A' * 64
+    >>> _init_secret_key(raw) is raw
+    True
+    >>> # Derive a key from a pass‑phrase
+    >>> key2 = _init_secret_key('my secret')
+    >>> len(key2)
+    64
+    >>> # Passing a short byte string raises an error
+    >>> _init_secret_key(b'short')
+    ValueError: Binary secret_key must be at least 64 bytes for HS512
+    """
+    if secret_key is None:
+        # No key supplied → generate a fresh random 64‑byte key
+        secret_key = secrets.token_bytes(64)
+    elif isinstance(secret_key, bytes):
+        # Caller supplied raw bytes – just verify length
+        if len(secret_key) < 64:
+            raise ValueError("Binary `secret_key` must be at least 64 bytes for HS512")
+        secret_key = secret_key
+    else:
+        # Caller supplied a pass‑phrase string → stretch it with Argon2
+        secret_key = _derive_key_argon2(secret_key)
+    return secret_key
+
+
 class JWTSessionManager(SessionManager):
     """Manage JWT-based user sessions with configurable timeouts and concurrency limits.
 
@@ -500,49 +590,26 @@ class JWTSessionManager(SessionManager):
         self._lock = RLock()  # to lock `self.session` dict for thread‑safe changes
         self.secret_key = self._init_secret_key(secret_key)
 
-    @staticmethod
-    def _derive_key_argon2(password: str) -> bytes:
-        """Derive a 64‑byte (512‑bit) secret using Argon2.
-        
+    def _init_secret_key(self, secret_key: str = None) -> bytes:
+        """Initialize or validate the secret key used for cryptographic operations.
+
         Parameters
         ----------
-        password: str
-            Human‑readable pass‑phrase supplied by the caller.
-        
+        secret_key : Union[str, None]
+            Optional user‑provided secret key as a string.
+            When ``None`` a fresh random key is created.
+
         Returns
         -------
         bytes
-            64‑byte key suitable for HS512.
-        """
-        # Argon2 parameters – adjust if you need stronger/higher‑memory settings
-        time_cost = 2  # number of iterations
-        memory_cost = 102_400  # KiB (≈100 MiB)
-        parallelism = 8  # CPU lanes
-        salt = secrets.token_bytes(16)  # 128‑bit random salt; stored only in‑memory here
-        # hash_secret_raw returns raw bytes (no encoding)
-        return hash_secret_raw(
-            secret=password.encode('utf‑8'),
-            salt=salt,
-            time_cost=time_cost,
-            memory_cost=memory_cost,
-            parallelism=parallelism,
-            hash_len=64,  # 64 bytes = 512 bits
-            type=Type.ID,
-        )
+            The secret key encoded as UTF‑8 bytes, or a newly generated random
+            key when no input is given.
 
-    def _init_secret_key(self, secret_key: str = None) -> bytes:
-        if secret_key is None:
-            # No key supplied → generate a fresh random 64‑byte key
-            secret_key = secrets.token_bytes(64)
-        elif isinstance(secret_key, bytes):
-            # Caller supplied raw bytes – just verify length
-            if len(secret_key) < 64:
-                raise ValueError("Binary secret_key must be at least 64 bytes for HS512")
-            secret_key = secret_key
-        else:
-            # Caller supplied a pass‑phrase string → stretch it with Argon2
-            secret_key = self._derive_key_argon2(secret_key)
-        return secret_key
+        See Also
+        --------
+        plantdb.commons.auth.session._init_secret_key
+        """
+        return _init_secret_key(secret_key)
 
     def _create_token(self, username, jti, exp_time, now, token_type='access'):
         """Create a JSON Web Token (JWT) with registered claims.
