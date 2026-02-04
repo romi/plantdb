@@ -1047,7 +1047,7 @@ class FSDB(db.DB):
             return None
 
     @require_token
-    def logout(self, **kwargs) -> bool:
+    def logout(self, **kwargs) -> tuple[bool, str]:
         """Log out a user by invalidating its session.
 
         Examples
@@ -1057,16 +1057,16 @@ class FSDB(db.DB):
         INFO     [FSDB] Successfully logged in as 'admin'.
         >>> db.logout()
         INFO     [FSDB] Successfully logged out from 'admin'.
-        True
+        (True, 'admin')
         >>> db.disconnect()
         """
         success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
         if success:
             self.logger.info(f"Successfully logged out from '{username}'.")
-            return True
+            return success, username
         else:
             self.logger.warning(f"Failed to logout!")
-            return False
+            return success, username
 
     @require_authentication
     def create_user(self, new_username, fullname, password, roles=None, **kwargs) -> None:
