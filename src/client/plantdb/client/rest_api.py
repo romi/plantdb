@@ -1078,8 +1078,8 @@ def request_logout(host, **kwargs) -> tuple[bool, str]:
     >>> from plantdb.client.rest_api import request_login
     >>> from plantdb.client.rest_api import request_logout
     >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
-    >>> logout = request_logout('localhost', port=5000, session_token=login_data['access_token'])
-    >>> print(logout)
+    >>> success, msg = request_logout('localhost', port=5000, session_token=login_data['access_token'])
+    >>> print(success)
     True
     """
     url = logout_url(host, **kwargs)
