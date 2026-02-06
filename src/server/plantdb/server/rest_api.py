@@ -2017,6 +2017,14 @@ class Image(Resource):
         """
         self.db = db
 
+    @staticmethod
+    def wants_base64(request) -> bool:
+        """
+        Return ``True`` when the query string contains ``as_base64`` with a truthy value.
+        """
+        flag = request.args.get('as_base64', default='false', type=str).lower()
+        return flag in ('true', '1', 'yes')
+
     @rate_limit(max_requests=3000, window_seconds=60)
     def get(self, scan_id, fileset_id, file_id):
         """Retrieve and serve an image from the database.
@@ -2075,18 +2083,31 @@ class Image(Resource):
         >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
         >>> import numpy as np
         >>> import requests
+        >>> import pybase64
         >>> from io import BytesIO
         >>> from PIL import Image
-        >>> # Get the first image as a thumbnail (default):
+        >>> # Example #1 - Get the first image as a thumbnail (default):
         >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True)
         >>> img = Image.open(BytesIO(response.content))
+        >>> image.show()
         >>> np.asarray(img).shape
         (113, 150, 3)
-        >>> # Get the first image in original size:
+        >>> # Example #2 - Get the first image in original size:
         >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig"})
         >>> img = Image.open(BytesIO(response.content))
+        >>> image.show()
         >>> np.asarray(img).shape
         (1080, 1440, 3)
+        >>> # Example #3 - Get a base64 encoded image:
+        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig", "as_base64": 'true'})
+        >>> print(response.json()['content-type'])
+        'image/jpeg'
+        >>> b64_string = response.json()['image']
+        >>> print(b64_string[:30])  # print the first 30 characters
+        '/9j/4AAQSkZJRgABAQAAAQABAAD/2w'
+        >>> image_data = pybase64.b64decode(b64_string)
+        >>> image = Image.open(BytesIO(image_data))
+        >>> image.show()
         """
         # Sanitize identifiers
         scan_id = sanitize_name(scan_id)
@@ -2095,21 +2116,29 @@ class Image(Resource):
 
         # Parse the `size` flag
         size = request.args.get('size', default='thumb', type=str)
-        # Parse the as_base64 flag (accepting true/1/yes in any case)
-        as_base64 = request.args.get('as_base64', default='false', type=str).lower() in ('true', '1', 'yes')
-
         # Get the path to the image resource:
         path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
         mime_type, _ = mimetypes.guess_type(path)
 
-        # If as_base64 is set, read the file, encode it, and return JSON
-        if as_base64:
+        if self.wants_base64(request):
+            # ---------- JSON (base64) ----------
             with open(path, 'rb') as f:
-                encoded = pybase64.b64encode(f.read()).decode('ascii')
-            return jsonify({'image': encoded, 'content-type': mime_type})
-        # Otherwise, return the file directly
-        return send_file(path, mimetype=mime_type)
+                b64_str = pybase64.b64encode(f.read()).decode('ascii')
+            # ``decode('ascii')`` gives us a plain string that can be JSON‑encoded.
+            payload = {
+                "image": b64_str,
+                "content-type": mime_type
+            }
+            # Wrap ``jsonify`` with ``make_response`` to add custom headers
+            resp = make_response(jsonify(payload))
+            resp.headers["Content-Type"] = "application/json"
+            resp.headers["X-Content-Encoding"] = "base64"
+        else:
+            # ---------- Binary (streaming) ----------
+            resp = make_response(send_file(path, mimetype=mime_type))
+            resp.headers["X-Content-Encoding"] = "binary"
 
+        return resp
 
 class PointCloud(Resource):
     """RESTful resource for serving and optionally downsampling point cloud data.

@@ -584,6 +584,8 @@ def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', as_base64=Fa
     >>> from plantdb.client.rest_api import scan_image_url
     >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb")
     'http://localhost/image/real_plant/images/00000_rgb?size=orig'
+    >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb", as_base64=True)
+    'http://localhost/image/real_plant/images/00000_rgb?size=orig&as_base64=true'
     >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb", prefix='/plantdb')
     'http://localhost/plantdb/image/real_plant/images/00000_rgb?size=orig'
     """
@@ -1349,8 +1351,8 @@ def request_scan_data(host, scan_id, **kwargs) -> dict:
         return {}
 
 
-def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', as_base64=False, **kwargs) -> Union[
-    bytes, dict]:
+def request_scan_image(host, scan_id, fileset_id, file_id,
+                       size='orig', as_base64=False, **kwargs) -> tuple[str, str, Union[str, bytes]]:
     """Get the image for a scan dataset and task fileset served by the PlantDB REST API.
 
     Parameters
@@ -1385,7 +1387,7 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', as_base6
 
     Returns
     -------
-    Union[bytes, dict]
+    tuple[str, str, Union[str, bytes]]
         If ``as_base64==True``, a dictionary with the 'image' encoded as base64 and the mimetype in 'content-type'.
         Else the image data as bytes.
 
@@ -1394,23 +1396,34 @@ def request_scan_image(host, scan_id, fileset_id, file_id, size='orig', as_base6
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import request_scan_image
-    >>> db_img = ['real_plant', 'images', '00000_rgb']
-    >>> img_bytes = request_scan_image('localhost', *db_img, port=5000)  # download the image
-    >>> # Display the image
+    >>> import pybase64
     >>> from PIL import Image
     >>> from io import BytesIO
+    >>> # Example #1 - Get an image as binary data:
+    >>> db_img = ['real_plant', 'images', '00000_rgb']
+    >>> _, _, img_bytes = request_scan_image('localhost', *db_img, port=5000)  # download the image
+    >>> print(img_bytes[:10])
+    b'\xff\xd8\xff\xe0\x00\x10JFIF'
     >>> image = Image.open(BytesIO(img_bytes))  # Open the image from the bytes data
     >>> image.show()  # Display the image
-    >>> # Get a thumbnail encoded in base64
-    >>> response = request_scan_image('localhost', *db_img, port=5000, size='thumb', as_base64=True)
-
+    >>> # Example #2 - Get an image as base64 data:
+    >>> _, _, b64_string = request_scan_image('localhost', *db_img, port=5000, as_base64=True)
+    >>> print(b64_string[:50])
+    /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUEBAQEAwUEBAQGBQ
+    >>> image_data = pybase64.b64decode(b64_string)
+    >>> image = Image.open(BytesIO(image_data))  # Open the image from the base64 data
+    >>> image.show()
     """
     url = scan_image_url(host, scan_id, fileset_id, file_id, size, as_base64, **kwargs)
     response = make_api_request(url=url, session_token=kwargs.get('session_token', None))
+    content_type = response.headers.get('Content-Type')
+    encoding = response.headers.get("X-Content-Encoding")
     if as_base64:
-        return response.json()
+        content_type = response.json()['content-type']
+        img_str = response.json()['image']
+        return content_type, encoding, img_str
     else:
-        return response.content
+        return content_type, encoding, response.content
 
 
 def request_scan_tasks_fileset(host, scan_id, **kwargs) -> dict:
