@@ -298,6 +298,12 @@ class PlantDBClient:
         url = join_url(self.base_url, api_endpoints.token_validation())
         response = self._request_with_refresh("POST", url, headers={"Authorization": f"Bearer {token}"})
         if response.ok:
+            resp_username = response.json()['user']['username']
+            if not self._username:
+                self._username = resp_username
+                self.refresh_token()
+            if self._username and resp_username != self._username:
+                self.logger.warning(f"Given token correspond to a different username")
             return True
         else:
             return False
