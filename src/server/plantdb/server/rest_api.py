@@ -55,6 +55,7 @@ from io import BytesIO
 from math import radians
 from pathlib import Path
 from tempfile import mkstemp
+from urllib import parse
 from zipfile import ZipFile
 
 import pybase64
@@ -424,7 +425,7 @@ def get_file_uri(scan, fileset, file):
     return f"/files/{scan_id}/{fileset_id}/{file_id}"
 
 
-def get_image_uri(scan, fileset, file, size="orig"):
+def get_image_uri(scan, fileset, file, size="orig", as_base64=False):
     """Return the URI for the corresponding `scan/fileset/file` tree.
 
     Parameters
@@ -442,6 +443,8 @@ def get_image_uri(scan, fileset, file, size="orig"):
           - `'thumb'`: image max width and height to `150`.
           - `'large'`: image max width and height to `1500`;
           - `'orig'`: original image, no chache;
+    as_base64 : bool, optional
+        A boolean flag indicating whether to return an image as a base64 string.
 
     Returns
     -------
@@ -458,8 +461,8 @@ def get_image_uri(scan, fileset, file, size="orig"):
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> get_image_uri(scan, 'images', '00000_rgb.jpg', size='orig')
     '/image/real_plant_analyzed/images/00000_rgb.jpg?size=orig'
-    >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb')
-    '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb'
+    >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb', as_base64=True)
+    '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb&as_base64=true'
     """
     from plantdb.commons.fsdb.core import Scan
     from plantdb.commons.fsdb.core import Fileset
@@ -467,7 +470,17 @@ def get_image_uri(scan, fileset, file, size="orig"):
     scan_id = scan.id if isinstance(scan, Scan) else scan
     fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
     file_id = file.path().name if isinstance(file, File) else file
-    return f"/image/{scan_id}/{fileset_id}/{file_id}?size={size}"
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if size is not None:
+        query["size"] = str(size)
+    if as_base64:
+        # Use lower‑case JSON‑style booleans for consistency
+        query["as_base64"] = str(as_base64).lower()
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return f"/image/{scan_id}/{fileset_id}/{file_id}{query_str}"
 
 
 task_filesUri_mapping = {
