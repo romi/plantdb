@@ -595,7 +595,8 @@ class FSDB(db.DB):
 
         for scan_id, scan in self.scans.items():
             try:
-                metadata = scan.get_metadata()
+                # Access metadata directly to avoid nested lock acquisition
+                metadata = _get_metadata(scan.metadata, None, {})
                 if self.rbac_manager.can_access_scan(current_user, metadata, Permission.READ):
                     accessible_scans[scan_id] = scan
             except Exception as e:
@@ -658,7 +659,8 @@ class FSDB(db.DB):
             raise Exception("No valid user!")
 
         scan = self.scans[scan_id]
-        metadata = scan.get_metadata()
+        # Access metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(scan.metadata, None, {})
         if self.rbac_manager.can_access_scan(current_user, metadata, Permission.READ):
             # Use shared lock for read operations
             with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
@@ -821,9 +823,11 @@ class FSDB(db.DB):
         if not self.scan_exists(scan_id):
             raise ValueError(f"Scan '{scan_id}' does not exist!")
 
-        # Check DELETE permission for this specific scan
+        # Check DELETE permission for this specific scan using its metadata
         scan = self.scans[scan_id]
-        if not self.rbac_manager.can_access_scan(current_user, scan.get_metadata(), Permission.DELETE):
+        # Access metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(scan.metadata, None, {})
+        if not self.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
             raise PermissionError(
                 f"Insufficient permissions to delete '{scan_id}' scan as '{current_user.username}' user!")
 
@@ -1921,7 +1925,8 @@ class Scan(db.Scan):
             raise PermissionError("No authenticated user!")
 
         # Get current metadata for validation
-        old_metadata = self.get_metadata()
+        # Access scan metadata directly to avoid nested lock acquisition
+        old_metadata = _get_metadata(self.metadata, None, {})
 
         if isinstance(data, str):
             if value is None:
@@ -1935,7 +1940,7 @@ class Scan(db.Scan):
             else:
                 new_metadata = data
 
-        # Validate metadata changes
+        # Validate scan metadata accessibility to current user
         if not self.db.rbac_manager.validate_scan_metadata_access(current_user, old_metadata, new_metadata):
             raise PermissionError(f"Insufficient permissions to modify scan '{self.id}' metadata!")
 
@@ -2014,8 +2019,10 @@ class Scan(db.Scan):
         if not current_user:
             raise PermissionError("No authenticated user!")
 
-        # Check WRITE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, self.get_metadata(), Permission.WRITE):
+        # Access scan metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(self.metadata, None, {})
+        # Check WRITE permission for this fileset using scan metadata
+        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
             raise PermissionError(f"Insufficient permissions to create a fileset in the '{self.id}' scan!")
 
         # Verify if the given `fs_id` is valid
@@ -2086,8 +2093,10 @@ class Scan(db.Scan):
         if not current_user:
             raise PermissionError("No authenticated user!")
 
-        # Check DELETE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, self.get_metadata(), Permission.DELETE):
+        # Access scan metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(self.metadata, None, {})
+        # Check DELETE permission for this fileset using scan metadata
+        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
             raise PermissionError(
                 f"Insufficient permissions to delete filesets from the '{self.id}' scan as '{current_user.username}' user!")
 
@@ -2385,8 +2394,10 @@ class Fileset(db.Fileset):
         if not current_user:
             raise PermissionError("No authenticated user!")
 
+        # Access scan metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(self.scan.metadata, None, {})
         # Check WRITE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
+        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
             raise PermissionError(f"Insufficient permissions to edit the '{self.scan.id}/{self.id}' fileset metadata!")
 
         # Use exclusive lock for this operation
@@ -2452,8 +2463,10 @@ class Fileset(db.Fileset):
         if not current_user:
             raise PermissionError("No authenticated user!")
 
+        # Access scan metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(self.scan.metadata, None, {})
         # Check WRITE permission for this file
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
+        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
             raise PermissionError(
                 f"Insufficient permissions to create a file in the '{self.scan.id}' scan as '{current_user.username}' user!")
 
@@ -2529,14 +2542,16 @@ class Fileset(db.Fileset):
         if not current_user:
             raise PermissionError("No authenticated user!")
 
+        # Access scan metadata directly to avoid nested lock acquisition
+        metadata = _get_metadata(self.scan.metadata, None, {})
         # Check DELETE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.DELETE):
+        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
             raise PermissionError(
                 f"Insufficient permissions to delete the files from the '{self.scan.id}' scan as '{current_user.username}' user!")
 
         # Verify if the given `fs_id` exists in the local database
         if not self.file_exists(f_id):
-            raise ValueError(f"File '{f_id}' does not exist in scan '{self.id}'")
+            raise ValueError(f"File '{f_id}' does not exist in '{self.scan.id}/{self.id}'")
 
         # Use exclusive lock for fileset creation
         self.logger.info(f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
