@@ -4,16 +4,19 @@
 import fcntl
 import json
 import os
+import shutil
 import tempfile
 import threading
 import time
 import unittest
 from unittest.mock import patch
 
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.lock import LockError
 from plantdb.commons.fsdb.lock import LockTimeoutError
 from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.lock import ScanLockManager
+from plantdb.commons.test_database import setup_test_database
 
 
 class TestLockType(unittest.TestCase):
@@ -453,6 +456,80 @@ class TestConcurrentLocks(unittest.TestCase):
         # Note: This assumes the first thread acquires the lock successfully
         self.assertEqual(len(results), 1)
         self.assertEqual(len(errors), 4)  # The other 4 should have timed out
+
+
+class TestFSDBLock(unittest.TestCase):
+    """Test suite for verifying permission handling in FSDB operations.
+
+    The tests exercise deletion of files, filesets, and scans under different user roles.
+    A temporary FSDB directory is created for each test case.
+
+    Attributes
+    ----------
+    fsdb_dir : str
+        Path to the temporary FSDB directory created for the test suite.
+    """
+    def setUp(self):
+        """Set up a temporary directory for testing."""
+        self.fsdb_dir = setup_test_database(['real_plant', 'real_plant_analyzed'], db_path=None)
+
+    def tearDown(self):
+        """Clean up the temporary directory after tests."""
+        shutil.rmtree(self.fsdb_dir)
+
+    def test_delete_file_without_permission(self):
+        """Test that attempting to delete a file without sufficient permissions raises ``PermissionError``."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("guest", "guest")
+        scan = db.get_scan('real_plant_analyzed')
+        fs = scan.get_fileset('Masks_1__0__1__0____channel____rgb_5619aa428d')
+
+        with self.assertRaises(PermissionError):
+            fs.delete_file("00000_rgb.png")
+
+    def test_delete_file_with_permission(self):
+        """Test deletion of a file when the user has sufficient permissions."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("admin", "admin")
+        scan = db.get_scan('real_plant_analyzed')
+        fs = scan.get_fileset('Masks_1__0__1__0____channel____rgb_5619aa428d')
+        fs.delete_file("00000_rgb")
+
+    def test_delete_fileset_without_permission(self):
+        """Test deletion of a fileset without sufficient permissions."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("guest", "guest")
+        scan = db.get_scan('real_plant_analyzed')
+
+        with self.assertRaises(PermissionError):
+            scan.delete_fileset('Masks_1__0__1__0____channel____rgb_5619aa428d')
+
+    def test_delete_fileset_with_permission(self):
+        """Delete a fileset from a scan when the user has sufficient permissions."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("admin", "admin")
+        scan = db.get_scan('real_plant_analyzed')
+        scan.delete_fileset('Masks_1__0__1__0____channel____rgb_5619aa428d')
+
+    def test_delete_scan_without_permission(self):
+        """Test that attempting to delete a scan without sufficient permissions raises ``PermissionError``."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("guest", "guest")
+
+        with self.assertRaises(PermissionError):
+            db.delete_scan('real_plant_analyzed')
+
+    def test_delete_scan_with_permission(self):
+        """Test that an administrator can delete an existing scan."""
+        db = FSDB(self.fsdb_dir)
+        db.connect()
+        db.login("admin", "admin")
+        db.delete_scan('real_plant_analyzed')
 
 
 if __name__ == '__main__':
