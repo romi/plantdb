@@ -21,6 +21,8 @@ Usage Examples
 >>> api_endpoints.scan('plant1', prefix='/api/v1')
 '/api/v1/scans/plant1'
 """
+
+from typing import Optional
 from urllib import parse
 
 
@@ -47,7 +49,8 @@ def sanitize_name(name) -> str:
     Raises
     ------
     ValueError
-        If the provided name contains invalid characters or does not meet the naming rules.
+        If the provided name contains invalid characters or does not meet
+        the naming rules.
     """
     import re
     sanitized_name = name.strip()  # Remove leading/trailing spaces
@@ -59,7 +62,7 @@ def sanitize_name(name) -> str:
     return sanitized_name
 
 
-def url_prefix(endpoint_path) :
+def url_prefix(endpoint_path):
     """Wrap an endpoint path generator with an optional URL prefix.
 
     Examples
@@ -336,7 +339,7 @@ def scan(scan_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64:bool, **kwargs) -> str:
+def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64: bool, **kwargs) -> str:
     """Return the URL path to the image endpoint.
 
     Parameters
@@ -512,19 +515,25 @@ def create_user(**kwargs) -> str:
     >>> api_endpoints.create_user()
     '/register'
     """
-    return f"/register"
+    return "/register"
 
 
 @url_prefix
 def create_scan(**kwargs) -> str:
     """URL to create a scan.
-    
+
     Returns
     -------
     str
         The URL path to scan creation.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.create_scan()
+    '/api/scan'
     """
-    return f"/api/scan"
+    return "/api/scan"
 
 
 @url_prefix
@@ -535,8 +544,14 @@ def create_fileset(**kwargs) -> str:
     -------
     str
         The URL path to fileset creation.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.create_fileset()
+    '/api/fileset'
     """
-    return f"/api/fileset"
+    return "/api/fileset"
 
 
 @url_prefix
@@ -548,7 +563,7 @@ def create_file(**kwargs) -> str:
     str
         The URL path to file creation.
     """
-    return f"/api/file"
+    return "/api/file"
 
 
 @url_prefix
@@ -618,3 +633,45 @@ def metadata_files(scan: str, fileset: str, file: str, **kwargs) -> str:
     fileset = sanitize_name(fileset)
     file = sanitize_name(file)
     return f"/api/scan/{scan_id}/{fileset}/{file}/metadata"
+
+
+@url_prefix
+def list_dataset_files(scan_id: Optional[str] = None, **kwargs) -> str:
+    """Return the URL path to list all files of a dataset (scan)."""
+    if scan_id:
+        scan_id = sanitize_name(scan_id)
+    return f"/files/{scan_id}" if scan_id else "/files"
+
+
+@url_prefix
+def pointcloud(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
+    """Return the URL path to the point‑cloud endpoint."""
+    scan_id = sanitize_name(scan_id)
+    fileset_id = sanitize_name(fileset_id)
+    file_id = sanitize_name(file_id)
+    return f"/pointcloud/{scan_id}/{fileset_id}/{file_id}"
+
+
+@url_prefix
+def pc_ground_truth(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
+    """Return the URL path to the point‑cloud ground‑truth endpoint."""
+    scan_id = sanitize_name(scan_id)
+    fileset_id = sanitize_name(fileset_id)
+    file_id = sanitize_name(file_id)
+    return f"/pcGroundTruth/{scan_id}/{fileset_id}/{file_id}"
+
+
+@url_prefix
+def mesh(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
+    """Return the URL path to the mesh endpoint."""
+    scan_id = sanitize_name(scan_id)
+    fileset_id = sanitize_name(fileset_id)
+    file_id = sanitize_name(file_id)
+    return f"/mesh/{scan_id}/{fileset_id}/{file_id}"
+
+
+@url_prefix
+def skeleton(scan_id: str, **kwargs) -> str:
+    """Return the URL path to the skeleton endpoint."""
+    scan_id = sanitize_name(scan_id)
+    return f"/skeleton/{scan_id}"
