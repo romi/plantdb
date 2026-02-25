@@ -29,6 +29,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from datetime import timezone
 from enum import Enum
+from fnmatch import fnmatchcase
+from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Set
 
@@ -76,6 +79,168 @@ class Permission(Enum):
     DELETE = "delete"
     MANAGE_USERS = "manage_users"
     MANAGE_GROUPS = "manage_groups"
+
+    def __eq__(self, other: Any) -> bool:
+        """Equality operator.
+        
+        Parameters
+        ----------
+        other : Any
+            Object to compare with the permission instance.
+            If a string is provided, it is interpreted as a permission name and converted to a
+            ``Permission`` instance for comparison.
+
+        Returns
+        -------
+        bool
+            ``True`` if ``other`` represents the same permission as ``self``, otherwise ``False``.
+
+        Notes
+        -----
+        The method safely handles objects that do not expose a ``value`` attribute
+        by catching ``AttributeError`` and returning ``False``.  
+        This ensures that comparisons with unrelated types do not raise unexpected exceptions.
+        """
+        if isinstance(other, str):
+            try:
+                return Permission.from_string(other) == self
+            except ValueError:
+                return False
+        else:
+            try:
+                return other.value == self.value
+            except AttributeError:
+                return False
+
+    def __hash__(self):
+        return hash(self.value)
+
+    @classmethod
+    def from_string(cls, s: str) -> "Permission":
+        """Convert a string to a `Permission` member.
+
+        The function is tolerant of the following inputs:
+        * the plain enum *value* (`"read"`);
+        * the plain enum *name* (`"READ"`);
+        * a fully‑qualified name (`"Permission.READ"`).
+
+        Parameters
+        ----------
+        s: str
+            The string representation supplied by the caller.
+
+        Returns
+        -------
+        plantdb.commons.auth.models.Permission
+            The matching enum member.
+
+        Raises
+        ------
+        ValueError
+            If ``s`` does not correspond to any defined permission.
+        
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Permission
+        >>> perm = Permission.from_string('READ')
+        >>> print(perm)
+        Permission.READ
+        """
+        # strip any surrounding whitespace.
+        s = s.strip()
+
+        # If the string contains a dot (e.g. "Permission.READ"), keep only the part after the last dot.
+        if "." in s:
+            s = s.split(".")[-1]
+
+        # Try to resolve by *name* first (case‑insensitive)
+        name_key = s.upper()
+        if name_key in cls.__members__:  # ``cls.__members__`` holds a mapping of names → members
+            return cls[name_key]
+
+        # If that fails, try to resolve by *value*.
+        try:
+            return cls(s)
+        except ValueError as exc:
+            # ``cls(s)`` raises ValueError automatically if not found.
+            raise ValueError(f"Unknown permission string: {s!r}") from exc
+
+
+def dataset_perm_to_str(dataset_perm: Dict[str, list[Permission]]) -> str:
+    """Convert a mapping of dataset names to permission lists into a compact string representation.
+
+    Parameters
+    ----------
+    dataset_perm
+        Mapping from dataset identifiers (strings) to a list of
+        ``Permission`` objects that define the access rights for each dataset.
+
+    Returns
+    -------
+    str
+        A single string where each dataset entry is formatted as
+        ``<dataset>/<perm1>,<perm2>,...`` and entries are separated by
+        semicolons.  The string representation of each ``Permission`` object
+        is obtained via ``str(permission)``.
+
+    Notes
+    -----
+    The function does not perform validation of the individual ``Permission``
+    objects beyond relying on their ``__str__`` method.  It is intended for
+    serialising permission specifications for downstream processing or logging.
+
+    Example
+    -------
+    >>> from plantdb.commons.auth.session import dataset_perm_to_str
+    >>> from plantdb.commons.auth.models import Permission
+    >>> ds = {'dataset_A': [Permission.READ], 'dataset_B': [Permission.READ, Permission.CREATE]}
+    >>> dataset_perm_to_str(ds)
+    'dataset_A/Permission.READ;dataset_B/Permission.READ,Permission.CREATE'
+    """
+    return ";".join([ds + '/' + ",".join(map(str, perms)) for ds, perms in dataset_perm.items()])
+
+
+def parse_dataset_perm(datasets_str: str) -> Dict[str, set[Permission]]:
+    """Convert a dataset permission string back into the original mapping.
+
+    Parameters
+    ----------
+    datasets_str:
+        The semicolon‑separated string.
+
+    Returns
+    -------
+    Dict[str, set[Permission]]
+        Mapping of dataset names to a set of Permission.
+        Empty permission lists are represented as an empty list.
+
+    Example
+    -------
+    >>> from plantdb.commons.auth.session import parse_dataset_perm
+    >>> s = 'dataset_A/Permission.READ;dataset_B/Permission.READ,Permission.CREATE'
+    >>> parse_dataset_perm(s)
+    {'sales': ['read', 'write'], 'marketing': ['read']}
+    """
+    # Guard against an empty string.
+    if not datasets_str:
+        return {}
+
+    result: Dict[str, set[Permission]] = {}
+
+    # Split on the outer “;” separator – each piece corresponds to one dataset.
+    for part in datasets_str.split(";"):
+        # Each part is ``<dataset>/<perm1>,<perm2>,...``.
+        # ``maxsplit=1`` protects us if a dataset name itself contains a '/'.
+        if "/" not in part:
+            # If there is no '/', treat the whole part as a dataset with no perms.
+            ds, perms_section = part, ""
+        else:
+            ds, perms_section = part.split("/", 1)
+        # An empty permissions section means the original list was empty.
+        perms = set() if perms_section == "" else set(perms_section.split(","))
+        result[ds] = {Permission.from_string(perm) for perm in perms}
+
+    return result
 
 
 class Role(Enum):

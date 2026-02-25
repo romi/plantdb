@@ -255,15 +255,18 @@ def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
         except IndexError:
             logged_user = default_user
         else:
-            logged_user = fsdb.session_manager.validate_session(session)['username']
+            if isinstance(fsdb, (Scan, Fileset, File)):
+                logged_user = fsdb.db.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
+            else:
+                logged_user = fsdb.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
     elif isinstance(fsdb.session_manager, (JWTSessionManager, SessionManager)):
         # If a JSON Web Token Session Manager or a Session Manager, require the token to retrieve the username
         if token:
             if isinstance(fsdb, (Scan, Fileset, File)):
-                username = fsdb.db.get_username(token)
+                user = fsdb.db.get_user_data(token=token)
             else:
-                username = fsdb.get_username(token)
-            logged_user = username
+                user = fsdb.get_user_data(token=token)
+            logged_user = user
         else:
             logged_user = default_user
     else:
@@ -286,11 +289,147 @@ def require_authentication(method):
     """
 
     def wrapper(self, *args, **kwargs):
-        kwargs['username'] = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
-                                                 token=kwargs.pop('token', None), **kwargs)
-        return method(self, *args, **kwargs)
+        # FIXME 'default_user' should be None!
+        user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
+                                   token=kwargs.get('token', None), **kwargs)
+
+        if not user:
+            raise PermissionError("No authenticated user!")
+        return method(self, *args, current_user=user, **kwargs)
 
     return wrapper
+
+def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
+    """Retrieve the `FSDB` and the `Scan` instance associated with a given object.
+
+    Parameters
+    ----------
+    obj : Scan or FSDB or Fileset or File
+        Object from which to obtain a ``Scan``. The function determines the
+        appropriate attribute based on the runtime type of ``obj``.
+    *args : tuple
+        Additional positional arguments. When ``obj`` is an ``FSDB``, the first
+        element should be the index or key identifying the desired scan.
+
+    Returns
+    -------
+    FSDB
+        The ``FSDB`` instance linked to ``obj``.
+    Scan
+        The ``Scan`` instance linked to ``obj``.
+
+    Raises
+    ------
+    TypeError
+        If ``obj`` is not an instance of ``Scan``, ``FSDB``, ``Fileset``, or ``File``.
+    ScanNotFoundError
+        If ``obj`` is an instance of ``FSDB`` and ``args[0]`` is not an existing ``Scan``.
+
+    Notes
+    -----
+    The dispatch logic is as follows:
+
+    - ``Scan``: returned directly.
+    - ``FSDB``: ``obj.scans[args[0]]`` is accessed; ``args`` must contain at
+      least one element identifying the scan.
+    - ``Fileset`` or ``File``: the ``scan`` attribute of the object is returned.
+    """
+    if isinstance(obj, Scan):
+        return obj.db, obj
+    elif isinstance(obj, FSDB):
+        try:
+            return obj, obj.scans[args[0]]
+        except KeyError:
+            raise ScanNotFoundError(obj, args[0])
+    elif isinstance(obj, Fileset):
+        return obj.db, obj.scan
+    elif isinstance(obj, File):
+        return obj.db, obj.scan
+    else:
+        raise TypeError(f"Unsupported object type: {type(obj)}")
+
+def requires_permission(required_permissions: Union[Permission, Tuple[Permission, ...]], check_scan_access: bool = False):
+    """Decorator that enforces permission checks before the execution of a method.
+
+    The decorator inspects the ``current_user`` keyword argument supplied
+    to the wrapped method and verifies that the user holds the required permissions.
+    When ``check_scan_access`` is ``True``, the check is performed against a specific
+    scan dataset, including additional token‑based dataset permissions. If the
+    user is missing any required permission, a ``PermissionError`` is raised.
+
+    Parameters
+    ----------
+    required_permissions : Union[Permission, Tuple[Permission, ...]]
+        Permission or tuple of permissions that the user must possess to invoke
+        the wrapped method.
+    check_scan_access : bool, optional
+        Determines whether the permission check is scoped to a particular scan
+        dataset (``True``) or performed at the generic user level (``False``).
+        Default is ``False``.
+
+    Returns
+    -------
+    function
+        A decorator that can be applied to instance methods. The decorator wraps
+        the original method with the described permission validation logic.
+
+    Raises
+    ------
+    PermissionError
+        Raised when no ``current_user`` is provided or when the user does not have
+        all of the required permissions for the operation.
+
+    Notes
+    -----
+    * The wrapper extracts the ``current_user`` from ``kwargs``; it must be passed
+      explicitly when the decorated method is called.
+    * When ``check_scan_access`` is enabled, the wrapper retrieves the target
+      ``Scan`` object via ``_get_scan`` and its metadata via ``_get_metadata`` to
+      perform dataset‑specific permission checks.
+    * For ``TokenUser`` instances, the wrapper also verifies that the token’s
+      dataset‑level permissions include the required permissions.
+
+    See Also
+    --------
+    functools.wraps
+        Preserves the original method’s metadata (name, docstring, etc.) when
+        creating the wrapper.
+    """
+
+    def decorator(method):
+        @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            if isinstance(required_permissions, Permission):
+                required_permissions_ = (required_permissions,)
+            else:
+                required_permissions_ = required_permissions
+
+            user: User = kwargs.get("current_user", None)
+            if user is None:
+                raise PermissionError("User must be logged in!")
+
+            # check dataset
+            if check_scan_access:
+                db, scan = _get_fsdb_and_scan(self, *args)
+                # Access metadata directly to avoid nested lock acquisition
+                metadata = _get_metadata(scan.metadata, None, {})
+                has_perms = all(
+                    db.rbac_manager.can_access_scan(user, metadata, perm) for perm in required_permissions_
+                )
+                # token user have restricted permissions per dataset
+                if isinstance(user, TokenUser):
+                    token_permissions = user.get_permissions_for_dataset(scan.id)
+                    has_perms = has_perms and all(perm in token_permissions for perm in required_permissions_)
+
+            else:
+                has_perms = all(self.rbac_manager.has_permission(user, perm) for perm in required_permissions_)
+
+            if not has_perms:
+                raise PermissionError(f"User {user.username} does not have required permissions to use {method.__name__}")
+
+            return method(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class FSDB(db.DB):
@@ -432,7 +571,7 @@ class FSDB(db.DB):
             )
 
         # Initialize RBAC manager with groups file in basedir
-        users_file = os.path.join(basedir, "users_0.15.json")
+        users_file = os.path.join(basedir, "users.json")
         groups_file = os.path.join(basedir, "groups.json")
         self.rbac_manager = RBACManager(users_file, groups_file, max_login_attempts, lockout_duration)
 
@@ -551,7 +690,7 @@ class FSDB(db.DB):
 
     @require_connected_db
     @require_authentication
-    def get_scans(self, query=None, **kwargs) -> List:
+    def get_scans(self, query=None, current_user=None, **kwargs) -> List:
         """Get a list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
@@ -585,11 +724,6 @@ class FSDB(db.DB):
         [<plantdb.commons.fsdb.core.Scan at *x************>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            self.logger.warning("No authenticated user, can not proceed.")
-            return []
-
         # Get all scans and filter by access permissions
         accessible_scans = {}
 
@@ -619,7 +753,8 @@ class FSDB(db.DB):
 
     @require_connected_db
     @require_authentication
-    def get_scan(self, scan_id, **kwargs):
+    @requires_permission(Permission.READ, check_scan_access=True)
+    def get_scan(self, scan_id, current_user=None, **kwargs):
         """Get a ` Scan ` instance in the local database.
 
         Parameters
@@ -651,28 +786,13 @@ class FSDB(db.DB):
         plantdb.commons.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        if not self.scan_exists(scan_id):
-            raise ScanNotFoundError(self, scan_id)
-
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise Exception("No valid user!")
-
-        scan = self.scans[scan_id]
-        # Access metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(scan.metadata, None, {})
-        if self.rbac_manager.can_access_scan(current_user, metadata, Permission.READ):
-            # Use shared lock for read operations
-            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
-                return scan
-        else:
-            self.logger.warning(f"User '{current_user.username}' cannot access scan {scan_id}!")
-
-        return None
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
+            return self.scans[scan_id]
 
     @require_connected_db
     @require_authentication
-    def create_scan(self, scan_id, metadata=None, **kwargs):
+    @requires_permission(Permission.CREATE, check_scan_access=False)
+    def create_scan(self, scan_id, metadata=None, current_user=None, **kwargs):
         """Create a new ``Scan`` instance in the local database.
 
         Parameters
@@ -722,14 +842,6 @@ class FSDB(db.DB):
         ValueError: Invalid scan identifier '0/07'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check CREATE permission
-        if not self.rbac_manager.has_permission(current_user, Permission.CREATE):
-            raise PermissionError(f"Insufficient permissions to create a scan as '{current_user.username}' user!")
-
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(scan_id):
             raise ValueError(f"Invalid scan identifier '{scan_id}'!")
@@ -773,7 +885,8 @@ class FSDB(db.DB):
 
     @require_connected_db
     @require_authentication
-    def delete_scan(self, scan_id, **kwargs) -> bool:
+    @requires_permission(Permission.DELETE, check_scan_access=True)
+    def delete_scan(self, scan_id, current_user=None, **kwargs) -> bool:
         """Delete an existing `Scan` from the local database.
 
         Parameters
@@ -816,21 +929,6 @@ class FSDB(db.DB):
         OSError: Invalid id
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        if not self.scan_exists(scan_id):
-            raise ValueError(f"Scan '{scan_id}' does not exist!")
-
-        # Check DELETE permission for this specific scan using its metadata
-        scan = self.scans[scan_id]
-        # Access metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(scan.metadata, None, {})
-        if not self.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
-            raise PermissionError(
-                f"Insufficient permissions to delete '{scan_id}' scan as '{current_user.username}' user!")
-
         # Use exclusive lock for scan deletion
         self.logger.info(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
@@ -844,7 +942,7 @@ class FSDB(db.DB):
 
     @require_connected_db
     @require_authentication
-    def list_scans(self, query=None, fuzzy=False, owner_only=True, **kwargs) -> list[str]:
+    def list_scans(self, query=None, fuzzy=False, owner_only=True, current_user=None, **kwargs) -> list[str]:
         """Get the list of scan identifiers from the local database.
 
         Parameters
@@ -878,7 +976,6 @@ class FSDB(db.DB):
         ['myscan_001']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.get_user_data(**kwargs)
         if not current_user:
             owner_only = False
 
@@ -965,6 +1062,7 @@ class FSDB(db.DB):
 
     # User management methods
 
+    @require_connected_db
     def validate_user(self, username: str, password: str) -> bool:
         """Validate the user credentials.
 
@@ -1073,6 +1171,7 @@ class FSDB(db.DB):
             return success, username
 
     @require_authentication
+    @requires_permission(Permission.MANAGE_USERS, check_scan_access=False)
     def create_user(self, new_username, fullname, password, roles=None, **kwargs) -> None:
         """Create a new user with the specified details.
 
@@ -1110,14 +1209,6 @@ class FSDB(db.DB):
         INFO     [FSDB] Successfully logged in as 'batman'.
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check user creation permissions
-        if not self.rbac_manager.can_create_user(current_user):
-            raise PermissionError(f"Insufficient permissions to create new user with user '{current_user.username}'")
-
         return self.rbac_manager.users.create(new_username, fullname, password, roles)
 
     def get_guest_user(self) -> User:
@@ -1223,7 +1314,7 @@ class FSDB(db.DB):
     # Group management methods
 
     @require_authentication
-    def create_group(self, name, users=None, description=None, **kwargs) -> Optional[Group]:
+    def create_group(self, name, users=None, description=None, current_user=None, **kwargs) -> Optional[Group]:
         """Create a new group.
 
         Parameters
@@ -1266,10 +1357,6 @@ class FSDB(db.DB):
         {'admin', 'batman'}
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if isinstance(users, str):
             users = [users]
         if isinstance(users, Iterable):
@@ -1278,7 +1365,7 @@ class FSDB(db.DB):
         return self.rbac_manager.create_group(current_user, name, users, description)
 
     @require_authentication
-    def add_user_to_group(self, group_name, user, **kwargs):
+    def add_user_to_group(self, group_name, user, current_user=None, **kwargs):
         """Add a user to a group.
 
         Parameters
@@ -1321,16 +1408,12 @@ class FSDB(db.DB):
         {'hquinn', 'batman', 'admin'}
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if not self.rbac_manager.add_user_to_group(current_user, group_name, user):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
     @require_authentication
-    def remove_user_from_group(self, group_name, user, **kwargs):
+    def remove_user_from_group(self, group_name, user, current_user=None, **kwargs):
         """Remove a user from a group.
 
         Parameters
@@ -1372,16 +1455,12 @@ class FSDB(db.DB):
         {'admin'}
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if not self.rbac_manager.remove_user_from_group(current_user, group_name, user):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
     @require_authentication
-    def delete_group(self, group_name, **kwargs) -> bool:
+    def delete_group(self, group_name, current_user=None, **kwargs) -> bool:
         """Delete a group.
 
         Parameters
@@ -1427,16 +1506,12 @@ class FSDB(db.DB):
         WARNING  [RBACManager] Deleting group 'groupA' by user 'admin'!
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if not self.rbac_manager.delete_group(current_user, group_name):
             raise PermissionError(f"Insufficient permissions or group '{group_name}' not found")
         return True
 
     @require_authentication
-    def list_groups(self, **kwargs) -> list[Group]:
+    def list_groups(self, current_user=None, **kwargs) -> list[Group]:
         """List all groups.
 
         Returns
@@ -1460,15 +1535,11 @@ class FSDB(db.DB):
         ['groupA']
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(kwargs.get('username', None))
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         groups = self.rbac_manager.list_groups(current_user)
         return groups if groups is not None else []
 
     @require_authentication
-    def get_user_groups(self, user=None, **kwargs) -> list[Group]:
+    def get_user_groups(self, user=None, current_user=None, **kwargs) -> list[Group]:
         """Get groups for a user.
 
         Parameters
@@ -1505,17 +1576,12 @@ class FSDB(db.DB):
         ['groupA']
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if user is None:
             user = current_user.username
-
         return self.rbac_manager.get_user_groups(user)
 
     @require_authentication
-    def get_scan_access_summary(self, scan_id, **kwargs):
+    def get_scan_access_summary(self, scan_id, current_user=None, **kwargs):
         """Get access summary for the current user on a scan.
 
         Parameters
@@ -1564,10 +1630,6 @@ class FSDB(db.DB):
         ['admin_role']
         >>> db.disconnect()
         """
-        current_user = self.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         if scan_id not in self.scans:
             return None
 
@@ -1886,7 +1948,8 @@ class Scan(db.Scan):
         return _get_metadata(self.measures, key, default={})
 
     @require_authentication
-    def set_metadata(self, data, value=None, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def set_metadata(self, data, value=None, current_user=None, **kwargs):
         """Add a new metadata to the scan.
 
         Parameters
@@ -1920,10 +1983,6 @@ class Scan(db.Scan):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         # Get current metadata for validation
         # Access scan metadata directly to avoid nested lock acquisition
         old_metadata = _get_metadata(self.metadata, None, {})
@@ -1941,8 +2000,9 @@ class Scan(db.Scan):
                 new_metadata = data
 
         # Validate scan metadata accessibility to current user
-        if not self.db.rbac_manager.validate_scan_metadata_access(current_user, old_metadata, new_metadata):
-            raise PermissionError(f"Insufficient permissions to modify scan '{self.id}' metadata!")
+        if 'owner' in new_metadata:
+            _ = new_metadata.pop('owner')
+            self.logger.warning(f"Removing owner entry from metadata update!")
 
         # Validate sharing groups if present
         if 'sharing' in new_metadata:
@@ -1951,10 +2011,6 @@ class Scan(db.Scan):
                 raise ValueError("Sharing field must be a list of group names")
             if not self.db.rbac_manager.validate_sharing_groups(sharing_groups):
                 raise ValueError("One or more sharing groups do not exist")
-
-        # Check WRITE permission for this scan
-        if not self.db.rbac_manager.can_access_scan(current_user, old_metadata, Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to modify scan '{self.id}' metadata.")
 
         # Use exclusive lock for metadata updates
         self.logger.info(f"Updating '{self.id}' scan metadata as '{current_user.username}' user...")
@@ -1969,7 +2025,8 @@ class Scan(db.Scan):
         return
 
     @require_authentication
-    def create_fileset(self, fs_id, metadata=None, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def create_fileset(self, fs_id, metadata=None, current_user=None, **kwargs):
         """Create a new `Fileset` instance in the local database attached to the current `Scan` instance.
 
         Parameters
@@ -2015,15 +2072,8 @@ class Scan(db.Scan):
         OSError: Invalid fileset identifier 'fileset/001'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
         # Access scan metadata directly to avoid nested lock acquisition
         metadata = _get_metadata(self.metadata, None, {})
-        # Check WRITE permission for this fileset using scan metadata
-        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to create a fileset in the '{self.id}' scan!")
 
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(fs_id):
@@ -2057,7 +2107,8 @@ class Scan(db.Scan):
         return fileset
 
     @require_authentication
-    def delete_fileset(self, fs_id, **kwargs) -> None:
+    @requires_permission(Permission.DELETE, check_scan_access=True)
+    def delete_fileset(self, fs_id, current_user=None, **kwargs) -> None:
         """Delete a given fileset from the scan dataset.
 
         Parameters
@@ -2089,17 +2140,6 @@ class Scan(db.Scan):
         []
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Access scan metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(self.metadata, None, {})
-        # Check DELETE permission for this fileset using scan metadata
-        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
-            raise PermissionError(
-                f"Insufficient permissions to delete filesets from the '{self.id}' scan as '{current_user.username}' user!")
-
         # Verify if the given `fs_id` exists in the local database
         if not self.fileset_exists(fs_id):
             raise ValueError(f"Fileset '{fs_id}' does not exist in scan '{self.id}'")
@@ -2357,7 +2397,8 @@ class Fileset(db.Fileset):
         return _get_metadata(self.metadata, key, default)
 
     @require_authentication
-    def set_metadata(self, data, value=None, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def set_metadata(self, data, value=None, current_user=None, **kwargs):
         """Add a new metadata to the fileset.
 
         Parameters
@@ -2390,16 +2431,6 @@ class Fileset(db.Fileset):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Access scan metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(self.scan.metadata, None, {})
-        # Check WRITE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
-            raise PermissionError(f"Insufficient permissions to edit the '{self.scan.id}/{self.id}' fileset metadata!")
-
         # Use exclusive lock for this operation
         self.logger.info(f"Editing the '{self.scan.id}/{self.id}' fileset metadata...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
@@ -2412,7 +2443,8 @@ class Fileset(db.Fileset):
         return
 
     @require_authentication
-    def create_file(self, f_id, metadata=None, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def create_file(self, f_id, metadata=None, current_user=None, **kwargs):
         """Create a new `File` instance in the local database attached to the current `Fileset` instance.
 
         Parameters
@@ -2459,16 +2491,6 @@ class Fileset(db.Fileset):
         ['file_007.json', 'test_image.png', 'test_json.json', 'dummy_image.png']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Access scan metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(self.scan.metadata, None, {})
-        # Check WRITE permission for this file
-        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.WRITE):
-            raise PermissionError(
-                f"Insufficient permissions to create a file in the '{self.scan.id}' scan as '{current_user.username}' user!")
 
         # Verify if the given `fs_id` is valid
         if not _is_valid_id(f_id):
@@ -2501,7 +2523,8 @@ class Fileset(db.Fileset):
         return file
 
     @require_authentication
-    def delete_file(self, f_id, **kwargs):
+    @requires_permission(Permission.DELETE, check_scan_access=True)
+    def delete_file(self, f_id, current_user=None, **kwargs):
         """Delete a given file from the current fileset.
 
         Parameters
@@ -2538,17 +2561,6 @@ class Fileset(db.Fileset):
         ['test_json.json', 'test_image.png']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Access scan metadata directly to avoid nested lock acquisition
-        metadata = _get_metadata(self.scan.metadata, None, {})
-        # Check DELETE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, metadata, Permission.DELETE):
-            raise PermissionError(
-                f"Insufficient permissions to delete the files from the '{self.scan.id}' scan as '{current_user.username}' user!")
-
         # Verify if the given `fs_id` exists in the local database
         if not self.file_exists(f_id):
             raise ValueError(f"File '{f_id}' does not exist in '{self.scan.id}/{self.id}'")
@@ -2648,7 +2660,7 @@ class File(db.File):
 
     Notes
     -----
-    `File` must be writen using ``write_raw`` or ``write`` methods to exist on disk.
+    `File` must be written using ``write_raw`` or ``write`` methods to exist on disk.
     Else they are just referenced in the database!
 
     Contrary to other classes (``Scan`` & ``Fileset``) the uniqueness is not checked!
@@ -2667,7 +2679,7 @@ class File(db.File):
         return
 
     def get_metadata(self, key=None, default={}):
-        """Get the metadata associated to a file.
+        """Get the metadata associated with a file.
 
         Parameters
         ----------
@@ -2698,7 +2710,8 @@ class File(db.File):
         return _get_metadata(self.metadata, key, default)
 
     @require_authentication
-    def set_metadata(self, data, value=None, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def set_metadata(self, data, value=None, current_user=None, **kwargs):
         """Add a new metadata to the file.
 
         Parameters
@@ -2726,15 +2739,6 @@ class File(db.File):
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check WRITE permission for this fileset
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(
-                f"Insufficient permissions to edit the '{self.scan.id}/{self.fileset.id}/{self.id}' file metadata!")
-
         # Use exclusive lock for this operation
         self.logger.info(f"Editing the '{self.scan.id}/{self.fileset.id}/{self.id}' fileset metadata...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
@@ -2747,7 +2751,8 @@ class File(db.File):
         return
 
     @require_authentication
-    def import_file(self, path, **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def import_file(self, path, current_user=None, **kwargs):
         """Import the file from its local path to the current fileset.
 
         Parameters
@@ -2769,15 +2774,6 @@ class File(db.File):
         True
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check WRITE permission for this file
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(
-                f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
-
         # Check if the path is a file
         if isinstance(path, str):
             path = Path(path)
@@ -2836,7 +2832,8 @@ class File(db.File):
             return f.read()
 
     @require_authentication
-    def write_raw(self, data, ext="", **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def write_raw(self, data, ext="", current_user=None, **kwargs):
         """Write a file from raw byte data.
 
         Parameters
@@ -2863,15 +2860,6 @@ class File(db.File):
         ['dummy_image.png', 'test_json.json', 'test_image.png', 'file_007.json']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check WRITE permission for this file
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(
-                f"Insufficient permissions to write raw '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
-
         # Use exclusive lock for this operation
         self.logger.info(
             f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
@@ -2919,7 +2907,8 @@ class File(db.File):
             return f.read()
 
     @require_authentication
-    def write(self, data, ext="", **kwargs):
+    @requires_permission(Permission.WRITE, check_scan_access=True)
+    def write(self, data, ext="", current_user=None, **kwargs):
         """Write a file from data.
 
         Parameters
@@ -2948,15 +2937,6 @@ class File(db.File):
         ['dummy_image.png', 'test_json.json', 'test_image.png', 'file_007.json']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        current_user = self.db.get_user_data(**kwargs)
-        if not current_user:
-            raise PermissionError("No authenticated user!")
-
-        # Check WRITE permission for this file
-        if not self.db.rbac_manager.can_access_scan(current_user, self.scan.get_metadata(), Permission.WRITE):
-            raise PermissionError(
-                f"Insufficient permissions to write '{self.filename}' file in '{self.scan.id}/{self.fileset.id}' as '{current_user.username}' user!")
-
         # Use exclusive lock for this operation
         self.logger.info(
             f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")

@@ -41,7 +41,7 @@ class TestFSDBDummy(DummyDBTestCase):
         scan.set_metadata(md)
         db = scan.get_db()
         scan_id = scan.id
-        db.dummy = False  # to avoid cleanup by `disconnect` method
+        db._is_dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         scan = db.get_scan(scan_id)
@@ -82,7 +82,7 @@ class TestFSDBDummy(DummyDBTestCase):
         db = fileset.get_db()
         scan_id = fileset.get_scan().id
         fs_id = fileset.id
-        db.dummy = False  # to avoid cleanup by `disconnect` method
+        db._is_dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         fileset = db.get_scan(scan_id).get_fileset(fs_id)
@@ -125,7 +125,7 @@ class TestFSDBDummy(DummyDBTestCase):
         scan_id = file.get_scan().id
         fs_id = file.get_fileset().id
         f_id = file.id
-        db.dummy = False  # to avoid cleanup by `disconnect` method
+        db._is_dummy = False  # to avoid cleanup by `disconnect` method
         db.disconnect()
         db.connect()
         file = db.get_scan(scan_id).get_fileset(fs_id).get_file(f_id)
