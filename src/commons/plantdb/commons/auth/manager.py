@@ -53,7 +53,9 @@ from typing import Union
 from argon2 import PasswordHasher
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Role
+from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
+from plantdb.commons.auth.models import parse_dataset_perm
 from plantdb.commons.log import get_logger
 
 ph = PasswordHasher()
@@ -357,6 +359,34 @@ class UserManager(object):
             self.logger.error(f"User '{username}' does not exist!")
             return None
         return self.users[username]
+
+    def get_token_user(self, token: dict) -> Union[TokenUser, None]:
+        """Retrieve a User object based on the provided username.
+
+        Parameters
+        ----------
+        token : dict
+            The token containing the identifier for the user to be retrieved and special permissions.
+            Must be a token with the type `api`.
+
+        Returns
+        -------
+        Union[TokenUser, None]
+            An instance of the User class representing the requested user.
+            If it does not exist, `None` is returned.
+        Raises
+        ------
+
+        """
+        if token["type"] != "api":
+            self.logger.error("Provided token is not an api token!")
+            raise TypeError("Provided token is not an api token!")
+        username = token.get('username')
+        if username not in self.users:
+            self.logger.error(f"User '{username}' does not exist!")
+            return None
+        user = self.users[username]
+        return TokenUser(**user.to_dict(), dataset_permissions=token.get("datasets"))
 
     def is_locked_out(self, username) -> bool:
         """Check if an account is locked.

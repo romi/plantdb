@@ -93,6 +93,7 @@ myscan_001/metadata/images/scan_img_99.json
 """
 
 import copy
+import functools
 import json
 import logging
 import os
@@ -103,12 +104,14 @@ from shutil import copyfile
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from plantdb.commons import db
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Permission
 from plantdb.commons.auth.models import Role
+from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
 from plantdb.commons.auth.rbac import RBACManager
 from plantdb.commons.auth.session import JWTSessionManager
@@ -161,6 +164,7 @@ def require_connected_db(method):
     plantdb.commons.fsdb.core.FSDB.connect : Method typically used to establish a database connection.
     """
 
+    @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         if not self.is_connected:
             raise ValueError("Database not connected, use the 'connect()' method first!")
@@ -173,6 +177,7 @@ def require_connected_db(method):
 def require_token(method):
     """Decorator that passes the token to the decorated method depending on the session manager."""
 
+    @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
 
         if isinstance(self.session_manager, SingleSessionManager):
@@ -288,6 +293,7 @@ def require_authentication(method):
     get_logged_user : Retrieves the username of the currently logged-in user.
     """
 
+    @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         # FIXME 'default_user' should be None!
         user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
@@ -1305,6 +1311,8 @@ class FSDB(db.DB):
 
         if username:
             return self.rbac_manager.users.get_user(username)
+        elif token and token["type"] == "api":
+            return self.rbac_manager.users.get_token_user(self.session_manager.validate_session(token))
         elif token:
             return self.rbac_manager.users.get_user(self.session_manager.session_username(token))
         else:

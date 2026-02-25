@@ -506,6 +506,11 @@ class User:
         KeyError
             If required keys are missing from the dictionary.
         """
+        args = cls._parse_user_dict(data)
+        return cls(**args)
+
+    @staticmethod
+    def _parse_user_dict(data: dict) -> dict[str | Any, set[Any] | datetime | datetime | None | bool | int | Any]:
         try:
             # Parse roles
             roles = set()
@@ -535,24 +540,26 @@ class User:
                 else:
                     return None
 
-            return cls(
-                username=data['username'],
-                fullname=data['fullname'],
-                password_hash=data['password_hash'],
-                roles=roles,
-                created_at=_datetime_convert(data['created_at']),
-                permissions=permissions,
-                last_login=_datetime_convert(data.get('last_login')),
-                is_active=data.get('is_active', True),
-                failed_attempts=data.get('failed_attempts', 0),
-                last_failed_attempt=_datetime_convert(data.get('last_failed_attempt')),
-                locked_until=_datetime_convert(data.get('locked_until')),
-                password_last_change=_datetime_convert(data.get('password_last_change')),
-            )
+            args = {
+                "username": data['username'],
+                "fullname": data['fullname'],
+                "password_hash": data['password_hash'],
+                "roles": roles,
+                "created_at": _datetime_convert(data['created_at']),
+                "permissions": permissions,
+                "last_login": _datetime_convert(data.get('last_login')),
+                "is_active": data.get('is_active', True),
+                "failed_attempts": data.get('failed_attempts', 0),
+                "last_failed_attempt": _datetime_convert(data.get('last_failed_attempt')),
+                "locked_until": _datetime_convert(data.get('locked_until')),
+                "password_last_change": _datetime_convert(data.get('password_last_change')),
+            }
+
         except KeyError as e:
             raise KeyError(f"Missing required field in user data: {e}")
         except ValueError as e:
             raise ValueError(f"Invalid data format in user data: {e}")
+        return args
 
     def to_json(self) -> str:
         """Convert ``User`` object to JSON string.
@@ -627,6 +634,76 @@ class User:
         self.failed_attempts += 1
         self.last_failed_attempt = datetime.now()
         return
+
+
+@dataclass
+class TokenUser(User):
+    dataset_permissions: Optional[dict[str, set[Permission]]] = None
+
+    def __post_init__(self):
+        if not self.dataset_permissions:
+            raise TypeError("`dataset_permissions` argument must be provided.`")
+
+    def to_dict(self) -> dict:
+        """Convert a ``TokenUser`` object to a dictionary for JSON serialization.
+
+        Returns
+        -------
+        dict
+            Dictionary representation of the ``TokenUser`` object.
+        """
+        d = super().to_dict()
+        d["dataset_permissions"] = self.dataset_permissions
+        return d
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'User':
+        """Create a ``User`` object from a dictionary (JSON deserialization).
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing user data.
+
+        Returns
+        -------
+        TokenUser
+            The ``TokenUser`` object created from the dictionary data.
+
+        Raises
+        ------
+        ValueError
+            If required fields are missing or invalid.
+        KeyError
+            If required keys are missing from the dictionary.
+        """
+        args = cls._parse_user_dict(data)
+        args["dataset_permissions"] = {
+            dname: {Permission(perm) for perm in permissions}
+            for dname, permissions in args["dataset_permissions"].items()
+        }
+        return cls(**args)
+
+    def get_permissions_for_dataset(self, dataset_name: str) -> set[Permission]:
+        """
+        Returns the set of permissions available for this TokenUser for the provided dataset name.
+
+        Parameters
+        ----------
+        dataset_name: str
+            Name of the dataset.
+
+        Returns
+        -------
+        set[Permission]
+            Set of available permissions for this TokenUser for the provided dataset name.
+
+        """
+        permissions = set()
+        for dataset_pattern, _permissions in self.dataset_permissions.items():
+            if fnmatchcase(dataset_name, dataset_pattern):
+                permissions |= _permissions & self.permissions
+        return permissions
 
 
 @dataclass
