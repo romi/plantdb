@@ -93,34 +93,34 @@ from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
 from plantdb.commons.test_database import DATASET
 from plantdb.commons.test_database import test_database
-from plantdb.server.rest_api import Archive
-from plantdb.server.rest_api import CurveSkeleton
-from plantdb.server.rest_api import DatasetFile
-from plantdb.server.rest_api import File
-from plantdb.server.rest_api import FileCreate
-from plantdb.server.rest_api import FileMetadata
-from plantdb.server.rest_api import FilesetCreate
-from plantdb.server.rest_api import FilesetFiles
-from plantdb.server.rest_api import FilesetMetadata
-from plantdb.server.rest_api import HealthCheck
-from plantdb.server.rest_api import Home
-from plantdb.server.rest_api import Image
-from plantdb.server.rest_api import Login
-from plantdb.server.rest_api import Logout
-from plantdb.server.rest_api import Mesh
-from plantdb.server.rest_api import PointCloud
-from plantdb.server.rest_api import PointCloudGroundTruth
-from plantdb.server.rest_api import Refresh
-from plantdb.server.rest_api import Register
-from plantdb.server.rest_api import Scan
-from plantdb.server.rest_api import ScanCreate
-from plantdb.server.rest_api import ScanFilesets
-from plantdb.server.rest_api import ScanMetadata
-from plantdb.server.rest_api import ScansList
-from plantdb.server.rest_api import ScansTable
-from plantdb.server.rest_api import Sequence
-from plantdb.server.rest_api import TokenRefresh
-from plantdb.server.rest_api import TokenValidation
+from plantdb.server.api.assets import Archive
+from plantdb.server.api.assets import CurveSkeleton
+from plantdb.server.api.assets import DatasetFile
+from plantdb.server.api.assets import File
+from plantdb.server.api.file import FileCreate
+from plantdb.server.api.file import FileMetadata
+from plantdb.server.api.fileset import FilesetCreate
+from plantdb.server.api.fileset import FilesetFiles
+from plantdb.server.api.fileset import FilesetMetadata
+from plantdb.server.api.base import HealthCheck
+from plantdb.server.api.base import Home
+from plantdb.server.api.assets import Image
+from plantdb.server.api.auth import Login
+from plantdb.server.api.auth import Logout
+from plantdb.server.api.assets import Mesh
+from plantdb.server.api.assets import PointCloud
+from plantdb.server.api.assets import PointCloudGroundTruth
+from plantdb.server.api.base import Refresh
+from plantdb.server.api.auth import Register
+from plantdb.server.api.scan import Scan
+from plantdb.server.api.scan import ScanCreate
+from plantdb.server.api.scan import ScanFilesets
+from plantdb.server.api.scan import ScanMetadata
+from plantdb.server.api.scan import ScansList
+from plantdb.server.api.scan import ScansTable
+from plantdb.server.api.assets import Sequence
+from plantdb.server.api.auth import TokenRefresh
+from plantdb.server.api.auth import TokenValidation
 
 
 def parsing() -> argparse.ArgumentParser:
@@ -326,7 +326,7 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         DatasetFile,
         "/files/<string:scan_id>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Refresh,
