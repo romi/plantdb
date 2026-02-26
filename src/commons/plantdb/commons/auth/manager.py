@@ -360,33 +360,35 @@ class UserManager(object):
             return None
         return self.users[username]
 
-    def get_token_user(self, token: dict) -> Union[TokenUser, None]:
+    def get_token_user(self, token_payload: dict) -> Union[TokenUser, None]:
         """Retrieve a User object based on the provided username.
 
         Parameters
         ----------
-        token : dict
+        token_payload : dict
             The token containing the identifier for the user to be retrieved and special permissions.
-            Must be a token with the type `api`.
+            Must be a token with the type `'api'`.
 
         Returns
         -------
         Union[TokenUser, None]
-            An instance of the User class representing the requested user.
-            If it does not exist, `None` is returned.
+            An instance of the ``User`` class representing the requested user.
+            If it does not exist, ``None`` is returned.
+
         Raises
         ------
-
+        TypeError
+            If the provided token payload does not correspond to an api token.
         """
-        if token["type"] != "api":
+        if token_payload["type"] != "api":
             self.logger.error("Provided token is not an api token!")
             raise TypeError("Provided token is not an api token!")
-        username = token.get('username')
+        username = token_payload.get('username')
         if username not in self.users:
             self.logger.error(f"User '{username}' does not exist!")
             return None
         user = self.users[username]
-        return TokenUser(**user.to_dict(), dataset_permissions=token.get("datasets"))
+        return TokenUser(**user.to_dict(), dataset_permissions=token_payload.get("datasets"))
 
     def is_locked_out(self, username) -> bool:
         """Check if an account is locked.
