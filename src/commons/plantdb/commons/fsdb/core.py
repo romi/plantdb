@@ -521,11 +521,11 @@ class FSDB(db.DB):
             The path to the root directory of the database.
         required_filesets : list of str, optional
             A list of required filesets to consider a scan valid.
-            By default, ``None``,  will set it to ``['metadata']`` to defines as a Scan the subdirectories with a 'metadata' directory.
-            Use `[]`  to accept any subdirectory of `basedir` as a valid scan
+            By default, ``None``, will set it to ``['metadata']`` to define as a "scan" the subdirectories with a 'metadata' directory.
+            Use `[]` to accept any subdirectory of `basedir` as a valid "scan".
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
-        session_manager : {SingleSessionManager, SessionManager, JWTSessionManager}, optional
+        session_manager : Union[SingleSessionManager, SessionManager, JWTSessionManager], optional
             The session manager to use for session authentication.
             Defaults to ``SingleSessionManager``.
         session_timeout : int, optional
