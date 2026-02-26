@@ -1041,7 +1041,7 @@ class JWTSessionManager(SessionManager):
             'audience': payload['aud'],  # audience
             'type': payload.get('type')  # type of token, 'access', 'api' or 'refresh'
         }
-        if ['datasets'] in payload:
+        if 'datasets' in payload:
             payload_dict['datasets'] = parse_dataset_perm(payload['datasets'])
         return payload_dict
 
