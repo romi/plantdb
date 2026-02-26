@@ -1059,7 +1059,7 @@ class JWTSessionManager(SessionManager):
         token : str
             The JSON Web Token to validate.
         token_type : str, optional
-            The expected token type ('access' or 'refresh').
+            The expected token type ('access', 'api' or 'refresh').
             Defaults to 'access'.
 
         Returns
@@ -1201,7 +1201,7 @@ class JWTSessionManager(SessionManager):
         try:
             payload = self._payload_from_token(token)
         except jwt.ExpiredSignatureError:
-            # Token is expired but we still want to clean it up from storage
+            # Token is expired, but we still want to clean it up from storage
             # Decode without verification to extract the jti
             payload = jwt.decode(
                 token,
@@ -1255,21 +1255,24 @@ class JWTSessionManager(SessionManager):
 
         return
 
-    def session_username(self, token: str) -> Optional[str]:
+    def session_username(self, token: str, token_type: str = 'access') -> Optional[str]:
         """Extract username from JSON Web Token.
 
         Parameters
         ----------
         token : str
             Current JSON Web Token.
+        token_type : str, optional
+            The expected token type ('access', 'api' or 'refresh').
+            Defaults to 'access'.
 
         Returns
         -------
         str or None
-            Username if token is valid.
+            The corresponding username if the token is valid.
         """
         try:
-            session_data = self.validate_session(token)
+            session_data = self.validate_session(token, token_type)
         except SessionValidationError as e:
             self.logger.warning(f"Provided session does not exist: {e}")
             return None
