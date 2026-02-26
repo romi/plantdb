@@ -3054,7 +3054,7 @@ def _filter_query(obj_list, query=None, fuzzy=False, debug=False):
             query_debug[obj.id] = {}
             f_query = []  # boolean list gathering the "filter test results"
             for q in query.keys():
-                query_test = partial_match(obj.get_metadata(q), query[q], fuzzy=fuzzy)
+                query_test = partial_match(query[q], obj.get_metadata(q), fuzzy=fuzzy)
                 if debug:
                     query_debug[obj.id][q] = {
                         'query_value': query[q],
