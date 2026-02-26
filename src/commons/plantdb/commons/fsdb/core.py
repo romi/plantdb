@@ -203,7 +203,7 @@ def require_token(method):
     return wrapper
 
 
-def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
+def get_logged_username(fsdb, default_user=None, token=None, token_type='access', **kwargs):
     """Returns the username of the currently logged user based on the session management system.
 
     This function identifies the username of the logged-in user by inspecting the session manager
@@ -219,8 +219,10 @@ def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
         The session manager is responsible for handling user sessions.
     default_user : str, optional
         A fallback username to use if no valid session or token is found. Defaults to ``None``.
-    token : str
+    token : str, optional
         The session token or JWT for validating the user's session.
+    token_type : str, optional
+        The token type ('access', 'api' or 'refresh'). Defaults to 'access'.
 
     Returns
     -------
@@ -268,9 +270,9 @@ def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
         # If a JSON Web Token Session Manager or a Session Manager, require the token to retrieve the username
         if token:
             if isinstance(fsdb, (Scan, Fileset, File)):
-                user = fsdb.db.get_user_data(token=token)
+                user = fsdb.db.get_user_data(token=token, token_type=token_type)
             else:
-                user = fsdb.get_user_data(token=token)
+                user = fsdb.get_user_data(token=token, token_type=token_type)
             logged_user = user
         else:
             logged_user = default_user
@@ -297,7 +299,9 @@ def require_authentication(method):
     def wrapper(self, *args, **kwargs):
         # FIXME 'default_user' should be None!
         user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
-                                   token=kwargs.get('token', None), **kwargs)
+                                   token=kwargs.get('token', None),
+                                   token_type=kwargs.get('token_type', 'access'),
+                                   **kwargs)
 
         if not user:
             raise PermissionError("No authenticated user!")
@@ -1101,7 +1105,7 @@ class FSDB(db.DB):
 
     @require_connected_db
     def login(self, username: str, password: str, **kwargs) -> Optional[str]:
-        """Authenticate user and create session.
+        """Authenticate a user and create a session.
 
         Parameters
         ----------
@@ -1243,18 +1247,21 @@ class FSDB(db.DB):
         """
         return self.rbac_manager.get_guest_user()
 
-    def get_username(self, token) -> Optional[str]:
+    def get_username(self, token, token_type='access') -> Optional[str]:
         """Get the username.
 
         Parameters
         ----------
         token : str
             The token provided by the RBAC manager.
+        token_type : str, optional
+            The expected token type ('access', 'api' or 'refresh').
+            Defaults to 'access'.
 
         Returns
         -------
         Optional[str]
-            The ``User.username`` if the token is valid, None otherwise.
+            The ``User.username`` if the token is valid, ``None`` otherwise.
 
         Examples
         --------
@@ -1268,9 +1275,9 @@ class FSDB(db.DB):
         'guest'
         >>> db.disconnect()
         """
-        return self.session_manager.session_username(token)
+        return self.session_manager.session_username(token, token_type)
 
-    def get_user_data(self, username=None, token=None) -> Optional[User]:
+    def get_user_data(self, username=None, token=None, token_type='access') -> Optional[User]:
         """Get the user data.
 
         Parameters
@@ -1279,11 +1286,14 @@ class FSDB(db.DB):
             The username to retrieve the user data from.
         token : str
             The token provided by the RBAC manager.
+        token_type : str, optional
+            The expected token type ('access', 'api' or 'refresh').
+            Defaults to 'access'.
 
         Returns
         -------
         Optional[User]
-            The User object corresponding to the currently authenticated user, if any, ``None`` otherwise.
+            A ``User`` instance corresponding to the currently authenticated user, if any, ``None`` otherwise.
 
         Notes
         -----
@@ -1311,10 +1321,10 @@ class FSDB(db.DB):
 
         if username:
             return self.rbac_manager.users.get_user(username)
-        elif token and token["type"] == "api":
-            return self.rbac_manager.users.get_token_user(self.session_manager.validate_session(token))
+        elif token and token_type == "api":
+            return self.rbac_manager.users.get_token_user(self.session_manager.validate_session(token, token_type))
         elif token:
-            return self.rbac_manager.users.get_user(self.session_manager.session_username(token))
+            return self.rbac_manager.users.get_user(self.session_manager.session_username(token, token_type))
         else:
             self.logger.error("No username or token provided")
             return None
