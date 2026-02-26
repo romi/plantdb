@@ -254,13 +254,17 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
     True
     >>> get_logged_username(db, default_user='guest')
     """
-    logged_user = default_user
+    if default_user:
+        logged_user = fsdb.get_user_data(username=default_user)
+    else:
+        logged_user = None
+
     if isinstance(fsdb.session_manager, SingleSessionManager):
         # If a Single SessionManager, get the username from the session manager (as only one user can be logged at once)
         try:
             session = list(fsdb.session_manager.sessions.keys())[0]
         except IndexError:
-            logged_user = default_user
+            logged_user = fsdb.get_user_data(username=default_user)
         else:
             if isinstance(fsdb, (Scan, Fileset, File)):
                 logged_user = fsdb.db.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
@@ -275,7 +279,7 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
                 user = fsdb.get_user_data(token=token, token_type=token_type)
             logged_user = user
         else:
-            logged_user = default_user
+            logged_user = fsdb.get_user_data(username=default_user)
     else:
         fsdb.logger.error("Can't serve a local PlantDB without a session manager!")
     return logged_user
@@ -300,8 +304,7 @@ def require_authentication(method):
         # FIXME 'default_user' should be None!
         user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
                                    token=kwargs.get('token', None),
-                                   token_type=kwargs.get('token_type', 'access'),
-                                   **kwargs)
+                                   token_type=kwargs.get('token_type', 'access'))
 
         if not user:
             raise PermissionError("No authenticated user!")
