@@ -527,11 +527,12 @@ class JWTSessionManager(SessionManager):
     This session manager extends `SessionManager` by issuing JSON Web Tokens (JWT) for authentication.
     An *access* token is short‑lived and is used for authorizing API calls, while a *refresh* token
     is long‑lived and can be exchanged for a new access token when the original expires.
+    An *api* token is long‑lived and adds dataset-specific rights to the token with a custom ``datasets`` claims.
     The manager keeps track of active access tokens to enforce a maximum number of concurrent
     sessions per application instance. Tokens are signed with a secret key that is either supplied by
     the caller or generated automatically. All tokens conform to RFC7519 and contain the standard
     registered claims (`iss`, `sub`, `aud`, `exp`, `iat`, `jti`) plus a custom ``type`` claim that
-    identifies the token as ``'access'`` or ``'refresh'``.
+    identifies the token as ``'access'``, ``'api'`` or ``'refresh'``.
 
     Attributes
     ----------
@@ -552,9 +553,11 @@ class JWTSessionManager(SessionManager):
     refresh_timeout : int
         Lifetime of a refresh token in seconds.
         The default value (``86400``) corresponds to 24 hours.
-    secret_key : str
+    secret_key : Union[str, bytes, None]
         Secret used for HS512 signing of JWTs.
-        If ``None`` is passed to the constructor, a cryptographically‑secure random key is generated.
+        If ``None`` is passed to the constructor, a random 64‑byte key is generated.
+        This will break the API tokens persistence across restarts as, after a restart, the new instance
+        gets a different secret key, so all previously persisted API tokens in the file become unverifiable.
     refresh_tokens : dict
         Mapping from refresh token identifier (``jti``) to a dictionary containing ``username``,
         creation and expiration timestamps, token type and the associated access token identifier.
@@ -562,7 +565,7 @@ class JWTSessionManager(SessionManager):
     _lock : threading.Lock
         A locking mechanism to lock `self.session` dict for thread‑safe changes
     api_token_dir : str or pathlib.Path
-        Directory where the ``api_token.json`` file will be stored.
+        Directory where the ``api_token.txt`` file will be stored.
     """
 
     def __init__(self, session_timeout: int = 900, refresh_timeout: int = 86400, max_concurrent_sessions: int = 10,
@@ -583,15 +586,16 @@ class JWTSessionManager(SessionManager):
         secret_key : Union[str, bytes, None]
            Secret used for HS512 signing of JWTs.
            - If a ``bytes`` object is supplied, it must be ≥ 64 bytes.
-           - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2
-             to produce a 64‑byte key.
-           - If ``None`` a fresh random 64‑byte key is generated.
+           - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2 to produce a 64‑byte key.
+           - If ``None`` (default) a fresh random 64‑byte key is generated.
+             This will break the API tokens persistence across restarts as, after a restart, the new instance
+             gets a different secret key, so all previously persisted API tokens in the file become unverifiable.
         leeway : int, optional
             Allowed leeway, in seconds, after tokens expiration date, to accommodate for clock-skew.
             Set it to `0` so that the token is considered expired immediately after its exp claim passes.
             Defaults to ``2``.
         api_token_dir : str or pathlib.Path, optional
-            Directory where the ``api_token.json`` file will be stored.
+            Directory where the ``api_token.txt`` file will be stored.
             Defaults to the system temporary directory.
         """
         super().__init__(session_timeout, max_concurrent_sessions)
@@ -599,11 +603,30 @@ class JWTSessionManager(SessionManager):
         self.leeway = leeway
         self.refresh_tokens = {}  # Track valid refresh tokens (jti -> session_info)
         self._lock = RLock()  # to lock `self.session` dict for thread‑safe changes
+
         self.secret_key = self._init_secret_key(secret_key)
-        self.api_token_file = Path(api_token_dir) / 'api_token.json'
+        self.api_token_file = Path(api_token_dir) / 'api_token.txt'
+        self._api_tokens: dict[str, str] = {}  # jti -> ISO expiry string
+        self._safe_secret_init(secret_key)
+
+        # Load any existing API tokens from disk
+        self._load_api_tokens()
 
         # ---- Start the daily clean‑up thread ----
         self._start_daily_cleanup_thread(hour=3, minute=0, tz=timezone.utc)
+
+    def _safe_secret_init(self, secret_key):
+        """Verifies if the secret key used for signing API tokens is random and nullify an existing api_token_file."""
+        if secret_key is None:
+            if self.api_token_file.exists():
+                self.logger.error("Got an existing API token file with a randomly generated secret key.")
+                self.logger.warning(f"Removing existing API token file at: {self.api_token_file}")
+                self.api_token_file.unlink()
+            else:
+                self.logger.warning(
+                    "Using a randomly generated secret key for token signature will render all saved API token useless at restart!")
+            self.logger.info("Set a secret key value to avoid loosing API tokens.")
+            self.logger.info("Use the 'JWT_SECRET_KEY' environment variable if you are using the `fsdb_rest_api` CLI.")
 
     def _init_secret_key(self, secret_key: Union[str, bytes] = None) -> bytes:
         """Initialize or validate the secret key used for cryptographic operations.
@@ -754,59 +777,127 @@ class JWTSessionManager(SessionManager):
         self.logger.debug(f"Created session for '{username}'")
         return access_token, refresh_token
 
-    def _dump_api_token(self, token, token_exp):
-        """Append a new API token and its expiry to the token file."""
-        with open(self.api_token_file, "a") as outfile:
-            # Store the expiry as an ISO‑8601 string for easy comparison later
-            outfile.write(f"{token} {token_exp.isoformat() if isinstance(token_exp, datetime) else token_exp}\n")
+    def _load_api_tokens(self) -> None:
+        """Load API tokens from disk into ``self._api_tokens``, discarding expired entries.
 
-    def _clean_up_token_file(self):
-        """Remove expired API tokens from ``self.api_token_file``.
+        Each line in the file is expected to have the format ``<jti> <ISO-8601 expiry>``.
+        Entries that are expired or malformed are silently dropped.  The cleaned state is
+        written back to disk so that the file stays tidy after every startup.
+        """
+        if not self.api_token_file.exists():
+            return
+
+        now = datetime.now(timezone.utc)
+        loaded: dict[str, str] = {}
+
+        with self._lock:
+            with open(self.api_token_file, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    parts = line.split(" ", maxsplit=1)
+                    if len(parts) != 2:
+                        self.logger.warning(f"Skipping malformed line in token file: {line!r}")
+                        continue
+                    jti, exp_str = parts
+                    try:
+                        exp_dt = datetime.fromisoformat(exp_str)
+                        if exp_dt.tzinfo is None:
+                            exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+                    except ValueError:
+                        self.logger.warning(f"Skipping token with unparseable expiry: {exp_str!r}")
+                        continue
+                    if exp_dt > now:
+                        loaded[jti] = exp_str
+                    else:
+                        self.logger.debug(f"Discarding expired API token jti={jti} (expired {exp_str})")
+
+            self._api_tokens = loaded
+            # Persist the cleaned state back to disk
+            self._save_api_tokens()
+
+        self.logger.debug(f"Loaded {len(self._api_tokens)} valid API token(s) from {self.api_token_file}")
+
+    def _save_api_tokens(self) -> None:
+        """Persist the current ``self._api_tokens`` dict to disk.
+
+        The caller is responsible for acquiring ``self._lock`` before calling this method.
+        """
+        with open(self.api_token_file, "w") as f:
+            for jti, exp_str in self._api_tokens.items():
+                f.write(f"{jti} {exp_str}\n")
+
+    def _dump_api_token(self, jti: str, token_exp: datetime) -> None:
+        """Register a new API token in memory and append it to the token file.
+
+        Parameters
+        ----------
+        jti : str
+            The unique token identifier.
+        token_exp : datetime
+            The expiration datetime of the token.
+        """
+        exp_str = token_exp.isoformat()
+        with self._lock:
+            self._api_tokens[jti] = exp_str
+            # Append to file (avoids rewriting the whole file on every creation)
+            with open(self.api_token_file, "a") as f:
+                f.write(f"{jti} {exp_str}\n")
+
+    def _is_api_token_active(self, jti: str) -> bool:
+        """Check whether an API token is registered and not expired.
+
+        Parameters
+        ----------
+        jti : str
+            The unique token identifier to look up.
 
         Returns
         -------
-        int
-            The number of tokens kept after cleanup.
-        int
-            The number of cleaned tokens.
+        bool
+            ``True`` if the token is known and its expiry is in the future.
         """
-        if not self.api_token_file.exists():
-            return []  # Nothing to clean up
+        exp_str = self._api_tokens.get(jti)
+        if exp_str is None:
+            return False
+        exp_dt = datetime.fromisoformat(exp_str)
+        if exp_dt.tzinfo is None:
+            exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+        return exp_dt > datetime.now(timezone.utc)
 
+    def _clean_up_token_file(self) -> Tuple[int, int]:
+        """Remove expired API tokens from memory and rewrite the token file.
+
+        Returns
+        -------
+        tuple[int, int]
+            ``(n_valid, n_cleaned)`` — the number of tokens kept and the number removed.
+        """
         now = datetime.now(timezone.utc)
+        with self._lock:
+            initial_count = len(self._api_tokens)
+            expired_jtis = []
+            # Identifies malformed or expired tokens for removal
+            for jti, exp_str in self._api_tokens.items():
+                try:
+                    exp_dt = datetime.fromisoformat(exp_str)
+                    if exp_dt.tzinfo is None:
+                        exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+                except ValueError:
+                    expired_jtis.append(jti)
+                    continue
+                if exp_dt <= now:
+                    expired_jtis.append(jti)
 
-        # Load the whole file as a single JSON object
-        tokens: dict[str, str] = {}
-        with open(self.api_token_file, "r") as f:
-            for line in f:
-                token, exp = line.strip().split(" ")
-                tokens[token] = exp
+            for jti in expired_jtis:
+                self.logger.debug(f"Removing expired API token jti={jti}")
+                del self._api_tokens[jti]
 
-        tot_tokens = len(tokens)
-        # Filter out expired entries
-        valid_tokens: dict[str, str] = {}
-        for token, exp in tokens.items():
-            # Normalize an ISO‑8601 string to a ``datetime`` for comparison.
-            if isinstance(exp, str):
-                exp_dt = datetime.fromisoformat(exp)
-                if exp_dt.tzinfo is None:
-                    exp_dt = exp_dt.replace(tzinfo=timezone.utc)
-            else:
-                self.logger.warning(f"Unsupported expiration type for token {token}: {type(exp)}")
-                continue
+            self._save_api_tokens()
 
-            if exp_dt > now:
-                valid_tokens[token] = exp
-            else:
-                self.logger.debug(f"Removing expired API token {token} (expired at {exp_dt.isoformat()})")
-
-        # Write the cleaned mapping back to the file
-        with open(self.api_token_file, "w") as outfile:
-            for token, token_exp in valid_tokens.items():
-                outfile.write(f"{token} {token_exp.isoformat() if isinstance(token_exp, datetime) else token_exp}")
-
-        n_valid_tokens = len(valid_tokens)
-        return n_valid_tokens, tot_tokens - n_valid_tokens
+        n_valid = len(self._api_tokens)
+        return n_valid, initial_count - n_valid
 
     def _start_daily_cleanup_thread(self, hour: int = 3, minute: int = 0, tz: timezone = timezone.utc) -> None:
         """Start a background daemon thread that clean up the token file every day at the given time.
@@ -906,23 +997,21 @@ class JWTSessionManager(SessionManager):
         elif isinstance(token_exp, str):
             token_exp = datetime.fromisoformat(token_exp)
 
-        # Check the valididty of the expiration date
+        # Check the validity of the expiration date
         if isinstance(token_exp, datetime):
-            try:
-                assert token_exp > now
-            except AssertionError:
-                self.logger.error(f"Token expiration date ({token_exp}) is not valid.")
+            if token_exp <= now:
+                self.logger.error(f"Token expiration date ({token_exp}) is in the past.")
                 return ""
         else:
-            self.logger.error(f"Token expiration date ({token_exp}) is not recognized.")
+            self.logger.error(f"Token expiration date ({token_exp}) is not valid.")
             return ""
 
         token_jti = secrets.token_urlsafe(16)
         # Create the token:
         api_token = self._create_token(username, token_jti, token_exp, now, "api", datasets=datasets)
 
-        # Append the token:
-        self._dump_api_token(api_token, token_exp)
+        # Register the token by jti:
+        self._dump_api_token(token_jti, token_exp)
 
         return api_token
 
@@ -1005,10 +1094,6 @@ class JWTSessionManager(SessionManager):
             self.logger.error(f"Error validating JSON Web Token: {e}")
             raise InvalidTokenProcessingError(e) from e
 
-        # FIXME
-        if payload.get('type') == 'api':
-            token_type = 'api'
-
         # Check token type
         if payload.get('type') != token_type:
             self.logger.error(f"Invalid token type: expected {token_type}, got {payload.get('type')}")
@@ -1029,8 +1114,10 @@ class JWTSessionManager(SessionManager):
                 self.logger.error("Refresh token not found in active refresh tokens")
                 raise RefreshTokenNotFoundError(f"Refresh token jti={jti} not found")
         elif token_type == 'api':
-            # Check JSON file
-            pass
+            # Check active API tokens in the file
+            if not self._is_api_token_active(jti):
+                self.logger.error("API token not found in token store or has expired")
+                raise SessionValidationError(f"API token jti={jti} is not active")
 
         payload_dict = {
             'username': payload['sub'],  # subject is the username
@@ -1097,6 +1184,55 @@ class JWTSessionManager(SessionManager):
                     return True, username
 
         return False, None
+
+    def invalidate_api_token(self, token: str) -> bool:
+        """Revoke an API token, removing it from memory and the persistent file.
+
+        Parameters
+        ----------
+        token : str
+            The full JWT string of the API token to revoke.
+
+        Returns
+        -------
+        bool
+            ``True`` if the token was found and removed, ``False`` otherwise.
+        """
+        try:
+            payload = self._payload_from_token(token)
+        except jwt.ExpiredSignatureError:
+            # Token is expired but we still want to clean it up from storage
+            # Decode without verification to extract the jti
+            payload = jwt.decode(
+                token,
+                self.secret_key,
+                algorithms=['HS512'],
+                audience='plantdb-client',
+                issuer='plantdb-api',
+                options={"verify_exp": False},
+                leeway=self.leeway
+            )
+        except (jwt.InvalidTokenError, Exception) as e:
+            self.logger.error(f"Failed to decode API token for invalidation: {e}")
+            return False
+
+        if payload.get('type') != 'api':
+            self.logger.warning("Token is not an API token, use invalidate_session() instead")
+            return False
+
+        jti = payload.get('jti')
+        if not jti:
+            return False
+
+        with self._lock:
+            if jti in self._api_tokens:
+                del self._api_tokens[jti]
+                self._save_api_tokens()
+                self.logger.debug(f"Invalidated API token jti={jti}")
+                return True
+
+        self.logger.warning(f"API token jti={jti} not found in active tokens")
+        return False
 
     def cleanup_expired_sessions(self) -> None:
         """Remove expired sessions from tracking."""
