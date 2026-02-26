@@ -254,11 +254,6 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
     True
     >>> get_logged_username(db, default_user='guest')
     """
-    if default_user:
-        logged_user = fsdb.get_user_data(username=default_user)
-    else:
-        logged_user = None
-
     if isinstance(fsdb.session_manager, SingleSessionManager):
         # If a Single SessionManager, get the username from the session manager (as only one user can be logged at once)
         try:
@@ -282,6 +277,8 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
             logged_user = fsdb.get_user_data(username=default_user)
     else:
         fsdb.logger.error("Can't serve a local PlantDB without a session manager!")
+        logged_user = None
+
     return logged_user
 
 
