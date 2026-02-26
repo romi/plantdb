@@ -502,13 +502,13 @@ class RBACManager :
 
         Returns
         -------
-        Role
+        plantdb.commons.models.Role
             The effective role for this specific scan dataset.
         """
         # Get the scan owner, default to guest if not specified
         scan_owner = scan_metadata.get('owner', self.users.GUEST_USERNAME)
 
-        # If user is the owner, they get CONTRIBUTOR role (unless they're admin)
+        # If the user is the owner, it gets the CONTRIBUTOR role (unless admin)
         if user.username == scan_owner:
             # Admins keep their admin privileges
             if Role.ADMIN in user.roles:
@@ -523,13 +523,13 @@ class RBACManager :
                 # Fallback to CONTRIBUTOR for owners
                 return Role.CONTRIBUTOR
 
-        # Check if user belongs to any shared groups
+        # Check if the user belongs to any shared groups
         shared_groups = scan_metadata.get('sharing', [])
         if shared_groups:
             user_groups = self.groups.get_user_groups(user.username)
             user_group_names = {group.name for group in user_groups}
 
-            # If user belongs to any shared group, they get CONTRIBUTOR role for this scan
+            # If the user belongs to any shared group, they get the CONTRIBUTOR role for this scan
             if any(group_name in user_group_names for group_name in shared_groups):
                 # Admins keep their admin privileges
                 if Role.ADMIN in user.roles:
