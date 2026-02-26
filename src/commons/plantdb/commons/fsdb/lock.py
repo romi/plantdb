@@ -54,7 +54,7 @@ class LockType(Enum):
 
 
 class LockError(Exception):
-    """Raised when lock acquisition fails."""
+    """Raised when the lock acquisition fails."""
 
     def __init__(self, message: str):
         self.message = message
@@ -65,7 +65,7 @@ class LockError(Exception):
 
 
 class LockTimeoutError(Exception):
-    """Raised when lock acquisition times out"""
+    """Raised when the lock acquisition times out"""
 
     def __init__(self, message: str = "Error: Lock acquisition timed-out!"):
         self.message = message
@@ -343,7 +343,7 @@ class ScanLockManager :
 
                     # Try to acquire the lock (non-blocking)
                     fcntl.flock(lock_fd, lock_flags)
-                    # SUCCESS – clear any stale warning timestamp for this scan_id
+                    # SUCCESS - clear any stale warning timestamp for this scan_id
                     self._warning_timestamps.pop(scan_id, None)
 
                     # Lock acquired successfully
@@ -375,14 +375,14 @@ class ScanLockManager :
                     last_warn = self._warning_timestamps.get(scan_id, 0.0)
                     if now - last_warn >= self._warning_debounce_interval:
                         self.logger.warning(
-                            f"Lock acquisition attempt failed for {scan_id} (attempt {attempt}) – "
+                            f"Lock acquisition attempt failed for {scan_id} (attempt {attempt}) - "
                             f"retrying... [pid={os.getpid()}, tid={threading.get_ident()}]"
                         )
                         self._warning_timestamps[scan_id] = now
                     else:
-                        # We’re within the debounce window – log at DEBUG instead of spamming WARN
+                        # We’re within the debounce window - log at DEBUG instead of spamming WARN
                         self.logger.debug(
-                            f"Retrying lock for {scan_id} (attempt {attempt}) – still waiting"
+                            f"Retrying lock for {scan_id} (attempt {attempt}) - still waiting"
                         )
                     time.sleep(0.1)  # Brief pause before retry
 

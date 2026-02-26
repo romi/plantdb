@@ -145,7 +145,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             A `User` object representing the user whose permissions will be checked.
             This user must have attributes `permissions` and `roles`.
 
@@ -162,9 +162,9 @@ class RBACManager :
 
         See Also
         --------
-        User : Represents a user with permissions and roles.
-        Permission : Represents a permission that can be assigned to users or roles.
-        Role : Represents a role with specific permissions.
+        plantdb.commons.auth.models.User : Represents a user with permissions and roles.
+        plantdb.commons.auth.models.Permission : Represents a permission that can be assigned to users or roles.
+        plantdb.commons.auth.models.Role : Represents a role with specific permissions.
 
         Examples
         --------
@@ -192,15 +192,15 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The User object to check for permissions.
-        permission : Permission
+        permission : plantdb.commons.auth.models.Permission
             The permission level or type to verify against the user's permissions.
 
         Returns
         -------
         bool
-            `True` if the user has the given permission, `False` otherwise.
+            ``True`` if the user has the given permission, ``False`` otherwise.
 
         Notes
         -----
@@ -218,15 +218,15 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user object to check for roles.
-        role : Role
+        role : plantdb.commons.auth.models.Role
             The role to verify against the user's roles.
 
         Returns
         -------
         bool
-            `True` if the user has the given role, `False` otherwise.
+            ``True`` if the user has the given role, ``False`` otherwise.
         """
         return role in user.roles
 
@@ -235,13 +235,13 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user object to check.
 
         Returns
         -------
         bool
-            True if the user is the guest user, False otherwise.
+            ``True`` if the user is the guest user, ``False`` otherwise.
         """
         return user.username == self.users.GUEST_USERNAME
 
@@ -260,13 +260,13 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to check.
 
         Returns
         -------
         bool
-            True if the user can create new users, False otherwise.
+            ``True`` if the user can create new users, ``False`` otherwise.
         """
         return self.has_permission(user, Permission.MANAGE_USERS)
 
@@ -277,13 +277,13 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to check.
 
         Returns
         -------
         bool
-            True if the user can manage groups, False otherwise.
+            ``True`` if the user can manage groups, ``False`` otherwise.
         """
         return self.has_permission(user, Permission.MANAGE_GROUPS)
 
@@ -296,7 +296,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to add members.
         group_name : str
             The name of the group.
@@ -304,7 +304,7 @@ class RBACManager :
         Returns
         -------
         bool
-            True if the user can add members to the group, False otherwise.
+            ``True`` if the user can add members to the group, ``False`` otherwise.
         """
         # Admins can manage any group
         if self.has_role(user, Role.ADMIN):
@@ -321,13 +321,13 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to check.
 
         Returns
         -------
         bool
-            True if the user can create groups, False otherwise.
+            ``True`` if the user can create groups, ``False`` otherwise.
         """
         return self.has_permission(user, Permission.MANAGE_GROUPS)
 
@@ -338,7 +338,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to delete the group.
 
         Returns
@@ -358,7 +358,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user creating the group.
         group_name : str
             The unique name for the group.
@@ -388,7 +388,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to add a member.
         group_name : str
             The name of the group.
@@ -412,7 +412,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to remove a member.
         group_name : str
             The name of the group.
@@ -436,7 +436,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to delete the group.
         group_name : str
             The name of the group to delete.
@@ -473,7 +473,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting the group list.
 
         Returns
@@ -495,7 +495,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to check.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
@@ -553,7 +553,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to check permissions for.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
@@ -577,11 +577,11 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting access.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
-        operation : Permission
+        operation : plantdb.commons.auth.models.Permission
             The operation/permission being requested.
 
         Returns
@@ -599,7 +599,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to modify ownership.
         scan_metadata : dict
             The scan metadata.
@@ -619,7 +619,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting to modify sharing.
         scan_metadata : dict
             The scan metadata.
@@ -639,7 +639,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user attempting to modify metadata.
         old_metadata : dict
             The current scan metadata.
@@ -715,7 +715,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user requesting scan access.
         all_scan_metadata : Dict[str, dict]
             Dictionary mapping scan IDs to their metadata.
@@ -731,7 +731,7 @@ class RBACManager :
             # Ensure owner field is present
             metadata = self.ensure_scan_owner(metadata)
 
-            # Check if user has READ access to this scan
+            # Check if the user has READ access to this scan
             if self.can_access_scan(user, metadata, Permission.READ):
                 accessible_scans[scan_id] = metadata
 
@@ -744,7 +744,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : User
+        user : plantdb.commons.auth.models.User
             The user to analyze.
         scan_metadata : dict
             The scan metadata.

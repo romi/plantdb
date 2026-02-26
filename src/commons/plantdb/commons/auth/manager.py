@@ -4,7 +4,7 @@
 """
 User and Group Management Module
 
-This module provides two primary classes – `UserManager` and `GroupManager` – to handle
+This module provides two primary classes - `UserManager` and `GroupManager` - to handle
 authentication, authorization, and role‑based access control in a lightweight
 file‑based persistence system. User data, including hashed passwords, roles,
 and lock‑out state, is stored in a JSON file, while group membership and
@@ -20,7 +20,7 @@ Key Features
 - **User activation/deactivation** and role assignment.
 - **Group management**: create, delete, add/remove users, and query memberships.
 - **Atomic JSON persistence** to avoid data corruption.
-- **Minimal dependencies** – relies only on the standard library plus `argon2`.
+- **Minimal dependencies** - relies only on the standard library plus `argon2`.
 
 Usage Examples
 --------------
@@ -244,7 +244,7 @@ class UserManager(object):
             The full name of the user to create.
         password : str
             The password of the user to create.
-        roles : Role or Set[Role], optional
+        roles : plantdb.commons.auth.models.Role or Set[plantdb.commons.auth.models.Role], optional
             The roles to associate with the user.
             If ``None`` (default), use the `Role.READER` role.
 
@@ -351,7 +351,7 @@ class UserManager(object):
 
         Returns
         -------
-        Union[User, None]
+        Union[plantdb.commons.auth.models.User, None]
             An instance of the User class representing the requested user.
             If it does not exist, `None` is returned.
         """
@@ -446,7 +446,7 @@ class UserManager(object):
         """
         pw_hash = self.get_user(username).password_hash
         try:
-            # Verify password, raises exception if wrong.
+            # Verify password, raises an exception if wrong.
             ph.verify(pw_hash, password)
         except Exception as e:
             self.logger.error(f"Failed to verify password for {username}: {e}")

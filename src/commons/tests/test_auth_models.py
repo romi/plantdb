@@ -104,8 +104,8 @@ class TestUser(unittest.TestCase):
         self.user = User(**self.sample_user_data)
 
     def test_user_to_dict_serializes_correctly(self):
-        """Test that to_dict method properly serializes user data."""
-        # Create user with sample data
+        """Test that the `to_dict` method properly serializes user data."""
+        # Create a user with sample data
         user_dict = self.user.to_dict()
 
         # Verify essential fields are present
@@ -116,8 +116,8 @@ class TestUser(unittest.TestCase):
         self.assertEqual(user_dict['username'], 'testuser')
 
     def test_user_from_dict_deserializes_correctly(self):
-        """Test that from_dict method properly creates User from dictionary."""
-        # Create user from dictionary
+        """Test that the `from_dict` method properly creates User from a dictionary."""
+        # Create a user from a dictionary
         user = User.from_dict(self.sample_user_data)
 
         # Verify user properties
@@ -127,7 +127,7 @@ class TestUser(unittest.TestCase):
         self.assertTrue(user.is_active)
 
     def test_user_to_json_returns_valid_json_string(self):
-        """Test that to_json method returns valid JSON string."""
+        """Test that the `to_json` method returns a valid JSON string."""
         user = User(**self.sample_user_data)
         json_str = user.to_json()
 
@@ -138,11 +138,11 @@ class TestUser(unittest.TestCase):
         self.assertEqual(parsed_data['username'], 'testuser')
 
     def test_user_from_json_creates_user_from_json_string(self):
-        """Test that from_json method creates User from JSON string."""
+        """Test that the `from_json` method creates User from a JSON string."""
         user = User(**self.sample_user_data)
         json_str = user.to_json()
 
-        # Create new user from JSON
+        # Create a new user from JSON
         new_user = User.from_json(json_str)
 
         # Verify users are equivalent
@@ -151,18 +151,18 @@ class TestUser(unittest.TestCase):
         self.assertEqual(user.roles, new_user.roles)
 
     def test_is_locked_out_returns_true_when_locked(self):
-        """Test that _is_locked_out returns True when user is currently locked."""
+        """Test that `_is_locked_out` returns True when the user is currently locked."""
         self.user.locked_until = datetime.now() + timedelta(minutes=1)
         self.assertTrue(self.user._is_locked_out())
 
     def test_is_locked_out_returns_false_when_lock_expired(self):
-        """Test that _is_locked_out returns False when lock has expired."""
-        # Set lock time in past
+        """Test that `_is_locked_out` returns False when the lock has expired."""
+        # Set lock time in the past
         self.user.locked_until = datetime.now() - timedelta(hours=1)
         self.assertFalse(self.user._is_locked_out())
 
     def test_record_failed_attempt_increments_counter(self):
-        """Test that _record_failed_attempt properly increments failed attempts."""
+        """Test that `_record_failed_attempt` properly increments failed attempts."""
         user = User(**self.sample_user_data)
         initial_attempts = copy.copy(user.failed_attempts)
 
@@ -188,11 +188,11 @@ class TestGroup(unittest.TestCase):
         )
 
     def test_add_user_adds_user_to_group(self):
-        """Test that add_user method successfully adds user to group."""
-        # Initially group should be empty
+        """Test that `add_user` method successfully adds user to group."""
+        # Initially a group should be empty
         self.assertEqual(len(self.group.users), 0)
 
-        # Add user to group
+        # Add user to a group
         self.group.add_user("testuser")
 
         # Verify user was added
@@ -200,8 +200,8 @@ class TestGroup(unittest.TestCase):
         self.assertIn("testuser", self.group.users)
 
     def test_add_user_prevents_duplicate_users(self):
-        """Test that add_user prevents adding the same user twice."""
-        # Add user twice
+        """Test that `add_user` prevents adding the same user twice."""
+        # Add a user twice
         self.group.add_user("testuser")
         self.group.add_user("testuser")
 
@@ -209,7 +209,7 @@ class TestGroup(unittest.TestCase):
         self.assertEqual(len(self.group.users), 1)
 
     def test_remove_user_removes_user_from_group(self):
-        """Test that remove_user method successfully removes user from group."""
+        """Test that `remove_user` method successfully removes user from the group."""
         # Add user first
         self.group.add_user("testuser")
         self.assertIn("testuser", self.group.users)
@@ -221,8 +221,8 @@ class TestGroup(unittest.TestCase):
         self.assertNotIn("testuser", self.group.users)
 
     def test_remove_user_handles_nonexistent_user(self):
-        """Test that remove_user gracefully handles removing non-existent user."""
-        # Try to remove user that doesn't exist
+        """Test that `remove_user` gracefully handles removing non-existent user."""
+        # Try to remove a user that doesn't exist
         initial_count = len(self.group.users)
         self.group.remove_user("nonexistent")
 
@@ -230,14 +230,14 @@ class TestGroup(unittest.TestCase):
         self.assertEqual(len(self.group.users), initial_count)
 
     def test_has_user_returns_true_for_existing_user(self):
-        """Test that has_user returns True when user exists in group."""
-        # Add user to group
+        """Test that `has_user` returns True when the user exists in the group."""
+        # Add user to a group
         self.group.add_user("testuser")
 
-        # Check if user exists
+        # Check if the user exists
         self.assertTrue(self.group.has_user("testuser"))
 
     def test_has_user_returns_false_for_nonexistent_user(self):
-        """Test that has_user returns False when user doesn't exist in group."""
+        """Test that `has_user` returns False when the user doesn't exist in the group."""
         # Check for non-existent user
         self.assertFalse(self.group.has_user("nonexistent"))

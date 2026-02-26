@@ -227,7 +227,7 @@ def parse_dataset_perm(datasets_str: str) -> Dict[str, set[Permission]]:
 
     result: Dict[str, set[Permission]] = {}
 
-    # Split on the outer “;” separator – each piece corresponds to one dataset.
+    # Split on the outer “;” separator - each piece corresponds to one dataset.
     for part in datasets_str.split(";"):
         # Each part is ``<dataset>/<perm1>,<perm2>,...``.
         # ``maxsplit=1`` protects us if a dataset name itself contains a '/'.
@@ -386,7 +386,7 @@ class User:
         The unique username of the user.
     password_hash : str
         The hashed password of the user.
-    roles : Set[Role]
+    roles : Set[plantdb.commons.auth.models.Role]
         A set containing roles assigned to the user.
     created_at : datetime
         The timestamp when the user account was created.

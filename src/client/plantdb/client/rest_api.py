@@ -77,7 +77,7 @@ else:
     try:
         PLANTDB_PORT = int(PLANTDB_PORT)  # normal integer port
     except ValueError:
-        # the value is something unexpected – fall back to the default
+        # the value is something unexpected - fall back to the default
         PLANTDB_PORT = None
 #: Default URL prefix for the plantdb REST API
 PLANTDB_PREFIX = os.getenv('PLANTDB_PREFIX', None)

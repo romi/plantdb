@@ -348,12 +348,12 @@ class PlantDBClient:
 
         # Determine severity and log accordingly
         if response.status_code >= 500:
-            # Server error – treat as serious
+            # Server error - treat as serious
             self.logger.error(
                 f"Server error {response.status_code}: {response.reason}"
             )
         else:
-            # Client error – treat as a warning
+            # Client error - treat as a warning
             self.logger.warning(
                 f"Client error {response.status_code}: {response.reason}"
             )
@@ -434,7 +434,7 @@ class PlantDBClient:
         requests.exceptions.RequestException
             If the request fails or the server returns an error status.
         """
-        # Build the URL for the “scans info” endpoint – the server side class is ScansTable
+        # Build the URL for the “scans info” endpoint - the server side class is ScansTable
         url = join_url(self.base_url, api_endpoints.scans_info())
 
         # Prepare query parameters exactly as the REST API expects
@@ -721,7 +721,7 @@ class PlantDBClient:
         >>> metadata = client.get_fileset_metadata('real_plant', 'my_fileset')
         >>> print(metadata)
         {'metadata': {'description': 'This is a test fileset'}}
-        >>> # Get specific metadata key
+        >>> # Get a specific metadata key
         >>> value = client.get_fileset_metadata('real_plant', 'my_fileset', key='description')
         >>> print(value)
         {'metadata': 'This is a test fileset'}
@@ -980,7 +980,7 @@ class PlantDBClient:
         >>> metadata = client.get_file_metadata('test_plant', 'images', 'image_001')
         >>> print(metadata)
         {'metadata': {'description': 'Test file'}}
-        >>> # Get specific metadata key
+        >>> # Get a specific metadata key
         >>> value = client.get_file_metadata('test_plant', 'images', 'image_001', key='description')
         >>> print(value)
         {'metadata': 'Test file'}

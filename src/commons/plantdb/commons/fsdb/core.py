@@ -237,9 +237,9 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
 
     See Also
     --------
-    plantdb.session_managers.SingleSessionManager : Manages single session systems.
-    plantdb.session_managers.JWTSessionManager : Handles JSON Web Token-based authentication.
-    plantdb.session_managers.SessionManager : Manages multiple generic user sessions.
+    plantdb.commons.fsdb.auth.session.SingleSessionManager : Manages single session systems.
+    plantdb.commons.fsdb.auth.session.JWTSessionManager : Handles JSON Web Token-based authentication.
+    plantdb.commons.fsdb.auth.session.SessionManager : Manages multiple generic user sessions.
 
     Examples
     --------
@@ -1298,7 +1298,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        Optional[User]
+        Optional[plantdb.commons.auth.models.User]
             A ``User`` instance corresponding to the currently authenticated user, if any, ``None`` otherwise.
 
         Notes

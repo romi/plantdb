@@ -77,18 +77,18 @@ class TestUserManager(unittest.TestCase):
         self.assertTrue(any("testuserB" in user['username'] for user in json_users))
 
     def test_hash_password_returns_hashed_string(self):
-        """Test that _hash_password returns a hashed version of password."""
+        """Test that _hash_password returns a hashed version of the password."""
         password = "testpassword"
         hashed = self.user_manager._hash_password(password)
 
-        # Verify hash is different from original and is a string
+        # Verify hash is different from the original and is a string
         self.assertIsInstance(hashed, str)
         self.assertNotEqual(hashed, password)
         self.assertGreater(len(hashed), len(password))
 
     def test_exists_returns_true_for_existing_user(self):
         """Test that exists method returns True for existing users."""
-        # Check if user exists
+        # Check if the user exists
         self.assertTrue(self.user_manager.exists("testuser"))
 
     def test_exists_returns_false_for_nonexistent_user(self):
@@ -96,7 +96,7 @@ class TestUserManager(unittest.TestCase):
         self.assertFalse(self.user_manager.exists("nonexistent"))
 
     def test_create_creates_new_user_successfully(self):
-        """Test that create method successfully creates new user."""
+        """Test that create method successfully creates a new user."""
         # Create user
         self.user_manager.create(
             username="newuser",
@@ -124,7 +124,7 @@ class TestUserManager(unittest.TestCase):
         self.assertIsNone(user)
 
     def test_is_locked_out_checks_user_lockout_status(self):
-        """Test that is_locked_out properly checks user lockout status."""
+        """Test that is_locked_out properly checks the user lockout status."""
         user = self.user_manager.get_user("testuser")
         user.locked_until = datetime.now() + timedelta(hours=1)
         # Check lockout status
@@ -132,7 +132,7 @@ class TestUserManager(unittest.TestCase):
         self.assertTrue(is_locked)
 
     def test_is_active_checks_user_active_status(self):
-        """Test that is_active properly checks if user is active."""
+        """Test that is_active properly checks if the user is active."""
         # Check active status
         is_active = self.user_manager.is_active("testuser")
         self.assertTrue(is_active)
@@ -145,7 +145,7 @@ class TestUserManager(unittest.TestCase):
 
     def test_validate_user_password_failure_case(self):
         """Test failed password validation scenario."""
-        # Validate with wrong password
+        # Validate with the wrong password
         is_valid = self.user_manager.validate_user_password("testuser", "wrong_password")
         self.assertFalse(is_valid)
 
@@ -159,7 +159,7 @@ class TestGroupManager(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures before each test method."""
-        # Create temporary file for testing
+        # Create a temporary file for testing
         self.temp_file = self._temp_group_file()
 
         self.group_manager = GroupManager(self.temp_file)
@@ -176,7 +176,7 @@ class TestGroupManager(unittest.TestCase):
             os.unlink(self.temp_file)
 
     def test_load_groups_loads_from_file(self):
-        """Test that _load_groups properly loads groups from JSON file."""
+        """Test that _load_groups properly loads groups from a JSON file."""
         # Create a new group manager (without test_group)
         group_manager = GroupManager(self._temp_group_file())
         # Override groups_file with the one create a setUp that contains the 'test_group'
@@ -273,7 +273,7 @@ class TestRBACManager(unittest.TestCase):
 
     def test_get_user_permissions_returns_permissions_for_user_roles(self):
         """Test that get_user_permissions returns correct permissions based on user roles."""
-        # Get permissions for testuser which has READER and CONTRIBUTOR roles
+        # Get permissions for the testuser which has READER and CONTRIBUTOR roles
         user = self.user_manager.get_user("testuser")
         permissions = self.rbac_manager.get_user_permissions(user)
 
@@ -282,15 +282,15 @@ class TestRBACManager(unittest.TestCase):
         self.assertIn(Permission.WRITE, permissions)  # From CONTRIBUTOR role
 
     def test_has_permission_returns_true_for_authorized_user(self):
-        """Test that has_permission returns True when user has required permission."""
-        # Test if user has READ permission (which they should as a READER)
+        """Test that has_permission returns True when the user has required permission."""
+        # Test if the user has READ permission (which they should as a READER)
         user = self.user_manager.get_user("testuser")
         has_perm = self.rbac_manager.has_permission(user, Permission.READ)
         self.assertTrue(has_perm)
 
     def test_has_permission_returns_false_for_unauthorized_user(self):
-        """Test that has_permission returns False when user lacks required permission."""
-        # Test if user has DELETE permission (which they should not have)
+        """Test that has_permission returns False when the user lacks required permission."""
+        # Test if the user has DELETE permission (which they should not have)
         user = self.user_manager.get_user("testuser")
         has_perm = self.rbac_manager.has_permission(user, Permission.DELETE)
         self.assertFalse(has_perm)
@@ -328,24 +328,24 @@ class TestRBACManager(unittest.TestCase):
         self.assertFalse(can_manage)
 
     def test_create_group_with_permission(self):
-        """Test that create_group delegates to GroupManager after permission check."""
+        """Test that create_group delegates to GroupManager after a permission check."""
         # Create a group using the admin user
         adminuser = self.user_manager.get_user("admin")
         group = self.rbac_manager.create_group(
             adminuser, "testgroup", {"admin"}, "Test group"
         )
 
-        # Verify group was created
+        # Verify that the group was created
         self.assertIsNotNone(group)
         self.assertEqual(group.name, "testgroup")
         self.assertEqual(group.created_by, "admin")
         self.assertEqual(group.description, "Test group")
 
-        # Verify group exists in group manager
+        # Verify that the group exists in the group manager
         self.assertTrue(self.group_manager.group_exists("testgroup"))
 
     def test_create_group_without_permission(self):
-        """Test that create_group raises exception when user lacks permission."""
+        """Test that create_group raises an exception when the user lacks permission."""
         # Attempt to create a group with a regular user (who lacks MANAGE_GROUPS permission)
         user = self.user_manager.get_user("guest")
         group = self.rbac_manager.create_group(

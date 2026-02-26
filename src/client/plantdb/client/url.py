@@ -38,7 +38,7 @@ logger = get_logger(__name__)
 ALLOWED_SCHEMES: set[str] = {"http", "https"}  # Only HTTP(S)
 BLACKLIST_CACHE_FILE = Path(tempfile.gettempdir()) / "github_blacklist_cache.txt"
 
-# Private / non‑routable IP ranges – we refuse to connect to any of them
+# Private / non‑routable IP ranges - we refuse to connect to any of them
 PRIVATE_NETWORKS: List[ipaddress._BaseNetwork] = [
     ipaddress.ip_network("10.0.0.0/8"),
     ipaddress.ip_network("172.16.0.0/12"),

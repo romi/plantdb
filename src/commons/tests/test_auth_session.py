@@ -24,7 +24,7 @@ from plantdb.commons.auth.session import _init_secret_key
 
 
 class TestSessionManager(unittest.TestCase):
-    """Test cases for `SessionManager` class"""
+    """Test cases for the ``SessionManager`` class"""
 
     def setUp(self):
         """Set up test fixtures before each test method."""
@@ -32,22 +32,22 @@ class TestSessionManager(unittest.TestCase):
 
     def test_init_creates_empty_sessions_dict(self):
         """Test that SessionManager initializes with empty sessions dictionary."""
-        # Verify initial state is correct
+        # Verify the initial state is correct
         self.assertEqual(len(self.session_manager.sessions), 0)
         self.assertEqual(self.session_manager.session_timeout, 3600)
         self.assertIsNotNone(self.session_manager.logger)
 
     def test_user_has_session_returns_consistent_id(self):
-        """Test that _user_has_session returns consistent session IDs for same user."""
+        """Test that _user_has_session returns consistent session IDs for the same user."""
         # Test session ID generation
         session_id1 = self.session_manager._user_has_session("testuser")
         session_id2 = self.session_manager._user_has_session("testuser")
 
-        # Session IDs should be consistent for same user at same time
+        # Session IDs should be consistent for the same user at the same time
         self.assertEqual(session_id1, session_id2)
 
     def test_create_session_stores_session_data(self):
-        """Test that create_session properly stores session with expiry time."""
+        """Test that create_session properly stores the session with expiry time."""
         # Create session
         session_id = self.session_manager.create_session("testuser")
 
@@ -75,7 +75,7 @@ class TestSessionManager(unittest.TestCase):
         temp_session_manager = SessionManager(session_timeout=0.1)  # 0.1 second timeout
         session_id = temp_session_manager.create_session("testuser")
 
-        # Wait for session to expire
+        # Wait for the session to expire
         time.sleep(0.2)
 
         # Validate after timeout period
@@ -102,13 +102,13 @@ class TestSessionManager(unittest.TestCase):
         # Create a session manager with a very short timeout for testing
         temp_session_manager = SessionManager(session_timeout=0.5)  # 0.5 second timeout
 
-        # Create first session
+        # Create the first session
         session1_id = temp_session_manager.create_session("user1")
 
         # Wait for a moment
-        time.sleep(0.6)  # Wait for first session to expire
+        time.sleep(0.6)  # Wait for the first session to expire
 
-        # Create second session
+        # Create a second session
         session2_id = temp_session_manager.create_session("user2")
 
         # Cleanup expired sessions
@@ -119,11 +119,11 @@ class TestSessionManager(unittest.TestCase):
         self.assertIn(session2_id, temp_session_manager.sessions)
 
     def test_session_username_returns_correct_username(self):
-        """Test that session_username returns the correct username for valid session."""
+        """Test that session_username returns the correct username for a valid session."""
         # Create session
         session_id = self.session_manager.create_session("testuser")
 
-        # Get username from session
+        # Get a username from a session
         username = self.session_manager.session_username(session_id)
         self.assertEqual(username, "testuser")
 
@@ -140,7 +140,7 @@ class TestSessionManager(unittest.TestCase):
         s2 = mgr.create_session("user2")
         self.assertIsNotNone(s1)
         self.assertIsNotNone(s2)
-        # Third session should be rejected
+        # The third session should be rejected
         s3 = mgr.create_session("user3")
         self.assertIsNone(s3)
 
@@ -156,12 +156,12 @@ class TestSessionManager(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_session_token_returns_none_for_none_username(self):
-        """Test that session_token returns None when username is None."""
+        """Test that session_token returns None when the username is None."""
         result = self.session_manager.session_token(None)
         self.assertIsNone(result)
 
     def test_refresh_session_creates_new_session(self):
-        """Test that refresh_session invalidates old and creates new session."""
+        """Test that refresh_session invalidates old and creates a new session."""
         session_id = self.session_manager.create_session("refresh_user")
         new_session_id = self.session_manager.refresh_session(session_id)
         # New token should be different
@@ -177,7 +177,7 @@ class TestSessionManager(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_user_has_session_returns_false_for_none(self):
-        """Test that _user_has_session returns False when username is None."""
+        """Test that _user_has_session returns False when the username is None."""
         self.assertFalse(self.session_manager._user_has_session(None))
 
     def test_invalidate_nonexistent_session_returns_false(self):
@@ -188,14 +188,14 @@ class TestSessionManager(unittest.TestCase):
 
 
 class TestSingleSessionManager(unittest.TestCase):
-    """Test cases for `SingleSessionManager` class."""
+    """Test cases for the ``SingleSessionManager`` class."""
 
     def test_single_session_enforced(self):
         """SingleSessionManager allows only one concurrent session."""
         mgr = SingleSessionManager(session_timeout=3600)
         s1 = mgr.create_session("user1")
         self.assertIsNotNone(s1)
-        # Second session should be rejected
+        # The second session should be rejected
         s2 = mgr.create_session("user2")
         self.assertIsNone(s2)
 
@@ -214,7 +214,7 @@ class TestSingleSessionManager(unittest.TestCase):
 
 
 class TestJWTSessionManager(unittest.TestCase):
-    """Comprehensive unit tests for `JWTSessionManager` class."""
+    """Comprehensive unit tests for the ``JWTSessionManager`` class."""
 
     # ------------------------------------------------------------------
     # Helper methods
@@ -273,7 +273,7 @@ class TestJWTSessionManager(unittest.TestCase):
         self.assertEqual(mgr.secret_key, raw)
 
     def test_init_default_leeway_is_two(self):
-        """Default leeway should be 2 seconds when not explicitly set."""
+        """The default leeway should be 2 seconds when not explicitly set."""
         mgr = JWTSessionManager(secret_key=b"X" * 64)
         self.assertEqual(mgr.leeway, 2)
 
@@ -757,7 +757,7 @@ class TestJWTSessionManager(unittest.TestCase):
         """Attempting to reuse a refresh token after rotation raises ``RefreshTokenNotFoundError``."""
         mgr = self._create_manager()
         _, refresh = mgr.create_session("linda")
-        # First rotation – should succeed
+        # First rotation - should succeed
         new_access, new_refresh = mgr.refresh_session(refresh)
         self.assertIsNotNone(new_access)
         self.assertIsNotNone(new_refresh)
@@ -813,7 +813,7 @@ class TestJWTSessionManager(unittest.TestCase):
         long_access, long_refresh = mgr.create_session("nora")
         long_jti = self._decode(long_access, mgr)["jti"]
 
-        # Run cleanup – only the first access token should disappear
+        # Run cleanup - only the first access token should disappear
         mgr.cleanup_expired_sessions()
         self.assertNotIn(short_jti, mgr.sessions)
         # The second access token must still be present
@@ -915,7 +915,7 @@ class TestJWTSessionManager(unittest.TestCase):
         self.assertFalse(mgr._user_has_session("ghost_user"))
 
     def test_user_has_session_false_for_none_username(self):
-        """`_user_has_session` returns False when username is None."""
+        """`_user_has_session` returns False when the username is None."""
         mgr = self._create_manager()
         self.assertFalse(mgr._user_has_session(None))
 
@@ -945,7 +945,7 @@ class TestJWTSessionManager(unittest.TestCase):
         self.assertIsNone(mgr.session_token("no_such_user"))
 
     def test_session_token_returns_none_for_none_username(self):
-        """`session_token` returns None when username is None."""
+        """`session_token` returns None when the username is None."""
         mgr = self._create_manager()
         self.assertIsNone(mgr.session_token(None))
 
@@ -1293,7 +1293,7 @@ class TestJWTSessionManager(unittest.TestCase):
             self.assertEqual(n_valid, 1)
             self.assertEqual(n_cleaned, 1)
 
-            # Read file and verify only valid token remains
+            # Read the file and verify only valid token remains
             content = mgr.api_token_file.read_text()
             self.assertNotIn("expired_token_abc", content)
             self.assertIn("valid_token_xyz", content)

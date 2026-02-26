@@ -444,7 +444,7 @@ def _derive_key_argon2(password: str) -> bytes:
     bytes
         64‑byte key suitable for HS512.
     """
-    # Argon2 parameters – adjust if you need stronger/higher‑memory settings
+    # Argon2 parameters - adjust if you need stronger/higher‑memory settings
     time_cost = 2  # number of iterations
     memory_cost = 102_400  # KiB (≈100 MiB)
     parallelism = 8  # CPU lanes
@@ -511,7 +511,7 @@ def _init_secret_key(secret_key: Union[str, bytes] = None) -> bytes:
         # No key supplied → generate a fresh random 64‑byte key
         secret_key = secrets.token_bytes(64)
     elif isinstance(secret_key, bytes):
-        # Caller supplied raw bytes – just verify length
+        # Caller supplied raw bytes - just verify length
         if len(secret_key) < 64:
             raise ValueError("Binary `secret_key` must be at least 64 bytes for HS512")
         secret_key = secret_key
@@ -926,7 +926,7 @@ class JWTSessionManager(SessionManager):
                     f"Daily token‑file clean‑up scheduled for {today_target.isoformat()} "
                     f"(in {seconds_to_wait:.0f}s)"
                 )
-                # Sleep until the next run time – ``time.sleep`` is safe in a daemon thread
+                # Sleep until the next run time - ``time.sleep`` is safe in a daemon thread
                 time.sleep(seconds_to_wait)
 
                 # ----- RUN THE CLEAN‑UP -----
@@ -937,10 +937,10 @@ class JWTSessionManager(SessionManager):
                         f"{n_valid} token(s) remain valid."
                         f"{n_cleaned} token(s) were cleaned-up."
                     )
-                except Exception as exc:  # pragma: no‑cover – defensive
+                except Exception as exc:
                     self.logger.error(f"Unexpected error during token clean‑up: {exc}")
 
-                # Loop back – the next iteration will recompute the next 03:00
+                # Loop back - the next iteration will recompute the next 03:00
 
         # The thread is marked as *daemon* so it won’t block interpreter shutdown
         thread = threading.Thread(target=_clean_up_worker, name="api-token-cleanup", daemon=True)
@@ -1292,7 +1292,7 @@ class JWTSessionManager(SessionManager):
         Tuple[str, str]
             A tuple containing (new_access_token, new_refresh_token) if successful.
         """
-        # Validate the refresh token – will raise if the refresh token is revoked or malformed
+        # Validate the refresh token - will raise if the refresh token is revoked or malformed
         session_data = self.validate_session(refresh_token, token_type='refresh')
 
         username = session_data['username']
