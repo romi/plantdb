@@ -82,4 +82,5 @@ io = [
 test = [
     "nose2[coverage]",
     "coverage[toml]",
+    "ruff"
 ]
