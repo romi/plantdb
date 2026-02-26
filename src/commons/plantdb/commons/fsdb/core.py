@@ -309,6 +309,7 @@ def require_authentication(method):
 
     return wrapper
 
+
 def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
     """Retrieve the `FSDB` and the `Scan` instance associated with a given object.
 
@@ -332,7 +333,7 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
     ------
     TypeError
         If ``obj`` is not an instance of ``Scan``, ``FSDB``, ``Fileset``, or ``File``.
-    ScanNotFoundError
+    plantdb.commons.fsdb.exceptions.ScanNotFoundError
         If ``obj`` is an instance of ``FSDB`` and ``args[0]`` is not an existing ``Scan``.
 
     Notes
@@ -358,7 +359,9 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
     else:
         raise TypeError(f"Unsupported object type: {type(obj)}")
 
-def requires_permission(required_permissions: Union[Permission, Tuple[Permission, ...]], check_scan_access: bool = False):
+
+def requires_permission(required_permissions: Union[Permission, Tuple[Permission, ...]],
+                        check_scan_access: bool = False):
     """Decorator that enforces permission checks before the execution of a method.
 
     The decorator inspects the ``current_user`` keyword argument supplied
@@ -435,10 +438,13 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
                 has_perms = all(self.rbac_manager.has_permission(user, perm) for perm in required_permissions_)
 
             if not has_perms:
-                raise PermissionError(f"User {user.username} does not have required permissions to use {method.__name__}")
+                raise PermissionError(
+                    f"User {user.username} does not have required permissions to use {method.__name__}")
 
             return method(self, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -483,7 +489,7 @@ class FSDB(db.DB):
     >>> # EXAMPLE 1: Use a temporary dummy local database:
     >>> db = dummy_db()
     >>> print(type(db))
-    <class 'plantdb.commons.fsdb.FSDB'>
+    <class 'plantdb.commons.fsdb.core.FSDB'>
     >>> print(db.path())
     /tmp/romidb_********
     >>> # Create a new `Scan`:
@@ -1670,7 +1676,7 @@ class Scan(db.Scan):
 
     Attributes
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         A local database instance hosting this ``Scan`` instance.
     id : str
         The identifier of this ``Scan`` instance in the local database `db`.
@@ -1750,7 +1756,7 @@ class Scan(db.Scan):
 
         Parameters
         ----------
-        db : plantdb.commons.fsdb.FSDB
+        db : plantdb.commons.fsdb.core.FSDB
             The database to put/find the scan dataset.
         scan_id : str
             The scan dataset name, should be unique in the `db`.
@@ -2236,7 +2242,7 @@ class Fileset(db.Fileset):
 
     Attributes
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         A local database instance hosting the ``Scan`` instance.
     scan : plantdb.commons.fsdb.core.Scan
         A scan instance hosting this ``Fileset`` instance.
@@ -2661,7 +2667,7 @@ class File(db.File):
 
     Attributes
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         Database where to find the fileset.
     fileset : plantdb.commons.fsdb.core.Fileset
         Set of files containing the file.

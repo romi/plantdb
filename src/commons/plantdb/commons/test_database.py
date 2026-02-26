@@ -546,7 +546,7 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The FSDB test database.
 
     Examples
@@ -586,7 +586,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The dummy database.
 
     Notes
