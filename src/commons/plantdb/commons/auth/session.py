@@ -226,11 +226,11 @@ class SessionManager:
         -------
         Union[dict, None]
             A dictionary with user information if valid, ``None`` if invalid/expired.
-            Returns dictionary with:
-            - username: The authenticated user
-            - created_at: When the session was created
-            - last_accessed: When the session was last validated
-            - expires_at: When the session expires
+
+              - username: The authenticated user
+              - created_at: When the session was created
+              - last_accessed: When the session was last validated
+              - expires_at: When the session expires
 
         Notes
         -----
@@ -1066,7 +1066,7 @@ class JWTSessionManager(SessionManager):
         -------
         dict or None
             User information if valid, ``None`` if invalid/expired.
-            Returns dictionary with:
+
             - username: The authenticated user
             - issued_at: When the token was issued
             - expires_at: When the token expires
@@ -1128,6 +1128,7 @@ class JWTSessionManager(SessionManager):
             'audience': payload['aud'],  # audience
             'type': payload.get('type')  # type of token, 'access', 'api' or 'refresh'
         }
+        # Update the payload with the dataset permissions
         if 'datasets' in payload:
             payload_dict['datasets'] = parse_dataset_perm(payload['datasets'])
         return payload_dict
