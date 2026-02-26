@@ -261,18 +261,11 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
         except IndexError:
             logged_user = fsdb.get_user_data(username=default_user)
         else:
-            if isinstance(fsdb, (Scan, Fileset, File)):
-                logged_user = fsdb.db.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
-            else:
-                logged_user = fsdb.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
+            logged_user = fsdb.get_user_data(username=fsdb.session_manager.validate_session(session)['username'])
     elif isinstance(fsdb.session_manager, (JWTSessionManager, SessionManager)):
         # If a JSON Web Token Session Manager or a Session Manager, require the token to retrieve the username
         if token:
-            if isinstance(fsdb, (Scan, Fileset, File)):
-                user = fsdb.db.get_user_data(token=token, token_type=token_type)
-            else:
-                user = fsdb.get_user_data(token=token, token_type=token_type)
-            logged_user = user
+            logged_user = fsdb.get_user_data(token=token, token_type=token_type)
         else:
             logged_user = fsdb.get_user_data(username=default_user)
     else:
@@ -299,9 +292,14 @@ def require_authentication(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         # FIXME 'default_user' should be None!
-        user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
-                                   token=kwargs.get('token', None),
-                                   token_type=kwargs.get('token_type', 'access'))
+        if isinstance(self, (Scan, Fileset, File)):
+            user = get_logged_username(self.db, default_user=kwargs.pop('default_user', 'guest'),
+                                       token=kwargs.get('token', None),
+                                       token_type=kwargs.get('token_type', 'access'))
+        else:
+            user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
+                                       token=kwargs.get('token', None),
+                                       token_type=kwargs.get('token_type', 'access'))
 
         if not user:
             raise PermissionError("No authenticated user!")
