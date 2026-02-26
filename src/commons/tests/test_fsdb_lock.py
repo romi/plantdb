@@ -434,9 +434,11 @@ class TestConcurrentLocks(unittest.TestCase):
 
         def acquire_exclusive_lock(user):
             try:
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, timeout=1.0):
+                # Use a short timeout for the threads
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, timeout=0.5):
                     results.append(user)
-                    time.sleep(0.5)  # Hold the lock for a bit
+                    # Hold the lock longer than the timeout of other threads (1.0s > 0.5s)
+                    time.sleep(1.0)
             except Exception as e:
                 errors.append(str(e))
 
