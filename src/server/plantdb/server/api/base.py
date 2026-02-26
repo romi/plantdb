@@ -60,7 +60,7 @@ Hereafter is a minimal working example that:
 >>> # Create a Flask application
 >>> app = Flask(__name__)
 >>> # Create a logger
->>> logger = logging.getLogger("plantdb.auth")
+>>> logger = logging.getLogger("plantdb.base")
 >>> logger.setLevel(logging.INFO)
 >>> # Initialize a test database with a JWTSessionManager
 >>> db_path = setup_test_database('real_plant')
