@@ -33,6 +33,7 @@ import time
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from enum import Enum
 from pathlib import Path
 from tempfile import gettempdir
 from threading import RLock
@@ -81,6 +82,80 @@ class RefreshTokenReuseError(SessionValidationError):
 
 class WrongTokenType(SessionValidationError):
     pass
+
+
+class TokenType(Enum):
+    """Canonical token types used throughout the API."""
+    ACCESS = "access"
+    API = "api"
+    REFRESH = "refresh"
+
+    def __eq__(self, other: Any) -> bool:
+        """Equality operator.
+
+        Parameters
+        ----------
+        other : Any
+            Object to compare with the token type instance.
+            If a string is provided, it is interpreted as a token type name and converted to a
+            ``Permission`` instance for comparison.
+
+        Returns
+        -------
+        bool
+            ``True`` if ``other`` represents the same token type as ``self``, otherwise ``False``.
+
+        Notes
+        -----
+        The method safely handles objects that do not expose a ``value`` attribute.
+        This ensures that comparisons with unrelated types do not raise unexpected exceptions.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.session import TokenType
+        >>> tt = TokenType.ACCESS
+        >>> tt == TokenType.ACCESS  # direct comparison with TokenType
+        True
+        >>> tt == 'access'  # comparison with string
+        True
+        >>> tt == 'Access'  # comparison with string is case-insensitive
+        True
+        >>> tt == TokenType.API  # direct comparison with TokenType
+        False
+        >>> tt == 'api'  # comparison with string
+        Fasle
+        """
+        if isinstance(other, str):
+            try:
+                return TokenType.from_string(other) == self
+            except ValueError:
+                return False
+        else:
+            try:
+                return other.value == self.value
+            except AttributeError:
+                return False
+
+    @classmethod
+    def from_string(cls, s: str) -> "TokenType":
+        # strip any surrounding whitespace.
+        s = s.strip()
+
+        # If the string contains a dot (e.g. "Permission.READ"), keep only the part after the last dot.
+        if "." in s:
+            s = s.split(".")[-1]
+
+        # Try to resolve by *name* first (case‑insensitive)
+        name_key = s.upper()
+        if name_key in cls.__members__:  # ``cls.__members__`` holds a mapping of names → members
+            return cls[name_key]
+
+        # If that fails, try to resolve by *value*.
+        try:
+            return cls(s)
+        except ValueError as exc:
+            # ``cls(s)`` raises ValueError automatically if not found.
+            raise ValueError(f"Unknown permission string: {s!r}") from exc
 
 
 class SessionManager:
@@ -1051,16 +1126,13 @@ class JWTSessionManager(SessionManager):
             leeway=self.leeway  # allowed clock skew, in seconds
         )
 
-    def validate_session(self, token: str, token_type: str = 'access') -> Optional[Dict[str, Any]]:
+    def validate_session(self, token: str) -> Optional[Dict[str, Any]]:
         """Validate a JSON Web Token and return user information.
 
         Parameters
         ----------
         token : str
             The JSON Web Token to validate.
-        token_type : str, optional
-            The expected token type ('access', 'api' or 'refresh').
-            Defaults to 'access'.
 
         Returns
         -------
@@ -1079,7 +1151,7 @@ class JWTSessionManager(SessionManager):
         try:
             payload = self._payload_from_token(token)
         except jwt.ExpiredSignatureError as e:
-            self.logger.error(f"JSON Web Token ({token_type}) expired")
+            self.logger.error(f"JSON Web Token expired")
             raise SessionValidationError(e) from e
         except jwt.InvalidAudienceError as e:
             self.logger.error("JSON Web Token has invalid audience")
@@ -1094,30 +1166,31 @@ class JWTSessionManager(SessionManager):
             self.logger.error(f"Error validating JSON Web Token: {e}")
             raise InvalidTokenProcessingError(e) from e
 
-        # Check token type
-        if payload.get('type') != token_type:
-            self.logger.error(f"Invalid token type: expected {token_type}, got {payload.get('type')}")
-            raise WrongTokenType(f"Invalid token type: {token_type}")
-
         jti = payload.get('jti')
+        token_type = payload.get('type')
 
         # Verify it's in our tracking list
-        if token_type == 'access':
+        if token_type == TokenType.ACCESS:
             if jti not in self.sessions:
                 self.logger.error("Access token not found in active sessions")
                 raise AccessTokenNotFoundError(f"Access token jti={jti} not found")
             # Update last accessed time
             with self._lock:
                 self.sessions[jti]['last_accessed'] = datetime.now(timezone.utc)
-        elif token_type == 'refresh':
+        elif token_type == TokenType.REFRESH:
             if jti not in self.refresh_tokens:
                 self.logger.error("Refresh token not found in active refresh tokens")
                 raise RefreshTokenNotFoundError(f"Refresh token jti={jti} not found")
-        elif token_type == 'api':
+        elif token_type == TokenType.API:
             # Check active API tokens in the file
             if not self._is_api_token_active(jti):
                 self.logger.error("API token not found in token store or has expired")
                 raise SessionValidationError(f"API token jti={jti} is not active")
+        else:
+            WrongTokenType(
+                f"Unsupported token_type '{token_type}'. "
+                f"Supported values are {[t.value for t in TokenType]}."
+            )
 
         payload_dict = {
             'username': payload['sub'],  # subject is the username
@@ -1154,7 +1227,7 @@ class JWTSessionManager(SessionManager):
             try:
                 payload = self._payload_from_token(token)
                 jti = payload.get('jti')
-                token_type = payload.get('type', 'access')
+                token_type = payload.get('type')
             except jwt.PyJWTError as e:
                 self.logger.error(f"Failed to decode token for invalidation: {e}")
                 return False, None
@@ -1256,16 +1329,13 @@ class JWTSessionManager(SessionManager):
 
         return
 
-    def session_username(self, token: str, token_type: str = 'access') -> Optional[str]:
+    def session_username(self, token: str) -> Optional[str]:
         """Extract username from JSON Web Token.
 
         Parameters
         ----------
         token : str
             Current JSON Web Token.
-        token_type : str, optional
-            The expected token type ('access', 'api' or 'refresh').
-            Defaults to 'access'.
 
         Returns
         -------
@@ -1273,7 +1343,7 @@ class JWTSessionManager(SessionManager):
             The corresponding username if the token is valid.
         """
         try:
-            session_data = self.validate_session(token, token_type)
+            session_data = self.validate_session(token)
         except SessionValidationError as e:
             self.logger.warning(f"Provided session does not exist: {e}")
             return None
@@ -1293,7 +1363,7 @@ class JWTSessionManager(SessionManager):
             A tuple containing (new_access_token, new_refresh_token) if successful.
         """
         # Validate the refresh token - will raise if the refresh token is revoked or malformed
-        session_data = self.validate_session(refresh_token, token_type='refresh')
+        session_data = self.validate_session(refresh_token)
 
         username = session_data['username']
         old_refresh_jti = session_data['jti']
