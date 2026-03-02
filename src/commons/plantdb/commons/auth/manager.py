@@ -61,6 +61,18 @@ from plantdb.commons.log import get_logger
 ph = PasswordHasher()
 
 
+#: Exception for duplicate users
+class UserExistsError(Exception):
+    """Raised when attempting to create a user that already exists."""
+    pass
+
+#: Exception for duplicate group
+class GroupExistsError(Exception):
+    """Raised when attempting to create a group that already exists."""
+    pass
+
+
+
 class UserManager(object):
     """UserManager class for managing user data.
 
@@ -264,7 +276,7 @@ class UserManager(object):
             assert not self.exists(username)
         except AssertionError:
             self.logger.error(f"User '{username}' already exists!")
-            return
+            raise UserExistsError(f"User '{username}' already exists")
 
         # Convert to a list:
         if isinstance(roles, Role):
@@ -389,6 +401,31 @@ class UserManager(object):
             return None
         user = self.users[username]
         return TokenUser(**user.to_dict(), dataset_permissions=token_payload.get("datasets"))
+
+    def get_user_from_decoded_token(self, token_payload: dict) -> Union[User, TokenUser, None]:
+        """Extract a user representation from a decoded JWT payload.
+
+        Parameters
+        ----------
+        token_payload
+            The decoded JWT payload as a ``dict``. It must contain a ``"type"`` entry and,
+            for ``"access"`` or ``"refresh"`` tokens, a ``"username"`` entry.
+
+        Returns
+        -------
+        Union[User, TokenUser, None]
+            * ``User``: when ``token_type`` is ``"access"`` or ``"refresh"``.
+            * ``TokenUser``: when ``token_type`` is ``"api"``.
+            * ``None``: when ``token_type`` is not recognized; an error is logged.
+        """
+        token_type = token_payload["type"]
+        if token_type == "api":
+            return self.get_token_user(token_payload)
+        elif token_type in ["access", "refresh"]:
+            return self.get_user(token_payload["username"])
+        else:
+            self.logger.error(f"Token type '{token_type}' does not exist!")
+            return None
 
     def is_locked_out(self, username) -> bool:
         """Check if an account is locked.
