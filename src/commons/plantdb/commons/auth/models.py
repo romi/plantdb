@@ -97,8 +97,7 @@ class Permission(Enum):
 
         Notes
         -----
-        The method safely handles objects that do not expose a ``value`` attribute
-        by catching ``AttributeError`` and returning ``False``.  
+        The method safely handles objects that do not expose a ``value`` attribute.
         This ensures that comparisons with unrelated types do not raise unexpected exceptions.
         """
         if isinstance(other, str):
