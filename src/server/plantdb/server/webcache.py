@@ -87,7 +87,7 @@ def __webcache_path(db, scan_id):
     return directory
 
 
-def __file_path(db, scan_id, fileset_id, file_id):
+def __file_path(db, scan_id, fileset_id, file_id, **kwargs):
     """Return the path to a file.
 
     Parameters
@@ -106,7 +106,7 @@ def __file_path(db, scan_id, fileset_id, file_id):
     pathlib.Path
         The path to the file.
     """
-    scan = db.get_scan(scan_id)
+    scan = db.get_scan(scan_id, **kwargs)
     fs = scan.get_fileset(fileset_id)
     f = fs.get_file(file_id)
     return db.basedir / scan.id / fs.id / f.filename
@@ -153,9 +153,9 @@ def __image_hash(scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -197,9 +197,9 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -232,7 +232,7 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
     return dst
 
 
-def __image_cached_path(db, scan_id, fileset_id, file_id, size):
+def __image_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Get The path to the cached image.
 
     Parameters
@@ -245,9 +245,9 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -261,7 +261,7 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
     return img_path
 
 
-def image_path(db, scan_id, fileset_id, file_id, size='orig'):
+def image_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     """Get the path to an image file.
 
     Parameters
@@ -274,9 +274,9 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
+    size : str | int, optional
         If an integer, use  it as the size of the cached image to create and return.
-        Otherwise, should be one of the following strings, default to `'orig'`:
+        Else, it should be a string from ``['orig', 'large', 'thumb']``, where:
 
           - `'thumb'`: image max width and height to `150`.
           - `'large'`: image max width and height to `1500`;
@@ -293,6 +293,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
+    >>> db.login('guest', 'guest')
     >>> # Example 1: Get the original image:
     >>> image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'orig')
     PosixPath('/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg')
@@ -307,9 +308,9 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         pass
 
     if size == "orig":
-        return __file_path(db, scan_id, fileset_id, file_id)
+        return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     elif size == "large" or size == "thumb" or isinstance(size, int):
-        return __image_cached_path(db, scan_id, fileset_id, file_id, size)
+        return __image_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs)
     else:
         raise ValueError(f"Unknown image size specification: {size}")
 
@@ -328,7 +329,7 @@ def __pointcloud_hash(scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'}
+    size : str
         The requested size ('orig' or 'preview').
 
     Returns
@@ -357,7 +358,7 @@ def __pointcloud_resize(pointcloud, voxel_size):
     return pointcloud.voxel_down_sample(voxel_size)
 
 
-def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
+def __pointcloud_cache(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Create a cache for a pointcloud resource.
 
     Parameters
@@ -370,11 +371,11 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     See Also
     --------
@@ -392,7 +393,7 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
     dst = cache_dir / __pointcloud_hash(scan_id, fileset_id, file_id, size)
 
     # Load the pointcloud and resize it:
-    src = __file_path(db, scan_id, fileset_id, file_id)
+    src = __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     pcd = read_pointcloud(str(src))
     pcd_npts = len(pcd.points)  # get the number of points
     if isinstance(size, float):
@@ -410,7 +411,7 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
     return dst
 
 
-def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
+def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Get The path to the cached pointcloud.
 
     Parameters
@@ -423,11 +424,11 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     Returns
     -------
@@ -437,11 +438,11 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
     cache_dir = __webcache_path(db, scan_id)
     pcd_path = cache_dir / __pointcloud_hash(scan_id, fileset_id, file_id, size)
     if not pcd_path.is_file():
-        __pointcloud_cache(db, scan_id, fileset_id, file_id, size)
+        __pointcloud_cache(db, scan_id, fileset_id, file_id, size, **kwargs)
     return pcd_path
 
 
-def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
+def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     """Get the path to a point cloud file.
 
     Parameters
@@ -454,12 +455,11 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float, optional
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
-        Default to 'orig'.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     Returns
     -------
@@ -482,13 +482,13 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
     """
     if size == "orig":
         print("Using original pointcloud file")
-        return __file_path(db, scan_id, fileset_id, file_id)
+        return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     elif size == "preview":
         print("Using cached pointcloud file")
-        return __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size)
+        return __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs)
     else:
         try:
-            path = __pointcloud_cached_path(db, scan_id, fileset_id, file_id, float(size))
+            path = __pointcloud_cached_path(db, scan_id, fileset_id, file_id, float(size), **kwargs)
         except ValueError:
             raise ValueError(f"Unknown pointcloud size specification: {size}")
         else:
@@ -498,7 +498,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
 # -----------------------------------------------------------------------------
 # Mesh
 # -----------------------------------------------------------------------------
-def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
+def mesh_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     """Get the path to a mesh file.
 
     Parameters
@@ -531,4 +531,4 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> db.disconnect()
     """
     print("Using original mesh file")
-    return __file_path(db, scan_id, fileset_id, file_id)
+    return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
