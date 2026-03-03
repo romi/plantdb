@@ -4,6 +4,7 @@ import logging
 import socket
 import threading
 import time
+from pathlib import Path
 
 from flask import Flask
 from werkzeug.serving import make_server
@@ -95,18 +96,18 @@ class TestRestApiServer:
         logger : logging.logger, optional
             A logger instance to use. By default, the logger will be set to the root logger.
         """
-        self.db_path = db_path if db_path else _mkdtemp_romidb()
-        self.port = port
-        self.host = host
-        self.prefix = prefix
-        self.ssl = ssl
-        self.test = test
-        self.empty = empty
-        self.models = models
+        self.db_path: Path = Path(db_path) if db_path else _mkdtemp_romidb()
+        self.port: int = port
+        self.host: str = host
+        self.prefix: str = prefix
+        self.ssl: bool = ssl
+        self.test: bool = test
+        self.empty: bool = empty
+        self.models: bool = models
         self.app = None
         self.server = None
         self.thread = None
-        self.logger = logger or get_logger(__name__)
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__) or get_logger(__name__)
         self._setup_flask_app()
 
     def _setup_flask_app(self):
