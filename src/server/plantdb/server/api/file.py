@@ -19,7 +19,7 @@
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with plantdb.  If not, see
+# License along with plantdb. If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ Hereafter is a minimal working example that:
 >>> db.connect()
 >>> # RESTful API and resource registration
 >>> api = Api(app)
->>> api.add_resource(FileMetadata, "/api/file/<scan_id>/<fileset_id>/<file_id>/metadata", resource_class_kwargs={"db": db, "logger": logger})
+>>> api.add_resource(FileMetadata, "/file/<scan_id>/<fileset_id>/<file_id>/metadata", resource_class_kwargs={"db": db, "logger": logger})
 >>> # Start the APP
 >>> app.run(host='0.0.0.0', port=5000)
 ```
@@ -75,7 +75,7 @@ It may be used as follows (in another Python REPL):
 ```python
 >>> import requests
 >>> # Retrieve metadata for a specific file
->>> url = "http://127.0.0.1:5000/api/file/real_plant/images/00001_rgb/metadata"
+>>> url = "http://127.0.0.1:5000/file/real_plant/images/00001_rgb/metadata"
 >>> response = requests.get(url)
 >>> print(response.json())
 {'metadata': {'approximate_pose': [76.64343138951801, 343.64146101970397, 80, 276.0, 0], 'channel': 'rgb', 'shot_id': '000001'}}
@@ -88,44 +88,28 @@ It may be used as follows (in another Python REPL):
 """
 # ... existing code ...
 import json
-import tempfile
-from tempfile import NamedTemporaryFile
 
 import requests
 from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask import request
-from flask_restful import Resource
+from flask import send_from_directory
 from flask_restful import Resource
 
-import plantdb
-from plantdb.client.rest_api import plantdb_url
-from plantdb.client.rest_api import plantdb_url
-from plantdb.client.rest_api import plantdb_url
 from plantdb.client.rest_api import plantdb_url
 from plantdb.commons.auth.session import SessionValidationError
-from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.exceptions import FileNotFoundError
+from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import NoAuthUserError
+from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.server.core.security import add_jwt_from_header
-from plantdb.server.core.security import add_jwt_from_header
-from plantdb.server.core.utils import sanitize_name
-from plantdb.server.core.utils import sanitize_name
-from plantdb.server.core.utils import sanitize_name
-from plantdb.server.core.utils import sanitize_name
-from plantdb.server.core.utils import sanitize_name
-from plantdb.server.core.utils import sanitize_name
-
+from plantdb.server.core.security import rate_limit
+from plantdb.server.core.security import sanitize_ids
+from plantdb.server.core.security import use_guest_as_default
 
 #: Define valid files extensions
 VALID_FILE_EXT = ['.jpg', '.jpeg', '.png', '.tif', '.txt', '.json', '.ply', '.yaml', '.toml']
 
 
-class FileCreate(Resource):
+class File(Resource):
     """Represents a File resource creation endpoint in the application.
 
     This class provides the functionality to create new files in filesets.
@@ -133,31 +117,32 @@ class FileCreate(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance used to create files.
+        The database providing the resources to serve.
     logger : logging.Logger
-        The logger instance for recording operations.
+        The logger used to record operations and errors.
     """
 
     def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
         self.logger = logger
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
+    @rate_limit(max_requests=240, window_seconds=60)
     @add_jwt_from_header
-    def post(self, **kwargs):
-        """Create a new file in a fileset and write data to it.
-
-        This method handles POST requests to create a new file with data. It expects
-        multipart/form-data with the file data and JSON metadata.
-
-        Notes
-        -----
-        The method expects the following form fields:
-        - file: The actual file data
-        - file_id: str       # Required: ID of the file
-        - ext: str           # Required: File extension (must be one of VALID_FILE_EXT)
-        - scan_id: str       # Required: ID of the scan
-        - fileset_id: str    # Required: ID of the fileset
-        - metadata: dict     # Optional: Additional metadata for the file (as JSON string)
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
+        """Retreive a file from a given scan and fileset.
 
         Returns
         -------
@@ -172,34 +157,109 @@ class FileCreate(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from tempfile import NamedTemporaryFile
-        >>> from plantdb.client.rest_api import plantdb_url
-        >>> # Create a YAML temporary file:
-        >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
-        >>> file_path = f.name
-        >>> login_res = requests.post(f"{plantdb_url('localhost', port=5000)}/login", json={'username': 'admin', 'password': 'admin'})
-        >>> token = login_res.json()['access_token']
-        >>> # Create a new file with metadata in the database:
-        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file"
-        >>> # Open the file separately for sending
-        >>> with open(file_path, 'rb') as file_handle:
-        ...     files = {
-        ...         'file': ('test_file.yaml', file_handle, 'application/octet-stream')
-        ...     }
-        ...     metadata = json.dumps({'description': 'Test document', 'author': 'John Doe'})
-        ...     data = {
-        ...         'file_id': 'new_file',
-        ...         'ext': 'yaml',
-        ...         'scan_id': 'real_plant',
-        ...         'fileset_id': 'images',
-        ...         'metadata': metadata
-        ...     }
-        ...     response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
+        >>> # Get a file from the database:
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
+        >>> response = requests.get(url)
         >>> print(response.status_code)
         201
         >>> print(response.json())
         {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
         >>> file_path.unlink()  # Delete the YAML test file
+        """
+
+        try:
+            # Get the scan
+            scan = self.db.get_scan(scan_id, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
+            # Get the fileset
+            fileset = scan.get_fileset(fileset_id)
+
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {
+                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
+            # Create the file
+            file = fileset.get_file(file_id)
+
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            self.logger.error(f"Error creating file: {str(e)}")
+            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            rel_file_path = file.path().relative_to(self.db.path())
+            return send_from_directory(self.db.path(), rel_file_path)
+
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
+    @add_jwt_from_header
+    def post(self, scan_id, fileset_id, file_id, **kwargs):
+        """Create a new file in a fileset and write data to it.
+
+        This method handles POST requests to create a new file with data. It validates the input data,
+        creates the file with the specified name, and associates it with the given scan and fileset IDs.
+        Optional metadata can be attached to the file.
+
+        Returns
+        -------
+        dict
+            Response containing a success message or error description.
+            If successful, also returns the created file ID under 'id' key, as sanitization may have happened.
+        int
+            HTTP status code (201, 400, 404, or 500)
+
+        Notes
+        -----
+        The method accepts a JSON request body with the following structure:
+
+            - file (Any): The actual file data
+            - ext (str): File extension (must be one of VALID_FILE_EXT)
+            - metadata (dict, optional): Additional metadata for the fileset
+
+        Examples
+        --------
+        >>> # Start a test REST API server first:
+        >>> # $ fsdb_rest_api --test
+        >>> import requests
+        >>> import json
+        >>> from pathlib import Path
+        >>> from tempfile import NamedTemporaryFile
+        >>> # Create a YAML temporary file:
+        >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
+        >>> file_path = f.name
+        >>> login_res = requests.post(f"http://127.0.0.1:5000/login", json={'username': 'admin', 'password': 'admin'})
+        >>> token = login_res.json()['access_token']
+        >>> # Create a new file with metadata in the database:
+        >>> scan_id = "real_plant"
+        >>> fileset_id = "images"
+        >>> file_id = Path(file_path).stem
+        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
+        >>> metadata = {'description': 'Test file description'}
+        >>> data = {'ext': '.yaml', 'metadata': json.dumps(metadata)}
+        >>> file_handle = open(file_path, 'rb')
+        >>> files = {'file': (Path(file_path).name, file_handle, 'application/octet-stream')}
+        >>> response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
+        >>> print(response.status_code)
+        201
+        >>> print(response.json())
+        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
+        >>> file_handle.close()
+        >>> Path(file_path).unlink()  # Delete the YAML test file
         """
         # Check if the request has the file part
         if 'file' not in request.files:
@@ -207,19 +267,14 @@ class FileCreate(Resource):
 
         file_data = request.files['file']
 
+        # Multipart/form‑data: fields are in ``request.form`` (`json=` is ignored when `files=` is present)
+        data = request.form.to_dict()
+
         # Get form data
-        file_id = request.form.get('file_id', None)
-        ext = request.form.get('ext', None)
-        scan_id = request.form.get('scan_id', None)
-        fileset_id = request.form.get('fileset_id', None)
-
+        ext = data.get('ext', None)
         # Validate required fields
-        if not all([file_id, ext, scan_id, fileset_id]):
-            missing_fields = [form_field.__name__ for form_field in [file_id, ext, scan_id, fileset_id] if
-                              form_field is None]
-            return {
-                'message': f"'file_id', 'ext', 'scan_id', and 'fileset_id' fields are required, missing: {missing_fields}"}, 400
-
+        if not ext:
+            return {'message': "'ext' field is required"}, 400
         # Validate file extension
         if not ext.startswith('.'):
             ext = f'.{ext}'
@@ -228,24 +283,44 @@ class FileCreate(Resource):
                 'message': f'Invalid file extension. Must be one of: {", ".join(VALID_FILE_EXT)}'
             }, 400
 
-        # Parse metadata if provided
-        try:
-            metadata = json.loads(request.form.get('metadata', '{}'))
-        except json.JSONDecodeError:
-            return {'message': 'Invalid metadata JSON format'}, 400
+        # Get metadata if provided
+        metadata_raw = data.get('metadata')
+        if metadata_raw:
+            try:
+                metadata = json.loads(metadata_raw)
+            except json.JSONDecodeError:
+                import ast
+                try:
+                    metadata = ast.literal_eval(metadata_raw)
+                except (ValueError, SyntaxError):
+                    return {'message': "Invalid metadata format – must be JSON or a Python dict string"}, 400
+        else:
+            metadata = None
 
         try:
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
-            if not scan:
-                return {'message': 'Scan not found'}, 404
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_id))
-            if not fileset:
-                return {'message': 'Fileset not found'}, 404
+            fileset = scan.get_fileset(fileset_id)
+
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {
+                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
             # Create the file
-            file_id = sanitize_name(file_id)
-            file = fileset.create_file(file_id, **kwargs)
+            file = fileset.create_file(file_id, metadata=metadata, **kwargs)
             try:
                 # Write the file data with the specified extension
                 if ext in ['.jpg', '.jpeg', '.png', '.tif']:
@@ -255,21 +330,18 @@ class FileCreate(Resource):
             except Exception as e:
                 fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
-                return {'message': f'Error writing file: {str(e)}'}, 500
-            # Set metadata if provided
-            if metadata:
-                file.set_metadata(metadata, **kwargs)
-            return {
-                'message': f"File '{file_id}{ext}' created and written successfully in fileset '{fileset.id}'.",
-                'id': f"{file_id}",
-            }, 201
+                return {'message': f'Error writing file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401
-
+            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
-            return {'message': f'Error creating file: {str(e)}'}, 500
+            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {
+                'message': f"File created and written successfully in fileset '{fileset.id}'.",
+                'id': f"{file_id}",
+            }, 201
 
 
 class FileMetadata(Resource):
@@ -281,7 +353,7 @@ class FileMetadata(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance for accessing file storage.
+        The database providing the resources to serve.
     logger : Logger
         The logger instance for this resource.
 
@@ -291,10 +363,24 @@ class FileMetadata(Resource):
     """
 
     def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
         self.logger = logger
 
-    def get(self, scan_id, fileset_id, file_id):
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
         """Retrieve metadata for a specified file.
 
         Parameters
@@ -323,7 +409,7 @@ class FileMetadata(Resource):
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
-        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
         >>> print(response.json())
         {'metadata': {'description': 'Test file'}}
@@ -333,28 +419,45 @@ class FileMetadata(Resource):
         {'metadata': 'Test file'}
         """
         key = request.args.get('key', default=None, type=str)
+        if key:
+            self.logger.debug(f"Got a metadata key '{key}' for scan '{scan_id}'...")
 
         try:
             # Get the scan
-            scan = self.db.get_scan(scan_id)
-            if not scan:
-                return {'message': 'Scan not found'}, 404
+            scan = self.db.get_scan(scan_id, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_id))
-            if not fileset:
-                return {'message': 'Fileset not found'}, 404
-            # Get the file
-            file = fileset.get_file(sanitize_name(file_id))
-            if not file:
-                return {'message': 'File not found'}, 404
+            fileset = scan.get_fileset(fileset_id)
+
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
+            file = fileset.get_file(file_id)
             # Get the metadata
             metadata = file.get_metadata(key)
-            return {'metadata': metadata}, 200
 
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving metadata: {str(e)}')
-            return {'message': f'Error retrieving metadata: {str(e)}'}, 500
+            return {'message': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'metadata': metadata}, 200
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
     @add_jwt_from_header
     def post(self, scan_id, fileset_id, file_id, **kwargs):
         """Update metadata for a specified file.
@@ -372,17 +475,18 @@ class FileMetadata(Resource):
         -------
         dict
             Response dictionary with either:
-                * {'metadata': dict} containing updated metadata for successful requests
-                * {'message': str} for error cases
+                * 'metadata': containing updated metadata for successful requests
+                * 'message': for error cases
         int
             HTTP status code (200, 400, 404, or 500).
 
         Notes
         -----
         The request body should be a JSON object containing:
-        - 'metadata' (dict): Required. The metadata to update/set
-        - 'replace' (bool): Optional. If ``True``, replaces entire metadata.
-                           If ``False`` (default), updates only specified keys.
+
+            - metadata (dict): The metadata to update/set
+            - replace (bool, optional). If ``True``, replaces entire metadata.
+              If ``False`` (default), updates only specified keys.
 
         Examples
         --------
@@ -390,39 +494,46 @@ class FileMetadata(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> url = f"{plantdb_url('localhost', port=5000)}/api/file/test_plant/images/image_001/metadata"
+        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
         >>> print(response.json())
         {'metadata': {'description': 'Updated description'}}
         """
+        # Get request data
+        data = request.get_json()
+        if not data or 'metadata' not in data:
+            return {'message': 'Missing metadata in request body'}, 400
+
+        metadata = data['metadata']
+        replace = data.get('replace', False)
+
+        if not isinstance(metadata, dict):
+            return {'message': 'Metadata must be a dictionary'}, 400
+
         try:
-            # Get request data
-            data = request.get_json()
-            if not data or 'metadata' not in data:
-                return {'message': 'Missing metadata in request body'}, 400
-
-            metadata = data['metadata']
-            replace = data.get('replace', False)
-
-            if not isinstance(metadata, dict):
-                return {'message': 'Metadata must be a dictionary'}, 400
-
             # Get the scan
-            scan = self.db.get_scan(scan_id)
-            if not scan:
-                return {'message': 'Scan not found'}, 404
+            scan = self.db.get_scan(scan_id, **kwargs)
 
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
             # Get the fileset
-            fileset = scan.get_fileset(sanitize_name(fileset_id))
-            if not fileset:
-                return {'message': 'Fileset not found'}, 404
+            fileset = scan.get_fileset(fileset_id)
 
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+        try:
             # Get the file
-            file = fileset.get_file(sanitize_name(file_id))
-            if not file:
-                return {'message': 'File not found'}, 404
-
+            file = fileset.get_file(file_id)
             # Update the metadata
             file.set_metadata(metadata, **kwargs)
             # TODO: make this works:
@@ -434,14 +545,15 @@ class FileMetadata(Resource):
             #    current_metadata = file.get_metadata()
             #    current_metadata.update(metadata)
             #    file.set_metadata(current_metadata)
-
             # Return updated metadata
             updated_metadata = file.get_metadata()
-            return {'metadata': updated_metadata}, 200
 
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401
-
+            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f'Error processing request: {str(e)}')
-            return {'message': f'Error processing request: {str(e)}'}, 500
+            return {'message': f'Error processing request: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'metadata': updated_metadata}, 200
