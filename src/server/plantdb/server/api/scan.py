@@ -96,15 +96,18 @@ It may be used as follows (in another Python REPL):
 """
 
 import json
+import logging
 
 import requests
 from flask import request
 from flask_restful import Resource
 
 from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
@@ -127,7 +130,7 @@ class ScansList(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -137,8 +140,8 @@ class ScansList(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @rate_limit(max_requests=30, window_seconds=60)
     def get(self):
@@ -223,7 +226,7 @@ class ScansTable(Resource):
     plantdb.server.rest_api.get_scan_info : Function used to extract information for each scan
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -233,8 +236,8 @@ class ScansTable(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @rate_limit(max_requests=120, window_seconds=60)
     @add_jwt_from_header
@@ -336,7 +339,7 @@ class Scan(Resource):
     plantdb.server.rest_api.sanitize_name : Function used to validate and clean scan IDs
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -346,8 +349,8 @@ class Scan(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=120, window_seconds=60)
@@ -504,7 +507,7 @@ class ScanMetadata(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -514,8 +517,8 @@ class ScanMetadata(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=120, window_seconds=60)
@@ -688,7 +691,7 @@ class ScanFilesets(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -698,8 +701,8 @@ class ScanFilesets(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @add_jwt_from_header

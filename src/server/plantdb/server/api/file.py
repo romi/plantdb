@@ -88,6 +88,7 @@ It may be used as follows (in another Python REPL):
 """
 # ... existing code ...
 import json
+import logging
 
 import requests
 from flask import request
@@ -96,10 +97,12 @@ from flask_restful import Resource
 
 from plantdb.client.rest_api import plantdb_url
 from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
@@ -122,7 +125,7 @@ class File(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -132,8 +135,8 @@ class File(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -362,7 +365,7 @@ class FileMetadata(Resource):
     All file and fileset names are sanitized before processing to ensure valid formats.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -372,8 +375,8 @@ class FileMetadata(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')

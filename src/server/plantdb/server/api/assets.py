@@ -91,6 +91,7 @@ Circle
 """
 
 import json
+import logging
 import mimetypes
 import os
 import pathlib
@@ -111,11 +112,13 @@ from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
 
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
+from plantdb.commons.log import get_logger
 from plantdb.server import webcache
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
@@ -158,7 +161,7 @@ class FilePath(Resource):
     provides a valid path() method for file location resolution.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -168,8 +171,8 @@ class FilePath(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self, path):
@@ -247,7 +250,7 @@ class DatasetFile(Resource):
     plantdb.server.rest_api.File : Resource for file retrieval operations
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -263,8 +266,8 @@ class DatasetFile(Resource):
             DeprecationWarning,
             stacklevel=2,
         )
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @add_jwt_from_header
@@ -383,7 +386,7 @@ class Image(Resource):
     attacks and ensure valid file access.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -393,8 +396,8 @@ class Image(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @staticmethod
     def wants_base64(request) -> bool:
@@ -550,7 +553,7 @@ class PointCloud(Resource):
     'application/octet-stream' mimetype.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -560,8 +563,8 @@ class PointCloud(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -697,7 +700,7 @@ class PointCloudGroundTruth(Resource):
         The logger instance for this resource.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -707,8 +710,8 @@ class PointCloudGroundTruth(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -830,7 +833,7 @@ class Mesh(Resource):
     The mesh data is served in PLY format as an octet-stream.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -840,8 +843,8 @@ class Mesh(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -962,7 +965,7 @@ class CurveSkeleton(Resource):
         The logger instance for this resource.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -972,8 +975,8 @@ class CurveSkeleton(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=5, window_seconds=60)
@@ -1082,7 +1085,7 @@ class Sequence(Resource):
         The logger instance for this resource.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -1092,8 +1095,8 @@ class Sequence(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=60, window_seconds=60)
@@ -1276,7 +1279,7 @@ class Archive(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -1286,8 +1289,8 @@ class Archive(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=5, window_seconds=60)

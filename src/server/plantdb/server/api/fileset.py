@@ -84,15 +84,18 @@ It may be used as follows (in another Python REPL):
 {'metadata': ['rgb']}
 ```
 """
+import logging
 
 import requests
 from flask import request
 from flask_restful import Resource
 
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import FilesetExistsError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
@@ -112,7 +115,7 @@ class Fileset(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -122,8 +125,8 @@ class Fileset(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -232,7 +235,7 @@ class FilesetMetadata(Resource):
     alphanumeric characters, underscores, dashes, or periods.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -242,8 +245,8 @@ class FilesetMetadata(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')
@@ -447,7 +450,7 @@ class FilesetFiles(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -457,8 +460,8 @@ class FilesetFiles(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @sanitize_ids('fileset_id')

@@ -131,7 +131,7 @@ class Register(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -141,8 +141,8 @@ class Register(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger
 
     @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
     @add_jwt_from_header
@@ -242,7 +242,7 @@ class Login(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -252,8 +252,8 @@ class Login(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -392,7 +392,7 @@ class Logout(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -402,8 +402,8 @@ class Logout(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @add_jwt_from_header
     def post(self, **kwargs):
@@ -460,7 +460,7 @@ class TokenValidation(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -470,8 +470,8 @@ class TokenValidation(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @add_jwt_from_header
     def post(self, **kwargs):
@@ -530,7 +530,7 @@ class TokenRefresh(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -540,8 +540,8 @@ class TokenRefresh(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     def post(self, **kwargs):
         """Refresh JSON Web Token.
@@ -578,20 +578,24 @@ class CreateApiToken(Resource):
 
     Attributes
     ----------
-    db : plantdb.core.FSDB
-        Database handler with a ``session_manager`` attribute.
-
-    Parameters
-    ----------
-    db : Any
-        Database handler providing access to the session manager.
-
+    db : plantdb.commons.fsdb.core.FSDB
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
-        """Initialize the TokenRefresh resource."""
+    def __init__(self, db, logger=None):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db: FSDB = db
-        self.logger = logger
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @add_jwt_from_header
     def post(self, **kwargs):

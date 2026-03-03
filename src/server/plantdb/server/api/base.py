@@ -87,10 +87,13 @@ PlantDB REST API
 >>> print(response.json()['status'])
 healthy
 """
+import logging
 
 from flask import request
 from flask_restful import Resource
 
+from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.log import get_logger
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
 
@@ -172,7 +175,7 @@ class HealthCheck(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -182,8 +185,8 @@ class HealthCheck(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -227,7 +230,7 @@ class Refresh(Resource):
         The logger used to record operations and errors.
     """
 
-    def __init__(self, db, logger):
+    def __init__(self, db, logger=None):
         """Initialize the resource.
 
         Parameters
@@ -237,8 +240,8 @@ class Refresh(Resource):
         logger : logging.Logger
             A logger instance to record operations and errors.
         """
-        self.db = db
-        self.logger = logger
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=60, window_seconds=60)
