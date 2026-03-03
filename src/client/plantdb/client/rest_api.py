@@ -1882,7 +1882,7 @@ def _ply_vertex_to_array(data):
     Parameters
     ----------
     data : PlyData
-        The `PlyData` object to be converted as numpy array.
+        The `PlyData` object to be converted as a numpy array.
 
     Returns
     -------
@@ -1898,7 +1898,7 @@ def _ply_face_to_array(data):
     Parameters
     ----------
     data : PlyData
-        The `PlyData` object to be converted as numpy array.
+        The `PlyData` object to be converted as a numpy array.
 
     Returns
     -------
