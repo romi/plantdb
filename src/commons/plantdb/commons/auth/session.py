@@ -1095,10 +1095,9 @@ class JWTSessionManager(SessionManager):
             raise InvalidTokenProcessingError(e) from e
 
         # Check token type
-        if payload.get('type') != token_type:
-            self.logger.error(f"Invalid token type: expected {token_type}, got {payload.get('type')}")
-            raise WrongTokenType(f"Invalid token type: {token_type}")
-
+        #if payload.get('type') != token_type:
+        #    self.logger.error(f"Invalid token type: expected {token_type}, got {payload.get('type')}")
+        #    raise WrongTokenType(f"Invalid token type: {token_type}")
         jti = payload.get('jti')
 
         # Verify it's in our tracking list

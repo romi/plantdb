@@ -125,6 +125,7 @@ from plantdb.client.rest_api import plantdb_url
 from plantdb.client.rest_api import plantdb_url
 from plantdb.commons.auth.session import SessionValidationError
 from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.core import FSDB
 
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import add_jwt_from_header
@@ -166,7 +167,7 @@ class ScansList(Resource):
 
     def __init__(self, db):
         """Initialize the ScansList resource."""
-        self.db = db
+        self.db: FSDB = db
 
     @rate_limit(max_requests=30, window_seconds=60)
     def get(self):
@@ -275,7 +276,7 @@ class ScansTable(Resource):
         logger : logging.Logger
             A logger instance for recording operations and errors.
         """
-        self.db = db
+        self.db: FSDB = db
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
@@ -371,7 +372,7 @@ class Scan(Resource):
         logger : logging.Logger
             A logger instance for recording operations and errors.
         """
-        self.db = db
+        self.db: FSDB = db
         self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
@@ -496,7 +497,7 @@ class ScanCreate(Resource):
     """
 
     def __init__(self, db, logger):
-        self.db = db
+        self.db: FSDB = db
         self.logger = logger
 
     @add_jwt_from_header
@@ -578,7 +579,7 @@ class ScanMetadata(Resource):
     """
 
     def __init__(self, db, logger):
-        self.db = db
+        self.db: FSDB = db
         self.logger = logger
 
     def get(self, scan_id):
@@ -744,7 +745,7 @@ class ScanFilesets(Resource):
     """
 
     def __init__(self, db, logger):
-        self.db = db
+        self.db: FSDB = db
         self.logger = logger
 
     def get(self, scan_id):

@@ -675,3 +675,7 @@ def skeleton(scan_id: str, **kwargs) -> str:
     """Return the URL path to the skeleton endpoint."""
     scan_id = sanitize_name(scan_id)
     return f"/skeleton/{scan_id}"
+
+@url_prefix
+def create_api_token():
+    return "/create-api-token"

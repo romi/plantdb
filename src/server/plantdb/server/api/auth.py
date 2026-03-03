@@ -98,7 +98,9 @@ from flask import make_response
 from flask import request
 from flask_restful import Resource
 
+from plantdb.commons.auth.models import User
 from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 
@@ -533,3 +535,55 @@ class TokenRefresh(Resource):
 
         except Exception as e:
             return {'message': f'Token refresh failed: {e}'}, 500
+
+class CreateApiToken(Resource):
+    """
+
+    Attributes
+    ----------
+    db : plantdb.core.FSDB
+        Database handler with a ``session_manager`` attribute.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+
+    """
+
+    def __init__(self, db, logger):
+        """Initialize the TokenRefresh resource."""
+        self.db: FSDB = db
+        self.logger = logger
+
+    @add_jwt_from_header
+    def post(self, **kwargs):
+        """Refresh JSON Web Token.
+
+        This method expects a JSON payload containing a 'refresh_token'.
+        It validates the refresh token and issues a new access/refresh token pair.
+        """
+        data = request.get_json()
+        if "datasets" not in data:
+            return {'message': 'Missing "datasets" field'}, 400
+        if "token_exp" not in data:
+            return {'message': 'Missing "token_exp" field'}, 400
+
+        try:
+            token = self.db.create_api_token(
+                token_exp=int(data['token_exp']),
+                datasets=data['datasets'],
+                **kwargs
+            )
+
+            if token:
+                response = {
+                    'message': 'Token refreshed successfully',
+                    'api_token': token,
+                }, 200
+                return response
+            else:
+                return {'message': 'Could not create token.'}, 401
+
+        except Exception as e:
+            return {'message': f'Token creation failed: {e}'}, 500
