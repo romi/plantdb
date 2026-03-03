@@ -184,7 +184,7 @@ def __image_resize(img, max_size):
     return img
 
 
-def __image_cache(db, scan_id, fileset_id, file_id, size):
+def __image_cache(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Create a cache for an image resource.
 
     Parameters
@@ -207,7 +207,7 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
         The path to the cached image.
     """
     # Get the path to the original image:
-    src = __file_path(db, scan_id, fileset_id, file_id)
+    src = __file_path(db, scan_id, fileset_id, file_id, **kwargs)
 
     # Get the path to the 'webcache' directory:
     cache_dir = __webcache_path(db, scan_id)
@@ -257,7 +257,7 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
     cache_dir = __webcache_path(db, scan_id)
     img_path = cache_dir / __image_hash(scan_id, fileset_id, file_id, size)
     if not img_path.is_file():
-        __image_cache(db, scan_id, fileset_id, file_id, size)
+        __image_cache(db, scan_id, fileset_id, file_id, size, **kwargs)
     return img_path
 
 
