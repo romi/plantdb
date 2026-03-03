@@ -19,7 +19,7 @@
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with plantdb.  If not, see
+# License along with plantdb. If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ Hereafter is a minimal working example that:
 >>> import logging
 >>> from flask import Flask
 >>> from flask_restful import Api
->>> from plantdb.server.api.assets import File
+>>> from plantdb.server.api.assets import FilePath
 >>> from plantdb.commons.auth.session import JWTSessionManager
 >>> from plantdb.commons.fsdb.core import FSDB
 >>> from plantdb.commons.test_database import setup_test_database
@@ -94,6 +94,7 @@ import json
 import mimetypes
 import os
 import pathlib
+import warnings
 from http.client import HTTPException
 from io import BytesIO
 from pathlib import Path
@@ -110,14 +111,17 @@ from flask import send_file
 from flask import send_from_directory
 from flask_restful import Resource
 
+from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.server import webcache
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
+from plantdb.server.core.security import sanitize_ids
+from plantdb.server.core.security import use_guest_as_default
 from plantdb.server.core.utils import compute_fileset_matches
-from plantdb.server.core.utils import sanitize_name
 from plantdb.server.services.assets import ArchiveError
 from plantdb.server.services.assets import ExtractionError
 from plantdb.server.services.assets import FileUploadError
@@ -129,7 +133,6 @@ from plantdb.server.services.assets import _test_zip_integrity
 from plantdb.server.services.assets import _validate_extension
 from plantdb.server.services.assets import _validate_mime_type
 from plantdb.server.services.assets import create_zip_for_scan
-from plantdb.server.services.assets import ensure_directory
 from plantdb.server.services.assets import extract_zip_to_scan
 from plantdb.server.services.assets import get_scan_path
 from plantdb.server.services.assets import validate_upload_headers
@@ -137,7 +140,7 @@ from plantdb.server.services.assets import write_file
 from plantdb.server.services.assets import write_streamed_file
 
 
-class File(Resource):
+class FilePath(Resource):
     """A RESTful resource class for serving files via HTTP GET requests.
 
     This class implements a REST API endpoint that serves files from a specified database location.
@@ -145,23 +148,28 @@ class File(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        A database instance containing the file path configuration.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
 
     Notes
     -----
-    The class requires proper initialization with A database instance that
+    The class requires proper initialization with a database instance that
     provides a valid path() method for file location resolution.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            A database instance providing access to file locations.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self, path):
@@ -186,9 +194,9 @@ class File(Resource):
         Raises
         ------
         werkzeug.exceptions.NotFound
-            If the requested file does not exist
+            If the requested file does not exist.
         werkzeug.exceptions.Forbidden
-            If the file access is forbidden
+            If the file access is forbidden.
         http.client.HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
@@ -223,8 +231,10 @@ class DatasetFile(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance that provides access to scan data and file locations.
+        The database providing the resources to serve.
         Used for validating scan IDs and determining file storage paths.
+    logger : logging.Logger
+        The logger used to record operations and errors.
 
     Notes
     -----
@@ -243,15 +253,23 @@ class DatasetFile(Resource):
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            A database instance providing access to file locations.
+            A database instance providing the resources to serve.
         logger : logging.Logger
-            A logger instance for recording operations and errors.
+            A logger instance to record operations and errors.
         """
+        # Emit a deprecation warning the first time this class is instantiated
+        warnings.warn(
+            "DatasetFile is pending deprecation and will be replaced by the Archive resource in an upcoming release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.db = db
         self.logger = logger
 
+    @sanitize_ids('scan_id')
+    @add_jwt_from_header
     @rate_limit(max_requests=30, window_seconds=60)
-    def post(self, scan_id):
+    def post(self, scan_id, **kwargs):
         """Handle POST request to upload and save a file to the server.
 
         This endpoint processes file uploads and saves them to the specified location. It supports
@@ -297,38 +315,16 @@ class DatasetFile(Resource):
         --------
         plantdb.commons.io.write_stream
         plantdb.commons.io.write_data
-
-        Examples
-        --------
-        >>> # Start the REST API server (in test mode)
-        >>> # fsdb_rest_api --test
-        >>> # Request a TOML configuration file
-        >>> import requests
-        >>> import toml
-        >>> # Example POST request with required headers
-        >>> headers = {
-        ...     'Content-Disposition': 'attachment; filename=data.txt',
-        ...     'Content-Length': '1024',
-        ...     'X-File-Path': 'path/to/data.txt'
-        ... }
-        >>> response = requests.post(
-        ...     'http://api/scans/scan123/files',
-        ...     headers=headers,
-        ...     data=file_content
-        ... )
-        >>> response.status_code
-        201
-        >>> response.json()
-        {'message': 'File path/to/data.txt received and saved'}
         """
         try:
-            # 1.  Validate request headers and extract useful values
+            # 1The database providing the resources to serveValidate request headers and extract useful values
             headers = validate_upload_headers(request.headers)
 
             # 2️. Resolve the target location on the filesystem
-            scan_root: Path = get_scan_path(self.db, scan_id)
+            scan_root: Path = get_scan_path(self.db, scan_id, **kwargs)
             file_path: Path = scan_root / headers["rel_filename"]
-            ensure_directory(file_path.parent)
+            parent_path = file_path.parent
+            parent_path.mkdir(parents=True, exist_ok=True)
 
             # 3. Persist the payload
             if headers["chunk_size"] == 0:
@@ -348,21 +344,23 @@ class DatasetFile(Resource):
                     f"{headers['content_length']} bytes"
                 )
 
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except FileUploadError as exc:
             self.logger.error("File upload failed: %s", exc)
-            return make_response(jsonify({"error": str(exc)}), 500)
-
+            return {"error": str(exc)}, 500  # HTTP 500 Internal Server Error)
         except HTTPException:
             # Let Flask‑RESTful propagate rate‑limit (429) or other HTTP errors.
             raise
-
         except Exception as exc:  # pragma: no cover - defensive fallback
             self.logger.exception("Unexpected error while handling file upload")
-            return make_response(jsonify({"error": str(exc)}), 400)
+            return {"error": str(exc)}, 400
 
         message = f"File {headers['rel_filename']} received and saved"
         self.logger.info(message)
-        return make_response(jsonify({"message": message}), 201)
+        return {"message": message}, 201
 
 
 class Image(Resource):
@@ -375,7 +373,9 @@ class Image(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance containing the image data.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
 
     Notes
     -----
@@ -383,15 +383,18 @@ class Image(Resource):
     attacks and ensure valid file access.
     """
 
-    def __init__(self, db):
-        """Initialize the Image resource with a database connection.
+    def __init__(self, db, logger):
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database instance for accessing stored images.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
     @staticmethod
     def wants_base64(request) -> bool:
@@ -401,8 +404,13 @@ class Image(Resource):
         flag = request.args.get('as_base64', default='false', type=str).lower()
         return flag in ('true', '1', 'yes')
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
     @rate_limit(max_requests=3000, window_seconds=60)
-    def get(self, scan_id, fileset_id, file_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
         """Retrieve and serve an image from the database.
 
         Handles image retrieval requests, optionally resizing the image
@@ -445,13 +453,8 @@ class Image(Resource):
         http.client.HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
 
-        Notes
-        -----
-        - All input parameters are sanitized before use.
-
         See Also
         --------
-        plantdb.server.rest_api.sanitize_name : Input sanitization and validation function.
         plantdb.server.webcache.image_path : Image path resolution function with caching and resizing options.
 
         Examples
@@ -485,15 +488,24 @@ class Image(Resource):
         >>> image = Image.open(BytesIO(image_data))
         >>> image.show()
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
-        fileset_id = sanitize_name(fileset_id)
-        file_id = sanitize_name(file_id)
-
         # Parse the `size` flag
         size = request.args.get('size', default='thumb', type=str)
         # Get the path to the image resource:
-        path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size)
+        try:
+            path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            self.logger.error(f'Error retrieving image file: {str(e)}')
+            return {'message': f'Error retrieving image file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
         mime_type, _ = mimetypes.guess_type(path)
 
         if self.wants_base64(request):
@@ -527,7 +539,9 @@ class PointCloud(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance containing the point cloud data.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
 
     Notes
     -----
@@ -536,18 +550,26 @@ class PointCloud(Resource):
     'application/octet-stream' mimetype.
     """
 
-    def __init__(self, db):
-        """Initialize the PointCloud resource with a database connection.
+    def __init__(self, db, logger):
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database instance for accessing stored point cloud data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id, fileset_id, file_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
         """Retrieve and serve a point cloud from the database.
 
         Handles point cloud retrieval requests with optional downsampling based on
@@ -618,11 +640,6 @@ class PointCloud(Resource):
         >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview", 'coords': 'true'})
         >>> coordinates = np.array(response.json()['coordinates'])
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
-        fileset_id = sanitize_name(fileset_id)
-        file_id = sanitize_name(file_id)
-
         # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
@@ -641,15 +658,19 @@ class PointCloud(Resource):
 
         try:
             # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
-        except FileNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
-        except FilesetNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
-        except ScanNotFoundError:
-            return {'error': f"No '{scan_id}' scan found!"}, 400
+            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'error': f"Unknown error: {e}"}, 400
+            self.logger.error(f'Error retrieving point cloud file: {str(e)}')
+            return {'message': f'Error retrieving point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
@@ -671,21 +692,31 @@ class PointCloudGroundTruth(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance used to retrieve point-cloud data.
+        The database providing the resources to serve.
+    logger : Logger
+        The logger instance for this resource.
     """
 
-    def __init__(self, db):
-        """Initialize the PointCloudGroundTruth resource.
+    def __init__(self, db, logger):
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database instance providing access to the point-cloud data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id, fileset_id, file_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
         """Retrieve and serve a ground-truth point-cloud file.
 
         Fetches the requested point-cloud data from the cache, potentially
@@ -737,11 +768,6 @@ class PointCloudGroundTruth(Resource):
         - Invalid size parameters default to 'preview'
         - Response mimetype is 'application/octet-stream'
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
-        fileset_id = sanitize_name(fileset_id)
-        file_id = sanitize_name(file_id)
-
         # Parse the `size` flag
         size = request.args.get('size', default='preview', type=str)
         # Try to convert the 'size' argument as a float:
@@ -760,15 +786,19 @@ class PointCloudGroundTruth(Resource):
 
         try:
             # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size)
-        except FileNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
-        except FilesetNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
-        except ScanNotFoundError:
-            return {'error': f"No '{scan_id}' scan found!"}, 400
+            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'error': f"Unknown error: {e}"}, 400
+            self.logger.error(f'Error retrieving ground truth point cloud file: {str(e)}')
+            return {'message': f'Error retrieving ground truth point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
@@ -791,25 +821,35 @@ class Mesh(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Reference to the database instance.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
 
     Notes
     -----
     The mesh data is served in PLY format as an octet-stream.
     """
 
-    def __init__(self, db):
-        """Initialize the Mesh resource.
+    def __init__(self, db, logger):
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            The database instance containing the mesh data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
+    @sanitize_ids('scan_id')
+    @sanitize_ids('fileset_id')
+    @sanitize_ids('file_id')
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id, fileset_id, file_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, fileset_id, file_id, **kwargs):
         """Retrieve and serve a triangular mesh file.
 
         This method handles GET requests for mesh data, supporting optional size
@@ -872,11 +912,6 @@ class Mesh(Resource):
         >>> vertices = mesh_data['vertex']
         >>> x_coords = list(vertices['x'])
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
-        fileset_id = sanitize_name(fileset_id)
-        file_id = sanitize_name(file_id)
-
         # Parse the `size` flag
         size = request.args.get('size', default='orig', type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
@@ -888,15 +923,19 @@ class Mesh(Resource):
 
         try:
             # Get the path to the mesh resource:
-            path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size)
-        except FileNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}/{file_id}' file found!"}, 400
-        except FilesetNotFoundError:
-            return {'error': f"No '{scan_id}/{fileset_id}' fileset found!"}, 400
-        except ScanNotFoundError:
-            return {'error': f"No '{scan_id}' scan found!"}, 400
+            path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except ScanNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FilesetNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
+        except FileNotFoundError as e:
+            return {'message': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'error': f"Unknown error: {e}"}, 400
+            self.logger.error(f'Error retrieving mesh file: {str(e)}')
+            return {'message': f'Error retrieving mesh file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
@@ -918,21 +957,29 @@ class CurveSkeleton(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance containing plant scan data and associated filesets.
+        The database providing the resources to serve.
+    logger : Logger
+        The logger instance for this resource.
     """
 
-    def __init__(self, db):
-        """Initialize the CurveSkeleton resource.
+    def __init__(self, db, logger):
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database instance providing access to plant scan data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
+    @sanitize_ids('scan_id')
     @rate_limit(max_requests=5, window_seconds=60)
-    def get(self, scan_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, **kwargs):
         """Retrieve the curve skeleton data for a specific scan.
 
         This method handles GET requests to fetch curve skeleton data. It performs
@@ -983,35 +1030,39 @@ class CurveSkeleton(Resource):
         >>> print(response.status_code)
         400
         >>> print(response.json())
-        {'error': "Scan 'invalid_id' not found!"}
+        {'message': "Scan 'invalid_id' not found!"}
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
         # Get the corresponding `Scan` instance
         try:
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
             return {"error": f"Scan '{scan_id}' not found!"}, 400
+
         task_fs_map = compute_fileset_matches(scan)
         # Get the corresponding `Fileset` instance
         try:
             fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
         except KeyError:
-            return {'error': "No 'CurveSkeleton' fileset mapped!"}, 400
+            return {'message': "No 'CurveSkeleton' fileset mapped!"}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError:
-            return {'error': "No 'CurveSkeleton' fileset found!"}, 400
+            return {'message': "No 'CurveSkeleton' fileset found!"}, 404  # HTTP 404 Not Found
+
         # Get the `File` corresponding to the CurveSkeleton resource
         try:
             file = fs.get_file('CurveSkeleton')
         except FileNotFoundError:
-            return {'error': "No 'CurveSkeleton' file found!"}, 400
+            return {'message': "No 'CurveSkeleton' file found!"}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return json.dumps({'error': str(e)}), 400
+            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+
         # Load the JSON file:
         try:
             skeleton = read_json(file.path())
         except Exception as e:
-            return json.dumps({'error': str(e)}), 400
+            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
         else:
             return skeleton
 
@@ -1026,25 +1077,29 @@ class Sequence(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance used for retrieving scan data.
+        The database providing the resources to serve.
     logger : Logger
         The logger instance for this resource.
-
-    Parameters
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        A database instance used for retrieving scan data.
-    logger : logging.Logger
-        A logger instance for this resource.
     """
 
     def __init__(self, db, logger):
-        """Initialize the Sequence resource."""
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
         self.logger = logger
 
+    @sanitize_ids('scan_id')
     @rate_limit(max_requests=60, window_seconds=60)
-    def get(self, scan_id):
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
+    def get(self, scan_id, **kwargs):
         """Retrieve angle and internode sequences data for a given scan.
 
         This method serves as a REST API endpoint to fetch angle, internode, and fruit point
@@ -1105,34 +1160,39 @@ class Sequence(Resource):
         >>> print(angles[:5])
         [47.13015345294241, 239.43543078022594, 311.8816488465762, 251.0289289739646, 249.56560354730826]
         """
-        # Sanitize identifiers
-        scan_id = sanitize_name(scan_id)
         type = request.args.get('type', default='all', type=str)
         # Get the corresponding `Scan` instance
         try:
-            scan = self.db.get_scan(scan_id)
+            scan = self.db.get_scan(scan_id, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
-            return {"error": f"Scan '{scan_id}' not found!"}, 400
+            return {"error": f"Scan '{scan_id}' not found!"}, 404  # HTTP 404 Not Found
+
         task_fs_map = compute_fileset_matches(scan)
         # Get the corresponding `Fileset` instance
         try:
             fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
         except KeyError:
-            return {'error': "No 'AnglesAndInternodes' fileset mapped!"}, 400
+            return {'message': "No 'AnglesAndInternodes' fileset mapped!"}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError:
-            return {'error': "No 'AnglesAndInternodes' fileset found!"}, 400
+            return {'message': "No 'AnglesAndInternodes' fileset found!"}, 404  # HTTP 404 Not Found
+
         # Get the `File` corresponding to the AnglesAndInternodes resource
         try:
             file = fs.get_file('AnglesAndInternodes')
         except FileNotFoundError:
-            return {'error': "No 'AnglesAndInternodes' file found!"}, 400
+            return {'message': "No 'AnglesAndInternodes' file found!"}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return json.dumps({'error': str(e)}), 400
+            return json.dumps({'message': str(e)}), 404  # HTTP 404 Not Found
+
         # Load the JSON file:
         try:
             measures = read_json(file.path())
         except Exception as e:
-            return json.dumps({'error': str(e)}), 400
+            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+
         # Load the manual 'measures.json' JSON file:
         manual_measures_file = scan.path() / 'measures.json'
         try:
@@ -1211,25 +1271,28 @@ class Archive(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        A database instance for accessing and managing scan data.
+        The database providing the resources to serve.
     logger : logging.Logger
-        A logger instance for recording operations and errors.
+        The logger used to record operations and errors.
     """
 
     def __init__(self, db, logger):
-        """Initialize the Archive resource.
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            A database instance for accessing and managing scan data.
+            A database instance providing the resources to serve.
         logger : logging.Logger
-            A logger instance for recording operations and errors.
+            A logger instance to record operations and errors.
         """
         self.db = db
         self.logger = logger
 
+    @sanitize_ids('scan_id')
     @rate_limit(max_requests=5, window_seconds=60)
+    @add_jwt_from_header
+    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
     def get(self, scan_id, **kwargs):
         """Create and serve a ZIP archive for the specified scan dataset.
 
@@ -1295,12 +1358,15 @@ class Archive(Resource):
         >>> # Stop the test server
         >>> server.stop()
         """
-        scan_id = sanitize_name(scan_id)
-
         try:
             scan = self.db.get_scan(scan_id, **kwargs)
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
-            return {'error': f'Could not find a scan named `{scan_id}`!'}, 404
+            return {'message': f'Could not find a scan named `{scan_id}`!'}, 404  # HTTP 404 Not Found
+        except Exception as e:
+            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             zip_path = create_zip_for_scan(Path(scan.path()), self.logger)
@@ -1320,6 +1386,7 @@ class Archive(Resource):
 
         return send_file(zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
 
+    @sanitize_ids('scan_id')
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     def post(self, scan_id, **kwargs):
@@ -1339,7 +1406,7 @@ class Archive(Resource):
         tuple
             A tuple containing (dict, int) where the dict contains either:
             - On success: {'success': message, 'files': list_of_extracted_files}
-            - On failure: {'error': error_message}
+            - On failure: {'message': error_message}
             The integer represents the HTTP status code (``200`` for success, ``400`` or ``500`` for errors)
 
         Notes
@@ -1383,8 +1450,6 @@ class Archive(Resource):
         True
         >>> server.stop()
         """
-        scan_id = sanitize_name(scan_id)
-
         # 1. Basic pre‑condition checks
         if self.db.scan_exists(scan_id):
             self.logger.error("Dataset `%s` already exists.", scan_id)
@@ -1407,7 +1472,7 @@ class Archive(Resource):
         try:
             temp_zip = _save_to_temp(uploaded, self.logger)
         except ValidationError as exc:
-            return {"error": str(exc)}, 500
+            return {"error": str(exc)}, 500  # HTTP 500 Internal Server Error
 
         # try/except/finally to ensure the temporary file is always removed
         try:
@@ -1418,8 +1483,13 @@ class Archive(Resource):
             # 4. Create destination scan and extract files
             try:
                 scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
-            except PermissionError as exc:
-                return {"message": f"Invalid credentials: {exc}"}, 401
+
+            except NoAuthUserError as e:
+                return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            except Exception as e:
+                return {
+                    'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
             extracted_files = extract_zip_to_scan(temp_zip, scan_path, self.logger)
 
             # 5. Refresh DB state and respond
@@ -1432,6 +1502,6 @@ class Archive(Resource):
         except Exception as exc:
             # Unexpected server‑side errors → 500
             self.logger.exception("Unexpected error while processing archive")
-            return {"error": f"Internal server error: {exc}"}, 500
+            return {"error": f"Internal server error: {exc}"}, 500  # HTTP 500 Internal Server Error
         finally:
             temp_zip.unlink(missing_ok=True)
