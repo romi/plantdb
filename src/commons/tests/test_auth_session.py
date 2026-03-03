@@ -454,7 +454,7 @@ class TestJWTSessionManager(unittest.TestCase):
         # Small delay to ensure timestamp differs
         time.sleep(0.05)
 
-        info = mgr.validate_session(access)  # defaults to token_type='access'
+        info = mgr.validate_session(access)
         self.assertEqual(info["username"], "bob")
         self.assertEqual(info["type"], "access")
         # ``last_accessed`` must be later than the previous value
@@ -480,35 +480,11 @@ class TestJWTSessionManager(unittest.TestCase):
         access_jti = mgr.refresh_tokens[payload["jti"]]["access_jti"]
         access_last = mgr.sessions[access_jti]["last_accessed"]
 
-        info = mgr.validate_session(refresh, token_type="refresh")
+        info = mgr.validate_session(refresh)
         self.assertEqual(info["username"], "carol")
         self.assertEqual(info["type"], "refresh")
         # Access token's ``last_accessed`` must stay unchanged
         self.assertEqual(mgr.sessions[access_jti]["last_accessed"], access_last)
-
-    # ------------------------------------------------------------------
-    # Token‑type mismatch handling
-    # ------------------------------------------------------------------
-    def test_token_type_mismatch_raises_invalid_token_processing_error(self):
-        """Supplying a refresh token when ``token_type='access'`` raises ``WrongTokenType``."""
-        mgr = self._create_manager()
-        _, refresh = mgr.create_session("dave")
-        with self.assertRaises(WrongTokenType):
-            mgr.validate_session(refresh, token_type="access")
-
-    def test_access_token_as_refresh_raises_wrong_token_type(self):
-        """Supplying an access token when ``token_type='refresh'`` raises ``WrongTokenType``."""
-        mgr = self._create_manager()
-        access, _ = mgr.create_session("mismatch_user")
-        with self.assertRaises(WrongTokenType):
-            mgr.validate_session(access, token_type="refresh")
-
-    def test_refresh_token_as_access_raises_wrong_token_type(self):
-        """Supplying a refresh token when ``token_type='access'`` raises ``WrongTokenType``."""
-        mgr = self._create_manager()
-        _, refresh = mgr.create_session("mismatch_user")
-        with self.assertRaises(WrongTokenType):
-            mgr.validate_session(refresh, token_type="access")
 
     # ------------------------------------------------------------------
     # Expiration handling
@@ -527,7 +503,7 @@ class TestJWTSessionManager(unittest.TestCase):
         _, refresh = mgr.create_session("frank")
         time.sleep(2)  # exceed refresh token life
         with self.assertRaises(SessionValidationError):
-            mgr.validate_session(refresh, token_type="refresh")
+            mgr.validate_session(refresh)
 
     # ------------------------------------------------------------------
     # Malformed / audience / issuer errors
@@ -630,7 +606,7 @@ class TestJWTSessionManager(unittest.TestCase):
         payload = self._decode(refresh, mgr)
         del mgr.refresh_tokens[payload["jti"]]  # simulate loss
         with self.assertRaises(RefreshTokenNotFoundError):
-            mgr.validate_session(refresh, token_type="refresh")
+            mgr.validate_session(refresh)
 
     # ------------------------------------------------------------------
     # Invalidation paths
@@ -1089,7 +1065,7 @@ class TestJWTSessionManager(unittest.TestCase):
         api_token = mgr.create_api_token("api_val_user", token_exp=60)
 
         # validate_session should auto-detect 'api' type
-        info = mgr.validate_session(api_token, token_type="api")
+        info = mgr.validate_session(api_token)
         self.assertEqual(info["username"], "api_val_user")
         self.assertEqual(info["type"], "api")
 
@@ -1102,7 +1078,7 @@ class TestJWTSessionManager(unittest.TestCase):
         del mgr._api_tokens[payload["jti"]]
 
         with self.assertRaises(SessionValidationError):
-            mgr.validate_session(api_token, token_type="api")
+            mgr.validate_session(api_token)
 
     def test_validate_api_token_with_datasets_returns_parsed_datasets(self):
         """Validating an API token with datasets returns parsed dataset permissions."""
@@ -1111,7 +1087,7 @@ class TestJWTSessionManager(unittest.TestCase):
         datasets = {"dataset_x": [Permission.READ]}
         api_token = mgr.create_api_token("ds_val_user", token_exp=60, datasets=datasets)
 
-        info = mgr.validate_session(api_token, token_type="api")
+        info = mgr.validate_session(api_token)
         self.assertIn("datasets", info)
         # The returned datasets should have been parsed back
         self.assertIn("dataset_x", info["datasets"])
@@ -1442,17 +1418,6 @@ class TestJWTSessionManager(unittest.TestCase):
         mgr = self._create_manager()
         with self.assertRaises(jwt.InvalidTokenError):
             mgr._payload_from_token("garbage")
-
-    # ------------------------------------------------------------------
-    # Edge case: validate_session with token_type not matching any branch
-    # ------------------------------------------------------------------
-    def test_validate_session_api_token_as_refresh_raises_wrong_type(self):
-        """Using an API token with token_type='refresh' raises WrongTokenType."""
-        mgr = self._create_manager()
-        api_token = mgr.create_api_token("api_as_refresh", token_exp=60)
-        with self.assertRaises(WrongTokenType):
-            mgr.validate_session(api_token, token_type="refresh")
-
 
 if __name__ == "__main__":
     unittest.main()
