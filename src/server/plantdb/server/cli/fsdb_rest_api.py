@@ -96,10 +96,10 @@ from plantdb.commons.test_database import test_database
 from plantdb.server.api.assets import Archive
 from plantdb.server.api.assets import CurveSkeleton
 from plantdb.server.api.assets import DatasetFile
-from plantdb.server.api.assets import File
-from plantdb.server.api.file import FileCreate
+from plantdb.server.api.assets import FilePath
+from plantdb.server.api.file import File
 from plantdb.server.api.file import FileMetadata
-from plantdb.server.api.fileset import FilesetCreate
+from plantdb.server.api.fileset import Fileset
 from plantdb.server.api.fileset import FilesetFiles
 from plantdb.server.api.fileset import FilesetMetadata
 from plantdb.server.api.base import HealthCheck
@@ -113,7 +113,6 @@ from plantdb.server.api.assets import PointCloudGroundTruth
 from plantdb.server.api.base import Refresh
 from plantdb.server.api.auth import Register
 from plantdb.server.api.scan import Scan
-from plantdb.server.api.scan import ScanCreate
 from plantdb.server.api.scan import ScanFilesets
 from plantdb.server.api.scan import ScanMetadata
 from plantdb.server.api.scan import ScansList
@@ -283,7 +282,7 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
 
 
 def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
-    """Register all RESTful resources with the Flask-RESTful API.
+    """Register all resources with the Flask-RESTful API.
 
     Parameters
     ----------
@@ -292,7 +291,7 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     db : FSDB
         The database connection.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
     """
     api.add_resource(
         Home,
@@ -301,12 +300,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         HealthCheck,
         "/health",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         ScansList,
         "/scans",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         ScansTable,
@@ -315,13 +314,13 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     )
     api.add_resource(
         Scan,
-        "/scans/<string:scan_id>",
+        "/scan/<string:scan_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
-        File,
+        FilePath,
         "/files/<path:path>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         DatasetFile,
@@ -331,17 +330,17 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         Refresh,
         "/refresh",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Image,
         "/image/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         PointCloud,
         "/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         PointCloudGroundTruth,
@@ -351,12 +350,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         Mesh,
         "/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         CurveSkeleton,
         "/skeleton/<string:scan_id>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Sequence,
@@ -372,12 +371,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         Register,
         "/register",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Login,
         "/login",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Logout,
@@ -387,7 +386,7 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         TokenRefresh,
         "/token-refresh",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         TokenValidation,
@@ -396,45 +395,40 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     )
     # Scan CRUD
     api.add_resource(
-        ScanCreate,
-        "/api/scan",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
         ScanMetadata,
-        "/api/scan/<string:scan_id>/metadata",
+        "/scan/<string:scan_id>/metadata",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         ScanFilesets,
-        "/api/scan/<string:scan_id>/filesets",
+        "/scan/<string:scan_id>/filesets",
         resource_class_args=(db, logger)
     )
     # Fileset CRUD
     api.add_resource(
-        FilesetCreate,
-        "/api/fileset",
+        Fileset,
+        "/fileset/<string:scan_id>/<string:fileset_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         FilesetMetadata,
-        "/api/fileset/<string:scan_id>/<string:fileset_id>/metadata",
+        "/fileset/<string:scan_id>/<string:fileset_id>/metadata",
         resource_class_args=(db, logger),
     )
     api.add_resource(
         FilesetFiles,
-        "/api/fileset/<string:scan_id>/<string:fileset_id>/files",
+        "/fileset/<string:scan_id>/<string:fileset_id>/files",
         resource_class_args=(db, logger),
     )
     # File CRUD
     api.add_resource(
-        FileCreate,
-        "/api/file",
+        File,
+        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         FileMetadata,
-        "/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
+        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
         resource_class_args=(db, logger),
     )
 
