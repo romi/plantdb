@@ -38,6 +38,7 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 import json
 import mimetypes
 import os
+from functools import wraps
 
 import requests
 from ada_url import join_url
@@ -74,6 +75,26 @@ def get_mime_type(extension):
     return mime_type
 
 
+def _auth_via_token(method):
+    """Decorator that injects the correct request function based on ``use_api_token``.
+
+    The wrapped method receives a private ``_request_fn`` argument that is either
+    ``self._request_with_refresh`` (default, uses the JWT) or
+    ``self._request_with_api_token`` (when ``use_api_token=True``).
+    """
+
+    @wraps(method)
+    def wrapper(self, *args, use_api_token: bool = False, **kwargs):
+        # Choose the request helper
+        request_fn = (self._request_with_api_token if use_api_token else self._request_with_refresh)
+        # Inject it as a private kwarg – the original signature stays clean
+        kwargs["_request_fn"] = request_fn
+        # Remove the public flag so the original method signature does not see it
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 class PlantDBClient:
     """Client for interacting with the PlantDB REST API.
 
@@ -92,12 +113,14 @@ class PlantDBClient:
     ----------
     base_url : str
         The base URL of the PlantDB REST API.
-    session : requests.Session
+    _session : requests.Session
         HTTP session that maintains cookies and connection pooling.
     _access_token : str
         The JSON Web Token to authenticate with the PlantDB REST API.
     _refresh_token : str
         The refresh token to obtain new access tokens.
+    _api_token : str
+        The long-lived API token granting permission to specific datasets.
     _username :str
         The login username.
     logger : logging.Logger
@@ -136,10 +159,15 @@ class PlantDBClient:
         if prefix is None:
             prefix = api_prefix()
         self.base_url = f"{base_url}{prefix}"
-        self.session = requests.Session()
+
+        # Dedicated session for access‑token requests
+        self._session = requests.Session()
+        # Dedicated session for API‑token requests
+        self._api_session = requests.Session()
 
         self._access_token = None
         self._refresh_token = None
+        self._api_token = None
         self._username = None
 
         self.logger = get_logger(__class__.__name__)
@@ -151,14 +179,30 @@ class PlantDBClient:
         Parameters
         ----------
         username : str
-            Username for authentication
+            Username for authentication.
         password : str
-            Password for authentication
+            Password for authentication.
 
         Returns
         -------
         bool
             ``True`` if login successful, ``False`` otherwise
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> print(client._access_token)  # print the 'admin' access token
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.login())
         data = {
@@ -167,15 +211,15 @@ class PlantDBClient:
         }
 
         try:
-            # Use session.request directly for login to avoid using expired tokens in headers
-            response = self.session.request("POST", url, json=data)
+            # Use _session.request directly for login to avoid using expired tokens in headers
+            response = self._session.request("POST", url, json=data)
             if response.ok:
                 result = response.json()
                 self._access_token = result.get('access_token')
                 self._refresh_token = result.get('refresh_token')
                 self._username = username
                 # Add the JWT to the header
-                self.session.headers.update({'Authorization': f'Bearer {self._access_token}'})
+                self._session.headers.update({'Authorization': f'Bearer {self._access_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
@@ -188,7 +232,7 @@ class PlantDBClient:
 
     def _request_with_refresh(self, method, url, **kwargs):
         """Perform an HTTP request with automatic token refresh on 401."""
-        response = self.session.request(method, url, **kwargs)
+        response = self._session.request(method, url, **kwargs)
 
         if response.status_code == 401 and self._refresh_token:
             self.logger.info("Access token expired, attempting to refresh...")
@@ -200,11 +244,43 @@ class PlantDBClient:
                 else:
                     # session already has the updated Authorization header
                     pass
-                return self.session.request(method, url, **kwargs)
+                return self._session.request(method, url, **kwargs)
             else:
                 self.logger.error("Token refresh failed, user needs to re-authenticate.")
 
         return response
+
+    def _request_with_api_token(self, method, url, **kwargs):
+        """Perform an HTTP request using the long‑lived API token.
+
+        The method creates (or re‑uses) a separate ``requests.Session`` that
+        carries the ``Authorization: Bearer <api_token>`` header, ensuring the
+        primary ``self.session`` (used for JWT auth) remains untouched.
+
+        Parameters
+        ----------
+        method : str
+            HTTP method, e.g. ``'GET'`` or ``'POST'``.
+        url : str
+            Fully‑qualified request URL.
+        **kwargs
+            Additional arguments forwarded to ``requests.Session.request``.
+
+        Returns
+        -------
+        requests.Response
+            The raw response object.
+        """
+        # If no API token is configured, just fall back to the regular session.
+        if not self._api_token:
+            self.logger.warning("API token not set; use `create_api_token` method first!")
+            return None
+
+        # Ensure the Authorization header contains the fresh API token.
+        # We replace any existing Authorization header in this dedicated session.
+        self._api_session.headers.update({"Authorization": f"Bearer {self._api_token}"})
+
+        return self._api_session.request(method, url, **kwargs)
 
     def logout(self) -> bool:
         """Logout user from the PlantDB API.
@@ -213,6 +289,23 @@ class PlantDBClient:
         -------
         bool
             ``True`` if logout successful, ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> # Then log out
+        >>> client.logout()
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.logout())
         try:
@@ -223,15 +316,47 @@ class PlantDBClient:
                 self._access_token = None
                 self._refresh_token = None
                 # Remove the Authorization with the JWT from the header
-                if 'Authorization' in self.session.headers:
-                    self.session.headers.pop('Authorization')
+                if 'Authorization' in self._session.headers:
+                    self._session.headers.pop('Authorization')
                 return True
             return False
         except Exception:
             return False
 
     def create_user(self, username: str, password: str, fullname: str) -> bool:
-        """Create a new user in the PlantDB API."""
+        """Create a new user in the PlantDB API.
+
+        Parameters
+        ----------
+        username : str
+            New username to create.
+        password : str
+            Password for authentication.
+        fullname : str
+            The full name of the user.
+
+        Returns
+        -------
+        bool
+            ``True`` if user creation is successful, ``False`` otherwise
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> _ = client.login('admin', 'admin')
+        >>> # Create a new user
+        >>> _ = client.create_user('batman', 'JokerInArkham', 'Bruce Wayne')
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
         url = join_url(self.base_url, api_endpoints.create_user())
         data = {
             'username': username,
@@ -283,6 +408,25 @@ class PlantDBClient:
             Returns the generated API token as a string if successful. Returns None
             if the token creation fails due to server error or other issues.
 
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.commons.auth.models import Permission
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> # Create an API token with 'WRITE' permission to create a new scan dataset 'new_scan'
+        >>> print(client.create_api_token(3600, {'new_scan': Permission.WRITE}))
+        >>> # Create a new scan dataset using the API token:
+        >>> client.create_scan('new_scan', {'description': "Test API token dataset"}, use_api_token=True)
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.create_api_token())
 
@@ -305,7 +449,8 @@ class PlantDBClient:
         try:
             response = self._request_with_refresh("POST", url, json=data)
             if response.ok:
-                return response.json().get('api_token')
+                self._api_token = response.json().get('api_token')
+                return self._api_token
             else:
                 error_msg = response.json().get('message', 'Unknown server error.')
                 self.logger.error(f"Failed to create API token: {error_msg}")
@@ -313,7 +458,6 @@ class PlantDBClient:
         except RequestException as e:
             self.logger.error(f"Failed to create API token: {e}")
             return None
-
 
     def refresh(self) -> bool:
         """Refresh the database."""
@@ -383,14 +527,14 @@ class PlantDBClient:
         url = join_url(self.base_url, api_endpoints.token_refresh())
         data = {'refresh_token': self._refresh_token}
         try:
-            # Use session.request directly to avoid infinite recursion with _request_with_refresh
-            response = self.session.request("POST", url, json=data)
+            # Use _session.request directly to avoid infinite recursion with _request_with_refresh
+            response = self._session.request("POST", url, json=data)
             if response.ok:
                 result = response.json()
                 self._access_token = result.get('access_token')
                 self._refresh_token = result.get('refresh_token')
                 # Update the header with the new access token
-                self.session.headers.update({'Authorization': f'Bearer {self._access_token}'})
+                self._session.headers.update({'Authorization': f'Bearer {self._access_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Token refresh failed')
@@ -517,7 +661,8 @@ class PlantDBClient:
         # Return the parsed JSON payload (list of dicts)
         return response.json()
 
-    def create_scan(self, name, metadata=None):
+    @_auth_via_token
+    def create_scan(self, name, metadata=None, *, _request_fn):
         """Create a new scan in the database.
 
         Parameters
@@ -526,6 +671,9 @@ class PlantDBClient:
             Name of the scan to create
         metadata : dict, optional
             Additional metadata for the scan
+        use_api_token : bool, optional (keyword‑only)
+            If ``True`` the request is sent with the long‑lived API token.
+            Defaults to ``False`` (uses the JWT access token).
 
         Returns
         -------
@@ -555,11 +703,13 @@ class PlantDBClient:
         >>> print(response['message'])
         {'message': "Scan 'test_plant' created successfully."}
         """
-        url = join_url(self.base_url, api_endpoints.create_scan())
-        data = {'name': name}
+        url = join_url(self.base_url, api_endpoints.scan(name))
+
+        data = {}
         if metadata:
             data['metadata'] = metadata
-        response = self._request_with_refresh("POST", url, json=data)
+
+        response = _request_fn("POST", url, json=data)  # the decorator injects '_request_fn'
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
