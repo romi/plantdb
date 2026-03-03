@@ -18,8 +18,8 @@ class RestApiServerTests(unittest.TestCase):
         # Start a test server with the built-in test dataset
         cls.server = TestRestApiServer(db_path=_mkdtemp_romidb(), test=True)
         cls.server.start()
-        # Wait briefly for server
-        for _ in range(100):
+        # Wait briefly for the server to start
+        for _ in range(10):
             try:
                 r = requests.get(cls.server.get_base_url() + "/health")
                 if r.status_code == 200:
@@ -82,7 +82,7 @@ class RestApiServerTests(unittest.TestCase):
         # Use first scan
         scans = self.client.list_scans()
         scan_id = scans[0]
-        r = requests.get(self.server.get_base_url() + f"/api/scan/{scan_id}/metadata")
+        r = requests.get(self.server.get_base_url() + f"/scan/{scan_id}/metadata")
         self.assertEqual(r.status_code, 200)
         info = r.json()
         self.assertIn("metadata", info)
