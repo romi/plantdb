@@ -481,7 +481,7 @@ class User:
             'failed_attempts': self.failed_attempts,
             'last_failed_attempt': self.last_failed_attempt.isoformat() if self.last_failed_attempt else None,
             'locked_until': self.locked_until.isoformat() if self.locked_until else None,
-            'password_last_change': self.password_last_change.isoformat() if self.password_last_change else self.created_at.isoformat(),
+            'password_last_change': self.password_last_change.isoformat() if self.password_last_change else None,
         }
 
     @classmethod
@@ -677,10 +677,16 @@ class TokenUser(User):
             If required keys are missing from the dictionary.
         """
         args = cls._parse_user_dict(data)
+
+        raw_dataset_perms = data.get("dataset_permissions")
+        if raw_dataset_perms is None:
+            raise KeyError("Missing required field 'dataset_permissions' in token user data")
+
         args["dataset_permissions"] = {
-            dname: {Permission(perm) for perm in permissions}
-            for dname, permissions in args["dataset_permissions"].items()
+            dname: {Permission(perm) for perm in perms}
+            for dname, perms in raw_dataset_perms.items()
         }
+
         return cls(**args)
 
     def get_permissions_for_dataset(self, dataset_name: str) -> set[Permission]:
