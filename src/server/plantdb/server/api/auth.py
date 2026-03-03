@@ -19,7 +19,7 @@
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with plantdb.  If not, see
+# License along with plantdb. If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
@@ -98,9 +98,20 @@ from flask import make_response
 from flask import request
 from flask_restful import Resource
 
+from plantdb.commons.auth.manager import UserExistsError
 from plantdb.commons.auth.session import SessionValidationError
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
+from plantdb.server.services.auth import InvalidCredentialsError
+from plantdb.server.services.auth import MissingFieldError
+from plantdb.server.services.auth import NoAuthUserError
+from plantdb.server.services.auth import TokenError
+from plantdb.server.services.auth import authenticate_user
+from plantdb.server.services.auth import check_username_exists
+from plantdb.server.services.auth import logout_user
+from plantdb.server.services.auth import refresh_token
+from plantdb.server.services.auth import register_user
+from plantdb.server.services.auth import validate_token
 
 
 class Register(Resource):
@@ -109,22 +120,28 @@ class Register(Resource):
     Responsible for handling the registration process by validating and creating user records in the database.
     This class provides a structured way to interact with user data, ensuring error handling and
     proper responses for client requests.
+    Only users with ADMIN rights can add user records.
 
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        Database instance used for storing and managing user records.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database object for with user records.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
     @rate_limit(max_requests=5, window_seconds=60)  # maximum of 1 requests per minute
     @add_jwt_from_header
@@ -133,6 +150,7 @@ class Register(Resource):
 
         Processes user registration by validating the input data and creating a new user in the database.
         Expects a JSON payload in the request body with required user details.
+        Only users with ADMIN rights can add user records.
 
         Returns
         -------
@@ -177,42 +195,29 @@ class Register(Resource):
         >>> res_dict["message"]
         'User successfully created'
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'batman', 'password': 'Alfred123!'})
+        >>> res_dict = response.json()
         >>> res_dict["message"]
         'Login successful'
         """
         # Parse JSON data from request body
         data = request.get_json()
-        # Check if all required fields are present in the request
-        required_fields = ['username', 'fullname', 'password']
-        if not data or not all(field in data for field in required_fields):
-            return {
-                'success': False,
-                'message': 'Missing required fields. Please provide username, fullname, and password'
-            }, 400
 
         try:
-            # Attempt to create a new user in the database
-            self.db.create_user(
-                new_username=data.pop('username'),
-                fullname=data.pop('fullname'),
-                password=data.pop('password'),
-                **kwargs
-            )
+            # Delegate to the service layer
+            register_user(self.db, data, token=kwargs.get('token'))
             # Return success response if the user creation succeeds
-            return {
-                'success': True,
-                'message': 'User successfully created'
-            }, 201
+            return {'message': 'User successfully created'}, 201
 
+        except MissingFieldError as e:
+            return {'message': str(e)}, 400  # HTTP 400 Bad Request
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401
-
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except UserExistsError as e:
+            return {'message': f'Failed to create user: {str(e)}'}, 409  # HTTP 409 Conflict
         except Exception as e:
-            # Return error response if the user creation fails (e.g., duplicate username)
-            return {
-                'success': False,
-                'message': f'Failed to create user: {str(e)}'
-            }, 400
+            return {'message': f'Failed to create user: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
 
 class Login(Resource):
@@ -224,19 +229,23 @@ class Login(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        A database object that provides access to user-related operations such as
-        checking if a user exists and validating user credentials.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database object for accessing user data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -276,11 +285,11 @@ class Login(Resource):
         """
         # Extract username from query parameters
         username = request.args.get('username', None)
-        # Return error if username parameter is missing
+        # Return an error if the username parameter is missing
         if not username:
-            return {'error': 'Missing username parameter'}, 400
+            return {'message': 'Missing username parameter'}, 400
         # Query database to check if the user exists
-        user_exists = self.db.rbac_manager.users.exists(username)
+        user_exists = check_username_exists(self.db, username)
         return {'username': username, 'exists': user_exists}, 200
 
     @rate_limit(max_requests=20, window_seconds=60)
@@ -343,37 +352,47 @@ class Login(Resource):
         username = data['username']
         password = data['password']
 
-        # Attempt to authenticate the user with provided credentials
-        tokens = self.db.login(username, password)
+        try:
+            access_token, refresh_token = authenticate_user(self.db, username, password)
+        except InvalidCredentialsError:
+            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+        except Exception as e:
+            return {'message': f'Authentication failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
-        # Prepare a response based on the authentication result
-        if tokens:
-            access_token, refresh_token = tokens
-            user = self.db.get_user_data(token=access_token, token_type='access')
-            # Create a response with user info, access token, and refresh token
-            response_data = {
-                'message': 'Login successful',
-                'user': {
-                    'username': user.username,
-                    'fullname': user.fullname,
-                },
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
-            response = make_response(jsonify(response_data), 200)
-            return response
-        else:
-            return {'message': 'Invalid credentials'}, 401
+        # Build the successful response with user info, access token, and refresh token
+        user = self.db.get_user_data(token=access_token)
+        response_data = {
+            'message': 'Login successful',
+            'user': {
+                'username': user.username,
+                'fullname': user.fullname,
+            },
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
+        return response_data, 200
 
 
 class Logout(Resource):
+    """Resource handling user logout requests.
+
+    Attributes
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
+    """
+
     def __init__(self, db, logger):
-        """Initialize the Logout resource.
+        """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            Database connection object for accessing scan data.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
         self.logger = logger
@@ -398,25 +417,22 @@ class Logout(Resource):
         Logout successful
         """
         try:
-            if 'token' in kwargs:
-                # Invalidate session
-                success, username = self.db.logout(**kwargs)
-                if success:
-                    response = {'message': f'Logout successful from {username}'}, 200
-                else:
-                    response = {'message': 'Logout failed!'}, 401
-            else:
-                self.logger.error(f"Logout error: no active session!")
-                response = {'message': 'Logout failed, no active session!'}, 401
+            # The decorator supplies the token via kwargs
+            token = kwargs.get('token')
+            if not token:
+                self.logger.error("Logout error: no active session!")
+                return {'message': 'Logout failed, no active session!'}, 401  # HTTP 401 Unauthorized (authentication)
 
-            return response
+            # Delegate to the service layer
+            username = logout_user(self.db, token, logger=self.logger)
 
-        except SessionValidationError as e:
-            return {'message': 'Invalid credentials!'}, 401
+            return {'message': f'Logout successful from {username}'}, 200
 
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Logout error: {str(e)}")
-            return {'message': 'Logout failed!'}, 500
+            return {'message': 'Logout failed!'}, 500  # HTTP 500 Internal Server Error
 
 
 class TokenValidation(Resource):
@@ -424,27 +440,28 @@ class TokenValidation(Resource):
 
     The resource exposes a POST endpoint that accepts a JSON Web Token, verifies its
     validity against the database session manager, and returns the authenticated
-    user’s basic profile information.  On success a 200 response is returned
+    user’s basic profile information. On success a 200 response is returned
     containing the user’s ``username`` and ``fullname``; on failure a 401
     response is returned with an error message.
 
     Attributes
     ----------
-    db : Any
-        Database handler with a ``session_manager`` attribute.
-    logger : Any
-        Logger used to log validation attempts.
-
-    Parameters
-    ----------
-    db : Any
-        Database handler providing access to the session manager.
-    logger : Any
-        Logger instance used for recording authentication events.
+    db : plantdb.commons.fsdb.core.FSDB
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
     def __init__(self, db, logger):
-        """Initialize the TokenValidation resource."""
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
         self.logger = logger
 
@@ -466,16 +483,24 @@ class TokenValidation(Resource):
         Token validation successful
         """
         try:
-            user = self.db.get_user_data(**kwargs)
+            token = kwargs.get('token')
+            if not token:
+                raise TokenError('No token supplied')
+
+            # Delegate to the service layer
+            user_info = validate_token(self.db, token)
+
+            response = {
+                'message': 'Token validation successful',
+                'user': user_info,
+            }, 200
+
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            response = {'message': f'Token validation failed: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
-            response = {'message': f'Token validation failed: {e}'}, 401
-        else:
-            response = {'message': 'Token validation successful',
-                        'user': {
-                            'username': user.username,
-                            'fullname': user.fullname,
-                        },
-                        }, 200
+            response = {'message': f'Unexpected error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         return response
 
@@ -485,25 +510,30 @@ class TokenRefresh(Resource):
 
     The `TokenRefresh` resource provides an endpoint that accepts an
     existing JSON Web Token, validates the current session, and issues a new
-    access token when the refresh is successful.  The resource interacts
+    access token when the refresh is successful. The resource interacts
     with a database session manager that exposes a ``refresh_session`` method
     to perform the actual token renewal.
 
     Attributes
     ----------
-    db : object
-        Database handler with a ``session_manager`` attribute.
-
-    Parameters
-    ----------
-    db : Any
-        Database handler providing access to the session manager.
-
+    db : plantdb.commons.fsdb.core.FSDB
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
-    def __init__(self, db):
-        """Initialize the TokenRefresh resource."""
+    def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
+        self.logger = logger
 
     def post(self, **kwargs):
         """Refresh JSON Web Token.
@@ -515,21 +545,22 @@ class TokenRefresh(Resource):
         if not data or 'refresh_token' not in data:
             return {'message': 'Missing refresh_token'}, 400
 
-        refresh_token = data['refresh_token']
+        refresh_token_str = data['refresh_token']
 
         try:
-            tokens = self.db.session_manager.refresh_session(refresh_token)
+            # Delegate to the service layer
+            access_token, new_refresh_token = refresh_token(self.db, refresh_token_str)
 
-            if tokens:
-                access_token, new_refresh_token = tokens
-                response = {
-                    'message': 'Token refreshed successfully',
-                    'access_token': access_token,
-                    'refresh_token': new_refresh_token
-                }, 200
-                return response
-            else:
-                return {'message': 'Invalid or expired refresh token'}, 401
+            response = {
+                'message': 'Token refreshed successfully',
+                'access_token': access_token,
+                'refresh_token': new_refresh_token
+            }, 200
+            return response
 
+        except NoAuthUserError as e:
+            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            return {'message': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
-            return {'message': f'Token refresh failed: {e}'}, 500
+            return {'message': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
