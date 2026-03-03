@@ -26,6 +26,8 @@
 import json
 import os
 from math import radians
+from plantdb.commons.fsdb.core import Scan
+from typing import Any, Dict, List, Optional, Literal, Protocol, Tuple
 
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.io import read_json
