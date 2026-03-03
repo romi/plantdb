@@ -314,11 +314,6 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
         resource_class_args=(db, logger)
     )
     api.add_resource(
-        Scan,
-        "/scan/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
         FilePath,
         "/files/<path:path>",
         resource_class_args=(db, logger)
@@ -400,6 +395,11 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
         resource_class_args=(db, logger)
     )
     # Scan CRUD
+    api.add_resource(
+        Scan,
+        "/scan/<string:scan_id>",
+        resource_class_args=(db, logger)
+    )
     api.add_resource(
         ScanMetadata,
         "/scan/<string:scan_id>/metadata",
