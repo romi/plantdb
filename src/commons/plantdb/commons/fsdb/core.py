@@ -204,7 +204,7 @@ def require_token(method):
     return wrapper
 
 
-def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
+def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs):
     """Returns the username of the currently logged user based on the session management system.
 
     This function identifies the username of the logged-in user by inspecting the session manager
@@ -215,7 +215,7 @@ def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
 
     Parameters
     ----------
-    fsdb : object
+    fsdb : plantd.commons.fsdb.FSDB
         The filesystem database instance containing configuration, logger, and session manager.
         The session manager is responsible for handling user sessions.
     default_user : str, optional
@@ -1256,6 +1256,47 @@ class FSDB(db.DB):
         >>> db.disconnect()
         """
         return self.rbac_manager.users.create(new_username, fullname, password, roles)
+
+    @require_connected_db
+    @get_authentication
+    @require_authentication
+    def create_api_token(
+            self, token_exp: int,
+            datasets: dict[str, tuple[Permission, ...] | Permission],
+            current_user: User | None = None, **kwargs
+    ) -> str:
+        """
+        Creates an API token for the current user with optional dataset permissions.
+
+        This method generates a new API token using the session manager, which must
+        be an instance of `JWTSessionManager`. The token is valid for a specified
+        expiration duration and optionally includes permissions for datasets. The
+        generated token can be used for authenticated API access.
+
+        Parameters
+        ----------
+        token_exp : int
+            The expiration duration of the API token in seconds.
+        datasets : dict of str to tuple of Permission or Permission
+            A dictionary where the keys are dataset names, and the values are either
+            a tuple of `Permission` instances or a single `Permission` instance
+            defining the access levels for each dataset.
+        current_user : plantdb.commons.fsdb.auth.models.User, optional
+            The user object representing the currently authenticated user. The username
+            from this object is used to associate the API token.
+        **kwargs
+            Additional keyword arguments passed for possible extended functionality.
+
+        Returns
+        -------
+        str
+            The generated API token.
+        """
+        if not isinstance(self.session_manager, JWTSessionManager):
+            raise RuntimeError("Session manager must be an instance of JWTSessionManager.")
+        session_manager: JWTSessionManager = self.session_manager
+        return session_manager.create_api_token(current_user.username, token_exp, datasets)
+
 
     def get_guest_user(self) -> User:
         """Retrieve the guest user information from the RBAC manager.

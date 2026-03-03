@@ -44,6 +44,7 @@ from ada_url import join_url
 from requests import RequestException
 
 from plantdb.client import api_endpoints
+from plantdb.commons.auth.models import Permission
 from plantdb.commons.log import get_logger
 
 
@@ -251,6 +252,68 @@ class PlantDBClient:
         except RequestException as e:
             self.logger.error(f"User registration request failed: {e}")
             return False
+
+    def create_api_token(
+            self,
+            token_exp: int,
+            dataset_permissions: dict[str, tuple[Permission | str, ...] | Permission | str]
+    ) -> str | None:
+        """
+        Creates an API token with a specified expiration time and dataset permissions.
+
+        This method generates an API token that is tied to the permissions of specific
+        datasets. The permissions for each dataset must be provided, and they will be
+        validated against the defined `Permission` type. This allows fine-grained
+        control over dataset access via the generated token. The token can only be
+        created successfully if the server accepts the provided data.
+
+        Parameters
+        ----------
+        token_exp : int
+            The expiration time for the API token in seconds.
+        dataset_permissions : dict of str to tuple[Permission | str, ...] or Permission or str
+            A dictionary where each key is a dataset name (unix globbing possible),
+            and the corresponding value is the permission(s) for that dataset.
+            Permissions can be a single `Permission` instance, a string, or a
+            tuple of `Permission` instances or strings.
+
+        Returns
+        -------
+        str or None
+            Returns the generated API token as a string if successful. Returns None
+            if the token creation fails due to server error or other issues.
+
+        """
+        url = join_url(self.base_url, api_endpoints.create_api_token())
+
+        # Validate dataset permissions
+        datasets = {}
+        for dataset, permissions in dataset_permissions.items():
+            if not isinstance(permissions, tuple):
+                permissions = (permissions,)
+            datasets[dataset] = []
+            for permission in permissions:
+                if isinstance(permission, str) and permission not in Permission:
+                    raise ValueError(f"Invalid permission: {permission}. "
+                                     f"Must be one of {[p.value for p in Permission]}.")
+                datasets[dataset].append(str(permission))
+
+        data = {
+            "token_exp": token_exp,
+            "datasets": datasets,
+        }
+        try:
+            response = self._request_with_refresh("POST", url, json=data)
+            if response.ok:
+                return response.json().get('api_token')
+            else:
+                error_msg = response.json().get('message', 'Unknown server error.')
+                self.logger.error(f"Failed to create API token: {error_msg}")
+                return None
+        except RequestException as e:
+            self.logger.error(f"Failed to create API token: {e}")
+            return None
+
 
     def refresh(self) -> bool:
         """Refresh the database."""

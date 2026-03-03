@@ -106,6 +106,7 @@ from plantdb.server.api.base import HealthCheck
 from plantdb.server.api.base import Home
 from plantdb.server.api.assets import Image
 from plantdb.server.api.auth import Login
+from plantdb.server.api.auth import CreateApiToken
 from plantdb.server.api.auth import Logout
 from plantdb.server.api.assets import Mesh
 from plantdb.server.api.assets import PointCloud
@@ -391,6 +392,11 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         TokenValidation,
         "/token-validation",
+        resource_class_args=(db, logger)
+    )
+    api.add_resource(
+        CreateApiToken,
+        "/create-api-token",
         resource_class_args=(db, logger)
     )
     # Scan CRUD

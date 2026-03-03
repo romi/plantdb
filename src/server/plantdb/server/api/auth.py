@@ -100,6 +100,7 @@ from flask_restful import Resource
 
 from plantdb.commons.auth.manager import UserExistsError
 from plantdb.commons.auth.session import SessionValidationError
+from plantdb.commons.fsdb.core import FSDB
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.services.auth import InvalidCredentialsError
@@ -201,6 +202,13 @@ class Register(Resource):
         """
         # Parse JSON data from request body
         data = request.get_json()
+        # Check if all required fields are present in the request
+        required_fields = ['username', 'fullname', 'password']
+        if not data or not all(field in data for field in required_fields):
+            return {
+                'success': False,
+                'message': 'Missing required fields. Please provide username, fullname, and password'
+            }, 400
 
         try:
             # Delegate to the service layer
@@ -564,3 +572,55 @@ class TokenRefresh(Resource):
             return {'message': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             return {'message': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+
+class CreateApiToken(Resource):
+    """
+
+    Attributes
+    ----------
+    db : plantdb.core.FSDB
+        Database handler with a ``session_manager`` attribute.
+
+    Parameters
+    ----------
+    db : Any
+        Database handler providing access to the session manager.
+
+    """
+
+    def __init__(self, db, logger):
+        """Initialize the TokenRefresh resource."""
+        self.db: FSDB = db
+        self.logger = logger
+
+    @add_jwt_from_header
+    def post(self, **kwargs):
+        """Refresh JSON Web Token.
+
+        This method expects a JSON payload containing a 'refresh_token'.
+        It validates the refresh token and issues a new access/refresh token pair.
+        """
+        data = request.get_json()
+        if "datasets" not in data:
+            return {'message': 'Missing "datasets" field'}, 400
+        if "token_exp" not in data:
+            return {'message': 'Missing "token_exp" field'}, 400
+
+        try:
+            token = self.db.create_api_token(
+                token_exp=int(data['token_exp']),
+                datasets=data['datasets'],
+                **kwargs
+            )
+
+            if token:
+                response = {
+                    'message': 'Token refreshed successfully',
+                    'api_token': token,
+                }, 200
+                return response
+            else:
+                return {'message': 'Could not create token.'}, 401
+
+        except Exception as e:
+            return {'message': f'Token creation failed: {e}'}, 500
