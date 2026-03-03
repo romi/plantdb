@@ -35,6 +35,8 @@ from zipfile import ZipFile
 
 from flask import request
 
+import plantdb.commons.fsdb.core
+
 
 # --------------------------------------------------------------------------- #
 # Custom Errors
@@ -129,45 +131,23 @@ def validate_upload_headers(headers: dict) -> dict:
 #  Scan‑related helpers
 # --------------------------------------------------------------------------- #
 
-def get_scan_path(db: Any, scan_id: str) -> Path:
-    """
-    Resolve the absolute path of a scan, raising ``FileUploadError`` if the
-    scan does not exist.
+def get_scan_path(db: plantdb.commons.fsdb.core.FSDB, scan_id: str, **kwargs) -> Path:
+    """Resolve the absolute path of a scan.
 
     Parameters
     ----------
-    db :
+    db : plantdb.commons.fsdb.core.FSDB
         Database object exposing ``get_scan``.
-    scan_id :
+    scan_id : str
         Identifier of the scan.
 
     Returns
     -------
     pathlib.Path
         Absolute directory of the scan.
-
-    Raises
-    ------
-    FileUploadError
-        If the scan cannot be retrieved.
     """
-    try:
-        scan = db.get_scan(scan_id)
-    except Exception as exc:
-        raise FileUploadError(f"Unable to locate scan '{scan_id}': {exc}") from exc
+    scan = db.get_scan(scan_id, **kwargs)
     return Path(scan.path())
-
-
-def ensure_directory(path: Path) -> None:
-    """
-    Make sure ``path`` exists, creating parents as needed.
-
-    Parameters
-    ----------
-    path :
-        Directory path to be created.
-    """
-    path.mkdir(parents=True, exist_ok=True)
 
 
 # --------------------------------------------------------------------------- #
@@ -194,11 +174,11 @@ def write_streamed_file(file_path: Path, content_length: int, chunk_size: int) -
 
     Parameters
     ----------
-    file_path :
+    file_path : pathlib.Path
         Destination file.
-    content_length :
+    content_length : int
         Expected total size (from the ``Content‑Length`` header).
-    chunk_size :
+    chunk_size : int
         Size of each chunk read from ``request.stream``.  ``0`` means “no
         streaming”, but the caller should have already handled that case.
 
@@ -279,7 +259,16 @@ def is_valid_archive(archive_path):
     Returns
     -------
     bool
-        Returns `True` if the archive meets all requirements, otherwise `False`.
+        Returns ``True`` if the archive meets all requirements, otherwise ``False``.
+
+    Notes
+    -----
+    - The function currently assumes that the required directories and files are all at or above a specified depth in the archive.
+    - Make sure that the provided `archive_path` points to a valid zip file.
+
+    See Also
+    --------
+    zipfile.ZipFile : Python's built-in module for reading and writing ZIP files.
 
     Examples
     --------
@@ -300,15 +289,6 @@ def is_valid_archive(archive_path):
     True
     >>> is_valid_archive('/tmp/real_plant_analyzed.zip')
     True
-
-    Notes
-    -----
-    - The function currently assumes that the required directories and files are all at or above a specified depth in the archive.
-    - Make sure that the provided `archive_path` points to a valid zip file.
-
-    See Also
-    --------
-    zipfile.ZipFile : Python's built-in module for reading and writing ZIP files.
     """
     req_dirs = ['images/', 'metadata/']
     req_files = ['files.json']
