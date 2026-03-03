@@ -218,7 +218,7 @@ def parse_dataset_perm(datasets_str: str) -> Dict[str, set[Permission]]:
     >>> from plantdb.commons.auth.session import parse_dataset_perm
     >>> s = 'dataset_A/Permission.READ;dataset_B/Permission.READ,Permission.CREATE'
     >>> parse_dataset_perm(s)
-    {'sales': ['read', 'write'], 'marketing': ['read']}
+    {'dataset_A': {<Permission.READ: 'read'>}, 'dataset_B': {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>}}
     """
     # Guard against an empty string.
     if not datasets_str:
