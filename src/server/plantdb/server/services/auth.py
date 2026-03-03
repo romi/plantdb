@@ -44,6 +44,7 @@ from typing import Tuple
 from plantdb.commons.auth.manager import UserExistsError
 from plantdb.commons.auth.session import SessionValidationError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
+from plantdb.commons.log import _get_logger
 
 
 # ---------------------------------------------------------------------------
@@ -59,27 +60,6 @@ class InvalidCredentialsError(ValueError):
 
 class TokenError(ValueError):
     """Raised for generic token‑related problems (validation / refresh)."""
-
-
-# ---------------------------------------------------------------------------
-# Helper utilities - internal to this module
-# ---------------------------------------------------------------------------
-
-def _get_logger(logger: logging.Logger | None = None) -> logging.Logger:
-    """Return ``logger`` if provided, otherwise a module‑level logger.
-
-    Parameters
-    ----------
-    logger : logging.Logger | None, optional, default ``None``
-        Optional logger used for diagnostic messages.
-        If ``None`` (default), a module‑level logger is obtained via ``_get_logger``.
-
-    Returns
-    -------
-    logging.Logger
-        The passed or created logger instance.
-    """
-    return logger if logger is not None else logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
