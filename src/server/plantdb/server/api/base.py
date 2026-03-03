@@ -19,7 +19,7 @@
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
-# License along with plantdb.  If not, see
+# License along with plantdb. If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
@@ -92,6 +92,7 @@ from flask import request
 from flask_restful import Resource
 
 from plantdb.server.core.security import rate_limit
+from plantdb.server.core.security import sanitize_ids
 
 task_filesUri_mapping = {
     "PointCloud": "pointCloud",
@@ -133,7 +134,7 @@ class Home(Resource):
                 "/health": "Health check endpoint to verify API is working",
                 "/scans": "List all available scans",
                 "/scans_info": "Table with scan information",
-                "/scans/<scan_id>": "Get information about a specific scan",
+                "/scan/<scan_id>": "Get information about a specific scan",
                 "/files/<path>": "Access files from the database",
                 "/files/<scan_id>": "Access dataset files for a specific scan",
                 "/refresh": "Refresh the database",
@@ -146,14 +147,14 @@ class Home(Resource):
                 "/archive/<scan_id>": "Access archive data",
                 "/register": "Register a new user",
                 "/login": "User login endpoint",
-                "/api/scan": "Create a new scan",
-                "/api/scan/<scan_id>/metadata": "Access/modify scan metadata",
-                "/api/scan/<scan_id>/filesets": "Access scan filesets",
-                "/api/fileset": "Create a new fileset",
-                "/api/fileset/<scan_id>/<fileset_id>/metadata": "Access/modify fileset metadata",
-                "/api/fileset/<scan_id>/<fileset_id>/files": "Access fileset files",
-                "/api/file": "Create a new file",
-                "/api/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Access/modify file metadata"
+                "/scan": "Create a new scan",
+                "/scan/<scan_id>/metadata": "Access/modify scan metadata",
+                "/scan/<scan_id>/filesets": "Access scan filesets",
+                "/fileset": "Create a new fileset",
+                "/fileset/<scan_id>/<fileset_id>/metadata": "Access/modify fileset metadata",
+                "/fileset/<scan_id>/<fileset_id>/files": "Access fileset files",
+                "/file": "Create a new file",
+                "/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Access/modify file metadata"
             }
         }
         return api_info
@@ -161,8 +162,28 @@ class Home(Resource):
 
 # Resource HealthCheck
 class HealthCheck(Resource):
-    def __init__(self, db):
+    """Simple health‑check resource exposing an endpoint that verifies the API and its database connectivity.
+
+    Attributes
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
+    """
+
+    def __init__(self, db, logger):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
         self.db = db
+        self.logger = logger
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -188,7 +209,7 @@ class HealthCheck(Resource):
             return {
                 "status": "error",
                 "message": f"API encountered an issue: {str(e)}"
-            }, 500
+            }, 500  # HTTP 500 Internal Server Error
 
 
 class Refresh(Resource):
@@ -201,19 +222,25 @@ class Refresh(Resource):
     Attributes
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance used for reloading data.
+        The database providing the resources to serve.
+    logger : logging.Logger
+        The logger used to record operations and errors.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, logger):
         """Initialize the resource.
 
         Parameters
         ----------
         db : plantdb.commons.fsdb.core.FSDB
-            A database instance to reload.
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
         """
         self.db = db
+        self.logger = logger
 
+    @sanitize_ids('scan_id')
     @rate_limit(max_requests=60, window_seconds=60)
     def get_specific_scan(self, scan_id):
         """Reload data for a specific scan in the database.
@@ -238,7 +265,7 @@ class Refresh(Resource):
             self.db.reload(scan_id)
             return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
         except Exception as e:
-            return {'message': f"Error during scan reload: {str(e)}"}, 500
+            return {'message': f"Error during scan reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
 
     @rate_limit(max_requests=12, window_seconds=60)
     def get_full_database(self):
@@ -259,7 +286,7 @@ class Refresh(Resource):
             self.db.reload(None)
             return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
         except Exception as e:
-            return {'message': f"Error during full database reload: {str(e)}"}, 500
+            return {'message': f"Error during full database reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
 
     def get(self):
         """Force the plant database to reload.
