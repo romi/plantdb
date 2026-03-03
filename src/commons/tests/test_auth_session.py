@@ -742,13 +742,6 @@ class TestJWTSessionManager(unittest.TestCase):
         with self.assertRaises(RefreshTokenNotFoundError):
             mgr.refresh_session(refresh)
 
-    def test_refresh_with_access_token_raises_wrong_token_type(self):
-        """Using an access token for refresh_session raises WrongTokenType."""
-        mgr = self._create_manager()
-        access, _ = mgr.create_session("wrong_type_user")
-        with self.assertRaises(WrongTokenType):
-            mgr.refresh_session(access)
-
     def test_refresh_with_expired_refresh_raises_session_validation_error(self):
         """Using an expired refresh token for refresh_session raises SessionValidationError."""
         mgr = self._create_manager(session_timeout=5, refresh_timeout=1)

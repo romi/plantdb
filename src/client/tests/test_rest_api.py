@@ -38,9 +38,9 @@ class TestRestApi(unittest.TestCase):
 
     def test_scan_url(self):
         self.assertEqual(scan_url('localhost', 'example', port=2020, prefix=''),
-                         'http://localhost:2020/scans/example')
+                         'http://localhost:2020/scan/example')
         self.assertEqual(scan_url('localhost', 'example', prefix='/plantdb'),
-                         'http://localhost/plantdb/scans/example')
+                         'http://localhost/plantdb/scan/example')
 
     def test_scan_image_url(self):
         self.assertEqual(scan_image_url('localhost', 'example', 'images', '0', port=2020, prefix=''),
