@@ -169,6 +169,7 @@ class FSDBTestCase(unittest.TestCase):
     def get_test_db(self) -> FSDB:
         """Return the test ``FSDB`` database."""
         self.db.connect()
+        self.db.login('guest', 'guest')
         return self.db
 
     def get_test_scan(self):
