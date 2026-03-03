@@ -601,7 +601,7 @@ class PlantDBClient:
         >>> print(value)
         {'metadata': 'Test plant scan'}
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/metadata"
+        url = f"{self.base_url}/scan/{scan_id}/metadata"
         params = {'key': key} if key else None
         response = self._request_with_refresh("GET", url, params=params)
 
@@ -646,7 +646,7 @@ class PlantDBClient:
         >>> print(response['metadata']['description'])
         Updated scan description
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/metadata"
+        url = f"{self.base_url}/scan/{scan_id}/metadata"
         data = {
             'metadata': metadata,
             'replace': replace
@@ -690,7 +690,7 @@ class PlantDBClient:
         >>> print(response)
         {'filesets': ['images']}
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/filesets"
+        url = f"{self.base_url}/scan/{scan_id}/filesets"
         params = {}
         if query is not None:
             params['query'] = query
@@ -738,7 +738,7 @@ class PlantDBClient:
         >>> print(response)
         {'message': "Fileset 'my_fileset' created successfully in 'real_plant'."}
         """
-        url = f"{self.base_url}/api/fileset"
+        url = f"{self.base_url}/fileset"
         data = {
             'fileset_id': fileset_id,
             'scan_id': scan_id
@@ -789,7 +789,7 @@ class PlantDBClient:
         >>> print(value)
         {'metadata': 'This is a test fileset'}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
+        url = f"{self.base_url}/fileset/{scan_id}/{fileset_id}/metadata"
         params = {'key': key} if key else None
         response = self._request_with_refresh("GET", url, params=params)
 
@@ -837,7 +837,7 @@ class PlantDBClient:
         >>> print(response)
         {'metadata': {'description': 'Updated fileset description', 'author': 'John Doe'}}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
+        url = f"{self.base_url}/fileset/{scan_id}/{fileset_id}/metadata"
         data = {
             'metadata': metadata,
             'replace': replace
@@ -883,7 +883,7 @@ class PlantDBClient:
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/files"
+        url = f"{self.base_url}/fileset/{scan_id}/{fileset_id}/files"
         params = {}
         if query is not None:
             params['query'] = query
@@ -964,7 +964,7 @@ class PlantDBClient:
         from io import BytesIO
         from pathlib import Path
 
-        url = f"{self.base_url}/api/file"
+        url = f"{self.base_url}/file"
 
         ext = ext.lstrip('.').lower()  # Remove the leading dot if present
         # Prepare data
@@ -1048,7 +1048,7 @@ class PlantDBClient:
         >>> print(value)
         {'metadata': 'Test file'}
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
+        url = f"{self.base_url}/file/{scan_id}/{fileset_id}/{file_id}/metadata"
         params = {'key': key} if key else None
         response = self._request_with_refresh("GET", url, params=params)
 
@@ -1103,7 +1103,7 @@ class PlantDBClient:
         >>> print(response)
         {'metadata': {'description': 'Updated description'}}
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
+        url = f"{self.base_url}/file/{scan_id}/{fileset_id}/{file_id}/metadata"
         data = {
             'metadata': metadata,
             'replace': replace

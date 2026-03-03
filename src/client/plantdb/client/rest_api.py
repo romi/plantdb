@@ -471,9 +471,9 @@ def scan_url(host, scan_id, **kwargs):
     --------
     >>> from plantdb.client.rest_api import scan_url
     >>> scan_url('localhost', "real_plant")
-    'http://localhost/scans/real_plant'
+    'http://localhost/scan/real_plant'
     >>> scan_url('localhost', "real_plant", prefix='/plantdb')
-    'http://localhost/plantdb/scans/real_plant'
+    'http://localhost/plantdb/scan/real_plant'
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.scan(scan_id, **kwargs))
@@ -699,7 +699,7 @@ def scan_file_url(host, scan_id, file_path, **kwargs):
         The complete URL for the dataset file.
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.scan_file(scan_id, file_path, **kwargs))
+    return join_url(url, api_endpoints.file_path(scan_id, file_path, **kwargs))
 
 
 def scan_config_url(host, scan_id, cfg_fname='scan.toml', **kwargs):

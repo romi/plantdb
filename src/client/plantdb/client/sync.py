@@ -815,7 +815,7 @@ class FSDBSync():
     def _list_http_scans(self, base_url):
         """List scans available via HTTP REST API."""
         try:
-            response = requests.get(f"{base_url}/scans/")
+            response = requests.get(f"{base_url}/scans")
             response.raise_for_status()
             return response.json()
         except Exception as e:
@@ -852,7 +852,7 @@ class FSDBSync():
         try:
             with open(archive_path, 'rb') as f:
                 files = {'archive': f}
-                response = requests.post(f"{base_url}/scans/{scan_id}/upload", files=files)
+                response = requests.post(f"{base_url}/scan/{scan_id}/upload", files=files)
                 response.raise_for_status()
         except Exception as e:
             print(f"Error uploading scan archive: {e}")
@@ -860,7 +860,7 @@ class FSDBSync():
     def _download_scan_archive(self, base_url, scan_id, archive_path):
         """Download a scan archive via HTTP REST API."""
         try:
-            response = requests.get(f"{base_url}/scans/{scan_id}/download")
+            response = requests.get(f"{base_url}/scan/{scan_id}/download")
             response.raise_for_status()
             with open(archive_path, 'wb') as f:
                 f.write(response.content)
