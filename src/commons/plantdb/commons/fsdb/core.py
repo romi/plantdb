@@ -120,6 +120,7 @@ from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetExistsError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
+from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.fsdb.file_ops import _delete_file
@@ -203,7 +204,7 @@ def require_token(method):
     return wrapper
 
 
-def get_logged_username(fsdb, default_user=None, token=None, token_type='access', **kwargs):
+def get_logged_username(fsdb, default_user=None, token=None, **kwargs):
     """Returns the username of the currently logged user based on the session management system.
 
     This function identifies the username of the logged-in user by inspecting the session manager
@@ -221,8 +222,6 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
         A fallback username to use if no valid session or token is found. Defaults to ``None``.
     token : str, optional
         The session token or JWT for validating the user's session.
-    token_type : str, optional
-        The token type ('access', 'api' or 'refresh'). Defaults to 'access'.
 
     Returns
     -------
@@ -265,45 +264,71 @@ def get_logged_username(fsdb, default_user=None, token=None, token_type='access'
     elif isinstance(fsdb.session_manager, (JWTSessionManager, SessionManager)):
         # If a JSON Web Token Session Manager or a Session Manager, require the token to retrieve the username
         if token:
-            logged_user = fsdb.get_user_data(token=token, token_type=token_type)
-        else:
+            logged_user = fsdb.get_user_data(token=token)
+        elif default_user:
             logged_user = fsdb.get_user_data(username=default_user)
+        else:
+            logged_user = None
     else:
-        fsdb.logger.error("Can't serve a local PlantDB without a session manager!")
-        logged_user = None
+        raise ValueError("Can't serve a local PlantDB without a session manager!")
 
     return logged_user
 
 
-def require_authentication(method):
-    """Decorator enforcing authentication by supplying the username of the logged-in user to the wrapped method.
+def get_authentication(method):
+    """Get authentication and inject ``current_user`` into the wrapped call.
 
-    This decorator retrieves the logged-in user's username using the
-    `get_logged_user` function, appends it to the keyword arguments, and
-    then calls the wrapped method. It ensures that the method always
-    receives the correct authentication context without needing to manually
-    pass the username.
+    The wrapper expects the following keyword arguments (all optional):
+        * ``default_user`` : fallback username (default: ``None`` → unauthenticated).
+        * ``token`` : JWT supplied by the client.
+
+    Any other ``**kwargs`` are passed through unchanged.
 
     See Also
     --------
-    get_logged_user : Retrieves the username of the currently logged-in user.
+    get_logged_username : Retrieves the username of the currently logged-in user.
     """
 
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        # FIXME 'default_user' should be None!
-        if isinstance(self, (Scan, Fileset, File)):
-            user = get_logged_username(self.db, default_user=kwargs.pop('default_user', 'guest'),
-                                       token=kwargs.get('token', None),
-                                       token_type=kwargs.get('token_type', 'access'))
-        else:
-            user = get_logged_username(self, default_user=kwargs.pop('default_user', 'guest'),
-                                       token=kwargs.get('token', None),
-                                       token_type=kwargs.get('token_type', 'access'))
+        """
+        Other Parameters
+        ----------------
+        default_user : str, optional
+            A fallback username to use if no valid session or token is found. Defaults to ``None``.
+        token : str, optional
+            The session token or JWT for validating the user's session.
+        """
+        # Pull and normalize the authentication‑related arguments
+        default_user: Optional[str] = kwargs.pop('default_user', None)  # FIXME 'default_user' should be None!
+        token: Optional[str] = kwargs.get('token', None)
 
-        if not user:
-            raise PermissionError("No authenticated user!")
-        return method(self, *args, current_user=user, **kwargs)
+        # Retrieve username based on the type of `self`
+        if isinstance(self, (Scan, Fileset, File)):
+            user = get_logged_username(self.db, default_user=default_user, token=token)
+        else:
+            user = get_logged_username(self, default_user=default_user, token=token)
+
+        # Update the `current_user` only if not already defined...
+        # This is to preserve any existing value of `current_user` directly passed to the method (like a guest user)
+        if not kwargs.get('current_user'):
+            kwargs['current_user'] = user
+
+        # Call the original method, injecting ``current_user``
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
+def require_authentication(method):
+    """Enforce authentication."""
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        # Abort if no authenticated user could be determined
+        if not kwargs.get('current_user'):
+            raise NoAuthUserError()
+        return method(self, *args, **kwargs)
 
     return wrapper
 
@@ -703,6 +728,7 @@ class FSDB(db.DB):
         return scan_id in self.scans
 
     @require_connected_db
+    @get_authentication
     @require_authentication
     def get_scans(self, query=None, current_user=None, **kwargs) -> List:
         """Get a list of `Scan` instances defined in the local database, possibly filtered using a `query`.
@@ -766,6 +792,7 @@ class FSDB(db.DB):
         return accessible_scans
 
     @require_connected_db
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.READ, check_scan_access=True)
     def get_scan(self, scan_id, current_user=None, **kwargs):
@@ -801,9 +828,12 @@ class FSDB(db.DB):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
+            if not self.scan_exists(scan_id):
+                ScanNotFoundError(self, scan_id)
             return self.scans[scan_id]
 
     @require_connected_db
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.CREATE, check_scan_access=False)
     def create_scan(self, scan_id, metadata=None, current_user=None, **kwargs):
@@ -898,6 +928,7 @@ class FSDB(db.DB):
         return scan
 
     @require_connected_db
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
     def delete_scan(self, scan_id, current_user=None, **kwargs) -> bool:
@@ -955,7 +986,7 @@ class FSDB(db.DB):
         return True
 
     @require_connected_db
-    @require_authentication
+    @get_authentication
     def list_scans(self, query=None, fuzzy=False, owner_only=True, current_user=None, **kwargs) -> list[str]:
         """Get the list of scan identifiers from the local database.
 
@@ -1184,6 +1215,7 @@ class FSDB(db.DB):
             self.logger.warning(f"Failed to logout!")
             return success, username
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.MANAGE_USERS, check_scan_access=False)
     def create_user(self, new_username, fullname, password, roles=None, **kwargs) -> None:
@@ -1251,16 +1283,13 @@ class FSDB(db.DB):
         """
         return self.rbac_manager.get_guest_user()
 
-    def get_username(self, token, token_type='access') -> Optional[str]:
+    def get_username(self, token) -> Optional[str]:
         """Get the username.
 
         Parameters
         ----------
         token : str
             The token provided by the RBAC manager.
-        token_type : str, optional
-            The expected token type ('access', 'api' or 'refresh').
-            Defaults to 'access'.
 
         Returns
         -------
@@ -1279,9 +1308,9 @@ class FSDB(db.DB):
         'guest'
         >>> db.disconnect()
         """
-        return self.session_manager.session_username(token, token_type)
+        return self.session_manager.session_username(token)
 
-    def get_user_data(self, username=None, token=None, token_type='access') -> Optional[User]:
+    def get_user_data(self, username=None, token=None) -> Optional[User]:
         """Get the user data.
 
         Parameters
@@ -1290,9 +1319,6 @@ class FSDB(db.DB):
             The username to retrieve the user data from.
         token : str
             The token provided by the RBAC manager.
-        token_type : str, optional
-            The expected token type ('access', 'api' or 'refresh').
-            Defaults to 'access'.
 
         Returns
         -------
@@ -1325,16 +1351,15 @@ class FSDB(db.DB):
 
         if username:
             return self.rbac_manager.users.get_user(username)
-        elif token and token_type == "api":
-            return self.rbac_manager.users.get_token_user(self.session_manager.validate_session(token, token_type))
         elif token:
-            return self.rbac_manager.users.get_user(self.session_manager.session_username(token, token_type))
+            return self.rbac_manager.users.get_user_from_decoded_token(self.session_manager.validate_session(token))
         else:
             self.logger.error("No username or token provided")
             return None
 
     # Group management methods
 
+    @get_authentication
     @require_authentication
     def create_group(self, name, users=None, description=None, current_user=None, **kwargs) -> Optional[Group]:
         """Create a new group.
@@ -1386,6 +1411,7 @@ class FSDB(db.DB):
 
         return self.rbac_manager.create_group(current_user, name, users, description)
 
+    @get_authentication
     @require_authentication
     def add_user_to_group(self, group_name, user, current_user=None, **kwargs):
         """Add a user to a group.
@@ -1434,6 +1460,7 @@ class FSDB(db.DB):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
+    @get_authentication
     @require_authentication
     def remove_user_from_group(self, group_name, user, current_user=None, **kwargs):
         """Remove a user from a group.
@@ -1481,6 +1508,7 @@ class FSDB(db.DB):
             raise PermissionError("Insufficient permissions or operation failed")
         return True
 
+    @get_authentication
     @require_authentication
     def delete_group(self, group_name, current_user=None, **kwargs) -> bool:
         """Delete a group.
@@ -1532,6 +1560,7 @@ class FSDB(db.DB):
             raise PermissionError(f"Insufficient permissions or group '{group_name}' not found")
         return True
 
+    @get_authentication
     @require_authentication
     def list_groups(self, current_user=None, **kwargs) -> list[Group]:
         """List all groups.
@@ -1560,6 +1589,7 @@ class FSDB(db.DB):
         groups = self.rbac_manager.list_groups(current_user)
         return groups if groups is not None else []
 
+    @get_authentication
     @require_authentication
     def get_user_groups(self, user=None, current_user=None, **kwargs) -> list[Group]:
         """Get groups for a user.
@@ -1602,6 +1632,7 @@ class FSDB(db.DB):
             user = current_user.username
         return self.rbac_manager.get_user_groups(user)
 
+    @get_authentication
     @require_authentication
     def get_scan_access_summary(self, scan_id, current_user=None, **kwargs):
         """Get access summary for the current user on a scan.
@@ -1969,6 +2000,7 @@ class Scan(db.Scan):
         """
         return _get_metadata(self.measures, key, default={})
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def set_metadata(self, data, value=None, current_user=None, **kwargs):
@@ -2046,6 +2078,7 @@ class Scan(db.Scan):
         self.logger.info(f"Done updating the scan metadata.")
         return
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def create_fileset(self, fs_id, metadata=None, current_user=None, **kwargs):
@@ -2128,6 +2161,7 @@ class Scan(db.Scan):
         self.logger.info(f"Done creating the fileset.")
         return fileset
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
     def delete_fileset(self, fs_id, current_user=None, **kwargs) -> None:
@@ -2418,6 +2452,7 @@ class Fileset(db.Fileset):
         """
         return _get_metadata(self.metadata, key, default)
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def set_metadata(self, data, value=None, current_user=None, **kwargs):
@@ -2464,6 +2499,7 @@ class Fileset(db.Fileset):
         self.logger.info(f"Done editing the fileset metadata.")
         return
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def create_file(self, f_id, metadata=None, current_user=None, **kwargs):
@@ -2544,6 +2580,7 @@ class Fileset(db.Fileset):
         self.logger.info(f"Done creating the file.")
         return file
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
     def delete_file(self, f_id, current_user=None, **kwargs):
@@ -2731,6 +2768,7 @@ class File(db.File):
         """
         return _get_metadata(self.metadata, key, default)
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def set_metadata(self, data, value=None, current_user=None, **kwargs):
@@ -2772,6 +2810,7 @@ class File(db.File):
         self.logger.info(f"Done editing the file metadata.")
         return
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def import_file(self, path, current_user=None, **kwargs):
@@ -2853,6 +2892,7 @@ class File(db.File):
         with path.open(mode="rb") as f:
             return f.read()
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def write_raw(self, data, ext="", current_user=None, **kwargs):
@@ -2928,6 +2968,7 @@ class File(db.File):
         with path.open(mode="r") as f:
             return f.read()
 
+    @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
     def write(self, data, ext="", current_user=None, **kwargs):
