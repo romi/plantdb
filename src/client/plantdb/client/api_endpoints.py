@@ -19,7 +19,7 @@ Usage Examples
 >>> api_endpoints.login(prefix='/api/v1')
 '/api/v1/login'
 >>> api_endpoints.scan('plant1', prefix='/api/v1')
-'/api/v1/scans/plant1'
+'/api/v1/scan/plant1'
 """
 
 from typing import Optional
@@ -63,21 +63,7 @@ def sanitize_name(name) -> str:
 
 
 def url_prefix(endpoint_path):
-    """Wrap an endpoint path generator with an optional URL prefix.
-
-    Examples
-    --------
-    >>> def base_path(user_id):
-    ...     return f"/users/{user_id}"
-    ...
-    >>> prefixed = url_prefix(base_path)
-    >>> prefixed(42)
-    '/users/42'
-    >>> prefixed(42, prefix='api')
-    '/api/users/42'
-    >>> prefixed(42, prefix='/api/')
-    '/api/users/42'
-    """
+    """Wrap an endpoint path generator with an optional URL prefix."""
 
     def wrapper(*args, **kwargs):
         if "prefix" in kwargs and kwargs["prefix"]:
@@ -206,6 +192,29 @@ def token_validation(**kwargs) -> str:
 
 
 @url_prefix
+def create_api_token():
+    """Return the URL path to the API token creation endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the API token creation endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.client import api_endpoints
+    >>> api_endpoints.create_api_token(prefix='/api/v1')
+    '/api/v1/create-api-token'
+    """
+    return "/create-api-token"
+
+
+@url_prefix
 def health(**kwargs) -> str:
     """Return the URL path to the health endpoint.
 
@@ -264,7 +273,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
 
 @url_prefix
 def scans(**kwargs) -> str:
-    """Return the URL path to the scans endpoint.
+    """Return the URL path to the scans' endpoint.
 
     Other Parameters
     ----------------
@@ -274,7 +283,7 @@ def scans(**kwargs) -> str:
     Returns
     -------
     str
-        The URL path to the scans endpoint.
+        The URL path to the scans' endpoint.
 
     Examples
     --------
@@ -331,11 +340,11 @@ def scan(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.client import api_endpoints
     >>> api_endpoints.scan('scan1')
-    '/scans/scan1'
+    '/scan/scan1'
     >>> api_endpoints.scan('scan1', prefix='/api/v1')
-    '/api/v1/scans/scan1'
+    '/api/v1/scan/scan1'
     """
-    return f"/scans/{sanitize_name(scan_id)}"
+    return f"/scan/{sanitize_name(scan_id)}"
 
 
 @url_prefix
@@ -471,12 +480,12 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return f"/files/{scan_id}/{fileset_id}/{file_id}"
+    return f"/file/{scan_id}/{fileset_id}/{file_id}"
 
 
 @url_prefix
-def scan_file(scan_id: str, file_path: str, **kwargs) -> str:
-    """Return the URL path to the `scan/fileset/file` endpoint.
+def file_path(scan_id: str, file_path: str, **kwargs) -> str:
+    """Return the URL path to the `scan/file_path` endpoint.
 
     Parameters
     ----------
@@ -488,12 +497,12 @@ def scan_file(scan_id: str, file_path: str, **kwargs) -> str:
     Returns
     -------
     str
-        The URL path to the file endpoint.
+        The URL path to the file path endpoint.
 
     Examples
     --------
     >>> from plantdb.client import api_endpoints
-    >>> api_endpoints.scan_file('real_plant','images/00000_rgb.jpg')
+    >>> api_endpoints.file_path('real_plant','images/00000_rgb.jpg')
     '/files/real_plant/images/00000_rgb.jpg'
     """
     scan_id = sanitize_name(scan_id)
@@ -519,54 +528,6 @@ def create_user(**kwargs) -> str:
 
 
 @url_prefix
-def create_scan(**kwargs) -> str:
-    """URL to create a scan.
-
-    Returns
-    -------
-    str
-        The URL path to scan creation.
-
-    Examples
-    --------
-    >>> from plantdb.client import api_endpoints
-    >>> api_endpoints.create_scan()
-    '/api/scan'
-    """
-    return "/api/scan"
-
-
-@url_prefix
-def create_fileset(**kwargs) -> str:
-    """URL to create a fileset.
-
-    Returns
-    -------
-    str
-        The URL path to fileset creation.
-
-    Examples
-    --------
-    >>> from plantdb.client import api_endpoints
-    >>> api_endpoints.create_fileset()
-    '/api/fileset'
-    """
-    return "/api/fileset"
-
-
-@url_prefix
-def create_file(**kwargs) -> str:
-    """URL to create a file.
-
-    Returns
-    -------
-    str
-        The URL path to file creation.
-    """
-    return "/api/file"
-
-
-@url_prefix
 def list_scan_filesets(scan: str, **kwargs) -> str:
     """URL to list the filesets associated with the given scan name.
 
@@ -576,7 +537,7 @@ def list_scan_filesets(scan: str, **kwargs) -> str:
         The URL path to filesets.
     """
     scan_id = sanitize_name(scan)
-    return f"/api/scan/{scan_id}/filesets"
+    return f"/scan/{scan_id}/filesets"
 
 
 @url_prefix
@@ -590,7 +551,7 @@ def list_fileset_files(scan: str, fileset: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan)
     fileset = sanitize_name(fileset)
-    return f"/api/scan/{scan_id}/{fileset}/files"
+    return f"/scan/{scan_id}/{fileset}/files"
 
 
 @url_prefix
@@ -603,7 +564,7 @@ def metadata_scan(scan: str, **kwargs) -> str:
         The URL path to scan metadata.
     """
     scan_id = sanitize_name(scan)
-    return f"/api/scan/{scan_id}/metadata"
+    return f"/scan/{scan_id}/metadata"
 
 
 @url_prefix
@@ -617,7 +578,7 @@ def metadata_fileset(scan: str, fileset: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan)
     fileset = sanitize_name(fileset)
-    return f"/api/scan/{scan_id}/{fileset}/metadata"
+    return f"/scan/{scan_id}/{fileset}/metadata"
 
 
 @url_prefix
@@ -632,7 +593,7 @@ def metadata_files(scan: str, fileset: str, file: str, **kwargs) -> str:
     scan_id = sanitize_name(scan)
     fileset = sanitize_name(fileset)
     file = sanitize_name(file)
-    return f"/api/scan/{scan_id}/{fileset}/{file}/metadata"
+    return f"/scan/{scan_id}/{fileset}/{file}/metadata"
 
 
 @url_prefix
@@ -675,7 +636,3 @@ def skeleton(scan_id: str, **kwargs) -> str:
     """Return the URL path to the skeleton endpoint."""
     scan_id = sanitize_name(scan_id)
     return f"/skeleton/{scan_id}"
-
-@url_prefix
-def create_api_token():
-    return "/create-api-token"
