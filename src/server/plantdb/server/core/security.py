@@ -66,11 +66,12 @@ if __name__ == '__main__':
     app.run()
 ```
 """
-
+import inspect
 import threading
 import time
 from collections import defaultdict
 from functools import wraps
+from typing import Callable
 
 from flask import Response
 from flask import request
@@ -90,8 +91,7 @@ def rate_limit(max_requests=5, window_seconds=60):
     max_requests : int, optional
         The maximum number of requests permitted within the time window (default is 5).
     window_seconds : int, optional
-        The duration of the rate-limiting window in seconds
-        (default is 60 seconds).
+        The duration of the rate-limiting window, in seconds (default is 60 seconds).
 
     Returns
     -------
@@ -107,7 +107,7 @@ def rate_limit(max_requests=5, window_seconds=60):
     Notes
     -----
     This implementation uses a thread lock to ensure thread safety when handling
-    requests, making it suitable for multi-threaded environments. The requests
+    requests, making it suitable for multithreaded environments. The requests
     data structure is a `defaultdict` that maps client IPs to a list of their
     request timestamps. Old requests outside the rate-limiting window are removed
     to maintain efficient memory usage.
@@ -126,7 +126,7 @@ def rate_limit(max_requests=5, window_seconds=60):
                 requests[client_ip] = [req_time for req_time in requests[client_ip]
                                        if current_time - req_time < window_seconds]
 
-                # Check if rate limit is exceeded
+                # Check if the rate limit is exceeded
                 if len(requests[client_ip]) >= max_requests:
                     return Response(
                         "Rate limit exceeded. Please try again later.",
@@ -143,38 +143,124 @@ def rate_limit(max_requests=5, window_seconds=60):
     return decorator
 
 
-def jwt_from_header(request) -> str:
-    """Extracts the JSON Web Token from the Authorization header of an HTTP request.
+def jwt_from_header(request) -> str | None:
+    """Extract the JWT from the ``Authorization``request header.
 
     Parameters
     ----------
-    request : object
-        An HTTP request object that provides a ``headers`` attribute.
+    request: requests.models.Request
+        An HTTP request exposing a ``headers`` mapping.
+
+    Returns
+    -------
+    str | None
+        The extracted JWT or ``None``.
+
+    Notes
+    -----
+    * The function expects the header to be in the form ``Bearer <token>``.
+    * The function performs a simple string replacement and does **not** perform any verification.
+    """
+    auth = request.headers.get('Authorization')
+    if not auth:
+        return None
+    return auth.replace('Bearer ', '')
+
+
+def add_jwt_from_header(f: Callable) -> Callable:
+    """Retrieve the JSON Web Token from the header and add it to keyword arguments, if any.
+
+    This enables automatic token definition from the request header.
+    """
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Get JSON Web Token from the request header
+        jwt_token = jwt_from_header(request)
+        if jwt_token:
+            kwargs['token'] = jwt_token
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def use_guest_as_default(f: Callable) -> Callable:
+    """Injects a guest user when no authentication token is provided.
+
+    This enables methods that expect an authenticated user to operate transparently with a default guest context.
+    """
+
+    @wraps(f)
+    def decorated_function(self, *args, **kwargs):
+        if not kwargs.get('token'):
+            kwargs["current_user"] = self.db.get_guest_user()
+        return f(self, *args, **kwargs)
+
+    return decorated_function
+
+
+def sanitize_name(name):
+    """Sanitizes and validates the provided name.
+
+    The function ensures that the input string adheres to predefined naming rules by:
+
+    - stripping leading/trailing spaces,
+    - isolating the last segment after splitting by slashes,
+    - validating the name against an alphanumeric pattern
+      with optional underscores (`_`), dashes (`-`), or periods (`.`).
+
+    Parameters
+    ----------
+    name : str
+        The name to sanitize and validate.
 
     Returns
     -------
     str
-        The JSON Web Token extracted from the ``Authorization`` header, or an
-        empty string if the header is missing or empty.
+        A sanitized name that conforms to the rules.
 
-    Notes
-    -----
-    * The function performs a simple string replacement and does **not**
-      check that the resulting token is a valid JWT.
+    Raises
+    ------
+    ValueError
+        If the provided name contains invalid characters or does not meet the naming rules.
     """
-    return request.headers.get('Authorization', "").replace('Bearer ', '')
+    import re
+    sanitized_name = name.strip()  # Remove leading/trailing spaces
+    sanitized_name = sanitized_name.split('/')[-1]  # isolate the last segment after splitting by slashes
+    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
+        raise ValueError(
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
+    return sanitized_name
 
 
-def add_jwt_from_header(f):
-    """Retrieve the JSON Web Token from the header and add it to keyword arguments, if any."""
+def sanitize_ids(*param_names):
+    """Decorator that sanitizes the given identifier parameters using ``sanitize_name``.
 
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Try to get JSON Web Token from the request header
-        jwt_token = jwt_from_header(request)
-        # Do not verify we actually got a token or test its validity; this is done by the database)
-        # Add token to keyword arguments (for later use by FSD methods)
-        kwargs['token'] = jwt_token
-        return f(*args, **kwargs)
+    If sanitization fails, logs a warning and returns a 400 response.
+    """
 
-    return decorated_function
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            # Bind the incoming args/kwargs to the function signature so we can
+            # address parameters by name regardless of how they were passed.
+            bound = inspect.signature(func).bind(self, *args, **kwargs)
+            bound.apply_defaults()
+
+            for name in param_names:
+                if name in bound.arguments:
+                    original = bound.arguments[name]
+                    try:
+                        bound.arguments[name] = sanitize_name(original)
+                    except ValueError as e:
+                        # Consistent logging / response pattern
+                        self.logger.warning(f"Invalid {name} format: {original}")
+                        return {'message': str(e)}, 400
+
+            # Call the original method with the (now sanitized) arguments
+            return func(**bound.arguments)
+
+        return wrapper
+
+    return decorator
