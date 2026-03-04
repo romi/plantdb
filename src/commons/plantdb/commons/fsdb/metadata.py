@@ -45,6 +45,7 @@ import copy
 import json
 from pathlib import Path
 from typing import Any
+from typing import Mapping
 
 from .path_helpers import _file_metadata_path
 from .path_helpers import _fileset_metadata_json_path
@@ -218,60 +219,77 @@ def _store_file_metadata(file) -> None:
     return
 
 
-def _get_metadata(metadata=None, key=None, default={}) -> Any:
-    """Get a copy of `metadata[key]`.
+def _get_metadata(metadata: Mapping[str, Any] = None, key: str = None, default: Any = None, ) -> Any:
+    """Return a copy of ``metadata[key]`` or of the whole ``metadata`` mapping when ``key`` is omitted.
 
     Parameters
     ----------
-    metadata : dict, optional
-        The metadata dictionary to get the `key` from.
-    key : str, optional
-        The `key` to get from the metadata dictionary.
-        By default, return a copy of the whole metadata dictionary.
+    metadata : Mapping[str, Any] | None, optional
+        Source dictionary. If ``None`` the ``default`` value is returned.
+    key : str | None, optional
+        Specific key to look up. When omitted, a copy of the entire mapping is returned.
     default : Any, optional
-        The default value to return if the `key` does not exist in the metadata.
-        Default is an empty dictionary ``{}``.
+        Value to return when ``metadata`` is ``None`` or the ``key`` is absent.
+        ``None`` is used as the sentinel; a new empty ``dict`` will be created
+        on‑the‑fly if you need an empty mapping.
 
     Returns
     -------
     Any
-        The value saved under `metadata['key']`, if any.
+        A deep‑copy of the requested value.
     """
-    # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
     if metadata is None:
-        return default
-    elif key is None:
+        # Ensure the caller can’t mutate a shared default object.
+        return copy.deepcopy(default) if default is not None else {}
+    if key is None:
         return copy.deepcopy(metadata)
-    else:
-        return copy.deepcopy(metadata.get(str(key), default))
+    # ``dict.get`` already returns ``default`` when the key is missing.
+    return copy.deepcopy(metadata.get(key, default))
 
 
-def _set_metadata(metadata, data, value) -> None:
-    """Set a `data` `value` in the ` metadata ` dictionary.
+def _set_metadata(metadata: dict[str, Any], data: str | Mapping[str, Any], value: Any = None) -> None:
+    """Set a `data` `value` in the `metadata` dictionary.
 
     Parameters
     ----------
-    metadata : dict
+    metadata : dict[str, Any]
         The metadata dictionary to get the key from.
-    data : str or dict
+    data : str | Mapping[str, Any]
         If a string, a key to address the `value`.
         If a dictionary, update the metadata dictionary with `data` (`value` is then unused).
-    value : any, optional
+    value : Any | None, optional
         The value to assign to `data` if the latest is not a dictionary.
 
     Raises
     ------
-    IOError
-        If `data` is not of the right type.
+    TypeError
+        If `data` is neither a ``str`` nor a ``Mapping``.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.metadata import _set_metadata
+    >>> md = {'description': 'This is the original description'}
+    >>> _set_metadata(md, 'description', 'Updated fileset description')
+    >>> print(md)
+    {'description': 'Updated fileset description'}
+    >>> _set_metadata(md, {'object': {'family': 'UFO', 'size': 'big'}})
+    >>> print(md)
+    {'description': 'Updated fileset description', 'object': {'family': 'UFO', 'size': 'big'}}
+    >>> _set_metadata(md, {'object': {'size': 'smaller'}})
+    >>> print(md)
+    {'description': 'Updated fileset description', 'object': {'size': 'small'}}
     """
     if isinstance(data, str):
         if value is None:
             logger.warning(f"Metadata key '{data}' was set to `None`!")
-        # Do a deepcopy of the value because we don't want the caller to inadvertently change the values.
-        metadata[data] = copy.deepcopy(value)
+        # Shallow‑copy immutable objects, deepcopy mutable containers.
+        if isinstance(value, (dict, list, set)):
+            metadata[data] = copy.deepcopy(value)
+        else:
+            metadata[data] = value
     elif isinstance(data, dict):
-        for key, value in data.items():
-            _set_metadata(metadata, key, value)
+        for key, subvalue in data.items():
+            _set_metadata(metadata, key, subvalue)
     else:
-        raise IOError(f"Invalid key: {data}")
+        raise TypeError(f"Invalid key type: {type(data).__name__}")
     return
