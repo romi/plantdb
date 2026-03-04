@@ -362,7 +362,7 @@ def scan(scan_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def metadata_scan(scan_id: str, **kwargs) -> str:
+def scan_metadata(scan_id: str, **kwargs) -> str:
     """URL to access the metadata associated with the given scan name.
 
     Parameters
@@ -385,7 +385,7 @@ def metadata_scan(scan_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def list_scan_filesets(scan_id: str, **kwargs) -> str:
+def scan_filesets_list(scan_id: str, **kwargs) -> str:
     """URL to list the filesets associated with the given scan name.
 
     Parameters
@@ -436,7 +436,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
 
 
 @url_prefix
-def metadata_fileset(scan_id: str, fileset_id: str, **kwargs) -> str:
+def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
     """URL to access the fileset metadata associated with the given scan and fileset name.
 
     Parameters
@@ -462,7 +462,7 @@ def metadata_fileset(scan_id: str, fileset_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def list_fileset_files(scan_id: str, fileset_id: str, **kwargs) -> str:
+def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     """URL to list the file associated with the given scan and filesets names.
 
     Parameters
@@ -518,7 +518,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def metadata_file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
+def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     """URL to access the file metadata associated with the given scan and fileset name.
 
     Parameters
@@ -683,7 +683,7 @@ def file_path(scan_id: str, file_path: str, **kwargs) -> str:
 
 
 @url_prefix
-def list_dataset_files(scan_id: Optional[str] = None, **kwargs) -> str:
+def dataset_files_list(scan_id: Optional[str] = None, **kwargs) -> str:
     """Return the URL path to list all files of a dataset (scan)."""
     if scan_id:
         scan_id = sanitize_name(scan_id)
