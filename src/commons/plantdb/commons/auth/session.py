@@ -250,7 +250,7 @@ class SessionManager:
         """
         return secrets.token_urlsafe(32)
 
-    def create_session(self, username: str) -> Union[str, None]:
+    def create_session(self, username: str) -> str | None:
         """Create a new session for a user.
 
         If the user already has an active session, it returns the existing session ID.
@@ -263,7 +263,7 @@ class SessionManager:
 
         Returns
         -------
-        Union[str, None]
+        str | None
             The ID of the created or existing session.
 
         Notes
@@ -289,7 +289,7 @@ class SessionManager:
         }
         return session_token
 
-    def validate_session(self, session_id: str) -> Union[dict, None]:
+    def validate_session(self, session_id: str) -> dict | None:
         """Validate a given session by checking its existence and expiration status.
 
         Parameters
@@ -299,7 +299,7 @@ class SessionManager:
 
         Returns
         -------
-        Union[dict, None]
+        dict | None
             A dictionary with user information if valid, ``None`` if invalid/expired.
 
               - username: The authenticated user
@@ -320,7 +320,7 @@ class SessionManager:
         if now > session['expires_at']:
             username = session['username']
             self.logger.warning(f"The session for user '{username}' has expired. Please log back in!")
-            success, username = self.invalidate_session(session_id)
+            _, _ = self.invalidate_session(session_id)
             return None
 
         # Update last accessed time
@@ -339,7 +339,7 @@ class SessionManager:
         -------
         bool
             ``True`` if the specified session was found and removed, ``False`` otherwise.
-        Union[str, None]
+        str | None
             The username corresponding to the invalidated session
 
         Notes
@@ -536,12 +536,12 @@ def _derive_key_argon2(password: str) -> bytes:
     )
 
 
-def _init_secret_key(secret_key: Union[str, bytes] = None) -> bytes:
+def _init_secret_key(secret_key: str | bytes = None) -> bytes:
     """Generate or derive a 64‑byte secret key for HS512 signing.
 
     Parameters
     ----------
-    secret_key: Union[str, bytes, None]
+    secret_key: str | bytes | None
         Optional secret key.
 
     Returns
@@ -628,7 +628,7 @@ class JWTSessionManager(SessionManager):
     refresh_timeout : int
         Lifetime of a refresh token in seconds.
         The default value (``86400``) corresponds to 24 hours.
-    secret_key : Union[str, bytes, None]
+    secret_key : str | bytes | None
         Secret used for HS512 signing of JWTs.
         If ``None`` is passed to the constructor, a random 64‑byte key is generated.
         This will break the API tokens persistence across restarts as, after a restart, the new instance
@@ -658,7 +658,7 @@ class JWTSessionManager(SessionManager):
         max_concurrent_sessions : int, optional
             The maximum number of concurrent sessions to allow.
             Defaults to ``10``.
-        secret_key : Union[str, bytes, None]
+        secret_key : str | bytes | None
            Secret used for HS512 signing of JWTs.
            - If a ``bytes`` object is supplied, it must be ≥ 64 bytes.
            - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2 to produce a 64‑byte key.
@@ -679,7 +679,7 @@ class JWTSessionManager(SessionManager):
         self.refresh_tokens = {}  # Track valid refresh tokens (jti -> session_info)
         self._lock = RLock()  # to lock `self.session` dict for thread‑safe changes
 
-        self.secret_key = self._init_secret_key(secret_key)
+        self.secret_key = _init_secret_key(secret_key)
         self.api_token_file = Path(api_token_dir) / 'api_token.txt'
         self._api_tokens: dict[str, str] = {}  # jti -> ISO expiry string
         self._safe_secret_init(secret_key)
@@ -702,27 +702,6 @@ class JWTSessionManager(SessionManager):
                     "Using a randomly generated secret key for token signature will render all saved API token useless at restart!")
             self.logger.info("Set a secret key value to avoid loosing API tokens.")
             self.logger.info("Use the 'JWT_SECRET_KEY' environment variable if you are using the `fsdb_rest_api` CLI.")
-
-    def _init_secret_key(self, secret_key: Union[str, bytes] = None) -> bytes:
-        """Initialize or validate the secret key used for cryptographic operations.
-
-        Parameters
-        ----------
-        secret_key : Union[str, bytes, None]
-            Optional user‑provided secret key as a string.
-            When ``None`` a fresh random key is created.
-
-        Returns
-        -------
-        bytes
-            The secret key encoded as UTF‑8 bytes, or a newly generated random
-            key when no input is given.
-
-        See Also
-        --------
-        plantdb.commons.auth.session._init_secret_key
-        """
-        return _init_secret_key(secret_key)
 
     def _create_token(self, username, jti, exp_time, now, token_type='access', **kwargs):
         """Create a JSON Web Token (JWT) with registered claims.
