@@ -49,6 +49,7 @@ from plantdb.commons.auth.manager import UserManager
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Permission
 from plantdb.commons.auth.models import Role
+from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
 from plantdb.commons.log import get_logger
 
@@ -136,7 +137,7 @@ class RBACManager :
         self.users = UserManager(users_file, max_login_attempts, lockout_duration)
         self.groups = GroupManager(groups_file)
 
-    def get_user_permissions(self, user: User) -> Set[Permission]:
+    def get_user_permissions(self, user: User | TokenUser) -> Set[Permission]:
         """Get the set of permissions a user has based on their assigned roles.
 
         This function returns a set containing all permissions directly assigned to
@@ -145,7 +146,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : plantdb.commons.auth.models.User
+        user : plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser
             A `User` object representing the user whose permissions will be checked.
             This user must have attributes `permissions` and `roles`.
 
@@ -184,7 +185,7 @@ class RBACManager :
             permissions.update(role.permissions)
         return permissions
 
-    def has_permission(self, user: User, permission: Permission) -> bool:
+    def has_permission(self, user: User | TokenUser, permission: Permission) -> bool:
         """Check if a user has a specific permission.
 
         This function determines whether the given user has the specified permission,
@@ -192,7 +193,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : plantdb.commons.auth.models.User
+        user : plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser
             The User object to check for permissions.
         permission : plantdb.commons.auth.models.Permission
             The permission level or type to verify against the user's permissions.
@@ -485,17 +486,17 @@ class RBACManager :
         # This can be restricted later if needed
         return self.groups.list_groups()
 
-    def get_effective_role_for_scan(self, user: User, scan_metadata: dict) -> Role:
+    def get_effective_role_for_scan(self, user: User | TokenUser, scan_metadata: dict) -> Role:
         """Get the effective role a user has for a specific scan dataset.
 
         This method determines the user's role based on:
-        1. Dataset ownership (owner gets CONTRIBUTOR role)
+        1. Dataset ownership (an owner gets CONTRIBUTOR role)
         2. Group sharing (shared group members get CONTRIBUTOR role)
         3. User's global role (fallback)
 
         Parameters
         ----------
-        user : plantdb.commons.auth.models.User
+        user : plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser
             The user to check.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
@@ -545,7 +546,7 @@ class RBACManager :
         else:
             return Role.READER
 
-    def get_scan_permissions(self, user: User, scan_metadata: dict) -> Set[Permission]:
+    def get_scan_permissions(self, user: User | TokenUser, scan_metadata: dict) -> Set[Permission]:
         """Get the set of permissions a user has for a specific scan dataset.
 
         This method considers the user's effective role for the specific scan,
@@ -553,7 +554,7 @@ class RBACManager :
 
         Parameters
         ----------
-        user : plantdb.commons.auth.models.User
+        user : plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser
             The user to check permissions for.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
@@ -566,18 +567,19 @@ class RBACManager :
         effective_role = self.get_effective_role_for_scan(user, scan_metadata)
         return effective_role.permissions
 
-    def can_access_scan(self, user: User, scan_metadata: dict, operation: Permission) -> bool:
+    def can_access_scan(self, user: User | TokenUser, scan_metadata: dict, operation: Permission) -> bool:
         """Check if a user can perform a specific operation on a scan dataset.
 
         This method implements the complete access control logic, including:
-        - Owner-based access (owners get CONTRIBUTOR role for their scans)
-        - Group-based access (shared group members get CONTRIBUTOR role)
+
+        - Owner-based access (owners get a `CONTRIBUTOR` role for their scans)
+        - Group-based access (shared group members get a `CONTRIBUTOR` role)
         - Global role-based access (fallback to user's global role)
         - Admin override (admins can do everything)
 
         Parameters
         ----------
-        user : plantdb.commons.auth.models.User
+        user : plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser
             The user requesting access.
         scan_metadata : dict
             The scan metadata containing 'owner' and optional 'sharing' fields.
