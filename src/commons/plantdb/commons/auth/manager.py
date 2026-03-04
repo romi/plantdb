@@ -51,11 +51,11 @@ from typing import Set
 from typing import Union
 
 from argon2 import PasswordHasher
+
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Role
 from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
-from plantdb.commons.auth.models import parse_dataset_perm
 from plantdb.commons.log import get_logger
 
 ph = PasswordHasher()
@@ -66,11 +66,11 @@ class UserExistsError(Exception):
     """Raised when attempting to create a user that already exists."""
     pass
 
+
 #: Exception for duplicate group
 class GroupExistsError(Exception):
     """Raised when attempting to create a group that already exists."""
     pass
-
 
 
 class UserManager(object):
@@ -353,7 +353,7 @@ class UserManager(object):
             print("Change it as soon as possible!")
         return
 
-    def get_user(self, username: str) -> Union[User, None]:
+    def get_user(self, username: str) -> User | None:
         """Retrieve a User object based on the provided username.
 
         Parameters
@@ -363,16 +363,16 @@ class UserManager(object):
 
         Returns
         -------
-        Union[plantdb.commons.auth.models.User, None]
-            An instance of the User class representing the requested user.
-            If it does not exist, `None` is returned.
+        plantdb.commons.auth.models.User | None
+            An instance of the ``User`` class representing the requested user.
+            If it does not exist, ``None`` is returned.
         """
         if not self.exists(username):
             self.logger.error(f"User '{username}' does not exist!")
             return None
         return self.users[username]
 
-    def get_token_user(self, token_payload: dict) -> Union[TokenUser, None]:
+    def get_token_user(self, token_payload: dict) -> TokenUser | None:
         """Retrieve a User object based on the provided username.
 
         Parameters
@@ -383,7 +383,7 @@ class UserManager(object):
 
         Returns
         -------
-        Union[TokenUser, None]
+        TokenUser | None
             An instance of the ``User`` class representing the requested user.
             If it does not exist, ``None`` is returned.
 
@@ -400,9 +400,12 @@ class UserManager(object):
             self.logger.error(f"User '{username}' does not exist!")
             return None
         user = self.users[username]
+
+        self.logger.debug(f"Creating TokenUser for user '{username}'...")
+        self.logger.debug(f"Dataset permission requested: {token_payload.get('datasets')}")
         return TokenUser(**user.to_dict(), dataset_permissions=token_payload.get("datasets"))
 
-    def get_user_from_decoded_token(self, token_payload: dict) -> Union[User, TokenUser, None]:
+    def get_user_from_decoded_token(self, token_payload: dict) -> User | TokenUser | None:
         """Extract a user representation from a decoded JWT payload.
 
         Parameters
@@ -413,7 +416,7 @@ class UserManager(object):
 
         Returns
         -------
-        Union[User, TokenUser, None]
+        User | TokenUser | None
             * ``User``: when ``token_type`` is ``"access"`` or ``"refresh"``.
             * ``TokenUser``: when ``token_type`` is ``"api"``.
             * ``None``: when ``token_type`` is not recognized; an error is logged.
@@ -427,7 +430,7 @@ class UserManager(object):
             self.logger.error(f"Token type '{token_type}' does not exist!")
             return None
 
-    def is_locked_out(self, username) -> bool:
+    def is_locked_out(self, username: str) -> bool:
         """Check if an account is locked.
 
         Parameters
@@ -446,7 +449,7 @@ class UserManager(object):
             self.logger.info(f"Account {username} is locked, try logging in after {user.locked_until}.")
         return is_locked
 
-    def is_active(self, username) -> bool:
+    def is_active(self, username: str) -> bool:
         """Check whether a user account is active.
 
         Parameters
