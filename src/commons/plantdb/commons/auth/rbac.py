@@ -710,6 +710,27 @@ class RBACManager :
                 return False
         return True
 
+    def valid_sharing_groups(self, sharing_groups: List[str]) -> List[str]:
+        """Validate groups in the sharing list if they exist.
+
+        Parameters
+        ----------
+        sharing_groups : List[str]
+            List of group names to validate.
+
+        Returns
+        -------
+        list
+            The list of valid groups; can be empty if none of the provided groups exist.
+        """
+        valid_groups = []
+        sharing_groups = set(sharing_groups)
+        for group_name in sharing_groups:
+            if not self.groups.group_exists(group_name):
+                self.logger.warning(f"Group '{group_name}' does not exist, can not share to non-existent group!")
+            valid_groups.append(group_name)
+        return valid_groups
+
     def get_accessible_scans_for_user(self, user: User, all_scan_metadata: Dict[str, dict]) -> Dict[str, dict]:
         """Filter scans to only include those the user has READ access to.
 
