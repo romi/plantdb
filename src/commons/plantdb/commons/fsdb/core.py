@@ -2097,47 +2097,89 @@ class Scan(db.Scan, MetadataManager):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Get current metadata for validation
-        # Access scan metadata directly to avoid nested lock acquisition
-        old_metadata = _get_metadata(self.metadata, None, {})
         self._update_metadata(data, value, current_user, _store_scan_metadata, cls_name="Scan")
 
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.DELETE, check_scan_access=True)
+    def change_owner(self, new_owner, current_user=None, **kwargs):
+        """Change the owner of the scan.
 
-        if isinstance(data, str):
-            if value is None:
-                self.logger.warning(f"No value given for key '{data}'!")
-            new_metadata = {data: value}
-        else:
-            try:
-                assert isinstance(data, dict)
-            except AssertionError:
-                raise ValueError(f"Invalid metadata type '{type(data)}'")
-            else:
-                new_metadata = data
-
-        # Validate scan metadata accessibility to current user
-        if 'owner' in new_metadata:
-            _ = new_metadata.pop('owner')
-            self.logger.warning(f"Removing owner entry from metadata update!")
-
-        # Validate sharing groups if present
-        if 'sharing' in new_metadata:
-            sharing_groups = new_metadata['sharing']
-            if not isinstance(sharing_groups, list):
-                raise ValueError("Sharing field must be a list of group names")
-            if not self.db.rbac_manager.validate_sharing_groups(sharing_groups):
-                raise ValueError("One or more sharing groups do not exist")
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()
+        >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
+        >>> print(new_scan.get_metadata('owner'))
+        admin
+        >>> new_scan.change_owner('guest')
+        >>> print(new_scan.get_metadata('owner'))
+        guest
+        >>> new_scan.change_owner('admin')
+        """
+        # Verify that the new owner exists:
+        if not self.db.rbac_manager.users.exists(new_owner):
+            self.logger.error(f"Owner '{new_owner}' does not exist, can not change ownership!")
+            return
 
         # Use exclusive lock for metadata updates
-        self.logger.info(f"Updating '{self.id}' scan metadata as '{current_user.username}' user...")
+        self.logger.info(f"Updating '{self.id}' scan owner to '{new_owner}' user...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Update metadata
-            _set_metadata(self.metadata, new_metadata, None)
+            _set_metadata(self.metadata, 'owner', new_owner)
             # Ensure modification timestamp
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
-        self.logger.info(f"Done updating the scan metadata.")
+        self.logger.info(f"Done updating the scan owner.")
+        return
+
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.DELETE, check_scan_access=True)
+    def group_share(self, groups, current_user=None, **kwargs):
+        """Change the group sharing of the scan.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()
+        >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
+        >>> print(new_scan.get_metadata('owner'))
+        admin
+        >>> print(new_scan.get_metadata('sharing', default=None))
+        None
+        >>> new_group = db.create_group('dummy_group', ['admin', 'guest'], 'A test group')
+        >>> new_scan.group_share('dummy_group')
+        >>> print(new_scan.get_metadata('sharing'))
+        ['dummy_group']
+        """
+        if isinstance(groups, str):
+            groups = [groups]
+        # Verify that the new group(s) exists:
+        valid_groups = self.db.rbac_manager.valid_sharing_groups(groups)
+
+        if len(valid_groups) == 0:
+            self.logger.error(f"No valid group(s) given, can not share to non-existent group!")
+            return
+
+        # Validate sharing groups if present
+        if 'sharing' in self.metadata:
+            sharing_groups = self.metadata['sharing']
+            if not self.db.rbac_manager.validate_sharing_groups(sharing_groups):
+                raise ValueError("One or more sharing groups do not exist")
+
+        # Use exclusive lock for metadata updates
+        valid_groups_str = ", ".join(valid_groups)
+        self.logger.info(f"Updating '{self.id}' scan group sharing to: '{valid_groups_str}'")
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
+            # Update metadata
+            _set_metadata(self.metadata, 'sharing', valid_groups)
+            # Ensure modification timestamp
+            _set_metadata(self.metadata, 'last_modified', iso_date_now())
+            _store_scan_metadata(self)
+
+        self.logger.info(f"Done updating the scan group sharing.")
         return
 
     @get_authentication
