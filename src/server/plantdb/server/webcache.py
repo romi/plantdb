@@ -56,7 +56,7 @@ Examples
 """
 import hashlib
 from pathlib import Path
-import logging
+from plantdb.commons.log import get_logger
 
 from PIL import Image
 
@@ -69,7 +69,7 @@ except ModuleNotFoundError:
 IMG_RESOLUTIONS = {"large": 1500, "thumb": 150}
 
 # Get logger instance
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def __webcache_path(db, scan_id: str) -> Path:
