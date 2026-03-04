@@ -133,6 +133,7 @@ from plantdb.commons.fsdb.file_ops import _make_scan
 from plantdb.commons.fsdb.file_ops import _store_scan
 from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.lock import ScanLockManager
+from plantdb.commons.fsdb.metadata import MetadataManager
 from plantdb.commons.fsdb.metadata import _get_metadata
 from plantdb.commons.fsdb.metadata import _set_metadata
 from plantdb.commons.fsdb.metadata import _store_file_metadata
@@ -885,8 +886,8 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> new_scan = db.create_scan('007', metadata={'project': 'GoldenEye'})  # create a new scan dataset
-        >>> print(new_scan.get_metadata('owner'))  # default user 'anonymous' for dummy database
-        anonymous
+        >>> print(new_scan.get_metadata('owner'))  # default user 'admin' for dummy database
+        admin
         >>> print(new_scan.get_metadata('project'))
         GoldenEye
         >>> scan = db.create_scan('007')  # attempt to create an existing scan dataset
@@ -916,6 +917,8 @@ class FSDB(db.DB):
         # Validate sharing groups if specified
         if 'sharing' in metadata:
             sharing_groups = metadata['sharing']
+            if isinstance(sharing_groups, str):
+                sharing_groups = [sharing_groups]
             if not isinstance(sharing_groups, list):
                 raise ValueError("Sharing field must be a list of group names")
             if not self.rbac_manager.validate_sharing_groups(sharing_groups):
@@ -1305,7 +1308,6 @@ class FSDB(db.DB):
             raise RuntimeError("Session manager must be an instance of JWTSessionManager.")
         session_manager: JWTSessionManager = self.session_manager
         return session_manager.create_api_token(current_user.username, token_exp, datasets)
-
 
     def get_guest_user(self) -> User:
         """Retrieve the guest user information from the RBAC manager.
@@ -1745,7 +1747,7 @@ class FSDB(db.DB):
             return None
 
 
-class Scan(db.Scan):
+class Scan(db.Scan, MetadataManager):
     """Implement ``Scan`` for the local *File System DataBase* from the abstract class ``db.Scan``.
 
     Implementation of a scan as a simple file structure with:
@@ -2074,12 +2076,20 @@ class Scan(db.Scan):
 
         Examples
         --------
-        >>> import json
         >>> from plantdb.commons.test_database import dummy_db
-        >>> from plantdb.commons.fsdb.path_helpers import _scan_metadata_path
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
+        >>> print(scan.get_metadata('test'))
+        1
         >>> scan.set_metadata("test", "value")
+        >>> print(scan.get_metadata('test'))
+        value
+        >>> # Changing scan ownership through metadata is blocked:
+        >>> scan.set_metadata("owner", "guest")
+        WARNING  [FSDB] Excluding 'owner' key from Scan metadata update!
+        >>> # Read the scan metadata file
+        >>> import json
+        >>> from plantdb.commons.fsdb.path_helpers import _scan_metadata_path
         >>> p = _scan_metadata_path(scan)
         >>> print(p.exists())
         True
@@ -2090,6 +2100,8 @@ class Scan(db.Scan):
         # Get current metadata for validation
         # Access scan metadata directly to avoid nested lock acquisition
         old_metadata = _get_metadata(self.metadata, None, {})
+        self._update_metadata(data, value, current_user, _store_scan_metadata, cls_name="Scan")
+
 
         if isinstance(data, str):
             if value is None:
@@ -2314,7 +2326,7 @@ class Scan(db.Scan):
             return [fs.id for fs in _filter_query(list(self.filesets.values()), query, fuzzy)]
 
 
-class Fileset(db.Fileset):
+class Fileset(db.Fileset, MetadataManager):
     """Implement ``Fileset`` for the local *File System DataBase* from the abstract class ``db.Fileset``.
 
     Implementation of a fileset as a simple files structure with:
@@ -2492,7 +2504,7 @@ class Fileset(db.Fileset):
         'value'
         >>> db.dummy=False  # to avoid cleaning up the temporary dummy database
         >>> db.disconnect()
-        >>> db.connect('anonymous')
+        >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> print(fs.get_metadata("test"))
@@ -2538,16 +2550,7 @@ class Fileset(db.Fileset):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Use exclusive lock for this operation
-        self.logger.info(f"Editing the '{self.scan.id}/{self.id}' fileset metadata...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
-            _set_metadata(self.metadata, data, value)
-            # Ensure modification timestamp
-            self.metadata['last_modified'] = iso_date_now()
-            _store_fileset_metadata(self)
-
-        self.logger.info(f"Done editing the fileset metadata.")
-        return
+        self._update_metadata(data, value, current_user, _store_fileset_metadata, cls_name="Fileset")
 
     @get_authentication
     @require_authentication
@@ -2747,7 +2750,7 @@ class Fileset(db.Fileset):
             return [f.id for f in _filter_query(list(self.files.values()), query, fuzzy)]
 
 
-class File(db.File):
+class File(db.File, MetadataManager):
     """Implement ``File`` for the local *File System DataBase* from abstract class ``db.File``.
 
     Attributes
@@ -2849,16 +2852,7 @@ class File(db.File):
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Use exclusive lock for this operation
-        self.logger.info(f"Editing the '{self.scan.id}/{self.fileset.id}/{self.id}' fileset metadata...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
-            _set_metadata(self.metadata, data, value)
-            # Ensure modification timestamp
-            self.metadata['last_modified'] = iso_date_now()
-            _store_file_metadata(self)
-
-        self.logger.info(f"Done editing the file metadata.")
-        return
+        self._update_metadata(data, value, current_user, _store_file_metadata, cls_name="File")
 
     @get_authentication
     @require_authentication
