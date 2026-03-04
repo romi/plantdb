@@ -47,10 +47,12 @@ from pathlib import Path
 from typing import Any
 from typing import Mapping
 
+from .lock import LockType
 from .path_helpers import _file_metadata_path
 from .path_helpers import _fileset_metadata_json_path
 from .path_helpers import _scan_metadata_path
 from ..log import get_logger
+from ..utils import iso_date_now
 
 logger = get_logger(__name__)
 
@@ -293,3 +295,60 @@ def _set_metadata(metadata: dict[str, Any], data: str | Mapping[str, Any], value
     else:
         raise TypeError(f"Invalid key type: {type(data).__name__}")
     return
+
+
+class MetadataManager(object):
+    """Common helper for updating metadata on Scan, Fileset and File objects."""
+    _FORBIDDEN_KEYS = {
+        'owner': "Excluding 'owner' key from {cls} metadata update!",
+        'sharing': "Excluding 'sharing' key from {cls} metadata update!",
+    }
+
+    def _prepare_new_metadata(self, data, value):
+        """Return a dict ready to be merged into ``self.metadata``."""
+        if isinstance(data, str):
+            if value is None:
+                self.logger.warning(f"No value given for metadata key '{data}'!")
+            return {data: value}
+        if isinstance(data, dict):
+            return data
+        raise ValueError(f"Invalid metadata type '{type(data)}'")
+
+    def _scrub_forbidden_keys(self, new_metadata, cls_name):
+        """Drop keys that are not allowed at this level and log a warning."""
+        for key, msg in self._FORBIDDEN_KEYS.items():
+            if key in new_metadata:
+                new_metadata.pop(key)
+                self.logger.warning(msg.format(cls=cls_name))
+        return
+
+    def _store_and_timestamp(self, store_func):
+        """Add the ``last_modified`` timestamp and persist the metadata."""
+        _set_metadata(self.metadata, 'last_modified', iso_date_now())
+        store_func(self)
+        return
+
+    def _update_metadata(self, data, value, current_user, store_func, cls_name):
+        """High‑level driver used by the concrete classes."""
+        from plantdb.commons.fsdb.core import Scan
+
+        new_metadata = self._prepare_new_metadata(data, value)
+        self._scrub_forbidden_keys(new_metadata, cls_name)
+        if len(new_metadata) == 0:
+            return
+
+        # Acquire exclusive lock on the *scan* – this mirrors the original behaviour.
+        self.logger.info(
+            f"Updating '{self.id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
+        )
+        if isinstance(self, Scan):
+            obj = self
+        else:
+            obj = self.scan
+
+        with self.db.lock_manager.acquire_lock(obj.id, LockType.EXCLUSIVE, current_user.username):
+            _set_metadata(self.metadata, new_metadata, None)
+            self._store_and_timestamp(store_func)
+
+        self.logger.info(f"Done updating the {cls_name.lower()} metadata.")
+        return
