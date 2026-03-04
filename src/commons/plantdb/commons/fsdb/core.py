@@ -300,7 +300,7 @@ def get_authentication(method):
             The session token or JWT for validating the user's session.
         """
         # Pull and normalize the authentication‑related arguments
-        default_user: Optional[str] = kwargs.pop('default_user', None)  # FIXME 'default_user' should be None!
+        default_user: Optional[str] = kwargs.pop('default_user', None)
         token: Optional[str] = kwargs.get('token', None)
 
         # Retrieve username based on the type of `self`
@@ -440,9 +440,21 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
             else:
                 required_permissions_ = required_permissions
 
-            user: User = kwargs.get("current_user", None)
+            user: User | TokenUser = kwargs.get("current_user", None)
             if user is None:
-                raise PermissionError("User must be logged in!")
+                raise NoAuthUserError()
+
+            # TokenUser have scan-based permissions, disabling scan access check is done for scan creation only
+            if isinstance(user, TokenUser) and not check_scan_access:
+                print(f"Scan id: {args[0]}")
+                scan_perms = user.get_permissions_for_dataset(args[0])
+                print(f"{scan_perms=}")
+                has_perms = all(perm in scan_perms for perm in required_permissions_)
+                print(f"{has_perms=}")
+                if not has_perms:
+                    raise PermissionError(
+                        f"User {user.username} does not have required permissions to use {method.__name__}")
+                return method(self, *args, **kwargs)
 
             # check dataset
             if check_scan_access:
@@ -1351,7 +1363,7 @@ class FSDB(db.DB):
         """
         return self.session_manager.session_username(token)
 
-    def get_user_data(self, username=None, token=None) -> Optional[User]:
+    def get_user_data(self, username=None, token=None) -> User | TokenUser | None:
         """Get the user data.
 
         Parameters
@@ -1363,7 +1375,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        Optional[plantdb.commons.auth.models.User]
+        plantdb.commons.auth.models.User | plantdb.commons.auth.models.TokenUser | None
             A ``User`` instance corresponding to the currently authenticated user, if any, ``None`` otherwise.
 
         Notes
