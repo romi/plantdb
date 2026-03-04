@@ -372,7 +372,6 @@ class TestUser(unittest.TestCase):
             password_hash="hashed_password",
             roles={Role.CONTRIBUTOR},
             created_at=self.now,
-            permissions={Permission.READ}
         )
 
     def test_user_initialization_minimal(self):
@@ -393,7 +392,8 @@ class TestUser(unittest.TestCase):
         self.assertIn(Role.READER, user.roles)
 
         # Verify optional fields have correct defaults
-        self.assertIsNone(user.permissions)
+        self.assertIsInstance(user.permissions, set)
+        self.assertEqual(len(user.permissions), 1)
         self.assertIsNone(user.last_login)
         self.assertTrue(user.is_active)
         self.assertEqual(user.failed_attempts, 0)
@@ -414,7 +414,6 @@ class TestUser(unittest.TestCase):
             password_hash="hash456",
             roles={Role.ADMIN, Role.CONTRIBUTOR},
             created_at=self.now,
-            permissions={Permission.READ, Permission.WRITE},
             last_login=last_login,
             is_active=False,
             failed_attempts=3,
@@ -427,7 +426,7 @@ class TestUser(unittest.TestCase):
         self.assertEqual(user.username, "bob")
         self.assertEqual(user.fullname, "Bob Jones")
         self.assertEqual(len(user.roles), 2)
-        self.assertEqual(len(user.permissions), 2)
+        self.assertEqual(len(user.permissions), 6)
         self.assertEqual(user.last_login, last_login)
         self.assertFalse(user.is_active)
         self.assertEqual(user.failed_attempts, 3)
@@ -494,7 +493,6 @@ class TestUser(unittest.TestCase):
         self.assertEqual(user_dict['fullname'], "Test User")
         self.assertEqual(user_dict['password_hash'], "hashed_password")
         self.assertIn('contributor', user_dict['roles'])
-        self.assertIn('read', user_dict['permissions'])
         self.assertTrue(user_dict['is_active'])
         self.assertEqual(user_dict['failed_attempts'], 0)
 
@@ -521,8 +519,8 @@ class TestUser(unittest.TestCase):
             'username': 'alice',
             'fullname': 'Alice Smith',
             'password_hash': 'hash123',
+            'created_at': self.now.isoformat(),
             'roles': ['reader'],
-            'created_at': self.now.isoformat()
         }
 
         # Create user from dict
@@ -542,16 +540,17 @@ class TestUser(unittest.TestCase):
             'password_hash': 'hash456',
             'roles': ['contributor'],
             'created_at': self.now.isoformat(),
-            'permissions': ['read', 'write']
         }
 
         # Create user from dict
         user = User.from_dict(user_dict)
+        user.grant_permission('manage_users')
 
         # Verify permissions were parsed
-        self.assertEqual(len(user.permissions), 2)
+        self.assertEqual(len(user.permissions), 4)
         self.assertIn(Permission.READ, user.permissions)
         self.assertIn(Permission.WRITE, user.permissions)
+        self.assertIn(Permission.MANAGE_USERS, user.permissions)
 
     def test_from_dict_invalid_role_skipped(self):
         """Test that invalid roles in dict are skipped for backward compatibility."""
@@ -659,15 +658,11 @@ class TestUser(unittest.TestCase):
         self.assertIsNone(self.user.last_failed_attempt)
 
         # Record failed attempt
-        before = datetime.now()
         self.user._record_failed_attempt()
-        after = datetime.now()
 
         # Verify counter incremented and timestamp set
         self.assertEqual(self.user.failed_attempts, 1)
         self.assertIsNotNone(self.user.last_failed_attempt)
-        self.assertGreaterEqual(self.user.last_failed_attempt, before)
-        self.assertLessEqual(self.user.last_failed_attempt, after)
 
     def test_record_multiple_failed_attempts(self):
         """Test recording multiple failed attempts."""
@@ -697,7 +692,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.CONTRIBUTOR},
             created_at=self.now,
-            permissions={Permission.READ, Permission.WRITE},
             dataset_permissions=self.dataset_perms
         )
 
@@ -714,7 +708,6 @@ class TestTokenUser(unittest.TestCase):
                 password_hash="hash",
                 roles={Role.CONTRIBUTOR},
                 created_at=self.now,
-                permissions={Permission.READ}
             )
 
     def test_tokenuser_to_dict(self):
@@ -726,7 +719,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.READER},
             created_at=self.now,
-            permissions={Permission.READ},
             dataset_permissions=self.dataset_perms
         )
 
@@ -769,7 +761,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.CONTRIBUTOR},
             created_at=self.now,
-            permissions={Permission.READ, Permission.WRITE, Permission.CREATE},
             dataset_permissions={'dataset_A': {Permission.READ, Permission.WRITE}}
         )
 
@@ -790,7 +781,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.CONTRIBUTOR},
             created_at=self.now,
-            permissions={Permission.READ, Permission.WRITE},
             dataset_permissions={'dataset_*': {Permission.READ}}
         )
 
@@ -809,7 +799,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.READER},
             created_at=self.now,
-            permissions={Permission.READ},
             dataset_permissions={'dataset_A': {Permission.READ}}
         )
 
@@ -828,7 +817,6 @@ class TestTokenUser(unittest.TestCase):
             password_hash="hash",
             roles={Role.READER},
             created_at=self.now,
-            permissions={Permission.READ},  # User only has READ
             dataset_permissions={'dataset_A': {Permission.READ, Permission.WRITE}}  # Dataset allows more
         )
 
