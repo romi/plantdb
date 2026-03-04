@@ -485,11 +485,9 @@ class FileMetadata(Resource):
 
         Notes
         -----
-        The request body should be a JSON object containing:
+        The request body accepts a JSON object containing:
 
-            - metadata (dict): The metadata to update/set
-            - replace (bool, optional). If ``True``, replaces entire metadata.
-              If ``False`` (default), updates only specified keys.
+            - 'metadata' (dict): the new metadata
 
         Examples
         --------
@@ -509,7 +507,6 @@ class FileMetadata(Resource):
             return {'message': 'Missing metadata in request body'}, 400
 
         metadata = data['metadata']
-        replace = data.get('replace', False)
 
         if not isinstance(metadata, dict):
             return {'message': 'Metadata must be a dictionary'}, 400
@@ -539,15 +536,6 @@ class FileMetadata(Resource):
             file = fileset.get_file(file_id)
             # Update the metadata
             file.set_metadata(metadata, **kwargs)
-            # TODO: make this works:
-            # if replace:
-            #    # Replace entire metadata dictionary
-            #    file.set_metadata(metadata)
-            # else:
-            #    # Update only specified keys
-            #    current_metadata = file.get_metadata()
-            #    current_metadata.update(metadata)
-            #    file.set_metadata(current_metadata)
             # Return updated metadata
             updated_metadata = file.get_metadata()
 

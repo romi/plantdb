@@ -149,9 +149,9 @@ class Fileset(Resource):
 
         Notes
         -----
-        The method accepts a JSON request body with the following structure:
+        The request body accepts a JSON object containing:
 
-            - metadata (dict, optional): Additional metadata for the fileset.
+            - 'metadata' (dict): the new metadata
 
         Raises
         ------
@@ -363,11 +363,9 @@ class FilesetMetadata(Resource):
 
         Notes
         -----
-        The request body should be a JSON object containing:
+        The request body accepts a JSON object containing:
 
-            - metadata (dict): The metadata to update/set
-            - replace (bool, optional). If ``True``, replaces entire metadata.
-              If ``False`` (default), updates only specified keys.
+            - 'metadata' (dict): the new metadata
 
         Examples
         --------
@@ -397,7 +395,6 @@ class FilesetMetadata(Resource):
             return {'message': 'No metadata provided in request'}, 400
 
         metadata = data['metadata']
-        replace = data.get('replace', False)
 
         if not isinstance(metadata, dict):
             return {'message': 'Metadata must be a dictionary'}, 400
@@ -418,15 +415,6 @@ class FilesetMetadata(Resource):
             fileset = scan.get_fileset(fileset_id)
             # Update the metadata
             fileset.set_metadata(metadata, **kwargs)
-            # TODO: make this works:
-            # if replace:
-            #    # Replace entire metadata dictionary
-            #    fileset.set_metadata(metadata)
-            # else:
-            #    # Update only specified keys
-            #    current_metadata = fileset.get_metadata()
-            #    current_metadata.update(metadata)
-            #    fileset.set_metadata(current_metadata)
             # Return updated metadata
             updated_metadata = fileset.get_metadata()
 

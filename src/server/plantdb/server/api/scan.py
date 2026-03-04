@@ -370,10 +370,10 @@ class Scan(Resource):
         dict
             A dictionary containing scan information with the following keys:
 
-                - metadata (dict): Contains scan date, object information, and image count
-                - files (dict): Contains paths to related files and archives
-                - tasks (dict): Contains information about processing task status
-                - thumbnail (str): URI to the scan's thumbnail image
+                - 'metadata' (dict): Contains scan date, object information, and image count
+                - 'files' (dict): Contains paths to related files and archives
+                - 'tasks' (dict): Contains information about processing task status
+                - 'thumbnail' (str): URI to the scan's thumbnail image
 
         Raises
         ------
@@ -436,12 +436,9 @@ class Scan(Resource):
 
         Notes
         -----
-        HTTP status codes:
+        The request body accepts a JSON object containing:
 
-            - 201 : Created successfully
-            - 400 : Bad request (invalid scan_id)
-            - 409 : Conflict (scan already exists)
-            - 500 : Internal server error
+            - 'metadata' (dict): the new metadata
 
         Examples
         --------
@@ -610,11 +607,9 @@ class ScanMetadata(Resource):
 
         Notes
         -----
-        The request body should be a JSON object containing:
+        The request body accepts a JSON object containing:
 
-            - metadata (dict): The metadata to update/set
-            - replace (bool, optional). If ``True``, replaces entire metadata.
-              If ``False`` (default), updates only specified keys.
+            - 'metadata' (dict): the new metadata
 
         Examples
         --------
@@ -642,7 +637,6 @@ class ScanMetadata(Resource):
             return {'message': 'No metadata provided in request'}, 400
 
         metadata = data['metadata']
-        replace = data.get('replace', False)
 
         if not isinstance(metadata, dict):
             return {'message': 'Metadata must be a dictionary'}, 400
@@ -652,15 +646,6 @@ class ScanMetadata(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
             # Update the metadata
             scan.set_metadata(metadata, **kwargs)
-            # TODO: make this works:
-            # if replace:
-            #    # Replace entire metadata dictionary
-            #    scan.set_metadata(metadata)
-            # else:
-            #    # Update only specified keys
-            #    current_metadata = scan.get_metadata()
-            #    current_metadata.update(metadata)
-            #    scan.set_metadata(current_metadata)
             # Return updated metadata
             updated_metadata = scan.get_metadata()
 
