@@ -446,11 +446,8 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
 
             # TokenUser have scan-based permissions, disabling scan access check is done for scan creation only
             if isinstance(user, TokenUser) and not check_scan_access:
-                print(f"Scan id: {args[0]}")
                 scan_perms = user.get_permissions_for_dataset(args[0])
-                print(f"{scan_perms=}")
                 has_perms = all(perm in scan_perms for perm in required_permissions_)
-                print(f"{has_perms=}")
                 if not has_perms:
                     raise PermissionError(
                         f"User {user.username} does not have required permissions to use {method.__name__}")
