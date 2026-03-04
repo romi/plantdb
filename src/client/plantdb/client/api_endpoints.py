@@ -458,7 +458,7 @@ def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return f"/scan/{scan_id}/{fileset_id}/metadata"
+    return f"/fileset/{scan_id}/{fileset_id}/metadata"
 
 
 @url_prefix
@@ -484,7 +484,7 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return f"/scan/{scan_id}/{fileset_id}/files"
+    return f"/fileset/{scan_id}/{fileset_id}/files"
 
 
 @url_prefix
