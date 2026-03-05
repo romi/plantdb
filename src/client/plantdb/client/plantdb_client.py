@@ -158,8 +158,13 @@ class PlantDBClient:
         # Dedicated session for access‑token requests
         self._session = requests.Session()
         if self._api_token:
-            # TODO: should probably validate the token here
-            self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
+            # Validate provided API token:
+            url = join_url(self.base_url, api_endpoints.token_validation())
+            response = self._session.request("POST", url, headers={"Authorization": f"Bearer {self._api_token}"})
+            if response.ok:
+                self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
+            else:
+                raise ValueError(f"Invalid API token: {self._api_token}")
 
         self.logger = get_logger(__class__.__name__)
 
