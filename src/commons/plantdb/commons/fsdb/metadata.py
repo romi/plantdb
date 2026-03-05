@@ -38,14 +38,29 @@ _set_metadata(metadata_dict, {"key1": "value1", "key2": "value2"}, None)
 
 # Getting metadata with a default value
 value = _get_metadata(metadata_dict, "key", default={})
-```
 """
+from __future__ import annotations
 
 import copy
 import json
 from pathlib import Path
 from typing import Any
 from typing import Mapping
+from typing import MutableMapping
+from typing import Union
+from typing import TYPE_CHECKING
+
+# ----------------------------------------------------------------------
+# NOTE: The following imports are only needed for type‑checking / IDE hints.
+# Importing them at runtime creates a circular dependency with `core.py`.
+# By guarding them with `TYPE_CHECKING` we keep static‑type information
+# without executing the import when the module is loaded.
+# ----------------------------------------------------------------------
+if TYPE_CHECKING:
+    from .core import File
+    from .core import Fileset
+    from .core import Scan
+# ----------------------------------------------------------------------
 
 from .lock import LockType
 from .path_helpers import _file_metadata_path
@@ -57,7 +72,7 @@ from ..utils import iso_date_now
 logger = get_logger(__name__)
 
 
-def _load_fileset_metadata(fileset) -> dict:
+def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
     """Load the metadata for a fileset.
 
     Parameters
@@ -67,13 +82,13 @@ def _load_fileset_metadata(fileset) -> dict:
 
     Returns
     -------
-    dict
+    dict[str, Any]
         The metadata dictionary.
     """
     return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
-def _load_metadata(path) -> dict:
+def _load_metadata(path: Union[str, Path]) -> dict[str, Any]:
     """Load a metadata dictionary from a JSON file.
 
     Parameters
@@ -83,7 +98,7 @@ def _load_metadata(path) -> dict:
 
     Returns
     -------
-    dict
+    dict[str, Any]
         The metadata dictionary.
 
     Raises
@@ -108,7 +123,7 @@ def _load_metadata(path) -> dict:
     return md
 
 
-def _load_scan_metadata(scan) -> dict:
+def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
     """Load the metadata for a scan dataset.
 
     Parameters
@@ -118,7 +133,7 @@ def _load_scan_metadata(scan) -> dict:
 
     Returns
     -------
-    dict
+    dict[str, Any]
         The metadata dictionary.
     """
     scan_md = {}
@@ -135,7 +150,7 @@ def _load_scan_metadata(scan) -> dict:
     return scan_md
 
 
-def _load_file_metadata(file) -> dict:
+def _load_file_metadata(file: File) -> dict[str, Any]:
     """Load the metadata for a file.
 
     Parameters
@@ -145,13 +160,13 @@ def _load_file_metadata(file) -> dict:
 
     Returns
     -------
-    dict
+    dict[str, Any]
         The metadata dictionary.
     """
     return _load_metadata(_file_metadata_path(file))
 
 
-def _mkdir_metadata(path) -> None:
+def _mkdir_metadata(path: Union[str, Path]) -> None:
     """Create the parent directories from a given path.
 
     Parameters
@@ -169,23 +184,24 @@ def _mkdir_metadata(path) -> None:
     return
 
 
-def _store_metadata(path, metadata) -> None:
+def _store_metadata(path: Union[str, Path], metadata: MutableMapping[str, Any]) -> None:
     """Save a metadata dictionary as a JSON file.
 
     Parameters
     ----------
     path : str or pathlib.Path
         JSON file path to use for saving the metadata.
-    metadata : dict
+    metadata : dict[str, Any]
         The metadata dictionary to save.
     """
     _mkdir_metadata(path)
-    with path.open(mode="w") as f:
+    path_obj = Path(path)
+    with path_obj.open(mode="w") as f:
         json.dump(metadata, f, sort_keys=True, indent=4, separators=(',', ': '))
     return
 
 
-def _store_scan_metadata(scan) -> None:
+def _store_scan_metadata(scan: Scan) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -197,7 +213,7 @@ def _store_scan_metadata(scan) -> None:
     return
 
 
-def _store_fileset_metadata(fileset) -> None:
+def _store_fileset_metadata(fileset: Fileset) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -209,7 +225,7 @@ def _store_fileset_metadata(fileset) -> None:
     return
 
 
-def _store_file_metadata(file) -> None:
+def _store_file_metadata(file: File) -> None:
     """Save the metadata for a dataset.
 
     Parameters
@@ -221,7 +237,7 @@ def _store_file_metadata(file) -> None:
     return
 
 
-def _get_metadata(metadata: Mapping[str, Any] = None, key: str = None, default: Any = None, ) -> Any:
+def _get_metadata(metadata: Mapping[str, Any] | None = None, key: str | None = None, default: Any = None, ) -> Any:
     """Return a copy of ``metadata[key]`` or of the whole ``metadata`` mapping when ``key`` is omitted.
 
     Parameters
@@ -249,7 +265,7 @@ def _get_metadata(metadata: Mapping[str, Any] = None, key: str = None, default: 
     return copy.deepcopy(metadata.get(key, default))
 
 
-def _set_metadata(metadata: dict[str, Any], data: str | Mapping[str, Any], value: Any = None) -> None:
+def _set_metadata(metadata: MutableMapping[str, Any], data: str | Mapping[str, Any], value: Any = None) -> None:
     """Set a `data` `value` in the `metadata` dictionary.
 
     Parameters
