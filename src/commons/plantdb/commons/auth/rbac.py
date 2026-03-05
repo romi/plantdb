@@ -181,8 +181,6 @@ class RBACManager :
         {<__main__.Permission object at 0x...>}
         """
         permissions = set(user.permissions) if user.permissions else set()
-        for role in user.roles:
-            permissions.update(role.permissions)
         return permissions
 
     def has_permission(self, user: User | TokenUser, permission: Permission) -> bool:
