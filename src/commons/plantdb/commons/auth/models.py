@@ -698,7 +698,7 @@ class TokenUser(User):
     >>> from plantdb.commons.auth.models import Permission, Role, User, TokenUser
     >>> # Create a TokenUser from an existing User:
     >>> user = User(username="jdoe", fullname="John Doe", password_hash="hashed_password", roles={Role.CONTRIBUTOR}, created_at=datetime.now(timezone.utc))
-    >>> token_user = TokenUser(**user.to_dict(), dataset_permissions={'new_scan': {Permission.WRITE}})
+    >>> token_user = TokenUser(**user.to_dict(), dataset_permissions={'new_scan': {Permission.WRITE, Permission.DELETE}})
     >>> token_user.permissions
     {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>, <Permission.WRITE: 'write'>}
     >>> token_user.get_permissions_for_dataset('new_scan')
@@ -781,11 +781,12 @@ class TokenUser(User):
             Set of available permissions for this TokenUser for the provided dataset name.
         """
         permissions = set()
+        def_perm = self.permissions
         for dataset_pattern, _permissions in self.dataset_permissions.items():
             # Check if the dataset name matches the glob‑style pattern.
             if fnmatchcase(dataset_name, dataset_pattern):
                 # Intersect pattern permissions with the user's global permissions and add them to the result set.
-                permissions |= _permissions & self.permissions
+                permissions |= _permissions & def_perm
         return permissions
 
 
