@@ -92,6 +92,11 @@ Logout successful from admin
 ```
 """
 
+import logging
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+
 import requests
 from flask import jsonify
 from flask import make_response
@@ -101,6 +106,7 @@ from flask_restful import Resource
 from plantdb.commons.auth.manager import UserExistsError
 from plantdb.commons.auth.session import SessionValidationError
 from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.services.auth import InvalidCredentialsError
@@ -609,18 +615,21 @@ class CreateApiToken(Resource):
             return {'message': 'Missing "datasets" field'}, 400
         if "token_exp" not in data:
             return {'message': 'Missing "token_exp" field'}, 400
+        token_exp = int(data['token_exp'])
 
         try:
             token = self.db.create_api_token(
-                token_exp=int(data['token_exp']),
+                token_exp=token_exp,
                 datasets=data['datasets'],
                 **kwargs
             )
 
             if token:
+                exp_date = datetime.now(timezone.utc) + timedelta(seconds=token_exp)
                 response = {
-                    'message': 'Token refreshed successfully',
+                    'message': 'API Token generated successfully',
                     'api_token': token,
+                    'expiration date': exp_date.isoformat(),
                 }, 200
                 return response
             else:
