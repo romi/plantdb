@@ -409,6 +409,40 @@ def token_refresh_url(host, **kwargs):
     return join_url(url, api_endpoints.token_refresh())
 
 
+def api_token_url(host, **kwargs):
+    """Generate the full URL for the PlantDB API token endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+
+    Returns
+    -------
+    str
+        The fully qualified URL as a string.
+
+    Examples
+    --------
+    >>> from plantdb.client.rest_api import api_token_url
+    >>> # Basic usage with default configuration
+    >>> url = api_token_url('localhost')
+    >>> print(url)
+    http://localhost/create-api-token
+    """
+    url = origin_url(host, **kwargs)
+    return join_url(url, api_endpoints.create_api_token())
+
+
 def scans_url(host, **kwargs):
     """Generates the URL listing the scans from the PlantDB REST API.
 
@@ -909,6 +943,10 @@ def make_api_request(url, method="GET", params=None, json_data=None,
     # Normalize the HTTP method name to uppercase for comparison
     method = method.upper()
 
+    # Add an empty JSON payload to forces the requests library to add the correct `Content‑Type: application/json` header
+    if not json_data:
+        json_data = {}
+
     try:
         if method.upper() == "GET":
             # GET: retrieve a resource, may include query params
@@ -1165,6 +1203,54 @@ def request_token_refresh(host, **kwargs) -> dict:
     """
     url = token_refresh_url(host, **kwargs)
     return make_api_request(url, method="POST", json_data={'refresh_token': kwargs.get('refresh_token', None)}).json()
+
+
+def request_api_token(host, token_exp, datasets, **kwargs) -> dict:
+    """Refresh a token by making a POST request to the token refresh endpoint.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or base URL used to construct the refresh endpoint.
+    token_exp : int
+        The expiration duration of the API token in seconds.
+    datasets : list[dict[str, Tuple[Permissions]]
+        A dictionary where the keys are dataset names, and the values are either
+        a tuple of `Permission` instances or a single `Permission` instance
+        defining the access levels for each dataset.
+
+
+    Other Parameters
+    ----------------
+    port : int
+        The PlantDB API port number, defaults to ``None``.
+    prefix : str
+        A path prefix for the PlantDB API, defaults to ``None``.
+    ssl : bool
+        A boolean flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
+    session_token : str
+        The PlantDB REST API session token of the user.
+
+    Returns
+    -------
+    dict
+        The token refresh data from the response, if successful.
+
+    Examples
+    --------
+    >>> # Start a test PlantDB REST API server first, in a terminal:
+    >>> # $ fsdb_rest_api --test
+    >>> from plantdb.client.rest_api import request_login
+    >>> from plantdb.client.rest_api import request_api_token
+    >>> login_data = request_login('localhost', 'admin', 'admin', port=5000)
+    >>> api_token_data = request_api_token('localhost', 3600, {"Dataset_A": ('read', 'write', 'create')}, port=5000, session_token=login_data['access_token'])
+    >>> api_token = api_token_data['api_token']
+    >>> print(api_token)
+    """
+    url = api_token_url(host, **kwargs)
+    # Extract the payload arguments (they are optional so we provide sensible defaults)
+    payload = {"datasets": datasets, "token_exp": token_exp}
+    return make_api_request(url, method="POST", json_data=payload, session_token=kwargs.get('session_token', None)).json()
 
 
 def request_new_user(host, username, password, fullname, **kwargs) -> bool:
