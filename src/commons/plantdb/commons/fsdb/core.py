@@ -451,7 +451,7 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
                 has_perms = all(perm in scan_perms for perm in required_permissions_)
                 if not has_perms:
                     raise PermissionError(
-                        f"User {user.username} does not have required permissions to use {method.__name__}")
+                        f"Token from User {user.username} does not have required permissions to use {method.__name__}")
                 return method(self, *args, **kwargs)
 
             # check dataset
