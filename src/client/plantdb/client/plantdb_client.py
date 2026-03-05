@@ -75,26 +75,6 @@ def get_mime_type(extension):
     return mime_type
 
 
-def _auth_via_token(method):
-    """Decorator that injects the correct request function based on ``use_api_token``.
-
-    The wrapped method receives a private ``_request_fn`` argument that is either
-    ``self._request_with_refresh`` (default, uses the JWT) or
-    ``self._request_with_api_token`` (when ``use_api_token=True``).
-    """
-
-    @wraps(method)
-    def wrapper(self, *args, use_api_token: bool = False, **kwargs):
-        # Choose the request helper
-        request_fn = (self._request_with_api_token if use_api_token else self._request_with_refresh)
-        # Inject it as a private kwarg – the original signature stays clean
-        kwargs["_request_fn"] = request_fn
-        # Remove the public flag so the original method signature does not see it
-        return method(self, *args, **kwargs)
-
-    return wrapper
-
-
 class PlantDBClient:
     """Client for interacting with the PlantDB REST API.
 
@@ -142,39 +122,50 @@ class PlantDBClient:
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import plantdb_url
     >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
-    >>> client.login('admin', 'admin')
-    >>> print(client._access_token)
-    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000))
-    >>> client2.validate_token(client._access_token)
-    >>> print(client.plantdb_url)
     >>> scans = client.list_scans()
     >>> print(scans)
     ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+    >>> client.login('admin', 'admin')
+    >>> print(client.base_url)
+    http://localhost:5000
+    >>> print(client._access_token)
+    eyJhbG...BsovwQ
+    >>> # Get an API token for a set of dataset (matching the 'dataset_*'):
+    >>> api_token = client.create_api_token(3600, {'dataset_*': ('read', 'write', 'create')})
+    >>> # Create a new client with the API token:
+    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000), api_token=api_token)
+    >>> resp = client2.create_scan('dataset_A', {'description': "Test dataset"})
+    >>> print(resp['id'])  # id of the created dataset
+    dataset_A
+    >>> resp = client2.create_scan('dataset_B', {'description': "Test dataset"})
+    >>> print(resp['id'])  # id of the created dataset
+    dataset_B
     >>> # Finally, stop the server
     >>> server.stop()
     """
 
-    def __init__(self, base_url, prefix=None):
+    def __init__(self, base_url, prefix=None, api_token=None):
         """Initialize the PlantDBClient with a base URL."""
         if prefix is None:
             prefix = api_prefix()
         self.base_url = f"{base_url}{prefix}"
 
-        # Dedicated session for access‑token requests
-        self._session = requests.Session()
-        # Dedicated session for API‑token requests
-        self._api_session = requests.Session()
-
         self._access_token = None
         self._refresh_token = None
-        self._api_token = None
+        self._api_token = api_token
         self._username = None
+
+        # Dedicated session for access‑token requests
+        self._session = requests.Session()
+        if self._api_token:
+            # TODO: should probably validate the token here
+            self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
 
         self.logger = get_logger(__class__.__name__)
 
+
     def login(self, username: str, password: str) -> bool:
-        """
-        Authenticate the user with the PlantDB API.
+        """Authenticate the user with the PlantDB API.
 
         Parameters
         ----------
@@ -187,6 +178,10 @@ class PlantDBClient:
         -------
         bool
             ``True`` if login successful, ``False`` otherwise
+
+        Notes
+        -----
+        Using this method with an existing API token will revoke it upon successful login.
 
         Examples
         --------
@@ -218,6 +213,9 @@ class PlantDBClient:
                 self._access_token = result.get('access_token')
                 self._refresh_token = result.get('refresh_token')
                 self._username = username
+                if self._api_token:
+                    self.logger.warning(f"Access token will replace API token in request authentication!")
+                    self._api_token = None
                 # Add the JWT to the header
                 self._session.headers.update({'Authorization': f'Bearer {self._access_token}'})
                 return True
@@ -230,7 +228,7 @@ class PlantDBClient:
             self.logger.error(f"Login request failed: {e}")
             return False
 
-    def _request_with_refresh(self, method, url, **kwargs):
+    def _request(self, method, url, **kwargs):
         """Perform an HTTP request with automatic token refresh on 401."""
         response = self._session.request(method, url, **kwargs)
 
@@ -249,38 +247,6 @@ class PlantDBClient:
                 self.logger.error("Token refresh failed, user needs to re-authenticate.")
 
         return response
-
-    def _request_with_api_token(self, method, url, **kwargs):
-        """Perform an HTTP request using the long‑lived API token.
-
-        The method creates (or re‑uses) a separate ``requests.Session`` that
-        carries the ``Authorization: Bearer <api_token>`` header, ensuring the
-        primary ``self.session`` (used for JWT auth) remains untouched.
-
-        Parameters
-        ----------
-        method : str
-            HTTP method, e.g. ``'GET'`` or ``'POST'``.
-        url : str
-            Fully‑qualified request URL.
-        **kwargs
-            Additional arguments forwarded to ``requests.Session.request``.
-
-        Returns
-        -------
-        requests.Response
-            The raw response object.
-        """
-        # If no API token is configured, just fall back to the regular session.
-        if not self._api_token:
-            self.logger.warning("API token not set; use `create_api_token` method first!")
-            return None
-
-        # Ensure the Authorization header contains the fresh API token.
-        # We replace any existing Authorization header in this dedicated session.
-        self._api_session.headers.update({"Authorization": f"Bearer {self._api_token}"})
-
-        return self._api_session.request(method, url, **kwargs)
 
     def logout(self) -> bool:
         """Logout user from the PlantDB API.
@@ -310,7 +276,7 @@ class PlantDBClient:
         url = join_url(self.base_url, api_endpoints.logout())
         try:
             # Use _request_with_refresh for logout as it requires authentication
-            response = self._request_with_refresh("POST", url)
+            response = self._request("POST", url)
             if response.ok:
                 self._username = None
                 self._access_token = None
@@ -366,7 +332,7 @@ class PlantDBClient:
 
         try:
             # create_user usually requires admin, use _request_with_refresh
-            response = self._request_with_refresh("POST", url, json=data)
+            response = self._request("POST", url, json=data)
             if response.ok:
                 return True
             else:
@@ -422,9 +388,10 @@ class PlantDBClient:
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
         >>> # Create an API token with 'WRITE' permission to create a new scan dataset 'new_scan'
-        >>> print(client.create_api_token(3600, {'new_scan': ('read', 'write', 'create')}))
-        >>> # Create a new scan dataset using the API token:
-        >>> client.create_scan('new_scan', {'description': "Test API token dataset"}, use_api_token=True)
+        >>> api_token = client.create_api_token(3600, {'new_scan': ('read', 'write', 'create')})
+        >>> # Create a new scan dataset using the API token (with a new client initialized with the API token):
+        >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000), api_token=api_token)
+        >>> client2.create_scan('new_scan', {'description': "Test API token dataset"}, use_api_token=True)
         >>> # Finally, stop the server
         >>> server.stop()
         """
@@ -433,7 +400,7 @@ class PlantDBClient:
         # Validate dataset permissions
         datasets = {}
         for dataset, permissions in dataset_permissions.items():
-            if not isinstance(permissions, tuple):
+            if not isinstance(permissions, (set, list, tuple)):
                 permissions = (permissions,)
             datasets[dataset] = []
             for permission in permissions:
@@ -447,7 +414,7 @@ class PlantDBClient:
             "datasets": datasets,
         }
         try:
-            response = self._request_with_refresh("POST", url, json=data)
+            response = self._request("POST", url, json=data)
             if response.ok:
                 self._api_token = response.json().get('api_token')
                 return self._api_token
@@ -484,7 +451,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.refresh(scan_id))
         try:
-            response = self._request_with_refresh("GET", url)
+            response = self._request("GET", url)
             if response.ok:
                 return True
             return False
@@ -495,10 +462,7 @@ class PlantDBClient:
         """Validate an authentication token against the remote service.
 
         This method sends a ``POST`` request to the token‑validation endpoint
-        using the supplied ``token`` in the ``Authorization`` header.  The
-        request is performed via :meth:`_request_with_refresh`, which will
-        transparently refresh the session if necessary.  The response's
-        ``ok`` attribute determines the boolean result.
+        using the supplied ``token`` in the ``Authorization`` header.
 
         Parameters
         ----------
@@ -508,11 +472,6 @@ class PlantDBClient:
         Returns
         -------
         ``True`` if the token is accepted by the server, otherwise ``False``.
-
-        See Also
-        --------
-        _request_with_refresh : Internal helper that handles token refresh.
-        api_endpoints.token_validation : Returns the relative URL for token validation.
 
         Examples
         --------
@@ -532,7 +491,7 @@ class PlantDBClient:
         >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.token_validation())
-        response = self._request_with_refresh("POST", url, headers={"Authorization": f"Bearer {token}"})
+        response = self._request("POST", url, headers={"Authorization": f"Bearer {token}"})
         if response.ok:
             resp_username = response.json()['user']['username']
             if not self._username:
@@ -666,7 +625,7 @@ class PlantDBClient:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self._request_with_refresh('GET', url, params=params)
+        response = self._request('GET', url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -725,7 +684,7 @@ class PlantDBClient:
             params["fuzzy"] = fuzzy
 
         # Perform the request; token refresh is handled automatically
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Turn HTTP errors into readable exceptions
         self._handle_http_errors(response)
@@ -733,8 +692,7 @@ class PlantDBClient:
         # Return the parsed JSON payload (list of dicts)
         return response.json()
 
-    @_auth_via_token
-    def create_scan(self, name, metadata=None, *, _request_fn):
+    def create_scan(self, name, metadata=None):
         """Create a new scan in the database.
 
         Parameters
@@ -743,9 +701,6 @@ class PlantDBClient:
             Name of the scan to create
         metadata : dict, optional
             Additional metadata for the scan
-        use_api_token : bool, optional (keyword‑only)
-            If ``True`` the request is sent with the long‑lived API token.
-            Defaults to ``False`` (uses the JWT access token).
 
         Returns
         -------
@@ -792,10 +747,11 @@ class PlantDBClient:
         if metadata:
             data['metadata'] = metadata
 
-        response = _request_fn("POST", url, json=data)  # the decorator injects '_request_fn'
-
+        # Send the request:
+        response = self._request("POST", url, json=data)
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
+
         return response.json()
 
     def get_scan_metadata(self, scan_id, key=None):
@@ -841,7 +797,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
         params = {'key': key} if key else None
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -891,7 +847,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
         data = {'metadata': metadata, 'replace': replace}
-        response = self._request_with_refresh("POST", url, json=data)
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -941,7 +897,7 @@ class PlantDBClient:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -992,7 +948,7 @@ class PlantDBClient:
         data = {'fileset_id': fileset_id, 'scan_id': scan_id}
         if metadata:
             data['metadata'] = metadata
-        response = self._request_with_refresh("POST", url, json=data)
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1043,7 +999,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
         params = {'key': key} if key else None
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1096,7 +1052,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
         data = {'metadata': metadata, 'replace': replace}
-        response = self._request_with_refresh("POST", url, json=data)
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1148,7 +1104,7 @@ class PlantDBClient:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1246,7 +1202,7 @@ class PlantDBClient:
             files = {
                 'file': (filename, file_data, get_mime_type(ext))
             }
-            response = self._request_with_refresh("POST", url, files=files, data=data)
+            response = self._request("POST", url, files=files, data=data)
         else:
             # Convert to a Path object if it's a string
             file_path = Path(file_data) if isinstance(file_data, str) else file_data
@@ -1257,7 +1213,7 @@ class PlantDBClient:
                 files = {
                     'file': (filename, file_handle, 'application/octet-stream')
                 }
-                response = self._request_with_refresh("POST", url, files=files, data=data)
+                response = self._request("POST", url, files=files, data=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1310,7 +1266,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
         params = {'key': key} if key else None
-        response = self._request_with_refresh("GET", url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -1365,7 +1321,7 @@ class PlantDBClient:
         """
         url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
         data = {'metadata': metadata, 'replace': replace}
-        response = self._request_with_refresh("POST", url, json=data)
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
