@@ -1330,7 +1330,6 @@ class Archive(Resource):
         >>> from io import BytesIO
         >>> from pathlib import Path
         >>> from zipfile import ZipFile
-        >>> from plantdb.client.rest_api import request_scan_names_list
         >>> from plantdb.server.test_rest_api import TestRestApiServer
         >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
@@ -1430,7 +1429,6 @@ class Archive(Resource):
         >>> from pathlib import Path
         >>> from tempfile import gettempdir
         >>> from plantdb.server.test_rest_api import TestRestApiServer
-        >>> from plantdb.client.rest_api import request_scan_names_list
         >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
         >>> server.start()

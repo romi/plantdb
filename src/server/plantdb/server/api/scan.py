@@ -176,12 +176,12 @@ class ScansList(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> # Get an info dict about all datasets:
+        >>> # Get a list of all datasets from the DB:
         >>> response = requests.get("http://127.0.0.1:5000/scans")
         >>> scans_list = response.json()
         >>> print(scans_list)  # List the known dataset ids
         ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant']
-        >>> # Get datasets with fuzzy filtering on metadata
+        >>> # Get  a list of datasets with fuzzy filtering on metadata
         >>> query = {"object": {"environment": "Lyon.*"}}
         >>> response = requests.get("http://127.0.0.1:5000/scans", params={"filterQuery": query, "fuzzy": "true"})
         >>> filtered_scans = response.json()

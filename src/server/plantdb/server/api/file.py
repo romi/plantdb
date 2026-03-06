@@ -95,7 +95,6 @@ from flask import request
 from flask import send_from_directory
 from flask_restful import Resource
 
-from plantdb.client.rest_api import plantdb_url
 from plantdb.commons.auth.session import SessionValidationError
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
@@ -410,7 +409,6 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import plantdb_url
         >>> # Get all metadata:
         >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
         >>> response = requests.get(url)
@@ -494,7 +492,6 @@ class FileMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> from plantdb.client.rest_api import plantdb_url
         >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
         >>> data = {"metadata": {"description": "Updated description"}}
         >>> response = requests.post(url, json=data)
