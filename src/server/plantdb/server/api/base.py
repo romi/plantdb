@@ -91,7 +91,6 @@ import logging
 
 from flask import request
 from flask_restful import Resource
-
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import get_logger
 from plantdb.server.core.security import rate_limit
@@ -129,35 +128,53 @@ class Home(Resource):
 
         api_info = {
             "name": "PlantDB REST API",
-            "description": "RESTful API for PlantDB querying",
+            "description": "RESTful API for querying PlantDB",
             "plantdb.commons": _package_version("plantdb.commons"),
             "plantdb.server": _package_version("plantdb.server"),
-            "endpoints": {
-                "/": "This endpoint provides information about the PlantDB REST API",
-                "/health": "Health check endpoint to verify API is working",
-                "/scans": "List all available scans",
-                "/scans_info": "Table with scan information",
-                "/scan/<scan_id>": "Get information about a specific scan",
-                "/files/<path>": "Access files from the database",
-                "/files/<scan_id>": "Access dataset files for a specific scan",
-                "/refresh": "Refresh the database",
-                "/image/<scan_id>/<fileset_id>/<file_id>": "Access specific images",
-                "/pointcloud/<scan_id>/<fileset_id>/<file_id>": "Access specific point clouds",
-                "/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>": "Access ground truth point clouds",
-                "/mesh/<scan_id>/<fileset_id>/<file_id>": "Access specific meshes",
-                "/skeleton/<scan_id>": "Access curve skeleton data",
-                "/sequence/<scan_id>": "Access sequence data",
-                "/archive/<scan_id>": "Access archive data",
-                "/register": "Register a new user",
-                "/login": "User login endpoint",
-                "/scan": "Create a new scan",
-                "/scan/<scan_id>/metadata": "Access/modify scan metadata",
-                "/scan/<scan_id>/filesets": "Access scan filesets",
-                "/fileset": "Create a new fileset",
-                "/fileset/<scan_id>/<fileset_id>/metadata": "Access/modify fileset metadata",
-                "/fileset/<scan_id>/<fileset_id>/files": "Access fileset files",
-                "/file": "Create a new file",
-                "/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Access/modify file metadata"
+
+            "base endpoints": {
+                "/": "Provides general information about the PlantDB REST API.",
+                "/health": "Health‑check endpoint that verifies the API is operational.",
+                "/refresh/<scan_id>": "Refreshes the database or a specific scan if provided."
+            },
+
+            "authentication endpoints": {
+                "/login": "Logs a user in.",
+                "/logout": "Logs a user out.",
+                "/register": "Registers a new user.",
+                "/token-validation": "Validates a token.",
+                "/token-refresh": "Refreshes a user’s access and refresh tokens.",
+                "/create-api-token": "Creates a new API token."
+            },
+
+            "scans endpoints": {
+                "/scans": "Returns a list of all available scans.",
+                "/scans_info": "Provides a table containing scan metadata.",
+                "/scan/<scan_id>": "Retrieves an existing scan or creates a new one.",
+                "/scan/<scan_id>/metadata": "Gets or updates metadata for the specified scan.",
+                "/scan/<scan_id>/filesets": "Lists the filesets belonging to the specified scan."
+            },
+
+            "filesets endpoints": {
+                "/fileset/<scan_id>/<fileset_id>": "Retrieves an existing fileset or creates a new one.",
+                "/fileset/<scan_id>/<fileset_id>/metadata": "Gets or updates metadata for the specified fileset.",
+                "/fileset/<scan_id>/<fileset_id>/files": "Lists the files contained in the specified fileset."
+            },
+
+            "files endpoints": {
+                "/file/<scan_id>/<fileset_id>/<file_id>": "Retrieves an existing file or creates a new one.",
+                "/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Gets or updates metadata for the specified file."
+            },
+
+            "assets endpoints": {
+                "/archive/<scan_id>": "Downloads or updates the archive for the given scan.",
+                "/files/<path>": "Retrieves a file located at the specified path.",
+                "/image/<scan_id>/<fileset_id>/<file_id>": "Returns a specific image.",
+                "/pointcloud/<scan_id>/<fileset_id>/<file_id>": "Returns a specific point‑cloud file.",
+                "/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>": "Returns a ground‑truth point‑cloud file.",
+                "/mesh/<scan_id>/<fileset_id>/<file_id>": "Returns a specific mesh file.",
+                "/sequence/<scan_id>": "Returns sequence data for the given scan.",
+                "/skeleton/<scan_id>": "Returns curve‑skeleton data for the given scan."
             }
         }
         return api_info
