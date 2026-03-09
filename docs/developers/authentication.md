@@ -23,11 +23,11 @@
 
 ### 2.1 `UserManager`
 
-* **Storage** – `users.json` (JSON array). File is atomically updated via a temporary file + `os.replace`.
-* **Password handling** – Argon2 (`argon2.PasswordHasher`) – never store plain text.
-* **Lock‑out** – `max_login_attempts` and `lockout_duration` configure how many failed attempts trigger a temporary lock.
-* **Guest & Admin** – On first run a `guest` user is created automatically;
-  an `admin` account is also provisioned (debug‑mode password `"admin"` – replace in production).
+* **Storage** - `users.json` (JSON array). File is atomically updated via a temporary file + `os.replace`.
+* **Password handling** - Argon2 (`argon2.PasswordHasher`) - never store plain text.
+* **Lock‑out** - `max_login_attempts` and `lockout_duration` configure how many failed attempts trigger a temporary lock.
+* **Guest & Admin** - On first run a `guest` user is created automatically;
+  an `admin` account is also provisioned (debug‑mode password `"admin"` - replace in production).
 * **Public API**
 
   ```python
@@ -41,8 +41,8 @@
 
 ### 2.2 `GroupManager`
 
-* **Storage** – `groups.json` (JSON object keyed by group name).
-* **Group model** – `Group(name, users, description, created_at, created_by)`.
+* **Storage** - `groups.json` (JSON object keyed by group name).
+* **Group model** - `Group(name, users, description, created_at, created_by)`.
 * **Operations**
 
   ```python
@@ -80,10 +80,10 @@
 ## 4. Role‑Based Access Control (`rbac.py`)
 
 * `RBACManager` aggregates `UserManager` and `GroupManager` to resolve permissions.
-* **Permission lookup** – combines user roles, group memberships, and per‑scan metadata.
-* **Scan access** – methods like `can_access_scan`, `can_modify_scan_owner`
+* **Permission lookup** - combines user roles, group memberships, and per‑scan metadata.
+* **Scan access** - methods like `can_access_scan`, `can_modify_scan_owner`
   consider owner, sharing groups, and the caller’s role.
-* **Guest user** – automatically granted `Role.READER` and read‑only permissions.
+* **Guest user** - automatically granted `Role.READER` and read‑only permissions.
 
 ```python
 from plantdb.commons.auth.rbac import RBACManager
@@ -143,9 +143,9 @@ if um.validate("username", "password"):
 
 ## 7. Extending the system
 
-* **New roles** – Add a value to the `Role` enum and extend `Role.permissions` accordingly.
-* **Custom permissions** – Create a new enum entry in `Permission` and grant it via a role or directly to a user.
-* **External auth provider** – Replace
+* **New roles** - Add a value to the `Role` enum and extend `Role.permissions` accordingly.
+* **Custom permissions** - Create a new enum entry in `Permission` and grant it via a role or directly to a user.
+* **External auth provider** - Replace
   `UserManager.validate` with a call to an external SSO service; keep the JWT logic unchanged.
 
 ---
@@ -174,7 +174,7 @@ scan = {"owner": "bob", "sharing": ["admins"]}  # Example metadata
 assert rbac.can_access_scan(alice, scan, Permission.READ)  # Depends on role/group
 ```
 
-> Running this snippet should never raise an exception – it demonstrates that the
+> Running this snippet should never raise an exception - it demonstrates that the
 > authentication, session, and RBAC layers are wired together correctly.
 
 ---

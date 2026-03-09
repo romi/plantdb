@@ -38,21 +38,26 @@ class TestRestApi(unittest.TestCase):
 
     def test_scan_url(self):
         self.assertEqual(scan_url('localhost', 'example', port=2020, prefix=''),
-                         'http://localhost:2020/scans/example')
+                         'http://localhost:2020/scan/example')
         self.assertEqual(scan_url('localhost', 'example', prefix='/plantdb'),
-                         'http://localhost/plantdb/scans/example')
+                         'http://localhost/plantdb/scan/example')
 
     def test_scan_image_url(self):
-        self.assertEqual(scan_image_url('localhost', 'example', 'images', '0', port=2020, prefix=''),
-                         'http://localhost:2020/image/example/images/0?size=orig')
         self.assertEqual(
-            scan_image_url('localhost', 'example', 'images', '1', 'big', port=2020, prefix=''),
-            'http://localhost:2020/image/example/images/1?size=big')
-        self.assertEqual(scan_image_url('localhost', 'example', 'images', '0', prefix='/plantdb'),
-                         'http://localhost/plantdb/image/example/images/0?size=orig')
+            scan_image_url('localhost', 'example', 'images', '0', size='orig', as_base64=False, port=2020, prefix=''),
+            'http://localhost:2020/image/example/images/0?size=orig&as_base64=false'
+        )
         self.assertEqual(
-            scan_image_url('localhost', 'example', 'images', '1', 'big', prefix='/plantdb'),
-            'http://localhost/plantdb/image/example/images/1?size=big')
+            scan_image_url('localhost', 'example', 'images', '1', size='big', as_base64=False, port=2020, prefix=''),
+            'http://localhost:2020/image/example/images/1?size=big&as_base64=false'
+        )
+        self.assertEqual(
+            scan_image_url('localhost', 'example', 'images', '0', prefix='/plantdb'),
+                         'http://localhost/plantdb/image/example/images/0?size=orig&as_base64=false'
+        )
+        self.assertEqual(
+            scan_image_url('localhost', 'example', 'images', '1',  size='big', prefix='/plantdb'),
+            'http://localhost/plantdb/image/example/images/1?size=big&as_base64=false')
 
     def test_refresh_url(self):
         self.assertEqual(refresh_url(host='localhost', port=2020, prefix=''),

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import logging
 import socket
 import threading
 import time
+from pathlib import Path
 
 from flask import Flask
 from werkzeug.serving import make_server
@@ -46,17 +47,18 @@ class TestRestApiServer:
 
     Examples
     --------
+    >>> import requests
     >>> from plantdb.server.test_rest_api import TestRestApiServer
-    >>> from plantdb.client.rest_api import request_scan_names_list
-    >>>
     >>> # EXAMPLE 1 - Create a test database and start the Flask App serving a REST API
     >>> server = TestRestApiServer(test=True)
     >>> server.start()
-    >>> scans_list = request_scan_names_list(server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> # Get a list of all datasets from the DB:
+    >>> response = requests.get("http://127.0.0.1:5000/scans")
+    >>> scans_list = response.json()
     >>> print(scans_list)
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
     >>> server.stop()
-    >>>
+
     >>> # EXAMPLE 2 - Serve an existing database
     >>> from plantdb.commons.test_database import test_database
     >>> test_db = test_database()  # set up a temporary test database
@@ -64,14 +66,16 @@ class TestRestApiServer:
     /tmp/ROMI_DB_********
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
-    >>> request_scan_names_list(host=server.host, port=server.port, prefix=server.prefix, ssl=server.ssl)
+    >>> # Get a list of all datasets from the DB:
+    >>> response = requests.get("http://127.0.0.1:5000/scans")
+    >>> scans_list = response.json()
     >>> print(scans_list)
     ['real_plant_analyzed']
     >>> server.stop()
     """
 
     def __init__(self, db_path=None, port=5000, host='127.0.0.1', prefix='', ssl=False, test=False, empty=False,
-                 models=False):
+                 models=False, logger=None):
         """Initialize the test REST API server.
 
         Parameters
@@ -92,19 +96,21 @@ class TestRestApiServer:
             Whether to create an empty database (default: False)
         models : bool, optional
             Whether to create a database with models (default: False)
+        logger : logging.logger, optional
+            A logger instance to use. By default, the logger will be set to the root logger.
         """
-        self.db_path = db_path if db_path else _mkdtemp_romidb()
-        self.port = port
-        self.host = host
-        self.prefix = prefix
-        self.ssl = ssl
-        self.test = test
-        self.empty = empty
-        self.models = models
+        self.db_path: Path = Path(db_path) if db_path else _mkdtemp_romidb()
+        self.port: int = port
+        self.host: str = host
+        self.prefix: str = prefix
+        self.ssl: bool = ssl
+        self.test: bool = test
+        self.empty: bool = empty
+        self.models: bool = models
         self.app = None
         self.server = None
         self.thread = None
-        self.logger = get_logger(__name__)
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__) or get_logger(__name__)
         self._setup_flask_app()
 
     def _setup_flask_app(self):
@@ -147,11 +153,11 @@ class TestRestApiServer:
         # Create server
         self.server = make_server(self.host, self.port, self.app, threaded=True)
 
-        # Start server in separate thread
+        # Start a server in a separate thread
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
 
-        # Wait a bit for server to start
+        # Wait a bit for the server to start
         time.sleep(0.5)
 
         self.logger.info(f"Test REST API server started at {self.get_base_url()}")
@@ -207,7 +213,7 @@ def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
     Parameters
     ----------
     db_path : str or pathlib.Path
-        Path to the database directory to serve
+        The path to the database directory to serve
     port : int, optional
         Port number for the server (default: 5000)
     host : str, optional
@@ -226,9 +232,9 @@ def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
     --------
     >>> from plantdb.commons.test_database import test_database
     >>> from plantdb.server.test_rest_api import test_rest_api
-    >>> # Create test database
+    >>> # Create a test database
     >>> db = test_database(dataset=None)
-    >>> # Create and start REST API server
+    >>> # Create and start a REST API server
     >>> api = test_rest_api(db.path(), port=8080)
     >>> api.start()
     >>> # Use the API
@@ -236,7 +242,7 @@ def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
     >>> # Stop the server
     >>> api.stop()
     >>>
-    >>> # Or use as context manager
+    >>> # Or use as a context manager
     >>> with test_rest_api(db.path(), port=8080) as api:
     ...     # API is running here
     ...     print(f"API URL: {api.get_base_url()}")

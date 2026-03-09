@@ -15,7 +15,7 @@ class TestWebCache(FSDBTestCase):
 
     def test_orig_image_path(self):
         db = self.get_test_db()
-        # Get the path to the original file using webcache module:
+        # Get the path to the original file using the webcache module:
         img_path = image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'orig')
         # Get the path to the original file using FSDB methods:
         img_file = db.get_scan('real_plant_analyzed').get_fileset('images').get_file('00000_rgb').path()
@@ -24,7 +24,7 @@ class TestWebCache(FSDBTestCase):
 
     def test_large_image_path(self):
         db = self.get_test_db()
-        # Get the path to the large file using webcache module:
+        # Get the path to the large file using the webcache module:
         img_path = image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'large')
         # Assert the folder containing the large image is 'webcache':
         self.assertEqual('webcache', img_path.parent.parts[-1])
@@ -34,7 +34,7 @@ class TestWebCache(FSDBTestCase):
 
     def test_thumb_image_path(self):
         db = self.get_test_db()
-        # Get the path to the thumb file using webcache module:
+        # Get the path to the thumb file using the webcache module:
         img_path = image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'thumb')
         # Assert the folder containing the thumb image is 'webcache':
         self.assertEqual('webcache', img_path.parent.parts[-1])
@@ -46,7 +46,7 @@ class TestWebCache(FSDBTestCase):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'PointCloud' task:
         fs_id = self.get_task_fileset_id('PointCloud')
-        # Get the path to the original file using webcache module:
+        # Get the path to the original file using the webcache module:
         pcd_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'PointCloud', 'orig')
         # Get the path to the original file using FSDB methods:
         pcd_file = db.get_scan('real_plant_analyzed').get_fileset(fs_id).get_file('PointCloud').path()
@@ -57,7 +57,7 @@ class TestWebCache(FSDBTestCase):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'PointCloud' task:
         fs_id = self.get_task_fileset_id('PointCloud')
-        # Get the path to the preview file using webcache module:
+        # Get the path to the preview file using the webcache module:
         pcd_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'PointCloud', 'preview')
         # Assert the folder containing the preview pcd is 'webcache':
         self.assertEqual('webcache', pcd_path.parent.parts[-1])
@@ -66,7 +66,7 @@ class TestWebCache(FSDBTestCase):
         db = self.get_test_db()
         # Get the name of the fileset containing the outputs of the 'TriangleMesh' task:
         fs_id = self.get_task_fileset_id('TriangleMesh')
-        # Get the path to the original file using webcache module:
+        # Get the path to the original file using the webcache module:
         mesh_path = pointcloud_path(db, 'real_plant_analyzed', fs_id, 'TriangleMesh', 'orig')
         # Get the path to the original file using FSDB methods:
         mesh_file = db.get_scan('real_plant_analyzed').get_fileset(fs_id).get_file('TriangleMesh').path()

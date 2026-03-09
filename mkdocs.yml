@@ -84,7 +84,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          import:
+          inventories:
             - https://docs.python.org/3/objects.inv
             - https://numpy.org/doc/stable/objects.inv
             - https://flask.palletsprojects.com/en/latest/objects.inv
@@ -94,19 +94,25 @@ plugins:
             - https://pytorch.org/docs/stable/objects.inv
             - http://www.open3d.org/docs/latest/objects.inv
           options:
+            allow_inspection: true
+            backlinks: tree
             docstring_style: numpy
             docstring_section_style: table
-            ignore_init_summary: true
+            parameter_headings: true
             merge_init_into_class: true
+            show_docstring_type_parameters: true
+            show_docstring_other_parameters: true
             show_docstring_examples: true
             show_docstring_raises: true
             signature_crossrefs: true
-            show_root_full_path: true
-            show_root_heading: true
-            show_category_heading: False
+            show_root_heading: false
+            show_root_full_path: false
+            show_root_members_full_path: false
+            show_object_full_path: false
+            show_category_heading: false
             show_bases: true
             separate_signature: true
-            show_symbol_type_heading: False
+            show_symbol_type_heading: true
             show_symbol_type_toc: true
             inherited_members: true
 

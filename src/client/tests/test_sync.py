@@ -13,7 +13,7 @@ from plantdb.commons.testing import DummyDBTestCase
 class TestSyncDummy(DummyDBTestCase):
     def test_sync_local_local(self):
         db = self.get_test_db()
-        db.dummy = False
+        db._is_dummy = False
         db.disconnect()
         with tempfile.TemporaryDirectory() as tmpdir:
             marker_path = Path(tmpdir) / MARKER_FILE_NAME

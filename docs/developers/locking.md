@@ -15,11 +15,11 @@
 
 Features:
 
-- **Shared (read) & exclusive (write) locks** – multiple readers may coexist, but writers have exclusive access.
-- **Timeouts** – configurable lock acquisition timeout to avoid deadlocks.
-- **Automatic cleanup** – stale lock files (_e.g._ from a crash) are purged on manager start.
-- **Metadata files** – optional `.info` files that record the lock holder, timestamp, PID, etc. Useful for debugging.
-- **Thread‑safe public API** – the manager uses an internal `threading.RLock` so you can call it from anywhere in the same process.
+- **Shared (read) & exclusive (write) locks** - multiple readers may coexist, but writers have exclusive access.
+- **Timeouts** - configurable lock acquisition timeout to avoid deadlocks.
+- **Automatic cleanup** - stale lock files (_e.g._ from a crash) are purged on manager start.
+- **Metadata files** - optional `.info` files that record the lock holder, timestamp, PID, etc. Useful for debugging.
+- **Thread‑safe public API** - the manager uses an internal `threading.RLock` so you can call it from anywhere in the same process.
 
 > **Why file locks?**  
 > They survive across process restarts and even across system reboots (as long as the underlying filesystem supports it). Unlike in‑memory mutexes, file locks are visible to any process that shares the same filesystem.
@@ -42,7 +42,7 @@ Features:
 ```python
 from plantdb.commons.fsdb.lock import ScanLockManager, LockType
 
-# Initialise manager – the .locks directory will be created automatically
+# Initialise manager - the .locks directory will be created automatically
 manager = ScanLockManager("/home/alice/scans")
 
 # 1. Read‑only operation (shared lock)
@@ -56,7 +56,7 @@ try:
         data = modify_scan("scan001")
         write_scan("scan001", data)
 except LockTimeoutError:
-    print("Could not obtain write lock – another process is writing")
+    print("Could not obtain write lock - another process is writing")
 ```
 
 ---
@@ -76,18 +76,18 @@ except LockTimeoutError:
 
 ## 5. Extending the System
 
-- **Custom lock file location** – override `_get_lock_file_path()` in a subclass.
-- **Different locking backends** – replace `fcntl.flock` with e.g. `portalocker` for cross‑platform support.
-- **Metadata hooks** – subclass `_write_lock_info()` to store additional context (e.g., user roles).
+- **Custom lock file location** - override `_get_lock_file_path()` in a subclass.
+- **Different locking backends** - replace `fcntl.flock` with e.g. `portalocker` for cross‑platform support.
+- **Metadata hooks** - subclass `_write_lock_info()` to store additional context (e.g., user roles).
 
 ---
 
 ## 6. Testing Strategy
 
-1. **Unit tests** – mock `fcntl` and file system interactions to test lock acquisition logic.
-2. **Integration tests** – spawn multiple processes that compete for the same lock; verify that exclusive writers block readers/writers as expected.
-3. **Crash simulation** – kill a process holding a lock and ensure the next startup cleans the stale file.
-4. **Timeout checks** – configure a very short timeout and confirm that a `LockTimeoutError` is raised when contention is high.
+1. **Unit tests** - mock `fcntl` and file system interactions to test lock acquisition logic.
+2. **Integration tests** - spawn multiple processes that compete for the same lock; verify that exclusive writers block readers/writers as expected.
+3. **Crash simulation** - kill a process holding a lock and ensure the next startup cleans the stale file.
+4. **Timeout checks** - configure a very short timeout and confirm that a `LockTimeoutError` is raised when contention is high.
 
 ---
 

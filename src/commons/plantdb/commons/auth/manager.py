@@ -4,7 +4,7 @@
 """
 User and Group Management Module
 
-This module provides two primary classes – `UserManager` and `GroupManager` – to handle
+This module provides two primary classes - `UserManager` and `GroupManager` - to handle
 authentication, authorization, and role‑based access control in a lightweight
 file‑based persistence system. User data, including hashed passwords, roles,
 and lock‑out state, is stored in a JSON file, while group membership and
@@ -20,7 +20,7 @@ Key Features
 - **User activation/deactivation** and role assignment.
 - **Group management**: create, delete, add/remove users, and query memberships.
 - **Atomic JSON persistence** to avoid data corruption.
-- **Minimal dependencies** – relies only on the standard library plus `argon2`.
+- **Minimal dependencies** - relies only on the standard library plus `argon2`.
 
 Usage Examples
 --------------
@@ -51,12 +51,26 @@ from typing import Set
 from typing import Union
 
 from argon2 import PasswordHasher
+
 from plantdb.commons.auth.models import Group
 from plantdb.commons.auth.models import Role
+from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
 from plantdb.commons.log import get_logger
 
 ph = PasswordHasher()
+
+
+#: Exception for duplicate users
+class UserExistsError(Exception):
+    """Raised when attempting to create a user that already exists."""
+    pass
+
+
+#: Exception for duplicate group
+class GroupExistsError(Exception):
+    """Raised when attempting to create a group that already exists."""
+    pass
 
 
 class UserManager(object):
@@ -242,7 +256,7 @@ class UserManager(object):
             The full name of the user to create.
         password : str
             The password of the user to create.
-        roles : Role or Set[Role], optional
+        roles : plantdb.commons.auth.models.Role or Set[plantdb.commons.auth.models.Role], optional
             The roles to associate with the user.
             If ``None`` (default), use the `Role.READER` role.
 
@@ -262,7 +276,7 @@ class UserManager(object):
             assert not self.exists(username)
         except AssertionError:
             self.logger.error(f"User '{username}' already exists!")
-            return
+            raise UserExistsError(f"User '{username}' already exists")
 
         # Convert to a list:
         if isinstance(roles, Role):
@@ -339,7 +353,7 @@ class UserManager(object):
             print("Change it as soon as possible!")
         return
 
-    def get_user(self, username: str) -> Union[User, None]:
+    def get_user(self, username: str) -> User | None:
         """Retrieve a User object based on the provided username.
 
         Parameters
@@ -349,16 +363,74 @@ class UserManager(object):
 
         Returns
         -------
-        Union[User, None]
-            An instance of the User class representing the requested user.
-            If it does not exist, `None` is returned.
+        plantdb.commons.auth.models.User | None
+            An instance of the ``User`` class representing the requested user.
+            If it does not exist, ``None`` is returned.
         """
         if not self.exists(username):
             self.logger.error(f"User '{username}' does not exist!")
             return None
         return self.users[username]
 
-    def is_locked_out(self, username) -> bool:
+    def get_token_user(self, token_payload: dict) -> TokenUser | None:
+        """Retrieve a User object based on the provided username.
+
+        Parameters
+        ----------
+        token_payload : dict
+            The token containing the identifier for the user to be retrieved and special permissions.
+            Must be a token with the type `'api'`.
+
+        Returns
+        -------
+        TokenUser | None
+            An instance of the ``User`` class representing the requested user.
+            If it does not exist, ``None`` is returned.
+
+        Raises
+        ------
+        TypeError
+            If the provided token payload does not correspond to an api token.
+        """
+        if token_payload["type"] != "api":
+            self.logger.error("Provided token is not an api token!")
+            raise TypeError("Provided token is not an api token!")
+        username = token_payload.get('username')
+        if username not in self.users:
+            self.logger.error(f"User '{username}' does not exist!")
+            return None
+        user = self.users[username]
+
+        self.logger.debug(f"Creating TokenUser for user '{username}'...")
+        self.logger.debug(f"Dataset permission requested: {token_payload.get('datasets')}")
+        return TokenUser(**user.to_dict(), dataset_permissions=token_payload.get("datasets"))
+
+    def get_user_from_decoded_token(self, token_payload: dict) -> User | TokenUser | None:
+        """Extract a user representation from a decoded JWT payload.
+
+        Parameters
+        ----------
+        token_payload
+            The decoded JWT payload as a ``dict``. It must contain a ``"type"`` entry and,
+            for ``"access"`` or ``"refresh"`` tokens, a ``"username"`` entry.
+
+        Returns
+        -------
+        User | TokenUser | None
+            * ``User``: when ``token_type`` is ``"access"`` or ``"refresh"``.
+            * ``TokenUser``: when ``token_type`` is ``"api"``.
+            * ``None``: when ``token_type`` is not recognized; an error is logged.
+        """
+        token_type = token_payload["type"]
+        if token_type == "api":
+            return self.get_token_user(token_payload)
+        elif token_type in ["access", "refresh"]:
+            return self.get_user(token_payload["username"])
+        else:
+            self.logger.error(f"Token type '{token_type}' does not exist!")
+            return None
+
+    def is_locked_out(self, username: str) -> bool:
         """Check if an account is locked.
 
         Parameters
@@ -377,7 +449,7 @@ class UserManager(object):
             self.logger.info(f"Account {username} is locked, try logging in after {user.locked_until}.")
         return is_locked
 
-    def is_active(self, username) -> bool:
+    def is_active(self, username: str) -> bool:
         """Check whether a user account is active.
 
         Parameters
@@ -414,7 +486,7 @@ class UserManager(object):
         """
         pw_hash = self.get_user(username).password_hash
         try:
-            # Verify password, raises exception if wrong.
+            # Verify password, raises an exception if wrong.
             ph.verify(pw_hash, password)
         except Exception as e:
             self.logger.error(f"Failed to verify password for {username}: {e}")

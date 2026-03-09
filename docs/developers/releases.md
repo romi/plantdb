@@ -17,11 +17,11 @@ Version numbers are expressed as `X.Y.Z`.
 
 The Git‑Flow model defines several branch types:
 
-- **main** – Production code
-- **dev** – Main integration branch for development
-- **feature/*** – Branches for developing new features (branched from `dev`)
-- **release/*** – Temporary branches to prepare releases (`dev` → `main`)
-- **hotfix/*** – Branches to quickly fix critical production bugs (branched from `main`)
+- **main** - Production code
+- **dev** - Main integration branch for development
+- **feature/*** - Branches for developing new features (branched from `dev`)
+- **release/*** - Temporary branches to prepare releases (`dev` → `main`)
+- **hotfix/*** - Branches to quickly fix critical production bugs (branched from `main`)
 
 Git‑Flow also provides commands for managing these branch types:
 

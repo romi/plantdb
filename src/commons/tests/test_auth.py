@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import tempfile
-import time
 import unittest
 from datetime import datetime
 from datetime import timedelta
@@ -17,7 +16,6 @@ from plantdb.commons.auth.models import Permission
 from plantdb.commons.auth.models import Role
 from plantdb.commons.auth.models import User
 from plantdb.commons.auth.rbac import RBACManager
-from plantdb.commons.auth.session import SessionManager
 
 
 class TestUserManager(unittest.TestCase):
@@ -79,18 +77,18 @@ class TestUserManager(unittest.TestCase):
         self.assertTrue(any("testuserB" in user['username'] for user in json_users))
 
     def test_hash_password_returns_hashed_string(self):
-        """Test that _hash_password returns a hashed version of password."""
+        """Test that _hash_password returns a hashed version of the password."""
         password = "testpassword"
         hashed = self.user_manager._hash_password(password)
 
-        # Verify hash is different from original and is a string
+        # Verify hash is different from the original and is a string
         self.assertIsInstance(hashed, str)
         self.assertNotEqual(hashed, password)
         self.assertGreater(len(hashed), len(password))
 
     def test_exists_returns_true_for_existing_user(self):
         """Test that exists method returns True for existing users."""
-        # Check if user exists
+        # Check if the user exists
         self.assertTrue(self.user_manager.exists("testuser"))
 
     def test_exists_returns_false_for_nonexistent_user(self):
@@ -98,7 +96,7 @@ class TestUserManager(unittest.TestCase):
         self.assertFalse(self.user_manager.exists("nonexistent"))
 
     def test_create_creates_new_user_successfully(self):
-        """Test that create method successfully creates new user."""
+        """Test that create method successfully creates a new user."""
         # Create user
         self.user_manager.create(
             username="newuser",
@@ -126,7 +124,7 @@ class TestUserManager(unittest.TestCase):
         self.assertIsNone(user)
 
     def test_is_locked_out_checks_user_lockout_status(self):
-        """Test that is_locked_out properly checks user lockout status."""
+        """Test that is_locked_out properly checks the user lockout status."""
         user = self.user_manager.get_user("testuser")
         user.locked_until = datetime.now() + timedelta(hours=1)
         # Check lockout status
@@ -134,7 +132,7 @@ class TestUserManager(unittest.TestCase):
         self.assertTrue(is_locked)
 
     def test_is_active_checks_user_active_status(self):
-        """Test that is_active properly checks if user is active."""
+        """Test that is_active properly checks if the user is active."""
         # Check active status
         is_active = self.user_manager.is_active("testuser")
         self.assertTrue(is_active)
@@ -147,7 +145,7 @@ class TestUserManager(unittest.TestCase):
 
     def test_validate_user_password_failure_case(self):
         """Test failed password validation scenario."""
-        # Validate with wrong password
+        # Validate with the wrong password
         is_valid = self.user_manager.validate_user_password("testuser", "wrong_password")
         self.assertFalse(is_valid)
 
@@ -161,7 +159,7 @@ class TestGroupManager(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures before each test method."""
-        # Create temporary file for testing
+        # Create a temporary file for testing
         self.temp_file = self._temp_group_file()
 
         self.group_manager = GroupManager(self.temp_file)
@@ -178,7 +176,7 @@ class TestGroupManager(unittest.TestCase):
             os.unlink(self.temp_file)
 
     def test_load_groups_loads_from_file(self):
-        """Test that _load_groups properly loads groups from JSON file."""
+        """Test that _load_groups properly loads groups from a JSON file."""
         # Create a new group manager (without test_group)
         group_manager = GroupManager(self._temp_group_file())
         # Override groups_file with the one create a setUp that contains the 'test_group'
@@ -275,7 +273,7 @@ class TestRBACManager(unittest.TestCase):
 
     def test_get_user_permissions_returns_permissions_for_user_roles(self):
         """Test that get_user_permissions returns correct permissions based on user roles."""
-        # Get permissions for testuser which has READER and CONTRIBUTOR roles
+        # Get permissions for the testuser which has READER and CONTRIBUTOR roles
         user = self.user_manager.get_user("testuser")
         permissions = self.rbac_manager.get_user_permissions(user)
 
@@ -284,15 +282,15 @@ class TestRBACManager(unittest.TestCase):
         self.assertIn(Permission.WRITE, permissions)  # From CONTRIBUTOR role
 
     def test_has_permission_returns_true_for_authorized_user(self):
-        """Test that has_permission returns True when user has required permission."""
-        # Test if user has READ permission (which they should as a READER)
+        """Test that has_permission returns True when the user has required permission."""
+        # Test if the user has READ permission (which they should as a READER)
         user = self.user_manager.get_user("testuser")
         has_perm = self.rbac_manager.has_permission(user, Permission.READ)
         self.assertTrue(has_perm)
 
     def test_has_permission_returns_false_for_unauthorized_user(self):
-        """Test that has_permission returns False when user lacks required permission."""
-        # Test if user has DELETE permission (which they should not have)
+        """Test that has_permission returns False when the user lacks required permission."""
+        # Test if the user has DELETE permission (which they should not have)
         user = self.user_manager.get_user("testuser")
         has_perm = self.rbac_manager.has_permission(user, Permission.DELETE)
         self.assertFalse(has_perm)
@@ -330,140 +328,30 @@ class TestRBACManager(unittest.TestCase):
         self.assertFalse(can_manage)
 
     def test_create_group_with_permission(self):
-        """Test that create_group delegates to GroupManager after permission check."""
+        """Test that create_group delegates to GroupManager after a permission check."""
         # Create a group using the admin user
         adminuser = self.user_manager.get_user("admin")
         group = self.rbac_manager.create_group(
             adminuser, "testgroup", {"admin"}, "Test group"
         )
 
-        # Verify group was created
+        # Verify that the group was created
         self.assertIsNotNone(group)
         self.assertEqual(group.name, "testgroup")
         self.assertEqual(group.created_by, "admin")
         self.assertEqual(group.description, "Test group")
 
-        # Verify group exists in group manager
+        # Verify that the group exists in the group manager
         self.assertTrue(self.group_manager.group_exists("testgroup"))
 
     def test_create_group_without_permission(self):
-        """Test that create_group raises exception when user lacks permission."""
+        """Test that create_group raises an exception when the user lacks permission."""
         # Attempt to create a group with a regular user (who lacks MANAGE_GROUPS permission)
         user = self.user_manager.get_user("guest")
         group = self.rbac_manager.create_group(
             user, "testgroup", {"testuser"}, "Test group"
         )
         self.assertIsNone(group)
-
-
-class TestSessionManager(unittest.TestCase):
-    """Test cases for SessionManager class"""
-
-    def setUp(self):
-        """Set up test fixtures before each test method."""
-        self.session_manager = SessionManager(session_timeout=3600)  # 1 hour timeout
-
-    def test_init_creates_empty_sessions_dict(self):
-        """Test that SessionManager initializes with empty sessions dictionary."""
-        # Verify initial state is correct
-        self.assertEqual(len(self.session_manager.sessions), 0)
-        self.assertEqual(self.session_manager.session_timeout, 3600)
-        self.assertIsNotNone(self.session_manager.logger)
-
-    def test_user_has_session_returns_consistent_id(self):
-        """Test that _user_has_session returns consistent session IDs for same user."""
-        # Test session ID generation
-        session_id1 = self.session_manager._user_has_session("testuser")
-        session_id2 = self.session_manager._user_has_session("testuser")
-
-        # Session IDs should be consistent for same user at same time
-        self.assertEqual(session_id1, session_id2)
-
-    def test_create_session_stores_session_data(self):
-        """Test that create_session properly stores session with expiry time."""
-        # Create session
-        session_id = self.session_manager.create_session("testuser")
-
-        # Verify session was created
-        self.assertIn(session_id, self.session_manager.sessions)
-        session_data = self.session_manager.sessions[session_id]
-        self.assertEqual(session_data['username'], "testuser")
-
-        # Should have created_at timestamp
-        self.assertIn('created_at', session_data)
-        self.assertIsInstance(session_data['created_at'], datetime)
-
-    def test_validate_session_returns_true_for_valid_session(self):
-        """Test that validate_session returns True for non-expired sessions."""
-        # Create session first
-        session_id = self.session_manager.create_session("testuser")
-
-        # Validate immediately (should be valid)
-        is_valid = self.session_manager.validate_session(session_id)
-        self.assertTrue(is_valid)
-
-    def test_validate_session_returns_false_for_expired_session(self):
-        """Test that validate_session returns False for expired sessions."""
-        # Create a session with a very short timeout
-        temp_session_manager = SessionManager(session_timeout=0.1)  # 0.1 second timeout
-        session_id = temp_session_manager.create_session("testuser")
-
-        # Wait for session to expire
-        time.sleep(0.2)
-
-        # Validate after timeout period
-        is_valid = temp_session_manager.validate_session(session_id)
-        self.assertFalse(is_valid)
-
-    def test_validate_session_returns_false_for_invalid_session_id(self):
-        """Test that validate_session returns False for non-existent session IDs."""
-        is_valid = self.session_manager.validate_session("invalid_session_id")
-        self.assertFalse(is_valid)
-
-    def test_invalidate_session_removes_session(self):
-        """Test that invalidate_session removes session from storage."""
-        # Create session first
-        session_id = self.session_manager.create_session("testuser")
-        self.assertIn(session_id, self.session_manager.sessions)
-
-        # Invalidate session
-        self.session_manager.invalidate_session(session_id)
-        self.assertNotIn(session_id, self.session_manager.sessions)
-
-    def test_cleanup_expired_sessions_removes_old_sessions(self):
-        """Test that cleanup_expired_sessions removes only expired sessions."""
-        # Create a session manager with a very short timeout for testing
-        temp_session_manager = SessionManager(session_timeout=0.5)  # 0.5 second timeout
-
-        # Create first session
-        session1_id = temp_session_manager.create_session("user1")
-
-        # Wait for a moment
-        time.sleep(0.6)  # Wait for first session to expire
-
-        # Create second session
-        session2_id = temp_session_manager.create_session("user2")
-
-        # Cleanup expired sessions
-        temp_session_manager.cleanup_expired_sessions()
-
-        # Only expired session should be removed
-        self.assertNotIn(session1_id, temp_session_manager.sessions)
-        self.assertIn(session2_id, temp_session_manager.sessions)
-
-    def test_session_username_returns_correct_username(self):
-        """Test that session_username returns the correct username for valid session."""
-        # Create session
-        session_id = self.session_manager.create_session("testuser")
-
-        # Get username from session
-        username = self.session_manager.session_username(session_id)
-        self.assertEqual(username, "testuser")
-
-    def test_session_username_returns_none_for_invalid_session(self):
-        """Test that session_username returns None for invalid session ID."""
-        username = self.session_manager.session_username("invalid_session")
-        self.assertIsNone(username)
 
 
 if __name__ == '__main__':

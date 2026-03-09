@@ -79,7 +79,7 @@ def _load_scan(db, scan_id):
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database instance to use to list the ``Scan``.
     scan_id : str
         The name of the scan to load.
@@ -147,7 +147,7 @@ def _load_scans(db):
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database instance to use to list the ``Scan``.
 
     Returns

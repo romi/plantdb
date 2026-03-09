@@ -231,9 +231,8 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
-def _get_archive(archive, force=False):
-    """
-    Download and verify an archive file from a given URL.
+def _get_archive(archive, force=False) :
+    """Download and verify an archive file from a given URL.
 
     This function retrieves an archive file from a specified URL.
     If the file already exists locally and `force` is not set to ``True``, it skips downloading again,
@@ -547,7 +546,7 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The FSDB test database.
 
     Examples
@@ -587,7 +586,7 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The dummy database.
 
     Notes
