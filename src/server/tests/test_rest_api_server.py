@@ -18,8 +18,8 @@ class RestApiServerTests(unittest.TestCase):
         # Start a test server with the built-in test dataset
         cls.server = TestRestApiServer(db_path=_mkdtemp_romidb(), test=True)
         cls.server.start()
-        # Wait briefly for server
-        for _ in range(100):
+        # Wait briefly for the server to start
+        for _ in range(10):
             try:
                 r = requests.get(cls.server.get_base_url() + "/health")
                 if r.status_code == 200:
@@ -44,7 +44,7 @@ class RestApiServerTests(unittest.TestCase):
         r = requests.post(self.server.get_base_url() + '/login',
                           json={'username': 'anonymous', 'password': 'AlanMoore'})
         self.assertEqual(r.status_code, 401)
-        # First attempt without login should fail
+        # The first attempt without a login should fail
         r = requests.post(self.server.get_base_url() + '/logout')
         self.assertEqual(r.status_code, 401)
 
@@ -82,10 +82,9 @@ class RestApiServerTests(unittest.TestCase):
         # Use first scan
         scans = self.client.list_scans()
         scan_id = scans[0]
-        r = requests.get(self.server.get_base_url() + f"/api/scan/{scan_id}/metadata")
+        r = requests.get(self.server.get_base_url() + f"/scan/{scan_id}/metadata")
         self.assertEqual(r.status_code, 200)
         info = r.json()
-        print(info)
         self.assertIn("metadata", info)
         self.assertIn("owner", info['metadata'])
 
@@ -173,7 +172,7 @@ class RestApiServerTests(unittest.TestCase):
             r = requests.post(self.server.get_base_url() + f'/archive/{new_dataset}', files=files)
             self.assertEqual(r.status_code, 401)
 
-            # Ensure file pointer is at the beginning before second request
+            # Ensure the file pointer is at the beginning before the second request
             zip_f.seek(0)
 
             # Test POST with proper authentication

@@ -231,9 +231,8 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
-def _get_archive(archive, force=False):
-    """
-    Download and verify an archive file from a given URL.
+def _get_archive(archive, force=False) :
+    """Download and verify an archive file from a given URL.
 
     This function retrieves an archive file from a specified URL.
     If the file already exists locally and `force` is not set to ``True``, it skips downloading again,
@@ -547,7 +546,7 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The FSDB test database.
 
     Examples
@@ -562,10 +561,11 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
+    session_manager = kwargs.pop('session_manager', None)
     if dataset is None:
-        return FSDB(setup_empty_database(db_path=db_path))
+        return FSDB(setup_empty_database(db_path=db_path), session_manager=session_manager)
     else:
-        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs))
+        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs), session_manager=session_manager)
 
 
 def dummy_db(with_scan=False, with_fileset=False, with_file=False):
@@ -586,20 +586,24 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
 
     Returns
     -------
-    plantdb.commons.fsdb.FSDB
+    plantdb.commons.fsdb.core.FSDB
         The dummy database.
 
     Notes
     -----
-    - Returns a 'connected' database, no need to call the `connect()` method.
-    - Uses the 'anonymous' user to login.
+    - Returns a 'connected' database, no need to call the ``connect()`` method.
+    - Uses the 'admin' user to login.
+    - Calling the ``disconnect()`` method will clean up the associated temporary directory.
 
     Examples
     --------
     >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
-    INFO     [plantdb.commons.fsdb] Already connected as 'anonymous' to the database '/tmp/romidb_********'!
+    INFO     [FSDB] Connected to database successfully
+    >>> from plantdb.commons.fsdb.core import get_logged_username
+    >>> get_logged_username(db)  # 'admin' is logged by default
+    'admin'
     >>> print(db.path())  # the database directory
     /tmp/romidb_********
     >>> print(db.list_scans())
@@ -628,6 +632,8 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     marker_file.open(mode='w').close()
     # Create the FSDB instance and connect
     db = FSDB(db_path, required_filesets=[], session_manager=SingleSessionManager())
+    # Flag this instance as a dummy DB so that disconnect will clean up the temp folder
+    db._is_dummy = True
     db.connect()
     # Login as adin to get all the rights (to create and edit)
     _ = db.login('admin', 'admin')

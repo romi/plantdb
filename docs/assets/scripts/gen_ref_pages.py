@@ -49,10 +49,14 @@ logger = logging.getLogger("API Builder")
 SUBPACKAGES = ['commons', 'server', 'client']
 
 # Define the source directory where the Python code resides
-src = Path(__file__).parent.parent.parent.parent / "src"
+# src = Path(__file__).parent.parent.parent.parent / "src"  # manual call
+src = Path.cwd() / "src"  # used with mkdocs serve
 logger.info(f"Browsing source code in {src}...")
 
 def scan_src_path(src_path, subpackage):
+    if not src_path.exists():
+        logger.warning(f"Directory {src_path} does not exist. Skipping...")
+        return
     # Recursively scan all Python files in the source directory
     for path in sorted(src_path.rglob("*.py")):
         logger.info(f"Processing {Path(path).relative_to(src_path)}...")
@@ -64,7 +68,7 @@ def scan_src_path(src_path, subpackage):
         full_doc_path = Path("reference", doc_path)
 
         # Extract the individual path parts (used for navigation hierarchy)
-        parts = tuple([subpackage]) + tuple(module_path.parts)
+        parts = tuple([subpackage]) + module_path.parts
 
         # Special handling for __init__.py: treat as index.md in navigation
         if parts[-1] == "__init__":

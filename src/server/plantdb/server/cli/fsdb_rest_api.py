@@ -43,8 +43,11 @@ Environment Variables
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
-- ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (32 bits secret).
-- ``JWT_SECRET_KEY``: The secret key to use with JWT token generator. Default to random (32 bits secret).
+- ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (64 bits secret).
+- ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (64 bits secret).
+- ``SESSION_TIMEOUT``: Session JWT validity duration in seconds. Default `900` seconds (15 min).
+- ``REFRESH_TIMEOUT``: Refresh JWT validity duration in seconds. Default `86400` seconds (1 day).
+- ``MAX_SESSION``: The maximum number of concurrent sessions to allow. Default `10`.
 
 Usage Examples
 --------------
@@ -60,13 +63,6 @@ To run the server with a temporary test database in debug mode:
 python fsdb_rest_api.py --test --debug
 ```
 
-RESTful endpoints include:
-- `/scans`: List all scans available in the database.
-- `/files/<path:path>`: Retrieve files from the database.
-- `/image/<scan_id>/<fileset_id>/<file_id>`: Access specific images.
-- `/pointcloud/<scan_id>/<fileset_id>/<file_id>`: Access specific point clouds.
-- `/mesh/<scan_id>/<fileset_id>/<file_id>`: Retrieve related meshes.
-
 For detailed command-line parameters, use the `--help` flag:
 ```shell
 python fsdb_rest_api.py --help
@@ -77,7 +73,6 @@ import argparse
 import atexit
 import logging
 import os
-import secrets
 import shutil
 import sys
 from pathlib import Path
@@ -91,45 +86,45 @@ from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from plantdb.commons.auth.session import JWTSessionManager
+from plantdb.commons.auth.session import _init_secret_key
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
 from plantdb.commons.test_database import DATASET
 from plantdb.commons.test_database import test_database
-from plantdb.server.rest_api import Archive
-from plantdb.server.rest_api import CurveSkeleton
-from plantdb.server.rest_api import DatasetFile
-from plantdb.server.rest_api import File
-from plantdb.server.rest_api import FileCreate
-from plantdb.server.rest_api import FileMetadata
-from plantdb.server.rest_api import FilesetCreate
-from plantdb.server.rest_api import FilesetFiles
-from plantdb.server.rest_api import FilesetMetadata
-from plantdb.server.rest_api import HealthCheck
-from plantdb.server.rest_api import Home
-from plantdb.server.rest_api import Image
-from plantdb.server.rest_api import Login
-from plantdb.server.rest_api import Logout
-from plantdb.server.rest_api import Mesh
-from plantdb.server.rest_api import PointCloud
-from plantdb.server.rest_api import PointCloudGroundTruth
-from plantdb.server.rest_api import Refresh
-from plantdb.server.rest_api import Register
-from plantdb.server.rest_api import Scan
-from plantdb.server.rest_api import ScanCreate
-from plantdb.server.rest_api import ScanFilesets
-from plantdb.server.rest_api import ScanMetadata
-from plantdb.server.rest_api import ScansList
-from plantdb.server.rest_api import ScansTable
-from plantdb.server.rest_api import Sequence
-from plantdb.server.rest_api import TokenRefresh
-from plantdb.server.rest_api import TokenValidation
+from plantdb.server.api.assets import Archive
+from plantdb.server.api.assets import CurveSkeleton
+from plantdb.server.api.assets import DatasetFile
+from plantdb.server.api.assets import FilePath
+from plantdb.server.api.file import File
+from plantdb.server.api.file import FileMetadata
+from plantdb.server.api.fileset import Fileset
+from plantdb.server.api.fileset import FilesetFiles
+from plantdb.server.api.fileset import FilesetMetadata
+from plantdb.server.api.base import HealthCheck
+from plantdb.server.api.base import Home
+from plantdb.server.api.assets import Image
+from plantdb.server.api.auth import Login
+from plantdb.server.api.auth import CreateApiToken
+from plantdb.server.api.auth import Logout
+from plantdb.server.api.assets import Mesh
+from plantdb.server.api.assets import PointCloud
+from plantdb.server.api.assets import PointCloudGroundTruth
+from plantdb.server.api.base import Refresh
+from plantdb.server.api.auth import Register
+from plantdb.server.api.scan import Scan
+from plantdb.server.api.scan import ScanFilesets
+from plantdb.server.api.scan import ScanMetadata
+from plantdb.server.api.scan import ScansList
+from plantdb.server.api.scan import ScansTable
+from plantdb.server.api.assets import Sequence
+from plantdb.server.api.auth import TokenRefresh
+from plantdb.server.api.auth import TokenValidation
 
 
 def parsing() -> argparse.ArgumentParser:
-    """
-    Create and configure an argument parser for a REST API server.
+    """Create and configure an argument parser for a REST API server.
 
     Returns
     -------
@@ -166,8 +161,7 @@ def parsing() -> argparse.ArgumentParser:
 
 
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
-    """
-    Retrieve a secret from the environment or generate a new one if missing.
+    """Retrieve a secret from the environment or generate a new one if missing.
 
     Parameters
     ----------
@@ -185,13 +179,12 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     if secret is None:
         logger.warning(f"No secret key was provided for {var_name}.")
         logger.info(f"Set one with the '{var_name}' environment variable or let the server generate a random one.")
-        secret = secrets.token_urlsafe(32)
+    secret = _init_secret_key(secret)
     return secret
 
 
 def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
-    """
-    Create and configure a Flask application instance.
+    """Create and configure a Flask application instance.
 
     Parameters
     ----------
@@ -202,7 +195,7 @@ def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
 
     Returns
     -------
-    Flask
+    flask.Flask
         The configured Flask application.
     """
     app = Flask(__name__)
@@ -221,7 +214,7 @@ def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Log
 
     Parameters
     ----------
-    app : Flask
+    app : flask.Flask
         The Flask application to extend.
     proxy : bool
         Whether the server is behind a reverse proxy.
@@ -259,16 +252,23 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
     db_path : Optional[Union[str, Path]]
         Existing database location or ``None`` to create a temp folder.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
 
     Returns
     -------
     Path
-        Path to the created test database.
+        The path to the created test database.
     """
+    jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
+    session_timeout = int(os.getenv("SESSION_TIMEOUT", 3600))
+    max_sessions = int(os.getenv("MAX_SESSION", 10))
     if empty:
         logger.info("Setting up a temporary test database without any datasets or configurations...")
-        db_path = test_database(None, db_path=db_path).path()
+        db_path = test_database(
+            None, db_path=db_path,
+            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
+                                              max_concurrent_sessions=max_sessions)
+        ).path()
     else:
         logger.info("Setting up a temporary test database with sample datasets and configurations...")
         db_path = test_database(
@@ -276,12 +276,14 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
             db_path=db_path,
             with_configs=True,
             with_models=models,
+            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
+                                              max_concurrent_sessions=max_sessions)
         ).path()
     return Path(db_path)
 
 
 def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
-    """Register all RESTful resources with the Flask-RESTful API.
+    """Register all resources with the Flask-RESTful API.
 
     Parameters
     ----------
@@ -290,7 +292,7 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     db : FSDB
         The database connection.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
     """
     api.add_resource(
         Home,
@@ -299,12 +301,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         HealthCheck,
         "/health",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         ScansList,
         "/scans",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         ScansTable,
@@ -312,34 +314,29 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
         resource_class_args=(db, logger)
     )
     api.add_resource(
-        Scan,
-        "/scans/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        File,
+        FilePath,
         "/files/<path:path>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         DatasetFile,
         "/files/<string:scan_id>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Refresh,
         "/refresh",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Image,
         "/image/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         PointCloud,
         "/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         PointCloudGroundTruth,
@@ -349,12 +346,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         Mesh,
         "/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
+        resource_class_args=(db, logger),
     )
     api.add_resource(
         CurveSkeleton,
         "/skeleton/<string:scan_id>",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Sequence,
@@ -370,12 +367,12 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         Register,
         "/register",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Login,
         "/login",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         Logout,
@@ -385,54 +382,59 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     api.add_resource(
         TokenRefresh,
         "/token-refresh",
-        resource_class_args=(db,)
+        resource_class_args=(db, logger)
     )
     api.add_resource(
         TokenValidation,
         "/token-validation",
         resource_class_args=(db, logger)
     )
+    api.add_resource(
+        CreateApiToken,
+        "/create-api-token",
+        resource_class_args=(db, logger)
+    )
     # Scan CRUD
     api.add_resource(
-        ScanCreate,
-        "/api/scan",
+        Scan,
+        "/scan/<string:scan_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         ScanMetadata,
-        "/api/scan/<string:scan_id>/metadata",
+        "/scan/<string:scan_id>/metadata",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         ScanFilesets,
-        "/api/scan/<string:scan_id>/filesets",
+        "/scan/<string:scan_id>/filesets",
         resource_class_args=(db, logger)
     )
     # Fileset CRUD
     api.add_resource(
-        FilesetCreate,
-        "/api/fileset",
+        Fileset,
+        "/fileset/<string:scan_id>/<string:fileset_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         FilesetMetadata,
-        "/api/fileset/<string:scan_id>/<string:fileset_id>/metadata",
+        "/fileset/<string:scan_id>/<string:fileset_id>/metadata",
         resource_class_args=(db, logger),
     )
     api.add_resource(
         FilesetFiles,
-        "/api/fileset/<string:scan_id>/<string:fileset_id>/files",
+        "/fileset/<string:scan_id>/<string:fileset_id>/files",
         resource_class_args=(db, logger),
     )
     # File CRUD
     api.add_resource(
-        FileCreate,
-        "/api/file",
+        File,
+        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>",
         resource_class_args=(db, logger)
     )
     api.add_resource(
         FileMetadata,
-        "/api/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
+        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
         resource_class_args=(db, logger),
     )
 
@@ -506,9 +508,17 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 4 - Database connection
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
+    session_timeout = int(os.getenv("SESSION_TIMEOUT", 3600))
+    refresh_timeout = int(os.getenv("REFRESH_TIMEOUT", 86400))
+    max_sessions = int(os.getenv("MAX_SESSION", 10))
     db = FSDB(
         db_path,
-        session_manager=JWTSessionManager(secret_key=jwt_key),
+        session_manager=JWTSessionManager(
+            secret_key=jwt_key,
+            session_timeout=session_timeout,
+            refresh_timeout=refresh_timeout,
+            max_concurrent_sessions=max_sessions,
+        ),
     )
     logger.info(f"Connecting to local plant database at '{db.path()}'.")
     db.connect()

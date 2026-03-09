@@ -46,7 +46,7 @@ def add_metadata_to_scan(db, scan_id, metadata):
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         A local database instance hosting the ``Scan`` instance.
     scan_id : str
         The identifier of the ``Scan`` instance in the local database.

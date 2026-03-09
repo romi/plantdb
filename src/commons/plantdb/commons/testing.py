@@ -67,7 +67,7 @@ class DummyDBTestCase(unittest.TestCase):
 
     Attributes
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The temporary directory.
     tmpclone : plantdb.commons.testing.TemporaryCloneDB
         A local temporary copy of a dummy test database.
@@ -149,7 +149,7 @@ class FSDBTestCase(unittest.TestCase):
 
     Attributes
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The temporary test database with the 'real_plant_analyzed' dataset.
     """
 
@@ -169,6 +169,7 @@ class FSDBTestCase(unittest.TestCase):
     def get_test_db(self) -> FSDB:
         """Return the test ``FSDB`` database."""
         self.db.connect()
+        self.db.login('guest', 'guest')
         return self.db
 
     def get_test_scan(self):

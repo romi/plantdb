@@ -26,9 +26,13 @@ True
 import datetime
 import json
 from dataclasses import dataclass
+from dataclasses import field
 from datetime import datetime
 from datetime import timezone
 from enum import Enum
+from fnmatch import fnmatchcase
+from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Set
 
@@ -77,6 +81,167 @@ class Permission(Enum):
     MANAGE_USERS = "manage_users"
     MANAGE_GROUPS = "manage_groups"
 
+    def __eq__(self, other: Any) -> bool:
+        """Equality operator.
+        
+        Parameters
+        ----------
+        other : Any
+            Object to compare with the permission instance.
+            If a string is provided, it is interpreted as a permission name and converted to a
+            ``Permission`` instance for comparison.
+
+        Returns
+        -------
+        bool
+            ``True`` if ``other`` represents the same permission as ``self``, otherwise ``False``.
+
+        Notes
+        -----
+        The method safely handles objects that do not expose a ``value`` attribute.
+        This ensures that comparisons with unrelated types do not raise unexpected exceptions.
+        """
+        if isinstance(other, str):
+            try:
+                return Permission.from_string(other) == self
+            except ValueError:
+                return False
+        else:
+            try:
+                return other.value == self.value
+            except AttributeError:
+                return False
+
+    def __hash__(self):
+        return hash(self.value)
+
+    @classmethod
+    def from_string(cls, s: str) -> "Permission":
+        """Convert a string to a `Permission` member.
+
+        The function is tolerant of the following inputs:
+        * the plain enum *value* (`"read"`);
+        * the plain enum *name* (`"READ"`);
+        * a fully‑qualified name (`"Permission.READ"`).
+
+        Parameters
+        ----------
+        s: str
+            The string representation supplied by the caller.
+
+        Returns
+        -------
+        plantdb.commons.auth.models.Permission
+            The matching enum member.
+
+        Raises
+        ------
+        ValueError
+            If ``s`` does not correspond to any defined permission.
+        
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Permission
+        >>> perm = Permission.from_string('READ')
+        >>> print(perm)
+        Permission.READ
+        """
+        # strip any surrounding whitespace.
+        s = s.strip()
+
+        # If the string contains a dot (e.g. "Permission.READ"), keep only the part after the last dot.
+        if "." in s:
+            s = s.split(".")[-1]
+
+        # Try to resolve by *name* first (case‑insensitive)
+        name_key = s.upper()
+        if name_key in cls.__members__:  # ``cls.__members__`` holds a mapping of names → members
+            return cls[name_key]
+
+        # If that fails, try to resolve by *value*.
+        try:
+            return cls(s)
+        except ValueError as exc:
+            # ``cls(s)`` raises ValueError automatically if not found.
+            raise ValueError(f"Unknown permission string: {s!r}") from exc
+
+
+def dataset_perm_to_str(dataset_perm: Dict[str, list[Permission]]) -> str:
+    """Convert a mapping of dataset names to permission lists into a compact string representation.
+
+    Parameters
+    ----------
+    dataset_perm
+        Mapping from dataset identifiers (strings) to a list of
+        ``Permission`` objects that define the access rights for each dataset.
+
+    Returns
+    -------
+    str
+        A single string where each dataset entry is formatted as
+        ``<dataset>/<perm1>,<perm2>,...`` and entries are separated by
+        semicolons.  The string representation of each ``Permission`` object
+        is obtained via ``str(permission)``.
+
+    Notes
+    -----
+    The function does not perform validation of the individual ``Permission``
+    objects beyond relying on their ``__str__`` method.  It is intended for
+    serialising permission specifications for downstream processing or logging.
+
+    Example
+    -------
+    >>> from plantdb.commons.auth.session import dataset_perm_to_str
+    >>> from plantdb.commons.auth.models import Permission
+    >>> ds = {'dataset_A': [Permission.READ], 'dataset_B': [Permission.READ, Permission.CREATE]}
+    >>> dataset_perm_to_str(ds)
+    'dataset_A/Permission.READ;dataset_B/Permission.READ,Permission.CREATE'
+    """
+    return ";".join([ds + '/' + ",".join(map(str, perms)) for ds, perms in dataset_perm.items()])
+
+
+def parse_dataset_perm(datasets_str: str) -> Dict[str, set[Permission]]:
+    """Convert a dataset permission string back into the original mapping.
+
+    Parameters
+    ----------
+    datasets_str:
+        The semicolon‑separated string.
+
+    Returns
+    -------
+    Dict[str, set[Permission]]
+        Mapping of dataset names to a set of Permission.
+        Empty permission lists are represented as an empty list.
+
+    Example
+    -------
+    >>> from plantdb.commons.auth.session import parse_dataset_perm
+    >>> s = 'dataset_A/Permission.READ;dataset_B/Permission.READ,Permission.CREATE'
+    >>> parse_dataset_perm(s)
+    {'dataset_A': {<Permission.READ: 'read'>}, 'dataset_B': {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>}}
+    """
+    # Guard against an empty string.
+    if not datasets_str:
+        return {}
+
+    result: Dict[str, set[Permission]] = {}
+
+    # Split on the outer “;” separator - each piece corresponds to one dataset.
+    for part in datasets_str.split(";"):
+        # Each part is ``<dataset>/<perm1>,<perm2>,...``.
+        # ``maxsplit=1`` protects us if a dataset name itself contains a '/'.
+        if "/" not in part:
+            # If there is no '/', treat the whole part as a dataset with no perms.
+            ds, perms_section = part, ""
+        else:
+            ds, perms_section = part.split("/", 1)
+        # An empty permissions section means the original list was empty.
+        perms = set() if perms_section == "" else set(perms_section.split(","))
+        result[ds] = {Permission.from_string(perm) for perm in perms}
+
+    return result
+
 
 class Role(Enum):
     """A class representing the role of a user in a system.
@@ -108,16 +273,61 @@ class Role(Enum):
     >>> Role.ADMIN
     <Role.ADMIN: 'admin'>
     >>> Role.ADMIN.permissions
-    {<Permission.ADMIN_ALL: 'admin_all'>,
-     <Permission.CREATE_SCAN: 'create_scan'>,
-     <Permission.DELETE_SCAN: 'delete_scan'>,
+    {<Permission.CREATE: 'create'>,
+     <Permission.DELETE: 'delete'>,
+     <Permission.MANAGE_GROUPS: 'manage_groups'>,
      <Permission.MANAGE_USERS: 'manage_users'>,
-     <Permission.READ_SCAN: 'read_scan'>,
-     <Permission.WRITE_SCAN: 'write_scan'>}
+     <Permission.READ: 'read'>,
+     <Permission.WRITE: 'write'>}
     """
     READER = "reader"
     CONTRIBUTOR = "contributor"
     ADMIN = "admin"
+
+    @property
+    def rank(self) -> int:
+        """Get the hierarchical rank of the role. Higher is more powerful.
+
+        Returns
+        -------
+        int
+            The rank of the role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.rank
+        1
+        """
+        ranks = {
+            Role.READER: 1,
+            Role.CONTRIBUTOR: 2,
+            Role.ADMIN: 3,
+        }
+        return ranks[self]
+
+    def can_assign(self, target_role: 'Role') -> bool:
+        """Check if this role has the authority to assign the target_role.
+
+        A user can only assign roles that are less than or equal to their own.
+
+        Returns
+        -------
+        bool
+            ``True`` if this role has the authority to assign the target_role; ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.can_assign(Role.CONTRIBUTOR)
+        False
+        >>> user = Role.CONTRIBUTOR
+        >>> user.can_assign(Role.CONTRIBUTOR)
+        True
+        """
+        return self.rank >= target_role.rank
 
     @property
     def permissions(self) -> Set[Permission]:
@@ -127,6 +337,18 @@ class Role(Enum):
         -------
         Set[Permission]
             A set containing all permissions granted to this role.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> guest = Role.READER
+        >>> guest.permissions
+        {<Permission.READ: 'read'>}
+        >>> user = Role.CONTRIBUTOR
+        >>> user.permissions
+        {<Permission.CREATE: 'create'>,
+         <Permission.READ: 'read'>,
+         <Permission.WRITE: 'write'>}
         """
         role_permissions = {
             Role.READER: {
@@ -151,13 +373,12 @@ class Role(Enum):
 
 @dataclass
 class User:
-    """
-    Summarize the purpose of the User class.
+    """Represents a user entity in the application.
 
-    The User class represents a user entity in an application. It contains attributes related to user authentication, roles,
-    permissions, and activity timestamps. The class is designed to encapsulate user data and provide methods for user management.
-    Users can have multiple roles and permissions, which are stored as sets. The class also tracks the creation time and last login
-    time of a user.
+    It contains attributes related to user authentication, roles, permissions, and activity timestamps.
+    The class is designed to encapsulate user data and provide methods for user management.
+    Users can have multiple roles and permissions, which are stored as sets.
+    The class also tracks the creation time and last login time of a user.
 
     Attributes
     ----------
@@ -165,24 +386,29 @@ class User:
         The unique username of the user.
     password_hash : str
         The hashed password of the user.
-    roles : Set[Role]
+    roles : Set[plantdb.commons.auth.models.Role]
         A set containing roles assigned to the user.
     created_at : datetime
         The timestamp when the user account was created.
-    permissions : Set[Permission], optional
-        A set containing specific permissions granted to the user.
-    last_login : Optional[datetime], optional
-        The timestamp of the last login. If not provided, defaults to None.
-    is_active : bool, optional
-        Indicates if the user account is active. Defaults to True.
-    failed_attempts : int, optional
-        Number of failed login attempts for the user. Defaults to 0.
-    locked_until : Optional[datetime], optional
-        Timestamp until which the user is locked out due to multiple failed attempts. Defaults to None.
+    last_login : Optional[datetime]
+        The timestamp of the last login. If not provided, defaults to ``None``.
+    is_active : bool
+        Indicates if the user account is active. Defaults to ``True``.
+    failed_attempts : int
+        Number of failed login attempts for the user. Defaults to ``0``.
+    last_failed_attempt: Optional[datetime]
+        The timestamp of the last failed attempts. Defaults to ``None``.
+    locked_until : Optional[datetime]
+        Timestamp until which the user is locked out due to multiple failed attempts.
+        Defaults to ``None``.
+    password_last_change : Optional[datetime]
+        The timestamp of the last password change. Defaults to ``None``.
+    _extra_permissions : Set[Permission]
+        A set containing specific permissions granted to the user, not covered by its `role`.
 
     Notes
     -----
-    Ensure that sensitive data like `password_hash` is handled securely and not exposed in logs or error messages.
+    Ensure that sensitive data like ``password_hash`` is handled securely and not exposed in logs or error messages.
 
     Examples
     --------
@@ -193,35 +419,37 @@ class User:
     ...     fullname="John Doe",
     ...     password_hash="hashed_password",
     ...     roles={Role.CONTRIBUTOR},
-    ...     permissions={Permission.MANAGE_USERS},
     ...     created_at=datetime.now(timezone.utc),
     ... )
     >>> print(user.username)
-    john_doe
+    jdoe
     >>> print(user.roles)  # get roles
     {<Role.CONTRIBUTOR: 'contributor'>}
-    >>> print(user.permissions)  # get directly assigned permissions
-    {<Permission.MANAGE_USERS: 'manage_users'>}
+    >>> print(user.permissions)
+    {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>, <Permission.WRITE: 'write'>}
+    >>> user.grant_permission(Permission.MANAGE_USERS)
+    >>> print(user.permissions)
+    {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>, <Permission.MANAGE_USERS: 'manage_users'>, <Permission.WRITE: 'write'>}
     >>> user.last_login = datetime.now(timezone.utc)  # set the timestamp when the user account was last login
     """
     username: str
     fullname: str
     password_hash: str
-    roles: Set[Role]
     created_at: datetime
-    permissions: Optional[Set[Permission]] = None
+    roles: Set[Role] = field(default_factory=set)
     last_login: Optional[datetime] = None
     is_active: bool = True
     failed_attempts: int = 0
     last_failed_attempt: Optional[datetime] = None
     locked_until: Optional[datetime] = None
     password_last_change: Optional[datetime] = None
+    # “extra” permissions that are not covered by any role
+    _extra_permissions: Set[Permission] = field(default_factory=set)
 
     def __eq__(self, other):
-        """
-        Compare two User objects for equality.
+        """Compare two ``User`` objects for equality.
 
-        Two User objects are considered equal if all their attributes have the same values.
+        Two ``User`` objects are considered equal if all their attributes have the same values.
 
         Parameters
         ----------
@@ -238,14 +466,29 @@ class User:
 
         return all(self.__dict__[attr] == other.__dict__[attr] for attr in self.__dict__)
 
+    @property
+    def permissions(self) -> Set[Permission]:
+        """All effective permissions = role‑derived ∪ extra."""
+        # Union of every role’s permissions and any manually‑added ones
+        role_perms = {perm for role in self.roles for perm in role.permissions}
+        return role_perms | self._extra_permissions
+
+    def grant_permission(self, perm: Permission) -> None:
+        """Add a permission not covered by any current role."""
+        if perm not in self.permissions:  # avoid duplicates
+            self._extra_permissions.add(perm)
+
+    def revoke_permission(self, perm: Permission) -> None:
+        """Remove an explicitly‑granted permission (won’t affect role‑derived ones)."""
+        self._extra_permissions.discard(perm)
+
     def to_dict(self) -> dict:
-        """
-        Convert User object to dictionary for JSON serialization.
+        """Convert a ``User`` object to a dictionary for JSON serialization.
 
         Returns
         -------
         dict
-            Dictionary representation of the user object.
+            Dictionary representation of the ``User`` object.
         """
         return {
             'username': self.username,
@@ -253,19 +496,18 @@ class User:
             'password_hash': self.password_hash,
             'roles': [role.value for role in self.roles],
             'created_at': self.created_at.isoformat(),
-            'permissions': [perm.value for perm in self.permissions] if self.permissions else None,
+            '_extra_permissions': [perm.value for perm in self._extra_permissions],
             'last_login': self.last_login.isoformat() if self.last_login else None,
             'is_active': self.is_active,
             'failed_attempts': self.failed_attempts,
             'last_failed_attempt': self.last_failed_attempt.isoformat() if self.last_failed_attempt else None,
             'locked_until': self.locked_until.isoformat() if self.locked_until else None,
-            'password_last_change': self.password_last_change.isoformat() if self.password_last_change else self.created_at.isoformat(),
+            'password_last_change': self.password_last_change.isoformat() if self.password_last_change else None,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> 'User':
-        """
-        Create User object from dictionary (JSON deserialization).
+        """Create a ``User`` object from a dictionary (JSON deserialization).
 
         Parameters
         ----------
@@ -275,7 +517,7 @@ class User:
         Returns
         -------
         User
-            User object created from the dictionary data.
+            The ``User`` object created from the dictionary data.
 
         Raises
         ------
@@ -284,6 +526,11 @@ class User:
         KeyError
             If required keys are missing from the dictionary.
         """
+        args = cls._parse_user_dict(data)
+        return cls(**args)
+
+    @staticmethod
+    def _parse_user_dict(data: dict) -> dict[str | Any, set[Any] | datetime | datetime | None | bool | int | Any]:
         try:
             # Parse roles
             roles = set()
@@ -295,11 +542,11 @@ class User:
                     pass
 
             # Parse permissions
-            permissions = set()
-            if data.get('permissions'):
-                for perm_value in data['permissions']:
+            extra_permissions = set()
+            if data.get('_extra_permissions'):
+                for perm_value in data['_extra_permissions']:
                     try:
-                        permissions.add(Permission(perm_value))
+                        extra_permissions.add(Permission(perm_value))
                     except ValueError:
                         # Skip invalid roles for backward compatibility
                         pass
@@ -313,42 +560,40 @@ class User:
                 else:
                     return None
 
-            return cls(
-                username=data['username'],
-                fullname=data['fullname'],
-                password_hash=data['password_hash'],
-                roles=roles,
-                created_at=_datetime_convert(data['created_at']),
-                permissions=permissions,
-                last_login=_datetime_convert(data.get('last_login')),
-                is_active=data.get('is_active', True),
-                failed_attempts=data.get('failed_attempts', 0),
-                last_failed_attempt=_datetime_convert(data.get('last_failed_attempt')),
-                locked_until=_datetime_convert(data.get('locked_until')),
-                password_last_change=_datetime_convert(data.get('password_last_change')),
-            )
+            args = {
+                "username": data['username'],
+                "fullname": data['fullname'],
+                "password_hash": data['password_hash'],
+                "roles": roles,
+                "created_at": _datetime_convert(data['created_at']),
+                "_extra_permissions": extra_permissions,
+                "last_login": _datetime_convert(data.get('last_login')),
+                "is_active": data.get('is_active', True),
+                "failed_attempts": data.get('failed_attempts', 0),
+                "last_failed_attempt": _datetime_convert(data.get('last_failed_attempt')),
+                "locked_until": _datetime_convert(data.get('locked_until')),
+                "password_last_change": _datetime_convert(data.get('password_last_change')),
+            }
+
         except KeyError as e:
             raise KeyError(f"Missing required field in user data: {e}")
         except ValueError as e:
             raise ValueError(f"Invalid data format in user data: {e}")
+        return args
 
     def to_json(self) -> str:
-        """
-        Convert User object to JSON string.
+        """Convert ``User`` object to JSON string.
 
         Returns
         -------
         str
-            JSON string representation of the user object.
-
-
+            JSON string representation of the ``User`` object.
         """
         return json.dumps(self.to_dict(), indent=2)
 
     @classmethod
     def from_json(cls, json_str: str) -> 'User':
-        """
-        Create User object from JSON string.
+        """Create a ``User`` object from JSON string.
 
         Parameters
         ----------
@@ -358,7 +603,7 @@ class User:
         Returns
         -------
         User
-            User object created from the JSON data.
+            The ``User`` object created from the JSON data.
 
         Raises
         ------
@@ -412,12 +657,145 @@ class User:
 
 
 @dataclass
-class Group:
+class TokenUser(User):
+    """A user representation that includes per‑dataset permission mappings derived from a token.
+
+    The ``TokenUser`` subclass augments the ``User`` class with an optional ``dataset_permissions``
+    attribute that maps glob‑style dataset name patterns to a set of ``Permission`` objects.
+
+    Attributes
+    ----------
+    username : str
+        The unique username of the user.
+    password_hash : str
+        The hashed password of the user.
+    roles : Set[plantdb.commons.auth.models.Role]
+        A set containing roles assigned to the user.
+    created_at : datetime
+        The timestamp when the user account was created.
+    permissions : Optional[Set[Permission]]
+        A set containing specific permissions granted to the user.
+    last_login : Optional[datetime]
+        The timestamp of the last login. If not provided, defaults to ``None``.
+    is_active : bool
+        Indicates if the user account is active. Defaults to ``True``.
+    failed_attempts : int
+        Number of failed login attempts for the user. Defaults to ``0``.
+    last_failed_attempt: Optional[datetime]
+        The timestamp of the last failed attempts. Defaults to ``None``.
+    locked_until : Optional[datetime]
+        Timestamp until which the user is locked out due to multiple failed attempts.
+        Defaults to ``None``.
+    password_last_change : Optional[datetime]
+        The timestamp of the last password change. Defaults to ``None``.
+    dataset_permissions : dict[str, set[Permission]]
+        Mapping from dataset name patterns (e.g., ``\"proj_*\"``) to a set of `Permission` objects
+        granting access to those datasets.
+
+    Examples
+    --------
+    >>> from datetime import datetime, timezone
+    >>> from plantdb.commons.auth.models import Permission, Role, User, TokenUser
+    >>> # Create a TokenUser from an existing User:
+    >>> user = User(username="jdoe", fullname="John Doe", password_hash="hashed_password", roles={Role.CONTRIBUTOR}, created_at=datetime.now(timezone.utc))
+    >>> token_user = TokenUser(**user.to_dict(), dataset_permissions={'new_scan': {Permission.WRITE, Permission.DELETE}})
+    >>> token_user.permissions
+    {<Permission.CREATE: 'create'>, <Permission.READ: 'read'>, <Permission.WRITE: 'write'>}
+    >>> token_user.get_permissions_for_dataset('new_scan')
+    {<Permission.WRITE: 'write'>}
     """
-    Represents a group of users for sharing scan datasets.
+    dataset_permissions: dict[str, set[Permission]] = None
+
+    def __post_init__(self):
+        """Validates that the dataset permissions mapping is supplied.
+
+        Raises
+        ------
+        TypeError
+            If the ``dataset_permissions`` mapping is missing.
+        """
+        # ---- roles type validation -------------------------------------
+        self.roles = {Role(role) if not isinstance(role, Role) else role for role in self.roles}
+        self._extra_permissions = {Role(perm) if not isinstance(perm, Permission) else perm for perm in self._extra_permissions}
+        # ---- dataset_permissions validation ----------------------------
+        if not self.dataset_permissions:
+            raise TypeError("`dataset_permissions` argument must be provided.")
+
+    def to_dict(self) -> dict:
+        """Convert a ``TokenUser`` object to a dictionary for JSON serialization.
+
+        Returns
+        -------
+        dict
+            Dictionary representation of the ``TokenUser`` object.
+        """
+        d = super().to_dict()
+        d["dataset_permissions"] = self.dataset_permissions
+        return d
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'User':
+        """Create a ``User`` object from a dictionary (JSON deserialization).
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing user data.
+
+        Returns
+        -------
+        TokenUser
+            The ``TokenUser`` object created from the dictionary data.
+
+        Raises
+        ------
+        ValueError
+            If required fields are missing or invalid.
+        KeyError
+            If required keys are missing from the dictionary.
+        """
+        args = cls._parse_user_dict(data)
+
+        raw_dataset_perms = data.get("dataset_permissions")
+        if raw_dataset_perms is None:
+            raise KeyError("Missing required field 'dataset_permissions' in token user data")
+
+        args["dataset_permissions"] = {
+            dname: {Permission(perm) for perm in perms}
+            for dname, perms in raw_dataset_perms.items()
+        }
+
+        return cls(**args)
+
+    def get_permissions_for_dataset(self, dataset_name: str) -> set[Permission]:
+        """Returns the set of permissions available for this TokenUser for the provided dataset name.
+
+        Parameters
+        ----------
+        dataset_name: str
+            Name of the dataset.
+
+        Returns
+        -------
+        set[Permission]
+            Set of available permissions for this TokenUser for the provided dataset name.
+        """
+        permissions = set()
+        def_perm = self.permissions
+        for dataset_pattern, _permissions in self.dataset_permissions.items():
+            # Check if the dataset name matches the glob‑style pattern.
+            if fnmatchcase(dataset_name, dataset_pattern):
+                # Intersect pattern permissions with the user's global permissions and add them to the result set.
+                permissions |= _permissions & def_perm
+        return permissions
+
+
+@dataclass
+class Group:
+    """Represents a group of users for sharing scan datasets.
 
     Groups allow multiple users to collaborate on scan datasets. When a scan is shared
-    with a group, all members of that group get CONTRIBUTOR role for that specific dataset.
+    with a group, all members of that group get the `` CONTRIBUTOR `` role for that specific dataset.
 
     Attributes
     ----------
@@ -425,7 +803,7 @@ class Group:
         The unique name of the group.
     users : Set[str]
         A set of usernames that belong to this group.
-    description : Optional[str], optional
+    description : Optional[str]
         An optional description of the group's purpose.
     created_at : datetime
         The timestamp when the group was created.
@@ -455,8 +833,7 @@ class Group:
     description: Optional[str] = None
 
     def add_user(self, username: str) -> bool:
-        """
-        Add a user to the group.
+        """Add a user to the group.
 
         Parameters
         ----------
@@ -474,8 +851,7 @@ class Group:
         return True
 
     def remove_user(self, username: str) -> bool:
-        """
-        Remove a user from the group.
+        """Remove a user from the group.
 
         Parameters
         ----------
@@ -493,8 +869,7 @@ class Group:
         return True
 
     def has_user(self, username: str) -> bool:
-        """
-        Check if a user is a member of the group.
+        """Check if a user is a member of the group.
 
         Parameters
         ----------

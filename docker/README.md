@@ -20,7 +20,7 @@ This variable represents the version number you want to assign to your build.
 
 ```shell
 # Set your desired version number
-export NEW_TAG=0.14.4
+export NEW_TAG=0.15.0
 ```
 
 #### 1. Running Unit Tests
@@ -78,7 +78,7 @@ For convenience, you can execute the entire workflow with a single command seque
 
 ```shell
 # Set version and execute entire workflow
-export NEW_TAG=0.14.4 && \
+export NEW_TAG=0.15.0 && \
 ./docker/build.sh -t $NEW_TAG && \
 ./docker/run.sh --unittest && \
 docker tag roboticsmicrofarms/plantdb:$NEW_TAG roboticsmicrofarms/plantdb:latest && \

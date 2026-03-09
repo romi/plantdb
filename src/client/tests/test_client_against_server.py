@@ -41,15 +41,16 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         scans. It ensures that the returned data is of the expected types
         and contains valid information.
         """
-        names = client.request_scan_names_list(self.server.host, **self.kw)
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
+        names = client.request_scan_names_list(self.server.host, session_token=login_data['access_token'], **self.kw)
         self.assertIsInstance(names, list)
         self.assertGreater(len(names), 0)
         scan_id = names[0]
 
-        info = client.request_scan_data(self.server.host, scan_id, **self.kw)
+        info = client.request_scan_data(self.server.host, scan_id, session_token=login_data['access_token'], **self.kw)
         self.assertEqual(info.get("id"), scan_id)
 
-        scans_info = client.request_scans_info(self.server.host, **self.kw)
+        scans_info = client.request_scans_info(self.server.host, session_token=login_data['access_token'], **self.kw)
         self.assertIsInstance(scans_info, list)
 
     def test_preview_and_images_helpers(self):
@@ -61,19 +62,20 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         It ensures that URL building is correct and requests complete successfully
         with status codes 200 or 404 depending on the dataset.
         """
-        names = client.request_scan_names_list(self.server.host, **self.kw)
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
+        names = client.request_scan_names_list(self.server.host, session_token=login_data['access_token'], **self.kw)
         scan_id = names[0]
         print(f"Selected scan ID: {scan_id}")
         # just ensure URL builds and request completes (200 or 404 acceptable depending on dataset)
-        url = client.scan_preview_image_url(self.server.host, scan_id, size="thumb", **self.kw)
+        url = client.scan_preview_image_url(self.server.host, scan_id, session_token=login_data['access_token'], size="thumb", **self.kw)
         print(f"URL: {url}")
         self.assertIn("/image/", url)
 
         # list task images
-        uris = client.list_task_images_uri(self.server.host, scan_id, task_name='images', size='orig', **self.kw)
+        uris = client.list_task_images_uri(self.server.host, scan_id, task_name='images', size='orig', session_token=login_data['access_token'], **self.kw)
         self.assertIsInstance(uris, list)
         # download images if any
-        imgs = client.parse_task_images(self.server.host, scan_id, task_name='images', size='orig', **self.kw)
+        imgs = client.parse_task_images(self.server.host, scan_id, task_name='images', size='orig', session_token=login_data['access_token'], **self.kw)
         self.assertIsInstance(imgs, list)
 
     def test_refresh_and_archive(self):
@@ -85,14 +87,14 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         Then, it retrieves a list of scan names and selects the first one as the target for archiving.
         The `download_scan_archive` method is called with this scan ID and no specified output directory, expecting to receive a tuple consisting of a BytesIO object and a message string.
         """
-        res_data = client.request_refresh(self.server.host, **self.kw).json()
-        self.assertIsInstance(res_data, dict)
-        self.assertIn("message", res_data)
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
+        success, message = client.request_refresh(self.server.host, session_token=login_data['access_token'], **self.kw)
+        self.assertTrue(success)
 
         names = client.request_scan_names_list(self.server.host, **self.kw)
         scan_id = names[0]
         # Download archive to temp dir
-        res_data = client.request_archive_download(self.server.host, scan_id, out_dir=None, **self.kw)
+        res_data = client.request_archive_download(self.server.host, scan_id, session_token=login_data['access_token'], out_dir=None, **self.kw)
         # when out_dir is None, a BytesIO and message tuple is expected
         self.assertIsInstance(res_data, tuple)
         self.assertIsInstance(res_data[0], io.BytesIO)
@@ -149,10 +151,11 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         task_names = ["PointCloud", "TriangleMesh", "CurveSkeleton", "TreeGraph"]
         expected_data_types = [list, dict, dict, nx.Graph]
 
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
         for task_name, expected_type in zip(task_names, expected_data_types):
             # We're testing the API calls succeed, not necessarily that data exists
             try:
-                data = client.get_task_data(self.server.host, scan_id, task_name, **self.kw)
+                data = client.get_task_data(self.server.host, scan_id, task_name, session_token=login_data['access_token'], **self.kw)
                 # If data is returned, validate its structure
                 if data is not None:
                     print(f"Data for task {task_name} is: {type(data)}")
@@ -239,8 +242,9 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         can retrieve angle data for a scan.
         """
         scan_id = "real_plant_analyzed"
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
 
-        data = client.get_angles_and_internodes_data(self.server.host, scan_id, **self.kw)
+        data = client.get_angles_and_internodes_data(self.server.host, scan_id, session_token=login_data['access_token'], **self.kw)
         # If data is returned, it should be a dictionary
         if data is not None:
             self.assertIsInstance(data, dict)

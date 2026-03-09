@@ -54,7 +54,7 @@ class LockType(Enum):
 
 
 class LockError(Exception):
-    """Raised when lock acquisition fails."""
+    """Raised when the lock acquisition fails."""
 
     def __init__(self, message: str):
         self.message = message
@@ -65,7 +65,7 @@ class LockError(Exception):
 
 
 class LockTimeoutError(Exception):
-    """Raised when lock acquisition times out"""
+    """Raised when the lock acquisition times out"""
 
     def __init__(self, message: str = "Error: Lock acquisition timed-out!"):
         self.message = message
@@ -75,9 +75,8 @@ class LockTimeoutError(Exception):
         return self.message
 
 
-class ScanLockManager:
-    """
-    Acquires and releases file-based locks for thread-safe resource management.
+class ScanLockManager :
+    """Acquires and releases file-based locks for thread-safe resource management.
 
     This class provides functionality for acquiring and releasing file-based locks,
     ensuring thread-safe operations across multiple threads or processes. Locks are
@@ -139,6 +138,11 @@ class ScanLockManager:
         self._active_locks: Dict[str, Dict] = {}  # Track active locks
         self._lock_files: Dict[str, int] = {}  # File descriptors for locks
         self._thread_lock = threading.RLock()  # Thread-safe operations
+
+        # Store the last time we emitted a warning per scan_id
+        self._warning_timestamps: Dict[str, float] = {}
+        # How long we wait before emitting the same warning again (seconds)
+        self._warning_debounce_interval: float = kwargs.get("warning_debounce_interval", 5.0)
 
         # Test write capability in base_path
         try:
@@ -324,7 +328,9 @@ class ScanLockManager:
         try:
             lock_file_path = self._get_lock_file_path(scan_id)
 
+            attempt = 0
             while time.time() - start_time < timeout:
+                attempt += 1
                 try:
                     # Open lock file
                     lock_fd = os.open(lock_file_path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC)
@@ -337,6 +343,8 @@ class ScanLockManager:
 
                     # Try to acquire the lock (non-blocking)
                     fcntl.flock(lock_fd, lock_flags)
+                    # SUCCESS - clear any stale warning timestamp for this scan_id
+                    self._warning_timestamps.pop(scan_id, None)
 
                     # Lock acquired successfully
                     with self._thread_lock:
@@ -350,7 +358,10 @@ class ScanLockManager:
 
                     self._write_lock_info(scan_id, lock_type, user)
                     acquired = True
-                    self.logger.debug(f"Successfully acquired {lock_type.value} lock for scan {scan_id}")
+                    self.logger.debug(
+                        f"Successfully acquired {lock_type.value} lock for scan {scan_id} "
+                        f"(attempt {attempt})"
+                    )
                     break
 
                 except (OSError, IOError) as e:
@@ -359,7 +370,20 @@ class ScanLockManager:
                         os.close(lock_fd)
                     except:
                         pass
-                    self.logger.warning(f"Lock acquisition attempt failed for {scan_id}, retrying...")
+
+                    now = time.time()
+                    last_warn = self._warning_timestamps.get(scan_id, 0.0)
+                    if now - last_warn >= self._warning_debounce_interval:
+                        self.logger.warning(
+                            f"Lock acquisition attempt failed for {scan_id} (attempt {attempt}) - "
+                            f"retrying... [pid={os.getpid()}, tid={threading.get_ident()}]"
+                        )
+                        self._warning_timestamps[scan_id] = now
+                    else:
+                        # We’re within the debounce window - log at DEBUG instead of spamming WARN
+                        self.logger.debug(
+                            f"Retrying lock for {scan_id} (attempt {attempt}) - still waiting"
+                        )
                     time.sleep(0.1)  # Brief pause before retry
 
             if not acquired:

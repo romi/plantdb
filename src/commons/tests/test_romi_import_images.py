@@ -30,7 +30,7 @@ class TestFSDBDummy(DummyDBTestCase):
         - Confirming that metadata associated with the imported files matches the original data
         """
         db = self.get_test_db()
-        db.dummy = False  # to avoid clean up by 'disconnect' method
+        db._is_dummy = False  # to avoid clean up by 'disconnect' method
         db.disconnect()
         copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
         out = subprocess.run(["fsdb_import_images", str(db.path()), copy_path,
@@ -64,7 +64,7 @@ class TestFSDBDummy(DummyDBTestCase):
             md_json = json.load(json_f)
         self.assertDictEqual(fs.metadata, md_json)
 
-        db.dummy = True
+        db._is_dummy = True
         db.disconnect()
 
 
