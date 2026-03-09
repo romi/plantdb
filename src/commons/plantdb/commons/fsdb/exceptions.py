@@ -106,3 +106,10 @@ class FileNoIDError(Exception):
 
 class FileNoFileNameError(Exception):
     """No 'file' entry could be found for this file."""
+
+
+class NoAuthUserError(Exception):
+    """Could not get an authenticated user."""
+
+    def __init__(self, message: str = None) -> None:
+        super().__init__(message if message else "No authenticated user!")

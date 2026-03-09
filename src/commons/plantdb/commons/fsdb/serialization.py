@@ -107,11 +107,11 @@ def _parse_file(fileset, file_info):
 
     Raises
     ------
-    FileNoIDError
+    plantdb.commons.fsdb.exceptions.FileNoIDError
         If the 'id' entry is missing from `file_info`.
-    FileNoFileNameError
+    plantdb.commons.fsdb.exceptions.FileNoFileNameError
         If the 'file' entry is missing from `file_info`.
-    FileNotFoundError
+    plantdb.commons.fsdb.exceptions.FileNotFoundError
         If the file is not found on drive.
     """
     from plantdb.commons.fsdb.core import File

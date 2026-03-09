@@ -38,7 +38,7 @@ logger = get_logger(__name__)
 ALLOWED_SCHEMES: set[str] = {"http", "https"}  # Only HTTP(S)
 BLACKLIST_CACHE_FILE = Path(tempfile.gettempdir()) / "github_blacklist_cache.txt"
 
-# Private / non‑routable IP ranges – we refuse to connect to any of them
+# Private / non‑routable IP ranges - we refuse to connect to any of them
 PRIVATE_NETWORKS: List[ipaddress._BaseNetwork] = [
     ipaddress.ip_network("10.0.0.0/8"),
     ipaddress.ip_network("172.16.0.0/12"),
@@ -51,9 +51,8 @@ PRIVATE_NETWORKS: List[ipaddress._BaseNetwork] = [
 ]
 
 
-def _load_whitelist_from_file() -> Optional[set[str]]:
-    """
-    Load allowed URLs from a specified environment variable file.
+def _load_whitelist_from_file() -> Optional[set[str]] :
+    """Load allowed URLs from a specified environment variable file.
 
     This function reads a file path from an environment variable,
     parses it line by line, and extracts hostnames to create a set of allowed URLs.
@@ -108,9 +107,8 @@ def _load_whitelist_from_file() -> Optional[set[str]]:
 WHITELIST: Optional[set[str]] = _load_whitelist_from_file()
 
 
-def _download_and_cache_blacklist(force: bool = False) -> Optional[Path]:
-    """
-    Ensure the blacklist file is present locally and up‑to‑date.
+def _download_and_cache_blacklist(force: bool = False) -> Optional[Path] :
+    """Ensure the blacklist file is present locally and up‑to‑date.
     Returns the path to the cached file or ``None`` on failure.
 
     Parameters
@@ -210,9 +208,8 @@ def _download_and_cache_blacklist(force: bool = False) -> Optional[Path]:
     return cache_path if cache_path.is_file() else None
 
 
-def _is_host_blacklisted(hostname: str) -> bool:
-    """
-    Check if a given hostname is listed in the blacklist.
+def _is_host_blacklisted(hostname: str) -> bool :
+    """Check if a given hostname is listed in the blacklist.
 
     This function reads a locally cached blacklist file and checks if the
     provided hostname (with or without "www." prefix) is present in it.
@@ -282,9 +279,8 @@ def _is_host_blacklisted(hostname: str) -> bool:
 # Helper utilities
 # --------------------------------------------------------------------------- #
 
-def _is_private_ip(ip: str) -> bool:
-    """
-    Return True if *ip* is in a private / non‑routable network.
+def _is_private_ip(ip: str) -> bool :
+    """Return True if *ip* is in a private / non‑routable network.
 
     Examples
     --------
@@ -304,9 +300,8 @@ def _is_private_ip(ip: str) -> bool:
     return any(addr in net for net in PRIVATE_NETWORKS)
 
 
-def _resolve_public_ips(hostname: str) -> List[str]:
-    """
-    Resolve the given hostname to a list of its public IPv4/IPv6 addresses.
+def _resolve_public_ips(hostname: str) -> List[str] :
+    """Resolve the given hostname to a list of its public IPv4/IPv6 addresses.
 
     This function queries DNS records for the specified hostname and filters out
     any private IP addresses.
@@ -400,9 +395,8 @@ def _resolve_public_ips(hostname: str) -> List[str]:
     return list(public_ips)
 
 
-def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool:
-    """
-    Validate the hostname based on given criteria.
+def _validate_hostname(hostname: str, allow_private_ip: bool = False) -> bool :
+    """Validate the hostname based on given criteria.
 
     This function checks if a hostname is valid by verifying it against a whitelist,
     blacklist, and ensuring it has at least one public IP unless private IPs are allowed.
@@ -585,9 +579,8 @@ def _handle_redirects(
         max_redirects: int,
         allow_private_ip: bool = False,
         validate_host: bool = True,
-) -> tuple[urllib3.HTTPResponse, str, int]:
-    """
-    Manually follow HTTP redirects up to ``max_redirects`` and return the final
+) -> tuple[urllib3.HTTPResponse, str, int] :
+    """Manually follow HTTP redirects up to ``max_redirects`` and return the final
     response, the URL that was finally fetched and the number of redirects
     that were performed.
     """

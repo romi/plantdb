@@ -125,7 +125,7 @@ Test REST API server started at http://127.0.0.1:5000
 ...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
 >>> from plantdb.client.rest_api import request_refresh
->>> request_refresh(**server_cfg)
+>>> success, msg = request_refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
 >>> scans_list = request_scan_names_list(**server_cfg)
 >>> print(scans_list)
@@ -815,7 +815,7 @@ class FSDBSync():
     def _list_http_scans(self, base_url):
         """List scans available via HTTP REST API."""
         try:
-            response = requests.get(f"{base_url}/scans/")
+            response = requests.get(f"{base_url}/scans")
             response.raise_for_status()
             return response.json()
         except Exception as e:
@@ -852,7 +852,7 @@ class FSDBSync():
         try:
             with open(archive_path, 'rb') as f:
                 files = {'archive': f}
-                response = requests.post(f"{base_url}/scans/{scan_id}/upload", files=files)
+                response = requests.post(f"{base_url}/scan/{scan_id}/upload", files=files)
                 response.raise_for_status()
         except Exception as e:
             print(f"Error uploading scan archive: {e}")
@@ -860,7 +860,7 @@ class FSDBSync():
     def _download_scan_archive(self, base_url, scan_id, archive_path):
         """Download a scan archive via HTTP REST API."""
         try:
-            response = requests.get(f"{base_url}/scans/{scan_id}/download")
+            response = requests.get(f"{base_url}/scan/{scan_id}/download")
             response.raise_for_status()
             with open(archive_path, 'wb') as f:
                 f.write(response.content)
@@ -994,9 +994,8 @@ def config_from_url(url):
     return config
 
 
-def _parse_database_spec(spec):
-    """
-    Parse and validate a database specification, determining the appropriate synchronization strategy.
+def _parse_database_spec(spec) :
+    """Parse and validate a database specification, determining the appropriate synchronization strategy.
 
     This function analyzes database specifications and returns a structured representation
     suitable for synchronization operations. It supports multiple database types including

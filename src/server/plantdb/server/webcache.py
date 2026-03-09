@@ -55,6 +55,8 @@ Examples
 >>> db.disconnect()
 """
 import hashlib
+from pathlib import Path
+from plantdb.commons.log import get_logger
 
 from PIL import Image
 
@@ -66,13 +68,16 @@ except ModuleNotFoundError:
 
 IMG_RESOLUTIONS = {"large": 1500, "thumb": 150}
 
+# Get logger instance
+logger = get_logger(__name__)
 
-def __webcache_path(db, scan_id):
+
+def __webcache_path(db, scan_id: str) -> Path:
     """Creates a 'webcache' directory in the scan directory.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -87,12 +92,12 @@ def __webcache_path(db, scan_id):
     return directory
 
 
-def __file_path(db, scan_id, fileset_id, file_id):
+def __file_path(db, scan_id, fileset_id, file_id, **kwargs) -> Path:
     """Return the path to a file.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -106,13 +111,13 @@ def __file_path(db, scan_id, fileset_id, file_id):
     pathlib.Path
         The path to the file.
     """
-    scan = db.get_scan(scan_id)
+    scan = db.get_scan(scan_id, **kwargs)
     fs = scan.get_fileset(fileset_id)
     f = fs.get_file(file_id)
     return db.basedir / scan.id / fs.id / f.filename
 
 
-def __hash(resource_type, scan_id, fileset_id, file_id, size):
+def __hash(resource_type, scan_id, fileset_id, file_id, size) -> str:
     """Create a hash for a resource.
 
     Parameters
@@ -142,7 +147,7 @@ def __hash(resource_type, scan_id, fileset_id, file_id, size):
 # -----------------------------------------------------------------------------
 # Image
 # -----------------------------------------------------------------------------
-def __image_hash(scan_id, fileset_id, file_id, size):
+def __image_hash(scan_id, fileset_id, file_id, size) -> str:
     """Create a file name for an image resource using a hash value.
 
     Parameters
@@ -153,9 +158,9 @@ def __image_hash(scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -165,7 +170,7 @@ def __image_hash(scan_id, fileset_id, file_id, size):
     return __hash("image", scan_id, fileset_id, file_id, size) + ".jpeg"
 
 
-def __image_resize(img, max_size):
+def __image_resize(img, max_size) -> Image.Image:
     """Resize a ``Pillow`` image.
 
     Parameters
@@ -184,12 +189,12 @@ def __image_resize(img, max_size):
     return img
 
 
-def __image_cache(db, scan_id, fileset_id, file_id, size):
+def __image_cache(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Create a cache for an image resource.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -197,9 +202,9 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -207,7 +212,7 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
         The path to the cached image.
     """
     # Get the path to the original image:
-    src = __file_path(db, scan_id, fileset_id, file_id)
+    src = __file_path(db, scan_id, fileset_id, file_id, **kwargs)
 
     # Get the path to the 'webcache' directory:
     cache_dir = __webcache_path(db, scan_id)
@@ -224,20 +229,20 @@ def __image_cache(db, scan_id, fileset_id, file_id, size):
     # Make sure we have an RGB image to be able to save in this format:
     if image.mode != "RGB":
         image = image.convert(mode="RGB")
-    save_kwargs = {'quality': 84}
+    save_kwargs = {'quality': 84, 'optimize': True}
     # Save the resized image in the "webcache" directory:
     image.save(dst, **save_kwargs)
-    print(f"Converted '{src}' to '{dst}', using size '{maxsize}'")
+    logger.info(f"Converted '{src}' to '{dst}', using size '{maxsize}'")
 
     return dst
 
 
-def __image_cached_path(db, scan_id, fileset_id, file_id, size):
+def __image_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Get The path to the cached image.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -245,9 +250,9 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use  it as the size of the cached image to create and return.
-        Else, should be a string in the given list.
+    size : str | int, optional
+        If an integer, use it as the size of the cached image to create and return.
+        Else, it should be a string from ``['orig', 'large', 'thumb']``.
 
     Returns
     -------
@@ -257,16 +262,16 @@ def __image_cached_path(db, scan_id, fileset_id, file_id, size):
     cache_dir = __webcache_path(db, scan_id)
     img_path = cache_dir / __image_hash(scan_id, fileset_id, file_id, size)
     if not img_path.is_file():
-        __image_cache(db, scan_id, fileset_id, file_id, size)
+        __image_cache(db, scan_id, fileset_id, file_id, size, **kwargs)
     return img_path
 
 
-def image_path(db, scan_id, fileset_id, file_id, size='orig'):
+def image_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     """Get the path to an image file.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -274,9 +279,9 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'large', 'thumb'} or int, optional
+    size : str | int, optional
         If an integer, use  it as the size of the cached image to create and return.
-        Otherwise, should be one of the following strings, default to `'orig'`:
+        Else, it should be a string from ``['orig', 'large', 'thumb']``, where: 
 
           - `'thumb'`: image max width and height to `150`.
           - `'large'`: image max width and height to `1500`;
@@ -293,6 +298,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
+    >>> db.login('guest', 'guest')
     >>> # Example 1: Get the original image:
     >>> image_path(db, 'real_plant_analyzed', 'images', '00000_rgb', 'orig')
     PosixPath('/tmp/ROMI_DB/real_plant_analyzed/images/00000_rgb.jpg')
@@ -307,9 +313,9 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig'):
         pass
 
     if size == "orig":
-        return __file_path(db, scan_id, fileset_id, file_id)
+        return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     elif size == "large" or size == "thumb" or isinstance(size, int):
-        return __image_cached_path(db, scan_id, fileset_id, file_id, size)
+        return __image_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs)
     else:
         raise ValueError(f"Unknown image size specification: {size}")
 
@@ -328,7 +334,7 @@ def __pointcloud_hash(scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'}
+    size : str
         The requested size ('orig' or 'preview').
 
     Returns
@@ -357,12 +363,12 @@ def __pointcloud_resize(pointcloud, voxel_size):
     return pointcloud.voxel_down_sample(voxel_size)
 
 
-def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
+def __pointcloud_cache(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Create a cache for a pointcloud resource.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -370,11 +376,11 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     See Also
     --------
@@ -392,7 +398,7 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
     dst = cache_dir / __pointcloud_hash(scan_id, fileset_id, file_id, size)
 
     # Load the pointcloud and resize it:
-    src = __file_path(db, scan_id, fileset_id, file_id)
+    src = __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     pcd = read_pointcloud(str(src))
     pcd_npts = len(pcd.points)  # get the number of points
     if isinstance(size, float):
@@ -403,19 +409,19 @@ def __pointcloud_cache(db, scan_id, fileset_id, file_id, size):
     pcd_lowres_npts = len(pcd_lowres.points)  # get the number of points
     write_pointcloud(str(dst), pcd_lowres)
 
-    print(f"Converted '{src}' to '{dst}', using voxelsize '{vxs}'")
-    print(f"  - Original number of points: {pcd_npts}")
-    print(f"  - Resized number of points: {pcd_lowres_npts}")
+    logger.info(f"Converted '{src}' to '{dst}', using voxelsize '{vxs}'")
+    logger.info(f"  - Original number of points: {pcd_npts}")
+    logger.info(f"  - Resized number of points: {pcd_lowres_npts}")
 
     return dst
 
 
-def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
+def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
     """Get The path to the cached pointcloud.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -423,11 +429,11 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     Returns
     -------
@@ -437,16 +443,16 @@ def __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size):
     cache_dir = __webcache_path(db, scan_id)
     pcd_path = cache_dir / __pointcloud_hash(scan_id, fileset_id, file_id, size)
     if not pcd_path.is_file():
-        __pointcloud_cache(db, scan_id, fileset_id, file_id, size)
+        __pointcloud_cache(db, scan_id, fileset_id, file_id, size, **kwargs)
     return pcd_path
 
 
-def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
+def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     """Get the path to a point cloud file.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -454,12 +460,11 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : {'orig', 'preview'} or float, optional
+    size : str | float
         The requested size of the point cloud.
-        Obviously 'orig' preserve the original point cloud.
-        'preview' will resize the point cloud to a `1.8` voxel size.
-        A float will resize the point cloud to given voxel size.
-        Default to 'orig'.
+        Use 'orig' (default) to preserve the original point cloud.
+        Use 'preview' to resize the point cloud to a `1.8` voxel size.
+        A float value will resize the point cloud to a given voxel size.
 
     Returns
     -------
@@ -481,14 +486,14 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> db.disconnect()
     """
     if size == "orig":
-        print("Using original pointcloud file")
-        return __file_path(db, scan_id, fileset_id, file_id)
+        logger.info("Using original pointcloud file")
+        return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
     elif size == "preview":
-        print("Using cached pointcloud file")
-        return __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size)
+        logger.info("Using cached pointcloud file")
+        return __pointcloud_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs)
     else:
         try:
-            path = __pointcloud_cached_path(db, scan_id, fileset_id, file_id, float(size))
+            path = __pointcloud_cached_path(db, scan_id, fileset_id, file_id, float(size), **kwargs)
         except ValueError:
             raise ValueError(f"Unknown pointcloud size specification: {size}")
         else:
@@ -498,12 +503,53 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig'):
 # -----------------------------------------------------------------------------
 # Mesh
 # -----------------------------------------------------------------------------
-def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
-    """Get the path to a mesh file.
+def __mesh_hash(scan_id, fileset_id, file_id, size):
+    """Create a hash for a mesh resource.
 
     Parameters
     ----------
-    db : plantdb.commons.fsdb.FSDB
+    scan_id : str
+        The ID of the scan in the database.
+    fileset_id : str
+        The ID of the fileset in the scan.
+    file_id : str
+        The ID of the file in the fileset.
+    size : str
+        The requested size ('orig' or 'preview').
+
+    Returns
+    -------
+    str
+        The hash of the mesh resource.
+    """
+    return __hash("mesh", scan_id, fileset_id, file_id, size) + ".ply"
+
+
+def __mesh_resize(mesh, voxel_size):
+    """Resize a mesh to given voxelsize within vertices are pooled.
+
+    Parameters
+    ----------
+    mesh : open3d.geometry.TriangleMesh
+        A mesh to resize to given voxelsize.
+    voxel_size : float
+        The voxelsize to use for resampling.
+
+    Returns
+    -------
+    open3d.geometry.TriangleMesh
+        The resized mesh.
+    """
+    # Use vertex clustering for meshes
+    return mesh.simplify_vertex_clustering(voxel_size)
+
+
+def __mesh_cache(db, scan_id, fileset_id, file_id, size, **kwargs):
+    """Create a cache for a mesh resource.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
         The database object.
     scan_id : str
         The ID of the scan in the database.
@@ -511,13 +557,98 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
         The ID of the fileset in the scan.
     file_id : str
         The ID of the file in the fileset.
-    size : any, optional
-        UNUSED.
+    size : str | float
+        The requested size of the mesh.
+        Use 'orig' (default) to preserve the original mesh.
+        Use 'preview' to resize the mesh to a `1.8` voxel size.
+        A float value will resize the mesh to a given voxel size.
 
     Returns
     -------
     pathlib.Path
-        The path to the original mesh.
+        The path to the cached mesh.
+    """
+    read_mesh = o3d.io.read_triangle_mesh
+    write_mesh = o3d.io.write_triangle_mesh
+    # Get the path to the 'webcache' directory:
+    cache_dir = __webcache_path(db, scan_id)
+    dst = cache_dir / __mesh_hash(scan_id, fileset_id, file_id, size)
+
+    # Load the mesh and resize it:
+    src = __file_path(db, scan_id, fileset_id, file_id, **kwargs)
+    mesh = read_mesh(str(src))
+    mesh_npts = len(mesh.vertices)  # get the number of vertices
+    
+    if isinstance(size, float):
+        vxs = size
+    else:
+        vxs = 1.8
+    mesh_lowres = __mesh_resize(mesh, vxs)
+    mesh_lowres_npts = len(mesh_lowres.vertices)  # get the number of vertices
+    
+    write_mesh(str(dst), mesh_lowres)
+
+    logger.info(f"Converted '{src}' to '{dst}', using voxelsize '{vxs}'")
+    logger.info(f"  - Original number of vertices: {mesh_npts}")
+    logger.info(f"  - Resized number of vertices: {mesh_lowres_npts}")
+
+    return dst
+
+
+def __mesh_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs):
+    """Get The path to the cached mesh.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The database object.
+    scan_id : str
+        The ID of the scan in the database.
+    fileset_id : str
+        The ID of the fileset in the scan.
+    file_id : str
+        The ID of the file in the fileset.
+    size : str | float
+        The requested size of the mesh.
+        Use 'orig' (default) to preserve the original mesh.
+        Use 'preview' to resize the mesh to a `1.8` voxel size.
+        A float value will resize the mesh to a given voxel size.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the cached mesh.
+    """
+    cache_dir = __webcache_path(db, scan_id)
+    mesh_path = cache_dir / __mesh_hash(scan_id, fileset_id, file_id, size)
+    if not mesh_path.is_file():
+        __mesh_cache(db, scan_id, fileset_id, file_id, size, **kwargs)
+    return mesh_path
+
+
+def mesh_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
+    """Get the path to a mesh file.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The database object.
+    scan_id : str
+        The ID of the scan in the database.
+    fileset_id : str
+        The ID of the fileset in the scan.
+    file_id : str
+        The ID of the file in the fileset.
+    size : str | float
+        The requested size of the mesh.
+        Use 'orig' (default) to preserve the original mesh.
+        Use 'preview' to resize the mesh to a `1.8` voxel size.
+        A float value will resize the mesh to a given voxel size.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the original or cached mesh.
 
     Examples
     --------
@@ -525,10 +656,24 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig'):
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database('real_plant_analyzed')
     >>> db.connect()
-    >>> # Example 1: Get the original pointcloud:
+    >>> # Example 1: Get the original mesh:
     >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')
     PosixPath('/tmp/ROMI_DB/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply')
+    >>> # Example 2: Get a down-sampled version of the mesh:
+    >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'preview')
+    PosixPath('/tmp/ROMI_DB/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply')
     >>> db.disconnect()
     """
-    print("Using original mesh file")
-    return __file_path(db, scan_id, fileset_id, file_id)
+    if size == "orig":
+        logger.info("Using original mesh file")
+        return __file_path(db, scan_id, fileset_id, file_id, **kwargs)
+    elif size == "preview":
+        logger.info("Using cached mesh file")
+        return __mesh_cached_path(db, scan_id, fileset_id, file_id, size, **kwargs)
+    else:
+        try:
+            path = __mesh_cached_path(db, scan_id, fileset_id, file_id, float(size), **kwargs)
+        except ValueError:
+            raise ValueError(f"Unknown mesh size specification: {size}")
+        else:
+            return path

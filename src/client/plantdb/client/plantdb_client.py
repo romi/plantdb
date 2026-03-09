@@ -21,7 +21,7 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
 >>> from plantdb.client.rest_api import plantdb_url
->>> client = PlantDBClient(plantdb_url())
+>>> client = PlantDBClient(plantdb_url('localhost', port=5000))
 >>> # Create a new scan
 >>> scan_id = client.create_scan(
 ...     name="Plant Sample 001",
@@ -35,14 +35,17 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 ... )
 ```
 """
+import json
 import mimetypes
 import os
+from functools import wraps
 
 import requests
 from ada_url import join_url
-from plantdb.client import api_endpoints
 from requests import RequestException
 
+from plantdb.client import api_endpoints
+from plantdb.commons.auth.models import Permission
 from plantdb.commons.log import get_logger
 
 
@@ -90,11 +93,15 @@ class PlantDBClient:
     ----------
     base_url : str
         The base URL of the PlantDB REST API.
-    session : requests.Session
+    _session : requests.Session
         HTTP session that maintains cookies and connection pooling.
-    jwt_token : str
-        The JWT token to authenticate with the PlantDB REST API.
-    username :str
+    _access_token : str
+        The JSON Web Token to authenticate with the PlantDB REST API.
+    _refresh_token : str
+        The refresh token to obtain new access tokens.
+    _api_token : str
+        The long-lived API token granting permission to specific datasets.
+    _username :str
         The login username.
     logger : logging.Logger
         The logger to use.
@@ -109,70 +116,93 @@ class PlantDBClient:
     --------
     >>> from plantdb.server.test_rest_api import TestRestApiServer
     >>> # Start a test PlantDB REST API server first:
-    >>> server = TestRestApiServer(test=True, port=5555)
+    >>> server = TestRestApiServer(test=True, port=5000)
     >>> server.start()
     >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
     >>> from plantdb.client.rest_api import plantdb_url
-    >>> client = PlantDBClient(plantdb_url('localhost', port=5555))
-    >>> client.login('admin', 'admin')
-    >>> print(client.jwt_token)
-    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5555))
-    >>> client2.validate_session_token(client.jwt_token)
-    >>> print(client.plantdb_url)
+    >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
     >>> scans = client.list_scans()
     >>> print(scans)
     ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+    >>> client.login('admin', 'admin')
+    >>> print(client.base_url)
+    http://localhost:5000
+    >>> print(client._access_token)
+    eyJhbG...BsovwQ
+    >>> # Get an API token for a set of dataset (matching the 'dataset_*'):
+    >>> api_token = client.create_api_token(3600, {'dataset_*': ('read', 'write', 'create')})
+    >>> # Create a new client with the API token:
+    >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000), api_token=api_token)
+    >>> resp = client2.create_scan('dataset_A', {'description': "Test dataset"})
+    >>> print(resp['id'])  # id of the created dataset
+    dataset_A
+    >>> resp = client2.create_scan('dataset_B', {'description': "Test dataset"})
+    >>> print(resp['id'])  # id of the created dataset
+    dataset_B
     >>> # Finally, stop the server
     >>> server.stop()
     """
 
-    def __init__(self, base_url, prefix=None):
+    def __init__(self, base_url, prefix=None, api_token=None):
         """Initialize the PlantDBClient with a base URL."""
         if prefix is None:
             prefix = api_prefix()
         self.base_url = f"{base_url}{prefix}"
-        self.session = requests.Session()
-        self.jwt_token = None
-        self.username = None
+
+        self._access_token = None
+        self._refresh_token = None
+        self._api_token = api_token
+        self._username = None
+
+        # Dedicated session for access‑token requests
+        self._session = requests.Session()
+        if self._api_token:
+            # Validate provided API token:
+            url = join_url(self.base_url, api_endpoints.token_validation())
+            response = self._session.request("POST", url, headers={"Authorization": f"Bearer {self._api_token}"})
+            if response.ok:
+                self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
+            else:
+                raise ValueError(f"Invalid API token: {self._api_token}")
+
         self.logger = get_logger(__class__.__name__)
 
-    def validate_session_token(self, token):
-        """
-        Sets the JWT token for the HTTP session and updates the Authorization header.
-
-        Parameters
-        ----------
-        token : str
-            The JWT token to be used for authentication.
-        """
-        url = join_url(self.base_url, api_endpoints.token_validation())
-        response = self.session.post(url, headers={"Authorization": f"Bearer {token}"})
-        if response.status_code == 200:
-            self.jwt_token = token
-            self.username = response.json().get('username')
-            # Add the JWT to the header
-            self.session.headers.update({'Authorization': f'Bearer {self.jwt_token}'})
-        else:
-            self.logger.error(f"Token validation failed!")
-            self.logger.error(response.json())
-        return
 
     def login(self, username: str, password: str) -> bool:
-        """
-        Authenticate the user with the PlantDB API.
+        """Authenticate the user with the PlantDB API.
 
         Parameters
         ----------
         username : str
-            Username for authentication
+            Username for authentication.
         password : str
-            Password for authentication
+            Password for authentication.
 
         Returns
         -------
         bool
             ``True`` if login successful, ``False`` otherwise
+
+        Notes
+        -----
+        Using this method with an existing API token will revoke it upon successful login.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> print(client._access_token)  # print the 'admin' access token
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.login())
         data = {
@@ -181,11 +211,18 @@ class PlantDBClient:
         }
 
         try:
-            response = self.session.post(url, json=data)
-            if response.status_code == 200:
+            # Use _session.request directly for login to avoid using expired tokens in headers
+            response = self._session.request("POST", url, json=data)
+            if response.ok:
                 result = response.json()
-                self.jwt_token = result.get('access_token')
-                self.username = username
+                self._access_token = result.get('access_token')
+                self._refresh_token = result.get('refresh_token')
+                self._username = username
+                if self._api_token:
+                    self.logger.warning(f"Access token will replace API token in request authentication!")
+                    self._api_token = None
+                # Add the JWT to the header
+                self._session.headers.update({'Authorization': f'Bearer {self._access_token}'})
                 return True
             else:
                 error_msg = response.json().get('message', 'Login failed')
@@ -196,78 +233,360 @@ class PlantDBClient:
             self.logger.error(f"Login request failed: {e}")
             return False
 
+    def _request(self, method, url, **kwargs):
+        """Perform an HTTP request with automatic token refresh on 401."""
+        response = self._session.request(method, url, **kwargs)
+
+        if response.status_code == 401 and self._refresh_token:
+            self.logger.info("Access token expired, attempting to refresh...")
+            if self.refresh_token():
+                self.logger.info("Token refresh successful, retrying request...")
+                # Update headers for the retry
+                if 'headers' in kwargs:
+                    kwargs['headers'].update({'Authorization': f'Bearer {self._access_token}'})
+                else:
+                    # session already has the updated Authorization header
+                    pass
+                return self._session.request(method, url, **kwargs)
+            else:
+                self.logger.error("Token refresh failed, user needs to re-authenticate.")
+
+        return response
+
     def logout(self) -> bool:
-        """
-        Logout user from the PlantDB API.
+        """Logout user from the PlantDB API.
 
         Returns
         -------
         bool
-            True if logout successful
+            ``True`` if logout successful, ``False`` otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> # Then log out
+        >>> client.logout()
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.logout())
         try:
-            response = self.session.post(url)
-            if response.status_code == 200:
-                self.username = None
+            # Use _request_with_refresh for logout as it requires authentication
+            response = self._request("POST", url)
+            if response.ok:
+                self._username = None
+                self._access_token = None
+                self._refresh_token = None
                 # Remove the Authorization with the JWT from the header
-                self.session.headers.pop('Authorization')
+                if 'Authorization' in self._session.headers:
+                    self._session.headers.pop('Authorization')
                 return True
             return False
         except Exception:
             return False
 
-    def refresh(self) -> bool:
-        """Refresh the database."""
-        url = join_url(self.base_url, api_endpoints.refresh())
-        try:
-            response = self.session.get(url)
-            if response.status_code == 200:
-                return True
-            return False
-        except Exception:
-            return False
-
-    def refresh_token(self) -> bool:
-        """Refresh the JWT token."""
-        url = join_url(self.base_url, api_endpoints.token_refresh())
-        try:
-            response = self.session.post(url)
-            if response.status_code == 200:
-                result = response.json()
-                self.jwt_token = result.get('access_token')
-                self.username = result.get('username')
-                return True
-            return False
-        except Exception:
-            return False
-
-    def _handle_http_errors(self, response):
-        """
-        Handles HTTP errors by raising a custom exception with an error message obtained
-        from the HTTP response. This function intercepts the original exception, extracts
-        the error message from the response JSON, and raises a new exception to the same
-        type with the extracted message.
+    def create_user(self, username: str, password: str, fullname: str) -> bool:
+        """Create a new user in the PlantDB API.
 
         Parameters
         ----------
-        response : requests.Response
-            The HTTP response object from which the status and error message will be
-            assessed. The response object is expected to have a JSON body containing
-            a key "message" for error details.
+        username : str
+            New username to create.
+        password : str
+            Password for authentication.
+        fullname : str
+            The full name of the user.
 
-        Raises
-        ------
-        RequestException
-            If the HTTP response status code indicates an error. The raised exception is
-            of the same type as the original exception, with the message replaced by the
-            value of the "message" key from the response JSON body.
+        Returns
+        -------
+        bool
+            ``True`` if user creation is successful, ``False`` otherwise
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> _ = client.login('admin', 'admin')
+        >>> # Create a new user
+        >>> _ = client.create_user('batman', 'JokerInArkham', 'Bruce Wayne')
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
+        url = join_url(self.base_url, api_endpoints.create_user())
+        data = {
+            'username': username,
+            'password': password,
+            'fullname': fullname,
+        }
+
         try:
-            response.raise_for_status()
+            # create_user usually requires admin, use _request_with_refresh
+            response = self._request("POST", url, json=data)
+            if response.ok:
+                return True
+            else:
+                error_msg = response.json().get('message', 'Unknown server error.')
+                self.logger.error(f"Failed to create user: {error_msg}")
+                return False
+
         except RequestException as e:
-            response_data = response.json()["message"]
-            raise type(e)(response_data) from e
+            self.logger.error(f"User registration request failed: {e}")
+            return False
+
+    def create_api_token(
+            self,
+            token_exp: int,
+            dataset_permissions: dict[str, tuple[Permission | str, ...] | Permission | str]
+    ) -> str | None:
+        """
+        Creates an API token with a specified expiration time and dataset permissions.
+
+        This method generates an API token that is tied to the permissions of specific
+        datasets. The permissions for each dataset must be provided, and they will be
+        validated against the defined `Permission` type. This allows fine-grained
+        control over dataset access via the generated token. The token can only be
+        created successfully if the server accepts the provided data.
+
+        Parameters
+        ----------
+        token_exp : int
+            The expiration time for the API token in seconds.
+        dataset_permissions : dict of str to tuple[Permission | str, ...] or Permission or str
+            A dictionary where each key is a dataset name (unix globbing possible),
+            and the corresponding value is the permission(s) for that dataset.
+            Permissions can be a single `Permission` instance, a string, or a
+            tuple of `Permission` instances or strings.
+
+        Returns
+        -------
+        str or None
+            Returns the generated API token as a string if successful. Returns None
+            if the token creation fails due to server error or other issues.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.commons.auth.models import Permission
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> # Create an API token with 'WRITE' permission to create a new scan dataset 'new_scan'
+        >>> api_token = client.create_api_token(3600, {'new_scan': ('read', 'write', 'create')})
+        >>> # Create a new scan dataset using the API token (with a new client initialized with the API token):
+        >>> client2 = PlantDBClient(plantdb_url('localhost', port=5000), api_token=api_token)
+        >>> client2.create_scan('new_scan', {'description': "Test API token dataset"}, use_api_token=True)
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
+        url = join_url(self.base_url, api_endpoints.create_api_token())
+
+        # Validate dataset permissions
+        datasets = {}
+        for dataset, permissions in dataset_permissions.items():
+            if not isinstance(permissions, (set, list, tuple)):
+                permissions = (permissions,)
+            datasets[dataset] = []
+            for permission in permissions:
+                if isinstance(permission, str) and permission not in Permission:
+                    raise ValueError(f"Invalid permission: {permission}. "
+                                     f"Must be one of {[p.value for p in Permission]}.")
+                datasets[dataset].append(str(permission))
+
+        data = {
+            "token_exp": token_exp,
+            "datasets": datasets,
+        }
+        try:
+            response = self._request("POST", url, json=data)
+            if response.ok:
+                self._api_token = response.json().get('api_token')
+                return self._api_token
+            else:
+                error_msg = response.json().get('message', 'Unknown server error.')
+                self.logger.error(f"Failed to create API token: {error_msg}")
+                return None
+        except RequestException as e:
+            self.logger.error(f"Failed to create API token: {e}")
+            return None
+
+    def refresh(self, scan_id: str | None = None) -> bool:
+        """Refresh the database.
+
+        Parameters
+        ----------
+        scan_id : str | None
+            The optional id of the scan to refresh, else refresh the whole database.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> client.refresh()
+        True
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
+        url = join_url(self.base_url, api_endpoints.refresh(scan_id))
+        try:
+            response = self._request("GET", url)
+            if response.ok:
+                return True
+            return False
+        except Exception:
+            return False
+
+    def validate_token(self, token) -> bool:
+        """Validate an authentication token against the remote service.
+
+        This method sends a ``POST`` request to the token‑validation endpoint
+        using the supplied ``token`` in the ``Authorization`` header.
+
+        Parameters
+        ----------
+        token : str
+            The bearer token to be validated.
+
+        Returns
+        -------
+        ``True`` if the token is accepted by the server, otherwise ``False``.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> client.validate_token(client._access_token)
+        True
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
+        url = join_url(self.base_url, api_endpoints.token_validation())
+        response = self._request("POST", url, headers={"Authorization": f"Bearer {token}"})
+        if response.ok:
+            resp_username = response.json()['user']['username']
+            if not self._username:
+                self._username = resp_username
+                self.refresh_token()
+            if self._username and resp_username != self._username:
+                self.logger.warning(f"Given token correspond to a different username")
+            return True
+        else:
+            return False
+
+    def refresh_token(self) -> bool:
+        """Refresh the JSON Web Token.
+
+        Uses the stored refresh token to obtain a new access/refresh token pair.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Use it to log in as 'admin'
+        >>> client.login('admin', 'admin')
+        >>> old_access_token = client._access_token
+        >>> client.refresh_token()
+        True
+        >>> client._access_token == old_access_token
+        False
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
+        if not self._refresh_token:
+            self.logger.error("No refresh token available")
+            return False
+
+        url = join_url(self.base_url, api_endpoints.token_refresh())
+        data = {'refresh_token': self._refresh_token}
+        try:
+            # Use _session.request directly to avoid infinite recursion with _request_with_refresh
+            response = self._session.request("POST", url, json=data)
+            if response.ok:
+                result = response.json()
+                self._access_token = result.get('access_token')
+                self._refresh_token = result.get('refresh_token')
+                # Update the header with the new access token
+                self._session.headers.update({'Authorization': f'Bearer {self._access_token}'})
+                return True
+            else:
+                error_msg = response.json().get('message', 'Token refresh failed')
+                self.logger.error(f"Token refresh failed: {error_msg}")
+                self._access_token = None
+                self._refresh_token = None
+                self._username = None
+                return False
+        except Exception as e:
+            self.logger.error(f"Token refresh request failed: {e}")
+            return False
+
+    def _handle_http_errors(self, response):
+        """Handles HTTP errors by logging a message appropriate to the severity of the HTTP status code."""
+        # If the response is successful, nothing to do
+        if response.ok:
+            return
+
+        # Determine severity and log accordingly
+        if response.status_code >= 500:
+            # Server error - treat as serious
+            self.logger.error(
+                f"Server error {response.status_code}: {response.reason}"
+            )
+        else:
+            # Client error - treat as a warning
+            self.logger.warning(
+                f"Client error {response.status_code}: {response.reason}"
+            )
+
+        # Try to pull a helpful message from the JSON payload
+        try:
+            response_data = response.json().get("message", response.text)
+        except ValueError:
+            # Fallback to raw text if JSON cannot be decoded
+            response_data = response.text
+
+        # Re‑raise a generic RequestException with the extracted message
+        raise RequestException(response_data)
 
     def list_scans(self, query=None, fuzzy=False):
         """List all scans in the database.
@@ -291,14 +610,19 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scans()
-        >>> print(response)
-        ['virtual_plant', 'real_plant_analyzed', 'real_plant', 'virtual_plant_analyzed', 'arabidopsis000']
+        >>> print(sorted(response))
+        ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         url = join_url(self.base_url, api_endpoints.scans())
         params = {}
@@ -306,10 +630,71 @@ class PlantDBClient:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self.session.get(url, params=params)
+        response = self._request('GET', url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
+        return response.json()
+
+    def list_scans_info(self, query=None, fuzzy=False):
+        """Retrieve detailed scan information dictionaries from the ScansTable resource.
+
+        Parameters
+        ----------
+        query : dict, optional
+            A dictionary that will be JSON‑encoded and sent as the ``filterQuery`` URL
+            parameter.  Use the same structure accepted by the server, _e.g._
+            ``{"object": {"species": "Arabidopsis.*"}}``.
+        fuzzy : bool, optional
+            When ``True`` the server performs fuzzy matching (default ``False``).
+
+        Returns
+        -------
+        list[dict]
+            A list where each entry is a dictionary containing the scan’s
+            ``metadata``, ``tasks``, ``files`` and other information as defined by `ScansTable`.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails or the server returns an error status.
+
+        Examples
+        --------
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> from plantdb.client.plantdb_client import PlantDBClient
+        >>> from plantdb.client.rest_api import plantdb_url
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> response = (client.list_scans_info())
+        >>> print(len(response))
+        5
+        >>> print(response[0]['id'])
+        real_plant_analyzed
+        >>> # Finally, stop the server
+        >>> server.stop()
+        """
+        # Build the URL for the “scans info” endpoint - the server side class is ScansTable
+        url = join_url(self.base_url, api_endpoints.scans_info())
+
+        # Prepare query parameters exactly as the REST API expects
+        params = {}
+        if query is not None:
+            # The API expects a JSON string in the ``filterQuery`` parameter
+            params["filterQuery"] = json.dumps(query)
+        if fuzzy:
+            params["fuzzy"] = fuzzy
+
+        # Perform the request; token refresh is handled automatically
+        response = self._request("GET", url, params=params)
+
+        # Turn HTTP errors into readable exceptions
+        self._handle_http_errors(response)
+
+        # Return the parsed JSON payload (list of dicts)
         return response.json()
 
     def create_scan(self, name, metadata=None):
@@ -334,24 +719,44 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
-        >>> metadata = {'description': 'Test plant scan'}
-        >>> response = client.create_scan('test_plant', metadata=metadata)
-        >>> print(response)
-        {'message': "Scan 'test_plant' created successfully."}
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Scan creation requires authentication
+        >>> response = client.create_scan('test_plant')
+        WARNING  [PlantDBClient] Client error 401: UNAUTHORIZED
+        requests.exceptions.RequestException: No authenticated user!
+        >>> # Log in as admin to get sufficient rights to create scan
+        >>> client.login('admin', 'admin')
+        >>> response = client.create_scan('test_plant', metadata={'description': 'Test plant scan'})
+        >>> print(response['message'])
+        Scan created successfully
+        >>> print(response['id'])
+        test_plant
+        >>> # Or create an API token with 'WRITE' permission to create a new scan dataset 'new_scan'
+        >>> print(client.create_api_token(3600, {'new_scan': ('read', 'write', 'create')}))
+        >>> # Create a new scan dataset using the API token:
+        >>> client.create_scan('new_scan', {'description': "Test API token dataset"}, use_api_token=True)
+        {'message': 'Scan created successfully', 'id': 'new_scan'}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/scan"
-        data = {'name': name}
+        url = join_url(self.base_url, api_endpoints.scan(name))
+
+        data = {}
         if metadata:
             data['metadata'] = metadata
-        response = self.session.post(url, json=data)
 
+        # Send the request:
+        response = self._request("POST", url, json=data)
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
+
         return response.json()
 
     def get_scan_metadata(self, scan_id, key=None):
@@ -376,23 +781,28 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
-        >>> metadata = client.get_scan_metadata('test_plant')
-        >>> print(metadata)
-        {'metadata': {'owner': 'anonymous', 'description': 'Test plant scan'}}
-        >>> # Get specific metadata key
-        >>> value = client.get_scan_metadata('test_plant', key='description')
-        >>> print(value)
-        {'metadata': 'Test plant scan'}
+        >>> metadata = client.get_scan_metadata('real_plant')
+        >>> print(metadata['metadata']['owner'])
+        guest
+        >>> # Get a specific metadata key
+        >>> value = client.get_scan_metadata('real_plant', key='owner')
+        >>> print(value['metadata'])
+        guest
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/metadata"
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
         params = {'key': key} if key else None
-        response = self.session.get(url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -423,22 +833,26 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Log in as admin to get sufficient rights
+        >>> client.login('admin', 'admin')
         >>> new_metadata = {'description': 'Updated scan description'}
-        >>> response = client.update_scan_metadata('test_plant', new_metadata)
-        >>> print(response)
-        {'metadata': {'owner': 'anonymous', 'description': 'Updated scan description'}}
+        >>> response = client.update_scan_metadata('real_plant', new_metadata)
+        >>> print(response['metadata']['description'])
+        Updated scan description
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/metadata"
-        data = {
-            'metadata': metadata,
-            'replace': replace
-        }
-        response = self.session.post(url, json=data)
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
+        data = {'metadata': metadata, 'replace': replace}
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -468,22 +882,27 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scan_filesets('real_plant')
         >>> print(response)
         {'filesets': ['images']}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/scan/{scan_id}/filesets"
+        url = join_url(self.base_url, api_endpoints.scan_filesets_list(scan_id))
         params = {}
         if query is not None:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self.session.get(url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -504,7 +923,7 @@ class PlantDBClient:
         Returns
         -------
         dict
-            Server response containing creation confirmation message
+            Server response containing a creation confirmation message
 
         Raises
         ------
@@ -513,24 +932,28 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Log in as admin to get sufficient rights
+        >>> client.login('admin', 'admin')
         >>> metadata = {'description': 'This is a test fileset'}
         >>> response = client.create_fileset('my_fileset', 'real_plant', metadata=metadata)
         >>> print(response)
-        {'message': "Fileset 'my_fileset' created successfully in 'real_plant'."}
+        {'message': "Fileset created successfully in 'real_plant'.", 'id': 'my_fileset'}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/fileset"
-        data = {
-            'fileset_id': fileset_id,
-            'scan_id': scan_id
-        }
+        url = join_url(self.base_url, api_endpoints.fileset(scan_id, fileset_id))
+        data = {'fileset_id': fileset_id, 'scan_id': scan_id}
         if metadata:
             data['metadata'] = metadata
-        response = self.session.post(url, json=data)
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -560,23 +983,28 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
-        >>> metadata = client.get_fileset_metadata('real_plant', 'my_fileset')
-        >>> print(metadata)
-        {'metadata': {'description': 'This is a test fileset'}}
-        >>> # Get specific metadata key
-        >>> value = client.get_fileset_metadata('real_plant', 'my_fileset', key='description')
-        >>> print(value)
-        {'metadata': 'This is a test fileset'}
+        >>> metadata = client.get_fileset_metadata('real_plant', 'images')
+        >>> print(metadata['metadata']['channels'])
+        ['rgb']
+        >>> # Get a specific metadata key
+        >>> value = client.get_fileset_metadata('real_plant', 'images', key='channels')
+        >>> print(value['metadata'])
+        ['rgb']
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
         params = {'key': key} if key else None
-        response = self.session.get(url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -609,23 +1037,27 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
-        >>> # Update metadata
-        >>> new_metadata = {'description': 'Updated fileset description', 'author': 'John Doe'}
-        >>> response = client.update_fileset_metadata('real_plant', 'my_fileset', new_metadata)
-        >>> print(response)
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Log in as admin to get sufficient rights
+        >>> client.login('admin', 'admin')
+        >>> # Replace the fileset metadata
+        >>> new_metadata = {'description': 'Updated fileset description', 'owner': 'John Doe'}
+        >>> response = client.update_fileset_metadata('real_plant', 'images', new_metadata, replace=True)
+        >>> print(response['metadata'])
         {'metadata': {'description': 'Updated fileset description', 'author': 'John Doe'}}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/metadata"
-        data = {
-            'metadata': metadata,
-            'replace': replace
-        }
-        response = self.session.post(url, json=data)
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
+        data = {'metadata': metadata, 'replace': replace}
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -657,22 +1089,27 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
-        >>> response = client.list_fileset_files('real_plant', 'images')
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> response = client.fileset_files_list('real_plant','images')
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/fileset/{scan_id}/{fileset_id}/files"
+        url = join_url(self.base_url, api_endpoints.fileset_files_list(scan_id, fileset_id))
         params = {}
         if query is not None:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
-        response = self.session.get(url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -710,13 +1147,14 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
-        >>> import tempfile
-        >>> import yaml
-        >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Log in as admin to get sufficient rights
+        >>> client.login('admin', 'admin')
         >>> # Example 1 - Existing YAML file path as string
         >>> metadata = {'description': 'Test document', 'author': 'John Doe'}
         >>> dummy_data = {'name': 'Test Plant', 'species': 'Arabidopsis thaliana'}
@@ -739,23 +1177,19 @@ class PlantDBClient:
         >>> metadata = {'description': 'Random RGB test image', 'author': 'John Doe'}
         >>> response = client.create_file(image_data, file_id='random_image', ext='png', scan_id='real_plant', fileset_id='images', metadata=metadata)
         >>> print(response)
-
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
         import os
         import json
         from io import BytesIO
         from pathlib import Path
 
-        url = f"{self.base_url}/api/file"
+        url = join_url(self.base_url, api_endpoints.file(scan_id, fileset_id, file_id))
 
-        ext = ext.lstrip('.').lower()  # Remove leading dot if present
-        # Prepare form data
-        data = {
-            'file_id': file_id,
-            'ext': ext,
-            'scan_id': scan_id,
-            'fileset_id': fileset_id
-        }
+        # Prepare data
+        ext = ext.lstrip('.').lower()  # Remove the leading dot if present
+        data = {'ext': ext}
 
         # Add metadata if provided
         if metadata:
@@ -773,18 +1207,18 @@ class PlantDBClient:
             files = {
                 'file': (filename, file_data, get_mime_type(ext))
             }
-            response = self.session.post(url, files=files, data=data)
+            response = self._request("POST", url, files=files, data=data)
         else:
-            # Convert to Path object if it's a string
+            # Convert to a Path object if it's a string
             file_path = Path(file_data) if isinstance(file_data, str) else file_data
 
-            # Handle file from path
+            # Handle file from a path
             with open(file_path, 'rb') as file_handle:
                 filename = os.path.basename(str(file_path))
                 files = {
                     'file': (filename, file_handle, 'application/octet-stream')
                 }
-                response = self.session.post(url, files=files, data=data)
+                response = self._request("POST", url, files=files, data=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -816,23 +1250,28 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_file_metadata('test_plant', 'images', 'image_001')
         >>> print(metadata)
         {'metadata': {'description': 'Test file'}}
-        >>> # Get specific metadata key
+        >>> # Get a specific metadata key
         >>> value = client.get_file_metadata('test_plant', 'images', 'image_001', key='description')
         >>> print(value)
         {'metadata': 'Test file'}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
         params = {'key': key} if key else None
-        response = self.session.get(url, params=params)
+        response = self._request("GET", url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
@@ -867,28 +1306,27 @@ class PlantDBClient:
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Start a test PlantDB REST API server first:
+        >>> server = TestRestApiServer(test=True, port=5000)
+        >>> server.start()
+        >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
-        >>> client = PlantDBClient(plantdb_url())
+        >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
+        >>> # Log in as admin to get sufficient rights
+        >>> client.login('admin', 'admin')
         >>> # Update metadata
         >>> new_metadata = {'description': 'Updated description'}
-        >>> response = client.update_file_metadata(
-        ...     'test_plant',
-        ...     'images',
-        ...     'image_001',
-        ...     new_metadata
-        ... )
+        >>> response = client.update_file_metadata('test_plant', 'images', 'image_001', new_metadata)
         >>> print(response)
         {'metadata': {'description': 'Updated description'}}
+        >>> # Finally, stop the server
+        >>> server.stop()
         """
-        url = f"{self.base_url}/api/file/{scan_id}/{fileset_id}/{file_id}/metadata"
-        data = {
-            'metadata': metadata,
-            'replace': replace
-        }
-        response = self.session.post(url, json=data)
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
+        data = {'metadata': metadata, 'replace': replace}
+        response = self._request("POST", url, json=data)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
