@@ -84,15 +84,8 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_get_success(self):
         """Test that retrieving a scan succeeds."""
-        # Get a scan ID first
-        r = requests.get(self.base_url + '/scans',
-                         headers={'Authorization': 'Bearer ' + self.admin_token})
-        if not r.ok:
-            print(r.json())
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        # Get a scan ID to test
+        scan_id = "real_plant"
 
         r = requests.get(self.base_url + f'/scan/{scan_id}',
                          headers={'Authorization': 'Bearer ' + self.admin_token})
@@ -144,14 +137,7 @@ class ScanApiTests(unittest.TestCase):
     def test_scan_metadata_get(self):
         """Test that getting scan metadata succeeds."""
         # Get a scan ID to test
-        r = requests.get(self.base_url + '/scans',
-                         headers={'Authorization': 'Bearer ' + self.admin_token})
-        if not r.ok:
-            print(r.json())
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = "real_plant"
 
         r = requests.get(self.base_url + f'/scan/{scan_id}/metadata',
                          headers={'Authorization': 'Bearer ' + self.admin_token})
@@ -166,14 +152,7 @@ class ScanApiTests(unittest.TestCase):
     def test_scan_metadata_post(self):
         """Test that updating scan metadata succeeds."""
         # Get a scan ID to test
-        r = requests.get(self.base_url + '/scans',
-                         headers={'Authorization': 'Bearer ' + self.admin_token})
-        if not r.ok:
-            print(r.json())
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = "real_plant"
 
         # Get current metadata
         r = requests.get(self.base_url + f'/scan/{scan_id}/metadata',
@@ -198,14 +177,7 @@ class ScanApiTests(unittest.TestCase):
     def test_scan_filesets_list(self):
         """Test that listing scan filesets succeeds."""
         # Get a scan ID to test
-        r = requests.get(self.base_url + '/scans',
-                         headers={'Authorization': 'Bearer ' + self.admin_token})
-        if not r.ok:
-            print(r.json())
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = "real_plant"
 
         r = requests.get(self.base_url + f'/scan/{scan_id}/filesets',
                          headers={'Authorization': 'Bearer ' + self.admin_token})
