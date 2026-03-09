@@ -167,7 +167,7 @@ def logout_user(db: Any, token: str, logger: logging.Logger | None = None) -> st
     NoAuthUserError
         If logout fails for any reason.
     """
-    log = _get_logger(logger)
+    log = _get_logger(logger.name if logger else __name__)
     try:
         success, username = db.logout(token=token)
         if not success:
