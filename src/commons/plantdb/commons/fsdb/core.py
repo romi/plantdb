@@ -1814,13 +1814,13 @@ class Scan(db.Scan, MetadataManager):
     ['007', 'romidb']
     >>> print(os.listdir(os.path.join(db.path(), scan.id)))  # Same goes for the metadata
     ['metadata']
-    >>> db.dummy = False  # to avoid cleaning up the
+    >>> db._is_dummy = False  # to avoid cleaning up the
     >>> db.disconnect()
     >>> # When reconnecting to db, if created scan is EMPTY (no Fileset & File) it is not found!
     >>> db.connect()
     >>> print(db.get_scan('007'))
     None
-    >>> db.dummy = True  # to clean up the temporary dummy database
+    >>> db._is_dummy = True  # to clean up the temporary dummy database
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
     >>> # Example #3: Use an existing database:
@@ -2544,14 +2544,14 @@ class Fileset(db.Fileset, MetadataManager):
         >>> fs.set_metadata("test", "value")
         >>> print(fs.get_metadata("test"))
         'value'
-        >>> db.dummy=False  # to avoid cleaning up the temporary dummy database
+        >>> db._is_dummy=False  # to avoid cleaning up the temporary dummy database
         >>> db.disconnect()
         >>> db.connect()
         >>> scan = db.get_scan("myscan_001")
         >>> fs = scan.get_fileset('fileset_001')
         >>> print(fs.get_metadata("test"))
         'value'
-        >>> db.dummy=True
+        >>> db._is_dummy=True
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _get_metadata(self.metadata, key, default)
