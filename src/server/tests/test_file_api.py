@@ -53,14 +53,7 @@ class FileApiTests(unittest.TestCase):
 
     def test_download_existing_file(self):
         """Test that downloading an existing file succeeds."""
-        # Get scan ID from the scans list
-        r = requests.get(self.base_url + '/scans')
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
-
-        # Try to download a file
+        scan_id = 'real_plant_analyzed'
         fileset_id = "images"
         file_id = "00000_rgb"
         r = requests.get(self.base_url + f'/file/{scan_id}/{fileset_id}/{file_id}',
@@ -78,12 +71,7 @@ class FileApiTests(unittest.TestCase):
 
     def test_create_file(self):
         """Test creating a new file."""
-        # First get a scan ID
-        r = requests.get(self.base_url + '/scans')
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = 'real_plant_analyzed'
 
         # Create a YAML temporary test file:
         from tempfile import NamedTemporaryFile

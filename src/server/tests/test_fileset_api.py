@@ -53,12 +53,7 @@ class FilesetApiTests(unittest.TestCase):
 
     def test_create_fileset(self):
         """Test creating a new fileset."""
-        # First get a scan ID
-        r = requests.get(self.base_url + '/scans')
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = 'real_plant_analyzed'
         # Then create a fileset ID and try to create it
         fileset_id = "test_fileset"
         r = requests.post(self.base_url + f'/fileset/{scan_id}/{fileset_id}',
@@ -71,12 +66,7 @@ class FilesetApiTests(unittest.TestCase):
 
     def test_create_fileset_without_auth(self):
         """Test creating a fileset without authorization fails."""
-        # First get a scan ID
-        r = requests.get(self.base_url + '/scans')
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = 'real_plant_analyzed'
         # Then create a fileset ID and try to create it (withou authentication it should fail)
         fileset_id = "test_fileset_no_auth"
         r = requests.post(self.base_url + f'/fileset/{scan_id}/{fileset_id}')
@@ -84,12 +74,7 @@ class FilesetApiTests(unittest.TestCase):
 
     def test_create_fileset_with_metadata(self):
         """Test creating a new fileset with metadata."""
-        # First get a scan ID
-        r = requests.get(self.base_url + '/scans')
-        self.assertEqual(r.status_code, 200)
-        scans = r.json()
-        self.assertGreater(len(scans), 0)
-        scan_id = scans[0]
+        scan_id = 'real_plant_analyzed'
         # Then create a metadata dictionary
         metadata = {'description': 'This is a test description'}
         # Then create a fileset ID and try to create it
