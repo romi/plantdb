@@ -94,7 +94,7 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         names = client.request_scan_names_list(self.server.host, **self.kw)
         scan_id = names[0]
         # Download archive to temp dir
-        res_data = client.request_archive_download(self.server.host, scan_id, out_dir=None, **self.kw)
+        res_data = client.request_archive_download(self.server.host, scan_id, session_token=login_data['access_token'], out_dir=None, **self.kw)
         # when out_dir is None, a BytesIO and message tuple is expected
         self.assertIsInstance(res_data, tuple)
         self.assertIsInstance(res_data[0], io.BytesIO)
@@ -242,8 +242,9 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         can retrieve angle data for a scan.
         """
         scan_id = "real_plant_analyzed"
+        login_data = client.request_login(self.server.host, 'guest', 'guest', **self.kw)
 
-        data = client.get_angles_and_internodes_data(self.server.host, scan_id, **self.kw)
+        data = client.get_angles_and_internodes_data(self.server.host, scan_id, session_token=login_data['access_token'], **self.kw)
         # If data is returned, it should be a dictionary
         if data is not None:
             self.assertIsInstance(data, dict)
