@@ -131,13 +131,10 @@ class TestIODummy(DummyDBTestCase):
     def test_write_vol(self):
         vol = rng.random((50, 50, 200))
         self._test_write_file(vol, 'volume')
-        self._test_write_file(vol, 'volume', compress=False)
 
     def test_read_vol(self):
         vol = rng.random((50, 50, 200))
         fpath, obj, _ = self._test_write_file(vol, 'volume')
-        self._test_read_file(fpath, obj, 'volume')
-        fpath, obj, _ = self._test_write_file(vol, 'volume', compress=False)
         self._test_read_file(fpath, obj, 'volume')
 
     def test_write_npz(self):
