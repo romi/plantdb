@@ -500,7 +500,6 @@ def _write_volume(fname, data, **kwargs):
         The data object to save.
     """
     import imageio.v3 as iio
-    import tifffile
     try:
         import imagecodecs
     except ImportError:
@@ -512,17 +511,9 @@ def _write_volume(fname, data, **kwargs):
 
     fname = Path(fname)
     ext = fname.suffix  # get the extension
-    # Override extension if specified in keyword-argument:
+    # Override extension if specified in the keyword-argument:
     kwargs['extension'] = ext
-    if kwargs.get('compress', False):
-        # By default, use LZW compression with `tifffile.imwrite`:
-        if 'compression' not in kwargs:
-            kwargs['compression'] = 'LZW'
-        tifffile.imwrite(fname, data, **kwargs)
-    else:
-        kwargs.pop('compress', None)
-        # No compression with `imageio.v3`
-        iio.imwrite(fname, data, **kwargs)
+    iio.imwrite(fname, data, **kwargs)
     return
 
 
@@ -538,32 +529,25 @@ def write_volume(file, data, ext="tiff", **kwargs):
     ext : str, optional
         File extension, defaults to "tiff".
 
-    Other Parameters
-    ----------------
-    compress : bool, optional
-        Indicate if the volume file should be compressed.
-        Defaults to ``True``.
-
     Examples
     --------
     >>> import numpy as np
-    >>> from plantdb.commons.fsdb.core import FSDB
     >>> from plantdb.commons.io import write_volume
-    >>> from plantdb.commons.fsdb.core import Scan, Fileset, File
     >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_fileset=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
     >>> fs = scan.get_fileset("fileset_001")
-    >>> vol = np.ones((50, 10, 10))  # stupid volume file with only `1` values
-    >>> f_lzw = fs.create_file('test_volume_compress')
-    >>> write_volume(f_lzw, vol)
-    >>> f = fs.create_file('test_volume')
-    >>> write_volume(f, vol, compress=False)
-    >>> print(f_lzw.path().stat().st_size)
-    15283
-    >>> print(f.path().stat().st_size)
-    48994
+    >>> vol = np.random.randint(0, 254, (10, 10, 10), 'uint8')  # random volume file with 8bit values
+    >>> f_uint8 = fs.create_file('test_volume_uint8')
+    >>> write_volume(f_uint8, vol)
+    >>> f_uint16 = fs.create_file('test_volume_uint16')
+    >>> write_volume(f_uint16, vol.astype('uint16'))
+    >>> print(f_uint8.path().stat().st_size)
+    2750
+    >>> print(f_uint16.path().stat().st_size)
+    3750
+    >>> db.disconnect()
     """
     _writer(file, data, ext, _write_volume, **kwargs)
     return
