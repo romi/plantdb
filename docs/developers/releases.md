@@ -61,7 +61,7 @@ git flow release start X.Y.Z
    # Version X.Y.Z - YYYY-MM-DD
       - Description of the first change
       - Description of the second change
-      - …
+      - ...
    ```
 
 2. Update version numbers in TOML files:
@@ -128,7 +128,7 @@ git checkout -b release/X.Y.Z dev
    # Version X.Y.Z - YYYY-MM-DD
       - Description of the first change
       - Description of the second change
-      - …
+      - ...
    ```
 
 2. Update version numbers in TOML files:
