@@ -643,7 +643,7 @@ class FSDB(db.DB):
             # Initialize scan discovery
             self.scans = _load_scans(self)
             self.is_connected = True
-            self.logger.info("Connected to database successfully")
+            self.logger.info("Successfully connected to the database")
         except Exception as e:
             self.logger.error(f"Failed to connect to database: {e}")
             raise
@@ -925,7 +925,7 @@ class FSDB(db.DB):
                 raise ValueError("One or more sharing groups do not exist")
 
         # Use exclusive lock for scan creation
-        self.logger.info(f"Creating a scan '{scan_id}' as user '{current_user.username}'...")
+        self.logger.debug(f"Creating a scan '{scan_id}' as user '{current_user.username}'...")
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
             # Initialize scan object
             scan = Scan(self, scan_id)  # Initialize a new Scan instance
@@ -936,7 +936,7 @@ class FSDB(db.DB):
             scan.store()  # store the new scan in the local database
             self.scans[scan_id] = scan  # Update scans dictionary with the new one
 
-        self.logger.info(f"Done creating scan.")
+        self.logger.debug(f"Done creating scan.")
         return scan
 
     @require_connected_db
@@ -987,14 +987,14 @@ class FSDB(db.DB):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Use exclusive lock for scan deletion
-        self.logger.info(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
+        self.logger.debug(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
             # Get the Scan instance from the database
             scan = self.scans[scan_id]
             _delete_scan(scan)  # delete the scan directory
             self.scans.pop(scan_id)  # remove the scan from the scan list
 
-        self.logger.info(f"Done deleting scan.")
+        self.logger.debug(f"Done deleting scan.")
         return True
 
     @require_connected_db
@@ -1189,7 +1189,7 @@ class FSDB(db.DB):
                         self.logger.error(f"Failed to login as '{username}'! Another user is logged in.")
                         return None
                     else:
-                        self.logger.info(f"Already logged in as '{username}'.")
+                        self.logger.warning(f"Already logged in as '{username}'.")
                         return
 
             # Else try to create a new session:
@@ -1199,7 +1199,7 @@ class FSDB(db.DB):
             except AssertionError:
                 self.logger.warning(f"User '{username}' has reached max concurrent sessions")
             else:
-                self.logger.info(f"Successfully logged in as '{username}'.")
+                self.logger.debug(f"Successfully logged in as '{username}'.")
             return session_token
         else:
             self.logger.error(f"Failed to login as '{username}'!")
@@ -1221,7 +1221,7 @@ class FSDB(db.DB):
         """
         success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
         if success:
-            self.logger.info(f"Successfully logged out from '{username}'.")
+            self.logger.debug(f"Successfully logged out from '{username}'.")
             return success, username
         else:
             self.logger.warning(f"Failed to logout!")
@@ -1398,7 +1398,7 @@ class FSDB(db.DB):
         """
         if username and token:
             self.logger.warning("Trying to retrieve user data from both 'username' and token!")
-            self.logger.info("Using 'token' to access user data.")
+            self.logger.debug("Using 'token' to access user data.")
             username = None
 
         if username:
@@ -2123,7 +2123,7 @@ class Scan(db.Scan, MetadataManager):
             return
 
         # Use exclusive lock for metadata updates
-        self.logger.info(f"Updating '{self.id}' scan owner to '{new_owner}' user...")
+        self.logger.debug(f"Updating '{self.id}' scan owner to '{new_owner}' user...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Update metadata
             _set_metadata(self.metadata, 'owner', new_owner)
@@ -2131,7 +2131,7 @@ class Scan(db.Scan, MetadataManager):
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
-        self.logger.info(f"Done updating the scan owner.")
+        self.logger.debug(f"Done updating the scan owner.")
         return
 
     @get_authentication
@@ -2171,7 +2171,7 @@ class Scan(db.Scan, MetadataManager):
 
         # Use exclusive lock for metadata updates
         valid_groups_str = ", ".join(valid_groups)
-        self.logger.info(f"Updating '{self.id}' scan group sharing to: '{valid_groups_str}'")
+        self.logger.debug(f"Updating '{self.id}' scan group sharing to: '{valid_groups_str}'")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Update metadata
             _set_metadata(self.metadata, 'sharing', valid_groups)
@@ -2179,7 +2179,7 @@ class Scan(db.Scan, MetadataManager):
             _set_metadata(self.metadata, 'last_modified', iso_date_now())
             _store_scan_metadata(self)
 
-        self.logger.info(f"Done updating the scan group sharing.")
+        self.logger.debug(f"Done updating the scan group sharing.")
         return
 
     @get_authentication
@@ -2242,7 +2242,7 @@ class Scan(db.Scan, MetadataManager):
             raise FilesetExistsError(self, fs_id)
 
         # Use exclusive lock for fileset creation
-        self.logger.info(f"Creating a fileset '{fs_id}' in scan '{self.id}' as '{current_user.username}' user...")
+        self.logger.debug(f"Creating a fileset '{fs_id}' in scan '{self.id}' as '{current_user.username}' user...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             # Create the new Fileset
             fileset = Fileset(self, fs_id)  # Initialize a new Fileset instance
@@ -2262,7 +2262,7 @@ class Scan(db.Scan, MetadataManager):
             self.filesets.update({fs_id: fileset})  # Update scan's filesets dictionary
             self.store()  # Store fileset instance to the JSON
 
-        self.logger.info(f"Done creating the fileset.")
+        self.logger.debug(f"Done creating the fileset.")
         return fileset
 
     @get_authentication
@@ -2305,14 +2305,14 @@ class Scan(db.Scan, MetadataManager):
             raise ValueError(f"Fileset '{fs_id}' does not exist in scan '{self.id}'")
 
         # Use exclusive lock for fileset deletion
-        self.logger.info(f"Deleting fileset '{fs_id}' from scan '{self.id}' as '{current_user.username}' user...")
+        self.logger.debug(f"Deleting fileset '{fs_id}' from scan '{self.id}' as '{current_user.username}' user...")
         with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
             fs = self.filesets[fs_id]
             _delete_fileset(fs)  # delete the fileset
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
             self.store()  # save the changes to the scan main JSON FILE (``files.json``)
 
-        self.logger.info(f"Done deleting fileset.")
+        self.logger.debug(f"Done deleting fileset.")
         return
 
     def store(self):
@@ -2653,7 +2653,7 @@ class Fileset(db.Fileset, MetadataManager):
             raise FileExistsError(self, f_id)
 
         # Use exclusive lock for file creation
-        self.logger.info(f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
+        self.logger.debug(f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             # Create the new File
             file = File(self, f_id)  # Initialize a new File instance
@@ -2672,7 +2672,7 @@ class Fileset(db.Fileset, MetadataManager):
             self.files.update({f_id: file})  # Update filesets's files dictionary
             self.store()  # Store fileset instance to the JSON
 
-        self.logger.info(f"Done creating the file.")
+        self.logger.debug(f"Done creating the file.")
         return file
 
     @get_authentication
@@ -2720,14 +2720,14 @@ class Fileset(db.Fileset, MetadataManager):
             raise ValueError(f"File '{f_id}' does not exist in '{self.scan.id}/{self.id}'")
 
         # Use exclusive lock for fileset creation
-        self.logger.info(f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
+        self.logger.debug(f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             f = self.files[f_id]
             _delete_file(f)  # delete the file
             self.files.pop(f_id)  # remove the File instance from the fileset
             self.store()  # save the changes to the scan main JSON FILE (``files.json``)
 
-        self.logger.info(f"Done deleting file.")
+        self.logger.debug(f"Done deleting file.")
         return
 
     def store(self):
@@ -2928,7 +2928,7 @@ class File(db.File, MetadataManager):
             raise ValueError(f"The provided path is not a file: {path}.")
 
         # Use exclusive lock for this operation
-        self.logger.info(
+        self.logger.debug(
             f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             # Get the file name and extension
@@ -2940,7 +2940,7 @@ class File(db.File, MetadataManager):
             copyfile(path, newpath)
             self.store()  # register it to the scan main JSON FILE
 
-        self.logger.info(f"Done importing file.")
+        self.logger.debug(f"Done importing file.")
         return
 
     def store(self):
@@ -3009,7 +3009,7 @@ class File(db.File, MetadataManager):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Use exclusive lock for this operation
-        self.logger.info(
+        self.logger.debug(
             f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             self.filename = _get_filename(self, ext)
@@ -3018,7 +3018,7 @@ class File(db.File, MetadataManager):
                 f.write(data)
             self.store()
 
-        self.logger.info(f"Done writing raw file.")
+        self.logger.debug(f"Done writing raw file.")
         return
 
     def read(self):
@@ -3087,7 +3087,7 @@ class File(db.File, MetadataManager):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Use exclusive lock for this operation
-        self.logger.info(
+        self.logger.debug(
             f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
         with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
             self.filename = _get_filename(self, ext)
@@ -3096,7 +3096,7 @@ class File(db.File, MetadataManager):
                 f.write(data)
             self.store()
 
-        self.logger.info(f"Done writing file.")
+        self.logger.debug(f"Done writing file.")
         return
 
     def path(self) -> pathlib.Path:
