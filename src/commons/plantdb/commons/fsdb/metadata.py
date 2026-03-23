@@ -354,7 +354,7 @@ class MetadataManager(object):
             return
 
         # Acquire exclusive lock on the *scan* – this mirrors the original behaviour.
-        self.logger.info(
+        self.logger.debug(
             f"Updating '{self.id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
         )
         if isinstance(self, Scan):
@@ -366,5 +366,5 @@ class MetadataManager(object):
             _set_metadata(self.metadata, new_metadata, None)
             self._store_and_timestamp(store_func)
 
-        self.logger.info(f"Done updating the {cls_name.lower()} metadata.")
+        self.logger.debug(f"Done updating the {cls_name.lower()} metadata.")
         return
