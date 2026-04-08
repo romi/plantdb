@@ -298,7 +298,7 @@ def _load_scan_filesets(scan):
     {'fsid_001': <plantdb.commons.fsdb.core.Fileset object at 0x7fa0122232d0>}
     """
     filesets = {}
-    # Get the path to the `files.json` associated to the `scan`:
+    # Get the path to the `files.json` associated with the `scan`:
     files_json = _scan_json_file(scan)
     # Load it:
     with files_json.open(mode="r") as f:
@@ -510,7 +510,7 @@ def _delete_file(file):
     Notes
     -----
     We have to delete:
-      - the JSON metadata file associated to the file.
+      - the JSON metadata file associated with the file.
       - the file
 
     See Also
@@ -530,7 +530,7 @@ def _delete_file(file):
         logger.debug(f"File path: '{file_path}'")
         raise IOError("Cannot delete files or directories outside of a local DB.")
 
-    # - Delete the JSON metadata file associated to the `File` instance:
+    # - Delete the JSON metadata file associated with the `File` instance:
     file_md_path = _file_metadata_path(file)
     if file_md_path.is_file():
         try:
@@ -543,7 +543,7 @@ def _delete_file(file):
             logger.info(
                 f"Deleted JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
 
-    # - Delete the file associated to the `File` instance:
+    # - Delete the file associated with the `File` instance:
     if file_path.is_file():
         try:
             file_path.unlink(missing_ok=False)
@@ -594,7 +594,7 @@ def _delete_fileset(fileset):
     for f_id in files_list:
         fileset.delete_file(f_id)
 
-    # - Delete the JSON metadata file associated to the `Fileset` instance:
+    # - Delete the JSON metadata file associated with the `Fileset` instance:
     json_md = _fileset_metadata_json_path(fileset)
     try:
         json_md.unlink(missing_ok=False)
@@ -604,7 +604,7 @@ def _delete_fileset(fileset):
     else:
         logger.info(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
 
-    # - Delete the metadata directory associated to the `Fileset` instance:
+    # - Delete the metadata directory associated with the `Fileset` instance:
     dir_md = _fileset_metadata_path(fileset)
     try:
         rmtree(dir_md, ignore_errors=True)
@@ -614,7 +614,7 @@ def _delete_fileset(fileset):
     else:
         logger.info(f"Deleted metadata directory for fileset '{fileset.id}'.")
 
-    # - Delete the directory associated to the `Fileset` instance:
+    # - Delete the directory associated with the `Fileset` instance:
     try:
         rmtree(fileset_path, ignore_errors=True)
     except:
@@ -708,7 +708,7 @@ def _make_scan(scan) -> pathlib.Path:
 
 
 def _store_scan(scan):
-    """Dump the fileset and files structure associated to a `scan` on drive.
+    """Dump the fileset and files structure associated with a `scan` on drive.
 
     Parameters
     ----------
