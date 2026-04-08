@@ -1972,10 +1972,6 @@ class Scan(db.Scan, MetadataManager):
         Fileset
             The retrieved or created fileset.
 
-        Notes
-        -----
-        If the `id` do not exist in the local database and `create` is `False`, `None` is returned.
-
         Examples
         --------
         >>> from plantdb.commons.test_database import dummy_db
@@ -1994,16 +1990,10 @@ class Scan(db.Scan, MetadataManager):
         None
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
-        # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username or "guest"):
+        if not self.fileset_exists(fs_id):
+            raise FilesetNotFoundError(self, fs_id)
 
-        # Use shared lock for read operations
-        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, self.db.get_guest_user().username):
-            if not self.fileset_exists(fs_id):
-                raise FilesetNotFoundError(self, fs_id)
-
-            return self.filesets[fs_id]
+        return self.filesets[fs_id]
 
     def get_metadata(self, key=None, default={}):
         """Get the metadata associated with a scan.
@@ -2032,7 +2022,7 @@ class Scan(db.Scan, MetadataManager):
             return _get_metadata(self.metadata, key, default)
 
     def get_measures(self, key=None):
-        """Get the manual measurements associated to a scan.
+        """Get the manual measurements associated with a scan.
 
         Parameters
         ----------
@@ -2506,19 +2496,13 @@ class Fileset(db.Fileset, MetadataManager):
         >>> img = read_image(f)
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
-        # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, current_user.username or "guest"):
+        if not self.file_exists(f_id):
+            raise FileNotFoundError(self, f_id)
 
-        # Use shared lock for read operations
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.SHARED, self.db.get_guest_user().username):
-            if not self.file_exists(f_id):
-                raise FileNotFoundError(self, f_id)
-
-            return self.files[f_id]
+        return self.files[f_id]
 
     def get_metadata(self, key=None, default={}):
-        """Get the metadata associated to a fileset.
+        """Get the metadata associated with a fileset.
 
         Parameters
         ----------
