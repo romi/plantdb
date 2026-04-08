@@ -325,12 +325,35 @@ class ScanLockManager :
         acquired = False
         start_time = time.time()
 
+        # Helper to check for conflicting active locks of a different type
+        def _has_active_lock(other_type: LockType) -> bool:
+            other_key = f"{scan_id}_{other_type.value}"
+            return other_key in self._active_locks
+
         try:
             lock_file_path = self._get_lock_file_path(scan_id)
 
             attempt = 0
             while time.time() - start_time < timeout:
                 attempt += 1
+
+                # Respect intra‑process lock conflicts before touching the file
+                if lock_type == LockType.SHARED and _has_active_lock(LockType.EXCLUSIVE):
+                    # An exclusive lock is active → treat as unavailable and retry
+                    self.logger.debug(
+                        f"Shared lock request for scan {scan_id} blocked by active exclusive lock"
+                    )
+                    time.sleep(0.5)
+                    continue
+
+                if lock_type == LockType.EXCLUSIVE and _has_active_lock(LockType.SHARED):
+                    # One or more shared locks are active → wait
+                    self.logger.debug(
+                        f"Exclusive lock request for scan {scan_id} blocked by active shared lock(s)"
+                    )
+                    time.sleep(0.5)
+                    continue
+
                 try:
                     # Open lock file
                     lock_fd = os.open(lock_file_path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC)

@@ -459,6 +459,100 @@ class TestConcurrentLocks(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(len(errors), 4)  # The other 4 should have timed out
 
+    def test_exclusive_lock_blocks_shared_lock(self):
+        """Verify that an exclusive lock prevents acquiring a shared lock for the same scan_id."""
+        scan_id = "test_scan"
+        user1 = "user1"
+        user2 = "user2"
+        results = []
+        errors = []
+
+        def acquire_exclusive_lock():
+            try:
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1, timeout=60.):
+                    # Hold the exclusive lock for a while
+                    time.sleep(0.5)
+                    # Try to acquire a shared lock (this should not happen while exclusive holds)
+                    results.append("exclusive_held")
+            except Exception as e:
+                errors.append(str(e))
+
+        def acquire_shared_lock():
+            try:
+                # Try to acquire a shared lock while exclusive is held
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, timeout=0.5):
+                    results.append("shared_acquired")
+            except Exception as e:
+                errors.append(str(e))
+
+        # Start exclusive lock thread
+        exclusive_thread = threading.Thread(target=acquire_exclusive_lock)
+        exclusive_thread.start()
+
+        # Give exclusive thread time to acquire the lock
+        time.sleep(0.1)
+
+        # Start shared lock thread
+        shared_thread = threading.Thread(target=acquire_shared_lock)
+        shared_thread.start()
+
+        # Wait for both threads to complete
+        exclusive_thread.join()
+        shared_thread.join()
+
+        # Verify that exclusive lock was acquired and shared lock failed
+        # The exclusive lock should be acquired and held, then released
+        # The shared lock should fail to acquire due to the exclusive lock
+        self.assertIn("exclusive_held", results)
+        self.assertEqual(len(errors), 1)  # Should have one error from shared lock attempt
+
+    def test_shared_lock_blocks_exclusive_lock(self):
+        """Verify that a shared lock prevents acquiring an exclusive lock for the same scan_id."""
+        scan_id = "test_scan"
+        user1 = "user1"
+        user2 = "user2"
+        results = []
+        errors = []
+
+        def acquire_shared_lock():
+            try:
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1):
+                    # Hold the shared lock for a while
+                    time.sleep(0.5)
+                    results.append("shared_held")
+            except Exception as e:
+                errors.append(str(e))
+
+        def acquire_exclusive_lock():
+            try:
+                # Try to acquire an exclusive lock while shared is held
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, timeout=0.5):
+                    results.append("exclusive_acquired")
+            except Exception as e:
+                errors.append(str(e))
+
+        # Start shared lock thread
+        shared_thread = threading.Thread(target=acquire_shared_lock)
+        shared_thread.start()
+
+        # Give shared thread time to acquire the lock
+        time.sleep(0.1)
+
+        # Start exclusive lock thread
+        exclusive_thread = threading.Thread(target=acquire_exclusive_lock)
+        exclusive_thread.start()
+
+        # Wait for both threads to complete
+        shared_thread.join()
+        exclusive_thread.join()
+
+        # The test should verify that the exclusive lock attempt times out
+        # Since we're using a short timeout, we expect the exclusive lock acquisition to fail
+        # This confirms that shared locks block exclusive locks
+        self.assertIn("shared_held", results)
+        # At least one error should be present from the exclusive lock attempt
+        self.assertGreater(len(errors), 0)
+
 
 class TestFSDBLock(unittest.TestCase):
     """Test suite for verifying permission handling in FSDB operations.
