@@ -1234,8 +1234,8 @@ class FSDB(db.DB):
 
     @get_authentication
     @require_authentication
-    @requires_permission(Permission.MANAGE_USERS, check_scan_access=False)
-    def create_user(self, new_username, fullname, password, roles=None, **kwargs) -> None:
+    def create_user(self, new_username, fullname, password, roles=None,
+                    current_user: User | TokenUser | None = None, **kwargs) -> None:
         """Create a new user with the specified details.
 
         Parameters
@@ -1247,17 +1247,20 @@ class FSDB(db.DB):
         password : str
             The password for the new user.
         roles : list[str], optional
-            A list of roles to assign to the new user. Default is None.
+            A list of roles to assign to the new user. Default is ``None``.
+        current_user : User | TokenUser | None
+            The current user, based on logged status or provided API token.
+            Default is ``None``.
 
         Raises
         ------
         PermissionError
             If no user is authenticated.
-            If the user lacks permission to create groups.
+            If the `current_user` lacks permission to create new users.
 
         See Also
         --------
-        RBACManager.users.create : Method used to actually create the user.
+        RBACManager.create_user : Method used to actually create the user.
 
         Examples
         --------
@@ -1274,7 +1277,8 @@ class FSDB(db.DB):
         WoBlNjJPmJHEwuFG3NAyrFtKMHnEg-BRjSplJU-uMbU
         >>> db.disconnect()
         """
-        return self.rbac_manager.users.create(new_username, fullname, password, roles)
+        _ = self.rbac_manager.create_user(current_user, new_username, fullname, password, roles)
+        return
 
     @get_authentication
     @require_authentication
@@ -1296,11 +1300,11 @@ class FSDB(db.DB):
         ------
         PermissionError
             If no user is authenticated, that is logged in or provided an API token.
-            If the user lacks permission to create groups.
+            If the user lacks permissions.
 
         See Also
         --------
-        RBACManager.users.create : Method used to actually create the user.
+        RBACManager.users.update_password : Method used to actually update the user's password.
 
         Examples
         --------
@@ -1456,7 +1460,10 @@ class FSDB(db.DB):
         if username:
             return self.rbac_manager.users.get_user(username)
         elif token:
-            return self.rbac_manager.users.get_user_from_decoded_token(self.session_manager.validate_session(token))
+            if isinstance(self.session_manager, SingleSessionManager):
+                return self.rbac_manager.users.get_user(self.session_manager.validate_session(token)['username'])
+            else:
+                return self.rbac_manager.users.get_user_from_decoded_token(self.session_manager.validate_session(token))
         else:
             self.logger.error("No username or token provided")
             return None
@@ -1504,7 +1511,7 @@ class FSDB(db.DB):
         >>> db = dummy_db()  # automatic login as 'admin'
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
-        >>> prin(group_a.users)
+        >>> print(group_a.users)
         {'admin', 'batman'}
         >>> db.disconnect()
         """
