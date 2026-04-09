@@ -673,18 +673,18 @@ class GroupManager:
 
     Attributes
     ----------
-    groups_file : Union[str, Path]
+    groups_file : str | Path
         Path to the JSON file where groups are stored.
     groups : Dict[str, plantdb.commons.auth.models.Group]
         Dictionary mapping group names to Group objects.
     """
 
-    def __init__(self, groups_file: Union[str, Path] = "groups.json"):
+    def __init__(self, groups_file: str | Path = "groups.json"):
         """Initialize the GroupManager.
 
         Parameters
         ----------
-        groups_file : Union[str, Path]
+        groups_file : str | Path
             Path to the JSON file for storing groups. Defaults to "groups.json".
         """
         self.groups_file = Path(groups_file)
