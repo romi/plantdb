@@ -240,6 +240,20 @@ class SessionManager:
         self.cleanup_expired_sessions()
         return len(self.sessions)
 
+    def has_logged_user(self) -> bool:
+        """Check if there is at least one active (logged‑in) user.
+
+        This method first cleans up any expired sessions and then determines
+        whether the internal ``sessions`` dictionary contains any entries.
+
+        Returns
+        -------
+        bool
+            ``True`` if at least one user has an active session, ``False`` otherwise.
+        """
+        self.cleanup_expired_sessions()
+        return len(self.sessions) > 0
+
     def _create_token(self, **kwargs) -> str:
         """Generate a secure random token.
 
