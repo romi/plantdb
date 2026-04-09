@@ -149,6 +149,41 @@ class TestUserManager(unittest.TestCase):
         is_valid = self.user_manager.validate_user_password("testuser", "wrong_password")
         self.assertFalse(is_valid)
 
+    def test_update_password_success_case(self):
+        """Test successful password update scenario."""
+        # Update password
+        self.user_manager.update_password("testuser", "testpassword", "newpassword")
+        
+        # Verify the password was updated by validating the new password
+        is_valid = self.user_manager.validate_user_password("testuser", "newpassword")
+        self.assertTrue(is_valid)
+        
+        # Verify old password is no longer valid
+        is_valid_old = self.user_manager.validate_user_password("testuser", "testpassword")
+        self.assertFalse(is_valid_old)
+
+    def test_update_password_invalid_current_password(self):
+        """Test password update fails when current password is incorrect."""
+        # Try to update password with wrong current password
+        self.user_manager.update_password("testuser", "wrongpassword", "newpassword")
+        
+        # Verify the password was NOT updated by validating the old password still works
+        is_valid_old = self.user_manager.validate_user_password("testuser", "testpassword")
+        self.assertTrue(is_valid_old)
+        
+        # Verify new password is not valid
+        is_valid_new = self.user_manager.validate_user_password("testuser", "newpassword")
+        self.assertFalse(is_valid_new)
+
+    def test_update_password_nonexistent_user(self):
+        """Test password update fails for nonexistent user."""
+        # Try to update password for non-existent user
+        self.user_manager.update_password("nonexistent", "testpassword", "newpassword")
+        
+        # Verify the password was NOT updated by validating the old password still works
+        is_valid_old = self.user_manager.validate_user_password("testuser", "testpassword")
+        self.assertTrue(is_valid_old)
+
 
 class TestGroupManager(unittest.TestCase):
     """Test cases for GroupManager class"""
