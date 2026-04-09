@@ -116,7 +116,7 @@ class UserManager(object):
         Parameters
         ----------
         users_file : str or pathlib.Path, optional
-            Path to the JSON file where user data is stored. Defaults to ``users.json``.
+            The path to the JSON file where user data is stored. Defaults to ``"users.json"``.
         max_login_attempts : int, optional
             Maximum number of failed login attempts before account lockout. Defaults to ``3``.
         lockout_duration : int or timedelta, optional
@@ -139,22 +139,22 @@ class UserManager(object):
     def _load_users(self) -> None:
         """Loads the user database from a JSON file and populates the internal dictionary.
 
-        This method checks if the users database file exists. If it does not exist, it initializes an empty dictionary,
+        This method checks if the user database file exists. If it does not exist, it initializes an empty dictionary,
         creates the file, and logs a warning message. If the file does exist, it loads the user data from the file,
         converts each user to a `User` object, and populates the internal dictionary with these objects.
 
         Notes
         -----
-        The method assumes that the users database file is in JSON format and contains valid user data.
+        The method assumes that the user database file is in JSON format and contains valid user data.
         """
         if not self.users_file.exists():
-            self.logger.warning(f"No users database file found under '{self.users_file}'")
+            self.logger.warning(f"No user database file found under '{self.users_file}'")
             self.users = {}
         elif self.users_file.stat().st_size == 0:
-            self.logger.warning(f"Empty users database file found under '{self.users_file}'")
+            self.logger.warning(f"Empty user database file found under '{self.users_file}'")
             self.users = {}
         else:
-            # Load the users list from the database
+            # Load the list of users from the database
             with open(self.users_file, "r") as f:
                 users_list = json.load(f)
             # Convert to a username indexed dict of User objects
@@ -642,7 +642,7 @@ class UserManager(object):
         password : str
             The current password of the user to verify their identity.
         new_password : str
-            The new password to set for the user. If ``None``, no change will occur.
+            The new password to set for the user. If ``None`` or empty, no change will occur.
         """
         # Verify if the login exists
         try:
@@ -657,7 +657,7 @@ class UserManager(object):
         user = self.get_user(username)
         timestamp = datetime.now()  # Get the current timestamp for tracking user creation time.
         if new_password:
-            user.password = self._hash_password(new_password)
+            user.password_hash = self._hash_password(new_password)
             user.password_last_change = timestamp
 
         self._save_users()
@@ -665,7 +665,7 @@ class UserManager(object):
         return
 
 
-class GroupManager:
+class GroupManager(object):
     """Manages groups for the RBAC system.
 
     This class handles the creation, modification, and persistence of user groups.
@@ -673,19 +673,20 @@ class GroupManager:
 
     Attributes
     ----------
-    groups_file : Union[str, Path]
-        Path to the JSON file where groups are stored.
+    groups_file : str | Path
+        The path to the JSON file where groups are stored.
     groups : Dict[str, plantdb.commons.auth.models.Group]
         Dictionary mapping group names to Group objects.
     """
 
-    def __init__(self, groups_file: Union[str, Path] = "groups.json"):
-        """Initialize the GroupManager.
+    def __init__(self, groups_file: str | Path = "groups.json"):
+        """
+        Initialize the GroupManager.
 
         Parameters
         ----------
-        groups_file : Union[str, Path]
-            Path to the JSON file for storing groups. Defaults to "groups.json".
+        groups_file : str | Path, optional
+            The path to the JSON file for storing groups. Defaults to ``"groups.json"``.
         """
         self.groups_file = Path(groups_file)
         self.groups: Dict[str, Group] = {}
@@ -701,7 +702,7 @@ class GroupManager:
             self.logger.warning(f"Empty groups database file found under '{self.groups_file}'")
             self.groups = {}
         else:
-            # Load the groups list from the database
+            # Load the group list from the database
             with open(self.groups_file, 'r') as f:
                 data = json.load(f)
             # Convert to a group-name indexed dict of Group objects

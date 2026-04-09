@@ -210,7 +210,7 @@ class Scan(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None, default=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         Parameters
         ----------
@@ -227,7 +227,7 @@ class Scan(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         If value is ``None``, scan metadata is set to data.
         If value is not ``None`` data is a key and is set to value.
@@ -362,7 +362,7 @@ class Fileset(object):
         raise NotImplementedError
 
     def get_metadata(self, key=None, default=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         Parameters
         ----------
@@ -379,7 +379,7 @@ class Fileset(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         If value is ``None``, scan metadata is set to data.
         If value is not ``None`` data is a key and is set to value.
@@ -506,7 +506,7 @@ class File(object):
         return self.fileset
 
     def get_metadata(self, key=None, default=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         Parameters
         ----------
@@ -523,7 +523,7 @@ class File(object):
         raise NotImplementedError
 
     def set_metadata(self, data, value=None):
-        """Get metadata associated to scan.
+        """Get metadata associated with scan.
 
         If value is ``None``, scan metadata is set to data.
         If value is not ``None`` data is a key and is set to value.

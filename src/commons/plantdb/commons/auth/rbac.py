@@ -24,7 +24,7 @@ Usage Examples
 >>> from plantdb.commons.auth.rbac import RBACManager, Permission, User
 >>> rbac = RBACManager()
 >>> # Create a new user and assign a role
->>> user = rbac.users.create_user('alice', roles={'CONTRIBUTOR'})
+>>> user = rbac.create_user('alice', roles={'CONTRIBUTOR'})
 >>> # Create a group and add the user
 >>> rbac.create_group(user, 'researchers')
 >>> rbac.add_user_to_group(user, 'researchers', 'alice')
@@ -36,6 +36,7 @@ True
 """
 
 from functools import wraps
+from pathlib import Path
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -91,7 +92,7 @@ def requires_permission(required_permissions: Union[Permission, List[Permission]
     return decorator
 
 
-class RBACManager :
+class RBACManager:
     """Manage Role-Based Access Control (RBAC) for users and permissions.
 
     This class provides methods to determine which permissions a user has,
@@ -100,34 +101,45 @@ class RBACManager :
 
     Attributes
     ----------
-    GUEST_USERNAME : str
-        The username for the default guest user account.
+    logger : logging.logger
+        The logger to use with this class.
+    users : plantdb.commons.auth.manager.UserManager
+        Manager for handling user operations.
     groups : plantdb.commons.auth.manager.GroupManager
         Manager for handling group operations.
 
     Examples
     --------
     >>> from plantdb.commons.auth.rbac import RBACManager
-    >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('all')
-    >>> db.connect()
-    >>> scan = db.get_scan('real_plant_analyzed')
     >>> rbac = RBACManager()
-    >>> guest_user = rbac.create_guest_user('guest')
-    >>> can_read = rbac.can_access_scan(guest_user, scan.metadata, Permission.READ)
-
+    >>> # Get the 'guest' user and have a look at its permissions
+    >>> guest = rbac.get_guest_user()
+v    >>> rbac.get_user_permissions(guest)
+    {<Permission.READ: 'read'>}
+    >>> rbac.can_create_group(guest)
+    False
+    >>> # Get the 'admin' user and create a new user
+    >>> admin = rbac.users.get_user('admin')
+    >>> rbac.can_create_user(admin)
+    True
+    >>> rbac.create_user(admin, 'butcher', 'Billy Butcher', 'terror')
+    >>> # The user database JSON file now has this user registered
+    >>> import json
+    >>> with open(rbac.users.users_file, 'r') as f: user_db = json.load(f)
+    >>> 'butcher' in [entry['username'] for entry in user_db]
     """
 
-    def __init__(self, users_file: str = 'users.json', groups_file: str = "groups.json", max_login_attempts=3,
-                 lockout_duration=900):
-        """Initialize the RBACManager.
+    def __init__(self, users_file: str | Path = 'users.json', groups_file: str | Path = "groups.json",
+                 max_login_attempts=3, lockout_duration=900):
+        """
+        Initialize the RBACManager.
 
         Parameters
         ----------
-        users_file : str, optional
-            Path to the JSON file for storing users database. Default is 'users.json'.
-        groups_file : str, optional
-            Path to the JSON file for storing groups database. Defaults to "groups.json".
+        users_file : str | Path, optional
+            Path to the JSON file acting as users' database. Default is 'users.json'.
+        groups_file : str | Path, optional
+            Path to the JSON file acting as groups' database. Defaults to "groups.json".
         max_login_attempts : int, optional
             Maximum number of failed login attempts before account lockout. Defaults to ``3``.
         lockout_duration : int or timedelta, optional
@@ -269,6 +281,45 @@ class RBACManager :
         """
         return self.has_permission(user, Permission.MANAGE_USERS)
 
+    def create_user(self, requesting_user: User, username: str, fullname: str, password: str,
+                    roles: Role | set[Role] | None = None) -> User | None:
+        """Create a new user account.
+
+        This method verifies that the requesting user has the ``MANAGE_USERS`` permission,
+        logs the creation attempt, and forwards the actual creation to the underlying
+        ``UserManager``.  It returns the newly created ``User`` object on success or ``None``
+        if the operation is not permitted.
+
+        Parameters
+        ----------
+        requesting_user : plantdb.commons.auth.models.User
+            The user performing the creation request.
+        username : str
+            Desired username for the new account.
+        fullname : str
+            The full name of the user to create.
+        password : str
+            Password for the new account.
+        roles : Role | set[Role] | None
+            Set of roles to assign to the new user.
+            If ``None`` (default), use the `Role.READER` role.
+
+        Returns
+        -------
+        User | None
+            The created ``User`` instance, or ``None`` if creation was denied.
+        """
+        if not self.can_create_user(requesting_user):
+            self.logger.error(
+                f"User '{requesting_user.username}' attempted to create user '{username}' without sufficient permission."
+            )
+            return None
+
+        self.logger.info(
+            f"User '{requesting_user.username}' is creating new user '{username}' with {roles=}."
+        )
+        return self.users.create(username, fullname, password, roles=roles)
+
     def can_manage_groups(self, user: User) -> bool:
         """Check if a user can manage groups (create/delete groups).
 
@@ -401,7 +452,8 @@ class RBACManager :
             ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):
-            self.logger.error(f"Insufficient permission to add user '{username_to_add}' to group '{group_name}' by user '{user.username}!")
+            self.logger.error(
+                f"Insufficient permission to add user '{username_to_add}' to group '{group_name}' by user '{user.username}!")
             return False
         self.logger.info(f"Adding user '{username_to_add}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.add_user_to_group(group_name, username_to_add)
@@ -425,9 +477,11 @@ class RBACManager :
             ``False`` if the permission was denied or the operation failed.
         """
         if not self.can_add_to_group(user, group_name):  # Same permission as adding
-            self.logger.error(f"Insufficient permission to remove user '{username_to_remove}' from group '{group_name}' by user '{user.username}!")
+            self.logger.error(
+                f"Insufficient permission to remove user '{username_to_remove}' from group '{group_name}' by user '{user.username}!")
             return False
-        self.logger.warning(f"Removing user '{username_to_remove}' from group '{group_name}' by user '{user.username}'!")
+        self.logger.warning(
+            f"Removing user '{username_to_remove}' from group '{group_name}' by user '{user.username}'!")
         return self.groups.remove_user_from_group(group_name, username_to_remove)
 
     def delete_group(self, user: User, group_name: str) -> bool:

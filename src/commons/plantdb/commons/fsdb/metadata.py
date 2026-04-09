@@ -50,6 +50,8 @@ from typing import MutableMapping
 from typing import Union
 from typing import TYPE_CHECKING
 
+from .lock import LockLevel
+
 # ----------------------------------------------------------------------
 # NOTE: The following imports are only needed for type‑checking / IDE hints.
 # Importing them at runtime creates a circular dependency with `core.py`.
@@ -347,22 +349,33 @@ class MetadataManager(object):
     def _update_metadata(self, data, value, current_user, store_func, cls_name):
         """High‑level driver used by the concrete classes."""
         from plantdb.commons.fsdb.core import Scan
+        from plantdb.commons.fsdb.core import Fileset
+        from plantdb.commons.fsdb.core import File
 
         new_metadata = self._prepare_new_metadata(data, value)
         self._scrub_forbidden_keys(new_metadata, cls_name)
         if len(new_metadata) == 0:
             return
 
-        # Acquire exclusive lock on the *scan* – this mirrors the original behaviour.
-        self.logger.debug(
-            f"Updating '{self.id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
-        )
         if isinstance(self, Scan):
-            obj = self
+            obj_id = f"{self.id}"
+            lock_level = LockLevel.SCAN
+        elif isinstance(self, Fileset):
+            obj_id = f"{self.scan.id}/{self.id}"
+            lock_level = LockLevel.FILESET
+        elif isinstance(self, File):
+            obj_id = f"{self.scan.id}/{self.fileset.id}/{self.id}"
+            lock_level = LockLevel.FILE
         else:
-            obj = self.scan
+            raise TypeError(
+                f"Unsupported object type for metadata update: {type(self).__name__}"
+            )
 
-        with self.db.lock_manager.acquire_lock(obj.id, LockType.EXCLUSIVE, current_user.username):
+        # Acquire exclusive lock on the object
+        self.logger.debug(
+            f"Updating '{obj_id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
+        )        
+        with self.db.lock_manager.acquire_lock(obj_id, LockType.EXCLUSIVE, current_user.username, lock_level):
             _set_metadata(self.metadata, new_metadata, None)
             self._store_and_timestamp(store_func)
 
