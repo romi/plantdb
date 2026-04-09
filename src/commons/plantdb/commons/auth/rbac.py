@@ -36,6 +36,7 @@ True
 """
 
 from functools import wraps
+from pathlib import Path
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -111,18 +112,33 @@ class RBACManager:
     --------
     >>> from plantdb.commons.auth.rbac import RBACManager
     >>> rbac = RBACManager()
-    >>> rbac.
+    >>> # Get the 'guest' user and have a look at its permissions
+    >>> guest = rbac.get_guest_user()
+v    >>> rbac.get_user_permissions(guest)
+    {<Permission.READ: 'read'>}
+    >>> rbac.can_create_group(guest)
+    False
+    >>> # Get the 'admin' user and create a new user
+    >>> admin = rbac.users.get_user('admin')
+    >>> rbac.can_create_user(admin)
+    True
+    >>> rbac.create_user(admin, 'butcher', 'Billy Butcher', 'terror')
+    >>> # The user database JSON file now has this user registered
+    >>> import json
+    >>> with open(rbac.users.users_file, 'r') as f: user_db = json.load(f)
+    >>> 'butcher' in [entry['username'] for entry in user_db]
     """
 
-    def __init__(self, users_file: str = 'users.json', groups_file: str = "groups.json", max_login_attempts=3,
-                 lockout_duration=900):
-        """Initialize the RBACManager.
+    def __init__(self, users_file: str | Path = 'users.json', groups_file: str | Path = "groups.json",
+                 max_login_attempts=3, lockout_duration=900):
+        """
+        Initialize the RBACManager.
 
         Parameters
         ----------
-        users_file : str, optional
+        users_file : str | Path, optional
             Path to the JSON file acting as users' database. Default is 'users.json'.
-        groups_file : str, optional
+        groups_file : str | Path, optional
             Path to the JSON file acting as groups' database. Defaults to "groups.json".
         max_login_attempts : int, optional
             Maximum number of failed login attempts before account lockout. Defaults to ``3``.
