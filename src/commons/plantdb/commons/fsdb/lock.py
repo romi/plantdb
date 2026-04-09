@@ -584,12 +584,14 @@ class LockManager:
         # Look for locks matching this resource and level
         for lock_key, lock_info in self._active_locks.items():
             # Extract resource_id and level from the lock key
-            # Format: resource_id_level_locktype
-            parts = lock_key.split('/', 2)
-            if len(parts) != 3:
+            # Format: resource_id/lock_level/lock_type
+            parts = lock_key.split('/')
+            if len(parts) < 3:
                 continue
-                
-            lock_resource_id, lock_level, _ = parts
+
+            lock_type = parts.pop(-1)
+            lock_level = parts.pop(-1)
+            lock_resource_id = "/".join(parts)
             # Check if this lock belongs to the requested resource and level
             if lock_resource_id == resource_id and lock_level == level.value:
                 if lock_info['type'] == LockType.EXCLUSIVE:
