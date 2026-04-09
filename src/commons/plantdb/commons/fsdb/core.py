@@ -2243,7 +2243,8 @@ class Scan(db.Scan, MetadataManager):
 
         # Use fileset-level exclusive lock for fileset creation
         self.logger.debug(f"Creating a fileset '{fs_id}' in scan '{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILESET):
+        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username,
+                                               LockLevel.FILESET):
             # Create the new Fileset
             fileset = Fileset(self, fs_id)  # Initialize a new Fileset instance
             _make_fileset(fileset)  # Create directory structure
@@ -2306,7 +2307,8 @@ class Scan(db.Scan, MetadataManager):
 
         # Use exclusive lock for fileset deletion
         self.logger.debug(f"Deleting fileset '{fs_id}' from scan '{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILESET):
+        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username,
+                                               LockLevel.FILESET):
             fs = self.filesets[fs_id]
             _delete_fileset(fs)  # delete the fileset
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
@@ -2552,7 +2554,8 @@ class Fileset(db.Fileset, MetadataManager):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Use shared lock for read operations
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}", LockType.SHARED, current_user.username, LockLevel.FILESET):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}", LockType.SHARED, current_user.username,
+                                               LockLevel.FILESET):
             return _get_metadata(self.metadata, key, default)
 
     @get_authentication
@@ -2653,8 +2656,10 @@ class Fileset(db.Fileset, MetadataManager):
             raise FileExistsError(self, f_id)
 
         # Use file-level exclusive lock for file creation
-        self.logger.debug(f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
+        self.logger.debug(
+            f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILE):
             # Create the new File
             file = File(self, f_id)  # Initialize a new File instance
 
@@ -2720,8 +2725,10 @@ class Fileset(db.Fileset, MetadataManager):
             raise ValueError(f"File '{f_id}' does not exist in '{self.scan.id}/{self.id}'")
 
         # Use exclusive lock for fileset creation
-        self.logger.debug(f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
+        self.logger.debug(
+            f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILE):
             f = self.files[f_id]
             _delete_file(f)  # delete the file
             self.files.pop(f_id)  # remove the File instance from the fileset
@@ -2865,7 +2872,8 @@ class File(db.File, MetadataManager):
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Use shared lock for read operations
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.SHARED, current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.SHARED,
+                                               current_user.username, LockLevel.FILE):
             return _get_metadata(self.metadata, key, default)
 
     @get_authentication
@@ -2936,7 +2944,8 @@ class File(db.File, MetadataManager):
         # Use exclusive lock for this operation
         self.logger.debug(
             f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILE):
             # Get the file name and extension
             ext = path.suffix[1:]
             self.filename = _get_filename(self, ext)
@@ -3017,7 +3026,8 @@ class File(db.File, MetadataManager):
         # Use file-level exclusive lock for this operation
         self.logger.debug(
             f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILE):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
             with path.open(mode="wb") as f:
@@ -3095,7 +3105,8 @@ class File(db.File, MetadataManager):
         # Use exclusive lock for this operation
         self.logger.debug(
             f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILE):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
             with path.open(mode="w") as f:
