@@ -339,6 +339,20 @@ class LockManager:
         This method uses a context manager and should be used within a 'with' statement. It handles both shared
         and exclusive locks, allowing multiple acquisitions for shared locks but raising an exception if an exclusive
         lock is already held.
+
+        Examples
+        --------
+        >>> import tempfile
+        >>> from plantdb.commons.fsdb.lock import LockManager
+        >>> from plantdb.commons.fsdb.lock import LockType
+        >>> from plantdb.commons.fsdb.lock import LockLevel
+        >>> manager = LockManager(tempfile.gettempdir())
+        >>> with manager.acquire_lock('scan123', LockType.EXCLUSIVE, user='user1', level=LockLevel.SCAN):
+        ...     print("scan123/scan/exclusive" in manager._active_locks)
+        True
+        >>> with manager.acquire_lock('scan123/test_fileset', LockType.EXCLUSIVE, user='user1', level=LockLevel.FILESET):
+        ...     print("scan123/test_fileset/fileset/exclusive" in manager._active_locks)
+        True
         """
         timeout = timeout or self.default_timeout
         # Create a unique lock key based on resource_id, level, and lock type
@@ -572,12 +586,19 @@ class LockManager:
 
         Examples
         --------
+        >>> import tempfile
         >>> from plantdb.commons.fsdb.lock import LockManager
-        >>> manager = LockManager('/path/to/local/database')
-        >>> lock = manager.acquire_lock('scan123', LockType.EXCLUSIVE, user='user1', level='scan')
-        >>> status = manager.get_lock_status("scan123", LockLevel.SCAN)
-        >>> print(status)
-        {'exclusive': None, 'shared': [{'user': 'user1', 'timestamp': '2023-01-01T12:00:00', 'count': 1}]}
+        >>> from plantdb.commons.fsdb.lock import LockType
+        >>> from plantdb.commons.fsdb.lock import LockLevel
+        >>> manager = LockManager(tempfile.gettempdir())
+        >>> with manager.acquire_lock('scan123', LockType.EXCLUSIVE, user='user1', level=LockLevel.SCAN):
+        ...     status = manager.get_lock_status("scan123", LockLevel.SCAN)
+        ...     print(status)
+        {'exclusive': {'user': 'user1', 'timestamp': 1775734565.6584513}, 'shared': []}
+        >>> with manager.acquire_lock('scan123/test_fileset', LockType.EXCLUSIVE, user='user1', level=LockLevel.FILESET):
+        ...     status = manager.get_lock_status("scan123/test_fileset", LockLevel.FILESET)
+        ...     print(status)
+        {'exclusive': {'user': 'user1', 'timestamp': 1775734690.2060757}, 'shared': []}
         """
         status = {'exclusive': None, 'shared': []}
 
