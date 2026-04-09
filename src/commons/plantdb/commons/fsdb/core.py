@@ -338,14 +338,43 @@ def require_authentication(method):
     return wrapper
 
 
-def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
-    """Retrieve the `FSDB` and the `Scan` instance associated with a given object.
+def _get_fsdb(obj) -> "FSDB":
+    """Retrieve the `FSDB` instance associated with a given object.
 
     Parameters
     ----------
-    obj : Scan or FSDB or Fileset or File
-        Object from which to obtain a ``Scan``. The function determines the
-        appropriate attribute based on the runtime type of ``obj``.
+    obj : FSDB | Scan | Fileset | File
+        Object from which to get the ``FSDB``.
+
+    Returns
+    -------
+    FSDB
+        The ``FSDB`` instance linked to ``obj``.
+
+    Raises
+    ------
+    TypeError
+        If ``obj`` is not an instance of ``FSDB``, ``Scan``, ``Fileset``, or ``File``.
+    """
+    if isinstance(obj, FSDB):
+        return obj
+    elif isinstance(obj, Scan):
+        return obj.db
+    elif isinstance(obj, Fileset):
+        return obj.db
+    elif isinstance(obj, File):
+        return obj.db
+    else:
+        raise TypeError(f"Unsupported object type: {type(obj)}")
+
+
+def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
+    """Retrieve the `FSDB` and the `Scan` instances associated with a given object.
+
+    Parameters
+    ----------
+    obj : FSDB | Scan | Fileset | File
+        Object from which to get the ``FSDB`` and ``Scan`` instances.
     *args : tuple
         Additional positional arguments. When ``obj`` is an ``FSDB``, the first
         element should be the index or key identifying the desired scan.
@@ -363,15 +392,6 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
         If ``obj`` is not an instance of ``Scan``, ``FSDB``, ``Fileset``, or ``File``.
     plantdb.commons.fsdb.exceptions.ScanNotFoundError
         If ``obj`` is an instance of ``FSDB`` and ``args[0]`` is not an existing ``Scan``.
-
-    Notes
-    -----
-    The dispatch logic is as follows:
-
-    - ``Scan``: returned directly.
-    - ``FSDB``: ``obj.scans[args[0]]`` is accessed; ``args`` must contain at
-      least one element identifying the scan.
-    - ``Fileset`` or ``File``: the ``scan`` attribute of the object is returned.
     """
     if isinstance(obj, Scan):
         return obj.db, obj
@@ -466,13 +486,14 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
                 has_perms = all(
                     db.rbac_manager.can_access_scan(user, metadata, perm) for perm in required_permissions_
                 )
-                # token user have restricted permissions per dataset
+                # Token users have restricted permissions per dataset
                 if isinstance(user, TokenUser):
                     token_permissions = user.get_permissions_for_dataset(scan.id)
                     has_perms = has_perms and all(perm in token_permissions for perm in required_permissions_)
 
             else:
-                has_perms = all(self.rbac_manager.has_permission(user, perm) for perm in required_permissions_)
+                db = _get_fsdb(self)
+                has_perms = all(db.rbac_manager.has_permission(user, perm) for perm in required_permissions_)
 
             if not has_perms:
                 raise PermissionError(
