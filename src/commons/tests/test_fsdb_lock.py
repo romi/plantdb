@@ -15,7 +15,8 @@ from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.lock import LockError
 from plantdb.commons.fsdb.lock import LockTimeoutError
 from plantdb.commons.fsdb.lock import LockType
-from plantdb.commons.fsdb.lock import ScanLockManager
+from plantdb.commons.fsdb.lock import LockManager
+from plantdb.commons.fsdb.lock import LockLevel
 from plantdb.commons.test_database import setup_test_database
 
 
@@ -45,14 +46,14 @@ class TestLockTimeoutError(unittest.TestCase):
         self.assertEqual(str(error), custom_message)
 
 
-class TestScanLockManager(unittest.TestCase):
+class TestLockManager(unittest.TestCase):
     """Test cases for the ScanLockManager class."""
 
     def setUp(self):
         """Set up a temporary directory for testing."""
         self.temp_dir = tempfile.mkdtemp()
         # Create a lock manager with a short default timeout for faster tests
-        self.lock_manager = ScanLockManager(self.temp_dir, default_timeout=1.0)
+        self.lock_manager = LockManager(self.temp_dir, default_timeout=1.0)
 
     def tearDown(self):
         """Clean up temporary files after tests."""
@@ -84,19 +85,19 @@ class TestScanLockManager(unittest.TestCase):
         scan_id = "test_scan"
         # Test for shared lock
         expected_path = os.path.join(self.temp_dir, ".locks", f"{scan_id}.lock")
-        actual_path = self.lock_manager._get_lock_file_path(scan_id)
+        actual_path = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
         self.assertEqual(actual_path, expected_path)
 
         # Test for exclusive lock
         expected_path = os.path.join(self.temp_dir, ".locks", f"{scan_id}.lock")
-        actual_path = self.lock_manager._get_lock_file_path(scan_id)
+        actual_path = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
         self.assertEqual(actual_path, expected_path)
 
     def test_get_lock_info_path(self):
         """Verify that _get_lock_info_path returns the correct path."""
         scan_id = "test_scan"
         expected_path = os.path.join(self.temp_dir, ".locks", f"{scan_id}.info")
-        actual_path = self.lock_manager._get_lock_info_path(scan_id)
+        actual_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
         self.assertEqual(actual_path, expected_path)
 
     @patch('fcntl.flock')
@@ -136,16 +137,16 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Write lock info
-        self.lock_manager._write_lock_info(scan_id, lock_type, user)
+        self.lock_manager._write_lock_info(scan_id, lock_type, user, LockLevel.SCAN)
 
         # Check that the file exists
-        info_path = self.lock_manager._get_lock_info_path(scan_id)
+        info_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
         self.assertTrue(os.path.exists(info_path))
 
         # Verify the content of the file
         with open(info_path, 'r') as f:
             info = json.load(f)
-            self.assertEqual(info['scan_id'], scan_id)
+            self.assertEqual(info['resource_id'], scan_id)
             self.assertEqual(info['lock_type'], lock_type.value)
             self.assertEqual(info['user'], user)
             self.assertIn('timestamp', info)
@@ -153,7 +154,7 @@ class TestScanLockManager(unittest.TestCase):
             self.assertIn('thread_id', info)
 
         # Remove lock info
-        self.lock_manager._remove_lock_info(scan_id)
+        self.lock_manager._remove_lock_info(scan_id, LockLevel.SCAN)
 
         # Check that the file no longer exists
         self.assertFalse(os.path.exists(info_path))
@@ -164,28 +165,28 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Acquire a shared lock
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user, LockLevel.SCAN):
             # Check that the lock file exists
-            lock_file = self.lock_manager._get_lock_file_path(scan_id)
+            lock_file = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
             self.assertTrue(os.path.exists(lock_file))
 
             # Check that the lock is registered in active locks
-            lock_key = f"{scan_id}_shared"
+            lock_key = f"{scan_id}/scan/shared"
             self.assertIn(lock_key, self.lock_manager._active_locks)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['type'], LockType.SHARED)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['user'], user)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['count'], 1)
 
             # Check that the lock info file exists
-            info_path = self.lock_manager._get_lock_info_path(scan_id)
+            info_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
             self.assertTrue(os.path.exists(info_path))
 
         # After the context manager exits, check that the lock is released
-        lock_file = self.lock_manager._get_lock_file_path(scan_id)
+        lock_file = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
         self.assertFalse(os.path.exists(lock_file))
-        lock_key = f"{scan_id}_shared"
+        lock_key = f"{scan_id}/scan/shared"
         self.assertNotIn(lock_key, self.lock_manager._active_locks)
-        info_path = self.lock_manager._get_lock_info_path(scan_id)
+        info_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
         self.assertFalse(os.path.exists(info_path))
 
     def test_acquire_exclusive_lock(self):
@@ -194,28 +195,28 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Acquire an exclusive lock
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, LockLevel.SCAN):
             # Check that the lock file exists
-            lock_file = self.lock_manager._get_lock_file_path(scan_id)
+            lock_file = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
             self.assertTrue(os.path.exists(lock_file))
 
             # Check that the lock is registered in active locks
-            lock_key = f"{scan_id}_exclusive"
+            lock_key = f"{scan_id}/scan/exclusive"
             self.assertIn(lock_key, self.lock_manager._active_locks)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['type'], LockType.EXCLUSIVE)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['user'], user)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['count'], 1)
 
             # Check that the lock info file exists
-            info_path = self.lock_manager._get_lock_info_path(scan_id)
+            info_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
             self.assertTrue(os.path.exists(info_path))
 
         # After the context manager exits, check that the lock is released
-        lock_file = self.lock_manager._get_lock_file_path(scan_id)
+        lock_file = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
         self.assertFalse(os.path.exists(lock_file))
-        lock_key = f"{scan_id}_exclusive"
+        lock_key = f"{scan_id}/scan/exclusive"
         self.assertNotIn(lock_key, self.lock_manager._active_locks)
-        info_path = self.lock_manager._get_lock_info_path(scan_id)
+        info_path = self.lock_manager._get_lock_info_path(scan_id, LockLevel.SCAN)
         self.assertFalse(os.path.exists(info_path))
 
     def test_acquire_multiple_shared_locks(self):
@@ -225,21 +226,21 @@ class TestScanLockManager(unittest.TestCase):
         user2 = "user2"
 
         # Acquire a shared lock with user1
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1, LockLevel.SCAN):
             # Acquire another shared lock with user2
-            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2):
+            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, LockLevel.SCAN):
                 # Check that the lock is registered in active locks with a count of 2
-                lock_key = f"{scan_id}_shared"
+                lock_key = f"{scan_id}/scan/shared"
                 self.assertIn(lock_key, self.lock_manager._active_locks)
                 self.assertEqual(self.lock_manager._active_locks[lock_key]['count'], 2)
 
             # After user2's lock is released, the count should be 1
-            lock_key = f"{scan_id}_shared"
+            lock_key = f"{scan_id}/scan/shared"
             self.assertIn(lock_key, self.lock_manager._active_locks)
             self.assertEqual(self.lock_manager._active_locks[lock_key]['count'], 1)
 
         # After both locks are released, the lock should be gone
-        lock_key = f"{scan_id}_shared"
+        lock_key = f"{scan_id}/scan/shared"
         self.assertNotIn(lock_key, self.lock_manager._active_locks)
 
     def test_exclusive_lock_prevents_shared(self):
@@ -249,10 +250,10 @@ class TestScanLockManager(unittest.TestCase):
         user2 = "user2"
 
         # Acquire an exclusive lock with user1
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1, LockLevel.SCAN):
             # Try to acquire a shared lock with user2 (should time out)
             with self.assertRaises(LockTimeoutError):
-                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, LockLevel.SCAN, timeout=0.5):
                     pass
 
     def test_shared_lock_prevents_exclusive(self):
@@ -262,10 +263,10 @@ class TestScanLockManager(unittest.TestCase):
         user2 = "user2"
 
         # Acquire a shared lock with user1
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1, LockLevel.SCAN):
             # Try to acquire an exclusive lock with user2 (should time out)
             with self.assertRaises(LockTimeoutError):
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, LockLevel.SCAN, timeout=0.5):
                     pass
 
     def test_exclusive_lock_prevents_exclusive(self):
@@ -275,10 +276,10 @@ class TestScanLockManager(unittest.TestCase):
         user2 = "user2"
 
         # Acquire an exclusive lock with user1
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1, LockLevel.SCAN):
             # Try to acquire another exclusive lock with user2 (should raise a LockError)
             with self.assertRaises(LockError):
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, LockLevel.SCAN, timeout=0.5):
                     pass
 
     def test_lock_timeout(self):
@@ -287,7 +288,7 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Create a lock file and hold an exclusive lock on it
-        lock_file_path = self.lock_manager._get_lock_file_path(scan_id)
+        lock_file_path = self.lock_manager._get_lock_file_path(scan_id, LockLevel.SCAN)
         os.makedirs(os.path.dirname(lock_file_path), exist_ok=True)
 
         # Open and lock the file outside of the lock manager
@@ -298,7 +299,7 @@ class TestScanLockManager(unittest.TestCase):
             # Try to acquire the lock (should time out)
             start_time = time.time()
             with self.assertRaises(LockTimeoutError):
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, LockLevel.SCAN, timeout=0.5):
                     pass
 
             # Check that it took approximately the timeout duration
@@ -313,7 +314,7 @@ class TestScanLockManager(unittest.TestCase):
     def test_get_lock_status_no_locks(self):
         """Verify that get_lock_status returns correct status when no locks exist."""
         scan_id = "test_scan"
-        status = self.lock_manager.get_lock_status(scan_id)
+        status = self.lock_manager.get_lock_status(scan_id, LockLevel.SCAN)
         self.assertEqual(status, {'exclusive': None, 'shared': []})
 
     def test_get_lock_status_with_exclusive_lock(self):
@@ -322,10 +323,11 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Acquire an exclusive lock
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, LockLevel.SCAN):
             # Get the lock status
-            status = self.lock_manager.get_lock_status(scan_id)
-
+            status = self.lock_manager.get_lock_status(scan_id, LockLevel.SCAN)
+            print(self.lock_manager._active_locks.items())
+            print(status)
             # Check the status
             self.assertIsNotNone(status['exclusive'])
             self.assertEqual(status['exclusive']['user'], user)
@@ -339,10 +341,10 @@ class TestScanLockManager(unittest.TestCase):
         user2 = "user2"
 
         # Acquire shared locks
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1):
-            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1, LockLevel.SCAN):
+            with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, LockLevel.SCAN):
                 # Get the lock status
-                status = self.lock_manager.get_lock_status(scan_id)
+                status = self.lock_manager.get_lock_status(scan_id, LockLevel.SCAN)
 
                 # Check the status
                 self.assertIsNone(status['exclusive'])
@@ -358,8 +360,8 @@ class TestScanLockManager(unittest.TestCase):
         user = "test_user"
 
         # Acquire multiple locks
-        with self.lock_manager.acquire_lock(scan_id1, LockType.SHARED, user):
-            with self.lock_manager.acquire_lock(scan_id2, LockType.EXCLUSIVE, user):
+        with self.lock_manager.acquire_lock(scan_id1, LockType.SHARED, user, LockLevel.SCAN):
+            with self.lock_manager.acquire_lock(scan_id2, LockType.EXCLUSIVE, user, LockLevel.SCAN):
                 # Check that the locks exist
                 self.assertEqual(len(self.lock_manager._active_locks), 2)
 
@@ -371,8 +373,8 @@ class TestScanLockManager(unittest.TestCase):
                 self.assertEqual(len(self.lock_manager._lock_files), 0)
 
                 # Check that the lock files are removed
-                lock_file1 = self.lock_manager._get_lock_file_path(scan_id1)
-                lock_file2 = self.lock_manager._get_lock_file_path(scan_id2)
+                lock_file1 = self.lock_manager._get_lock_file_path(scan_id1, LockLevel.SCAN)
+                lock_file2 = self.lock_manager._get_lock_file_path(scan_id2, LockLevel.SCAN)
                 self.assertFalse(os.path.exists(lock_file1))
                 self.assertFalse(os.path.exists(lock_file2))
 
@@ -383,7 +385,7 @@ class TestConcurrentLocks(unittest.TestCase):
     def setUp(self):
         """Set up a temporary directory for testing."""
         self.temp_dir = tempfile.mkdtemp()
-        self.lock_manager = ScanLockManager(self.temp_dir, default_timeout=2.0)
+        self.lock_manager = LockManager(self.temp_dir, default_timeout=2.0)
 
     def tearDown(self):
         """Clean up temporary files after tests."""
@@ -404,7 +406,7 @@ class TestConcurrentLocks(unittest.TestCase):
 
         def acquire_shared_lock(user):
             try:
-                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user):
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user, LockLevel.SCAN):
                     results.append(user)
                     time.sleep(0.5)  # Hold the lock for a bit
             except Exception as e:
@@ -435,7 +437,7 @@ class TestConcurrentLocks(unittest.TestCase):
         def acquire_exclusive_lock(user):
             try:
                 # Use a short timeout for the threads
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user, LockLevel.SCAN, timeout=0.5):
                     results.append(user)
                     # Hold the lock longer than the timeout of other threads (1.0s > 0.5s)
                     time.sleep(1.0)
@@ -469,7 +471,7 @@ class TestConcurrentLocks(unittest.TestCase):
 
         def acquire_exclusive_lock():
             try:
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1, timeout=60.):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user1, LockLevel.SCAN, timeout=60.):
                     # Hold the exclusive lock for a while
                     time.sleep(0.5)
                     # Try to acquire a shared lock (this should not happen while exclusive holds)
@@ -480,7 +482,7 @@ class TestConcurrentLocks(unittest.TestCase):
         def acquire_shared_lock():
             try:
                 # Try to acquire a shared lock while exclusive is held
-                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user2, LockLevel.SCAN, timeout=0.5):
                     results.append("shared_acquired")
             except Exception as e:
                 errors.append(str(e))
@@ -516,7 +518,7 @@ class TestConcurrentLocks(unittest.TestCase):
 
         def acquire_shared_lock():
             try:
-                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1):
+                with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, user1, LockLevel.SCAN):
                     # Hold the shared lock for a while
                     time.sleep(0.5)
                     results.append("shared_held")
@@ -526,7 +528,7 @@ class TestConcurrentLocks(unittest.TestCase):
         def acquire_exclusive_lock():
             try:
                 # Try to acquire an exclusive lock while shared is held
-                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, timeout=0.5):
+                with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, user2, LockLevel.SCAN, timeout=0.5):
                     results.append("exclusive_acquired")
             except Exception as e:
                 errors.append(str(e))
