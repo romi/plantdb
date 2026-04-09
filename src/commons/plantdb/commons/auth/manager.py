@@ -642,7 +642,7 @@ class UserManager(object):
         password : str
             The current password of the user to verify their identity.
         new_password : str
-            The new password to set for the user. If ``None``, no change will occur.
+            The new password to set for the user. If ``None`` or empty, no change will occur.
         """
         # Verify if the login exists
         try:
@@ -657,7 +657,7 @@ class UserManager(object):
         user = self.get_user(username)
         timestamp = datetime.now()  # Get the current timestamp for tracking user creation time.
         if new_password:
-            user.password = self._hash_password(new_password)
+            user.password_hash = self._hash_password(new_password)
             user.password_last_change = timestamp
 
         self._save_users()
@@ -701,7 +701,7 @@ class GroupManager:
             self.logger.warning(f"Empty groups database file found under '{self.groups_file}'")
             self.groups = {}
         else:
-            # Load the groups list from the database
+            # Load the group list from the database
             with open(self.groups_file, 'r') as f:
                 data = json.load(f)
             # Convert to a group-name indexed dict of Group objects
