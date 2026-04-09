@@ -1276,6 +1276,52 @@ class FSDB(db.DB):
         """
         return self.rbac_manager.users.create(new_username, fullname, password, roles)
 
+    @get_authentication
+    @require_authentication
+    def update_user_password(self, old_password: str, new_password: str,
+                             current_user: User | TokenUser | None = None, **kwargs) -> None:
+        """Create a new user with the specified details.
+
+        Parameters
+        ----------
+        old_password : str
+            The password for the user.
+        new_password : str
+            The new password for the user.
+        current_user : User | TokenUser | None
+            The current user, based on logged status or provided API token.
+            Default is ``None``.
+
+        Raises
+        ------
+        PermissionError
+            If no user is authenticated, that is logged in or provided an API token.
+            If the user lacks permission to create groups.
+
+        See Also
+        --------
+        RBACManager.users.create : Method used to actually create the user.
+
+        Examples
+        --------
+        >>> from plantdb.commons.auth.models import Role
+        >>> from plantdb.commons.test_database import dummy_db
+        >>> db = dummy_db()  # automatic login as 'admin'
+        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        INFO     [UserManager] Welcome Bruce Wayne, please log in...'
+        >>> db.logout()  # log out from 'admin' session
+        (True, 'admin')
+        >>> token = db.login('batman', 'joker')
+        >>> db.update_user_password('joker', 'alfred')
+        INFO     [UserManager] Password updated for user 'batman'...
+        >>> db.logout()  # log out from 'batman' session
+        (True, 'batman')
+        >>> token = db.login('batman', 'alfred')  # login with new password
+        >>> db.disconnect()
+        """
+        return self.rbac_manager.users.update_password(current_user.username, old_password, new_password)
+
     @require_connected_db
     @get_authentication
     @require_authentication
