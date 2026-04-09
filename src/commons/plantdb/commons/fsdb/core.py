@@ -131,9 +131,9 @@ from plantdb.commons.fsdb.file_ops import _load_scans
 from plantdb.commons.fsdb.file_ops import _make_fileset
 from plantdb.commons.fsdb.file_ops import _make_scan
 from plantdb.commons.fsdb.file_ops import _store_scan
-from plantdb.commons.fsdb.lock import LockType
-from plantdb.commons.fsdb.lock import LockManager
 from plantdb.commons.fsdb.lock import LockLevel
+from plantdb.commons.fsdb.lock import LockManager
+from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.metadata import MetadataManager
 from plantdb.commons.fsdb.metadata import _get_metadata
 from plantdb.commons.fsdb.metadata import _set_metadata
@@ -185,8 +185,11 @@ def require_token(method):
 
         if isinstance(self.session_manager, SingleSessionManager):
             # If a Single SessionManager, get the token from the session manager
-            session = list(self.session_manager.sessions.keys())[0]
-            kwargs['token'] = session
+            try:
+                session = list(self.session_manager.sessions.keys())[0]
+                kwargs['token'] = session
+            except IndexError:
+                self.logger.error("No logged user!")
 
         elif isinstance(self.session_manager, JWTSessionManager):
             # If a JSON Web Token Session Manager, require the token
@@ -206,7 +209,7 @@ def require_token(method):
     return wrapper
 
 
-def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs):
+def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs) -> User | TokenUser | None:
     """Returns the username of the currently logged user based on the session management system.
 
     This function identifies the username of the logged-in user by inspecting the session manager
@@ -227,7 +230,7 @@ def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs):
 
     Returns
     -------
-    str
+    User | TokenUser | None
         The username of the logged-in user or the fallback `default_user`.
 
     Notes
@@ -1173,17 +1176,15 @@ class FSDB(db.DB):
         >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
         >>> token = db.login('guest', 'guest')
         ERROR    [FSDB] Failed to login as 'guest'! Another user is logged in.
-        >>> db.logout()
-        INFO     [FSDB] User 'admin' logged out successfully.
-        True
+        >>> db.logout()  # log out from 'admin' session
+        (True, 'admin')
         >>> token = db.login('guest', 'guest')
-        [FSDB] Successfully logged in as 'guest'.
         >>> db.disconnect()
         """
         if self.validate_user(username, password):
 
             # If a SingleSessionManager and a currently logged user, abort
-            if isinstance(self.session_manager, SingleSessionManager):
+            if isinstance(self.session_manager, SingleSessionManager) and self.session_manager.has_logged_user():
                 current_username = get_logged_username(self)
                 if current_username:
                     if current_username != username:
@@ -1215,9 +1216,12 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()  # automatic login as 'admin'
         INFO     [FSDB] Successfully logged in as 'admin'.
-        >>> db.logout()
-        INFO     [FSDB] Successfully logged out from 'admin'.
+        >>> db.logout()  # log out from 'admin' session
         (True, 'admin')
+        >>> db.logout()  # log out from NO session
+        ERROR    [FSDB] No logged user!
+        WARNING  [FSDB] Failed to logout!
+        (False, None)
         >>> db.disconnect()
         """
         success, username = self.session_manager.invalidate_session(kwargs.get('token', None))
@@ -1263,9 +1267,11 @@ class FSDB(db.DB):
         INFO     [FSDB] Successfully logged in as 'admin'.
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         INFO     [UserManager] Welcome Bruce Wayne, please log in...'
-        >>> db.logout()
+        >>> db.logout()  # log out from 'admin' session
+        (True, 'admin')
         >>> token = db.login('batman', 'joker')
-        INFO     [FSDB] Successfully logged in as 'batman'.
+        >>> print(token)
+        WoBlNjJPmJHEwuFG3NAyrFtKMHnEg-BRjSplJU-uMbU
         >>> db.disconnect()
         """
         return self.rbac_manager.users.create(new_username, fullname, password, roles)
@@ -1368,9 +1374,9 @@ class FSDB(db.DB):
 
         Parameters
         ----------
-        username : str
+        username : str | None
             The username to retrieve the user data from.
-        token : str
+        token : str | None
             The token provided by the RBAC manager.
 
         Returns
@@ -1388,10 +1394,9 @@ class FSDB(db.DB):
         >>> db = dummy_db()  # automatic login as 'admin'
         >>> db.get_user_data(username='admin')
         User(username='admin', fullname='PlantDB Admin', password_hash='$argon2id$v=19$m=65536,t=3,p=4$zMr0ZhclnHHdOgwWKv3Hbg$SZshbPdNiCdBONb8vgzZAKyWPl5sNIUwB8mQWkzGYOQ', roles={<Role.ADMIN: 'admin'>}, created_at=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163), permissions=None, last_login=datetime.datetime(2026, 1, 29, 17, 22, 49, 770793), is_active=True, failed_attempts=0, last_failed_attempt=None, locked_until=None, password_last_change=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163))
-        >>> db.logout()
-        INFO     [FSDB] Successfully logged out from 'admin'.
+        >>> db.logout()  # log out from 'admin' session
+        (True, 'admin')
         >>> token = db.login('guest', 'guest')
-        INFO     [FSDB] Successfully logged in as 'guest'.
         >>> user_data = db.get_user_data(token=token)
         >>> print(user_data.fullname)
         PlantDB Guest
