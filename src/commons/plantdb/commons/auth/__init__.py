@@ -35,7 +35,7 @@ Usage Examples
 >>>
 >>> # RBAC operations
 >>> rbac_mgr = rbac.RBACManager()
->>> user = rbac_mgr.users.create_user("alice", roles={rbac.Role.CONTRIBUTOR})
+>>> user = rbac_mgr.create_user("alice", roles={rbac.Role.CONTRIBUTOR})
 >>> rbac_mgr.create_group(user, "researchers")
 >>> rbac_mgr.add_user_to_group(user, "researchers", "alice")
 >>> scan_meta = {"owner": "bob", "sharing": ["researchers"]}
