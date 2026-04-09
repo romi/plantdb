@@ -132,7 +132,8 @@ from plantdb.commons.fsdb.file_ops import _make_fileset
 from plantdb.commons.fsdb.file_ops import _make_scan
 from plantdb.commons.fsdb.file_ops import _store_scan
 from plantdb.commons.fsdb.lock import LockType
-from plantdb.commons.fsdb.lock import ScanLockManager
+from plantdb.commons.fsdb.lock import LockManager
+from plantdb.commons.fsdb.lock import LockLevel
 from plantdb.commons.fsdb.metadata import MetadataManager
 from plantdb.commons.fsdb.metadata import _get_metadata
 from plantdb.commons.fsdb.metadata import _set_metadata
@@ -603,8 +604,8 @@ class FSDB(db.DB):
         self.is_connected: bool = False
         self.required_filesets = required_filesets or ['metadata']
 
-        # Initialize scan lock manager
-        self.lock_manager = ScanLockManager(basedir)
+        # Initialize lock manager
+        self.lock_manager = LockManager(basedir)
 
         # Initialize the session manager
         if session_manager is None:
@@ -837,7 +838,7 @@ class FSDB(db.DB):
         plantdb.commons.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username, LockLevel.SCAN):
             if not self.scan_exists(scan_id):
                 ScanNotFoundError(self, scan_id)
             return self.scans[scan_id]
@@ -926,7 +927,7 @@ class FSDB(db.DB):
 
         # Use exclusive lock for scan creation
         self.logger.debug(f"Creating a scan '{scan_id}' as user '{current_user.username}'...")
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Initialize scan object
             scan = Scan(self, scan_id)  # Initialize a new Scan instance
             scan_path = _make_scan(scan)  # Create directory structure
@@ -988,7 +989,7 @@ class FSDB(db.DB):
         """
         # Use exclusive lock for scan deletion
         self.logger.debug(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
-        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username):
+        with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Get the Scan instance from the database
             scan = self.scans[scan_id]
             _delete_scan(scan)  # delete the scan directory
@@ -1061,7 +1062,7 @@ class FSDB(db.DB):
         dict
             Dictionary with lock status information
         """
-        return self.lock_manager.get_lock_status(scan_id)
+        return self.lock_manager.get_lock_status(scan_id, LockLevel.SCAN)
 
     @require_connected_db
     def is_scan_locked(self, scan_id: str) -> bool:
@@ -1881,7 +1882,7 @@ class Scan(db.Scan, MetadataManager):
         """
         # If no owner is defined, set it to the guest user, save it and reload it into the DB
         if 'owner' not in self.metadata:
-            metadata = self.db.rbac_manager.ensure_scan_owner(self.get_metadata())
+            metadata = self.db.rbac_manager.ensure_scan_owner(self.metadata)
             _set_metadata(self.metadata, metadata, None)
             _store_scan_metadata(self)
             self.db.reload(self.id)
@@ -1995,7 +1996,10 @@ class Scan(db.Scan, MetadataManager):
 
         return self.filesets[fs_id]
 
-    def get_metadata(self, key=None, default={}):
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.READ, check_scan_access=False)
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a scan.
 
         Parameters
@@ -2012,16 +2016,14 @@ class Scan(db.Scan, MetadataManager):
             If `key` is ``None``, returns a dictionary.
             Else, returns the value attached to this key.
         """
-        # TODO: should probably create a `@retrieve_username` decorator to provide it to method that do not require a username but could use it
-        # TODO: Or maybe get rid of the lock_manager here?
-        # with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username or "guest"):
-        #    return _get_metadata(self.metadata, key, default)
-
         # Use shared lock for read operations
-        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, self.db.get_guest_user().username):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
             return _get_metadata(self.metadata, key, default)
 
-    def get_measures(self, key=None):
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.READ, check_scan_access=True)
+    def get_measures(self, key=None, current_user=None, **kwargs):
         """Get the manual measurements associated with a scan.
 
         Parameters
@@ -2040,7 +2042,9 @@ class Scan(db.Scan, MetadataManager):
         These manual measurements should be a JSON file named `measures.json`.
         It is located at the root folder of the scan dataset.
         """
-        return _get_metadata(self.measures, key, default={})
+        # Use shared lock for read operations
+        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
+            return _get_metadata(self.measures, key, default={})
 
     @get_authentication
     @require_authentication
@@ -2087,6 +2091,7 @@ class Scan(db.Scan, MetadataManager):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        # The locking mechanism is handled by the `MetadataManager._update_metadata` method
         self._update_metadata(data, value, current_user, _store_scan_metadata, cls_name="Scan")
 
     @get_authentication
@@ -2114,7 +2119,7 @@ class Scan(db.Scan, MetadataManager):
 
         # Use exclusive lock for metadata updates
         self.logger.debug(f"Updating '{self.id}' scan owner to '{new_owner}' user...")
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Update metadata
             _set_metadata(self.metadata, 'owner', new_owner)
             # Ensure modification timestamp
@@ -2162,7 +2167,7 @@ class Scan(db.Scan, MetadataManager):
         # Use exclusive lock for metadata updates
         valid_groups_str = ", ".join(valid_groups)
         self.logger.debug(f"Updating '{self.id}' scan group sharing to: '{valid_groups_str}'")
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Update metadata
             _set_metadata(self.metadata, 'sharing', valid_groups)
             # Ensure modification timestamp
@@ -2231,9 +2236,9 @@ class Scan(db.Scan, MetadataManager):
         if self.fileset_exists(fs_id):
             raise FilesetExistsError(self, fs_id)
 
-        # Use exclusive lock for fileset creation
+        # Use fileset-level exclusive lock for fileset creation
         self.logger.debug(f"Creating a fileset '{fs_id}' in scan '{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILESET):
             # Create the new Fileset
             fileset = Fileset(self, fs_id)  # Initialize a new Fileset instance
             _make_fileset(fileset)  # Create directory structure
@@ -2296,7 +2301,7 @@ class Scan(db.Scan, MetadataManager):
 
         # Use exclusive lock for fileset deletion
         self.logger.debug(f"Deleting fileset '{fs_id}' from scan '{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(self.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.id}/{fs_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILESET):
             fs = self.filesets[fs_id]
             _delete_fileset(fs)  # delete the fileset
             self.filesets.pop(fs_id)  # remove the Fileset instance from the scan
@@ -2362,8 +2367,8 @@ class Fileset(db.Fileset, MetadataManager):
     """Implement ``Fileset`` for the local *File System DataBase* from the abstract class ``db.Fileset``.
 
     Implementation of a fileset as a simple files structure with:
-      * directory ``${FSDB.basedir}/${FSDB.scan.id}/${Fileset.id}`` containing set of files;
-      * directory ``${FSDB.basedir}/${FSDB.scan.id}/metadata`` containing JSON metadata associated to files;
+      * directory ``${FSDB.basedir}/${FSDB.scan.id}/${Fileset.id}`` containing a set of files;
+      * directory ``${FSDB.basedir}/${FSDB.scan.id}/metadata`` containing JSON metadata associated with files;
       * JSON file ``files.json`` containing the list of files from fileset;
 
     Attributes
@@ -2403,7 +2408,7 @@ class Fileset(db.Fileset, MetadataManager):
         self.logger = self.db.logger
 
     def _erase(self):
-        """Erase the files and metadata associated to this fileset."""
+        """Erase the files and metadata associated with this fileset."""
         for f_id, f in self.files.items():
             f._erase()
         # Reinitialize the attributes
@@ -2501,7 +2506,10 @@ class Fileset(db.Fileset, MetadataManager):
 
         return self.files[f_id]
 
-    def get_metadata(self, key=None, default={}):
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.READ, check_scan_access=True)
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a fileset.
 
         Parameters
@@ -2509,7 +2517,7 @@ class Fileset(db.Fileset, MetadataManager):
         key : str
             A key that should exist in the fileset's metadata.
         default : Any, optional
-            The default value to return if the key do not exist in the metadata.
+            The default value to return if the key does not exist in the metadata.
             Default is an empty dictionary``{}``.
 
         Returns
@@ -2538,7 +2546,9 @@ class Fileset(db.Fileset, MetadataManager):
         >>> db._is_dummy=True
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        return _get_metadata(self.metadata, key, default)
+        # Use shared lock for read operations
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}", LockType.SHARED, current_user.username, LockLevel.FILESET):
+            return _get_metadata(self.metadata, key, default)
 
     @get_authentication
     @require_authentication
@@ -2576,6 +2586,7 @@ class Fileset(db.Fileset, MetadataManager):
         {'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        # The locking mechanism is handled by the `MetadataManager._update_metadata` method
         self._update_metadata(data, value, current_user, _store_fileset_metadata, cls_name="Fileset")
 
     @get_authentication
@@ -2619,7 +2630,7 @@ class Fileset(db.Fileset, MetadataManager):
         >>> new_f = fs.create_file('file_007')
         >>> fs.list_files()
         ['dummy_image', 'test_image', 'test_json', 'file_007']
-        >>> print([f.name for f in fs.path().iterdir()])  # the file only exist in the database, not on drive!
+        >>> print([f.name for f in fs.path().iterdir()])  # the file only exists in the database, not on drive!
         ['dummy_image.png', 'test_json.json', 'test_image.png']
         >>> md = {"Name": "Bond, James Bond"}  # Create an example dictionary to save as JSON
         >>> from plantdb.commons import io
@@ -2636,9 +2647,9 @@ class Fileset(db.Fileset, MetadataManager):
         if self.file_exists(f_id):
             raise FileExistsError(self, f_id)
 
-        # Use exclusive lock for file creation
+        # Use file-level exclusive lock for file creation
         self.logger.debug(f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
             # Create the new File
             file = File(self, f_id)  # Initialize a new File instance
 
@@ -2653,7 +2664,7 @@ class Fileset(db.Fileset, MetadataManager):
             _set_metadata(file.metadata, initial_metadata, None)  # add metadata dictionary to the new scan
             _store_file_metadata(file)
 
-            self.files.update({f_id: file})  # Update filesets's files dictionary
+            self.files.update({f_id: file})  # Update filesets's file dictionary
             self.store()  # Store fileset instance to the JSON
 
         self.logger.debug(f"Done creating the file.")
@@ -2705,7 +2716,7 @@ class Fileset(db.Fileset, MetadataManager):
 
         # Use exclusive lock for fileset creation
         self.logger.debug(f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
             f = self.files[f_id]
             _delete_file(f)  # delete the file
             self.files.pop(f_id)  # remove the File instance from the fileset
@@ -2816,7 +2827,10 @@ class File(db.File, MetadataManager):
         self.metadata = {}
         return
 
-    def get_metadata(self, key=None, default={}):
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.READ, check_scan_access=True)
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a file.
 
         Parameters
@@ -2824,7 +2838,7 @@ class File(db.File, MetadataManager):
         key : str
             A key that should exist in the file's metadata.
         default : Any, optional
-            The default value to return if the key do not exist in the metadata.
+            The default value to return if the key does not exist in the metadata.
             Default is an empty dictionary``{}``.
 
         Returns
@@ -2845,7 +2859,9 @@ class File(db.File, MetadataManager):
         {'random json': True}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        return _get_metadata(self.metadata, key, default)
+        # Use shared lock for read operations
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.SHARED, current_user.username, LockLevel.FILE):
+            return _get_metadata(self.metadata, key, default)
 
     @get_authentication
     @require_authentication
@@ -2878,6 +2894,7 @@ class File(db.File, MetadataManager):
         {'random json': True, 'test': 'value'}
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        # The locking mechanism is handled by the `MetadataManager._update_metadata` method
         self._update_metadata(data, value, current_user, _store_file_metadata, cls_name="File")
 
     @get_authentication
@@ -2914,7 +2931,7 @@ class File(db.File, MetadataManager):
         # Use exclusive lock for this operation
         self.logger.debug(
             f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
             # Get the file name and extension
             ext = path.suffix[1:]
             self.filename = _get_filename(self, ext)
@@ -2992,10 +3009,10 @@ class File(db.File, MetadataManager):
         ['dummy_image.png', 'test_json.json', 'test_image.png', 'file_007.json']
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        # Use exclusive lock for this operation
+        # Use file-level exclusive lock for this operation
         self.logger.debug(
             f"Writing raw file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
             with path.open(mode="wb") as f:
@@ -3073,7 +3090,7 @@ class File(db.File, MetadataManager):
         # Use exclusive lock for this operation
         self.logger.debug(
             f"Writing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(self.scan.id, LockType.EXCLUSIVE, current_user.username):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE, current_user.username, LockLevel.FILE):
             self.filename = _get_filename(self, ext)
             path = _file_path(self)
             with path.open(mode="w") as f:
