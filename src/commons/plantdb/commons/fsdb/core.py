@@ -645,8 +645,10 @@ class FSDB(db.DB):
             )
 
         # Initialize RBAC manager with groups file in basedir
-        users_file = os.path.join(basedir, "users.json")
-        groups_file = os.path.join(basedir, "groups.json")
+        users_file = basedir / "users.json"
+        users_file.touch(exist_ok=True)  # create the file if missing
+        groups_file = basedir / "groups.json"
+        groups_file.touch(exist_ok=True)  # create the file if missing
         self.rbac_manager = RBACManager(users_file, groups_file, max_login_attempts, lockout_duration)
 
     def path(self) -> pathlib.Path:
