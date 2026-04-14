@@ -69,7 +69,6 @@ python fsdb_rest_api.py --help
 ```
 """
 
-import argparse
 import atexit
 import logging
 import os
@@ -80,6 +79,7 @@ from time import sleep
 from typing import Optional
 from typing import Union
 
+import click
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
@@ -97,67 +97,30 @@ from plantdb.server.api.assets import Archive
 from plantdb.server.api.assets import CurveSkeleton
 from plantdb.server.api.assets import DatasetFile
 from plantdb.server.api.assets import FilePath
+from plantdb.server.api.assets import Image
+from plantdb.server.api.assets import Mesh
+from plantdb.server.api.assets import PointCloud
+from plantdb.server.api.assets import PointCloudGroundTruth
+from plantdb.server.api.assets import Sequence
+from plantdb.server.api.auth import CreateApiToken
+from plantdb.server.api.auth import Login
+from plantdb.server.api.auth import Logout
+from plantdb.server.api.auth import Register
+from plantdb.server.api.auth import TokenRefresh
+from plantdb.server.api.auth import TokenValidation
+from plantdb.server.api.base import HealthCheck
+from plantdb.server.api.base import Home
+from plantdb.server.api.base import Refresh
 from plantdb.server.api.file import File
 from plantdb.server.api.file import FileMetadata
 from plantdb.server.api.fileset import Fileset
 from plantdb.server.api.fileset import FilesetFiles
 from plantdb.server.api.fileset import FilesetMetadata
-from plantdb.server.api.base import HealthCheck
-from plantdb.server.api.base import Home
-from plantdb.server.api.assets import Image
-from plantdb.server.api.auth import Login
-from plantdb.server.api.auth import CreateApiToken
-from plantdb.server.api.auth import Logout
-from plantdb.server.api.assets import Mesh
-from plantdb.server.api.assets import PointCloud
-from plantdb.server.api.assets import PointCloudGroundTruth
-from plantdb.server.api.base import Refresh
-from plantdb.server.api.auth import Register
 from plantdb.server.api.scan import Scan
 from plantdb.server.api.scan import ScanFilesets
 from plantdb.server.api.scan import ScanMetadata
 from plantdb.server.api.scan import ScansList
 from plantdb.server.api.scan import ScansTable
-from plantdb.server.api.assets import Sequence
-from plantdb.server.api.auth import TokenRefresh
-from plantdb.server.api.auth import TokenValidation
-
-
-def parsing() -> argparse.ArgumentParser:
-    """Create and configure an argument parser for a REST API server.
-
-    Returns
-    -------
-    argparse.ArgumentParser
-        The configured argument parser capable of parsing and retrieving command-line arguments.
-    """
-    parser = argparse.ArgumentParser(description='Serve a local plantdb database (FSDB) through a REST API.')
-    parser.add_argument('-db', '--db_location', type=str, default=os.environ.get("ROMI_DB", None),
-                        help='location of the database to serve.')
-
-    app_args = parser.add_argument_group("webserver arguments")
-    app_args.add_argument('--host', type=str, default="0.0.0.0",
-                          help="hostname to listen on; defaults to '0.0.0.0'.")
-    app_args.add_argument('--port', type=int, default=5000,
-                          help="port of the webserver; defaults to '5000'.")
-    app_args.add_argument('--debug', action='store_true',
-                          help="enable debug mode.")
-    app_args.add_argument('--proxy', action='store_true',
-                          help="use when the server sits behind a reverse proxy.")
-
-    misc_args = parser.add_argument_group("other arguments")
-    misc_args.add_argument("--test", action='store_true',
-                           help="set up a temporary test database before starting the REST API.")
-    misc_args.add_argument("--empty", action='store_true',
-                           help="do not populate the test database with toy datasets.")
-    misc_args.add_argument("--models", action='store_true',
-                           help="include trained CNN model in the test database.")
-
-    log_opt = parser.add_argument_group("logging options")
-    log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
-                         help="logging level; defaults to 'INFO'.")
-
-    return parser
 
 
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
@@ -519,6 +482,7 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
             refresh_timeout=refresh_timeout,
             max_concurrent_sessions=max_sessions,
         ),
+        log_level = log_level,
     )
     logger.info(f"Connecting to local plant database at '{db.path()}'.")
     db.connect()
@@ -532,25 +496,62 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
     return app
 
 
-def main():
-    """Entry point for the REST API server.
+# ---------------------------------------------------------------------------
+# Click command‑line interface
+# ---------------------------------------------------------------------------
 
-    Parses command line arguments, builds the Flask application, and starts the development server
-    with the supplied host/port and debug settings.
-    """
-    parser = parsing()
-    args = parser.parse_args()
-
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-db', '--db_location', 'db_location',
+              type=click.Path(),
+              default=os.getenv("ROMI_DB", None),
+              help='Location of the database to serve.')
+@click.option('--host',
+              default="0.0.0.0",
+              show_default=True,
+              help="Hostname to listen on; defaults to '0.0.0.0'.")
+@click.option('--port',
+              type=int,
+              default=5000,
+              show_default=True,
+              help="Port of the webserver; defaults to '5000'.")
+@click.option('--debug',
+              is_flag=True,
+              default=False,
+              help="Enable debug mode.")
+@click.option('--proxy',
+              is_flag=True,
+              default=False,
+              help="Use when the server sits behind a reverse proxy.")
+@click.option('--test',
+              is_flag=True,
+              default=False,
+              help="Set up a temporary test database before starting the REST API.")
+@click.option('--empty',
+              is_flag=True,
+              default=False,
+              help="Do not populate the test database with toy datasets.")
+@click.option('--models',
+              is_flag=True,
+              default=False,
+              help="Include trained CNN model in the test database.")
+@click.option('--log-level',
+              type=click.Choice(LOG_LEVELS, case_sensitive=False),
+              default=DEFAULT_LOG_LEVEL,
+              show_default=True,
+              help="Logging level; defaults to 'INFO'.")
+def main(db_location, host, port, debug, proxy, test, empty, models, log_level):
+    """Entry point for the REST API server using Click."""
+    print(f"{log_level.upper()=}")
     app = rest_api(
-        db_path=args.db_location,
-        proxy=args.proxy,
-        log_level=args.log_level,
-        test=args.test,
-        empty=args.empty,
-        models=args.models,
+        db_path=db_location,
+        proxy=proxy,
+        log_level=log_level.upper(),
+        test=test,
+        empty=empty,
+        models=models,
     )
-    # Start the Flask application:
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    # Start the Flask development server.
+    app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == '__main__':
