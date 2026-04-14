@@ -101,6 +101,7 @@ import pathlib
 from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -145,6 +146,7 @@ from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
 from plantdb.commons.fsdb.validation import _is_valid_id
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import iso_date_now
 
@@ -152,7 +154,7 @@ from plantdb.commons.utils import iso_date_now
 MARKER_FILE_NAME = "romidb"
 
 
-def require_connected_db(method):
+def require_connected_db(method: Callable) -> Callable:
     """Decorator that ensures the method is only called when the database is connected.
 
     This ensures that operations that require a valid database connection are properly guarded against calls when the connection is inactive.
@@ -177,7 +179,7 @@ def require_connected_db(method):
     return wrapper
 
 
-def require_token(method):
+def require_token(method: Callable) -> Callable:
     """Decorator that passes the token to the decorated method depending on the session manager."""
 
     @functools.wraps(method)
@@ -280,7 +282,7 @@ def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs) -
     return logged_user
 
 
-def get_authentication(method):
+def get_authentication(method: Callable) -> Callable:
     """Get authentication and inject ``current_user`` into the wrapped call.
 
     The wrapper expects the following keyword arguments (all optional):
@@ -325,7 +327,7 @@ def get_authentication(method):
     return wrapper
 
 
-def require_authentication(method):
+def require_authentication(method: Callable) -> Callable:
     """Enforce authentication."""
 
     @functools.wraps(method)
@@ -333,6 +335,24 @@ def require_authentication(method):
         # Abort if no authenticated user could be determined
         if not kwargs.get('current_user'):
             raise NoAuthUserError()
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
+def use_guest_as_default(method: Callable) -> Callable:
+    """Injects a guest user when no authentication is provided.
+
+    This enables methods that require an authenticated user to operate transparently with a default guest context.
+    """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if not kwargs.get('current_user'):
+            if isinstance(self, (Scan, Fileset, File)):
+                kwargs["current_user"] = self.db.get_guest_user()
+            else:
+                kwargs["current_user"] = self.get_guest_user()
         return method(self, *args, **kwargs)
 
     return wrapper
@@ -559,7 +579,7 @@ class FSDB(db.DB):
     >>> # EXAMPLE 2: Use a local database:
     >>> import os
     >>> from plantdb.commons.fsdb.core import FSDB
-    >>> db = FSDB(os.environ.get('ROMI_DB', "/data/ROMI/DB/"))
+    >>> db = FSDB(os.environ.get('ROMI_DB', "/data/ROMI/DB/"), log_level="DEBUG")
     >>> db.connect()
     >>> token = db.login('guest', 'guest')
     >>> scan_ids = db.list_scans(owner_only=False, token=token)
@@ -574,7 +594,7 @@ class FSDB(db.DB):
                  logger: Optional[logging.Logger] = None,
                  session_manager: Union[SingleSessionManager, SessionManager, JWTSessionManager] = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
-                 lockout_duration: int = 900, max_concurrent_sessions: int = 10):
+                 lockout_duration: int = 900, max_concurrent_sessions: int = 10, **kwargs):
         """Database constructor.
 
         Check the given `` basedir `` directory exists and load accessible ``Scan`` objects.
@@ -605,6 +625,11 @@ class FSDB(db.DB):
             The maximum number of concurrent sessions to login before locking up.
             Defaults to 10.
 
+        Other Parameters
+        ----------------
+        log_level : str
+            A logging level to set for the logger. Defaults to ``INFO``.
+
         Raises
         ------
         NotADirectoryError
@@ -617,7 +642,8 @@ class FSDB(db.DB):
         plantdb.commons.fsdb.core.MARKER_FILE_NAME
         """
         super().__init__()
-        self.logger = logger or get_logger(__class__.__name__)
+        self.logger = logger or get_logger(__class__.__name__,
+                                           log_level=kwargs.get('log_level', DEFAULT_LOG_LEVEL))
 
         basedir = Path(basedir)
         # Check the given path to the root directory of the database is a directory:
@@ -2078,7 +2104,7 @@ class Scan(db.Scan, MetadataManager):
         return self.filesets[fs_id]
 
     @get_authentication
-    @require_authentication
+    @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=False)
     def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a scan.
@@ -2102,7 +2128,7 @@ class Scan(db.Scan, MetadataManager):
             return _get_metadata(self.metadata, key, default)
 
     @get_authentication
-    @require_authentication
+    @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
     def get_measures(self, key=None, current_user=None, **kwargs):
         """Get the manual measurements associated with a scan.
@@ -2590,7 +2616,7 @@ class Fileset(db.Fileset, MetadataManager):
         return self.files[f_id]
 
     @get_authentication
-    @require_authentication
+    @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
     def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a fileset.
@@ -2916,7 +2942,7 @@ class File(db.File, MetadataManager):
         return
 
     @get_authentication
-    @require_authentication
+    @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
     def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
         """Get the metadata associated with a file.
