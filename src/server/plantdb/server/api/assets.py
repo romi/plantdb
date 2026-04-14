@@ -246,8 +246,8 @@ class DatasetFile(Resource):
 
     See Also
     --------
-    plantdb.server.rest_api.ScansList : Resource for managing scan listings
-    plantdb.server.rest_api.File : Resource for file retrieval operations
+    plantdb.server.api.scan.ScansList : Resource for managing scan listings
+    plantdb.server.api.scan.File : Resource for file retrieval operations
     """
 
     def __init__(self, db, logger=None):
@@ -621,7 +621,7 @@ class PointCloud(Resource):
 
         See Also
         --------
-        plantdb.server.rest_api.sanitize_name : Input sanitization & validation function.
+        plantdb.server.core.security.sanitize_name : Input sanitization & validation function.
         plantdb.server.webcache.pointcloud_path : Point cloud path resolution function with caching and downsampling options.
 
         Examples
@@ -897,7 +897,7 @@ class Mesh(Resource):
 
         See Also
         --------
-        plantdb.server.rest_api.sanitize_name : Function used to validate input parameters
+        plantdb.server.core.security.sanitize_name : Function used to validate input parameters
         plantdb.server.webcache.mesh_path : Function to retrieve mesh file path
 
         Examples
@@ -1146,7 +1146,7 @@ class Sequence(Resource):
 
         See Also
         --------
-        plantdb.server.rest_api.sanitize_name : Function used to validate and clean scan_id
+        plantdb.server.core.security.sanitize_name : Function used to validate and clean scan_id
         plantdb.server.rest_api.compute_fileset_matches : Function to match filesets with tasks
 
         Examples

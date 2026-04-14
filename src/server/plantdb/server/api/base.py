@@ -339,7 +339,7 @@ class Refresh(Resource):
 
         See Also
         --------
-        plantdb.server.rest_api.rate_limit
+        plantdb.server.core.security.rate_limit
         plantsb.fsdb.FSDB.reload
 
         Examples
