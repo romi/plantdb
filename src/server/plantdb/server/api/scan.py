@@ -223,7 +223,7 @@ class ScansTable(Resource):
 
     See Also
     --------
-    plantdb.server.rest_api.get_scan_info : Function used to extract information for each scan
+    plantdb.server.services.scan.get_scan_info : Function used to extract information for each scan
     """
 
     def __init__(self, db, logger=None):
@@ -303,7 +303,7 @@ class ScansTable(Resource):
         for scan_id in scans_list:
             try:
                 scan = self.db.get_scan(scan_id, **kwargs)
-                scan_info = get_scan_info(scan, logger=self.logger)
+                scan_info = get_scan_info(scan, logger=self.logger, **kwargs)
             except NoAuthUserError as e:
                 return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except ScanNotFoundError as e:
@@ -335,8 +335,8 @@ class Scan(Resource):
 
     See Also
     --------
-    plantdb.server.rest_api.get_scan_info : Function used to collect and format scan information
-    plantdb.server.rest_api.sanitize_name : Function used to validate and clean scan IDs
+    plantdb.server.services.scan.get_scan_info : Function used to collect and format scan information
+    plantdb.server.core.security.sanitize_name : Function used to validate and clean scan IDs
     """
 
     def __init__(self, db, logger=None):
