@@ -67,6 +67,8 @@ from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import requests
+
+from plantdb.commons.auth.session import NoAuthSessionManager
 from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
 from tqdm import tqdm
@@ -513,7 +515,7 @@ def setup_test_database(dataset, db_path=TEST_DIR, keep_tmp=True, with_configs=F
     db.connect()
     db.list_scans(owner_only=False)
     for scan_name, scan in db.scans.items():
-        _ = scan.owner  # get the owner of the scan, if unknown, it will be set to the anonymous user
+        _ = scan.owner  # get the owner of the scan, if unknown, it will be set to the 'guest' user
     db.disconnect()
 
     logger.info(f"The test database is set up under '{db_path}'.")
@@ -535,6 +537,8 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
 
     Other Parameters
     ----------------
+    session_manager : SessionManager
+        The session manager to use, defaults to ``NoAuthSessionManager``.
     keep_tmp : bool
         Whether to keep the temporary files. Defaults to ``False``.
     with_configs : bool
@@ -554,14 +558,14 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     >>> from plantdb.commons.test_database import test_database
     >>> db = test_database()
     >>> db.connect()
-    >>> db.list_scans()
+    >>> db.list_scans(owner_only=False)
     ['real_plant_analyzed']
     >>> db.path()
     PosixPath('/tmp/ROMI_DB_********')
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
-    session_manager = kwargs.pop('session_manager', None)
+    session_manager = kwargs.pop('session_manager', NoAuthSessionManager())
     if dataset is None:
         return FSDB(setup_empty_database(db_path=db_path), session_manager=session_manager)
     else:
@@ -599,10 +603,9 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     --------
     >>> from plantdb.commons.test_database import dummy_db
     >>> db = dummy_db(with_file=True)
-    >>> db.connect()
     INFO     [FSDB] Connected to database successfully
     >>> from plantdb.commons.fsdb.core import get_logged_username
-    >>> get_logged_username(db)  # 'admin' is logged by default
+    >>> get_logged_username(db).username  # 'admin' is logged by default
     'admin'
     >>> print(db.path())  # the database directory
     /tmp/romidb_********
@@ -631,12 +634,10 @@ def dummy_db(with_scan=False, with_fileset=False, with_file=False):
     marker_file = db_path / MARKER_FILE_NAME
     marker_file.open(mode='w').close()
     # Create the FSDB instance and connect
-    db = FSDB(db_path, required_filesets=[], session_manager=SingleSessionManager())
+    db = FSDB(db_path, required_filesets=[], session_manager=NoAuthSessionManager())
     # Flag this instance as a dummy DB so that disconnect will clean up the temp folder
     db._is_dummy = True
     db.connect()
-    # Login as adin to get all the rights (to create and edit)
-    _ = db.login('admin', 'admin')
 
     if with_file:
         # To create a `File`, existing `Scan` & `Fileset` are required
