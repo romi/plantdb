@@ -1224,13 +1224,17 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # NoAuthSessionManager with automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> token = db.login('guest', 'guest')
         ERROR    [FSDB] Failed to login as 'guest'! Another user is logged in.
         >>> db.logout()  # log out from 'admin' session
         (True, 'admin')
         >>> token = db.login('guest', 'guest')
+        >>> print(len(token))
+        43
         >>> db.disconnect()
         """
         if self.validate_user(username, password):
@@ -1266,9 +1270,10 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
-        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.logout()  # log out from 'admin' session
         (True, 'admin')
         >>> db.logout()  # log out from NO session
@@ -1318,16 +1323,18 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
-        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
+        INFO     [RBACManager] User 'admin' is creating new user 'batman' with roles=<Role.CONTRIBUTOR: 'contributor'>.
         INFO     [UserManager] Welcome Bruce Wayne, please log in...'
         >>> db.logout()  # log out from 'admin' session
         (True, 'admin')
         >>> token = db.login('batman', 'joker')
-        >>> print(token)
-        WoBlNjJPmJHEwuFG3NAyrFtKMHnEg-BRjSplJU-uMbU
+        >>> print(len(token))
+        43
         >>> db.disconnect()
         """
         _ = self.rbac_manager.create_user(current_user, new_username, fullname, password, roles)
@@ -1361,10 +1368,10 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
-        INFO     [FSDB] Successfully logged in as 'admin'.
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         INFO     [UserManager] Welcome Bruce Wayne, please log in...'
         >>> db.logout()  # log out from 'admin' session
@@ -1375,6 +1382,8 @@ class FSDB(db.DB):
         >>> db.logout()  # log out from 'batman' session
         (True, 'batman')
         >>> token = db.login('batman', 'alfred')  # login with new password
+        >>> print(len(token))
+        43
         >>> db.disconnect()
         """
         return self.rbac_manager.users.update_password(current_user.username, old_password, new_password)
@@ -1384,7 +1393,7 @@ class FSDB(db.DB):
     @require_authentication
     def create_api_token(
             self, token_exp: int,
-            datasets: dict[str, tuple[Permission, ...] | Permission],
+            datasets: dict[str, list[Permission] | Permission],
             current_user: User | None = None, **kwargs
     ) -> str:
         """
@@ -1399,25 +1408,39 @@ class FSDB(db.DB):
         ----------
         token_exp : int
             The expiration duration of the API token in seconds.
-        datasets : dict of str to tuple of Permission or Permission
+        datasets : dict[str, list[Permission] | Permission]
             A dictionary where the keys are dataset names, and the values are either
             a tuple of `Permission` instances or a single `Permission` instance
             defining the access levels for each dataset.
         current_user : plantdb.commons.fsdb.auth.models.User, optional
             The user object representing the currently authenticated user. The username
             from this object is used to associate the API token.
-        **kwargs
-            Additional keyword arguments passed for possible extended functionality.
+
+        Other Parameters
+        ----------------
+        token : str
+            The token to use to authenticate against the ``JWTSessionManager``.
 
         Returns
         -------
         str
             The generated API token.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> from plantdb.commons.auth.session import JWTSessionManager
+        >>> from plantdb.commons.auth.models import Permission
+        >>> db = test_database(session_manager=JWTSessionManager())
+        >>> db.connect()
+        >>> access_token, refresh_token = db.login('admin', 'admin')
+        >>> api_token = db.create_api_token(3600, {'real_plant_analyzed': [Permission.WRITE]}, token=access_token)
+        >>> db.disconnect()
         """
         if not isinstance(self.session_manager, JWTSessionManager):
             raise RuntimeError("Session manager must be an instance of JWTSessionManager.")
-        session_manager: JWTSessionManager = self.session_manager
-        return session_manager.create_api_token(current_user.username, token_exp, datasets)
+
+        return self.session_manager.create_api_token(current_user.username, token_exp, datasets)
 
     def get_guest_user(self) -> User:
         """Retrieve the guest user information from the RBAC manager.
@@ -1460,14 +1483,12 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
-        >>> db.logout()
-        INFO     [FSDB] Successfully logged out from 'admin'.
-        >>> token = db.login('guest', 'guest')
-        INFO     [FSDB] Successfully logged in as 'guest'.
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.get_username(token)
-        'guest'
+        'admin'
         >>> db.disconnect()
         """
         return self.session_manager.session_username(token)
@@ -1493,14 +1514,13 @@ class FSDB(db.DB):
 
         Examples
         --------
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.get_user_data(username='admin')
         User(username='admin', fullname='PlantDB Admin', password_hash='$argon2id$v=19$m=65536,t=3,p=4$zMr0ZhclnHHdOgwWKv3Hbg$SZshbPdNiCdBONb8vgzZAKyWPl5sNIUwB8mQWkzGYOQ', roles={<Role.ADMIN: 'admin'>}, created_at=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163), permissions=None, last_login=datetime.datetime(2026, 1, 29, 17, 22, 49, 770793), is_active=True, failed_attempts=0, last_failed_attempt=None, locked_until=None, password_last_change=datetime.datetime(2026, 1, 29, 17, 22, 49, 683163))
-        >>> db.logout()  # log out from 'admin' session
-        (True, 'admin')
-        >>> token = db.login('guest', 'guest')
-        >>> user_data = db.get_user_data(token=token)
+        >>> user_data = db.get_user_data(username='guest')
         >>> print(user_data.fullname)
         PlantDB Guest
         >>> db.disconnect()
@@ -1560,8 +1580,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print(group_a.users)
@@ -1608,8 +1630,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print(group_a.users)
@@ -1657,8 +1681,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print(group_a.users)
@@ -1703,8 +1729,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print(group_a.users)
@@ -1742,8 +1770,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print([g.name for g in db.list_groups()])
@@ -1784,8 +1814,10 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.auth.models import Role
-        >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # automatic login as 'admin'
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
         >>> db.create_user('batman', 'Bruce Wayne', 'joker', roles=Role.CONTRIBUTOR)
         >>> group_a = db.create_group('groupA', ['batman'], description="The group A.")
         >>> print([g.name for g in db.get_user_groups('batman')])
