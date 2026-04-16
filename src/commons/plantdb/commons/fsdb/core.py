@@ -630,6 +630,9 @@ class FSDB(db.DB):
         ----------------
         log_level : str
             A logging level to set for the logger. Defaults to ``INFO``.
+        no_auth : bool
+            A boolean flag to switch between session managers.
+            If ``True``, use `NoAuthSessionManager` else use `SingleSessionManager`.
 
         Raises
         ------
@@ -882,6 +885,7 @@ class FSDB(db.DB):
 
         Examples
         --------
+        >>> # Example #1 - API demo
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
@@ -892,6 +896,18 @@ class FSDB(db.DB):
         >>> unknown_scan = db.get_scan('unknown')
         plantdb.commons.fsdb.ScanNotFoundError: Unknown scan id 'unknown'!
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
+
+        >>> # Example #2 - API demo with authentication
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> scan = db.get_scan('real_plant_analyzed')
+        plantdb.commons.fsdb.exceptions.NoAuthUserError: No authenticated user!
+        >>> token = db.login('admin', 'admin')
+        >>> scan = db.get_scan('real_plant_analyzed')
+        >>> print(scan.id)
+        real_plant_analyzed
+        >>> db.disconnect()
         """
         with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username, LockLevel.SCAN):
             if not self.scan_exists(scan_id):
@@ -2158,6 +2174,18 @@ class Scan(db.Scan, MetadataManager):
         any
             If `key` is ``None``, returns a dictionary.
             Else, returns the value attached to this key.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database()
+        >>> db.connect()
+        >>> token = db.login('admin', 'admin')
+        >>> scan = db.get_scan('real_plant_analyzed')
+        >>> scan.get_metadata('owner')
+        'guest'
+        >>> db.logout()
+        >>> scan.get_metadata('owner')  # Can still access it as 'guest' user
         """
         # Use shared lock for read operations
         with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
