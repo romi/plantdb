@@ -116,6 +116,7 @@ from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
 from plantdb.commons.auth.rbac import RBACManager
 from plantdb.commons.auth.session import JWTSessionManager
+from plantdb.commons.auth.session import NoAuthSessionManager
 from plantdb.commons.auth.session import SessionManager
 from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
@@ -252,7 +253,7 @@ def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs) -
     >>> import os
     >>> from plantdb.commons.test_database import dummy_db
     >>> from plantdb.commons.fsdb.core import get_logged_username
-    >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+    >>> db = dummy_db()  # NoAuthSessionManager with automatic login as 'admin'
     >>> get_logged_username(db)
     'admin'
     >>> db.logout()
@@ -260,8 +261,8 @@ def get_logged_username(fsdb: "FSDB", default_user=None, token=None, **kwargs) -
     True
     >>> get_logged_username(db, default_user='guest')
     """
-    if isinstance(fsdb.session_manager, SingleSessionManager):
-        # If a Single SessionManager, get the username from the session manager (as only one user can be logged at once)
+    if isinstance(fsdb.session_manager, (NoAuthSessionManager, SingleSessionManager)):
+        # Get the username from the session manager (as only one user can be logged at once)
         try:
             session = list(fsdb.session_manager.sessions.keys())[0]
         except IndexError:
@@ -576,7 +577,7 @@ class FSDB(db.DB):
     <class 'plantdb.commons.fsdb.core.Scan'>
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
-    >>> # EXAMPLE 2: Use a local database:
+    >>> # EXAMPLE 2: Use a local database with a :
     >>> import os
     >>> from plantdb.commons.fsdb.core import FSDB
     >>> db = FSDB(os.environ.get('ROMI_DB', "/data/ROMI/DB/"), log_level="DEBUG")
@@ -592,7 +593,7 @@ class FSDB(db.DB):
     def __init__(self, basedir: Union[str, Path],
                  required_filesets: Optional[List[str]] = None,
                  logger: Optional[logging.Logger] = None,
-                 session_manager: Union[SingleSessionManager, SessionManager, JWTSessionManager] = None,
+                 session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
                  lockout_duration: int = 900, max_concurrent_sessions: int = 10, **kwargs):
         """Database constructor.
@@ -609,9 +610,9 @@ class FSDB(db.DB):
             Use `[]` to accept any subdirectory of `basedir` as a valid "scan".
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
-        session_manager : Union[SingleSessionManager, SessionManager, JWTSessionManager], optional
+        session_manager : SessionManager, optional
             The session manager to use for session authentication.
-            Defaults to ``SingleSessionManager``.
+            Defaults to ``NoAuthSessionManager`` if ``'no_auth'`` kwarg is set to `True``, else ``SingleSessionManager``.
         session_timeout : int, optional
             Session timeout in seconds.
             Defaults to 3600 (1 hour).
@@ -659,15 +660,17 @@ class FSDB(db.DB):
 
         # Initialize the session manager
         if session_manager is None:
-            self.session_manager = SingleSessionManager(
-                session_timeout=session_timeout,
-            )
-        elif isinstance(session_manager, (SingleSessionManager, SessionManager, JWTSessionManager)):
+            if kwargs.get('no_auth', False):
+                self.session_manager = NoAuthSessionManager(session_timeout=session_timeout)
+            else:
+                self.session_manager = SingleSessionManager(session_timeout=session_timeout)
+        elif isinstance(session_manager,
+                        (SingleSessionManager, SessionManager, JWTSessionManager, NoAuthSessionManager)):
             self.session_manager = session_manager
         else:
             raise ValueError(
                 f"session_manager must be an instance of 'SingleSessionManager', 'SessionManager', "
-                f"or 'JWTSessionManager', got {type(session_manager)}"
+                f" 'JWTSessionManager' or 'NoAuthSessionManager', got {type(session_manager)}"
             )
 
         # Initialize RBAC manager with groups file in basedir
@@ -1196,7 +1199,7 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+        >>> db = dummy_db()  # NoAuthSessionManager with automatic login as 'admin'
         >>> db.validate_user('guest', 'guest')
         True
         >>> db.disconnect()
@@ -1222,7 +1225,7 @@ class FSDB(db.DB):
         Examples
         --------
         >>> from plantdb.commons.test_database import dummy_db
-        >>> db = dummy_db()  # SingleSessionManager with automatic login as 'admin'
+        >>> db = dummy_db()  # NoAuthSessionManager with automatic login as 'admin'
         >>> token = db.login('guest', 'guest')
         ERROR    [FSDB] Failed to login as 'guest'! Another user is logged in.
         >>> db.logout()  # log out from 'admin' session
@@ -1233,7 +1236,8 @@ class FSDB(db.DB):
         if self.validate_user(username, password):
 
             # If a SingleSessionManager and a currently logged user, abort
-            if isinstance(self.session_manager, SingleSessionManager) and self.session_manager.has_logged_user():
+            if isinstance(self.session_manager,
+                          (NoAuthSessionManager, SingleSessionManager)) and self.session_manager.has_logged_user():
                 current_username = get_logged_username(self)
                 if current_username:
                     if current_username != username:
@@ -1973,7 +1977,7 @@ class Scan(db.Scan, MetadataManager):
         """A property method to retrieve or set the `owner` of a resource.
 
         If the `owner` is not already defined in the resource's metadata, this property
-        ensures that a default owner is assigned (using a guest user). The updated metadata
+        ensures that a default owner is assigned (using the 'guest' user). The updated metadata
         is then stored in the database, and the resource is reloaded.
 
         Returns
@@ -1987,7 +1991,7 @@ class Scan(db.Scan, MetadataManager):
         _store_scan_metadata : Saves updated metadata to the database.
         db.reload : Reloads the resource from the database after updates.
         """
-        # If no owner is defined, set it to the guest user, save it and reload it into the DB
+        # If no owner is defined, set it to the 'guest' user, save it and reload it into the DB
         if 'owner' not in self.metadata:
             metadata = self.db.rbac_manager.ensure_scan_owner(self.metadata)
             _set_metadata(self.metadata, metadata, None)
