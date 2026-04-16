@@ -100,6 +100,8 @@ ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 ENV PLANTDB_API_PREFIX=""
 # Location of the database folder to serve:
 ENV ROMI_DB="/myapp/db"
+# Force credentials usage on this database
+ENV ROMI_DB_NOAUTH="0"
 
 # Change Shell to 'bash', default is 'sh':
 SHELL ["/bin/bash", "-c"]
