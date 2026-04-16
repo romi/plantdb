@@ -520,6 +520,80 @@ class SingleSessionManager(SessionManager):
         super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
 
 
+class NoAuthSessionManager(SessionManager):
+    """
+    A session manager for testing where every request is considered
+    authenticated as the built‑in ``admin`` user.
+
+    - The admin token is created once at construction and reused.
+    - ``validate_session`` always succeeds (refreshes the token only when it has expired).
+    - Suitable for use in `plantdb.commons.fsdb.core.FSDB` tests and
+      docstring examples where security is irrelevant.
+
+    Examples
+    --------
+    >>> from plantdb.commons.auth.session import NoAuthSessionManager
+    >>> noauth_sm = NoAuthSessionManager()
+    >>> token = noauth_sm.admin_token()
+    >>> noauth_sm.validate_session(token)['username']
+    'admin'
+    >>> # Any request that expects a session manager can now receive `noauth_sm` without worrying about authentication.
+    >>> from plantdb.commons.test_database import setup_test_database
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> db_path = setup_test_database('real_plant')
+    >>> db = FSDB(db_path, session_manager=NoAuthSessionManager())
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')  # no need to log in to access the dataset
+    >>> scan.set_metadata('test', "No authentication required to write stuff!")
+    >>> print(scan.get_metadata('test'))
+    No authentication required to write stuff!
+    """
+
+    def __init__(self, session_timeout: int = 3600) -> None:
+        # Force a single‑session policy; the real admin manager does the same.
+        super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
+        self._admin_username = "admin"
+        # Create the admin session eagerly.
+        self._admin_token = super().create_session(self._admin_username)
+
+    # ------------------------------------------------------------------
+    # Public helpers
+    # ------------------------------------------------------------------
+    def admin_token(self) -> str | None:
+        """Return the (static) admin token."""
+        return self._admin_token
+
+    # ------------------------------------------------------------------
+    # Overridden SessionManager API
+    # ------------------------------------------------------------------
+    def create_session(self, username: str | None = None) -> str | None:
+        """
+        Ignore the supplied *username* – always return the pre‑created admin token.
+        This mirrors the behavior of ``AdminSessionManager`` but without any conditional logic.
+        """
+        return self._admin_token
+
+    def validate_session(self, session_id: str) -> dict | None:
+        """
+        Validate the stored admin token.  If it has expired, recreate it
+        and return the fresh session information.
+        """
+        # First try the existing token; ``super().validate_session`` also updates ``last_accessed``.
+        session = super().validate_session(self._admin_token)
+        if session is None:
+            # Token expired → make a new one.
+            self._admin_token = super().create_session(self._admin_username)
+            session = super().validate_session(self._admin_token)
+        return session
+
+    def session_username(self, session_id: str) -> str | None:
+        """Always return ``admin`` for any session identifier."""
+        # We bypass the parent implementation because it would look up the
+        # token in ``self.sessions`` – we know the admin token is always
+        # present (or recreated above).
+        return self._admin_username
+
+
 def _derive_key_argon2(password: str) -> bytes:
     """Derive a 64‑byte (512‑bit) secret using Argon2.
 
