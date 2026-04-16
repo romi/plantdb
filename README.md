@@ -179,6 +179,15 @@ docker run -p 5000:5000 -v $ROMI_DB:/myapp/db -it roboticsmicrofarms/plantdb
 
 **Obviously, you have to install docker first!**
 
+### Production ready
+
+If you want to set up a database for multiple users and want to **secure it by enabling authentication**, you must secure it by setting a `.env` at its root directory as follows:
+```dotenv
+ROMI_DB_NOAUTH="0"
+```
+Or set it as an environment variable if you prefer, as done in our distributed docker image.
+Any system-wide environment variable will take precedence over variables in the `.env` file.
+
 ## Usage
 
 ### Python API
@@ -186,13 +195,12 @@ docker run -p 5000:5000 -v $ROMI_DB:/myapp/db -it roboticsmicrofarms/plantdb
 Here is a minimal example how to use the `plantdb` library in Python:
 
 ```python
-# Get the environment variable $ROMI_DB
 import os
-
-db_path = os.environ['ROMI_DB']
-# Use it to connect to DB:
 from plantdb.commons.fsdb.core import FSDB
 
+# Get the environment variable $ROMI_DB
+db_path = os.getenv('ROMI_DB')
+# Use it to connect to DB:
 db = FSDB(db_path)
 db.connect()
 # Access to a dataset named `real_plant` (from the example database)
