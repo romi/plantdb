@@ -69,6 +69,7 @@ from zipfile import ZipFile
 import requests
 
 from plantdb.commons.auth.session import NoAuthSessionManager
+from plantdb.commons.auth.session import SessionManager
 from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
 from tqdm import tqdm
@@ -537,8 +538,12 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
 
     Other Parameters
     ----------------
+    no_auth : bool
+        A boolean flag to switch between session managers.
+        If ``True``, use `NoAuthSessionManager` else use `SingleSessionManager`.
     session_manager : SessionManager
         The session manager to use, defaults to ``NoAuthSessionManager``.
+        Override the `no_auth` parameter.
     keep_tmp : bool
         Whether to keep the temporary files. Defaults to ``False``.
     with_configs : bool
@@ -556,7 +561,7 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     Examples
     --------
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database()
+    >>> db = test_database(no_auth=True)
     >>> db.connect()
     >>> db.list_scans(owner_only=False)
     ['real_plant_analyzed']
@@ -565,7 +570,17 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
-    session_manager = kwargs.pop('session_manager', NoAuthSessionManager())
+    # Use the 'no_auth' keyword argument to define the correct session manager
+    if kwargs.pop('no_auth', False):
+        session_manager = NoAuthSessionManager()
+    else:
+        session_manager = SingleSessionManager()
+    # If a valid session manager is provided as input, use it
+    in_manager = kwargs.pop('session_manager', None)
+    if in_manager and isinstance(in_manager, SessionManager):
+        session_manager = in_manager
+
+    # Create the test database with selected dataset and session manager
     if dataset is None:
         return FSDB(setup_empty_database(db_path=db_path), session_manager=session_manager)
     else:
