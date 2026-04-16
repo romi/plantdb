@@ -67,12 +67,11 @@ from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import requests
+from tqdm import tqdm
 
 from plantdb.commons.auth.session import NoAuthSessionManager
 from plantdb.commons.auth.session import SessionManager
-from plantdb.commons.auth.session import SingleSessionManager
 from plantdb.commons.log import get_logger
-from tqdm import tqdm
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -234,7 +233,7 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
-def _get_archive(archive, force=False) :
+def _get_archive(archive, force=False) -> Path:
     """Download and verify an archive file from a given URL.
 
     This function retrieves an archive file from a specified URL.
@@ -251,7 +250,7 @@ def _get_archive(archive, force=False) :
 
     Returns
     -------
-    Path
+    pathlib.Path
         The path to the downloaded and verified archive file.
     """
     url = ZIP_URLS[archive]
@@ -265,7 +264,7 @@ def _get_archive(archive, force=False) :
     return tmp_fname
 
 
-def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False):
+def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     """Download and extract an archive from ZENODO.
 
     Parameters
@@ -302,7 +301,7 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
     return out_path / archive
 
 
-def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False):
+def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     """Download and extract a test dataset from ZENODO.
 
     Parameters
@@ -334,7 +333,7 @@ def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False):
     return db_path
 
 
-def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False):
+def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     """Download and extract the trained CNN model from ZENODO.
 
     Parameters
@@ -364,7 +363,7 @@ def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False):
     return db_path
 
 
-def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False):
+def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     """Download and extract the pipeline configurations from ZENODO.
 
     Parameters
@@ -394,7 +393,7 @@ def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False):
     return db_path
 
 
-def setup_empty_database(db_path=None):
+def setup_empty_database(db_path=None) -> Path:
     """Sets up an empty ROMI database.
 
     Sets up necessary marker file and ensures the absence of a lock file.
@@ -443,7 +442,8 @@ def setup_empty_database(db_path=None):
     return db_path
 
 
-def setup_test_database(dataset, db_path=TEST_DIR, keep_tmp=True, with_configs=False, with_models=False, force=False):
+def setup_test_database(dataset, db_path=TEST_DIR,
+                        keep_tmp=True, with_configs=False, with_models=False, force=False) -> Path:
     """Download and extract the test database from ZENODO.
 
     Parameters
@@ -570,21 +570,22 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
-    # Use the 'no_auth' keyword argument to define the correct session manager
-    if kwargs.pop('no_auth', False):
-        session_manager = NoAuthSessionManager()
-    else:
-        session_manager = SingleSessionManager()
+    # Extract the 'no_auth' keyword argument to pass it to FSDB.__init__
+    no_auth = kwargs.pop('no_auth', False)
     # If a valid session manager is provided as input, use it
     in_manager = kwargs.pop('session_manager', None)
-    if in_manager and isinstance(in_manager, SessionManager):
+    if isinstance(in_manager, SessionManager):
         session_manager = in_manager
+    else:
+        session_manager = None
 
     # Create the test database with selected dataset and session manager
     if dataset is None:
-        return FSDB(setup_empty_database(db_path=db_path), session_manager=session_manager)
+        return FSDB(setup_empty_database(db_path=db_path),
+                    session_manager=session_manager, no_auth=no_auth)
     else:
-        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs), session_manager=session_manager)
+        return FSDB(setup_test_database(dataset, db_path=db_path, **kwargs),
+                    session_manager=session_manager, no_auth=no_auth)
 
 
 def dummy_db(with_scan=False, with_fileset=False, with_file=False):
