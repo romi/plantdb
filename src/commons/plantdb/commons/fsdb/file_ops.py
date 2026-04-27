@@ -414,9 +414,6 @@ def _load_fileset_files(fileset, fileset_info):
         for n, file_info in enumerate(files_info):
             try:
                 file = _load_file(fileset, file_info)
-                fid = file_info.get("id")
-                if fid is None:
-                    raise FileNotFoundError(f"Missing 'id' for the {n}-th 'files' entry.")
             except FileNoIDError:
                 logger.error(f"Could not get an 'id' entry for the {n}-th 'files' entry from '{scan_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
@@ -426,6 +423,7 @@ def _load_fileset_files(fileset, fileset_info):
                 logger.error(f"Could not find file '{fname}' for '{scan_id}/{fs_id}'.")
                 logger.debug(f"Current `file_info`: {file_info}")
             else:
+                fid = file_info.get("id")
                 files[fid] = file
     else:
         raise IOError(f"Expected a list of files in `files.json` from dataset '{fileset.scan.id}'!")
