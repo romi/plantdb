@@ -131,7 +131,7 @@ def _parse_file(fileset, file_info):
     path = _file_path(file)
     if not path.is_file():
         logger.debug(f"Missing file: {path}")
-        raise FileNotFoundError(f"File: Not found at '{path}'")
+        raise FileNotFoundError(fileset, fid)
     return file
 
 
