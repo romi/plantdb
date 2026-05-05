@@ -102,8 +102,7 @@ Trained tensor, read and written using ``torch``.
 import tempfile
 from pathlib import Path
 
-from plantdb.commons import db
-from plantdb.commons import fsdb
+from plantdb.commons.db import File
 from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)
@@ -114,7 +113,7 @@ def _reader(file, reader, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
     reader : function
         The function to use to read the data.
@@ -125,7 +124,7 @@ def _reader(file, reader, **kwargs):
         The loaded data.
     """
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     # Load the file with the selected reader:
     with open(file, 'r') as f:
@@ -138,7 +137,7 @@ def _write_db_file(dbfile, data, ext, writer, **kwargs):
 
     Parameters
     ----------
-    dbfile : plantdb.commons.db.File
+    dbfile : plantdb.commons.File
         The ``File`` instance to save the data to.
     data : Any
         The data to save.
@@ -160,7 +159,7 @@ def _writer(file, data, ext, writer, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the point cloud data to the given file path, ignoring the extension parameter `ext`.
     data : Any
@@ -170,7 +169,7 @@ def _writer(file, data, ext, writer, **kwargs):
     writer : function
         The function to use to write the `data`.
     """
-    if isinstance(file, db.File):
+    if isinstance(file, File):
         _write_db_file(file, data, ext, writer, **kwargs)
     else:
         writer(file, data, **kwargs)
@@ -182,7 +181,7 @@ def read_json(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -207,7 +206,7 @@ def read_json(file, **kwargs):
     """
     import json
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     # Load the file:
     with open(file, mode='r') as f:
@@ -238,7 +237,7 @@ def write_json(file, data, ext="json", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict
@@ -267,7 +266,7 @@ def read_toml(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -292,7 +291,7 @@ def read_toml(file, **kwargs):
     """
     import toml
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     # Load the file:
     with open(file, mode='r') as f:
@@ -321,7 +320,7 @@ def write_toml(file, data, ext="toml", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict
@@ -350,7 +349,7 @@ def read_image(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -377,7 +376,7 @@ def read_image(file, **kwargs):
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return iio.imread(file, **kwargs)
 
@@ -424,7 +423,7 @@ def write_image(file, data, ext="png", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : array like
@@ -455,7 +454,7 @@ def read_volume(file, ext="tiff", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
     ext : str, optional
         File extension, defaults to "tiff".
@@ -484,7 +483,7 @@ def read_volume(file, ext="tiff", **kwargs):
     """
     import imageio.v3 as iio
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return iio.imread(file, **kwargs)
 
@@ -522,7 +521,7 @@ def write_volume(file, data, ext="tiff", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File
+    file : plantdb.commons.File
         The `File` object used to write the associated file.
     data : array like
         The 3D array to save as volume image.
@@ -558,7 +557,7 @@ def read_npz(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -585,7 +584,7 @@ def read_npz(file, **kwargs):
     """
     import numpy as np
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return dict(np.load(file, **kwargs))
 
@@ -610,7 +609,7 @@ def write_npz(file, data, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : dict of numpy.ndarray
@@ -639,7 +638,7 @@ def read_point_cloud(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -670,7 +669,7 @@ def read_point_cloud(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return io.read_point_cloud(str(file), **kwargs)
 
@@ -695,7 +694,7 @@ def write_point_cloud(file, data, ext="ply", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : open3d.geometry.PointCloud
@@ -727,7 +726,7 @@ def read_triangle_mesh(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -737,7 +736,7 @@ def read_triangle_mesh(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return io.read_triangle_mesh(str(file), **kwargs)
 
@@ -762,7 +761,7 @@ def write_triangle_mesh(file, data, ext="ply", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : open3d.geometry.TriangleMesh
@@ -779,7 +778,7 @@ def read_voxel_grid(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -789,7 +788,7 @@ def read_voxel_grid(file, **kwargs):
     """
     from open3d import io
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return io.read_voxel_grid(str(file), **kwargs)
 
@@ -814,7 +813,7 @@ def write_voxel_grid(file, data, ext="ply", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File
+    file : plantdb.commons.File
         The `File` object used to write the associated file.
     data : open3d.geometry.VoxelGrid
         The voxel grid object to save.
@@ -835,7 +834,7 @@ def read_graph(file, **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
 
     Returns
@@ -864,7 +863,7 @@ def read_graph(file, **kwargs):
     """
     import pickle
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     # Load the pickled file:
     with open(file, mode='rb') as f:
@@ -897,7 +896,7 @@ def write_graph(file, data, ext="p", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : networkx.Graph
@@ -927,7 +926,7 @@ def read_torch(file, ext="pt", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         A ``File`` instance or file path, to read from.
     ext : str, optional
         File extension, defaults to "pt".
@@ -950,7 +949,7 @@ def read_torch(file, ext="pt", **kwargs):
     """
     import torch
     # Get path to file if in a database:
-    if isinstance(file, fsdb.core.File):
+    if isinstance(file, File):
         file = file.path()
     return torch.load(file, **kwargs)
 
@@ -975,7 +974,7 @@ def write_torch(file, data, ext="pt", **kwargs):
 
     Parameters
     ----------
-    file : plantdb.commons.db.File or pathlib.Path or str
+    file : plantdb.commons.File or pathlib.Path or str
         If a ``File`` instance, the file will be saved to the associated database/scan/fileset.
         Else, write the `data` to the given file path, ignoring the extension parameter `ext`.
     data : TorchTensor
