@@ -551,11 +551,12 @@ class NoAuthSessionManager(SessionManager):
     """
 
     def __init__(self, session_timeout: int = 3600) -> None:
+        # Abort if environment explicitly disables NoAuth mode.
         if os.environ.get('ROMI_DB_NOAUTH', 1) == 0:
             raise RuntimeError('Unable to use NoAuthSessionManager, forbidden by environment variable!')
-        # Force a single‑session policy; the real admin manager does the same.
+        # Initialize base SessionManager with single‑session limit.
         super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
-        self._admin_username = "admin"
+        self._admin_username = "admin"  # Fixed admin username.
         # Create the admin session eagerly.
         self._admin_token = super().create_session(self._admin_username)
 
@@ -570,30 +571,26 @@ class NoAuthSessionManager(SessionManager):
     # Overridden SessionManager API
     # ------------------------------------------------------------------
     def create_session(self, username: str | None = None) -> str | None:
-        """
-        Ignore the supplied *username* – always return the pre‑created admin token.
-        This mirrors the behavior of ``AdminSessionManager`` but without any conditional logic.
-        """
+        """Ignore the supplied `username` and always return the pre‑created admin token."""
         return self._admin_token
 
     def validate_session(self, session_id: str) -> dict | None:
         """
-        Validate the stored admin token.  If it has expired, recreate it
-        and return the fresh session information.
+        Validate the stored admin token.
+
+        If it has expired, recreate it and return the fresh session information.
         """
         # First try the existing token; ``super().validate_session`` also updates ``last_accessed``.
         session = super().validate_session(self._admin_token)
         if session is None:
-            # Token expired → make a new one.
+            # Token is expired, so we generate a new one.
             self._admin_token = super().create_session(self._admin_username)
             session = super().validate_session(self._admin_token)
         return session
 
     def session_username(self, session_id: str) -> str | None:
         """Always return ``admin`` for any session identifier."""
-        # We bypass the parent implementation because it would look up the
-        # token in ``self.sessions`` – we know the admin token is always
-        # present (or recreated above).
+        # We bypass the parent implementation because it would look up the token in ``self.sessions``
         return self._admin_username
 
 
