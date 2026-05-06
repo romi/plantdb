@@ -27,6 +27,7 @@ Usage Examples
 {'username': 'alice', 'issued_at': 1769011058, 'expires_at': 1769012858, 'jti': 'HVaAR4XHmIJgCKbZMDqmwg', 'issuer': 'plantdb-api', 'audience': 'plantdb-client'}
 >>> new_token = manager.refresh_session(token)
 """
+import os
 import secrets
 import threading
 import time
@@ -550,6 +551,8 @@ class NoAuthSessionManager(SessionManager):
     """
 
     def __init__(self, session_timeout: int = 3600) -> None:
+        if os.environ.get('ROMI_DB_NOAUTH', 1) == 0:
+            raise RuntimeError('Unable to use NoAuthSessionManager, forbidden by environment variable!')
         # Force a single‑session policy; the real admin manager does the same.
         super().__init__(session_timeout=session_timeout, max_concurrent_sessions=1)
         self._admin_username = "admin"
