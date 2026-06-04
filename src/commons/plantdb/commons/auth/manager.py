@@ -44,6 +44,7 @@ import os
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -136,6 +137,30 @@ class UserManager(object):
         self.lockout_duration = timedelta(seconds=lockout_duration) if isinstance(lockout_duration,
                                                                                   int) else lockout_duration
 
+    def _load_user_file(self) -> list[dict[str, Any]]:
+        """Load the list of users from the database."""
+        with open(self.users_file, "r") as f:
+            users_list = json.load(f)
+        return users_list
+
+    def _parse_user_list(self, users_list: list[dict[str, Any]]) -> None:
+        """Convert to a username indexed dict of User objects.
+
+        Parameters
+        ----------
+        users_list : list of dict
+            List of user data dictionaries loaded from the JSON persistence file.
+            Each dictionary must contain the keys required by ``User.from_dict``.
+
+        See Also
+        --------
+        plantdb.commons.auth.models.User.from_dict : Class method that creates a `User` from a dict.
+        """
+        for user in users_list:
+            user = User.from_dict(user)
+            self.users[user.username] = user
+        self.logger.debug(f"Loaded {len(self.users)} users from '{self.users_file}'.")
+
     def _load_users(self) -> None:
         """Loads the user database from a JSON file and populates the internal dictionary.
 
@@ -147,22 +172,22 @@ class UserManager(object):
         -----
         The method assumes that the user database file is in JSON format and contains valid user data.
         """
+        self.users = {}
         if not self.users_file.exists():
             self.logger.warning(f"No user database file found under '{self.users_file}'")
-            self.users = {}
         elif self.users_file.stat().st_size == 0:
             self.logger.warning(f"Empty user database file found under '{self.users_file}'")
-            self.users = {}
         else:
             # Load the list of users from the database
-            with open(self.users_file, "r") as f:
-                users_list = json.load(f)
+            users_list = self._load_user_file()
             # Convert to a username indexed dict of User objects
-            self.users = {}
-            for user in users_list:
-                user = User.from_dict(user)
-                self.users[user.username] = user
-            self.logger.debug(f"Loaded {len(self.users)} users from '{self.users_file}'.")
+            try:
+                self._parse_user_list(users_list)
+            except Exception as e:
+                self.logger.critical(f"Error parsing user list")
+                if 'role' not in users_list[0]:
+                    self.logger.warning("You are using an outdated user database file")
+                    self.logger.info("Fix it with `scripts/fix_local_fsdb.py`")
         return
 
     def _save_users(self) -> None:
