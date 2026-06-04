@@ -304,15 +304,15 @@ def yes_no_choice(question: str, default: bool=True) -> bool:
     --------
     >>> from plantdb.commons.utils import yes_no_choice
     >>> yes_no_choice("Is ROMI an awesome project?")
-    Is ROMI an awesome project? [YES/no]>?
-    Out[3]: True
+    Is ROMI an awesome project? [Y/n]>?
+    True
     >>> yes_no_choice("I am your father!", default=False)
-    I am your father! [yes/NO]>?
-    Out[5]: False
+    I am your father! [y/N]>?
+    False
     """
     opt = {"": default, "yes": True, "y": True, "ye": True, "no": False, "n": False}
-    default_str = "YES" if default else "NO"
-    prompt = f"{question} [{default_str}/{'no' if default else 'yes'}]>"
+    default_choice = " [Y/n]" if default else " [y/N]"
+    prompt = f"{question} {default_choice}"
     while True:
         kbd = input(prompt).strip().lower()
         # Empty input -> take the supplied default
