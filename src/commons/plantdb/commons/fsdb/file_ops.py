@@ -324,7 +324,7 @@ def _load_scan_filesets(scan):
     # Get the list of info (dict) about the filesets
     filesets_info = structure["filesets"]
     if isinstance(filesets_info, list):
-        for idx, fileset_info in enumerate(filesets_info):
+        for fileset_info in filesets_info:
             try:
                 fileset, _needs_update = _load_fileset(scan, fileset_info)
             except Exception as e:
