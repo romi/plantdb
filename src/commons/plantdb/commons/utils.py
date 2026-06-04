@@ -289,3 +289,35 @@ def iso_date_now():
     '2025-09-16T23:39:54.132898'
     """
     return datetime.isoformat(datetime.now())
+
+def yes_no_choice(question: str, default: bool=True) -> bool:
+    """Raise a yes/no question with a default reply and wait for a valid reply from user.
+
+    Parameters
+    ----------
+    question : str
+        The question to ask.
+    default : bool, optional
+        The default answer to the question.
+
+    Examples
+    --------
+    >>> from plantdb.commons.utils import yes_no_choice
+    >>> yes_no_choice("Is ROMI an awesome project?")
+    Is ROMI an awesome project? [YES/no]>?
+    Out[3]: True
+    >>> yes_no_choice("I am your father!", default=False)
+    I am your father! [yes/NO]>?
+    Out[5]: False
+    """
+    opt = {"": default, "yes": True, "y": True, "ye": True, "no": False, "n": False}
+    default_str = "YES" if default else "NO"
+    prompt = f"{question} [{default_str}/{'no' if default else 'yes'}]>"
+    while True:
+        kbd = input(prompt).strip().lower()
+        # Empty input -> take the supplied default
+        if kbd == "":
+            return default
+        if kbd in opt:
+            return opt[kbd]
+        print("Please answer with 'yes' or 'no'.")
