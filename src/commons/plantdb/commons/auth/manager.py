@@ -189,7 +189,8 @@ class UserManager(object):
                 if isinstance(users_list, dict) and 'role' not in list(users_list.values())[0]:
                     self.logger.warning("You are using an outdated user database file")
                     if yes_no_choice("Do you want to replace it?", default=True):
-                        pass
+                        # No error raised, the method returns with an empty dictionary for the `users` attribute
+                        self.users = {}  # force an empty users database to trigger the creation of a new user database
                     else:
                         raise
                 else:
