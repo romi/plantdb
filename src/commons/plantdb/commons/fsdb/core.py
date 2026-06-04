@@ -98,6 +98,7 @@ import json
 import logging
 import os
 import pathlib
+import tempfile
 from collections.abc import Iterable
 from pathlib import Path
 from shutil import copyfile
@@ -676,10 +677,17 @@ class FSDB(db.DB):
                 f" 'JWTSessionManager' or 'NoAuthSessionManager', got {type(session_manager)}"
             )
 
-        # Initialize RBAC manager with groups file in basedir
-        users_file = basedir / "users.json"
+        if isinstance(self.session_manager, NoAuthSessionManager):
+            # Create a temporary directory with empty to avoid enabling access to real user & groups data
+            manager_dir = Path(tempfile.mkdtemp(prefix='plantdb-'))
+        else:
+            # Will use/create the real users & groups JSON files in basedir
+            manager_dir = basedir
+
+        # Initialize RBAC manager with users & groups files
+        users_file = manager_dir / "users.json"
         users_file.touch(exist_ok=True)  # create the file if missing
-        groups_file = basedir / "groups.json"
+        groups_file = manager_dir / "groups.json"
         groups_file.touch(exist_ok=True)  # create the file if missing
         self.rbac_manager = RBACManager(users_file, groups_file, max_login_attempts, lockout_duration)
 
