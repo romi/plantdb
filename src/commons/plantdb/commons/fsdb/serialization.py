@@ -50,13 +50,13 @@ file = _parse_file(fileset, file_info)
 ```
 """
 
-from .path_helpers import _file_path
-from .path_helpers import _fileset_path
 from .exceptions import FileNoFileNameError
 from .exceptions import FileNoIDError
 from .exceptions import FileNotFoundError
 from .exceptions import FilesetNoIDError
 from .exceptions import FilesetNotFoundError
+from .path_helpers import _file_path
+from .path_helpers import _fileset_path
 from ..log import get_logger
 
 logger = get_logger(__name__)
@@ -79,7 +79,7 @@ def _parse_fileset(scan, fileset_info):
     from plantdb.commons.fsdb.core import Fileset
     fsid = fileset_info.get("id", None)
     if fsid is None:
-        raise FilesetNoIDError("Fileset: No ID")
+        raise FilesetNoIDError(scan)
 
     fileset = Fileset(scan, fsid)
     # Get the expected directory path and check it exists:
@@ -118,7 +118,7 @@ def _parse_file(fileset, file_info):
     fid = file_info.get("id", None)
     if fid is None:
         logger.debug(f"Input `file_info`: {file_info}")
-        raise FileNoIDError(f"File: No ID for file '{file_info}'")
+        raise FileNoIDError(fileset)
 
     filename = file_info.get("file", None)
     if filename is None:

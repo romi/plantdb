@@ -41,15 +41,13 @@ A comprehensive module for managing file system operations in a hierarchical dat
 """
 
 import json
-
 import pathlib
 from shutil import rmtree
 
 from tqdm import tqdm
 
-from .exceptions import FileNoIDError
-from .exceptions import FilesetNoIDError
-from .exceptions import FilesetNotFoundError
+from plant3dvision.utils import yes_no_choice
+from .exceptions import FileNotFoundError
 from .metadata import _load_file_metadata
 from .metadata import _load_fileset_metadata
 from .metadata import _load_metadata
@@ -66,10 +64,10 @@ from .serialization import _parse_file
 from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
 from .validation import _is_safe_to_delete
-
 from ..log import get_logger
 
 logger = get_logger(__name__)
+
 
 def _load_scan(db, scan_id):
     """Load ``Scan`` from given database.
@@ -131,7 +129,9 @@ def _load_scan(db, scan_id):
         #  - path to scan directory exists
         #  - required subdirectories exists, if any
         #  - required files exists, if any
-        scan.filesets = _load_scan_filesets(scan)
+        scan.filesets, needs_update = _load_scan_filesets(scan)
+        if needs_update:
+            _store_scan(scan)
         scan.metadata = _load_scan_metadata(scan)
         scan.measures = _load_scan_measures(scan)
     else:
@@ -179,6 +179,8 @@ def _load_scans(db):
     >>> print(scans)
     [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
     """
+    from plantdb.commons.fsdb.core import Scan
+
     # List all subdirectories of the database path:
     dir_names = db.path().iterdir()
     # Filter out non-directories:
@@ -189,6 +191,7 @@ def _load_scans(db):
 
     # Loop through the directories and load them as scan if they meet the criteria
     scans = {}
+    bad_scans = set()
     for dir_name in tqdm(dir_names, unit="scan"):
         scan_name = dir_name.name  # get the scan name from the directory
         if scan_name.startswith('.'):
@@ -198,6 +201,17 @@ def _load_scans(db):
         # If the scan could be loaded, add it to the dictionary of scans
         if scan is not None:
             scans[scan_name] = scan
+        else:
+            bad_scans.add(scan_name)
+
+    if bad_scans:
+        n_bad = len(bad_scans)
+        logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
+        if yes_no_choice(
+                f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {len(bad_scans)} scan{'' if n_bad == 1 else 's'}?"):
+            for scan_name in bad_scans:
+                _delete_scan(Scan(db, scan_name))
+
     return scans
 
 
@@ -303,26 +317,27 @@ def _load_scan_filesets(scan):
     # Load it:
     with files_json.open(mode="r") as f:
         structure = json.load(f)
+
+    # Inform `_load_scan` to update the `files.json` associated with the `scan`
+    needs_update = False
+
     # Get the list of info (dict) about the filesets
     filesets_info = structure["filesets"]
     if isinstance(filesets_info, list):
-        for n, fileset_info in enumerate(filesets_info):
+        for fileset_info in filesets_info:
             try:
-                fileset = _load_fileset(scan, fileset_info)
-                fsid = fileset_info.get("id")
-                if fsid is None:
-                    raise FilesetNoIDError(f"Missing 'id' for the {n}-th 'filesets' entry.")
-                filesets[fsid] = fileset
-            except FilesetNoIDError:
-                logger.error(f"Could not get an 'id' entry for the {n}-th 'filesets' entry from '{scan.id}'.")
-                logger.debug(f"Current `fileset_info`: {fileset_info}")
-            except FilesetNotFoundError:
-                fsid = fileset_info.get("id", None)
-                logger.error(f"Fileset directory '{fsid}' not found for scan {scan.id}, skip it.")
+                fileset, _needs_update = _load_fileset(scan, fileset_info)
+            except Exception as e:
+                logger.error(e)
+                needs_update = True
+            else:
+                needs_update = needs_update or _needs_update
+                filesets[fileset.id] = fileset
     else:
-        raise IOError(f"Could not find a list of filesets in '{files_json}'.")
+        logger.error(f"Could not load a list of filesets for scan '{scan.id}' from: '{files_json}'")
+        return None, True
 
-    return filesets
+    return filesets, needs_update
 
 
 def _load_fileset(scan, fileset_info):
@@ -337,7 +352,7 @@ def _load_fileset(scan, fileset_info):
 
     Returns
     -------
-    plantdb.commons.fsdb.core.Fileset
+    plantdb.commons.fsdb.core.Fileset | None
         A fileset with its ``files`` & ``metadata`` attributes restored.
 
     Examples
@@ -360,9 +375,9 @@ def _load_fileset(scan, fileset_info):
     ['dummy_image', 'test_image', 'test_json']
     """
     fileset = _parse_fileset(scan, fileset_info)
-    fileset.files = _load_fileset_files(fileset, fileset_info)
+    fileset.files, needs_update = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
-    return fileset
+    return fileset, needs_update
 
 
 def _load_fileset_files(fileset, fileset_info):
@@ -407,27 +422,25 @@ def _load_fileset_files(fileset, fileset_info):
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
     """
-    scan_id = fileset.scan.id
     files = {}
     files_info = fileset_info.get("files", None)
+
+    # Inform `_load_fileset` to update the `files.json` associated with the `scan`
+    needs_update = False
+
     if isinstance(files_info, list):
-        for n, file_info in enumerate(files_info):
+        for idx, file_info in enumerate(files_info):
             try:
                 file = _load_file(fileset, file_info)
-            except FileNoIDError:
-                logger.error(f"Could not get an 'id' entry for the {n}-th 'files' entry from '{scan_id}'.")
-                logger.debug(f"Current `file_info`: {file_info}")
-            except FileNotFoundError:
-                fs_id = fileset.id
-                fname = file_info.get("file")
-                logger.error(f"Could not find file '{fname}' for '{scan_id}/{fs_id}'.")
-                logger.debug(f"Current `file_info`: {file_info}")
+            except Exception as e:
+                logger.error(e)
+                needs_update = True
             else:
-                fid = file_info.get("id")
-                files[fid] = file
+                files[file.id] = file
     else:
         raise IOError(f"Expected a list of files in `files.json` from dataset '{fileset.scan.id}'!")
-    return files
+
+    return files, needs_update
 
 
 def _load_file(fileset, file_info):
