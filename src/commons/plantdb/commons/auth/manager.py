@@ -58,6 +58,7 @@ from plantdb.commons.auth.models import Role
 from plantdb.commons.auth.models import TokenUser
 from plantdb.commons.auth.models import User
 from plantdb.commons.log import get_logger
+from plantdb.commons.utils import yes_no_choice
 
 ph = PasswordHasher()
 
@@ -183,11 +184,16 @@ class UserManager(object):
             # Convert to a username indexed dict of User objects
             try:
                 self._parse_user_list(users_list)
-            except Exception as e:
+            except Exception:
                 self.logger.critical(f"Error parsing user list")
-                if 'role' not in users_list[0]:
+                if isinstance(users_list, dict) and 'role' not in list(users_list.values())[0]:
                     self.logger.warning("You are using an outdated user database file")
-                    self.logger.info("Fix it with `scripts/fix_local_fsdb.py`")
+                    if yes_no_choice("Do you want to replace it?", default=True):
+                        pass
+                    else:
+                        raise
+                else:
+                    raise
         return
 
     def _save_users(self) -> None:
