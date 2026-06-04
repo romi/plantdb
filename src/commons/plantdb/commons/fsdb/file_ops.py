@@ -46,7 +46,6 @@ from shutil import rmtree
 
 from tqdm import tqdm
 
-from plant3dvision.utils import yes_no_choice
 from .exceptions import FileNotFoundError
 from .metadata import _load_file_metadata
 from .metadata import _load_fileset_metadata
