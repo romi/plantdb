@@ -99,9 +99,15 @@ class FileExistsError(Exception):
 class FilesetNoIDError(Exception):
     """No 'id' entry could be found for this fileset."""
 
+    def __init__(self, scan: 'Scan') -> None:
+        super().__init__(f"Missing the 'id' entry for a 'Fileset' in scan '{scan.id}'!")
+
 
 class FileNoIDError(Exception):
     """No 'id' entry could be found for this file."""
+
+    def __init__(self, fs: 'Fileset') -> None:
+        super().__init__(f"Missing the 'id' entry for a 'File' in scan/fileset '{fs.scan.id}/{fs.id}'!.")
 
 
 class FileNoFileNameError(Exception):
