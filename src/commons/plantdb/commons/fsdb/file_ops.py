@@ -207,8 +207,17 @@ def _load_scans(db):
     if bad_scans:
         n_bad = len(bad_scans)
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
-        if yes_no_choice(
-                f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {len(bad_scans)} scan{'' if n_bad == 1 else 's'}?"):
+        try:
+            # Prompt the user only when stdin is available.
+            answer = yes_no_choice(
+                f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {n_bad} scan{'' if n_bad == 1 else 's'}?"
+            )
+        except EOFError:
+            # No interactive input –> default to **no** (do not delete)
+            logger.debug("EOFError while reading user input, defaulting to “no”.")
+            answer = False
+
+        if answer:
             for scan_name in bad_scans:
                 _delete_scan(Scan(db, scan_name))
 
