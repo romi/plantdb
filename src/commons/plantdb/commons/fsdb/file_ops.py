@@ -64,6 +64,7 @@ from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
 from .validation import _is_safe_to_delete
 from ..log import get_logger
+from ..utils import yes_no_choice
 
 logger = get_logger(__name__)
 
