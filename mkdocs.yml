@@ -8,7 +8,10 @@ repo_url: https://github.com/romi/plantdb
 nav:
   - 'Home': index.md
   - 'PlantDB Sync UI': plantdb_sync.md
-  - 'REST API': rest_api.md
+  - 'REST API':
+    - rest_api/index.md
+    - rest_api/rest_api_usage.md
+    - rest_api/rest_api_endpoints.md
   - 'Reference API': reference/
   - 'Developers' :
     - 'Release Guide': developers/releases.md
