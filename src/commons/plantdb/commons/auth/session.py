@@ -747,12 +747,12 @@ class JWTSessionManager(SessionManager):
             The maximum number of concurrent sessions to allow.
             Defaults to ``10``.
         secret_key : str | bytes | None
-           Secret used for HS512 signing of JWTs.
-           - If a ``bytes`` object is supplied, it must be ≥ 64 bytes.
-           - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2 to produce a 64‑byte key.
-           - If ``None`` (default) a fresh random 64‑byte key is generated.
-             This will break the API tokens persistence across restarts as, after a restart, the new instance
-             gets a different secret key, so all previously persisted API tokens in the file become unverifiable.
+            Secret used for HS512 signing of JWTs.
+            - If a ``bytes`` object is supplied, it must be ≥ 64 bytes.
+            - If a ``str`` (pass‑phrase) is supplied, it will be stretched with Argon2 to produce a 64‑byte key.
+            - If ``None`` (default) a fresh random 64‑byte key is generated.
+              This will break the API tokens persistence across restarts as, after a restart, the new instance
+              gets a different secret key, so all previously persisted API tokens in the file become unverifiable.
         leeway : int, optional
             Allowed leeway, in seconds, after tokens expiration date, to accommodate for clock-skew.
             Set it to `0` so that the token is considered expired immediately after its exp claim passes.

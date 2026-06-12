@@ -60,7 +60,7 @@ def requires_permission(required_permissions: Union[Permission, List[Permission]
 
     Parameters
     ----------
-    required_permission:  Union[Permission, List[Permission]]
+    required_permissions: Union[Permission, List[Permission]]
         A single permission string or list of permission that the user must have to access the decorated method.
     """
 
