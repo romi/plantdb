@@ -417,8 +417,6 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
         The name of the scan to access.
     fileset_id : str
         The name of the fileset to access.
-    file_id : str
-        The name of the file to access.
 
     Other Parameters
     ----------------
