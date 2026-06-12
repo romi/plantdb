@@ -24,11 +24,11 @@ jobs:
     steps:
       # Step 1: Check out the repository code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Step 2: Set up Miniconda environment
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           auto-update-conda: true   # Ensure conda is updated to latest version
           python-version: "3.10"    # Specify Python version for the environment

@@ -26,23 +26,23 @@ jobs:
     steps:
       # Step 1: Get the repository code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Step 2: Set up Docker Buildx for multi-platform builds and build caching
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       # Step 3: Extract metadata to generate Docker tags and labels
       - name: Extract metadata (tags, labels) for Docker
         id: meta  # Set ID to reference this step's outputs later
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v6
         with:
           images: roboticsmicrofarms/plantdb  # Target Docker image name
           tags: type=sha,format=short,prefix=  # Create tags from git SHA (short format)
 
       # Step 4: Build the Docker image and save to local tar file
       - name: Build and Cache docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .  # Build context is repository root
           file: docker/Dockerfile  # Path to Dockerfile
@@ -51,7 +51,7 @@ jobs:
 
       # Step 5: Save the built image as a workflow artifact
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: myimage
           path: /tmp/myimage.tar
@@ -68,14 +68,14 @@ jobs:
 
       # Step 7: Authenticate with Docker Hub
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}  # Use stored credentials
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Step 8: Push the image to Docker Hub with both SHA tag and "latest" tag
       - name: Push as latest
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true  # Actually push to registry
