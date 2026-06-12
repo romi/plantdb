@@ -26,7 +26,7 @@ Call the entrypoint:
 sync_app
 ```
 
-You amy also run the synchronization tool using Python:
+You may also run the synchronization tool using Python:
 ```shell
 python -m plantdb.client.sync_app
 ```
