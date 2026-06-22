@@ -76,51 +76,77 @@ import shutil
 import sys
 from pathlib import Path
 from time import sleep
-from typing import Optional
-from typing import Union
+from typing import Optional, Union
 
 import click
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
-from werkzeug.middleware.proxy_fix import ProxyFix
 
-from plantdb.commons.auth.session import JWTSessionManager
-from plantdb.commons.auth.session import _init_secret_key
+from plantdb.commons.api_endpoints import archive
+from plantdb.commons.api_endpoints import (
+    create_api_token,
+    file,
+    file_metadata,
+    fileset,
+    fileset_files_list,
+    fileset_metadata,
+    health,
+    home,
+    image,
+    login,
+    logout,
+    pointcloud,
+    refresh,
+    register,
+    scan,
+    scan_filesets_list,
+    scan_metadata,
+    scans,
+    scans_info,
+    token_refresh,
+    token_validation,
+)
+from plantdb.commons.api_endpoints import dataset_files_list
+from plantdb.commons.api_endpoints import file_path
+from plantdb.commons.api_endpoints import mesh
+from plantdb.commons.api_endpoints import pc_ground_truth
+from plantdb.commons.api_endpoints import sequence
+from plantdb.commons.api_endpoints import skeleton
+from plantdb.commons.auth.session import JWTSessionManager, _init_secret_key
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.log import DEFAULT_LOG_LEVEL
-from plantdb.commons.log import LOG_LEVELS
-from plantdb.commons.log import get_logger
-from plantdb.commons.test_database import DATASET
-from plantdb.commons.test_database import test_database
-from plantdb.server.api.assets import Archive
-from plantdb.server.api.assets import CurveSkeleton
-from plantdb.server.api.assets import DatasetFile
-from plantdb.server.api.assets import FilePath
-from plantdb.server.api.assets import Image
-from plantdb.server.api.assets import Mesh
-from plantdb.server.api.assets import PointCloud
-from plantdb.server.api.assets import PointCloudGroundTruth
-from plantdb.server.api.assets import Sequence
-from plantdb.server.api.auth import CreateApiToken
-from plantdb.server.api.auth import Login
-from plantdb.server.api.auth import Logout
-from plantdb.server.api.auth import Register
-from plantdb.server.api.auth import TokenRefresh
-from plantdb.server.api.auth import TokenValidation
-from plantdb.server.api.base import HealthCheck
-from plantdb.server.api.base import Home
-from plantdb.server.api.base import Refresh
-from plantdb.server.api.file import File
-from plantdb.server.api.file import FileMetadata
-from plantdb.server.api.fileset import Fileset
-from plantdb.server.api.fileset import FilesetFiles
-from plantdb.server.api.fileset import FilesetMetadata
-from plantdb.server.api.scan import Scan
-from plantdb.server.api.scan import ScanFilesets
-from plantdb.server.api.scan import ScanMetadata
-from plantdb.server.api.scan import ScansList
-from plantdb.server.api.scan import ScansTable
+from plantdb.commons.log import DEFAULT_LOG_LEVEL, LOG_LEVELS, get_logger
+from plantdb.commons.test_database import DATASET, test_database
+from plantdb.server.api.assets import (
+    Archive,
+    CurveSkeleton,
+    DatasetFile,
+    FilePath,
+    Image,
+    Mesh,
+    PointCloud,
+    PointCloudGroundTruth,
+    Sequence,
+)
+from plantdb.server.api.auth import (
+    CreateApiToken,
+    Login,
+    Logout,
+    Register,
+    TokenRefresh,
+    TokenValidation,
+)
+from plantdb.server.api.base import HealthCheck, Home, Refresh
+from plantdb.server.api.file import File, FileMetadata
+from plantdb.server.api.fileset import Fileset, FilesetFiles, FilesetMetadata
+from plantdb.server.api.scan import (
+    Scan,
+    ScanFilesets,
+    ScanMetadata,
+    ScansList,
+    ScansTable,
+)
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
@@ -141,7 +167,9 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     secret = os.environ.get(var_name)
     if secret is None:
         logger.warning(f"No secret key was provided for {var_name}.")
-        logger.info(f"Set one with the '{var_name}' environment variable or let the server generate a random one.")
+        logger.info(
+            f"Set one with the '{var_name}' environment variable or let the server generate a random one."
+        )
     secret = _init_secret_key(secret)
     return secret
 
@@ -172,7 +200,9 @@ def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
     return app
 
 
-def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger) -> Api:
+def _configure_api(
+    app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger
+) -> Api:
     """Attach a `flask_restful.Api` to the `app` and configure proxy handling.
 
     Parameters
@@ -202,8 +232,12 @@ def _configure_api(app: Flask, proxy: bool, url_prefix: str, logger: logging.Log
     return api
 
 
-def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str, Path]],
-                         logger: logging.Logger) -> Path:
+def _setup_test_database(
+    empty: bool,
+    models: bool,
+    db_path: Optional[Union[str, Path]],
+    logger: logging.Logger,
+) -> Path:
     """Create a temporary test database, optionally populated with toy data.
 
     Parameters
@@ -226,185 +260,111 @@ def _setup_test_database(empty: bool, models: bool, db_path: Optional[Union[str,
     session_timeout = int(os.getenv("SESSION_TIMEOUT", 3600))
     max_sessions = int(os.getenv("MAX_SESSION", 10))
     if empty:
-        logger.info("Setting up a temporary test database without any datasets or configurations...")
+        logger.info(
+            "Setting up a temporary test database without any datasets or configurations..."
+        )
         db_path = test_database(
-            None, db_path=db_path,
-            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
-                                              max_concurrent_sessions=max_sessions)
+            None,
+            db_path=db_path,
+            session_manager=JWTSessionManager(
+                secret_key=jwt_key,
+                session_timeout=session_timeout,
+                max_concurrent_sessions=max_sessions,
+            ),
         ).path()
     else:
-        logger.info("Setting up a temporary test database with sample datasets and configurations...")
+        logger.info(
+            "Setting up a temporary test database with sample datasets and configurations..."
+        )
         db_path = test_database(
             DATASET,
             db_path=db_path,
             with_configs=True,
             with_models=models,
-            session_manager=JWTSessionManager(secret_key=jwt_key, session_timeout=session_timeout,
-                                              max_concurrent_sessions=max_sessions)
+            session_manager=JWTSessionManager(
+                secret_key=jwt_key,
+                session_timeout=session_timeout,
+                max_concurrent_sessions=max_sessions,
+            ),
         ).path()
     return Path(db_path)
 
 
 def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
-    """Register all resources with the Flask-RESTful API.
+    """Register all resources with the Flask‑RESTful API.
 
-    Parameters
-    ----------
-    api : Api
-        The Flask-RESTful API instance.
-    db : FSDB
-        The database connection.
-    logger : logging.Logger
-        A logger instance for warning and debugging.
+    The endpoint strings are generated by the helper functions defined in
+    ``plantdb.commons.api_endpoints``.  By keeping the mapping in a single
+    data‑structure we avoid duplicated code and the sanity‑check errors that
+    appear when trying to call the helpers inline.
     """
-    api.add_resource(
-        Home,
-        "/"
-    )
-    api.add_resource(
-        HealthCheck,
-        "/health",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        ScansList,
-        "/scans",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        ScansTable,
-        "/scans_info",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        FilePath,
-        "/files/<path:path>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        DatasetFile,
-        "/files/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Refresh,
-        "/refresh",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Image,
-        "/image/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db, logger),
-    )
-    api.add_resource(
-        PointCloud,
-        "/pointcloud/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db, logger),
-    )
-    api.add_resource(
-        PointCloudGroundTruth,
-        "/pcGroundTruth/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db,),
-    )
-    api.add_resource(
-        Mesh,
-        "/mesh/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db, logger),
-    )
-    api.add_resource(
-        CurveSkeleton,
-        "/skeleton/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Sequence,
-        "/sequence/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Archive,
-        "/archive/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    # User-oriented endpoints
-    api.add_resource(
-        Register,
-        "/register",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Login,
-        "/login",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        Logout,
-        "/logout",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        TokenRefresh,
-        "/token-refresh",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        TokenValidation,
-        "/token-validation",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        CreateApiToken,
-        "/create-api-token",
-        resource_class_args=(db, logger)
-    )
-    # Scan CRUD
-    api.add_resource(
-        Scan,
-        "/scan/<string:scan_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        ScanMetadata,
-        "/scan/<string:scan_id>/metadata",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        ScanFilesets,
-        "/scan/<string:scan_id>/filesets",
-        resource_class_args=(db, logger)
-    )
-    # Fileset CRUD
-    api.add_resource(
-        Fileset,
-        "/fileset/<string:scan_id>/<string:fileset_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        FilesetMetadata,
-        "/fileset/<string:scan_id>/<string:fileset_id>/metadata",
-        resource_class_args=(db, logger),
-    )
-    api.add_resource(
-        FilesetFiles,
-        "/fileset/<string:scan_id>/<string:fileset_id>/files",
-        resource_class_args=(db, logger),
-    )
-    # File CRUD
-    api.add_resource(
-        File,
-        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>",
-        resource_class_args=(db, logger)
-    )
-    api.add_resource(
-        FileMetadata,
-        "/file/<string:scan_id>/<string:fileset_id>/<string:file_id>/metadata",
-        resource_class_args=(db, logger),
-    )
+    # Helper that only passes ``resource_class_args`` when they are non‑empty.
+    def _add(resource, endpoint_func, *rc_args):
+        if rc_args:
+            api.add_resource(resource, endpoint_func(), resource_class_args=rc_args)
+        else:
+            api.add_resource(resource, endpoint_func())
+
+    # --------------------------------------------------------------------
+    # Mapping of (resource class, endpoint function, *resource args)
+    # --------------------------------------------------------------------
+    RESOURCE_MAP = [
+        # Core endpoints
+        (Home, home),
+        (HealthCheck, health, db, logger),
+        (Refresh, refresh, db, logger),
+
+        # Authentication
+        (Register, register, db, logger),
+        (Login, login, db, logger),
+        (Logout, logout, db, logger),
+        (TokenRefresh, token_refresh, db, logger),
+        (TokenValidation, token_validation, db, logger),
+        (CreateApiToken, create_api_token, db, logger),
+
+        # Scan CRUD
+        (ScansList, scans, db, logger),
+        (ScansTable, scans_info, db, logger),
+        (Scan, lambda: scan("<string:scan_id>"), db, logger),
+        (ScanMetadata, lambda: scan_metadata("<string:scan_id>"), db, logger),
+        (ScanFilesets, lambda: scan_filesets_list("<string:scan_id>"), db, logger),
+
+        # Fileset CRUD
+        (Fileset, lambda: fileset("<string:scan_id>", "<string:fileset_id>"), db, logger),
+        (FilesetMetadata, lambda: fileset_metadata("<string:scan_id>", "<string:fileset_id>"), db, logger),
+        (FilesetFiles, lambda: fileset_files_list("<string:scan_id>", "<string:fileset_id>"), db, logger),
+
+        # File CRUD
+        (File, lambda: file("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+        (FileMetadata, lambda: file_metadata("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+
+        # Assets CRUD
+        (FilePath, lambda: file_path("<string:scan_id>", "<path:path>"), db, logger),
+        (DatasetFile, lambda: dataset_files_list("<string:scan_id>"), db, logger),
+        (Image, lambda: image("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+        (PointCloud, lambda: pointcloud("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+        (PointCloudGroundTruth, lambda: pc_ground_truth("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db),
+        (Mesh, lambda: mesh("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+        (CurveSkeleton, lambda: skeleton("<string:scan_id>"), db, logger),
+        (Sequence, lambda: sequence("<string:scan_id>", None), db, logger),
+        (Archive, lambda: archive("<string:scan_id>"), db, logger),
+    ]
+
+    # Register everything
+    for res, ep_func, *_args in RESOURCE_MAP:
+        _add(res, ep_func, *_args)
 
 
-def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefix: str = "", ssl: bool = False,
-             log_level: str = DEFAULT_LOG_LEVEL, test: bool = False, empty: bool = False,
-             models: bool = False) -> Flask:
+def rest_api(
+    db_path: Optional[Union[str, Path]],
+    proxy: bool = False,
+    url_prefix: str = "",
+    ssl: bool = False,
+    log_level: str = DEFAULT_LOG_LEVEL,
+    test: bool = False,
+    empty: bool = False,
+    models: bool = False,
+) -> Flask:
     """Initialize and configure a RESTful API server for Plant Database querying.
 
     This function sets up a Flask application with various RESTful endpoints to enable interaction with a
@@ -436,7 +396,7 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
         A boolean flag to specify whether the test database should be populated with trained CNN models.
         Defaults to ``False``.
     """
-    wlogger = logging.getLogger('werkzeug')
+    wlogger = logging.getLogger("werkzeug")
     logger = get_logger("fsdb_rest_api", log_level=log_level)
 
     # 1 - Application and API configuration
@@ -446,7 +406,9 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 2 - Handle test mode
     if test:
-        db_path = _setup_test_database(empty=empty, models=models, db_path=db_path, logger=logger)
+        db_path = _setup_test_database(
+            empty=empty, models=models, db_path=db_path, logger=logger
+        )
 
         def _cleanup() -> None:
             logger.info(f"Cleaning up temporary database directory at '{db_path}'.")
@@ -460,9 +422,7 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 
     # 3 - Validate path
     if not db_path:
-        logger.error(
-            "No path to the local PlantDB was specified; aborting startup."
-        )
+        logger.error("No path to the local PlantDB was specified; aborting startup.")
         logger.info(
             "Set the environment variable 'ROMI_DB' or use the '--db_location' CLI argument."
         )
@@ -482,7 +442,7 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
             refresh_timeout=refresh_timeout,
             max_concurrent_sessions=max_sessions,
         ),
-        log_level = log_level,
+        log_level=log_level,
     )
     logger.info(f"Connecting to local plant database at '{db.path()}'.")
     db.connect()
@@ -500,45 +460,61 @@ def rest_api(db_path: Optional[Union[str, Path]], proxy: bool = False, url_prefi
 # Click command‑line interface
 # ---------------------------------------------------------------------------
 
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-db', '--db_location', 'db_location',
-              type=click.Path(),
-              default=os.getenv("ROMI_DB", None),
-              help='Location of the database to serve.')
-@click.option('--host',
-              default="0.0.0.0",
-              show_default=True,
-              help="Hostname to listen on; defaults to '0.0.0.0'.")
-@click.option('--port',
-              type=int,
-              default=5000,
-              show_default=True,
-              help="Port of the webserver; defaults to '5000'.")
-@click.option('--debug',
-              is_flag=True,
-              default=False,
-              help="Enable debug mode.")
-@click.option('--proxy',
-              is_flag=True,
-              default=False,
-              help="Use when the server sits behind a reverse proxy.")
-@click.option('--test',
-              is_flag=True,
-              default=False,
-              help="Set up a temporary test database before starting the REST API.")
-@click.option('--empty',
-              is_flag=True,
-              default=False,
-              help="Do not populate the test database with toy datasets.")
-@click.option('--models',
-              is_flag=True,
-              default=False,
-              help="Include trained CNN model in the test database.")
-@click.option('--log-level',
-              type=click.Choice(LOG_LEVELS, case_sensitive=False),
-              default=DEFAULT_LOG_LEVEL,
-              show_default=True,
-              help="Logging level; defaults to 'INFO'.")
+
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    "-db",
+    "--db_location",
+    "db_location",
+    type=click.Path(),
+    default=os.getenv("ROMI_DB", None),
+    help="Location of the database to serve.",
+)
+@click.option(
+    "--host",
+    default="0.0.0.0",
+    show_default=True,
+    help="Hostname to listen on; defaults to '0.0.0.0'.",
+)
+@click.option(
+    "--port",
+    type=int,
+    default=5000,
+    show_default=True,
+    help="Port of the webserver; defaults to '5000'.",
+)
+@click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
+@click.option(
+    "--proxy",
+    is_flag=True,
+    default=False,
+    help="Use when the server sits behind a reverse proxy.",
+)
+@click.option(
+    "--test",
+    is_flag=True,
+    default=False,
+    help="Set up a temporary test database before starting the REST API.",
+)
+@click.option(
+    "--empty",
+    is_flag=True,
+    default=False,
+    help="Do not populate the test database with toy datasets.",
+)
+@click.option(
+    "--models",
+    is_flag=True,
+    default=False,
+    help="Include trained CNN model in the test database.",
+)
+@click.option(
+    "--log-level",
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    default=DEFAULT_LOG_LEVEL,
+    show_default=True,
+    help="Logging level; defaults to 'INFO'.",
+)
 def main(db_location, host, port, debug, proxy, test, empty, models, log_level):
     """Entry point for the REST API server using Click."""
     print(f"{log_level.upper()=}")
@@ -554,5 +530,5 @@ def main(db_location, host, port, debug, proxy, test, empty, models, log_level):
     app.run(host=host, port=port, debug=debug)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

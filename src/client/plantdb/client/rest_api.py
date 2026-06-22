@@ -63,8 +63,8 @@ from PIL import Image
 from ada_url import join_url
 from plyfile import PlyData
 
-from plantdb.client import api_endpoints
-from plantdb.client.api_endpoints import sanitize_name
+from plantdb.commons import api_endpoints
+from plantdb.commons.api_endpoints import sanitize_name
 from plantdb.commons.log import get_logger
 
 #: Default hostname to PlantDB REST API is 'localhost':
@@ -563,7 +563,7 @@ def scan_preview_image_url(host, scan_id, size="thumb", **kwargs):
     >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
     >>> image.show()  # Display the image
     """
-    from plantdb.client.api_endpoints import sanitize_name
+    from plantdb.commons.api_endpoints import sanitize_name
     scan_id = sanitize_name(scan_id)
     scan_names = request_scan_names_list(host, **kwargs)
     if scan_id not in scan_names:

@@ -15,7 +15,7 @@ Key Features
 
 Usage Examples
 --------------
->>> from plantdb.client import api_endpoints
+>>> from plantdb.commons import api_endpoints
 >>> api_endpoints.login(prefix='/api/v1')
 '/api/v1/login'
 >>> api_endpoints.scan('plant1', prefix='/api/v1')
@@ -81,6 +81,28 @@ def url_prefix(endpoint_path):
 # ------------------------------------------------------------------------
 
 @url_prefix
+def home(**kwargs) -> str:
+    """Return the URL path to the home endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the home endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.home(prefix='/api/v1')
+    '/api/v1/'
+    """
+    return "/"
+
+@url_prefix
 def health(**kwargs) -> str:
     """Return the URL path to the health endpoint.
 
@@ -96,7 +118,7 @@ def health(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.health(prefix='/api/v1')
     '/api/v1/health'
     """
@@ -124,7 +146,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.refresh(prefix='/api/v1')
     '/api/v1/refresh'
     >>> api_endpoints.refresh('scan1')
@@ -157,7 +179,7 @@ def register(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.register(prefix='/api/v1')
     '/api/v1/register'
     """
@@ -180,7 +202,7 @@ def login(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.login(prefix='/api/v1')
     '/api/v1/login'
     """
@@ -203,7 +225,7 @@ def logout(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.logout(prefix='/api/v1')
     '/api/v1/logout'
     """
@@ -226,7 +248,7 @@ def token_refresh(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.token_refresh(prefix='/api/v1')
     '/api/v1/token-refresh'
     """
@@ -249,7 +271,7 @@ def token_validation(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.token_validation(prefix='/api/v1')
     '/api/v1/token-validation'
     """
@@ -272,7 +294,7 @@ def create_api_token():
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.create_api_token(prefix='/api/v1')
     '/api/v1/create-api-token'
     """
@@ -300,7 +322,7 @@ def scans(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scans(prefix='/api/v1')
     '/api/v1/scans'
     """
@@ -323,7 +345,7 @@ def scans_info(**kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scans_info(prefix='/api/v1')
     '/api/v1/scans_info'
     """
@@ -351,7 +373,7 @@ def scan(scan_id: str, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scan('scan1')
     '/scan/scan1'
     >>> api_endpoints.scan('scan1', prefix='/api/v1')
@@ -505,7 +527,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.file('real_plant','images','00000_rgb')
     '/files/real_plant/images/00000_rgb'
     """
@@ -572,7 +594,7 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64: boo
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.image('real_plant','images','00000_rgb', 'orig', False)
     '/image/real_plant/images/00000_rgb?size=orig'
     >>> api_endpoints.image('real_plant','images','00000_rgb', 'thumb', True)
@@ -613,7 +635,7 @@ def sequence(scan_id: str, type: str, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.sequence('real_plant', 'all')
     '/sequence/real_plant?type=all'
     """
@@ -646,7 +668,7 @@ def archive(scan_id: str, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.archive('scan1')
     '/archive/scan1'
     """
@@ -672,7 +694,7 @@ def file_path(scan_id: str, file_path: str, **kwargs) -> str:
 
     Examples
     --------
-    >>> from plantdb.client import api_endpoints
+    >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.file_path('real_plant','images/00000_rgb.jpg')
     '/files/real_plant/images/00000_rgb.jpg'
     """

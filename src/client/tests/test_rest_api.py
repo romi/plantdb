@@ -1,6 +1,6 @@
 import unittest
 
-from plantdb.client.api_endpoints import sanitize_name
+from plantdb.commons.api_endpoints import sanitize_name
 from plantdb.client.rest_api import archive_url
 from plantdb.client.rest_api import plantdb_url
 from plantdb.client.rest_api import refresh_url

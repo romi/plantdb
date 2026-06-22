@@ -44,7 +44,7 @@ import requests
 from ada_url import join_url
 from requests import RequestException
 
-from plantdb.client import api_endpoints
+from plantdb.commons import api_endpoints
 from plantdb.commons.auth.models import Permission
 from plantdb.commons.log import get_logger
 
