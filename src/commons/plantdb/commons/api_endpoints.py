@@ -22,7 +22,6 @@ Usage Examples
 '/api/v1/scan/plant1'
 """
 
-from typing import Optional
 from urllib import parse
 
 
@@ -77,6 +76,44 @@ def url_prefix(endpoint_path):
 
 
 # ------------------------------------------------------------------------
+# Resource mapping
+# ------------------------------------------------------------------------
+
+HOME = "/"
+HEALTH = "/health"
+REFRESH = "/refresh"
+# --- Authentication ---
+REGISTER = "/register"
+LOGIN = "/login"
+LOGOUT = "/logout"
+TOKEN_REFRESH = "/token-refresh"
+TOKEN_VALIDATION = "/token-validation"
+CREATE_API_TOKEN = "/create-api-token"
+# --- Scans ---
+SCANS = "/scans"
+SCANS_INFO = SCANS + "/info"
+# --- Scan object ---
+SCAN = SCANS + "/{scan_id}"
+SCAN_MD = SCAN + "/metadata"
+SCAN_FILESETS = SCAN + "/filesets"
+# --- Fileset object ---
+FILESET = "/filesets/{scan_id}/{fileset_id}"
+FILESET_MD = FILESET + "/metadata"
+FILESET_FILES = FILESET + "/files"
+# --- Fileset object ---
+FILE = "/files/{scan_id}/{fileset_id}/{file_id}"
+FILE_MD = FILE + "/metadata"
+# --- Assets ---
+IMAGE = "/image/{scan_id}/{fileset_id}/{file_id}"
+POINTCLOUD = "/pointcloud/{scan_id}"
+MESH = "/mesh/{scan_id}"
+SEQUENCE = "/sequence/{scan_id}"
+SKELETON = "/skeleton/{scan_id}"
+ARCHIVE = "/archive/{scan_id}"
+FILE_PATH = "/file/{scan_id}/{file_path}"
+
+
+# ------------------------------------------------------------------------
 # - Base Endpoints
 # ------------------------------------------------------------------------
 
@@ -100,7 +137,8 @@ def home(**kwargs) -> str:
     >>> api_endpoints.home(prefix='/api/v1')
     '/api/v1/'
     """
-    return "/"
+    return HOME
+
 
 @url_prefix
 def health(**kwargs) -> str:
@@ -122,7 +160,7 @@ def health(**kwargs) -> str:
     >>> api_endpoints.health(prefix='/api/v1')
     '/api/v1/health'
     """
-    return "/health"
+    return HEALTH
 
 
 @url_prefix
@@ -156,7 +194,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
     if scan_id:
         scan_id = sanitize_name(scan_id)
         params = f"?scan_id={scan_id}"
-    return f"/refresh{params}"
+    return f"{REFRESH}{params}"
 
 
 # ------------------------------------------------------------------------
@@ -183,7 +221,7 @@ def register(**kwargs) -> str:
     >>> api_endpoints.register(prefix='/api/v1')
     '/api/v1/register'
     """
-    return "/register"
+    return REGISTER
 
 
 @url_prefix
@@ -206,7 +244,7 @@ def login(**kwargs) -> str:
     >>> api_endpoints.login(prefix='/api/v1')
     '/api/v1/login'
     """
-    return "/login"
+    return LOGIN
 
 
 @url_prefix
@@ -229,7 +267,7 @@ def logout(**kwargs) -> str:
     >>> api_endpoints.logout(prefix='/api/v1')
     '/api/v1/logout'
     """
-    return "/logout"
+    return LOGOUT
 
 
 @url_prefix
@@ -252,7 +290,7 @@ def token_refresh(**kwargs) -> str:
     >>> api_endpoints.token_refresh(prefix='/api/v1')
     '/api/v1/token-refresh'
     """
-    return "/token-refresh"
+    return TOKEN_REFRESH
 
 
 @url_prefix
@@ -275,7 +313,7 @@ def token_validation(**kwargs) -> str:
     >>> api_endpoints.token_validation(prefix='/api/v1')
     '/api/v1/token-validation'
     """
-    return "/token-validation"
+    return TOKEN_VALIDATION
 
 
 @url_prefix
@@ -298,7 +336,7 @@ def create_api_token():
     >>> api_endpoints.create_api_token(prefix='/api/v1')
     '/api/v1/create-api-token'
     """
-    return "/create-api-token"
+    return CREATE_API_TOKEN
 
 
 # ------------------------------------------------------------------------
@@ -326,7 +364,7 @@ def scans(**kwargs) -> str:
     >>> api_endpoints.scans(prefix='/api/v1')
     '/api/v1/scans'
     """
-    return "/scans"
+    return SCANS
 
 
 @url_prefix
@@ -349,7 +387,7 @@ def scans_info(**kwargs) -> str:
     >>> api_endpoints.scans_info(prefix='/api/v1')
     '/api/v1/scans_info'
     """
-    return "/scans_info"
+    return SCANS_INFO
 
 
 @url_prefix
@@ -380,7 +418,7 @@ def scan(scan_id: str, **kwargs) -> str:
     '/api/v1/scan/scan1'
     """
     scan_id = sanitize_name(scan_id)
-    return f"/scan/{scan_id}"
+    return SCAN.format(scan_id=scan_id)
 
 
 @url_prefix
@@ -403,7 +441,7 @@ def scan_metadata(scan_id: str, **kwargs) -> str:
         The URL path to scan metadata.
     """
     scan_id = sanitize_name(scan_id)
-    return f"/scan/{scan_id}/metadata"
+    return SCAN_MD.format(scan_id=scan_id)
 
 
 @url_prefix
@@ -426,7 +464,7 @@ def scan_filesets_list(scan_id: str, **kwargs) -> str:
         The URL path to filesets.
     """
     scan_id = sanitize_name(scan_id)
-    return f"/scan/{scan_id}/filesets"
+    return SCAN_FILESETS.format(scan_id=scan_id)
 
 
 @url_prefix
@@ -452,7 +490,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return f"/fileset/{scan_id}/{fileset_id}"
+    return FILESET.format(scan_id=scan_id, fileset_id=fileset_id)
 
 
 @url_prefix
@@ -478,7 +516,7 @@ def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return f"/fileset/{scan_id}/{fileset_id}/metadata"
+    return FILESET_MD.format(scan_id=scan_id, fileset_id=fileset_id)
 
 
 @url_prefix
@@ -504,7 +542,7 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return f"/fileset/{scan_id}/{fileset_id}/files"
+    return FILESET_FILES.format(scan_id=scan_id, fileset_id=fileset_id)
 
 
 @url_prefix
@@ -534,7 +572,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return f"/file/{scan_id}/{fileset_id}/{file_id}"
+    return FILE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
 
 
 @url_prefix
@@ -563,7 +601,7 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return f"/file/{scan_id}/{fileset_id}/{file_id}/metadata"
+    return FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
 
 
 # ------------------------------------------------------------------------
@@ -571,7 +609,8 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 # ------------------------------------------------------------------------
 
 @url_prefix
-def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64: bool, **kwargs) -> str:
+def image(scan_id: str, fileset_id: str, file_id: str,
+          size: int | str | None = None, as_base64: bool | None = None, **kwargs) -> str:
     """Return the URL path to the image endpoint.
 
     Parameters
@@ -582,9 +621,9 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64: boo
         The name of the fileset containing the image.
     file_id : str
         The name of the image.
-    size : str or int
+    size : str or int, optional
         The size parameter of the image request.
-    as_base64 : bool
+    as_base64 : bool, optional
         A boolean flag indicating whether to return an image as a base64 string.
 
     Returns
@@ -613,20 +652,20 @@ def image(scan_id: str, fileset_id: str, file_id: str, size: str, as_base64: boo
         query["as_base64"] = str(as_base64).lower()
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
-    return f"/image/{scan_id}/{fileset_id}/{file_id}{query_str}"
+    return IMAGE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id) + f"{query_str}"
 
 
 @url_prefix
-def sequence(scan_id: str, type: str, **kwargs) -> str:
+def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
     """Return the URL path to the sequence endpoint.
 
     Parameters
     ----------
     scan_id : str
         The name of the scan dataset containing the angles and internodes sequence.
-    type : str or int
-        The type of measure to reques, in ['all', 'angles', 'internodes', 'fruit_points',
-         'manual_angles', 'manual_internodes'].
+    seq_type : str, optional
+        The type of measure to request, in ``['all', 'angles', 'internodes', 'fruit_points',
+         'manual_angles', 'manual_internodes']``.
 
     Returns
     -------
@@ -636,20 +675,145 @@ def sequence(scan_id: str, type: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.sequence('real_plant', 'all')
+    >>> api_endpoints.sequence('real_plant','all')
     '/sequence/real_plant?type=all'
     """
     valid_types = ['all', 'angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
-    type = 'all' if type not in valid_types else type
+    seq_type = 'all' if seq_type not in valid_types else seq_type
     scan_id = sanitize_name(scan_id)
 
     # Assemble optional query parameters
     query: dict[str, str] = {}
-    if type is not None:
-        query["type"] = str(type)
+    if seq_type is not None:
+        query["type"] = str(seq_type)
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
-    return f"/sequence/{scan_id}{query_str}"
+    return SEQUENCE.format(scan_id=scan_id) + f"{query_str}"
+
+
+@url_prefix
+def pointcloud(scan_id: str,
+               size: int | float | str | None = None,
+               coords: bool | None = None,
+               pcd_type: str = "default",
+               **kwargs) -> str:
+    """Return the URL path to the point‑cloud endpoint.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset containing the point‑cloud.
+    size : str or int or float
+        Query parameter controlling downsampling.
+        Accepted values:
+            * 'orig' - serve the original point cloud.
+            * 'preview' - serve a precomputed preview (default).
+            * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
+        If an invalid string is supplied, the default 'preview' is used.
+    coords : str
+        Query parameter indicating whether to return the point coordinates as JSON.
+    pcd_type : str or int
+        The type of point‑cloud to request, in ``['default', 'gt']``.
+
+    Returns
+    -------
+    str
+        The URL path to the point‑cloud endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.pointcloud('real_plant')
+    '/pointcloud/real_plant?type=default'
+    >>> api_endpoints.pointcloud('real_plant','gt')
+    '/pointcloud/real_plant?type=gt'
+    """
+    VALID_SIZES = {'orig', 'preview'}
+    VALID_TYPES = ['default', 'gt']
+    seq_type = '' if pcd_type not in VALID_TYPES else pcd_type
+    scan_id = sanitize_name(scan_id)
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if size is not None:
+        if isinstance(size, (int, float)):
+            query["size"] = str(size)
+        elif isinstance(size, str) and size in VALID_SIZES:
+            query["size"] = size.lower()
+        else:
+            raise ValueError(f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}")
+    if seq_type is not None:
+        query["type"] = str(seq_type)
+    if coords is not None:
+        query["coords"] = str(coords)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return POINTCLOUD.format(scan_id=scan_id) + f"{query_str}"
+
+
+@url_prefix
+def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs) -> str:
+    """Return the URL path to the mesh endpoint.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset containing the mesh.
+    coords : str
+        Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
+
+    Returns
+    -------
+    str
+        The URL path to the mesh endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.mesh('real_plant')
+    '/mesh/real_plant'
+    """
+    VALID_SIZES = {'orig'}
+    scan_id = sanitize_name(scan_id)
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if size is not None:
+        if isinstance(size, int):
+            query["size"] = str(size)
+        elif isinstance(size, str) and size in VALID_SIZES:
+            query["size"] = size.lower()
+        else:
+            raise ValueError(f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}")
+    if coords is not None:
+        query["coords"] = str(coords)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return MESH.format(scan_id=scan_id) + f"{query_str}"
+
+
+@url_prefix
+def skeleton(scan_id: str, **kwargs) -> str:
+    """Return the URL path to the skeleton endpoint.
+
+    Parameters
+    ----------
+    scan_id : str
+        The name of the scan dataset containing the skeleton.
+
+    Returns
+    -------
+    str
+        The URL path to the skeleton endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.skeleton('real_plant')
+    '/skeleton/real_plant'
+    """
+    scan_id = sanitize_name(scan_id)
+    return SKELETON.format(scan_id=scan_id)
 
 
 @url_prefix
@@ -673,7 +837,7 @@ def archive(scan_id: str, **kwargs) -> str:
     '/archive/scan1'
     """
     scan_id = sanitize_name(scan_id)
-    return f"/archive/{scan_id}"
+    return ARCHIVE.format(scan_id=scan_id)
 
 
 @url_prefix
@@ -699,46 +863,4 @@ def file_path(scan_id: str, file_path: str, **kwargs) -> str:
     '/files/real_plant/images/00000_rgb.jpg'
     """
     scan_id = sanitize_name(scan_id)
-    return f"/files/{scan_id}/{file_path.lstrip('/')}"
-
-
-@url_prefix
-def dataset_files_list(scan_id: Optional[str] = None, **kwargs) -> str:
-    """Return the URL path to list all files of a dataset (scan)."""
-    if scan_id:
-        scan_id = sanitize_name(scan_id)
-    return f"/files/{scan_id}" if scan_id else "/files"
-
-
-@url_prefix
-def pointcloud(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
-    """Return the URL path to the point‑cloud endpoint."""
-    scan_id = sanitize_name(scan_id)
-    fileset_id = sanitize_name(fileset_id)
-    file_id = sanitize_name(file_id)
-    return f"/pointcloud/{scan_id}/{fileset_id}/{file_id}"
-
-
-@url_prefix
-def pc_ground_truth(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
-    """Return the URL path to the point‑cloud ground‑truth endpoint."""
-    scan_id = sanitize_name(scan_id)
-    fileset_id = sanitize_name(fileset_id)
-    file_id = sanitize_name(file_id)
-    return f"/pcGroundTruth/{scan_id}/{fileset_id}/{file_id}"
-
-
-@url_prefix
-def mesh(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
-    """Return the URL path to the mesh endpoint."""
-    scan_id = sanitize_name(scan_id)
-    fileset_id = sanitize_name(fileset_id)
-    file_id = sanitize_name(file_id)
-    return f"/mesh/{scan_id}/{fileset_id}/{file_id}"
-
-
-@url_prefix
-def skeleton(scan_id: str, **kwargs) -> str:
-    """Return the URL path to the skeleton endpoint."""
-    scan_id = sanitize_name(scan_id)
-    return f"/skeleton/{scan_id}"
+    return FILE_PATH.format(scan_id=scan_id, file_path=file_path.lstrip('/'))
