@@ -107,6 +107,19 @@ task_filesUri_mapping = {
 # Home page resource
 class Home(Resource):
 
+    def __init__(self, db, logger=None):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        """
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
         """Return basic API information and documentation.
