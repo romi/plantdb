@@ -230,6 +230,12 @@ class HealthCheck(Resource):
         try:
             # Try to check database connection
             scan_count = len(self.db.list_scans(owner_only=False))
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": f"API encountered an issue: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
+        else:
             return {
                 "status": "healthy",
                 "message": "API is running correctly",
@@ -238,12 +244,6 @@ class HealthCheck(Resource):
                     "scan_count": scan_count
                 }
             }, 200
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"API encountered an issue: {str(e)}"
-            }, 500  # HTTP 500 Internal Server Error
-
 
 class Refresh(Resource):
     """RESTful resource for reloading the database on demand.
@@ -296,9 +296,11 @@ class Refresh(Resource):
         """
         try:
             self.db.reload(scan_id)
-            return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
         except Exception as e:
-            return {'message': f"Error during scan reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+            return {'error': f"Error during scan reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
+
 
     @rate_limit(max_requests=12, window_seconds=60)
     def get_full_database(self):
@@ -317,9 +319,11 @@ class Refresh(Resource):
         """
         try:
             self.db.reload(None)
-            return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
         except Exception as e:
-            return {'message': f"Error during full database reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+            return {'error': f"Error during full database reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
+
 
     def get(self):
         """Force the plant database to reload.
