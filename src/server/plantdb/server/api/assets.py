@@ -348,9 +348,9 @@ class DatasetFile(Resource):
                 )
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FileUploadError as exc:
             self.logger.error("File upload failed: %s", exc)
             return {"error": str(exc)}, 500  # HTTP 500 Internal Server Error)
@@ -363,7 +363,7 @@ class DatasetFile(Resource):
 
         message = f"File {headers['rel_filename']} received and saved"
         self.logger.info(message)
-        return {"message": message}, 201
+        return {'message': message}, 201
 
 
 class Image(Resource):
@@ -498,16 +498,16 @@ class Image(Resource):
             path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving image file: {str(e)}')
-            return {'message': f'Error retrieving image file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving image file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         mime_type, _ = mimetypes.guess_type(path)
 
@@ -530,6 +530,59 @@ class Image(Resource):
             resp.headers["X-Content-Encoding"] = "binary"
 
         return resp
+
+
+def resource_file(db, scan_id, task_name, **kwargs):
+    """Retrieve a specific ``File`` object from the database.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The database instance.
+    scan_id : str
+        Identifier of the scan containing the requested file.
+    task_name : str
+        Name of the task (fileset) and file to fetch.
+    **kwargs
+        Additional arguments passed to ``FSDB.get_scan`` (e.g. JWT token).
+
+    Returns
+    -------
+    tuple
+        Either ``(file, 200)`` on success or ``(error_dict, status_code)`` on failure.
+        The error dictionary always uses the key ``"error"`` for consistency.
+    """
+
+    # Get the corresponding `Scan` instance
+    try:
+        scan = db.get_scan(scan_id, **kwargs)
+
+    except NoAuthUserError as e:
+        return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+    except ScanNotFoundError:
+        return {"error": f"Scan '{scan_id}' not found!"}, 400
+
+    task_fs_map = compute_fileset_matches(scan)
+    # Get the corresponding `Fileset` instance
+    try:
+        fs = scan.get_fileset(task_fs_map[task_name])
+    except KeyError:
+        return {"error": f"No fileset mapped for task '{task_name}'."}, 404
+    except FilesetNotFoundError:
+        return {"error": f"Fileset for task '{task_name}' not found."}, 404
+
+    # Get the `File` corresponding to the resource
+    try:
+        file = fs.get_file(task_name)
+    except FileNotFoundError:
+        return {"error": f"File '{fs.id}/{task_name}' not found."}, 404
+    except Exception as exc:                     # Unexpected internal error
+        # Use JSON‑serializable payload; Flask will handle conversion.
+        return {"error": f"Internal server error: {str(exc)}"}, 500
+
+    # Success – return the File object (Flask‑RESTful resources expect the
+    # object itself; the caller can decide the HTTP status if required).
+    return file
 
 
 class PointCloud(Resource):
@@ -567,12 +620,10 @@ class PointCloud(Resource):
         self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
+    def get(self, scan_id, **kwargs):
         """Retrieve and serve a point cloud from the database.
 
         Handles point cloud retrieval requests with optional downsampling based on
@@ -583,10 +634,6 @@ class PointCloud(Resource):
         ----------
         scan_id : str
             Identifier for the scan containing the point cloud.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific point cloud file.
 
         Other Parameters
         ----------------
@@ -602,6 +649,9 @@ class PointCloud(Resource):
             Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
             Defaults to 'false', which streams the PLY file.
             If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+        type : str
+            Query parameter indicating whether to return the reconstructed point cloud (default) or
+            the ground truth ('type=gt').
 
         Returns
         -------
@@ -659,149 +709,34 @@ class PointCloud(Resource):
         # Parse the coords flag (accepting true/1/yes in any case)
         coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
 
+        # Parse the `spcd_typeize` flag
+        pcd_type = request.args.get('type', default='default', type=str)
+        # If a string, make sure that the 'pcd_type' argument we got is a valid option, else default to 'default':
+        if isinstance(pcd_type, str) and pcd_type not in ['default', 'gt']:
+            task_name = 'PointCloud'
+        else:
+            task_name = 'PointCloudGroundTruth'
+
+        file = resource_file(self.db, scan_id, task_name, **kwargs)
+        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
+
         try:
             # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.pointcloud_path(self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving point cloud file: {str(e)}')
-            return {'message': f'Error retrieving point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
-
-        # If coords_flag is set, read the file and return JSON
-        if coords_flag:
-            import numpy as np
-            from open3d import io
-            pcd = io.read_point_cloud(path, print_progress=False)
-            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'coordinates': np.array(pcd.points).tolist()})
-        # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
-
-
-class PointCloudGroundTruth(Resource):
-    """A RESTful resource for serving ground-truth point-cloud data.
-
-    This class handles HTTP GET requests for point-cloud data, with optional
-    downsampling capabilities based on the requested size parameter.
-
-    Attributes
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        The database providing the resources to serve.
-    logger : Logger
-        The logger instance for this resource.
-    """
-
-    def __init__(self, db, logger=None):
-        """Initialize the resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.core.FSDB
-            A database instance providing the resources to serve.
-        logger : logging.Logger
-            A logger instance to record operations and errors.
-        """
-        self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
-
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
-    @rate_limit(max_requests=5, window_seconds=60)
-    @add_jwt_from_header
-    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
-        """Retrieve and serve a ground-truth point-cloud file.
-
-        Fetches the requested point-cloud data from the cache, potentially
-        downsampling it based on the size parameter provided in the query string.
-
-        Parameters
-        ----------
-        scan_id : str
-            Identifier for the scan to retrieve.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific point-cloud file.
-
-        Other Parameters
-        ----------------
-        size : str or float
-            Query parameter controlling downsampling.
-            Accepted values:
-                * 'orig' - serve the original point cloud.
-                * 'preview' - serve a precomputed preview (default).
-                * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
-            If an invalid string is supplied, the default 'preview' is used.
-        coords : str
-            Query parameter indicating whether to return the point coordinates as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
-            Defaults to 'false', which streams the PLY file.
-            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
-
-        Returns
-        -------
-        flask.Response
-            HTTP response containing the point-cloud data as an octet-stream.
-
-        Raises
-        ------
-        werkzeug.exceptions.NotFound
-            If the requested point-cloud file doesn't exist.
-        http.client.HTTPException
-             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
-
-        Notes
-        -----
-        - In the URL, you can use the 'size' parameter to specify the size of the point-cloud:
-            * 'orig': Original size
-            * 'preview': Preview size (default)
-            * A float value: Custom voxel size for downsampling
-        - All identifiers are sanitized before use
-        - Invalid size parameters default to 'preview'
-        - Response mimetype is 'application/octet-stream'
-        """
-        # Parse the `size` flag
-        size = request.args.get('size', default='preview', type=str)
-        # Try to convert the 'size' argument as a float:
-        try:
-            vxs = float(size)
-        except ValueError:
-            pass
-        else:
-            size = vxs
-        # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
-        if isinstance(size, str) and size not in ['orig', 'preview']:
-            size = 'preview'
-
-        # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
-
-        try:
-            # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            self.logger.error(f'Error retrieving ground truth point cloud file: {str(e)}')
-            return {'message': f'Error retrieving ground truth point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
@@ -847,12 +782,10 @@ class Mesh(Resource):
         self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
 
     @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
+    def get(self, scan_id, **kwargs):
         """Retrieve and serve a triangular mesh file.
 
         This method handles GET requests for mesh data, supporting optional size
@@ -863,10 +796,6 @@ class Mesh(Resource):
         ----------
         scan_id : str
             Identifier for the scan containing the mesh.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific mesh file.
 
         Other Parameters
         ----------------
@@ -924,21 +853,26 @@ class Mesh(Resource):
         # Parse the coords flag (accepting true/1/yes in any case)
         coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
 
+        file = resource_file(self.db, scan_id, "TriangleMesh", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
+
         try:
             # Get the path to the mesh resource:
-            path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.mesh_path(self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving mesh file: {str(e)}')
-            return {'message': f'Error retrieving mesh file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving mesh file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
@@ -1033,39 +967,18 @@ class CurveSkeleton(Resource):
         >>> print(response.status_code)
         400
         >>> print(response.json())
-        {'message': "Scan 'invalid_id' not found!"}
+        {'error': "Scan 'invalid_id' not found!"}
         """
-        # Get the corresponding `Scan` instance
-        try:
-            scan = self.db.get_scan(scan_id, **kwargs)
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError:
-            return {"error": f"Scan '{scan_id}' not found!"}, 400
-
-        task_fs_map = compute_fileset_matches(scan)
-        # Get the corresponding `Fileset` instance
-        try:
-            fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        except KeyError:
-            return {'message': "No 'CurveSkeleton' fileset mapped!"}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError:
-            return {'message': "No 'CurveSkeleton' fileset found!"}, 404  # HTTP 404 Not Found
-
-        # Get the `File` corresponding to the CurveSkeleton resource
-        try:
-            file = fs.get_file('CurveSkeleton')
-        except FileNotFoundError:
-            return {'message': "No 'CurveSkeleton' file found!"}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+        file = resource_file(self.db, scan_id, "CurveSkeleton", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         # Load the JSON file:
         try:
             skeleton = read_json(file.path())
         except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({'error': str(e)}), 500  # HTTP 500 Internal Server Error
         else:
             return skeleton
 
@@ -1164,39 +1077,20 @@ class Sequence(Resource):
         [47.13015345294241, 239.43543078022594, 311.8816488465762, 251.0289289739646, 249.56560354730826]
         """
         type = request.args.get('type', default='all', type=str)
-        # Get the corresponding `Scan` instance
-        try:
-            scan = self.db.get_scan(scan_id, **kwargs)
 
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError:
-            return {"error": f"Scan '{scan_id}' not found!"}, 404  # HTTP 404 Not Found
-
-        task_fs_map = compute_fileset_matches(scan)
-        # Get the corresponding `Fileset` instance
-        try:
-            fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
-        except KeyError:
-            return {'message': "No 'AnglesAndInternodes' fileset mapped!"}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError:
-            return {'message': "No 'AnglesAndInternodes' fileset found!"}, 404  # HTTP 404 Not Found
-
-        # Get the `File` corresponding to the AnglesAndInternodes resource
-        try:
-            file = fs.get_file('AnglesAndInternodes')
-        except FileNotFoundError:
-            return {'message': "No 'AnglesAndInternodes' file found!"}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            return json.dumps({'message': str(e)}), 404  # HTTP 404 Not Found
+        file = resource_file(self.db, scan_id, "AnglesAndInternodes", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         # Load the JSON file:
         try:
             measures = read_json(file.path())
         except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({'error': str(e)}), 500  # HTTP 500 Internal Server Error
 
         # Load the manual 'measures.json' JSON file:
+        scan = file.scan
         manual_measures_file = scan.path() / 'measures.json'
         try:
             manual_measures = read_json(manual_measures_file)
@@ -1364,11 +1258,11 @@ class Archive(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
-            return {'message': f'Could not find a scan named `{scan_id}`!'}, 404  # HTTP 404 Not Found
+            return {'error': f'Could not find a scan named `{scan_id}`!'}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             zip_path = create_zip_for_scan(Path(scan.path()), self.logger)
@@ -1408,7 +1302,7 @@ class Archive(Resource):
         tuple
             A tuple containing (dict, int) where the dict contains either:
             - On success: {'success': message, 'files': list_of_extracted_files}
-            - On failure: {'message': error_message}
+            - On failure: {'error': error_message}
             The integer represents the HTTP status code (``200`` for success, ``400`` or ``500`` for errors)
 
         Notes
@@ -1486,16 +1380,16 @@ class Archive(Resource):
                 scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
 
             except NoAuthUserError as e:
-                return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+                return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except Exception as e:
                 return {
-                    'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                    'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
             extracted_files = extract_zip_to_scan(temp_zip, scan_path, self.logger)
 
             # 5. Refresh DB state and respond
             self.db.reload(scan_id)
-            return {"message": "ZIP file processed successfully", "files": extracted_files}, 200
+            return {'error': "ZIP file processed successfully", "files": extracted_files}, 200
 
         except (ValidationError, ExtractionError) as exc:
             # Validation / extraction errors are client‑side problems → 400
