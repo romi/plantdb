@@ -166,7 +166,9 @@ class FilePath(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self, path):
@@ -261,9 +263,11 @@ class DatasetFile(Resource):
             stacklevel=2,
         )
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @add_jwt_from_header
     @rate_limit(max_requests=30, window_seconds=60)
     def post(self, scan_id, **kwargs):
@@ -342,9 +346,9 @@ class DatasetFile(Resource):
                 )
 
         except NoAuthUserError as e:
-            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileUploadError as exc:
             self.logger.error("File upload failed: %s", exc)
             return {"error": str(exc)}, 500  # HTTP 500 Internal Server Error)
@@ -357,7 +361,7 @@ class DatasetFile(Resource):
 
         message = f"File {headers['rel_filename']} received and saved"
         self.logger.info(message)
-        return {'message': message}, 201
+        return {"message": message}, 201
 
 
 class Image(Resource):
@@ -391,19 +395,21 @@ class Image(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
     @staticmethod
     def wants_base64(request) -> bool:
         """
         Return ``True`` when the query string contains ``as_base64`` with a truthy value.
         """
-        flag = request.args.get('as_base64', default='false', type=str).lower()
-        return flag in ('true', '1', 'yes')
+        flag = request.args.get("as_base64", default="false", type=str).lower()
+        return flag in ("true", "1", "yes")
 
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
+    @sanitize_ids("scan_id")
+    @sanitize_ids("fileset_id")
+    @sanitize_ids("file_id")
     @rate_limit(max_requests=3000, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -486,34 +492,35 @@ class Image(Resource):
         >>> image.show()
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='thumb', type=str)
+        size = request.args.get("size", default="thumb", type=str)
         # Get the path to the image resource:
         try:
-            path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.image_path(
+                self.db, scan_id, fileset_id, file_id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving image file: {str(e)}')
-            return {'error': f'Error retrieving image file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving image file: {str(e)}")
+            return {
+                "error": f"Error retrieving image file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         mime_type, _ = mimetypes.guess_type(path)
 
         if self.wants_base64(request):
             # ---------- JSON (base64) ----------
-            with open(path, 'rb') as f:
-                b64_str = pybase64.b64encode(f.read()).decode('ascii')
+            with open(path, "rb") as f:
+                b64_str = pybase64.b64encode(f.read()).decode("ascii")
             # ``decode('ascii')`` gives us a plain string that can be JSON‑encoded.
-            payload = {
-                "image": b64_str,
-                "content-type": mime_type
-            }
+            payload = {"image": b64_str, "content-type": mime_type}
             # Wrap ``jsonify`` with ``make_response`` to add custom headers
             resp = make_response(jsonify(payload))
             resp.headers["Content-Type"] = "application/json"
@@ -558,9 +565,11 @@ class PointCloud(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -635,7 +644,7 @@ class PointCloud(Resource):
         >>> coordinates = np.array(response.json()['coordinates'])
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='preview', type=str)
+        size = request.args.get("size", default="preview", type=str)
         # Try to convert the 'size' argument as a float:
         try:
             vxs = float(size)
@@ -644,19 +653,23 @@ class PointCloud(Resource):
         else:
             size = vxs
         # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
-        if isinstance(size, str) and size not in ['orig', 'preview']:
-            size = 'preview'
+        if isinstance(size, str) and size not in ["orig", "preview"]:
+            size = "preview"
 
         # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+        coords_flag = request.args.get("coords", default="false", type=str).lower() in (
+            "true",
+            "1",
+            "yes",
+        )
 
         # Parse the `spcd_typeize` flag
-        pcd_type = request.args.get('type', default='default', type=str)
+        pcd_type = request.args.get("type", default="default", type=str)
         # If a string, make sure that the 'pcd_type' argument we got is a valid option, else default to 'default':
-        if isinstance(pcd_type, str) and pcd_type not in ['default', 'gt']:
-            task_name = 'PointCloud'
+        if isinstance(pcd_type, str) and pcd_type not in ["default", "gt"]:
+            task_name = "PointCloud"
         else:
-            task_name = 'PointCloudGroundTruth'
+            task_name = "PointCloudGroundTruth"
 
         file = resource_file(self.db, scan_id, task_name, **kwargs)
         # If an error tuple was returned, forward it directly to Flask‑RESTful.
@@ -665,29 +678,34 @@ class PointCloud(Resource):
 
         try:
             # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs)
+            path = webcache.pointcloud_path(
+                self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving point cloud file: {str(e)}')
-            return {'error': f'Error retrieving point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving point cloud file: {str(e)}")
+            return {
+                "error": f"Error retrieving point cloud file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
             import numpy as np
             from open3d import io
+
             pcd = io.read_point_cloud(path, print_progress=False)
             # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+            return jsonify({"coordinates": np.array(pcd.points).tolist()})
         # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype="application/octet-stream")
 
 
 class Mesh(Resource):
@@ -720,9 +738,11 @@ class Mesh(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -786,13 +806,17 @@ class Mesh(Resource):
         >>> x_coords = list(vertices['x'])
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='orig', type=str)
+        size = request.args.get("size", default="orig", type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
-        if not size in ['orig']:
-            size = 'orig'
+        if not size in ["orig"]:
+            size = "orig"
 
         # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+        coords_flag = request.args.get("coords", default="false", type=str).lower() in (
+            "true",
+            "1",
+            "yes",
+        )
 
         file = resource_file(self.db, scan_id, "TriangleMesh", **kwargs)
         # If an error tuple was returned, forward it directly to Flask‑RESTful.
@@ -801,29 +825,39 @@ class Mesh(Resource):
 
         try:
             # Get the path to the mesh resource:
-            path = webcache.mesh_path(self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs)
+            path = webcache.mesh_path(
+                self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'error': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving mesh file: {str(e)}')
-            return {'error': f'Error retrieving mesh file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving mesh file: {str(e)}")
+            return {
+                "error": f"Error retrieving mesh file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
             import numpy as np
             from open3d import io
+
             pcd = io.read_triangle_mesh(path, print_progress=False)
             # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'vertices': np.array(pcd.vertices).tolist(), 'triangles': np.array(pcd.triangles).tolist()})
+            return jsonify(
+                {
+                    "vertices": np.array(pcd.vertices).tolist(),
+                    "triangles": np.array(pcd.triangles).tolist(),
+                }
+            )
         # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype="application/octet-stream")
 
 
 class CurveSkeleton(Resource):
@@ -851,9 +885,11 @@ class CurveSkeleton(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -919,7 +955,7 @@ class CurveSkeleton(Resource):
         try:
             skeleton = read_json(file.path())
         except Exception as e:
-            return json.dumps({'error': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({"error": str(e)}), 500  # HTTP 500 Internal Server Error
         else:
             return skeleton
 
@@ -950,9 +986,11 @@ class Sequence(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=60, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -1017,7 +1055,7 @@ class Sequence(Resource):
         >>> print(angles[:5])
         [47.13015345294241, 239.43543078022594, 311.8816488465762, 251.0289289739646, 249.56560354730826]
         """
-        type = request.args.get('type', default='all', type=str)
+        type = request.args.get("type", default="all", type=str)
 
         file = resource_file(self.db, scan_id, "AnglesAndInternodes", **kwargs)
         # If an error tuple was returned, forward it directly to Flask‑RESTful.
@@ -1028,24 +1066,32 @@ class Sequence(Resource):
         try:
             measures = read_json(file.path())
         except Exception as e:
-            return json.dumps({'error': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({"error": str(e)}), 500  # HTTP 500 Internal Server Error
 
         # Load the manual 'measures.json' JSON file:
         scan = file.scan
-        manual_measures_file = scan.path() / 'measures.json'
+        manual_measures_file = scan.path() / "measures.json"
         try:
             manual_measures = read_json(manual_measures_file)
         except Exception as e:
             if manual_measures_file.exists():
-                self.logger.warning(f"Failed to load manual measures file: {manual_measures_file}")
+                self.logger.warning(
+                    f"Failed to load manual measures file: {manual_measures_file}"
+                )
                 self.logger.warning(e)
             pass
         else:
-            measures['manual_angles'] = manual_measures['angles']
-            measures['manual_internodes'] = manual_measures['internodes']
+            measures["manual_angles"] = manual_measures["angles"]
+            measures["manual_internodes"] = manual_measures["internodes"]
 
         # Make sure that the 'type' argument we got is a valid option, else default to 'all':
-        if type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
+        if type in [
+            "angles",
+            "internodes",
+            "fruit_points",
+            "manual_angles",
+            "manual_internodes",
+        ]:
             return measures[type]
         else:
             return measures
@@ -1077,9 +1123,11 @@ class Archive(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -1151,11 +1199,15 @@ class Archive(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
-            return {'error': f'Could not find a scan named `{scan_id}`!'}, 404  # HTTP 404 Not Found
+            return {
+                "error": f"Could not find a scan named `{scan_id}`!"
+            }, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {
+                "error": f"Error accessing the scan {scan_id}: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         try:
             zip_path = create_zip_for_scan(Path(scan.path()), self.logger)
@@ -1173,9 +1225,11 @@ class Archive(Resource):
                 self.logger.error(f"Failed to delete temporary file `{zip_path}`: {e}")
             return response
 
-        return send_file(zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
+        return send_file(
+            zip_path, download_name=f"{scan_id}.zip", mimetype="application/zip"
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     def post(self, scan_id, **kwargs):
@@ -1273,16 +1327,20 @@ class Archive(Resource):
                 scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
 
             except NoAuthUserError as e:
-                return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+                return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except Exception as e:
                 return {
-                    'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                    "error": f"Error accessing the scan {scan_id}: {str(e)}"
+                }, 500  # HTTP 500 Internal Server Error
 
             extracted_files = extract_zip_to_scan(temp_zip, scan_path, self.logger)
 
             # 5. Refresh DB state and respond
             self.db.reload(scan_id)
-            return {'error': "ZIP file processed successfully", "files": extracted_files}, 200
+            return {
+                "error": "ZIP file processed successfully",
+                "files": extracted_files,
+            }, 200
 
         except (ValidationError, ExtractionError) as exc:
             # Validation / extraction errors are client‑side problems → 400
@@ -1290,6 +1348,8 @@ class Archive(Resource):
         except Exception as exc:
             # Unexpected server‑side errors → 500
             self.logger.exception("Unexpected error while processing archive")
-            return {"error": f"Internal server error: {exc}"}, 500  # HTTP 500 Internal Server Error
+            return {
+                "error": f"Internal server error: {exc}"
+            }, 500  # HTTP 500 Internal Server Error
         finally:
             temp_zip.unlink(missing_ok=True)

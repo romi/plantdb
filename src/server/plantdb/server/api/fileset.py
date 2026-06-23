@@ -192,22 +192,22 @@ class Fileset(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Create the fileset
             fileset = scan.create_fileset(fileset_id, metadata=metadata, **kwargs)
 
         except FilesetExistsError as e:
-            return {'message': str(e)}, 409  # HTTP 409 Conflict
+            return {'error': str(e)}, 409  # HTTP 409 Conflict
         except Exception as e:
             # Handle all other exceptions including duplicate scans
             self.logger.error(f"Error creating fileset {fileset_id} in scan {scan_id}: {str(e)}")
-            return {'message': f'Error creating fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error creating fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {
                 'message': f"Fileset created successfully in '{scan.id}'.",
@@ -308,11 +308,11 @@ class FilesetMetadata(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
@@ -321,10 +321,10 @@ class FilesetMetadata(Resource):
             metadata = fileset.get_metadata(key)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving metadata: {str(e)}')
-            return {'message': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': metadata}, 200
 
@@ -351,7 +351,7 @@ class FilesetMetadata(Resource):
             Response dictionary with either:
 
                 - 'metadata': Updated metadata dictionary on success
-                - 'message': Error message on failure
+                - 'error': Error message on failure
         int
             HTTP status code (200 for success, 4xx/5xx for errors)
 
@@ -392,23 +392,23 @@ class FilesetMetadata(Resource):
         # Get request data
         data = request.get_json()
         if not data or 'metadata' not in data:
-            return {'message': 'No metadata provided in request'}, 400
+            return {'error': 'No metadata provided in request'}, 400
 
         metadata = data['metadata']
 
         if not isinstance(metadata, dict):
-            return {'message': 'Metadata must be a dictionary'}, 400
+            return {'error': 'Metadata must be a dictionary'}, 400
 
         try:
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
@@ -419,10 +419,10 @@ class FilesetMetadata(Resource):
             updated_metadata = fileset.get_metadata()
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error updating {fileset_id} fileset metadata: {str(e)}')
-            return {'message': f'Error updating {fileset_id} fileset metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error updating {fileset_id} fileset metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': updated_metadata}, 200
 
@@ -471,7 +471,7 @@ class FilesetFiles(Resource):
         dict
             Response containing either:
               - On success (200): {'files': list of file information}
-              - On error (404, 500): {'message': error description}
+              - On error (404, 500): {'error': error description}
         int
             HTTP status code (200, 404, or 500)
 
@@ -505,11 +505,11 @@ class FilesetFiles(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
@@ -518,9 +518,9 @@ class FilesetFiles(Resource):
             files = fileset.list_files(query, fuzzy)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error listing files: {str(e)}')
-            return {'message': f'Error listing files: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error listing files: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'files': files}, 200

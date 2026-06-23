@@ -197,12 +197,12 @@ class ScansList(Resource):
                 try:
                     query = json.loads(query)
                 except json.JSONDecodeError:
-                    return {'message': 'Invalid JSON format in filterQuery parameter.'}, 400
+                    return {'error': 'Invalid JSON format in filterQuery parameter.'}, 400
             # Query database for matching scans, allowing access to all owners
             scans = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
         except Exception as e:
             # Return an error response if any exception occurs
-            return {'message': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return scans, 200
 
@@ -305,11 +305,11 @@ class ScansTable(Resource):
                 scan = self.db.get_scan(scan_id, **kwargs)
                 scan_info = get_scan_info(scan, logger=self.logger, **kwargs)
             except NoAuthUserError as e:
-                return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+                return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except ScanNotFoundError as e:
-                return {'message': str(e)}, 404  # HTTP 404 Not Found
+                return {'error': str(e)}, 404  # HTTP 404 Not Found
             except Exception as e:
-                return {'message': f"Error while accessing '{scan_id}': {str(e)}"}, 404  # HTTP 404 Not Found
+                return {'error': f"Error while accessing '{scan_id}': {str(e)}"}, 404  # HTTP 404 Not Found
             else:
                 scans_info.append(scan_info)
         return scans_info, 200
@@ -401,11 +401,11 @@ class Scan(Resource):
             scan_info = get_scan_info(scan, logger=self.logger)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f"Error while accessing '{scan_id}': {str(e)}"}, 404  # HTTP 404 Not Found
+            return {'error': f"Error while accessing '{scan_id}': {str(e)}"}, 404  # HTTP 404 Not Found
         else:
             return scan_info, 200
 
@@ -427,7 +427,7 @@ class Scan(Resource):
             A dictionary containing the response with the following possible structures:
 
                 - On success: {'message': 'Scan created successfully', 'id': scan_id}
-                - On error: {'message': error_message}
+                - On error: {'error': error_message}
 
         Raises
         ------
@@ -473,18 +473,18 @@ class Scan(Resource):
             # Check if scan creation was successful
             if scan is None:
                 self.logger.error(f"Failed to create scan: {scan_id}")
-                return {'message': 'Failed to create scan'}, 500  # HTTP 500 Internal Server Error
+                return {'error': 'Failed to create scan'}, 500  # HTTP 500 Internal Server Error
             self.logger.info(f"Successfully created scan: {scan_id}")
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanExistsError as e:
-            return {'message': str(e)}, 409  # HTTP 409 Conflict
+            return {'error': str(e)}, 409  # HTTP 409 Conflict
         except Exception as e:
             # Handle all other exceptions including duplicate scans
             self.logger.error(f"Error creating scan {scan_id}: {str(e)}")
             # Return generic server error for all other exceptions
-            return {'message': f'Internal server error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Internal server error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             # Return success response with HTTP 201 (Created) status code
             return {'message': 'Scan created successfully', 'id': scan.id}, 201
@@ -576,12 +576,12 @@ class ScanMetadata(Resource):
             metadata = scan.get_metadata(key)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving metadata: {str(e)}')
-            return {'message': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': metadata}, 200
 
@@ -601,7 +601,7 @@ class ScanMetadata(Resource):
         dict
             Response dictionary with either:
                 - 'metadata': Updated metadata dictionary on success
-                - 'message': Error message on failure
+                - 'error': Error message on failure
         int
             HTTP status code (200 for success, 4xx/5xx for errors)
 
@@ -634,12 +634,12 @@ class ScanMetadata(Resource):
         # Get request data
         data = request.get_json()
         if not data or 'metadata' not in data:
-            return {'message': 'No metadata provided in request'}, 400
+            return {'error': 'No metadata provided in request'}, 400
 
         metadata = data['metadata']
 
         if not isinstance(metadata, dict):
-            return {'message': 'Metadata must be a dictionary'}, 400
+            return {'error': 'Metadata must be a dictionary'}, 400
 
         try:
             # Get the scan
@@ -650,14 +650,14 @@ class ScanMetadata(Resource):
             updated_metadata = scan.get_metadata()
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f'Error updating {scan_id} scan metadata: {str(e)}')
-            return {'message': f'Error updating {scan_id} scan metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error updating {scan_id} scan metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': updated_metadata}, 200
 
@@ -708,7 +708,7 @@ class ScanFilesets(Resource):
         dict
             Response containing either:
               - On success (200): {'filesets': list of fileset IDs}
-              - On error (404, 500): {'message': error description}
+              - On error (404, 500): {'error': error description}
         int
             HTTP status code (200, 404, or 500)
 
@@ -739,11 +739,11 @@ class ScanFilesets(Resource):
             filesets = scan.list_filesets(query, fuzzy)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error listing filesets: {str(e)}')
-            return {'message': f'Error listing filesets: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error listing filesets: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'filesets': filesets}, 200

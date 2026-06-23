@@ -83,7 +83,7 @@ It may be used as follows (in another Python REPL):
 >>> data = {"metadata": {"description": "Updated via API", "author": "bot"}}
 >>> response = requests.post(url, json=data)
 >>> print(response.json())
-{'message': 'Error processing request: User guest does not have required permissions to use set_metadata'}
+{'error': 'Error processing request: User guest does not have required permissions to use set_metadata'}
 ```
 """
 # ... existing code ...
@@ -102,6 +102,7 @@ from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.log import get_logger
+from plantdb.server.api.utils import resource_file
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
@@ -177,31 +178,29 @@ class File(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {
-                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Create the file
             file = fileset.get_file(file_id)
-
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
-            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             rel_file_path = file.path().relative_to(self.db.path())
             return send_from_directory(self.db.path(), rel_file_path)
@@ -265,7 +264,7 @@ class File(Resource):
         """
         # Check if the request has the file part
         if 'file' not in request.files:
-            return {'message': 'No file provided'}, 400
+            return {'error': 'No file provided'}, 400
 
         file_data = request.files['file']
 
@@ -276,13 +275,13 @@ class File(Resource):
         ext = data.get('ext', None)
         # Validate required fields
         if not ext:
-            return {'message': "'ext' field is required"}, 400
+            return {'error': "'ext' field is required"}, 400
         # Validate file extension
         if not ext.startswith('.'):
             ext = f'.{ext}'
         if ext not in VALID_FILE_EXT:
             return {
-                'message': f'Invalid file extension. Must be one of: {", ".join(VALID_FILE_EXT)}'
+                'error': f'Invalid file extension. Must be one of: {", ".join(VALID_FILE_EXT)}'
             }, 400
 
         # Get metadata if provided
@@ -295,7 +294,7 @@ class File(Resource):
                 try:
                     metadata = ast.literal_eval(metadata_raw)
                 except (ValueError, SyntaxError):
-                    return {'message': "Invalid metadata format – must be JSON or a Python dict string"}, 400
+                    return {'error': "Invalid metadata format – must be JSON or a Python dict string"}, 400
         else:
             metadata = None
 
@@ -304,21 +303,21 @@ class File(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             return {
-                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Create the file
@@ -332,13 +331,13 @@ class File(Resource):
             except Exception as e:
                 fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
-                return {'message': f'Error writing file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                return {'error': f'Error writing file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
-            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {
                 'message': f"File created and written successfully in fileset '{fileset.id}'.",
@@ -428,31 +427,30 @@ class FileMetadata(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             file = fileset.get_file(file_id)
             # Get the metadata
             metadata = file.get_metadata(key)
-
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving metadata: {str(e)}')
-            return {'message': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': metadata}, 200
 
@@ -477,7 +475,7 @@ class FileMetadata(Resource):
         dict
             Response dictionary with either:
                 * 'metadata': containing updated metadata for successful requests
-                * 'message': for error cases
+                * 'error': for error cases
         int
             HTTP status code (200, 400, 404, or 500).
 
@@ -501,32 +499,32 @@ class FileMetadata(Resource):
         # Get request data
         data = request.get_json()
         if not data or 'metadata' not in data:
-            return {'message': 'Missing metadata in request body'}, 400
+            return {'error': 'Missing metadata in request body'}, 400
 
         metadata = data['metadata']
 
         if not isinstance(metadata, dict):
-            return {'message': 'Metadata must be a dictionary'}, 400
+            return {'error': 'Metadata must be a dictionary'}, 400
 
         try:
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the file
@@ -537,11 +535,11 @@ class FileMetadata(Resource):
             updated_metadata = file.get_metadata()
 
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f'Error processing request: {str(e)}')
-            return {'message': f'Error processing request: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error processing request: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': updated_metadata}, 200
