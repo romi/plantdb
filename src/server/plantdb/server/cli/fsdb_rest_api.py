@@ -76,77 +76,75 @@ import shutil
 import sys
 from pathlib import Path
 from time import sleep
-from typing import Optional, Union
+from typing import Optional
+from typing import Union
 
 import click
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
-
-from plantdb.commons.api_endpoints import archive
-from plantdb.commons.api_endpoints import (
-    create_api_token,
-    file,
-    file_metadata,
-    fileset,
-    fileset_files_list,
-    fileset_metadata,
-    health,
-    home,
-    image,
-    login,
-    logout,
-    pointcloud,
-    refresh,
-    register,
-    scan,
-    scan_filesets_list,
-    scan_metadata,
-    scans,
-    scans_info,
-    token_refresh,
-    token_validation,
-)
-from plantdb.commons.api_endpoints import dataset_files_list
-from plantdb.commons.api_endpoints import file_path
-from plantdb.commons.api_endpoints import mesh
-from plantdb.commons.api_endpoints import pc_ground_truth
-from plantdb.commons.api_endpoints import sequence
-from plantdb.commons.api_endpoints import skeleton
-from plantdb.commons.auth.session import JWTSessionManager, _init_secret_key
-from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.log import DEFAULT_LOG_LEVEL, LOG_LEVELS, get_logger
-from plantdb.commons.test_database import DATASET, test_database
-from plantdb.server.api.assets import (
-    Archive,
-    CurveSkeleton,
-    DatasetFile,
-    FilePath,
-    Image,
-    Mesh,
-    PointCloud,
-    PointCloudGroundTruth,
-    Sequence,
-)
-from plantdb.server.api.auth import (
-    CreateApiToken,
-    Login,
-    Logout,
-    Register,
-    TokenRefresh,
-    TokenValidation,
-)
-from plantdb.server.api.base import HealthCheck, Home, Refresh
-from plantdb.server.api.file import File, FileMetadata
-from plantdb.server.api.fileset import Fileset, FilesetFiles, FilesetMetadata
-from plantdb.server.api.scan import (
-    Scan,
-    ScanFilesets,
-    ScanMetadata,
-    ScansList,
-    ScansTable,
-)
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+from plantdb.commons.api_endpoints import ARCHIVE
+from plantdb.commons.api_endpoints import FILE
+from plantdb.commons.api_endpoints import FILESET
+from plantdb.commons.api_endpoints import FILESET_FILES
+from plantdb.commons.api_endpoints import FILESET_MD
+from plantdb.commons.api_endpoints import FILE_MD
+from plantdb.commons.api_endpoints import FILE_PATH
+from plantdb.commons.api_endpoints import IMAGE
+from plantdb.commons.api_endpoints import MESH
+from plantdb.commons.api_endpoints import POINTCLOUD
+from plantdb.commons.api_endpoints import SCAN
+from plantdb.commons.api_endpoints import SCAN_FILESETS
+from plantdb.commons.api_endpoints import SCAN_MD
+from plantdb.commons.api_endpoints import SEQUENCE
+from plantdb.commons.api_endpoints import SKELETON
+from plantdb.commons.api_endpoints import create_api_token
+from plantdb.commons.api_endpoints import health
+from plantdb.commons.api_endpoints import home
+from plantdb.commons.api_endpoints import login
+from plantdb.commons.api_endpoints import logout
+from plantdb.commons.api_endpoints import refresh
+from plantdb.commons.api_endpoints import register
+from plantdb.commons.api_endpoints import scans
+from plantdb.commons.api_endpoints import scans_info
+from plantdb.commons.api_endpoints import token_refresh
+from plantdb.commons.api_endpoints import token_validation
+from plantdb.commons.auth.session import JWTSessionManager
+from plantdb.commons.auth.session import _init_secret_key
+from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
+from plantdb.commons.test_database import DATASET
+from plantdb.commons.test_database import test_database
+from plantdb.server.api.assets import Archive
+from plantdb.server.api.assets import CurveSkeleton
+from plantdb.server.api.assets import FilePath
+from plantdb.server.api.assets import Image
+from plantdb.server.api.assets import Mesh
+from plantdb.server.api.assets import PointCloud
+from plantdb.server.api.assets import Sequence
+from plantdb.server.api.auth import CreateApiToken
+from plantdb.server.api.auth import Login
+from plantdb.server.api.auth import Logout
+from plantdb.server.api.auth import Register
+from plantdb.server.api.auth import TokenRefresh
+from plantdb.server.api.auth import TokenValidation
+from plantdb.server.api.base import HealthCheck
+from plantdb.server.api.base import Home
+from plantdb.server.api.base import Refresh
+from plantdb.server.api.file import File
+from plantdb.server.api.file import FileMetadata
+from plantdb.server.api.fileset import Fileset
+from plantdb.server.api.fileset import FilesetFiles
+from plantdb.server.api.fileset import FilesetMetadata
+from plantdb.server.api.scan import Scan
+from plantdb.server.api.scan import ScanFilesets
+from plantdb.server.api.scan import ScanMetadata
+from plantdb.server.api.scan import ScansList
+from plantdb.server.api.scan import ScansTable
 
 
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
@@ -201,7 +199,7 @@ def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
 
 
 def _configure_api(
-    app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger
+        app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger
 ) -> Api:
     """Attach a `flask_restful.Api` to the `app` and configure proxy handling.
 
@@ -233,10 +231,10 @@ def _configure_api(
 
 
 def _setup_test_database(
-    empty: bool,
-    models: bool,
-    db_path: Optional[Union[str, Path]],
-    logger: logging.Logger,
+        empty: bool,
+        models: bool,
+        db_path: Optional[Union[str, Path]],
+        logger: logging.Logger,
 ) -> Path:
     """Create a temporary test database, optionally populated with toy data.
 
@@ -253,7 +251,7 @@ def _setup_test_database(
 
     Returns
     -------
-    Path
+    pathlib.Path
         The path to the created test database.
     """
     jwt_key = _get_env_secret("JWT_SECRET_KEY", logger)
@@ -293,77 +291,68 @@ def _setup_test_database(
 def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     """Register all resources with the Flask‑RESTful API.
 
-    The endpoint strings are generated by the helper functions defined in
-    ``plantdb.commons.api_endpoints``.  By keeping the mapping in a single
-    data‑structure we avoid duplicated code and the sanity‑check errors that
+    The endpoint strings are generated by the helper functions defined in ``plantdb.commons.api_endpoints``.
+    By keeping the mapping in a single data‑structure we avoid duplicated code and the sanity‑check errors that
     appear when trying to call the helpers inline.
     """
-    # Helper that only passes ``resource_class_args`` when they are non‑empty.
-    def _add(resource, endpoint_func, *rc_args):
-        if rc_args:
-            api.add_resource(resource, endpoint_func(), resource_class_args=rc_args)
-        else:
-            api.add_resource(resource, endpoint_func())
-
-    # --------------------------------------------------------------------
     # Mapping of (resource class, endpoint function, *resource args)
-    # --------------------------------------------------------------------
     RESOURCE_MAP = [
         # Core endpoints
         (Home, home),
-        (HealthCheck, health, db, logger),
-        (Refresh, refresh, db, logger),
+        (HealthCheck, health),
+        (Refresh, refresh),
 
         # Authentication
-        (Register, register, db, logger),
-        (Login, login, db, logger),
-        (Logout, logout, db, logger),
-        (TokenRefresh, token_refresh, db, logger),
-        (TokenValidation, token_validation, db, logger),
-        (CreateApiToken, create_api_token, db, logger),
+        (Register, register),
+        (Login, login),
+        (Logout, logout),
+        (TokenRefresh, token_refresh),
+        (TokenValidation, token_validation),
+        (CreateApiToken, create_api_token),
 
         # Scan CRUD
-        (ScansList, scans, db, logger),
-        (ScansTable, scans_info, db, logger),
-        (Scan, lambda: scan("<string:scan_id>"), db, logger),
-        (ScanMetadata, lambda: scan_metadata("<string:scan_id>"), db, logger),
-        (ScanFilesets, lambda: scan_filesets_list("<string:scan_id>"), db, logger),
+        (ScansList, scans),
+        (ScansTable, scans_info),
+        (Scan, lambda: SCAN.format(scan_id="<string:scan_id>")),
+        (ScanMetadata, lambda: SCAN_MD.format(scan_id="<string:scan_id>")),
+        (ScanFilesets, lambda: SCAN_FILESETS.format(scan_id="<string:scan_id>")),
 
         # Fileset CRUD
-        (Fileset, lambda: fileset("<string:scan_id>", "<string:fileset_id>"), db, logger),
-        (FilesetMetadata, lambda: fileset_metadata("<string:scan_id>", "<string:fileset_id>"), db, logger),
-        (FilesetFiles, lambda: fileset_files_list("<string:scan_id>", "<string:fileset_id>"), db, logger),
+        (Fileset, lambda: FILESET.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
+        (FilesetMetadata, lambda: FILESET_MD.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
+        (FilesetFiles, lambda: FILESET_FILES.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
 
         # File CRUD
-        (File, lambda: file("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
-        (FileMetadata, lambda: file_metadata("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
+        (File,
+         lambda: FILE.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>", file_id="<string:file_id>")),
+        (FileMetadata, lambda: FILE_MD.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>",
+                                              file_id="<string:file_id>")),
 
         # Assets CRUD
-        (FilePath, lambda: file_path("<string:scan_id>", "<path:path>"), db, logger),
-        (DatasetFile, lambda: dataset_files_list("<string:scan_id>"), db, logger),
-        (Image, lambda: image("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
-        (PointCloud, lambda: pointcloud("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
-        (PointCloudGroundTruth, lambda: pc_ground_truth("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db),
-        (Mesh, lambda: mesh("<string:scan_id>", "<string:fileset_id>", "<string:file_id>"), db, logger),
-        (CurveSkeleton, lambda: skeleton("<string:scan_id>"), db, logger),
-        (Sequence, lambda: sequence("<string:scan_id>", None), db, logger),
-        (Archive, lambda: archive("<string:scan_id>"), db, logger),
+        (Image, lambda: IMAGE.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>",
+                                     file_id="<string:file_id>")),
+        (FilePath, lambda: FILE_PATH.format(scan_id="<string:scan_id>", file_path="<path:path>")),
+        (PointCloud, lambda: POINTCLOUD.format(scan_id="<string:scan_id>")),
+        (Mesh, lambda: MESH.format(scan_id="<string:scan_id>")),
+        (CurveSkeleton, lambda: SKELETON.format(scan_id="<string:scan_id>")),
+        (Sequence, lambda: SEQUENCE.format(scan_id="<string:scan_id>")),
+        (Archive, lambda: ARCHIVE.format(scan_id="<string:scan_id>")),
     ]
 
     # Register everything
-    for res, ep_func, *_args in RESOURCE_MAP:
-        _add(res, ep_func, *_args)
+    for resource, endpoint_func in RESOURCE_MAP:
+        api.add_resource(resource, endpoint_func(), resource_class_args=(db, logger))
 
 
 def rest_api(
-    db_path: Optional[Union[str, Path]],
-    proxy: bool = False,
-    url_prefix: str = "",
-    ssl: bool = False,
-    log_level: str = DEFAULT_LOG_LEVEL,
-    test: bool = False,
-    empty: bool = False,
-    models: bool = False,
+        db_path: Optional[Union[str, Path]],
+        proxy: bool = False,
+        url_prefix: str = "",
+        ssl: bool = False,
+        log_level: str = DEFAULT_LOG_LEVEL,
+        test: bool = False,
+        empty: bool = False,
+        models: bool = False,
 ) -> Flask:
     """Initialize and configure a RESTful API server for Plant Database querying.
 
