@@ -78,6 +78,52 @@ def url_prefix(endpoint_path):
 # ------------------------------------------------------------------------
 # Resource mapping
 # ------------------------------------------------------------------------
+# /api/v1/
+#       ├─ auth/
+#       │   ├─ login          (POST)
+#       │   ├─ logout         (POST)
+#       │   ├─ register       (POST)
+#       │   └─ tokens/
+#       │        └─ (POST)    → create-api-token
+#       ├─ health            (GET)
+#       ├─ scans/
+#       │   ├─ (GET)     → list scans
+#       │   ├─ info/     → list scans
+#       │   ├─ {scan_id}/
+#       │   │   ├─ (GET)       → retrieve a specific scan
+#       │   │   ├─ (POST)      → create a new scan
+#       │   │   ├─ metadata/ (GET, POST)
+#       │   │   │   ├─ (GET)   → get `scan_id` metadata
+#       │   │   │   └─ (POST)  → update `scan_id` metadata
+#       │   │   ├─ filesets/
+#       │   │   │   ├─ (GET)           → list filesets for scan
+#       │   │   │   └─ {fileset_id}/
+#       │   │   │       ├─ (GET)       → retrieve fileset
+#       │   │   │       ├─ (POST)      → create new fileset
+#       │   │   │       ├─ metadata/
+#       │   │   │       │   ├─ (GET)   → get `scan_id/fileset_id` metadata
+#       │   │   │       │   └─ (POST)  → update `scan_id/fileset_id` metadata
+#       │   │   │       └─ files/
+#       │   │   │           ├─ (GET)           → list files
+#       │   │   │           └─ {file_id}/
+#       │   │   │               ├─ (GET)       → retrieve file
+#       │   │   │               ├─ (POST)      → create new file
+#       │   │   │               └─ metadata/   → (GET, PATCH)
+#       │   │   │                   ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
+#       │   │   │                   └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
+#       │   └─ {scan_id}/refresh (POST)
+#       └─ assets/
+#           ├─ archive/{scan_id}
+#           │   ├─ (GET)       → retrieve scan archive
+#           │   └─ (POST)      → create a new scan by uploading a scan archive
+#           ├─ image/{scan_id}/{fileset_id}/{file_id}
+#           │   ├─ (GET)       → get `scan_id/fileset_id/file_id` image
+#           │   └─ (POST)      → create a new `scan_id/fileset_id/file_id` image
+#           ├─ pointcloud/{scan_id}   (GET) → retrieve scan pointcloud
+#           ├─ mesh/{scan_id}         (GET) → retrieve scan triangular mesh
+#           ├─ sequence/{scan_id}     (GET) → retrieve scan sequence
+#           └─ skeleton/{scan_id}     (GET) → retrieve scan skeleton
+# ------------------------------------------------------------------------
 
 HOME = "/"
 HEALTH = "/health"
@@ -110,7 +156,7 @@ MESH = "/mesh/{scan_id}"
 SEQUENCE = "/sequence/{scan_id}"
 SKELETON = "/skeleton/{scan_id}"
 ARCHIVE = "/archive/{scan_id}"
-FILE_PATH = "/file/{scan_id}/{file_path}"
+FILE_PATH = "/files/{scan_id}/{file_path}"
 
 
 # ------------------------------------------------------------------------
@@ -648,7 +694,7 @@ def image(scan_id: str, fileset_id: str, file_id: str,
     if size is not None:
         query["size"] = str(size)
     if as_base64 is not None:
-        # Use lower‑case JSON‑style booleans for consistency
+        # Use lower-case JSON-style booleans for consistency
         query["as_base64"] = str(as_base64).lower()
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
@@ -697,28 +743,28 @@ def pointcloud(scan_id: str,
                coords: bool | None = None,
                pcd_type: str = "default",
                **kwargs) -> str:
-    """Return the URL path to the point‑cloud endpoint.
+    """Return the URL path to the point-cloud endpoint.
 
     Parameters
     ----------
     scan_id : str
-        The name of the scan dataset containing the point‑cloud.
+        The name of the scan dataset containing the point-cloud.
     size : str or int or float
         Query parameter controlling downsampling.
         Accepted values:
             * 'orig' - serve the original point cloud.
             * 'preview' - serve a precomputed preview (default).
-            * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
+            * A float value - perform on-the-fly voxel downsampling using the specified voxel size.
         If an invalid string is supplied, the default 'preview' is used.
     coords : str
         Query parameter indicating whether to return the point coordinates as JSON.
     pcd_type : str or int
-        The type of point‑cloud to request, in ``['default', 'gt']``.
+        The type of point-cloud to request, in ``['default', 'gt']``.
 
     Returns
     -------
     str
-        The URL path to the point‑cloud endpoint.
+        The URL path to the point-cloud endpoint.
 
     Examples
     --------
