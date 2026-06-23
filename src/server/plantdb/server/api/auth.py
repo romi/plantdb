@@ -97,9 +97,6 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-import requests
-from flask import jsonify
-from flask import make_response
 from flask import request
 from flask_restful import Resource
 
@@ -213,26 +210,26 @@ class Register(Resource):
         if not data or not all(field in data for field in required_fields):
             return {
                 'success': False,
-                'message': 'Missing required fields. Please provide username, fullname, and password'
+                'error': 'Missing required fields. Please provide username, fullname, and password'
             }, 400
 
         try:
             # Delegate to the service layer
             register_user(self.db, data, token=kwargs.get('token'))
-            # Return success response if the user creation succeeds
-            return {'message': 'User successfully created'}, 201
-
         except MissingFieldError as e:
-            return {'message': str(e)}, 400  # HTTP 400 Bad Request
+            response = {'error': str(e)}, 400  # HTTP 400 Bad Request
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except SessionValidationError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except UserExistsError as e:
-            return {'message': f'Failed to create user: {str(e)}'}, 409  # HTTP 409 Conflict
+            response = {'error': f'Failed to create user: {str(e)}'}, 409  # HTTP 409 Conflict
         except Exception as e:
-            return {'message': f'Failed to create user: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': f'Failed to create user: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            response = {'message': f"User {data['username']} successfully created"}, 201
 
+        return response
 
 class Login(Resource):
     """A RESTful resource to handle user login and authentication processes.
@@ -301,10 +298,13 @@ class Login(Resource):
         username = request.args.get('username', None)
         # Return an error if the username parameter is missing
         if not username:
-            return {'message': 'Missing username parameter'}, 400
-        # Query database to check if the user exists
-        user_exists = check_username_exists(self.db, username)
-        return {'username': username, 'exists': user_exists}, 200
+            response = {'error': 'Missing username parameter'}, 400
+        else:
+            # Query database to check if the user exists
+            user_exists = check_username_exists(self.db, username)
+            response = {'username': username, 'exists': user_exists}, 200
+
+        return response
 
     @rate_limit(max_requests=20, window_seconds=60)
     def post(self):
@@ -360,7 +360,7 @@ class Login(Resource):
         data = request.get_json()
         # Validate that required fields are present in the request
         if not data or 'username' not in data or 'password' not in data:
-            return {'authenticated': False, 'message': 'Missing username or password'}, 400
+            return {'authenticated': False, 'error': 'Missing username or password'}, 400
 
         # Extract credentials from request data
         username = data['username']
@@ -369,22 +369,23 @@ class Login(Resource):
         try:
             access_token, refresh_token = authenticate_user(self.db, username, password)
         except InvalidCredentialsError:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
-            return {'message': f'Authentication failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': f'Authentication failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            # Build the successful response with user info, access token, and refresh token
+            user = self.db.get_user_data(token=access_token)
+            response = {
+                'message': 'Login successful',
+                'user': {
+                    'username': user.username,
+                    'fullname': user.fullname,
+                },
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }, 200
 
-        # Build the successful response with user info, access token, and refresh token
-        user = self.db.get_user_data(token=access_token)
-        response_data = {
-            'message': 'Login successful',
-            'user': {
-                'username': user.username,
-                'fullname': user.fullname,
-            },
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }
-        return response_data, 200
+        return response
 
 
 class Logout(Resource):
@@ -430,24 +431,24 @@ class Logout(Resource):
         >>> print(response.json()['message'])
         Logout successful
         """
-        try:
-            # The decorator supplies the token via kwargs
-            token = kwargs.get('token')
-            if not token:
-                self.logger.error("Logout error: no active session!")
-                return {'message': 'Logout failed, no active session!'}, 401  # HTTP 401 Unauthorized (authentication)
+        # The decorator supplies the token via kwargs
+        token = kwargs.get('token')
+        if not token:
+            self.logger.error("Logout error: no active session!")
+            return {'error': 'Logout failed, no active session!'}, 401  # HTTP 401 Unauthorized (authentication)
 
+        try:
             # Delegate to the service layer
             username = logout_user(self.db, token, logger=self.logger)
-
-            return {'message': f'Logout successful from {username}'}, 200
-
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Logout error: {str(e)}")
-            return {'message': 'Logout failed!'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': 'Logout failed!'}, 500  # HTTP 500 Internal Server Error
+        else:
+            response = {'message': f'Logout successful from {username}'}, 200
 
+        return response
 
 class TokenValidation(Resource):
     """Validate a JSON Web Token (JWT) and retrieve associated user data.
@@ -496,25 +497,25 @@ class TokenValidation(Resource):
         >>> print(response.json()['message'])
         Token validation successful
         """
-        try:
-            token = kwargs.get('token')
-            if not token:
-                raise TokenError('No token supplied')
+        # The decorator supplies the token via kwargs
+        token = kwargs.get('token')
+        if not token:
+            return {'error': 'No token supplied'}, 400
 
+        try:
             # Delegate to the service layer
             user_info = validate_token(self.db, token)
-
+        except NoAuthUserError as e:
+            response = {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            response = {'error': f'Token validation failed: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
+        except Exception as e:
+            response = {'error': f'Unexpected error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
             response = {
                 'message': 'Token validation successful',
                 'user': user_info,
             }, 200
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except TokenError as e:
-            response = {'message': f'Token validation failed: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
-        except Exception as e:
-            response = {'message': f'Unexpected error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         return response
 
@@ -557,27 +558,27 @@ class TokenRefresh(Resource):
         """
         data = request.get_json()
         if not data or 'refresh_token' not in data:
-            return {'message': 'Missing refresh_token'}, 400
+            return {'error': 'Missing refresh_token'}, 400
 
         refresh_token_str = data['refresh_token']
 
         try:
             # Delegate to the service layer
             access_token, new_refresh_token = refresh_token(self.db, refresh_token_str)
-
+        except NoAuthUserError as e:
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            response = {'error': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
+        except Exception as e:
+            response = {'error': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
             response = {
                 'message': 'Token refreshed successfully',
                 'access_token': access_token,
                 'refresh_token': new_refresh_token
             }, 200
-            return response
 
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except TokenError as e:
-            return {'message': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
-        except Exception as e:
-            return {'message': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        return response
 
 class CreateApiToken(Resource):
     """
@@ -612,9 +613,9 @@ class CreateApiToken(Resource):
         """
         data = request.get_json()
         if "datasets" not in data:
-            return {'message': 'Missing "datasets" field'}, 400
+            return {'error': 'Missing "datasets" field'}, 400
         if "token_exp" not in data:
-            return {'message': 'Missing "token_exp" field'}, 400
+            return {'error': 'Missing "token_exp" field'}, 400
         token_exp = int(data['token_exp'])
 
         try:
@@ -623,17 +624,17 @@ class CreateApiToken(Resource):
                 datasets=data['datasets'],
                 **kwargs
             )
-
-            if token:
-                exp_date = datetime.now(timezone.utc) + timedelta(seconds=token_exp)
-                response = {
-                    'message': 'API Token generated successfully',
-                    'api_token': token,
-                    'expiration date': exp_date.isoformat(),
-                }, 200
-                return response
-            else:
-                return {'message': 'Could not create token.'}, 401
-
         except Exception as e:
-            return {'message': f'Token creation failed: {e}'}, 500
+            response = {'error': f'Token creation failed: {e}'}, 500
+        else:
+            exp_date = datetime.now(timezone.utc) + timedelta(seconds=token_exp)
+            response = (
+                {
+                    "message": "API Token generated successfully",
+                    "api_token": token,
+                    "expiration date": exp_date.isoformat(),
+                },
+                200,
+            )
+
+        return response
