@@ -2665,12 +2665,12 @@ class Fileset(db.Fileset, MetadataManager):
         Parameters
         ----------
         f_id : str
-            Name of the file to get/create.
+            Name of the file to get.
 
         Returns
         -------
         plantdb.commons.fsdb.core.File
-            The retrieved or created file.
+            The retrieved file.
 
         Examples
         --------
