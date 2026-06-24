@@ -1097,7 +1097,7 @@ class PlantDBClient:
         >>> from plantdb.client.plantdb_client import PlantDBClient
         >>> from plantdb.client.rest_api import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
-        >>> response = client.fileset_files_list('real_plant','images')
+        >>> response = client.fileset_files_list('real_plant', 'images')
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
         >>> # Finally, stop the server
