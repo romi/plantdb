@@ -71,10 +71,10 @@ from urllib.parse import urlparse
 from requests.exceptions import HTTPError
 from tqdm import tqdm
 
-from plantdb.client.rest_api import request_archive_download
-from plantdb.client.rest_api import request_scan_names_list
-from plantdb.client.rest_api import request_refresh
-from plantdb.client.rest_api import request_archive_upload
+from plantdb.client.rest_api.requests import request_archive_download
+from plantdb.client.rest_api.requests import request_scan_names_list
+from plantdb.client.rest_api.requests import request_refresh
+from plantdb.client.rest_api.requests import request_archive_upload
 from plantdb.client.url import is_server_available
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
