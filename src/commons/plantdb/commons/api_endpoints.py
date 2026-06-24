@@ -79,8 +79,8 @@ def url_prefix(endpoint_path):
 # Resource mapping
 # ------------------------------------------------------------------------
 # /api/v1/
-#       ├─ health        (GET) → REST API status
-#       ├─ refresh/      (GET) → Reload the whole database
+#       ├─ health       (GET) → REST API status
+#       ├─ refresh/     (GET) → Reload the whole database
 #       │   └─ {scan_id}     (GET) → Reload the scan
 #       ├─ auth/
 #       │   ├─ login         (POST) → user login
@@ -94,15 +94,14 @@ def url_prefix(endpoint_path):
 #       │   ├─ (GET)     → list scans
 #       │   ├─ info      (GET) → list scans
 #       │   └─ {scan_id}/
-#       │       ├─ (GET)       → retrieve a specific scan
-#       │       ├─ (POST)      → create a new scan
+#       │       ├─ (GET)    → retrieve a specific scan
+#       │       ├─ (POST)   → create a new scan
 #       │       ├─ metadata/
 #       │       │   ├─ (GET)   → get `scan_id` metadata
 #       │       │   └─ (POST)  → update `scan_id` metadata
 #       │       └─ filesets/
-#       │           ├─ (GET)           → list filesets for scan
+#       │           ├─ (GET)       → list filesets for scan
 #       │           └─ {fileset_id}/
-#       │               ├─ (GET)       → retrieve fileset
 #       │               ├─ (POST)      → create new fileset
 #       │               ├─ metadata/
 #       │               │   ├─ (GET)   → get `scan_id/fileset_id` metadata
