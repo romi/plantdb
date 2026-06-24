@@ -366,7 +366,7 @@ def token_validation(**kwargs) -> str:
 
 
 @url_prefix
-def create_api_token():
+def create_api_token(**kwargs):
     """Return the URL path to the API token creation endpoint.
 
     Other Parameters
