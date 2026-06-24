@@ -188,23 +188,23 @@ class ScansList(Resource):
         >>> print(filtered_scans)  # list of scan IDs matching the filter
         ['real_plant_analyzed', 'real_plant']
         """
+        # Get fuzzy parameter from request URL
+        fuzzy = request.args.get('fuzzy', False, type=bool)
+        # Get filter query from "filterQuery" JSON data
+        query_data = request.get_json(silent=True)
+        if isinstance(query_data, dict):
+            query = query_data.get("filterQuery")
+        else:
+            query = None
+
         try:
-            # Get filter query and fuzzy match parameters from request URL
-            query = request.args.get('filterQuery', None)
-            fuzzy = request.args.get('fuzzy', False, type=bool)
-            # Parse JSON filter query if provided
-            if query is not None:
-                try:
-                    query = json.loads(query)
-                except json.JSONDecodeError:
-                    return {'error': 'Invalid JSON format in filterQuery parameter.'}, 400
             # Query database for matching scans, allowing access to all owners
-            scans = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
         except Exception as e:
             # Return an error response if any exception occurs
             return {'error': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
-            return scans, 200
+            return scans_list, 200
 
 
 class ScansTable(Resource):
@@ -291,13 +291,21 @@ class ScansTable(Resource):
         >>> print(sorted(scan['id'] for scan in scans_info))
         ['arabidopsis000']
         """
-        query = request.args.get('filterQuery', None)
+        # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
+        # Get filter query from "filterQuery" JSON data
+        query_data = request.get_json(silent=True)
+        if isinstance(query_data, dict):
+            query = query_data.get("filterQuery")
+        else:
+            query = None
 
-        if query is not None:
-            query = json.loads(query)
-
-        scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+        try:
+            # Query database for matching scans, allowing access to all owners
+            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+        except Exception as e:
+            # Return an error response if any exception occurs
+            return {'error': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         scans_info = []
         for scan_id in scans_list:
@@ -729,14 +737,20 @@ class ScanFilesets(Resource):
         >>> print(len(response.json()['filesets']))  # Get the number of filesets
         10
         """
-        query = request.args.get('query', default=None, type=str)
-        fuzzy = request.args.get('fuzzy', default=False, type=bool)
+        # Get fuzzy parameter from request URL
+        fuzzy = request.args.get('fuzzy', False, type=bool)
+        # Get filter query from "filterQuery" JSON data
+        query_data = request.get_json(silent=True)
+        if isinstance(query_data, dict):
+            query = query_data.get("filterQuery")
+        else:
+            query = None
 
         try:
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
             # Get the list of filesets
-            filesets = scan.list_filesets(query, fuzzy)
+            filesets = scan.list_filesets(query=query, fuzzy=fuzzy)
 
         except NoAuthUserError as e:
             return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
