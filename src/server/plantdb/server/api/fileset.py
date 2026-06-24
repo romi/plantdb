@@ -161,23 +161,36 @@ class Fileset(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
-        >>> token = response.json()['access_token']
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
         >>> # Create a new fileset with metadata:
         >>> scan_id = 'real_plant'
         >>> fileset_id = 'test_fileset'
         >>> metadata = {'description': 'This is a test fileset'}
-        >>> url = f"http://127.0.0.1:5000/fileset/{scan_id}/{fileset_id}"
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.fileset(scan_id, fileset_id)
         >>> response = requests.post(url, json={'metadata': metadata}, headers={'Authorization': 'Bearer ' + token})
-        >>> response = requests.post(url, json={'metadata': metadata})
-        >>> print(response.status_code)
-        201
+        >>> print(response.ok)
+        True
         >>> print(response.json())
-        {'message': "Fileset 'my_fileset' created successfully in 'real_plant'."}
+        {'message': "Fileset created successfully in 'real_plant'.", 'id': 'test_fileset'}
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.fileset_metadata(scan_id, fileset_id)
+        >>> response = requests.get(url)
+        >>> fs_md = response.json()['metadata']
+        >>> print(fs_md['description'])
+        This is a test fileset
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get JSON data from request
         data = request.get_json(silent=True)
@@ -285,18 +298,27 @@ class FilesetMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get all metadata:
-        >>> url = "http://127.0.0.1:5000/fileset/real_plant/images/metadata"
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.fileset_metadata(scan_id, fileset_id)
         >>> response = requests.get(url)
-        >>> metadata = response.json()['metadata']
-        >>> print(metadata['channels'])
+        >>> f_md = response.json()['metadata']
+        >>> print(f_md['channels'])
         ['rgb']
         >>> # Get a specific metadata key:
-        >>> response = requests.get(url+"?key=channels")
-        >>> print(response.json()['metadata'])
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.fileset_metadata(scan_id, fileset_id, key='channels')
+        >>> response = requests.get(url)
+        >>> md = response.json()['metadata']
+        >>> print(md)
         ['rgb']
         """
         key = request.args.get('key', default=None, type=str)
@@ -369,25 +391,32 @@ class FilesetMetadata(Resource):
 
         Examples
         --------
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
-        >>> token = response.json()['access_token']
-        >>> # Get all metadata:
-        >>> url = "http://127.0.0.1:5000/fileset/real_plant/images/metadata"
-        >>> response = requests.get(url)
-        >>> metadata = response.json()['metadata']
-        >>> # Update the original metadata dictionary and upload it to the database:
-        >>> metadata['object']['description'] = 'Test plant scan images'
-        >>> response = requests.post(url, json={'metadata': metadata}, headers={'Authorization': 'Bearer ' + token})
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
+        >>> # Now update the metadata:
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id)
+        >>> data = {"metadata": {"description": "Updated description"}}
+        >>> response = requests.post(url, json=data, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.ok)
         True
-        >>> print(response.json()['metadata']['object']['description'])
-        Test plant scan images
-        >>> # Replace metadata:
-        >>> metadata_update = {"metadata": {"description": "Brand new description", "version": "2.0"}, "replace": True}
-        >>> response = requests.post(url, json=metadata_update)
-        >>> print(response.json())
+        >>> print(response.json()['metadata']['description'])
+        Updated description
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get request data
         data = request.get_json()
@@ -486,16 +515,23 @@ class FilesetFiles(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> # List files in a fileset:
-        >>> url = f"http://127.0.0.1:5000/fileset/real_plant/images/files"
+        >>> from plantdb.commons import api_endpoints
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.fileset_files_list(scan_id, fileset_id)
         >>> response = requests.get(url)
-        >>> print(response.status_code)
-        200
-        >>> print(response.json())
-        {'files': ['00000_rgb', '00001_rgb', '00002_rgb', '00003_rgb', '00004_rgb', '00005_rgb', '00006_rgb', '00007_rgb', '00008_rgb', '00009_rgb', '00010_rgb', '00011_rgb', '00012_rgb', '00013_rgb', '00014_rgb', '00015_rgb', '00016_rgb', '00017_rgb', '00018_rgb', '00019_rgb', '00020_rgb', '00021_rgb', '00022_rgb', '00023_rgb', '00024_rgb', '00025_rgb', '00026_rgb', '00027_rgb', '00028_rgb', '00029_rgb', '00030_rgb', '00031_rgb', '00032_rgb', '00033_rgb', '00034_rgb', '00035_rgb', '00036_rgb', '00037_rgb', '00038_rgb', '00039_rgb', '00040_rgb', '00041_rgb', '00042_rgb', '00043_rgb', '00044_rgb', '00045_rgb', '00046_rgb', '00047_rgb', '00048_rgb', '00049_rgb', '00050_rgb', '00051_rgb', '00052_rgb', '00053_rgb', '00054_rgb', '00055_rgb', '00056_rgb', '00057_rgb', '00058_rgb', '00059_rgb']}
+        >>> file_list = response.json()['files']
+        >>> print(file_list)
+        ['00000_rgb', '00001_rgb', '00002_rgb', '00003_rgb', '00004_rgb', '00005_rgb', '00006_rgb', '00007_rgb', '00008_rgb', '00009_rgb', '00010_rgb', '00011_rgb', '00012_rgb', '00013_rgb', '00014_rgb', '00015_rgb', '00016_rgb', '00017_rgb', '00018_rgb', '00019_rgb', '00020_rgb', '00021_rgb', '00022_rgb', '00023_rgb', '00024_rgb', '00025_rgb', '00026_rgb', '00027_rgb', '00028_rgb', '00029_rgb', '00030_rgb', '00031_rgb', '00032_rgb', '00033_rgb', '00034_rgb', '00035_rgb', '00036_rgb', '00037_rgb', '00038_rgb', '00039_rgb', '00040_rgb', '00041_rgb', '00042_rgb', '00043_rgb', '00044_rgb', '00045_rgb', '00046_rgb', '00047_rgb', '00048_rgb', '00049_rgb', '00050_rgb', '00051_rgb', '00052_rgb', '00053_rgb', '00054_rgb', '00055_rgb', '00056_rgb', '00057_rgb', '00058_rgb', '00059_rgb']
+        >>> # Stop the test server
+        >>> server.stop()
         """
         query = request.args.get('query', default=None, type=str)
         fuzzy = request.args.get('fuzzy', default=False, type=bool)
