@@ -8,12 +8,12 @@ in the plantdb.server.api.fileset module.
 """
 
 import unittest
-import requests
-import tempfile
-import os
 
-from plantdb.server.test_rest_api import TestRestApiServer
+import requests
+
+from plantdb.commons import api_endpoints
 from plantdb.commons.test_database import _mkdtemp_romidb
+from plantdb.server.test_rest_api import TestRestApiServer
 
 
 class FilesetApiTests(unittest.TestCase):
@@ -31,7 +31,7 @@ class FilesetApiTests(unittest.TestCase):
         import time
         for _ in range(10):
             try:
-                r = requests.get(cls.base_url + "/health")
+                r = requests.get(cls.base_url + api_endpoints.health())
                 if r.status_code == 200:
                     break
             except Exception:
@@ -47,8 +47,8 @@ class FilesetApiTests(unittest.TestCase):
 
     @classmethod
     def _login_admin(cls, base_url):
-        """Login as admin user and return access token."""
-        r = requests.post(base_url + '/login', json={'username': 'admin', 'password': 'admin'})
+        """Login as the admin user and return an access token."""
+        r = requests.post(base_url + api_endpoints.login(), json={'username': 'admin', 'password': 'admin'})
         return r.json()['access_token']
 
     def test_create_fileset(self):
@@ -56,7 +56,7 @@ class FilesetApiTests(unittest.TestCase):
         scan_id = 'real_plant_analyzed'
         # Then create a fileset ID and try to create it
         fileset_id = "test_fileset"
-        r = requests.post(self.base_url + f'/fileset/{scan_id}/{fileset_id}',
+        r = requests.post(self.base_url + api_endpoints.fileset(scan_id, fileset_id),
                           headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 201)
         response = r.json()
@@ -67,9 +67,9 @@ class FilesetApiTests(unittest.TestCase):
     def test_create_fileset_without_auth(self):
         """Test creating a fileset without authorization fails."""
         scan_id = 'real_plant_analyzed'
-        # Then create a fileset ID and try to create it (withou authentication it should fail)
+        # Then create a fileset ID and try to create it (without authentication it should fail)
         fileset_id = "test_fileset_no_auth"
-        r = requests.post(self.base_url + f'/fileset/{scan_id}/{fileset_id}')
+        r = requests.post(self.base_url + api_endpoints.fileset(scan_id, fileset_id))
         self.assertEqual(r.status_code, 401)
 
     def test_create_fileset_with_metadata(self):
@@ -79,7 +79,7 @@ class FilesetApiTests(unittest.TestCase):
         metadata = {'description': 'This is a test description'}
         # Then create a fileset ID and try to create it
         fileset_id = "test_fileset_md"
-        r = requests.post(self.base_url + f'/fileset/{scan_id}/{fileset_id}',
+        r = requests.post(self.base_url + api_endpoints.fileset(scan_id, fileset_id),
                           json=metadata,
                           headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 201)
