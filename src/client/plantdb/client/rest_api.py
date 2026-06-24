@@ -54,7 +54,6 @@ import os
 from io import BytesIO
 from pathlib import Path
 from typing import Union
-from urllib.parse import splitport
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
@@ -168,8 +167,11 @@ def origin_url(host, port=None, ssl=False, **kwargs) -> str:
 
     # Apply an explicit ``port`` argument (overwrites any existing one)
     if port is not None:
-        # ``splitport`` safely separates host from any existing port.
-        hostname, _ = splitport(netloc)
+        # separates host from any existing port.
+        try:
+            hostname, _ = netloc.split(":")
+        except ValueError:
+            hostname = netloc
         # Ensure ``port`` is a clean string without a leading colon.
         clean_port = str(port).lstrip(":")
         netloc = f"{hostname}:{clean_port}"
@@ -255,11 +257,11 @@ def login_url(host, **kwargs):
     >>> # Default URL using module level constants
     >>> url = login_url('localhost')
     >>> print(url)
-    http://localhost/login
+    http://localhost/auth/login
     >>> # Override host, add a prefix and enable SSL
     >>> url = login_url('dev.romi.local', prefix="/plantdb", ssl=True)
     >>> print(url)
-    https://dev.romi.local/plantdb/login
+    https://dev.romi.local/plantdb/auth/login
     """
     origin = origin_url(host, **kwargs)
     return join_url(origin, api_endpoints.login(**kwargs))
@@ -293,11 +295,11 @@ def logout_url(host, **kwargs):
     >>> # Basic usage with default configuration
     >>> url = logout_url('localhost')
     >>> print(url)
-    http://localhost/logout
+    http://localhost/auth/logout
     >>> # Specify a custom prefix and enable SSL
     >>> url = logout_url('dev.romi.local', prefix="/plantdb", ssl=True)
     >>> print(url)
-    https://dev.romi.local/plantdb/logout
+    https://dev.romi.local/plantdb/auth/logout
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.logout(**kwargs))
@@ -327,15 +329,15 @@ def register_url(host, **kwargs):
 
     Examples
     --------
-    >>> from plantdb.client.rest_api import logout_url
+    >>> from plantdb.client.rest_api import register_url
     >>> # Basic usage with default configuration
-    >>> url = logout_url('localhost')
+    >>> url = register_url('localhost')
     >>> print(url)
-    http://localhost/logout
+    http://localhost/auth/register
     >>> # Specify a custom prefix and enable SSL
-    >>> url = logout_url('dev.romi.local', prefix="/plantdb", ssl=True)
+    >>> url = register_url('dev.romi.local', prefix="/plantdb", ssl=True)
     >>> print(url)
-    https://dev.romi.local/plantdb/logout
+    https://dev.romi.local/plantdb/auth/register
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.register(**kwargs))
@@ -369,10 +371,10 @@ def token_validation_url(host, **kwargs):
     >>> # Basic usage with default configuration
     >>> url = token_validation_url('localhost')
     >>> print(url)
-    http://localhost/token-validation
+    http://localhost/auth/token/validation
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.token_validation())
+    return join_url(url, api_endpoints.token_validation(**kwargs))
 
 
 def token_refresh_url(host, **kwargs):
@@ -403,10 +405,10 @@ def token_refresh_url(host, **kwargs):
     >>> # Basic usage with default configuration
     >>> url = token_refresh_url('localhost')
     >>> print(url)
-    http://localhost/token-refresh
+    http://localhost/auth/token/refresh
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.token_refresh())
+    return join_url(url, api_endpoints.token_refresh(**kwargs))
 
 
 def api_token_url(host, **kwargs):
@@ -437,10 +439,10 @@ def api_token_url(host, **kwargs):
     >>> # Basic usage with default configuration
     >>> url = api_token_url('localhost')
     >>> print(url)
-    http://localhost/create-api-token
+    http://localhost/auth/token/create-api-token
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.create_api_token())
+    return join_url(url, api_endpoints.create_api_token(**kwargs))
 
 
 def scans_url(host, **kwargs):
@@ -505,9 +507,9 @@ def scan_url(host, scan_id, **kwargs):
     --------
     >>> from plantdb.client.rest_api import scan_url
     >>> scan_url('localhost', "real_plant")
-    'http://localhost/scan/real_plant'
+    'http://localhost/scans/real_plant'
     >>> scan_url('localhost', "real_plant", prefix='/plantdb')
-    'http://localhost/plantdb/scan/real_plant'
+    'http://localhost/plantdb/scans/real_plant'
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.scan(scan_id, **kwargs))
@@ -551,10 +553,10 @@ def scan_preview_image_url(host, scan_id, size="thumb", **kwargs):
     >>> from plantdb.client.rest_api import scan_preview_image_url
     >>> img_url = scan_preview_image_url('localhost', 'real_plant')
     >>> print(img_url)
-    http://localhost/image/real_plant/images/00000_rgb?size=thumb
+    http://localhost/assets/image/real_plant/images/00000_rgb?size=thumb
     >>> img_url = scan_preview_image_url('localhost', 'real_plant', size=100)
     >>> print(img_url)
-    http://localhost/image/real_plant/images/00000_rgb?size=100
+    http://localhost/assets/image/real_plant/images/00000_rgb?size=100
     >>> # Download and display the image
     >>> import requests
     >>> from PIL import Image
@@ -617,11 +619,11 @@ def scan_image_url(host, scan_id, fileset_id, file_id, size='orig', as_base64=Fa
     --------
     >>> from plantdb.client.rest_api import scan_image_url
     >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb")
-    'http://localhost/image/real_plant/images/00000_rgb?size=orig'
+    'http://localhost/assets/image/real_plant/images/00000_rgb?size=orig'
     >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb", as_base64=True)
-    'http://localhost/image/real_plant/images/00000_rgb?size=orig&as_base64=true'
+    'http://localhost/assets/image/real_plant/images/00000_rgb?size=orig&as_base64=true'
     >>> scan_image_url('localhost', "real_plant", "images", "00000_rgb", prefix='/plantdb')
-    'http://localhost/plantdb/image/real_plant/images/00000_rgb?size=orig'
+    'http://localhost/plantdb/assets/image/real_plant/images/00000_rgb?size=orig'
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.image(scan_id, fileset_id, file_id, size, as_base64, **kwargs))
@@ -694,27 +696,25 @@ def archive_url(host, scan_id, **kwargs):
     --------
     >>> from plantdb.client.rest_api import archive_url
     >>> archive_url('localhost', 'arabidopsis000')
-    'http://localhost/archive/arabidopsis000'
+    'http://localhost/assets/archive/arabidopsis000'
     >>> archive_url('localhost', '../arabidopsis000')
-    'http://localhost/archive/arabidopsis000'
+    'http://localhost/assets/archive/arabidopsis000'
     >>> archive_url('localhost', 'arabidopsis+000')
     ValueError: Invalid dataset name: 'arabidopsis+000'. Dataset names must be alphanumeric and can include underscores or dashes.
     >>> archive_url('localhost', 'arabidopsis000', prefix='/plantdb')
-    'http://localhost/plantdb/archive/arabidopsis000'
+    'http://localhost/plantdb/assets/archive/arabidopsis000'
     """
     url = origin_url(host, **kwargs)
     return join_url(url, api_endpoints.archive(scan_id, **kwargs))
 
 
-def scan_file_url(host, scan_id, file_path, **kwargs):
+def scan_file_url(host, file_path, **kwargs):
     """Build the URL for accessing a dataset file.
 
     Parameters
     ----------
     host : str
         The hostname or IP address of the PlantDB REST API server.
-    scan_id : str
-        The name of the dataset.
     file_path : str
         The path to the file in the databse.
 
@@ -733,7 +733,7 @@ def scan_file_url(host, scan_id, file_path, **kwargs):
         The complete URL for the dataset file.
     """
     url = origin_url(host, **kwargs)
-    return join_url(url, api_endpoints.file_path(scan_id, file_path, **kwargs))
+    return join_url(url, api_endpoints.file_path(file_path, **kwargs))
 
 
 def scan_config_url(host, scan_id, cfg_fname='scan.toml', **kwargs):
@@ -766,11 +766,11 @@ def scan_config_url(host, scan_id, cfg_fname='scan.toml', **kwargs):
     --------
     >>> from plantdb.client.rest_api import scan_config_url
     >>> scan_config_url('localhost', 'real_plant')
-    'http://localhost/files/real_plant/scan.toml'
+    'http://localhost/assets/files/real_plant/scan.toml'
     >>> scan_config_url('localhost', 'real_plant', prefix='/plantdb')
-    'http://localhost/plantdb/files/real_plant/scan.toml'
+    'http://localhost/plantdb/assets/files/real_plant/scan.toml'
     """
-    return scan_file_url(host, scan_id, cfg_fname, **kwargs)
+    return scan_file_url(host, f"{scan_id}/{cfg_fname}", **kwargs)
 
 
 def scan_reconstruction_url(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
@@ -778,6 +778,8 @@ def scan_reconstruction_url(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
 
     Parameters
     ----------
+    host : str
+        The hostname or IP address of the PlantDB REST API server.
     scan_id : str
         The name of the dataset.
     cfg_fname : str, optional
@@ -801,11 +803,11 @@ def scan_reconstruction_url(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
     --------
     >>> from plantdb.client.rest_api import scan_reconstruction_url
     >>> scan_reconstruction_url('localhost', 'real_plant')
-    'http://localhost/files/real_plant/pipeline.toml'
+    'http://localhost/assets/files/real_plant/pipeline.toml'
     >>> scan_reconstruction_url('localhost', 'real_plant', prefix='/plantdb')
-    'http://localhost/plantdb/files/real_plant/pipeline.toml'
+    'http://localhost/plantdb/assets/files/real_plant/pipeline.toml'
     """
-    return scan_file_url(host, scan_id, cfg_fname, **kwargs)
+    return scan_file_url(host, f"{scan_id}/{cfg_fname}", **kwargs)
 
 
 def list_task_images_uri(host, scan_id, task_name='images', size='orig', as_base64=True, **kwargs):
@@ -848,16 +850,16 @@ def list_task_images_uri(host, scan_id, task_name='images', size='orig', as_base
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import list_task_images_uri
     >>> print(list_task_images_uri('localhost', 'real_plant')[2])
-    http://localhost/image/real_plant/images/00002_rgb?size=orig
+    http://localhost/assets/image/real_plant/images/00002_rgb?size=orig
     >>> print(list_task_images_uri('localhost', 'real_plant', size=100)[2])
-    http://localhost/image/real_plant/images/00002_rgb?size=100
+    http://localhost/assets/image/real_plant/images/00002_rgb?size=100
     """
     scan_info = request_scan_data(host, scan_id, **kwargs)
     tasks_id = scan_info["tasks_fileset"][task_name]
     images = scan_info["images"]
     url = origin_url(host, **kwargs)
     return [join_url(url, api_endpoints.image(scan_id, tasks_id, Path(img).stem, size, as_base64, **kwargs))
-        for img in images]
+            for img in images]
 
 
 # -----------------------------------------------------------------------------
@@ -1250,7 +1252,8 @@ def request_api_token(host, token_exp, datasets, **kwargs) -> dict:
     url = api_token_url(host, **kwargs)
     # Extract the payload arguments (they are optional so we provide sensible defaults)
     payload = {"datasets": datasets, "token_exp": token_exp}
-    return make_api_request(url, method="POST", json_data=payload, session_token=kwargs.get('session_token', None)).json()
+    return make_api_request(url, method="POST", json_data=payload,
+                            session_token=kwargs.get('session_token', None)).json()
 
 
 def request_new_user(host, username, password, fullname, **kwargs) -> bool:
@@ -2254,7 +2257,7 @@ def _load_toml_from_url(url, **kwargs):
     return None
 
 
-def get_toml_file(host, scan_id, file_path, **kwargs):
+def get_toml_file(host, file_path, **kwargs):
     """Return a loaded TOML file for selected dataset, if it exists.
 
     Parameters
@@ -2283,11 +2286,11 @@ def get_toml_file(host, scan_id, file_path, **kwargs):
     >>> # Start a test PlantDB REST API server first, in a terminal:
     >>> # $ fsdb_rest_api --test
     >>> from plantdb.client.rest_api import get_toml_file
-    >>> cfg = get_toml_file('real_plant_analyzed', 'pipeline.toml')
+    >>> cfg = get_toml_file('real_plant_analyzed/pipeline.toml')
     >>> cfg['PointCloud']
     {'upstream_task': 'Voxels', 'level_set_value': 1.0}
     """
-    url = scan_file_url(host, scan_id, file_path, **kwargs)
+    url = scan_file_url(host, file_path, **kwargs)
     return _load_toml_from_url(url, **kwargs)
 
 
@@ -2325,7 +2328,7 @@ def get_scan_config(host, scan_id, cfg_fname='scan.toml', **kwargs):
     'Circle'
 
     """
-    return get_toml_file(host, scan_id, cfg_fname, **kwargs)
+    return get_toml_file(host, f"{scan_id}/{cfg_fname}", **kwargs)
 
 
 def get_reconstruction_config(host, scan_id, cfg_fname='pipeline.toml', **kwargs):
@@ -2362,7 +2365,7 @@ def get_reconstruction_config(host, scan_id, cfg_fname='pipeline.toml', **kwargs
     'Voxels'
 
     """
-    return get_toml_file(host, scan_id, cfg_fname, **kwargs)
+    return get_toml_file(host, f"{scan_id}/{cfg_fname}", **kwargs)
 
 
 def get_angles_and_internodes_data(host, scan_id, **kwargs):
@@ -2400,10 +2403,9 @@ def get_angles_and_internodes_data(host, scan_id, **kwargs):
     >>> print(len(data['angles']))
     33
     """
-    url = origin_url(host, **kwargs)
+    url = join_url(origin_url(host, **kwargs), api_endpoints.sequence(scan_id))
 
-    response = make_api_request(join_url(url, f"sequence/{scan_id}"),
-                                session_token=kwargs.get('session_token', None))
+    response = make_api_request(url, session_token=kwargs.get('session_token', None))
     if response.ok:
         data = json.loads(response.content.decode('utf-8'))
         return {seq: data[seq] for seq in ['angles', 'internodes']}
