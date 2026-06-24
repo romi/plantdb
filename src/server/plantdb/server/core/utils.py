@@ -168,7 +168,7 @@ def _get_colmap_camera_model(scan):
     --------
     >>> from plantdb.commons.test_database import test_database
     >>> from plantdb.server.core.utils import _get_colmap_camera_model
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> camera_model, poses = _get_colmap_camera_model(scan)

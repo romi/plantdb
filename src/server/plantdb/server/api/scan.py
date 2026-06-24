@@ -390,7 +390,7 @@ class Scan(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> # Get detailed information about a specific dataset
-        >>> response = requests.get("http://127.0.0.1:5000/scan/real_plant_analyzed")
+        >>> response = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
         >>> scan_data = response.json()
         >>> # Access metadata information
         >>> print(scan_data['metadata']['nbPhotos'])
@@ -556,7 +556,7 @@ class ScanMetadata(Resource):
         >>> # Start a test REST API server first:
         >>> # $ fsdb_rest_api --test
         >>> import requests
-        >>> url = "http://127.0.0.1:5000/scan/real_plant/metadata"
+        >>> url = "http://127.0.0.1:5000/scans/real_plant/metadata"
         >>> response = requests.get(url)  # Get all metadata
         >>> metadata = response.json()['metadata']
         >>> print(metadata['owner'])
@@ -620,7 +620,7 @@ class ScanMetadata(Resource):
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> token = response.json()['access_token']
         >>> # Get the whole metadata dictionary for an existing dataset:
-        >>> url = "http://127.0.0.1:5000/scan/real_plant/metadata"
+        >>> url = "http://127.0.0.1:5000/scans/real_plant/metadata"
         >>> response = requests.get(url)  # Get all metadata
         >>> metadata = response.json()['metadata']
         >>> # Update the original metadata dictionary and upload it to the database:
@@ -718,13 +718,13 @@ class ScanFilesets(Resource):
         >>> # $ fsdb_rest_api --test
         >>> import requests
         >>> # List filesets in a scan:
-        >>> url = "http://127.0.0.1:5000/scan/real_plant/filesets"
+        >>> url = "http://127.0.0.1:5000/scans/real_plant/filesets"
         >>> response = requests.get(url)
         >>> print(response.status_code)
         200
         >>> print(response.json())
         {'filesets': ['images']}
-        >>> url = "http://127.0.0.1:5000/scan/real_plant_analyzed/filesets"
+        >>> url = "http://127.0.0.1:5000/scans/real_plant_analyzed/filesets"
         >>> response = requests.get(url)
         >>> print(len(response.json()['filesets']))  # Get the number of filesets
         10

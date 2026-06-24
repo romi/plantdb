@@ -296,7 +296,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import image_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> db.login('guest', 'guest')
     >>> # Example 1: Get the original image:
@@ -475,7 +475,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import pointcloud_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> # Example 1: Get the original pointcloud:
     >>> pointcloud_path(db, 'real_plant_analyzed', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'PointCloud', 'orig')
@@ -654,7 +654,7 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import mesh_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> # Example 1: Get the original mesh:
     >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')

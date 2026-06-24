@@ -62,7 +62,7 @@ def get_scan_info(scan, **kwargs):
     --------
     >>> from plantdb.server.services.scan import get_scan_info
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_info = get_scan_info(scan)
@@ -183,7 +183,7 @@ def get_scan_data(scan, **kwargs):
     --------
     >>> from plantdb.server.services.scan import get_scan_data
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> scan = db.get_scan('real_plant_analyzed')
     >>> scan_data = get_scan_data(scan)
