@@ -58,7 +58,7 @@ from dash import ctx
 from dash import dcc
 from dash import html
 
-from plantdb.client.rest_api import request_scan_names_list
+from plantdb.client.rest_api.requests import request_scan_names_list
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.client.sync import FSDBSync
 from plantdb.client.sync import config_from_url
@@ -576,7 +576,7 @@ def get_scans_for_db(config):
             return db.list_scans(owner_only=False)
         elif config["type"] == "http":
             from plantdb.client.rest_api import refresh_url
-            from plantdb.client.rest_api import make_api_request
+            from plantdb.client.rest_api.requests import make_api_request
             url = refresh_url(**config)
             refreshed = _try_refresh(url)
             n_attempts = 0
