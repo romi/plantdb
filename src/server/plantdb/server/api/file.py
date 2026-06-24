@@ -157,20 +157,23 @@ class File(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get a file from the database:
         >>> scan_id = 'real_plant'
         >>> fileset_id = 'images'
         >>> file_id = '00000_rgb'
-        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
-        >>> response = requests.get(url)
-        >>> print(response.status_code)
-        201
-        >>> print(response.json())
-        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
-        >>> file_path.unlink()  # Delete the YAML test file
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.file(scan_id, fileset_id, file_id))
+        >>> print(response.ok)
+        True
+        >>> # Stop the test server
+        >>> server.stop()
         """
 
         try:
@@ -234,33 +237,42 @@ class File(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
         >>> import json
         >>> from pathlib import Path
         >>> from tempfile import NamedTemporaryFile
+        >>> from plantdb.commons import api_endpoints
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
-        >>> login_res = requests.post(f"http://127.0.0.1:5000/login", json={'username': 'admin', 'password': 'admin'})
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
         >>> token = login_res.json()['access_token']
         >>> # Create a new file with metadata in the database:
         >>> scan_id = "real_plant"
         >>> fileset_id = "images"
         >>> file_id = Path(file_path).stem
-        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file(scan_id, fileset_id, file_id)
         >>> metadata = {'description': 'Test file description'}
         >>> data = {'ext': '.yaml', 'metadata': json.dumps(metadata)}
         >>> file_handle = open(file_path, 'rb')
         >>> files = {'file': (Path(file_path).name, file_handle, 'application/octet-stream')}
         >>> response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
-        >>> print(response.status_code)
-        201
+        >>> print(response.ok)
+        True
         >>> print(response.json())
-        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
+        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'.", 'id': 'tmpescmpwuq'}
         >>> file_handle.close()
         >>> Path(file_path).unlink()  # Delete the YAML test file
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Check if the request has the file part
         if 'file' not in request.files:
@@ -405,18 +417,29 @@ class FileMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get all metadata:
-        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id)
         >>> response = requests.get(url)
-        >>> print(response.json())
-        {'metadata': {'description': 'Test file'}}
+        >>> f_md = response.json()['metadata']
+        >>> print(f_md['channel'])
+        rgb
         >>> # Get a specific metadata key:
-        >>> response = requests.get(url+"?key=description")
-        >>> print(response.json())
-        {'metadata': 'Test file'}
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id, key="channel")
+        >>> response = requests.get(url)
+        >>> md = response.json()['metadata']
+        >>> print(md)
+        rgb
         """
         key = request.args.get('key', default=None, type=str)
         if key:
@@ -487,14 +510,32 @@ class FileMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
+        >>> from plantdb.commons import api_endpoints
+        >>> # Start by log in as 'admin'
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
+        >>> # Now update the metadata:
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id)
         >>> data = {"metadata": {"description": "Updated description"}}
-        >>> response = requests.post(url, json=data)
-        >>> print(response.json())
-        {'metadata': {'description': 'Updated description'}}
+        >>> response = requests.post(url, json=data, headers={'Authorization': 'Bearer ' + token})
+        >>> # Inspect returned metadata:
+        >>> f_md = response.json()['metadata']
+        >>> print(f_md['description'])
+        Updated description
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get request data
         data = request.get_json()
