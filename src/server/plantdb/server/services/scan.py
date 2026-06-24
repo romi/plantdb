@@ -26,20 +26,18 @@
 import json
 import os
 from math import radians
-from plantdb.commons.fsdb.core import Scan
-from typing import Any, Dict, List, Optional, Literal, Protocol, Tuple
 
+from plantdb.commons import api_endpoints
 from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import is_radians
 from plantdb.server import webcache
+from plantdb.server.api.base import task_filesUri_mapping
 from plantdb.server.core.utils import _get_colmap_camera_model
 from plantdb.server.core.utils import compute_fileset_matches
-from plantdb.server.core.utils import get_file_uri
 from plantdb.server.core.utils import get_scan_date
 from plantdb.server.core.utils import get_scan_template
-from plantdb.server.api.base import task_filesUri_mapping
 
 
 def get_scan_info(scan, **kwargs):
@@ -99,15 +97,15 @@ def get_scan_info(scan, **kwargs):
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
     ## Get the URL to the archive:
-    scan_info["metadata"]["files"]["archive"] = f"/archive/{scan.id}"
+    scan_info["metadata"]["files"]["archive"] = api_endpoints.archive(scan.id)
     ## Get the path to the JSON metadata file:
-    metadata_json_path = os.path.join(f"/files/", scan.id, "metadata", "metadata.json")
+    metadata_json_path = api_endpoints.file_path(os.path.join(scan.id, "metadata", "metadata.json"))
     scan_info["metadata"]["files"]["metadata"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
     img_f = img_fs.get_files()[0]
-    scan_info["thumbnailUri"] = f"/image/{scan.id}/{img_fs.id}/{img_f.id}?size=thumb"
+    scan_info["thumbnailUri"] = api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb")
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
@@ -148,7 +146,8 @@ def get_scan_info(scan, **kwargs):
     for task, uri_key in task_filesUri_mapping.items():
         if scan_info[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
-            scan_info["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
+            f = fs.get_file(task)
+            scan_info["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
 
     # Get the workspace metadata
     scan_info["workspace"] = img_fs.get_metadata("workspace")
@@ -208,7 +207,8 @@ def get_scan_data(scan, **kwargs):
     for task, uri_key in task_filesUri_mapping.items():
         if scan_data[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
-            scan_data["filesUri"][uri_key] = get_file_uri(scan, fs, fs.get_file(task))
+            f = fs.get_file(task)
+            scan_data["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
 
     # Load some of the data:
     scan_data["data"] = {}

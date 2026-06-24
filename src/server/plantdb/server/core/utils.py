@@ -24,7 +24,8 @@
 # ------------------------------------------------------------------------------
 
 import datetime
-from urllib import parse
+
+from plantdb.commons import api_endpoints
 
 
 def get_scan_date(scan):
@@ -161,7 +162,7 @@ def _get_colmap_camera_model(scan):
 
     See Also
     --------
-    get_image_uri : Function used to generate URIs for images based on scan, fileset, and file objects.
+    api_endpoints.image : Function used to generate URIs for images based on scan, fileset, and file objects.
 
     Examples
     --------
@@ -188,105 +189,7 @@ def _get_colmap_camera_model(scan):
             "id": img_f.id,
             "tvec": camera_md['tvec'],
             "rotmat": camera_md['rotmat'],
-            "photoUri": get_image_uri(scan.id, img_fs.id, img_f, size="orig"),
-            "thumbnailUri": get_image_uri(scan.id, img_fs.id, img_f, size="thumb")
+            "photoUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="orig"),
+            "thumbnailUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb")
         })
     return model, poses
-
-
-def get_file_uri(scan, fileset, file):
-    """Return the URI for the corresponding `scan/fileset/file` tree.
-
-    Parameters
-    ----------
-    scan : plantdb.commons.fsdb.core.Scan or str
-        A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.core.Fileset or str
-        A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.core.File or str
-        A ``File`` instance or the name of the file.
-
-    Returns
-    -------
-    str
-        The URI for the corresponding `scan/fileset/file` tree.
-
-    Examples
-    --------
-    >>> from plantdb.server.core.utils import compute_fileset_matches
-    >>> from plantdb.server.core.utils import get_file_uri
-    >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
-    >>> db.connect()
-    >>> scan = db.get_scan('real_plant_analyzed')
-    >>> fs_match = compute_fileset_matches(scan)
-    >>> fs = scan.get_fileset(fs_match['PointCloud'])
-    >>> f = fs.get_file("PointCloud")
-    >>> get_file_uri(scan, fs, f)
-    '/files/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply'
-    """
-    from plantdb.commons.fsdb.core import Scan
-    from plantdb.commons.fsdb.core import Fileset
-    from plantdb.commons.fsdb.core import File
-    scan_id = scan.id if isinstance(scan, Scan) else scan
-    fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
-    file_id = file.path().name if isinstance(file, File) else file
-    return f"/files/{scan_id}/{fileset_id}/{file_id}"
-
-
-def get_image_uri(scan, fileset, file, size="orig", as_base64=False):
-    """Return the URI for the corresponding `scan/fileset/file` tree.
-
-    Parameters
-    ----------
-    scan : plantdb.commons.fsdb.core.Scan or str
-        A ``Scan`` instance or the name of the scan dataset.
-    fileset : plantdb.commons.fsdb.core.Fileset or str
-        A ``Fileset`` instance or the name of the fileset.
-    file : plantdb.commons.fsdb.core.File or str
-        A ``File`` instance or the name of the file.
-    size : {'orig', 'large', 'thumb'} or int, optional
-        If an integer, use it as the size of the cached image to create and return.
-        Otherwise, should be one of the following strings, default to `'orig'`:
-
-          - `'thumb'`: image max width and height to `150`.
-          - `'large'`: image max width and height to `1500`;
-          - `'orig'`: original image, no chache;
-    as_base64 : bool, optional
-        A boolean flag indicating whether to return an image as a base64 string.
-
-    Returns
-    -------
-    str
-        The URI for the corresponding `scan/fileset/file` tree.
-
-    Examples
-    --------
-    >>> from plantdb.server.core.utils import get_image_uri
-    >>> from plantdb.commons.test_database import test_database
-    >>> from plantdb.server.core.utils import compute_fileset_matches
-    >>> db = test_database('real_plant_analyzed')
-    >>> db.connect()
-    >>> scan = db.get_scan('real_plant_analyzed')
-    >>> get_image_uri(scan, 'images', '00000_rgb.jpg', size='orig')
-    '/image/real_plant_analyzed/images/00000_rgb.jpg?size=orig'
-    >>> get_image_uri(scan, 'images', '00011_rgb.jpg', size='thumb', as_base64=True)
-    '/image/real_plant_analyzed/images/00011_rgb.jpg?size=thumb&as_base64=true'
-    """
-    from plantdb.commons.fsdb.core import Scan
-    from plantdb.commons.fsdb.core import Fileset
-    from plantdb.commons.fsdb.core import File
-    scan_id = scan.id if isinstance(scan, Scan) else scan
-    fileset_id = fileset.id if isinstance(fileset, Fileset) else fileset
-    file_id = file.path().name if isinstance(file, File) else file
-
-    # Assemble optional query parameters
-    query: dict[str, str] = {}
-    if size is not None:
-        query["size"] = str(size)
-    if as_base64:
-        # Use lower‑case JSON‑style booleans for consistency
-        query["as_base64"] = str(as_base64).lower()
-
-    query_str = f"?{parse.urlencode(query)}" if query else ""
-    return f"/image/{scan_id}/{fileset_id}/{file_id}{query_str}"
