@@ -217,7 +217,7 @@ class AuthApiTests(unittest.TestCase):
         """Test that token refresh with a missing refresh token fails."""
         r = requests.post(self.base_url + api_endpoints.token_refresh(),
                           json={})
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 401)
 
     def test_token_refresh_invalid_token(self):
         """Test that token refresh with an invalid refresh token fails."""
