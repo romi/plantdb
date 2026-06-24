@@ -124,6 +124,7 @@ from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetExistsError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
+from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.fsdb.file_ops import _delete_file
@@ -147,6 +148,7 @@ from plantdb.commons.fsdb.path_helpers import _file_path
 from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
+from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
@@ -654,6 +656,9 @@ class FSDB(db.DB):
         # Check the given path to the root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
+        if not _is_fsdb(basedir):
+            raise NotAnFSDBError(f"Directory {basedir} is not a valid path to an FSDB!")
+
         self.basedir = Path(basedir).resolve()
         self.scans = {}
         self.is_connected: bool = False
