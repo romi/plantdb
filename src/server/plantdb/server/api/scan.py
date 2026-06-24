@@ -173,20 +173,33 @@ class ScansList(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get a list of all datasets from the DB:
-        >>> response = requests.get("http://127.0.0.1:5000/scans")
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scans()
+        >>> response = requests.get(url)
         >>> scans_list = response.json()
         >>> print(scans_list)  # List the known dataset ids
         ['arabidopsis000', 'virtual_plant_analyzed', 'real_plant_analyzed', 'real_plant', 'virtual_plant']
-        >>> # Get  a list of datasets with fuzzy filtering on metadata
-        >>> query = {"object": {"environment": "Lyon.*"}}
-        >>> response = requests.get("http://127.0.0.1:5000/scans", params={"filterQuery": query, "fuzzy": "true"})
+        >>> # Get the metadata dictionary for these scans:
+        >>> def get_md(scan_id): return requests.get("http://127.0.0.1:5000" + api_endpoints.scan_metadata(scan_id))
+        >>> md_dict = {}
+        >>> for scan_id in scans_list: md_dict[scan_id]=get_md(scan_id).json()['metadata']
+        >>> for scan_id, md in md_dict.items(): print(f"{scan_id}: {md.get('object', {}).get('environment')}")
+        >>> # Get a list of datasets with fuzzy filtering on metadata
+        >>> query = {"object": {"environment": "Lyon indoor"}}
+        >>> response = requests.get(url, json={"filterQuery": query}, params={"fuzzy": "true"})
         >>> filtered_scans = response.json()
         >>> print(filtered_scans)  # list of scan IDs matching the filter
         ['real_plant_analyzed', 'real_plant']
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
@@ -274,22 +287,27 @@ class ScansTable(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> import json
+        >>> from plantdb.commons import api_endpoints
         >>> # Get a list of information dictionaries about all datasets:
-        >>> response = requests.get("http://127.0.0.1:5000/scans_info")
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scans_info()
+        >>> response = requests.get(url)
         >>> scans_info = response.json()
         >>> # List the known dataset id:
         >>> print(sorted(scan['id'] for scan in scans_info))
         ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
         >>> # Add a metadata filter to the query:
-        >>> query = {"object": {"species": "Arabidopsis.*"}}
-        >>> response = requests.get("http://127.0.0.1:5000/scans_info", params={"filterQuery": json.dumps(query), "fuzzy": "true"})
+        >>> query = {"object": {"environment": "Lyon indoor"}}
+        >>> response = requests.get(url, json={"filterQuery": query}, params={"fuzzy": "true"})
         >>> scans_info = response.json()
         >>> print(sorted(scan['id'] for scan in scans_info))
-        ['arabidopsis000']
+        ['real_plant', 'real_plant_analyzed']
         """
         # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
@@ -394,11 +412,16 @@ class Scan(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get detailed information about a specific dataset
-        >>> response = requests.get("http://127.0.0.1:5000/scans/real_plant_analyzed")
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.scan('real_plant'))
         >>> scan_data = response.json()
         >>> # Access metadata information
         >>> print(scan_data['metadata']['nbPhotos'])
@@ -450,22 +473,40 @@ class Scan(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
-        >>> token = response.json()['access_token']
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
         >>> # Create a new scan dataset
-        >>> response = requests.post("http://127.0.0.1:5000/scan/test_scan_001", headers={'Authorization': 'Bearer ' + token})
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scan("test_scan_001")
+        >>> response = requests.post(url, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.ok)
         True
         >>> scan_data = response.json()
         >>> print(scan_data['id'])
         test_scan_001
+        >>> # Create a new scan dataset with metadata
         >>> md = {'metadata': {'test_metadata': True}}
-        >>> response = requests.post("http://127.0.0.1:5000/scan/test_scan_md", json=md, headers={'Authorization': 'Bearer ' + token})
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scan("test_scan_md")
+        >>> response = requests.post(url, json=md, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.ok)
+        >>> print(response.json()['id'])
+        test_scan_md
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scan_metadata("test_scan_md")
+        >>> response = requests.get(url)
+        >>> response.json()['metadata']['test_metadata']
+        True
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get JSON data from request
         data = request.get_json(silent=True)
@@ -494,6 +535,7 @@ class Scan(Resource):
             # Return generic server error for all other exceptions
             return {'error': f'Internal server error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
+            self.db.reload(scan_id)  # load the newly created scan
             # Return success response with HTTP 201 (Created) status code
             return {'message': 'Scan created successfully', 'id': scan.id}, 201
 
@@ -561,10 +603,15 @@ class ScanMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> url = "http://127.0.0.1:5000/scans/real_plant/metadata"
+        >>> from plantdb.commons import api_endpoints
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scan_metadata('real_plant')
         >>> response = requests.get(url)  # Get all metadata
         >>> metadata = response.json()['metadata']
         >>> print(metadata['owner'])
@@ -572,6 +619,8 @@ class ScanMetadata(Resource):
         >>> response = requests.get(url+"?key=owner")  # Get a specific metadata key
         >>> print(response.json()['metadata'])
         guest
+        >>> # Stop the test server
+        >>> server.stop()
         """
         key = request.args.get('key', default=None, type=str)
         if key:
@@ -581,7 +630,7 @@ class ScanMetadata(Resource):
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
             # Get the metadata
-            metadata = scan.get_metadata(key)
+            metadata = scan.get_metadata(key, default={})
 
         except NoAuthUserError as e:
             return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
@@ -621,23 +670,29 @@ class ScanMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
-        >>> token = response.json()['access_token']
-        >>> # Get the whole metadata dictionary for an existing dataset:
-        >>> url = "http://127.0.0.1:5000/scans/real_plant/metadata"
-        >>> response = requests.get(url)  # Get all metadata
-        >>> metadata = response.json()['metadata']
-        >>> # Update the original metadata dictionary and upload it to the database:
-        >>> metadata['object']['description'] = 'Test plant scan'
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
+        >>> # Update the metadata dictionary for an existing dataset:
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.scan_metadata("real_plant")
+        >>> metadata = {'object': {'description': 'Test plant scan'}}
         >>> response = requests.post(url, json={'metadata': metadata}, headers={'Authorization': 'Bearer ' + token})
         >>> print(response.ok)
         True
         >>> print(response.json()['metadata']['object']['description'])
         Test plant scan
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get request data
         data = request.get_json()
@@ -722,20 +777,27 @@ class ScanFilesets(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # List filesets in a scan:
-        >>> url = "http://127.0.0.1:5000/scans/real_plant/filesets"
+        >>> url = "http://127.0.0.1:5000/" + api_endpoints.scan_filesets_list("real_plant")
         >>> response = requests.get(url)
-        >>> print(response.status_code)
-        200
+        >>> print(response.ok)
+        True
         >>> print(response.json())
         {'filesets': ['images']}
-        >>> url = "http://127.0.0.1:5000/scans/real_plant_analyzed/filesets"
+        >>> url = "http://127.0.0.1:5000/" + api_endpoints.scan_filesets_list("real_plant_analyzed")
         >>> response = requests.get(url)
         >>> print(len(response.json()['filesets']))  # Get the number of filesets
         10
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
