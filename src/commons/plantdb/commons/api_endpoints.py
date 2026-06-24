@@ -79,46 +79,50 @@ def url_prefix(endpoint_path):
 # Resource mapping
 # ------------------------------------------------------------------------
 # /api/v1/
+#       ├─ health        (GET) → REST API status
+#       ├─ refresh/      (GET) → Reload the whole database
+#       │   └─ {scan_id}     (GET) → Reload the scan
 #       ├─ auth/
-#       │   ├─ login          (POST)
-#       │   ├─ logout         (POST)
-#       │   ├─ register       (POST)
+#       │   ├─ login         (POST) → user login
+#       │   ├─ logout        (POST) → user logout
+#       │   ├─ register      (POST) → new user registration
 #       │   └─ tokens/
-#       │        └─ (POST)    → create-api-token
-#       ├─ health            (GET)
+#       │       ├─ refresh            (GET) → retrieve a specific scan
+#       │       ├─ validation         (GET) → retrieve a specific scan
+#       │       └─ create-api-token   (POST) → create-api-token
 #       ├─ scans/
 #       │   ├─ (GET)     → list scans
-#       │   ├─ info/     → list scans
-#       │   ├─ {scan_id}/
-#       │   │   ├─ (GET)       → retrieve a specific scan
-#       │   │   ├─ (POST)      → create a new scan
-#       │   │   ├─ metadata/ (GET, POST)
-#       │   │   │   ├─ (GET)   → get `scan_id` metadata
-#       │   │   │   └─ (POST)  → update `scan_id` metadata
-#       │   │   ├─ filesets/
-#       │   │   │   ├─ (GET)           → list filesets for scan
-#       │   │   │   └─ {fileset_id}/
-#       │   │   │       ├─ (GET)       → retrieve fileset
-#       │   │   │       ├─ (POST)      → create new fileset
-#       │   │   │       ├─ metadata/
-#       │   │   │       │   ├─ (GET)   → get `scan_id/fileset_id` metadata
-#       │   │   │       │   └─ (POST)  → update `scan_id/fileset_id` metadata
-#       │   │   │       └─ files/
-#       │   │   │           ├─ (GET)           → list files
-#       │   │   │           └─ {file_id}/
-#       │   │   │               ├─ (GET)       → retrieve file
-#       │   │   │               ├─ (POST)      → create new file
-#       │   │   │               └─ metadata/   → (GET, PATCH)
-#       │   │   │                   ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
-#       │   │   │                   └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
-#       │   └─ {scan_id}/refresh (POST)
+#       │   ├─ info      (GET) → list scans
+#       │   └─ {scan_id}/
+#       │       ├─ (GET)       → retrieve a specific scan
+#       │       ├─ (POST)      → create a new scan
+#       │       ├─ metadata/
+#       │       │   ├─ (GET)   → get `scan_id` metadata
+#       │       │   └─ (POST)  → update `scan_id` metadata
+#       │       └─ filesets/
+#       │           ├─ (GET)           → list filesets for scan
+#       │           └─ {fileset_id}/
+#       │               ├─ (GET)       → retrieve fileset
+#       │               ├─ (POST)      → create new fileset
+#       │               ├─ metadata/
+#       │               │   ├─ (GET)   → get `scan_id/fileset_id` metadata
+#       │               │   └─ (POST)  → update `scan_id/fileset_id` metadata
+#       │               └─ files/
+#       │                   ├─ (GET)           → list files
+#       │                   └─ {file_id}/
+#       │                       ├─ (GET)       → retrieve file
+#       │                       ├─ (POST)      → create new file
+#       │                       └─ metadata/   → (GET, PATCH)
+#       │                           ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
+#       │                           └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
 #       └─ assets/
+#           ├─ files/{file_path}      (GET) → retrieve a specific scan
 #           ├─ archive/{scan_id}
-#           │   ├─ (GET)       → retrieve scan archive
-#           │   └─ (POST)      → create a new scan by uploading a scan archive
+#           │   ├─ (GET)              → retrieve scan archive
+#           │   └─ (POST)             → create a new scan by uploading a scan archive
 #           ├─ image/{scan_id}/{fileset_id}/{file_id}
-#           │   ├─ (GET)       → get `scan_id/fileset_id/file_id` image
-#           │   └─ (POST)      → create a new `scan_id/fileset_id/file_id` image
+#           │   ├─ (GET)              → get `scan_id/fileset_id/file_id` image
+#           │   └─ (POST)             → create a new `scan_id/fileset_id/file_id` image
 #           ├─ pointcloud/{scan_id}   (GET) → retrieve scan pointcloud
 #           ├─ mesh/{scan_id}         (GET) → retrieve scan triangular mesh
 #           ├─ sequence/{scan_id}     (GET) → retrieve scan sequence
@@ -129,12 +133,12 @@ HOME = "/"
 HEALTH = "/health"
 REFRESH = "/refresh"
 # --- Authentication ---
-REGISTER = "/register"
-LOGIN = "/login"
-LOGOUT = "/logout"
-TOKEN_REFRESH = "/token-refresh"
-TOKEN_VALIDATION = "/token-validation"
-CREATE_API_TOKEN = "/create-api-token"
+REGISTER = "/auth/register"
+LOGIN = "/auth/login"
+LOGOUT = "/auth/logout"
+TOKEN_REFRESH = "/auth/token/refresh"
+TOKEN_VALIDATION = "/auth/token/validation"
+CREATE_API_TOKEN = "/auth/token/create-api-token"
 # --- Scans ---
 SCANS = "/scans"
 SCANS_INFO = SCANS + "/info"
@@ -150,13 +154,13 @@ FILESET_FILES = FILESET + "/files"
 FILE = "/files/{scan_id}/{fileset_id}/{file_id}"
 FILE_MD = FILE + "/metadata"
 # --- Assets ---
-IMAGE = "/image/{scan_id}/{fileset_id}/{file_id}"
-POINTCLOUD = "/pointcloud/{scan_id}"
-MESH = "/mesh/{scan_id}"
-SEQUENCE = "/sequence/{scan_id}"
-SKELETON = "/skeleton/{scan_id}"
-ARCHIVE = "/archive/{scan_id}"
-FILE_PATH = "/files/{scan_id}/{file_path}"
+IMAGE = "/assets/image/{scan_id}/{fileset_id}/{file_id}"
+POINTCLOUD = "/assets/pointcloud/{scan_id}"
+MESH = "/assets/mesh/{scan_id}"
+SEQUENCE = "/assets/sequence/{scan_id}"
+SKELETON = "/assets/skeleton/{scan_id}"
+ARCHIVE = "/assets/archive/{scan_id}"
+FILE_PATH = "/assets/files/{file_path}"
 
 
 # ------------------------------------------------------------------------
@@ -265,7 +269,7 @@ def register(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.register(prefix='/api/v1')
-    '/api/v1/register'
+    '/api/v1/auth/register'
     """
     return REGISTER
 
@@ -288,7 +292,7 @@ def login(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.login(prefix='/api/v1')
-    '/api/v1/login'
+    '/api/v1/auth/login'
     """
     return LOGIN
 
@@ -311,7 +315,7 @@ def logout(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.logout(prefix='/api/v1')
-    '/api/v1/logout'
+    '/api/v1/auth/logout'
     """
     return LOGOUT
 
@@ -334,7 +338,7 @@ def token_refresh(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.token_refresh(prefix='/api/v1')
-    '/api/v1/token-refresh'
+    '/api/v1/auth/token/refresh'
     """
     return TOKEN_REFRESH
 
@@ -357,7 +361,7 @@ def token_validation(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.token_validation(prefix='/api/v1')
-    '/api/v1/token-validation'
+    '/api/v1/auth/token/validation'
     """
     return TOKEN_VALIDATION
 
@@ -380,7 +384,7 @@ def create_api_token():
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.create_api_token(prefix='/api/v1')
-    '/api/v1/create-api-token'
+    '/api/v1/auth/token/create-api-token'
     """
     return CREATE_API_TOKEN
 
@@ -431,7 +435,7 @@ def scans_info(**kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scans_info(prefix='/api/v1')
-    '/api/v1/scans_info'
+    '/api/v1/scans/info'
     """
     return SCANS_INFO
 
@@ -459,9 +463,9 @@ def scan(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scan('scan1')
-    '/scan/scan1'
+    '/scans/scan1'
     >>> api_endpoints.scan('scan1', prefix='/api/v1')
-    '/api/v1/scan/scan1'
+    '/api/v1/scans/scan1'
     """
     scan_id = sanitize_name(scan_id)
     return SCAN.format(scan_id=scan_id)
@@ -485,6 +489,12 @@ def scan_metadata(scan_id: str, **kwargs) -> str:
     -------
     str
         The URL path to scan metadata.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.scan_metadata('real_plant')
+    '/filesets/real_plant/metadata'
     """
     scan_id = sanitize_name(scan_id)
     return SCAN_MD.format(scan_id=scan_id)
@@ -508,6 +518,12 @@ def scan_filesets_list(scan_id: str, **kwargs) -> str:
     -------
     str
         The URL path to filesets.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.scan_filesets_list('real_plant')
+    '/filesets/real_plant/filesets'
     """
     scan_id = sanitize_name(scan_id)
     return SCAN_FILESETS.format(scan_id=scan_id)
@@ -533,6 +549,12 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
     -------
     str
         The URL path to file metadata.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.fileset('real_plant','images')
+    '/filesets/real_plant/images'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -559,6 +581,12 @@ def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
     -------
     str
         The URL path to fileset metadata.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.fileset_metadata('real_plant','images')
+    '/filesets/real_plant/images/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -585,6 +613,12 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     -------
     str
         The URL path to the filesets list of files.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.fileset_files_list('real_plant','images')
+    '/filesets/real_plant/images/files'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -643,6 +677,12 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     -------
     str
         The URL path to file metadata.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.file_metadata('real_plant','images','00000_rgb')
+    '/files/real_plant/images/00000_rgb/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -681,9 +721,9 @@ def image(scan_id: str, fileset_id: str, file_id: str,
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.image('real_plant','images','00000_rgb', 'orig', False)
-    '/image/real_plant/images/00000_rgb?size=orig'
+    '/assets/image/real_plant/images/00000_rgb?size=orig'
     >>> api_endpoints.image('real_plant','images','00000_rgb', 'thumb', True)
-    '/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
+    '/assets/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -722,7 +762,7 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.sequence('real_plant','all')
-    '/sequence/real_plant?type=all'
+    '/assets/sequence/real_plant?type=all'
     """
     valid_types = ['all', 'angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
     seq_type = 'all' if seq_type not in valid_types else seq_type
@@ -770,9 +810,9 @@ def pointcloud(scan_id: str,
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.pointcloud('real_plant')
-    '/pointcloud/real_plant?type=default'
+    '/assets/pointcloud/real_plant?type=default'
     >>> api_endpoints.pointcloud('real_plant','gt')
-    '/pointcloud/real_plant?type=gt'
+    '/assets/pointcloud/real_plant?type=gt'
     """
     VALID_SIZES = {'orig', 'preview'}
     VALID_TYPES = ['default', 'gt']
@@ -817,7 +857,7 @@ def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.mesh('real_plant')
-    '/mesh/real_plant'
+    '/assets/mesh/real_plant'
     """
     VALID_SIZES = {'orig'}
     scan_id = sanitize_name(scan_id)
@@ -856,7 +896,7 @@ def skeleton(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.skeleton('real_plant')
-    '/skeleton/real_plant'
+    '/assets/skeleton/real_plant'
     """
     scan_id = sanitize_name(scan_id)
     return SKELETON.format(scan_id=scan_id)
@@ -880,14 +920,14 @@ def archive(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.archive('scan1')
-    '/archive/scan1'
+    '/assets/archive/scan1'
     """
     scan_id = sanitize_name(scan_id)
     return ARCHIVE.format(scan_id=scan_id)
 
 
 @url_prefix
-def file_path(scan_id: str, file_path: str, **kwargs) -> str:
+def file_path(file_path: str, **kwargs) -> str:
     """Return the URL path to the `scan/file_path` endpoint.
 
     Parameters
@@ -905,8 +945,7 @@ def file_path(scan_id: str, file_path: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.file_path('real_plant','images/00000_rgb.jpg')
-    '/files/real_plant/images/00000_rgb.jpg'
+    >>> api_endpoints.file_path('real_plant/images/00000_rgb.jpg')
+    '/assets/files/real_plant/images/00000_rgb.jpg'
     """
-    scan_id = sanitize_name(scan_id)
-    return FILE_PATH.format(scan_id=scan_id, file_path=file_path.lstrip('/'))
+    return FILE_PATH.format(file_path=file_path.lstrip('/'))
