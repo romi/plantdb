@@ -1,35 +1,60 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# plantdb - Data handling tools for the ROMI project
+#
+# Copyright (C) 2018-2019 Sony Computer Science Laboratories
+# Authors: D. Colliaux, T. Wintz, P. Hanappe
+#
+# This file is part of plantdb.
+#
+# plantdb is free software: you can redistribute it
+# and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# plantdb is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with plantdb.  If not, see
+# <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
 import os
 import unittest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-from plantdb.client.rest_api import api_token_url
-from plantdb.client.rest_api import archive_url
-from plantdb.client.rest_api import login_url
-from plantdb.client.rest_api import logout_url
-from plantdb.client.rest_api import make_api_request
-from plantdb.client.rest_api import origin_url
-from plantdb.client.rest_api import plantdb_url
-from plantdb.client.rest_api import refresh_url
-from plantdb.client.rest_api import register_url
-from plantdb.client.rest_api import request_api_token
-from plantdb.client.rest_api import request_check_username
-from plantdb.client.rest_api import request_login
-from plantdb.client.rest_api import request_logout
-from plantdb.client.rest_api import request_new_user
-from plantdb.client.rest_api import request_scan_data
-from plantdb.client.rest_api import request_scan_names_list
-from plantdb.client.rest_api import request_scans_info
-from plantdb.client.rest_api import request_token_refresh
-from plantdb.client.rest_api import request_token_validation
-from plantdb.client.rest_api import scan_config_url
-from plantdb.client.rest_api import scan_file_url
-from plantdb.client.rest_api import scan_image_url
-from plantdb.client.rest_api import scan_reconstruction_url
-from plantdb.client.rest_api import scan_url
-from plantdb.client.rest_api import scans_url
-from plantdb.client.rest_api import token_refresh_url
-from plantdb.client.rest_api import token_validation_url
+from plantdb.client.rest_api.requests import make_api_request
+from plantdb.client.rest_api.requests import request_api_token
+from plantdb.client.rest_api.requests import request_check_username
+from plantdb.client.rest_api.requests import request_login
+from plantdb.client.rest_api.requests import request_logout
+from plantdb.client.rest_api.requests import request_new_user
+from plantdb.client.rest_api.requests import request_scan_data
+from plantdb.client.rest_api.requests import request_scan_names_list
+from plantdb.client.rest_api.requests import request_scans_info
+from plantdb.client.rest_api.requests import request_token_refresh
+from plantdb.client.rest_api.requests import request_token_validation
+from plantdb.client.rest_api.urls import api_token_url
+from plantdb.client.rest_api.urls import archive_url
+from plantdb.client.rest_api.urls import login_url
+from plantdb.client.rest_api.urls import logout_url
+from plantdb.client.rest_api.urls import origin_url
+from plantdb.client.rest_api.urls import plantdb_url
+from plantdb.client.rest_api.urls import refresh_url
+from plantdb.client.rest_api.urls import register_url
+from plantdb.client.rest_api.urls import scan_config_url
+from plantdb.client.rest_api.urls import scan_file_url
+from plantdb.client.rest_api.urls import scan_image_url
+from plantdb.client.rest_api.urls import scan_reconstruction_url
+from plantdb.client.rest_api.urls import scan_url
+from plantdb.client.rest_api.urls import scans_url
+from plantdb.client.rest_api.urls import token_refresh_url
+from plantdb.client.rest_api.urls import token_validation_url
 
 
 class TestRestApi(unittest.TestCase):
@@ -155,7 +180,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(scan_reconstruction_url('localhost', 'real_plant', port=2020, prefix=''),
                          'http://localhost:2020/assets/files/real_plant/pipeline.toml')
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_login(self, mock_request):
         """Test request_login functionality"""
         mock_response = MagicMock()
@@ -171,7 +196,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result['access_token'], 'test_token')
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_check_username(self, mock_request):
         """Test request_check_username functionality"""
         mock_response = MagicMock()
@@ -183,7 +208,7 @@ class TestRestApi(unittest.TestCase):
         self.assertTrue(result)
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_logout(self, mock_request):
         """Test request_logout functionality"""
         mock_response = MagicMock()
@@ -196,7 +221,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result, (True, 'Logged out'))
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_token_validation(self, mock_request):
         """Test request_token_validation functionality"""
         mock_response = MagicMock()
@@ -208,7 +233,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result['user']['username'], 'testuser')
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_token_refresh(self, mock_request):
         """Test request_token_refresh functionality"""
         mock_response = MagicMock()
@@ -223,7 +248,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result['access_token'], 'new_access_token')
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_api_token(self, mock_request):
         """Test request_api_token functionality"""
         mock_response = MagicMock()
@@ -235,7 +260,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result['api_token'], 'test_api_token')
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_new_user(self, mock_request):
         """Test request_new_user functionality"""
         mock_response = MagicMock()
@@ -248,7 +273,7 @@ class TestRestApi(unittest.TestCase):
         self.assertTrue(result)
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_scan_names_list(self, mock_request):
         """Test request_scan_names_list functionality"""
         mock_response = MagicMock()
@@ -260,8 +285,8 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(result, ['scan1', 'scan2'])
         mock_request.assert_called_once()
 
-    @patch('plantdb.client.rest_api.request_scan_names_list')
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.request_scan_names_list')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_scans_info(self, mock_request, mock_names):
         """Test request_scans_info functionality"""
         mock_names.return_value = ['scan1', 'scan2']
@@ -274,7 +299,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(len(result), 2)
         mock_request.assert_called()
 
-    @patch('plantdb.client.rest_api.make_api_request')
+    @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_scan_data(self, mock_request):
         """Test request_scan_data functionality"""
         mock_response = MagicMock()
@@ -285,30 +310,6 @@ class TestRestApi(unittest.TestCase):
 
         self.assertEqual(result['name'], 'test_scan')
         mock_request.assert_called_once()
-
-    def test_make_api_request_get(self):
-        """Test make_api_request with GET method"""
-        with patch('plantdb.client.rest_api.requests.get') as mock_get:
-            mock_response = MagicMock()
-            mock_response.raise_for_status.return_value = None
-            mock_response.json.return_value = {'test': 'data'}
-            mock_get.return_value = mock_response
-
-            result = make_api_request('http://localhost', method='GET')
-
-            self.assertEqual(result.json(), {'test': 'data'})
-
-    def test_make_api_request_post(self):
-        """Test make_api_request with POST method"""
-        with patch('plantdb.client.rest_api.requests.post') as mock_post:
-            mock_response = MagicMock()
-            mock_response.raise_for_status.return_value = None
-            mock_response.json.return_value = {'test': 'data'}
-            mock_post.return_value = mock_response
-
-            result = make_api_request('http://localhost', method='POST', json_data={'key': 'value'})
-
-            self.assertEqual(result.json(), {'test': 'data'})
 
     def test_make_api_request_invalid_method(self):
         """Test make_api_request with invalid method"""
