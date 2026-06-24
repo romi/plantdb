@@ -472,13 +472,15 @@ def scan(scan_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def scan_metadata(scan_id: str, **kwargs) -> str:
+def scan_metadata(scan_id: str, key: str | None = None, **kwargs) -> str:
     """URL to access the metadata associated with the given scan name.
 
     Parameters
     ----------
     scan_id : str
         The name of the scan to access.
+    key : str
+        A specific metadata key to fetch.
 
     Other Parameters
     ----------------
@@ -497,7 +499,14 @@ def scan_metadata(scan_id: str, **kwargs) -> str:
     '/filesets/real_plant/metadata'
     """
     scan_id = sanitize_name(scan_id)
-    return SCAN_MD.format(scan_id=scan_id)
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if key is not None:
+        query["key"] = str(key)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return SCAN_MD.format(scan_id=scan_id) + f"{query_str}"
 
 
 @url_prefix
@@ -553,7 +562,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.fileset('real_plant','images')
+    >>> api_endpoints.fileset('real_plant', 'images')
     '/filesets/real_plant/images'
     """
     scan_id = sanitize_name(scan_id)
@@ -562,7 +571,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
 
 
 @url_prefix
-def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
+def fileset_metadata(scan_id: str, fileset_id: str, key: str | None = None, **kwargs) -> str:
     """URL to access the fileset metadata associated with the given scan and fileset name.
 
     Parameters
@@ -571,6 +580,8 @@ def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
         The name of the scan to access.
     fileset_id : str
         The name of the fileset to access.
+    key : str
+        A specific metadata key to fetch.
 
     Other Parameters
     ----------------
@@ -585,12 +596,19 @@ def fileset_metadata(scan_id: str, fileset_id: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.fileset_metadata('real_plant','images')
+    >>> api_endpoints.fileset_metadata('real_plant', 'images')
     '/filesets/real_plant/images/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
-    return FILESET_MD.format(scan_id=scan_id, fileset_id=fileset_id)
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if key is not None:
+        query["key"] = str(key)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return FILESET_MD.format(scan_id=scan_id, fileset_id=fileset_id) + f"{query_str}"
 
 
 @url_prefix
@@ -617,7 +635,7 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.fileset_files_list('real_plant','images')
+    >>> api_endpoints.fileset_files_list('real_plant', 'images')
     '/filesets/real_plant/images/files'
     """
     scan_id = sanitize_name(scan_id)
@@ -646,7 +664,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.file('real_plant','images','00000_rgb')
+    >>> api_endpoints.file('real_plant', 'images', '00000_rgb')
     '/files/real_plant/images/00000_rgb'
     """
     scan_id = sanitize_name(scan_id)
@@ -656,7 +674,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
+def file_metadata(scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs) -> str:
     """URL to access the file metadata associated with the given scan and fileset name.
 
     Parameters
@@ -667,6 +685,8 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
         The name of the fileset to access.
     file_id : str
         The name of the file to access.
+    key : str
+        A specific metadata key to fetch.
 
     Other Parameters
     ----------------
@@ -681,13 +701,20 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.file_metadata('real_plant','images','00000_rgb')
+    >>> api_endpoints.file_metadata('real_plant', 'images', '00000_rgb')
     '/files/real_plant/images/00000_rgb/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
     file_id = sanitize_name(file_id)
-    return FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
+
+    # Assemble optional query parameters
+    query: dict[str, str] = {}
+    if key is not None:
+        query["key"] = str(key)
+
+    query_str = f"?{parse.urlencode(query)}" if query else ""
+    return FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id) + f"{query_str}"
 
 
 # ------------------------------------------------------------------------
@@ -720,9 +747,9 @@ def image(scan_id: str, fileset_id: str, file_id: str,
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.image('real_plant','images','00000_rgb', 'orig', False)
+    >>> api_endpoints.image('real_plant', 'images', '00000_rgb', 'orig', False)
     '/assets/image/real_plant/images/00000_rgb?size=orig'
-    >>> api_endpoints.image('real_plant','images','00000_rgb', 'thumb', True)
+    >>> api_endpoints.image('real_plant', 'images', '00000_rgb', 'thumb', True)
     '/assets/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
     """
     scan_id = sanitize_name(scan_id)
