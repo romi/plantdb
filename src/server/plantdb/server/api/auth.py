@@ -184,9 +184,14 @@ class Register(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by login as admin to have permission to create new users
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> token = response.json()['access_token']
@@ -202,6 +207,8 @@ class Register(Resource):
         >>> res_dict = response.json()
         >>> res_dict["message"]
         'Login successful'
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Parse JSON data from request body
         data = request.get_json()
@@ -282,9 +289,14 @@ class Login(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Check if the user exists (valid username):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=admin")
         >>> print(response.json())
@@ -293,6 +305,8 @@ class Login(Resource):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=superman")
         >>> print(response.json())
         {'username': 'superman', 'exists': False}
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Extract username from query parameters
         username = request.args.get('username', None)
@@ -340,21 +354,28 @@ class Login(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Valid login request
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json())
         {'authenticated': True, 'message': 'Login successful. Welcome, Guy Fawkes!'}
-        >>> print(response.status_code)
-        200
+        >>> print(response.ok)
+        True
         >>> # Invalid request (missing credentials)
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin'})
         >>> print(response.json())
         {'authenticated': False, 'message': 'Missing username or password'}
         >>> print(response.status_code)
         400
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get JSON data from the request body
         data = request.get_json()
@@ -418,9 +439,14 @@ class Logout(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json()['message'])
@@ -430,6 +456,8 @@ class Logout(Resource):
         >>> response = requests.post("http://127.0.0.1:5000/logout", headers={'Authorization': 'Bearer ' + token})
         >>> print(response.json()['message'])
         Logout successful
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # The decorator supplies the token via kwargs
         token = kwargs.get('token')
@@ -486,21 +514,27 @@ class TokenValidation(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by login as admin
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> response = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json={'username': 'admin', 'password': 'admin'})
         >>> token = response.json()['access_token']
         >>> # Now create a new user:
-        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + token})
+        >>> response = requests.post("http://127.0.0.1:5000" + api_endpoints.token_validation(), headers={'Authorization': 'Bearer ' + token})
         >>> print(response.json()['message'])
         Token validation successful
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # The decorator supplies the token via kwargs
         token = kwargs.get('token')
-        if not token:
-            return {'error': 'No token supplied'}, 400
 
         try:
             # Delegate to the service layer
@@ -557,11 +591,7 @@ class TokenRefresh(Resource):
         It validates the refresh token and issues a new access/refresh token pair.
         """
         data = request.get_json()
-        if not data or 'refresh_token' not in data:
-            return {'error': 'Missing refresh_token'}, 400
-
-        refresh_token_str = data['refresh_token']
-
+        refresh_token_str = data.get('refresh_token')
         try:
             # Delegate to the service layer
             access_token, new_refresh_token = refresh_token(self.db, refresh_token_str)
