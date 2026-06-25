@@ -80,10 +80,11 @@ def _is_valid_id(name):
     return True
 
 
-def _is_fsdb(path):
+def _is_fsdb(path) -> bool:
     """Test if the given path is indeed an FSDB database.
 
-    Do it by checking the presence of the ``MARKER_FILE_NAME``.
+    Do it by checking the presence of the ``MARKER_FILE_NAME`` and validating
+    the directory structure to ensure it's a complete FSDB.
 
     Parameters
     ----------
@@ -94,15 +95,110 @@ def _is_fsdb(path):
     -------
     bool
         ``True`` if an FSDB database, else ``False``.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.validation import _is_fsdb
+    >>> from plantdb.commons.test_database import setup_empty_database
+    >>> from plantdb.commons.test_database import setup_test_database
+    >>> path = setup_empty_database()  # initialize an empty FSDB in the temporary directory
+    >>> print(path)
+    /tmp/ROMI_DB_********
+    >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
+    ['romidb']
+    >>> _is_fsdb(path)
+    True
+    >>> path = setup_test_database('real_plant', None)  # initialize an FSDB in the temporary directory with a test dataset
+    >>> print(path)
+    /tmp/ROMI_DB_********
+    >>> print([path.name for path in path.iterdir()])  # database with a single dataset
+    ['romidb', 'real_plant', 'groups.json', 'users.json', '.locks']
+    >>> _is_fsdb(path)
+    True
     """
     from .core import MARKER_FILE_NAME
+
     path = Path(path)
+    # Check if the path is a directory
+    if not path.is_dir():
+        return False
+
+    # Check if the marker file exists (original check)
     marker_path = path / MARKER_FILE_NAME
-    return marker_path.is_file()
+    if not marker_path.is_file():
+        return False
+
+    # Check for at least one scan directory with proper structure
+    scan_dirs = [f for f in path.iterdir() if f.is_dir() and not f.name.startswith('.')]
+    # If no scan directories, it's an empty FSDB
+    if not scan_dirs:
+        logger.warning(f"Empty FSDB database in path: {path}")
+        return True  # Still valid as an empty FSDB
+
+    bad_dir = []
+    # Check if the scan directories have the required structure
+    for scan_dir in scan_dirs:
+        if not _is_scan_dataset(scan_dir):
+            bad_dir.append(scan_dir)
+
+    if len(bad_dir) > 0:
+        logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")
+        # TODO: list the bad scans
+        # TODO: write an FSDB cleaner script
+
+    return not bad_dir
 
 
-def _is_safe_to_delete(path):
-    """Tests if given path is safe to delete.
+def _is_scan_dataset(path, validate_json_fileset=False) -> bool:
+    """Test if the given path is an FSDB dataset.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        A path to test as a valid FSDB dataset.
+
+    Returns
+    -------
+    bool
+        ``True`` if the path is an FSDB dataset, else ``False``.
+    """
+    import json
+
+    # Check if scan directory contains `files.json`
+    files_json_path = path / "files.json"
+    if not files_json_path.is_file():
+        return False
+
+    # Try to parse files.json to ensure it's valid
+    try:
+        with open(files_json_path, 'r') as f:
+            files_data = json.load(f)
+    except (json.JSONDecodeError, IOError):
+        # If files.json is not valid JSON or cannot be read, continue to next scan
+        return False
+
+    # Check if files.json has the expected structure
+    if "filesets" not in files_data:
+        return False
+
+    if validate_json_fileset:
+        for fs in files_data["filesets"]:
+            fs_path = Path(fs) / fs
+            # TODO: create a more comprehensive `_is_valid_fileset`
+            if not fs_path.is_dir():
+                return False
+
+    # Check for required subdirectories
+    metadata_dir = path / "metadata"
+    if not metadata_dir.is_dir():
+        return False
+
+    # If we reach here, we have a valid scan dataset structure
+    return True
+
+
+def _is_safe_to_delete(path) -> bool:
+    """Tests if a given path is safe to delete.
 
     Parameters
     ----------

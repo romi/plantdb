@@ -412,8 +412,8 @@ def setup_empty_database(db_path=None) -> Path:
     Examples
     --------
     >>> from plantdb.commons.test_database import setup_empty_database
-    >>> path = setup_empty_database()
-    >>> print(path)  # initialize a `ROMI_DB` directory in the temporary directory by default
+    >>> path = setup_empty_database()  # initialize an empty FSDB in the temporary directory
+    >>> print(path)
     /tmp/ROMI_DB_********
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
