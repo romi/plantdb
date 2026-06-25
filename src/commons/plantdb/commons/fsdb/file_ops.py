@@ -63,6 +63,7 @@ from .serialization import _parse_file
 from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
 from .validation import _is_safe_to_delete
+from .validation import _is_scan_dataset
 from ..log import get_logger
 from ..utils import yes_no_choice
 
@@ -113,22 +114,12 @@ def _load_scan(db, scan_id):
     [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
     """
     from plantdb.commons.fsdb.core import Scan
-    required_fs = db.required_filesets
 
     scan = Scan(db, scan_id)
     scan_path = _scan_path(scan)
 
-    # If specific filesets are required, test if they exist as subdirectories:
-    if required_fs is not None:
-        req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
-    else:
-        req_subdir = True
-
-    if scan_path.is_dir() and req_subdir:
-        # Parse the fileset, metadata and measure if:
-        #  - path to scan directory exists
-        #  - required subdirectories exists, if any
-        #  - required files exists, if any
+    # Try to load the scan's filesets, metadata and manual measures:
+    if scan_path.is_dir():
         scan.filesets, needs_update = _load_scan_filesets(scan)
         if needs_update:
             _store_scan(scan)
@@ -207,19 +198,19 @@ def _load_scans(db):
     if bad_scans:
         n_bad = len(bad_scans)
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
-        try:
-            # Prompt the user only when stdin is available.
-            answer = yes_no_choice(
-                f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {n_bad} scan{'' if n_bad == 1 else 's'}?"
-            )
-        except EOFError:
-            # No interactive input –> default to **no** (do not delete)
-            logger.debug("EOFError while reading user input, defaulting to “no”.")
-            answer = False
+        # try:
+        #     # Prompt the user only when stdin is available.
+        #     answer = yes_no_choice(
+        #         f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {n_bad} scan{'' if n_bad == 1 else 's'}?"
+        #     )
+        # except EOFError:
+        #     # No interactive input –> default to **no** (do not delete)
+        #     logger.debug("EOFError while reading user input, defaulting to “no”.")
+        #     answer = False
 
-        if answer:
-            for scan_name in bad_scans:
-                _delete_scan(Scan(db, scan_name))
+        # if answer:
+        #     for scan_name in bad_scans:
+        #         _delete_scan(Scan(db, scan_name))
 
     return scans
 
