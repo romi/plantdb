@@ -37,6 +37,8 @@ is_safe = _is_safe_to_delete(path_to_delete)
 
 from pathlib import Path
 
+from .path_helpers import _fileset_path
+from .path_helpers import _scan_json_file
 from ..log import get_logger
 
 logger = get_logger(__name__)
@@ -80,7 +82,7 @@ def _is_valid_id(name):
     return True
 
 
-def _is_fsdb(path) -> bool:
+def _is_fsdb(path, validate_json_fileset=False) -> bool:
     """Test if the given path is indeed an FSDB database.
 
     Do it by checking the presence of the ``MARKER_FILE_NAME`` and validating
@@ -90,6 +92,8 @@ def _is_fsdb(path) -> bool:
     ----------
     path : str or pathlib.Path
         A path to test as a valid FSDB database.
+    validate_json_fileset : bool
+        A boolean flag to enable the validation of the filesets defined in the scan's `files.json`.
 
     Returns
     -------
@@ -138,34 +142,37 @@ def _is_fsdb(path) -> bool:
     bad_dir = []
     # Check if the scan directories have the required structure
     for scan_dir in scan_dirs:
-        if not _is_scan_dataset(scan_dir):
+        if not _is_scan_dataset(scan_dir, validate_json_fileset):
             bad_dir.append(scan_dir)
 
     if len(bad_dir) > 0:
         logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")
-        # TODO: list the bad scans
+        n_bad = len(bad_dir)
+        logger.info(f"Found {n_bad} bad scans: {', '.join(bad_dir)}")  # list the bad scans
         # TODO: write an FSDB cleaner script
 
     return not bad_dir
 
 
-def _is_scan_dataset(path, validate_json_fileset=False) -> bool:
+def _is_scan_dataset(scan_path, validate_json_fileset=False) -> bool:
     """Test if the given path is an FSDB dataset.
 
     Parameters
     ----------
-    path : str or pathlib.Path
-        A path to test as a valid FSDB dataset.
+    scan_path : str or pathlib.Path
+        A path to test as a valid FSDB scan dataset.
+    validate_json_fileset : bool
+        A boolean flag to enable the validation of the filesets defined in the scan's `files.json`.
 
     Returns
     -------
     bool
-        ``True`` if the path is an FSDB dataset, else ``False``.
+        ``True`` if the path is an FSDB scan dataset, else ``False``.
     """
     import json
 
     # Check if scan directory contains `files.json`
-    files_json_path = path / "files.json"
+    files_json_path = scan_path / "files.json"
     if not files_json_path.is_file():
         return False
 
@@ -183,17 +190,54 @@ def _is_scan_dataset(path, validate_json_fileset=False) -> bool:
 
     if validate_json_fileset:
         for fs in files_data["filesets"]:
-            fs_path = Path(fs) / fs
-            # TODO: create a more comprehensive `_is_valid_fileset`
-            if not fs_path.is_dir():
-                return False
+            _is_valid_fileset(scan_path, fs["id"], fs['files'])
 
     # Check for required subdirectories
-    metadata_dir = path / "metadata"
+    metadata_dir = scan_path / "metadata"
     if not metadata_dir.is_dir():
         return False
 
     # If we reach here, we have a valid scan dataset structure
+    return True
+
+
+def _is_valid_fileset(scan_path, fileset_id, fs_info) -> bool:
+    """Check if a given fileset ID corresponds to a valid fileset in the scan.
+
+    A valid fileset must:
+    1. Be defined in the scan's files.json registry
+    2. Have the required files present
+
+    Parameters
+    ----------
+    scan_path : str or pathlib.Path
+        A path to test as a valid FSDB scan dataset.
+    fileset_id : str
+        The ID of the fileset to check.
+    fs_info : list
+        The list of files from the fileset to check.
+
+    Returns
+    -------
+    bool
+        ``True`` if the fileset is valid, ``False`` otherwise.
+    """
+    fs_path = scan_path / fileset_id
+    # TODO: create a more comprehensive `_is_valid_fileset`
+    if not fs_path.is_dir():
+        return False
+
+    # Check that all required files exist
+    for file_info in fs_info:
+        file_id = file_info.get("id")
+        file_name = file_info.get("file")
+
+        if file_id and file_name:
+            # Construct the path to the file
+            file_path = fs_path / file_name
+            if not file_path.is_file():
+                return False
+
     return True
 
 
