@@ -592,6 +592,7 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
+                 extra_dirs:list[str]=['configs'],
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -604,6 +605,9 @@ class FSDB(db.DB):
         ----------
         basedir : str or pathlib.Path
             The path to the root directory of the database.
+        extra_dirs : list of str
+            A list of directory names that can reside at the root of the filesystem database without trowing an error.
+            Defaults to ``['configs']``.
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
         session_manager : SessionManager, optional
@@ -651,6 +655,7 @@ class FSDB(db.DB):
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
 
         self.basedir = Path(basedir).resolve()
+        self.extra_dirs = extra_dirs
         self.scans = {}
         self.is_connected: bool = False
 
@@ -701,7 +706,7 @@ class FSDB(db.DB):
 
     def connect(self) -> bool:
         """Connect the database by loading the scans' dataset."""
-        if not _is_fsdb(self.basedir):
+        if not _is_fsdb(self.basedir, extra_dirs=self.extra_dirs):
             raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery

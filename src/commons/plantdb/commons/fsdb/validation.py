@@ -82,7 +82,7 @@ def _is_valid_id(name):
     return True
 
 
-def _is_fsdb(path, validate_json_fileset=False) -> bool:
+def _is_fsdb(path, validate_json_fileset=False, extra_dirs:list[str]=['configs']) -> bool:
     """Test if the given path is indeed an FSDB database.
 
     Do it by checking the presence of the ``MARKER_FILE_NAME`` and validating
@@ -94,6 +94,9 @@ def _is_fsdb(path, validate_json_fileset=False) -> bool:
         A path to test as a valid FSDB database.
     validate_json_fileset : bool
         A boolean flag to enable the validation of the filesets defined in the scan's `files.json`.
+    extra_dirs : list of str
+        A list of directory names that can reside at the root of the filesystem database without trowing an error.
+        Defaults to ``['configs']``.
 
     Returns
     -------
@@ -144,6 +147,8 @@ def _is_fsdb(path, validate_json_fileset=False) -> bool:
     bad_dir = []
     # Check if the scan directories have the required structure
     for scan_dir in scan_dirs:
+        if scan_dir.name in extra_dirs:
+            continue  # skip the verification for any folder declared as "extra"
         if not _is_scan_dataset(scan_dir, validate_json_fileset):
             bad_dir.append(str(scan_dir))
 
