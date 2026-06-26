@@ -545,8 +545,6 @@ class FSDB(db.DB):
         The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
-    required_filesets : List[str]
-        A list of required filesets to consider a scan valid. Set it to ``None`` to accept any subdirectory of basedir as a valid scan. Defaults to ['metadata'].
     logger : logging.Logger
         An instance to use for logging. Defaults to the module logger.
     session_manager : Union[SingleSessionManager, SessionManager, JWTSessionManager]
@@ -594,7 +592,6 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
-                 required_filesets: Optional[List[str]] = None,
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -607,10 +604,6 @@ class FSDB(db.DB):
         ----------
         basedir : str or pathlib.Path
             The path to the root directory of the database.
-        required_filesets : list of str, optional
-            A list of required filesets to consider a scan valid.
-            By default, ``None``, will set it to ``['metadata']`` to define as a "scan" the subdirectories with a 'metadata' directory.
-            Use `[]` to accept any subdirectory of `basedir` as a valid "scan".
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
         session_manager : SessionManager, optional
@@ -656,13 +649,10 @@ class FSDB(db.DB):
         # Check the given path to the root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
-        if not _is_fsdb(basedir):
-            raise NotAnFSDBError(f"Directory {basedir} is not a valid path to an FSDB!")
 
         self.basedir = Path(basedir).resolve()
         self.scans = {}
         self.is_connected: bool = False
-        self.required_filesets = required_filesets or ['metadata']
 
         # Initialize lock manager
         self.lock_manager = LockManager(basedir)
@@ -711,6 +701,8 @@ class FSDB(db.DB):
 
     def connect(self) -> bool:
         """Connect the database by loading the scans' dataset."""
+        if not _is_fsdb(self.basedir):
+            raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery
             self.scans = _load_scans(self)
