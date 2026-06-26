@@ -18,6 +18,7 @@ dependencies = [
     "plyfile",
     "toml",
     "tqdm",
+    "send2trash"
 ]
 description = "Core shared library for the ROMI plant database ecosystem."
 readme = "README.md"
