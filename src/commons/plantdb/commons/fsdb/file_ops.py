@@ -86,76 +86,6 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'Scan | None':
-    """Load a single scan from the filesystem database.
-
-    This internal helper retrieves the scan identified by ``scan_id`` from the
-    ``db`` instance, attempts to populate its filesets, metadata and manual
-    measures, and returns the fully populated ``Scan`` object.
-    If the scan directory does not exist, ``None`` is returned.
-
-    Parameters
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        The filesystem database instance from which the scan should be loaded.
-    scan_id : str
-        Identifier of the scan to load.
-        Must correspond to a directory name inside the database's scan root.
-    updates_files_json : bool
-        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
-
-    Returns
-    -------
-    plantdb.commons.fsdb.core.Scan | None
-        The loaded ``Scan`` object if the scan directory exists; otherwise ``None``.
-
-    See Also
-    --------
-    _load_scans : Load all scans from a database.
-    _scan_path : Compute the filesystem path of a given scan.
-    _load_scan_filesets : Load filesets belonging to a scan.
-    _load_scan_metadata : Load metadata associated with a scan.
-    _load_scan_measures : Load manual measures for a scan.
-
-    Examples
-    --------
-    >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.test_database import dummy_db
-    >>> from plantdb.commons.fsdb.file_ops import _load_scans
-    >>> db = dummy_db()
-    >>> db.connect()
-    >>> db.create_scan("007")
-    >>> db.create_scan("111")
-    >>> scans = _load_scans(db)
-    >>> print(scans)
-    []
-    >>> db = dummy_db(with_fileset=True)
-    >>> db.connect()
-    >>> scans = _load_scans(db)
-    >>> print(scans)
-    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
-    """
-    from plantdb.commons.fsdb.core import Scan
-
-    scan = Scan(db, scan_id)  # initialize and empty Scan instance
-    scan_path = _scan_path(scan)  # path the scan directory
-    # If the directory exists, try to load the scan:
-    if _is_scan_dataset(scan_path, validate_json_fileset=False):
-        # Try to load the filesets and their files
-        scan.filesets, needs_update = _load_scan_filesets(scan)
-        if needs_update and updates_files_json:
-            files_json = _scan_json_file(scan)
-            backup_file(files_json)  # create a backup file
-            _store_scan(scan)  # update the scan's ``files.json``
-        # Try to load the scan's metadata
-        scan.metadata = _load_scan_metadata(scan)
-        # Try to load the scan's manual measure, if any
-        scan.measures = _load_scan_measures(scan)
-    else:
-        scan = None
-    return scan
-
-
 def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan']:
     """Load all scans from a PlantDB filesystem database.
 
@@ -237,6 +167,76 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
 
     return scans
+
+
+def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'Scan | None':
+    """Load a single scan from the filesystem database.
+
+    This internal helper retrieves the scan identified by ``scan_id`` from the
+    ``db`` instance, attempts to populate its filesets, metadata and manual
+    measures, and returns the fully populated ``Scan`` object.
+    If the scan directory does not exist, ``None`` is returned.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The filesystem database instance from which the scan should be loaded.
+    scan_id : str
+        Identifier of the scan to load.
+        Must correspond to a directory name inside the database's scan root.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
+
+    Returns
+    -------
+    plantdb.commons.fsdb.core.Scan | None
+        The loaded ``Scan`` object if the scan directory exists; otherwise ``None``.
+
+    See Also
+    --------
+    _load_scans : Load all scans from a database.
+    _scan_path : Compute the filesystem path of a given scan.
+    _load_scan_filesets : Load filesets belonging to a scan.
+    _load_scan_metadata : Load metadata associated with a scan.
+    _load_scan_measures : Load manual measures for a scan.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> from plantdb.commons.fsdb.file_ops import _load_scans
+    >>> db = dummy_db()
+    >>> db.connect()
+    >>> db.create_scan("007")
+    >>> db.create_scan("111")
+    >>> scans = _load_scans(db)
+    >>> print(scans)
+    []
+    >>> db = dummy_db(with_fileset=True)
+    >>> db.connect()
+    >>> scans = _load_scans(db)
+    >>> print(scans)
+    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
+    """
+    from plantdb.commons.fsdb.core import Scan
+
+    scan = Scan(db, scan_id)  # initialize and empty Scan instance
+    scan_path = _scan_path(scan)  # path the scan directory
+    # If the directory exists, try to load the scan:
+    if _is_scan_dataset(scan_path, validate_json_fileset=False):
+        # Try to load the filesets and their files
+        scan.filesets, needs_update = _load_scan_filesets(scan)
+        if needs_update and updates_files_json:
+            files_json = _scan_json_file(scan)
+            backup_file(files_json)  # create a backup file
+            _store_scan(scan)  # update the scan's ``files.json``
+        # Try to load the scan's metadata
+        scan.metadata = _load_scan_metadata(scan)
+        # Try to load the scan's manual measure, if any
+        scan.measures = _load_scan_measures(scan)
+    else:
+        scan = None
+    return scan
 
 
 def _load_dummy_fileset(scan: 'Scan') -> dict[str, 'Fileset']:
