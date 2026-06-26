@@ -124,6 +124,7 @@ from plantdb.commons.fsdb.exceptions import FileNotFoundError
 from plantdb.commons.fsdb.exceptions import FilesetExistsError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
+from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.fsdb.file_ops import _delete_file
@@ -147,6 +148,7 @@ from plantdb.commons.fsdb.path_helpers import _file_path
 from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
+from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
@@ -543,8 +545,6 @@ class FSDB(db.DB):
         The dictionary of ``Scan`` instances attached to the database, indexed by their identifier.
     is_connected : bool
         ``True`` if the database is connected (locked directory), else ``False``.
-    required_filesets : List[str]
-        A list of required filesets to consider a scan valid. Set it to ``None`` to accept any subdirectory of basedir as a valid scan. Defaults to ['metadata'].
     logger : logging.Logger
         An instance to use for logging. Defaults to the module logger.
     session_manager : Union[SingleSessionManager, SessionManager, JWTSessionManager]
@@ -592,7 +592,7 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
-                 required_filesets: Optional[List[str]] = None,
+                 extra_dirs:list[str]=['configs'],
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -605,10 +605,9 @@ class FSDB(db.DB):
         ----------
         basedir : str or pathlib.Path
             The path to the root directory of the database.
-        required_filesets : list of str, optional
-            A list of required filesets to consider a scan valid.
-            By default, ``None``, will set it to ``['metadata']`` to define as a "scan" the subdirectories with a 'metadata' directory.
-            Use `[]` to accept any subdirectory of `basedir` as a valid "scan".
+        extra_dirs : list of str
+            A list of directory names that can reside at the root of the filesystem database without trowing an error.
+            Defaults to ``['configs']``.
         logger : logging.Logger, optional
             Logger instance to use for logging. Defaults to the module logger.
         session_manager : SessionManager, optional
@@ -654,10 +653,11 @@ class FSDB(db.DB):
         # Check the given path to the root directory of the database is a directory:
         if not basedir.is_dir():
             raise NotADirectoryError(f"Directory {basedir} does not exists!")
+
         self.basedir = Path(basedir).resolve()
+        self.extra_dirs = extra_dirs
         self.scans = {}
         self.is_connected: bool = False
-        self.required_filesets = required_filesets or ['metadata']
 
         # Initialize lock manager
         self.lock_manager = LockManager(basedir)
@@ -706,6 +706,8 @@ class FSDB(db.DB):
 
     def connect(self) -> bool:
         """Connect the database by loading the scans' dataset."""
+        if not _is_fsdb(self.basedir, extra_dirs=self.extra_dirs):
+            raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery
             self.scans = _load_scans(self)
