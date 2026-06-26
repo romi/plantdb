@@ -41,9 +41,11 @@ A comprehensive module for managing file system operations in a hierarchical dat
 """
 
 import json
-import pathlib
-from shutil import rmtree
+from pathlib import Path
+from typing import Any
+from typing import TYPE_CHECKING
 
+from send2trash import send2trash
 from tqdm import tqdm
 
 from .exceptions import FileNotFoundError
@@ -64,36 +66,56 @@ from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
 from .validation import _is_safe_to_delete
 from .validation import _is_scan_dataset
+from .validation import _is_valid_fileset
 from ..log import get_logger
-from ..utils import yes_no_choice
+from ..utils import backup_file
+
+# ----------------------------------------------------------------------
+# NOTE: The following imports are only needed for type‑checking / IDE hints.
+# Importing them at runtime creates a circular dependency with `core.py`.
+# By guarding them with `TYPE_CHECKING` we keep static‑type information
+# without executing the import when the module is loaded.
+# ----------------------------------------------------------------------
+if TYPE_CHECKING:
+    from .core import FSDB
+    from .core import Scan
+    from .core import Fileset
+    from .core import File
+# ----------------------------------------------------------------------
 
 logger = get_logger(__name__)
 
 
-def _load_scan(db, scan_id):
-    """Load ``Scan`` from given database.
+def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'Scan | None':
+    """Load a single scan from the filesystem database.
 
-    List subdirectories of ``db.basedir`` as ``Scan`` instances.
-    May be restrited to the presense of subdirectories in .
+    This internal helper retrieves the scan identified by ``scan_id`` from the
+    ``db`` instance, attempts to populate its filesets, metadata and manual
+    measures, and returns the fully populated ``Scan`` object.
+    If the scan directory does not exist, ``None`` is returned.
 
     Parameters
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance to use to list the ``Scan``.
+        The filesystem database instance from which the scan should be loaded.
     scan_id : str
-        The name of the scan to load.
+        Identifier of the scan to load.
+        Must correspond to a directory name inside the database's scan root.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
 
     Returns
     -------
-    list of plantdb.commons.fsdb.core.Scan
-         The list of ``fsdb.Scan`` found in the database.
+    plantdb.commons.fsdb.core.Scan | None
+        The loaded ``Scan`` object if the scan directory exists; otherwise ``None``.
 
     See Also
     --------
-    plantdb.commons.fsdb._scan_path
-    plantdb.commons.fsdb._scan_files_json
-    plantdb.commons.fsdb._load_scan_filesets
-    plantdb.commons.fsdb._load_scan_metadata
+    _load_scans : Load all scans from a database.
+    _scan_path : Compute the filesystem path of a given scan.
+    _load_scan_filesets : Load filesets belonging to a scan.
+    _load_scan_metadata : Load metadata associated with a scan.
+    _load_scan_measures : Load manual measures for a scan.
 
     Examples
     --------
@@ -115,43 +137,60 @@ def _load_scan(db, scan_id):
     """
     from plantdb.commons.fsdb.core import Scan
 
-    scan = Scan(db, scan_id)
-    scan_path = _scan_path(scan)
-
-    # Try to load the scan's filesets, metadata and manual measures:
-    if scan_path.is_dir():
+    scan = Scan(db, scan_id)  # initialize and empty Scan instance
+    scan_path = _scan_path(scan)  # path the scan directory
+    # If the directory exists, try to load the scan:
+    if _is_scan_dataset(scan_path, validate_json_fileset=False):
+        # Try to load the filesets and their files
         scan.filesets, needs_update = _load_scan_filesets(scan)
-        if needs_update:
-            _store_scan(scan)
+        if needs_update and updates_files_json:
+            files_json = _scan_json_file(scan)
+            backup_file(files_json)  # create a backup file
+            _store_scan(scan)  # update the scan's ``files.json``
+        # Try to load the scan's metadata
         scan.metadata = _load_scan_metadata(scan)
+        # Try to load the scan's manual measure, if any
         scan.measures = _load_scan_measures(scan)
     else:
         scan = None
     return scan
 
 
-def _load_scans(db):
-    """Load list of ``Scan`` from given database.
+def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan']:
+    """Load all scans from a PlantDB filesystem database.
 
-    List subdirectories of ``db.basedir`` as ``Scan`` instances.
-    May be restrited to the presense of subdirectories in .
+    This internal helper iterates over the sub‑directories of the database path and attempts to instantiate
+    a `Scan` for each directory that follows the expected naming convention.
+    Directories that cannot be loaded are skipped and reported via the logger.
 
     Parameters
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance to use to list the ``Scan``.
+        The PlantDB filesystem database instance from which scans should be loaded.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
 
     Returns
     -------
-    dict of plantdb.commons.fsdb.core.Scan
-         The scan-id indexex dictionary of ``fsdb.Scan`` found in the database.
+    dict[str, plantdb.commons.fsdb.core.Scan]
+        Dictionary mapping each successfully loaded scan name to its corresponding `Scan` instance.
+        If no scan directories are present, an empty dictionary is returned.
+
+    Raises
+    ------
+    OSError
+        If the database path cannot be accessed (_e.g._, due to permission issues or the path not existing).
+
+    Notes
+    -----
+    * Hidden directories (names starting with ``'.'``) are ignored.
+    * Scans that fail to load are collected in ``bad_scans`` and reported at *INFO* level via the logger.
+    * The function returns an empty dictionary rather than ``None`` when no
+      scans are found, which simplifies downstream handling.
 
     See Also
     --------
-    plantdb.commons.fsdb._scan_path
-    plantdb.commons.fsdb._scan_files_json
-    plantdb.commons.fsdb._load_scan_filesets
-    plantdb.commons.fsdb._load_scan_metadata
+    _load_scan : Loads a single scan directory into a ``Scan`` object.
 
     Examples
     --------
@@ -170,8 +209,6 @@ def _load_scans(db):
     >>> print(scans)
     [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
     """
-    from plantdb.commons.fsdb.core import Scan
-
     # List all subdirectories of the database path:
     dir_names = db.path().iterdir()
     # Filter out non-directories:
@@ -188,7 +225,7 @@ def _load_scans(db):
         if scan_name.startswith('.'):
             continue  # ignore dot-folders (hidden)
         # Try to load each scan directory as a `Scan` instance with:
-        scan = _load_scan(db, scan_name)
+        scan = _load_scan(db, scan_name, updates_files_json)
         # If the scan could be loaded, add it to the dictionary of scans
         if scan is not None:
             scans[scan_name] = scan
@@ -198,24 +235,11 @@ def _load_scans(db):
     if bad_scans:
         n_bad = len(bad_scans)
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
-        # try:
-        #     # Prompt the user only when stdin is available.
-        #     answer = yes_no_choice(
-        #         f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {n_bad} scan{'' if n_bad == 1 else 's'}?"
-        #     )
-        # except EOFError:
-        #     # No interactive input –> default to **no** (do not delete)
-        #     logger.debug("EOFError while reading user input, defaulting to “no”.")
-        #     answer = False
-
-        # if answer:
-        #     for scan_name in bad_scans:
-        #         _delete_scan(Scan(db, scan_name))
 
     return scans
 
 
-def _load_dummy_fileset(scan):
+def _load_dummy_fileset(scan: 'Scan') -> dict[str, 'Fileset']:
     """Create lightweight "dummy" filesets from a scan by populating only file paths.
 
     This function creates a more efficient representation of filesets by avoiding
@@ -274,8 +298,8 @@ def _load_dummy_fileset(scan):
     return filesets
 
 
-def _load_scan_filesets(scan):
-    """Load the list of ``Fileset`` from given `scan` dataset and return them as a dict.
+def _load_scan_filesets(scan: 'Scan') -> tuple[dict[str, 'Fileset'] | None, bool]:
+    """Load the ``Fileset`` mapping from given `scan` dataset and return them as a dict.
 
     Load the list of filesets using "filesets" top-level entry from ``files.json``.
 
@@ -286,9 +310,11 @@ def _load_scan_filesets(scan):
 
     Returns
     -------
-    dict
-        A dictionary where keys are `fsid` (id of the filesets) and values are
-        the `Fileset` instances.
+    dict or None
+        A dictionary where keys are `fsid` (id of the filesets) and values are the `Fileset` instances.
+        May be ``None` if the filesets could not be loaded.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     See Also
     --------
@@ -340,7 +366,7 @@ def _load_scan_filesets(scan):
     return filesets, needs_update
 
 
-def _load_fileset(scan, fileset_info):
+def _load_fileset(scan: 'Scan', fileset_info: dict[str, str | list]) -> tuple['Fileset | None', bool]:
     """Load a fileset and set its attributes.
 
     Parameters
@@ -354,6 +380,8 @@ def _load_fileset(scan, fileset_info):
     -------
     plantdb.commons.fsdb.core.Fileset | None
         A fileset with its ``files`` & ``metadata`` attributes restored.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     Examples
     --------
@@ -374,13 +402,14 @@ def _load_fileset(scan, fileset_info):
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
     """
+    _is_valid_fileset(scan.path(), fileset_info['id'], fileset_info['files'])
     fileset = _parse_fileset(scan, fileset_info)
     fileset.files, needs_update = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
     return fileset, needs_update
 
 
-def _load_fileset_files(fileset, fileset_info):
+def _load_fileset_files(fileset: 'Fileset', fileset_info: dict[str, str | list]) -> tuple[dict[str, 'File'], bool]:
     """Load the list of ``File`` from given `fileset`.
 
     Parameters
@@ -392,8 +421,10 @@ def _load_fileset_files(fileset, fileset_info):
 
     Returns
     -------
-    list of plantdb.commons.fsdb.core.File
-         The list of ``File`` found in the `fileset`.
+    dict
+        The file ID indexed dictionary of ``File`` found in the `fileset`.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     See Also
     --------
@@ -422,7 +453,7 @@ def _load_fileset_files(fileset, fileset_info):
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
     """
-    files = {}
+    files: dict[str, File] = {}
     files_info = fileset_info.get("files", None)
 
     # Inform `_load_fileset` to update the `files.json` associated with the `scan`
@@ -443,8 +474,8 @@ def _load_fileset_files(fileset, fileset_info):
     return files, needs_update
 
 
-def _load_file(fileset, file_info):
-    """Get a `File` instance for given `fileset` using provided `file_info`.
+def _load_file(fileset: 'Fileset', file_info: dict[str, str]) -> 'File':
+    """Get a ``File`` instance for given `fileset` using provided `file_info`.
 
     Parameters
     ----------
@@ -468,7 +499,7 @@ def _load_file(fileset, file_info):
     return file
 
 
-def _load_measures(path):
+def _load_measures(path: str | Path) -> dict[str, Any]:
     """Load a measure dictionary from a JSON file.
 
     Parameters
@@ -489,7 +520,7 @@ def _load_measures(path):
     return _load_metadata(path)
 
 
-def _load_scan_measures(scan):
+def _load_scan_measures(scan: 'Scan') -> dict[str, Any]:
     """Load the measures for a dataset.
 
     Parameters
@@ -505,7 +536,7 @@ def _load_scan_measures(scan):
     return _load_measures(_scan_measures_path(scan))
 
 
-def _delete_file(file):
+def _delete_file(file: 'File') -> None:
     """Delete the given file.
 
     Parameters
@@ -567,7 +598,7 @@ def _delete_file(file):
     return
 
 
-def _delete_fileset(fileset):
+def _delete_fileset(fileset: 'Fileset') -> None:
     """Delete the given fileset.
 
     Parameters
@@ -618,7 +649,7 @@ def _delete_fileset(fileset):
     # - Delete the metadata directory associated with the `Fileset` instance:
     dir_md = _fileset_metadata_path(fileset)
     try:
-        rmtree(dir_md, ignore_errors=True)
+        send2trash(dir_md)
     except:
         logger.warning(f"Could not find metadata directory for fileset '{fileset.id}'.")
         logger.debug(f"Metadata directory path: '{dir_md}'.")
@@ -627,7 +658,7 @@ def _delete_fileset(fileset):
 
     # - Delete the directory associated with the `Fileset` instance:
     try:
-        rmtree(fileset_path, ignore_errors=True)
+        send2trash(fileset_path)
     except:
         logger.warning(f"Could not find directory for fileset '{fileset.id}'.")
         logger.debug(f"Fileset directory path: '{fileset_path}'.")
@@ -636,7 +667,7 @@ def _delete_fileset(fileset):
     return
 
 
-def _delete_scan(scan):
+def _delete_scan(scan: 'Scan') -> None:
     """Delete the given scan, starting by its `Fileset`s.
 
     Parameters
@@ -660,7 +691,7 @@ def _delete_scan(scan):
 
     # - Delete the whole directory will get rid of everything (metadata, filesets, files):
     try:
-        rmtree(scan_path, ignore_errors=True)
+        send2trash(scan_path)
     except:
         logger.warning(f"Could not find directory for scan '{scan.id}'.")
         logger.debug(f"Scan path: '{scan_path}'.")
@@ -670,7 +701,7 @@ def _delete_scan(scan):
     return
 
 
-def _make_fileset(fileset) -> pathlib.Path:
+def _make_fileset(fileset: 'Fileset') -> Path:
     """Create the fileset directory.
 
     Parameters
@@ -694,7 +725,7 @@ def _make_fileset(fileset) -> pathlib.Path:
     return path
 
 
-def _make_scan(scan) -> pathlib.Path:
+def _make_scan(scan: 'Scan') -> Path:
     """Create the scan directory.
 
     Parameters
@@ -718,7 +749,7 @@ def _make_scan(scan) -> pathlib.Path:
     return path
 
 
-def _store_scan(scan):
+def _store_scan(scan: 'Scan') -> None:
     """Dump the fileset and files structure associated with a `scan` on drive.
 
     Parameters
