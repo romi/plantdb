@@ -149,7 +149,7 @@ def _is_fsdb(path, validate_json_fileset=False) -> bool:
         logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")
         n_bad = len(bad_dir)
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_dir)}")  # list the bad scans
-        # TODO: write an FSDB cleaner script
+        logger.info("Use the `fsdb_healthcheck` CLI script to fix this.")
 
     return not bad_dir
 

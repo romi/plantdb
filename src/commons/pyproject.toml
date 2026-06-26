@@ -57,7 +57,7 @@ source = "https://github.com/romi/plantdb"
 issues = "https://github.com/romi/plantdb/issues"
 
 [project.scripts]
-fsdb_check = "plantdb.commons.cli.fsdb_check:main"
+fsdb_healthcheck = "plantdb.commons.cli.fsdb_healthcheck:main"
 fsdb_import_file = "plantdb.commons.cli.fsdb_import_file:main"
 fsdb_import_folder = "plantdb.commons.cli.fsdb_import_folder:main"
 fsdb_import_images = "plantdb.commons.cli.fsdb_import_images:main"
