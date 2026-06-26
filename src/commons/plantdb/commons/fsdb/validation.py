@@ -223,7 +223,6 @@ def _is_valid_fileset(scan_path, fileset_id, fs_info) -> bool:
         ``True`` if the fileset is valid, ``False`` otherwise.
     """
     fs_path = scan_path / fileset_id
-    # TODO: create a more comprehensive `_is_valid_fileset`
     if not fs_path.is_dir():
         return False
 
