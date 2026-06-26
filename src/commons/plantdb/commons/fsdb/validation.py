@@ -82,7 +82,7 @@ def _is_valid_id(name):
     return True
 
 
-def _is_fsdb(path, validate_json_fileset=False, extra_dirs:list[str]=['configs']) -> bool:
+def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['configs']) -> bool:
     """Test if the given path is indeed an FSDB database.
 
     Do it by checking the presence of the ``MARKER_FILE_NAME`` and validating
@@ -242,7 +242,7 @@ def _is_valid_fileset(scan_path, fileset_id, fs_info) -> bool:
     if all(file_exists):
         return True
     else:
-        logger.error(f"Missing {len(file_exists)-sum(file_exists)} files in '{fileset_id}' for '{scan_path}'.")
+        logger.error(f"Missing {len(file_exists) - sum(file_exists)} files in '{fileset_id}' for '{scan_path}'.")
         return False
 
 
@@ -262,6 +262,7 @@ def _fileset_files_exists(fs_info, fs_path) -> list[bool]:
                 file_exists.append(True)
 
     return file_exists
+
 
 def _is_safe_to_delete(path) -> bool:
     """Tests if a given path is safe to delete.
