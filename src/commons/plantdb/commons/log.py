@@ -22,7 +22,56 @@
 # License along with plantdb.  If not, see
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+
+"""Logging Configuration and Management
+
+A comprehensive logging utility module that provides flexible and configurable logging setup
+for Python applications, supporting both console and file-based logging with color formatting options.
+
+Environment Variable
+--------------------
+``ROMI_APP_LOGGER`` is an optional environment variable that can be used to override the default logger name.
+When ``ROMI_APP_LOGGER`` is defined, the ``get_logger`` function will use its value as the logger name instead
+of the module‑derived name. This allows a single logger configuration to be shared across multiple components
+of the ROMI application.
+
+Key Features
+------------
+- Configurable log levels with sensible defaults
+- Console logging with optional color formatting
+- File-based logging with automatic file handling
+- Dummy logger for testing/development
+- Centralized logging configuration management
+- Custom formatting options for log messages
+- Dynamic log filename generation
+
+Usage Examples
+--------------
+>>> # Basic usage
+>>> from plantdb.log import get_logger
+>>> logger = get_logger(__name__)
+>>> logger.info("Application started")
+INFO     [__main__] Application started
+>>> logger.error("An error occurred")
+ERROR    [__main__] An error occurred
+
+>>> # With custom configuration
+>>> logger = get_logger(__name__, log_level="DEBUG")
+>>> logger.debug("Debugging information")
+DEBUG    [__main__] Debugging information
+
+>>> # With App logger
+>>> import os
+>>> logger = get_logger('MyApp', log_level="INFO")
+>>> os.environ.setdefault('ROMI_APP_LOGGER', 'fsdb_rest_api')
+>>> # Can be called by another module, the environment variable will override logger name
+>>> another_logger = get_logger('MyModule')
+>>> another_logger.info("Debugging information")
+INFO     [fsdb_rest_api] Debugging information
+"""
+
 import logging
+import os
 import sys
 
 from colorlog import ColoredFormatter
@@ -143,7 +192,8 @@ def get_logger(logger_name, log_file=None, log_level=DEFAULT_LOG_LEVEL):
     logging.Logger
         The configured logger instance ready to log messages with the specified settings.
     """
-    logger_name = logger_name.split(".")[-1]
+    name = logger_name.split(".")[-1]
+    logger_name = os.getenv('ROMI_APP_LOGGER', name)
     if not logging.getLogger(logger_name).hasHandlers():
         return _get_logger(logger_name, log_file=log_file, log_level=log_level)
     return logging.getLogger(logger_name)
