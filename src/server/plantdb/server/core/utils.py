@@ -23,6 +23,41 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+"""
+# PlantDB Server Core Utilities
+
+Utility functions for managing scan data in the PlantDB server.
+They provide convenient ways to retrieve acquisition dates, map file sets, generate scan templates, and extract
+COLMAP camera information, simplifying data handling and API development.
+
+## Usage Examples
+
+```python
+>>> from plantdb.server.core.utils import get_scan_date
+>>> from plantdb.server.core.utils import compute_fileset_matches
+>>> from plantdb.server.core.utils import get_scan_template
+>>> from plantdb.server.core.utils import _get_colmap_camera_model
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
+>>> db.connect()
+>>> scan = db.get_scan('real_plant_analyzed')
+>>> # Assuming `db` is a connected PlantDB instance and `scan` is a Scan object
+>>> print(get_scan_date(scan))
+2026-07-02 13:34:09
+>>> print(compute_fileset_matches(scan))
+{'images': 'images', 'AnglesAndInternodes': 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595', 'TreeGraph': 'TreeGraph__False_CurveSkeleton_c304a2cc71', 'CurveSkeleton': 'CurveSkeleton__TriangleMesh_0393cb5708', 'TriangleMesh': 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'PointCloud': 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'Voxels': 'Voxels___x____300__450__colmap_camera_False_2a093f0ccc', 'Masks': 'Masks_1__0__1__0____channel____rgb_5619aa428d', 'Colmap': 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc', 'Undistorted': 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7'}
+>>> template = get_scan_template(scan.id)
+>>> print(template['id'])
+real_plant_analyzed
+>>> camera_model, poses = _get_colmap_camera_model(scan)
+>>> print(camera_model)
+{'height': 1080, 'id': 1, 'model': 'OPENCV', 'params': [1166.9518889440105, 1166.9518889440105, 720.0, 540.0, -0.0013571157486977348, -0.0013571157486977348, 0.0, 0.0], 'width': 1440}
+>>> print(poses[0])
+{'id': '00000_rgb', 'tvec': [369.4279687732083, 120.36109311437637, -62.07043190848918], 'rotmat': [[0.06475585405884698, -0.9971710205080586, 0.038165890845442085], [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284], [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]], 'photoUri': '/api/v1/assets/image/real_plant_analyzed/images/00000_rgb?size=orig', 'thumbnailUri': '/api/v1/assets/image/real_plant_analyzed/images/00000_rgb?size=thumb'}
+```
+"""
+
 import datetime
 
 from plantdb.commons import api_endpoints

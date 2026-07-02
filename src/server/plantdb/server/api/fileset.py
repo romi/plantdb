@@ -31,10 +31,10 @@ These resources interface with the underlying filesystem database (FSDB) to prov
 
 ## Key Features
 
-- **FilesetCreate** - Create new filesets associated with specific scans, including initial metadata assignment and name sanitization.
-- **FilesetMetadata** - Retrieve or update metadata for a specific fileset, supporting both full dictionary retrieval and specific key lookups.
-- **FilesetFiles** - List and query files contained within a fileset, with support for fuzzy searching and filtering.
-- **Security** - Integrated JWT validation via decorators to ensure authorized access to data modification endpoints.
+- **FilesetCreate**: Create new filesets associated with specific scans, including initial metadata assignment and name sanitization.
+- **FilesetMetadata**: Retrieve or update metadata for a specific fileset, supporting both full dictionary retrieval and specific key lookups.
+- **FilesetFiles**: List and query files contained within a fileset, with support for fuzzy searching and filtering.
+- **Security**: Integrated JWT validation via decorators to ensure authorized access to data modification endpoints.
 
 ## Usage Examples
 

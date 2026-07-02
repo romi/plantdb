@@ -31,10 +31,10 @@ This module allows users to upload files to specific filesets and manipulate ass
 
 ## Key Features
 
-- **File Creation** - Upload files with automatic extension validation, name sanitization, and support for both binary and text modes.
-- **Metadata Retrieval** - Access complete metadata dictionaries or specific keys for any file stored in the database.
-- **Metadata Management** - Update or set metadata for existing files with support for partial updates.
-- **Security Integration** - Leverages JWT-based authentication via the `@add_jwt_from_header` decorator to ensure secure access to file operations.
+- **File Creation**: Upload files with automatic extension validation, name sanitization, and support for both binary and text modes.
+- **Metadata Retrieval**: Access complete metadata dictionaries or specific keys for any file stored in the database.
+- **Metadata Management**: Update or set metadata for existing files with support for partial updates.
+- **Security Integration**: Leverages JWT-based authentication via the `@add_jwt_from_header` decorator to ensure secure access to file operations.
 
 ## Usage Examples
 
@@ -306,7 +306,7 @@ class File(Resource):
                 try:
                     metadata = ast.literal_eval(metadata_raw)
                 except (ValueError, SyntaxError):
-                    return {'error': "Invalid metadata format – must be JSON or a Python dict string"}, 400
+                    return {'error': "Invalid metadata format: must be JSON or a Python dict string"}, 400
         else:
             metadata = None
 

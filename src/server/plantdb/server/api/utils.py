@@ -1,5 +1,56 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# plantdb - Data handling tools for the ROMI project
+#
+# Copyright (C) 2018-2019 Sony Computer Science Laboratories
+# Authors: D. Colliaux, T. Wintz, P. Hanappe
+#
+# This file is part of plantdb.
+#
+# plantdb is free software: you can redistribute it
+# and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# plantdb is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with plantdb. If not, see
+# <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+"""
+# PlantDB Utility Functions
+
+A small collection of helper utilities used throughout the PlantDB project to simplify common filesystem‑related tasks.
+These functions handle safe retrieval of database resources, verify path containment, and inspect the contents
+ of ZIP archives, reducing boiler‑plate and ensuring consistent error handling across the code base.
+
+## Key Features
+
+- **resource_file**: Retrieves a ``File`` object from the PlantDB database, translating common error conditions into
+  clear JSON‑style messages and HTTP status codes.
+- **is_within_directory**: Checks whether a target path lies inside a given directory, preventing directory‑traversal vulnerabilities.
+- **is_directory_in_archive**: Determines if a specific top‑level directory exists inside a ZIP archive,
+  useful for validating package structures before extraction.
+
+## Usage Examples
+
+>>> from plantdb.server.api.utils import resource_file, is_within_directory, is_directory_in_archive
+>>> # Retrieve a file from the database (returns a File object or an error dict)
+>>> result = resource_file(db, "scan123", "segmentation")
+>>> # Verify a path is under a base directory
+>>> is_within_directory("/data/plantdb", "/data/plantdb/scans/scan123")
+True
+>>> # Check for a directory named 'images' inside a zip file
+>>> is_directory_in_archive("dataset.zip", "images")
+True
+"""
+
 import os
 from zipfile import ZipFile
 
@@ -58,7 +109,7 @@ def resource_file(db, scan_id, task_name, **kwargs):
         # Use JSON‑serializable payload; Flask will handle conversion.
         return {"error": f"Internal server error: {str(exc)}"}, 500
 
-    # Success – return the File object (Flask‑RESTful resources expect the
+    # Success: return the File object (Flask‑RESTful resources expect the
     # object itself; the caller can decide the HTTP status if required).
     return file
 

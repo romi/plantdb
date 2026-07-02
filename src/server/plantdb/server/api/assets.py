@@ -470,9 +470,9 @@ class PointCloud(Resource):
         size : str or float
             Query parameter controlling downsampling.
             Accepted values:
-                * 'orig' - serve the original point cloud.
-                * 'preview' - serve a precomputed preview (default).
-                * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
+                * 'orig': serve the original point cloud.
+                * 'preview': serve a precomputed preview (default).
+                * A float value: perform on‑the‑fly voxel downsampling using the specified voxel size.
             If an invalid string is supplied, the default 'preview' is used.
         coords : str
             Query parameter indicating whether to return the point coordinates as JSON.

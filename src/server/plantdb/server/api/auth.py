@@ -31,11 +31,11 @@ The resources add security features such as rate‑limiting and automatic JWT ex
 
 ## Key Features
 
-- **Register** - Create new user accounts with input validation, rate limiting, and JWT handling.
-- **Login** - Check username existence, authenticate credentials, and return access/refresh tokens.
-- **Logout** - Invalidate a user session and log the outcome.
-- **TokenValidation** - Verify a JWT and return the associated user's basic profile information.
-- **TokenRefresh** - Issue a fresh access token given a valid refresh token.
+- **Register**: Create new user accounts with input validation, rate limiting, and JWT handling.
+- **Login**: Check username existence, authenticate credentials, and return access/refresh tokens.
+- **Logout**: Invalidate a user session and log the outcome.
+- **TokenValidation**: Verify a JWT and return the associated user's basic profile information.
+- **TokenRefresh**: Issue a fresh access token given a valid refresh token.
 - Built‑in decorators (`@rate_limit`, `@add_jwt_from_header`) ensure consistent security across all endpoints.
 
 ## Usage Examples

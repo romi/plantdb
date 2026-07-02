@@ -24,22 +24,22 @@
 # ------------------------------------------------------------------------------
 
 """
-FSDB REST API - Serve Plant Database through RESTful Endpoints
+# FSDB REST API - Serve Plant Database through RESTful Endpoints
 
 This module provides a RESTful API server for interacting with a local plant database (FSDB).
 It is designed for the ROMI project and facilitates efficient data handling and retrieval of plant-related datasets.
 The server enables users to query and manage plant scans, images, point clouds, and other related data files.
 
-Key Features
-------------
+## Key Features
+
 - Serve a local plant database (FSDB) through RESTful API endpoints.
 - Manage plant scans and related data, including images, point clouds, and meshes.
 - Retrieve and manage dataset files with various configurations.
 - Run in test mode with optional preconfigured datasets or an empty test database.
 - Lightweight server setup using Flask, with options for debugging and CORS support.
 
-Environment Variables
----------------------
+## Environment Variables
+
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
@@ -49,8 +49,8 @@ Environment Variables
 - ``REFRESH_TIMEOUT``: Refresh JWT validity duration in seconds. Default `86400` seconds (1 day).
 - ``MAX_SESSION``: The maximum number of concurrent sessions to allow. Default `10`.
 
-Usage Examples
---------------
+## Usage Examples
+
 To start the REST API server for a local plant database:
 
 ```shell

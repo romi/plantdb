@@ -23,14 +23,38 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Authentication service layer.
+"""
+# Authentication Service Layer
 
-This module contains pure‑Python functions that implement the business logic for
-user registration, login, logout, token validation and token refresh.  The
-functions are deliberately small (atomic) and raise domain‑specific exceptions
-instead of returning HTTP responses.  Flask‑RESTful resources in
-``plantdb.server.api.auth`` act as thin adapters that translate these exceptions
-into proper HTTP status codes and JSON payloads.
+Provides pure‑Python business‑logic functions for user registration, login, logout,
+token validation, and token refresh. The functions are independent of the Flask‑RESTful
+API layer and raise domain‑specific exceptions, making them reusable across
+different interfaces and straightforward to unit‑test.
+
+## Key Features
+
+- Register new users with required‑field validation.
+- Check whether a username already exists.
+- Authenticate credentials and obtain JWT access and refresh tokens.
+- Invalidate a session (logout) and return the logged‑out username.
+- Validate JWT tokens and retrieve basic user information.
+- Refresh access tokens using a refresh token.
+- Consistent, domain‑specific exception hierarchy (`MissingFieldError`, `InvalidCredentialsError`, `TokenError`, etc.).
+
+## Usage Examples
+
+```python
+>>> from plantdb.server.services.auth import register_user, logout_user, authenticate_user
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
+>>> db.connect()
+>>> register_user(db, {"username": "alice", "fullname": "Alice", "password": "secret"})
+>>> logout_user(db, db.session_manager._admin_token)
+>>> access_token = authenticate_user(db, "alice", "secret")
+>>> print(access_token)
+phQk4Uez7Gim3SkY6oBzrCBvos2eHS_wU-_ZvvoPCQI
+```
 """
 
 from __future__ import annotations

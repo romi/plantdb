@@ -23,6 +23,57 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+"""
+Assets handling utilities for PlantDB
+
+Provides a collection of helper functions and custom exceptions used by the PlantDB server to validate, create,
+and extract ZIP archives that store scan datasets.
+These utilities ensure that uploads conform to the required directory layout, manage atomic file writes,
+and protect against unsafe extractions such as path‑traversal attacks.
+
+## Key Features
+
+- **Header validation** for streamed uploads, guaranteeing required metadata.
+- **Atomic file writing** for raw data and streamed chunks.
+- **Robust ZIP validation** that checks required directories, files, and depth.
+- **Safe archive creation** that excludes temporary caches and returns a temporary ZIP path.
+- **Secure extraction** with top‑level directory stripping, UTF‑8 filename handling, path‑traversal protection, and SHA‑256 hash verification.
+
+## Usage Examples
+
+```python
+>>> from pathlib import Path
+>>> import logging
+>>> from plantdb.server.services.assets import (
+...     validate_upload_headers,
+...     create_zip_for_scan,
+...     extract_zip_to_scan,
+... )
+>>> logger = logging.getLogger(__name__)
+
+# Validate request headers (normally ``request.headers`` from Flask)
+>>> headers = {
+...     "Content-Disposition": "attachment; filename=data.zip",
+...     "Content-Length": "1024",
+...     "X-File-Path": "scan1/data.zip",
+...     "X-Chunk-Size": "256",
+... }
+>>> info = validate_upload_headers(headers)
+>>> info
+{'rel_filename': 'scan1/data.zip', 'content_length': 1024, 'chunk_size': 256}
+
+# Create a ZIP archive for a scan directory
+>>> scan_dir = Path("/data/plantdb/scans/scan1")
+>>> zip_path = create_zip_for_scan(scan_dir, logger)
+
+# Extract a validated ZIP archive into a destination directory
+>>> dest = Path("/data/plantdb/scans/scan1_extracted")
+>>> extracted_files = extract_zip_to_scan(zip_path, dest, logger)
+>>> len(extracted_files) > 0
+True
+```
+"""
+
 import hashlib
 import logging
 import os
@@ -33,14 +84,12 @@ from typing import List
 from zipfile import BadZipFile
 from zipfile import ZipFile
 
-from flask import request
-
 import plantdb.commons.fsdb.core
-
 
 # --------------------------------------------------------------------------- #
 # Custom Errors
 # --------------------------------------------------------------------------- #
+
 
 class ArchiveError(RuntimeError):
     """Base class for archive‑related errors."""
@@ -131,6 +180,7 @@ def validate_upload_headers(headers: dict) -> dict:
 #  Scan‑related helpers
 # --------------------------------------------------------------------------- #
 
+
 def get_scan_path(db: plantdb.commons.fsdb.core.FSDB, scan_id: str, **kwargs) -> Path:
     """Resolve the absolute path of a scan.
 
@@ -153,6 +203,7 @@ def get_scan_path(db: plantdb.commons.fsdb.core.FSDB, scan_id: str, **kwargs) ->
 # --------------------------------------------------------------------------- #
 #  File‑writing helpers (atomic, testable)
 # --------------------------------------------------------------------------- #
+
 
 def write_file(file_path: Path, data: bytes) -> int:
     """Write ``data`` to ``file_path`` in a single operation.
@@ -202,6 +253,7 @@ def write_streamed_file(file_path: Path, content_length: int, chunk_size: int) -
 # ------------------------------------------------------------------- #
 #   Validation helpers (POST - archive handling)
 # ------------------------------------------------------------------- #
+
 
 def _ensure_file_present(uploaded_file: Any) -> None:
     if uploaded_file is None:
@@ -290,32 +342,47 @@ def is_valid_archive(archive_path):
     >>> is_valid_archive('/tmp/real_plant_analyzed.zip')
     True
     """
-    req_dirs = ['images/', 'metadata/']
-    req_files = ['files.json']
+    req_dirs = ["images/", "metadata/"]
+    req_files = ["files.json"]
 
-    top_dir = ''
+    top_dir = ""
     max_dir_dept = 2
-    with ZipFile(archive_path, 'r') as zip_ref:
+    with ZipFile(archive_path, "r") as zip_ref:
         zip_files = zip_ref.namelist()
 
     # List all top-level members in the zip file
-    top_level_dirs = {name for name in zip_files if name.count('/') == 1 and name.endswith('/')}
-    top_level_dirs |= {name.split('/')[0] + '/' for name in zip_files if name.count('/') == 1 and name.split('/')[0]}
+    top_level_dirs = {
+        name for name in zip_files if name.count("/") == 1 and name.endswith("/")
+    }
+    top_level_dirs |= {
+        name.split("/")[0] + "/"
+        for name in zip_files
+        if name.count("/") == 1 and name.split("/")[0]
+    }
 
     # If a lone directory is found at the top, move one step down
     if len(top_level_dirs) == 1:
         top_dir = next(iter(top_level_dirs))
-        top_level_dirs = {name.replace(top_dir, '') for name in zip_files if
-                          name.count('/') == 2 and name.endswith('/')}
-        top_level_dirs |= {name.split('/')[1] + '/' for name in zip_files if
-                           name.count('/') == 2 and '/'.join(name.split('/')[:-1])}
+        top_level_dirs = {
+            name.replace(top_dir, "")
+            for name in zip_files
+            if name.count("/") == 2 and name.endswith("/")
+        }
+        top_level_dirs |= {
+            name.split("/")[1] + "/"
+            for name in zip_files
+            if name.count("/") == 2 and "/".join(name.split("/")[:-1])
+        }
 
     # Check if the required file and directories are among them
     has_req_dirs = [rd in top_level_dirs for rd in req_dirs]
-    has_req_files = [f'{top_dir}{rf}' in zip_files for rf in req_files]
+    has_req_files = [f"{top_dir}{rf}" in zip_files for rf in req_files]
     req_dir_depth = all(
-        name.count('/') <= max_dir_dept + 1 if 'metadata' in name else name.count('/') <= max_dir_dept for name in
-        zip_files)
+        name.count("/") <= max_dir_dept + 1
+        if "metadata" in name
+        else name.count("/") <= max_dir_dept
+        for name in zip_files
+    )
 
     if all(has_req_dirs) and all(has_req_files) and req_dir_depth:
         return True
@@ -339,6 +406,7 @@ def _ensure_valid_structure(zip_path: Path) -> None:
 # ------------------------------------------------------------------- #
 #   ARCHIVES - ZIP creation (GET) & Extraction (POST)
 # ------------------------------------------------------------------- #
+
 
 def create_zip_for_scan(scan_path: Path, logger: logging.Logger) -> Path:
     """Create a temporary ZIP file containing all files under ``scan_path`` (except any ``webcache`` directories).
@@ -384,8 +452,10 @@ def create_zip_for_scan(scan_path: Path, logger: logging.Logger) -> Path:
     return zip_path
 
 
-def extract_zip_to_scan(zip_path: Path, destination: Path, logger: logging.Logger) -> List[str]:
-    """ Extract ``zip_path`` into ``destination`` while performing safety checks.
+def extract_zip_to_scan(
+    zip_path: Path, destination: Path, logger: logging.Logger
+) -> List[str]:
+    """Extract ``zip_path`` into ``destination`` while performing safety checks.
 
     Parameters
     ----------
@@ -447,9 +517,7 @@ def extract_zip_to_scan(zip_path: Path, destination: Path, logger: logging.Logge
 
                 # Safety: the target must stay inside ``destination``
                 if not str(target_path).startswith(str(destination.resolve())):
-                    raise ExtractionError(
-                        f"Path traversal attempt detected: {member}"
-                    )
+                    raise ExtractionError(f"Path traversal attempt detected: {member}")
 
                 # Create parent directories
                 target_path.parent.mkdir(parents=True, exist_ok=True)

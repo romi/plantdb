@@ -1,12 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+"""
+# Test REST API Server Module
+
+Provides a lightweight, thread‑based Flask server that serves the PlantDB REST API for use in automated tests and development.
+By running the server in a separate daemon thread, test suites can interact with a fully functional API without
+blocking the main interpreter, enabling fast, isolated integration tests.
+
+## Key Features
+
+- **Threaded server**: Starts a WSGI server in a background thread that can be started and stopped programmatically.
+- **Configurable environment**: Host, port, URL prefix, SSL, and database initialization (test, empty, models) are all selectable via constructor arguments.
+- **Context‑manager support**: Use `with` statements to automatically start and stop the server, ensuring clean teardown.
+- **Convenient factory function**: `test_rest_api()` creates a ready‑to‑use `TestRestApiServer` instance with a single call.
+
+## Usage Examples
+
+```python
+>>> from plantdb.server.test_rest_api import test_rest_api
+>>> # Create a temporary test database and start the API
+>>> api = test_rest_api(test=True)
+>>> api.start()
+>>> # Interact with the API (e.g., list scans)
+>>> import requests
+>>> response = requests.get(f"{api.get_base_url()}/scans")
+>>> print(response.json())
+['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
+>>> api.stop()
+
+>>> # Using the server as a context manager
+>>> with test_rest_api(test=True) as api:
+...     print(f"API running at {api.get_base_url()}")
+...     # Perform HTTP requests here
+```
+"""
+
 import logging
 import socket
 import threading
 import time
 from pathlib import Path
 
-from flask import Flask
 from werkzeug.serving import make_server
 
 from plantdb.commons.log import get_logger

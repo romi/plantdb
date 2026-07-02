@@ -33,11 +33,11 @@ by configurable rate‑limiting to safeguard the service.
 
 ## Key Features
 
-- **Health check endpoint** - quickly verify that the service and underlying
+- **Health check endpoint**: quickly verify that the service and underlying
   database are operational.
-- **Dynamic database refresh** - reload a single scan or the entire dataset
+- **Dynamic database refresh**: reload a single scan or the entire dataset
   without restarting the server.
-- **Self‑describing root resource** - returns API name, description,
+- **Self‑describing root resource**: returns API name, description,
   version information, and a list of all available routes.
 
 ## Usage Examples

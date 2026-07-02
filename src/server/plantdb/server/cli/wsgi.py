@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""WSGI Application Entry Point
+"""
+# WSGI Application Entry Point
 
 This module serves as the Web Server Gateway Interface (WSGI) entry point for the application,
 allowing web servers like Gunicorn, uWSGI, or Apache with mod_wsgi to interact with the application.
 
-Key Features
-------------
+## Key Features
+
 - Provides the application instance for WSGI-compatible web servers
 - Serves as the deployment entry point in production environments
 - Separates server configuration from application logic
 - Enables standard deployment practices for Python web applications
 
-Environment Variables
----------------------
+## Environment Variables
+
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
 - ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
@@ -24,14 +25,12 @@ Environment Variables
 - ``REFRESH_TIMEOUT``: Refresh JWT validity duration in seconds. Default `86400` seconds (1 day).
 - ``MAX_SESSION``: The maximum number of concurrent sessions to allow. Default `10`.
 
-Usage Examples
---------------
+## Usage Examples
+
 When deploying with uWSGI:
-
-.. code-block:: bash
-
-   uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
-
+```shell
+uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
+```
 Should then be accessible under: http://localhost:5000/scans
 """
 

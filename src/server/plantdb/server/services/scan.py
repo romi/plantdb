@@ -23,6 +23,38 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+"""
+# PlantDB Scan Services
+
+Convenient utilities for extracting high‑level information and associated data from a PlantDB *scan* dataset.
+The functions aggregate metadata, file locations, camera parameters, and derived data (_e.g._, skeletons, angles)
+into plain Python structures, making it easy for downstream tools (e.g., visualizers, analysis scripts) to consume
+scan contents without dealing with low‑level filesystem details.
+
+## Key Features
+
+- Automatic handling of legacy vs. new PlantDB API versions.
+- Friendly logging with a per‑function logger fallback.
+- Generation of URLs for web‑based resources (thumbnails, archives, individual files) via the PlantDB API endpoints.
+
+## Usage Examples
+```python
+>>> from plantdb.server.services.scan import get_scan_info, get_scan_data
+>>> from plantdb.commons.test_database import test_database
+>>> db = test_database('real_plant_analyzed', no_auth=True)
+>>> db.connect()
+>>> scan = db.get_scan('real_plant_analyzed')
+>>> info = get_scan_info(scan)
+>>> print(info['id'], info['hasTriangleMesh'])
+real_plant_analyzed True
+>>> data = get_scan_data(scan)
+>>> print(data['camera']['model'])
+{'id': 1, 'model': 'OPENCV', 'width': 1440, 'height': 1080, 'params': [1166.9518889440105, 1166.9518889440105, 720.0, 540.0, -0.0013571157486977348, -0.0013571157486977348, 0.0, 0.0]}
+>>> db.disconnect()
+```
+"""
+
+
 import json
 import os
 from math import radians
