@@ -28,8 +28,8 @@ import sys
 from colorlog import ColoredFormatter
 
 # Define a set of log levels by retrieving all existing log level names from Python's logging module,
-# excluding specific levels ("FATAL" and "WARN") which are not standard or redundant.
-LOG_LEVELS = set(logging._nameToLevel.keys()) - {"FATAL", "WARN"}
+# excluding specific levels (NOTSET", "FATAL" and "WARN") which are not standard or redundant.
+LOG_LEVELS = set([ll.upper() for ll in logging._nameToLevel.keys()]) - {"NOTSET", "FATAL", "WARN"}
 
 # Set the default logging level to "INFO".
 DEFAULT_LOG_LEVEL = 'INFO'
