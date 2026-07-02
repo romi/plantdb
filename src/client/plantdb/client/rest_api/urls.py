@@ -574,7 +574,7 @@ def scan_preview_image_url(host, scan_id, size="thumb", **kwargs):
     >>> image = Image.open(BytesIO(response.content))  # Open the image from the bytes data
     >>> image.show()  # Display the image
     """
-    from plantdb.commons.api_endpoints import sanitize_name
+    from plantdb.commons.utils import sanitize_name
     from plantdb.client.rest_api.requests import request_scan_names_list
     from plantdb.client.rest_api.requests import request_scan_data
 

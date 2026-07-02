@@ -19,22 +19,18 @@ A comprehensive module for managing file system operations in a hierarchical dat
 ## Usage Examples
 
 ```python
->>> # Load all scans from a database
->>> from plantdb.commons.fsdb.core import FSDB
->>> from plantdb.commons.fsdb.file_ops import _load_scans
-
->>> # Initialize and connect to database
->>> db = FSDB('/path/to/database')
+>>> from plantdb.commons.test_database import test_database
+>>> from plantdb.commons.fsdb.file_ops import _load_scans,_make_scan, _store_scan, _delete_scan
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
 >>> db.connect()
-
 >>> # Load all scans
 >>> scans = _load_scans(db)
-
 >>> # Create and store a new scan
 >>> scan = db.create_scan("scan_001")
 >>> _make_scan(scan)
+PosixPath('/tmp/ROMI_DB_sgqmij8t/scan_001')
 >>> _store_scan(scan)
-
 >>> # Delete a scan
 >>> _delete_scan(scan)
 ```

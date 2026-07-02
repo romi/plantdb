@@ -1,120 +1,87 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""API Endpoints for PlantDB client.
+"""
+# API Endpoints for PlantDB client.
 
-This module provides helper functions to construct URL paths for the PlantDB
-REST API. Each function returns the endpoint string with optional prefix
-and performs basic sanitization of identifiers.
+This module provides helper functions to construct URL paths for the PlantDB REST API.
+Each function returns the endpoint string with an optional prefix and performs basic sanitization of identifiers.
 
-Key Features
-------------
+## Key Features
+
 - Sanitizes and validates scan, fileset, and file names.
 - Supports optional URL prefixes for API versioning.
 - Generates paths for authentication, health checks, scans, images, and archives.
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from plantdb.commons import api_endpoints
 >>> api_endpoints.login()
 '/api/v1/login'
 >>> api_endpoints.scan('plant1', )
 '/api/v1/scan/plant1'
+```
+
+## Resource mapping
+
+Hereafter we detail the hierarchy of the resources defined in `plantdb.server.api.*` submodules and the
+Flask REST API in the `plantdb.server.cli.fsdb_rest_api` submodule.
+```
+/api/v1/
+      ├─ health       (GET) → REST API status
+      ├─ refresh/     (GET) → Reload the whole database
+      │   └─ {scan_id}     (GET) → Reload the scan
+      ├─ auth/
+      │   ├─ login         (POST) → user login
+      │   ├─ logout        (POST) → user logout
+      │   ├─ register      (POST) → new user registration
+      │   └─ tokens/
+      │       ├─ refresh            (GET) → retrieve a specific scan
+      │       ├─ validation         (GET) → retrieve a specific scan
+      │       └─ create-api-token   (POST) → create-api-token
+      ├─ scans/
+      │   ├─ (GET)     → list scans
+      │   ├─ info      (GET) → list scans
+      │   └─ {scan_id}/
+      │       ├─ (GET)    → retrieve a specific scan
+      │       ├─ (POST)   → create a new scan
+      │       ├─ metadata/
+      │       │   ├─ (GET)   → get `scan_id` metadata
+      │       │   └─ (POST)  → update `scan_id` metadata
+      │       └─ filesets/
+      │           ├─ (GET)       → list filesets for scan
+      │           └─ {fileset_id}/
+      │               ├─ (POST)      → create new fileset
+      │               ├─ metadata/
+      │               │   ├─ (GET)   → get `scan_id/fileset_id` metadata
+      │               │   └─ (POST)  → update `scan_id/fileset_id` metadata
+      │               └─ files/
+      │                   ├─ (GET)           → list files
+      │                   └─ {file_id}/
+      │                       ├─ (GET)       → retrieve file
+      │                       ├─ (POST)      → create new file
+      │                       └─ metadata/   → (GET, PATCH)
+      │                           ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
+      │                           └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
+      └─ assets/
+          ├─ files/{file_path}      (GET) → retrieve a specific scan
+          ├─ archive/{scan_id}
+          │   ├─ (GET)              → retrieve scan archive
+          │   └─ (POST)             → create a new scan by uploading a scan archive
+          ├─ image/{scan_id}/{fileset_id}/{file_id}
+          │   ├─ (GET)              → get `scan_id/fileset_id/file_id` image
+          │   └─ (POST)             → create a new `scan_id/fileset_id/file_id` image
+          ├─ pointcloud/{scan_id}   (GET) → retrieve scan pointcloud
+          ├─ mesh/{scan_id}         (GET) → retrieve scan triangular mesh
+          ├─ sequence/{scan_id}     (GET) → retrieve scan sequence
+          └─ skeleton/{scan_id}     (GET) → retrieve scan skeleton
+```
 """
 
 from urllib import parse
+from plantdb.commons.utils import sanitize_name
 
-
-def sanitize_name(name) -> str:
-    """Sanitizes and validates the provided name.
-
-    The function ensures that the input string adheres to predefined naming rules by:
-
-    - stripping leading/trailing spaces,
-    - isolating the last segment after splitting by slashes,
-    - validating the name against an alphanumeric pattern
-      with optional underscores (`_`), dashes (`-`), or periods (`.`).
-
-    Parameters
-    ----------
-    name : str
-        The name to sanitize and validate.
-
-    Returns
-    -------
-    str
-        Sanitized name that conforms to the rules.
-
-    Raises
-    ------
-    ValueError
-        If the provided name contains invalid characters or does not meet
-        the naming rules.
-    """
-    import re
-
-    sanitized_name = name.strip()  # Remove leading/trailing spaces
-    sanitized_name = sanitized_name.split("/")[-1]  # isolate the last segment after splitting by slashes
-    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
-    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
-        raise ValueError(
-            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods."
-        )
-    return sanitized_name
-
-
-# ------------------------------------------------------------------------
-# Resource mapping
-# ------------------------------------------------------------------------
-# /api/v1/
-#       ├─ health       (GET) → REST API status
-#       ├─ refresh/     (GET) → Reload the whole database
-#       │   └─ {scan_id}     (GET) → Reload the scan
-#       ├─ auth/
-#       │   ├─ login         (POST) → user login
-#       │   ├─ logout        (POST) → user logout
-#       │   ├─ register      (POST) → new user registration
-#       │   └─ tokens/
-#       │       ├─ refresh            (GET) → retrieve a specific scan
-#       │       ├─ validation         (GET) → retrieve a specific scan
-#       │       └─ create-api-token   (POST) → create-api-token
-#       ├─ scans/
-#       │   ├─ (GET)     → list scans
-#       │   ├─ info      (GET) → list scans
-#       │   └─ {scan_id}/
-#       │       ├─ (GET)    → retrieve a specific scan
-#       │       ├─ (POST)   → create a new scan
-#       │       ├─ metadata/
-#       │       │   ├─ (GET)   → get `scan_id` metadata
-#       │       │   └─ (POST)  → update `scan_id` metadata
-#       │       └─ filesets/
-#       │           ├─ (GET)       → list filesets for scan
-#       │           └─ {fileset_id}/
-#       │               ├─ (POST)      → create new fileset
-#       │               ├─ metadata/
-#       │               │   ├─ (GET)   → get `scan_id/fileset_id` metadata
-#       │               │   └─ (POST)  → update `scan_id/fileset_id` metadata
-#       │               └─ files/
-#       │                   ├─ (GET)           → list files
-#       │                   └─ {file_id}/
-#       │                       ├─ (GET)       → retrieve file
-#       │                       ├─ (POST)      → create new file
-#       │                       └─ metadata/   → (GET, PATCH)
-#       │                           ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
-#       │                           └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
-#       └─ assets/
-#           ├─ files/{file_path}      (GET) → retrieve a specific scan
-#           ├─ archive/{scan_id}
-#           │   ├─ (GET)              → retrieve scan archive
-#           │   └─ (POST)             → create a new scan by uploading a scan archive
-#           ├─ image/{scan_id}/{fileset_id}/{file_id}
-#           │   ├─ (GET)              → get `scan_id/fileset_id/file_id` image
-#           │   └─ (POST)             → create a new `scan_id/fileset_id/file_id` image
-#           ├─ pointcloud/{scan_id}   (GET) → retrieve scan pointcloud
-#           ├─ mesh/{scan_id}         (GET) → retrieve scan triangular mesh
-#           ├─ sequence/{scan_id}     (GET) → retrieve scan sequence
-#           └─ skeleton/{scan_id}     (GET) → retrieve scan skeleton
-# ------------------------------------------------------------------------
 URL_PREFIX = "/api/v1"
 HOME = "/"
 HEALTH = "/health"

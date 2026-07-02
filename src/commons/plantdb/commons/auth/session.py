@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 
 """
-Session Management
+# Session Management
 
-Provides a flexible session management system supporting both standard and JWT-based
-sessions. It handles session creation, validation, expiration, concurrency limits,
-and refresh logic, making it suitable for web applications and database
-connections.
+Provides a flexible session management system supporting both standard and JWT-based sessions.
+It handles session creation, validation, expiration, concurrency limits, and refresh logic,
+making it suitable for web applications and database connections.
 
-Key Features
-------------
+## Key Features
+
 - Centralized session store with expiration tracking
 - Support for plain token and JSON Web Tokens with standard claims
 - Concurrency control (max concurrent sessions)
 - Automatic cleanup of expired sessions
 - Session refresh mechanism to extend validity
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from plantdb.commons.auth.session import JWTSessionManager
 >>> manager = JWTSessionManager(session_timeout=1800, secret_key='my_secret')
 >>> token = manager.create_session('alice')
@@ -26,6 +26,7 @@ Usage Examples
 >>> print(user_info)
 {'username': 'alice', 'issued_at': 1769011058, 'expires_at': 1769012858, 'jti': 'HVaAR4XHmIJgCKbZMDqmwg', 'issuer': 'plantdb-api', 'audience': 'plantdb-client'}
 >>> new_token = manager.refresh_session(token)
+```
 """
 import os
 import secrets

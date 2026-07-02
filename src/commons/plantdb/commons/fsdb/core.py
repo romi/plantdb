@@ -24,7 +24,23 @@
 # ------------------------------------------------------------------------------
 
 """
-This module implement a database as a **local file structure**.
+# File Structure DataBase
+
+This module implements a lightweight, filesystem‑based data store that offers user authentication,
+role‑based access control, and convenient management of hierarchical scan objects.
+It is useful for applications that need to organise, share, and version data collections (_e.g._ scientific scans)
+without requiring a full‑blown relational database.
+
+## Key Features
+
+- **Authentication & RBAC**: Functions such as ``require_token``, ``require_authentication`` and the ``rbac_manager`` attribute enforce user permissions and token‑based access.
+- **Scan management**: The ``FSDB`` class provides methods to create, list, delete and lock scans (``create_scan``, ``list_scans``, ``is_scan_locked``), as well as to retrieve scan‑specific metadata.
+- **Fileset handling**: Within each scan, ``Fileset`` objects group related files; they support creation, deletion, metadata handling and existence checks.
+- **File abstraction**: The ``File`` class offers transparent read/write of raw bytes or structured data, along with per‑file metadata storage.
+- **Session & lock management**: Built‑in session handling and lock utilities prevent concurrent modifications and ensure data integrity.
+- **Convenient utilities**: Helper functions like ``get_logged_username``, ``use_guest_as_default`` and ``requires_permission`` simplify common workflow steps.
+
+## Implementation
 
 Assuming that the `FSDB` root database directory is `dbroot/`, there is a `Scan` with `'myscan_001'` as `Scan.id` and there are some metadata (see below), you should have the following file structure:
 ```
@@ -80,7 +96,8 @@ The `myscan_001/files.json` file then contains the following structure:
 }
 ```
 
-The metadata of the scan (`metadata.json`), of the set of 'images' files (`<Fileset.id>.json`) and of each 'image' files (`<File.id>.json`) are all stored as JSON files in a separate directory:
+The metadata of the scan (`metadata.json`), of the set of 'images' files (`<Fileset.id>.json`) and of each 'image'
+ files (`<File.id>.json`) are all stored as JSON files in a separate directory:
 ```
 myscan_001/metadata/
 myscan_001/metadata/metadata.json
@@ -89,6 +106,25 @@ myscan_001/metadata/images/scan_img_01.json
 myscan_001/metadata/images/scan_img_02.json
 [...]
 myscan_001/metadata/images/scan_img_99.json
+```
+
+## Usage Examples
+
+```python
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
+>>> db.connect()
+>>> # Create a new scan named "experiment‑001"
+>>> scan = db.create_scan("experiment-001")
+>>> # Add a fileset to the scan
+>>> fileset = scan.create_fileset("raw-data")
+>>> # Store a file inside the fileset
+>>> file = fileset.create_file("sensor")
+>>> file.write_raw(b"timestamp,value\\n0,12.3\\n1,13.7", ext="csv")
+>>> # Retrieve metadata later
+>>> meta = file.get_metadata()
+>>> print(meta.get("size"))
 ```
 """
 

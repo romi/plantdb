@@ -73,7 +73,7 @@ from plantdb.client.rest_api.urls import scan_url
 from plantdb.client.rest_api.urls import scans_url
 from plantdb.client.rest_api.urls import token_refresh_url
 from plantdb.client.rest_api.urls import token_validation_url
-from plantdb.commons.api_endpoints import sanitize_name
+from plantdb.commons.utils import sanitize_name
 from plantdb.commons.log import get_logger
 
 logger = get_logger(__name__)

@@ -24,11 +24,13 @@
 # ------------------------------------------------------------------------------
 
 """
+# Test Database Utilities
+
 This module regroups tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
 It aims at simplifying the creation of a test database for demonstration or CI purposes.
 
-Examples
---------
+## Examples
+
 >>> from plantdb.commons.test_database import setup_test_database
 >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
 >>> db_path = setup_test_database('real_plant')

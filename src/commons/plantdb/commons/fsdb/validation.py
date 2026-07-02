@@ -18,20 +18,20 @@ This module ensures data integrity and safe operations when working with file sy
 ## Usage Examples
 
 ```python
-from validation import _is_valid_id, _is_fsdb, _is_safe_to_delete
-from pathlib import Path
+>>> from plantdb.commons.fsdb.validation import _is_valid_id, _is_fsdb, _is_safe_to_delete
+>>> from pathlib import Path
 
-# Validate an identifier
-result = _is_valid_id("valid-name.123")  # Returns True
-result = _is_valid_id("invalid/name")    # Returns False
+>>> # Validate an identifier
+>>> result = _is_valid_id("valid-name.123")  # Returns True
+>>> result = _is_valid_id("invalid/name")    # Returns False
 
-# Check if a path is an FSDB database
-db_path = Path("/path/to/database")
-is_db = _is_fsdb(db_path)
+>>> # Check if a path is an FSDB database
+>>> db_path = Path("/path/to/database")
+>>> is_db = _is_fsdb(db_path)
 
-# Verify if a path is safe to delete
-path_to_delete = Path("/path/to/database/subfolder")
-is_safe = _is_safe_to_delete(path_to_delete)
+>>> # Verify if a path is safe to delete
+>>> path_to_delete = Path("/path/to/database/subfolder")
+>>> is_safe = _is_safe_to_delete(path_to_delete)
 ```
 """
 

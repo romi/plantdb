@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 
 """
-Authentication and Authorization Utilities
+# Authentication and Authorization Utilities
 
 Provides a unified set of tools for managing sessions, users, groups, and fine‑grained permissions
 within the PlantDB ecosystem. By consolidating session handling, file‑based persistence, RBAC logic,
 and core authentication models, it simplifies the integration of authentication flows across services.
 
-Key Features
-------------
+## Key Features
+
 - Flexible session management with optional JWT support and automatic expiration handling
 - File‑based user and group persistence with Argon2 password hashing and atomic JSON updates
 - Full role‑based access control (ADMIN, CONTRIBUTOR, READER) for scans and user accounts
 - Serializable Permission, Role, User, and Group dataclasses with helper utilities
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from pathlib import Path
 >>> from plantdb.commons.auth import session, manager, rbac, models
 >>>
@@ -42,4 +43,5 @@ Usage Examples
 >>> can_read = rbac_mgr.can_access_scan(user, scan_meta, rbac.Permission.READ)
 >>> print(can_read)
 True
+```
 """
