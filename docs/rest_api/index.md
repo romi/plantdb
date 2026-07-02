@@ -6,11 +6,11 @@ This interface provides programmatic access to plant scan datasets, images, poin
 Use the API to list scans, retrieve files, and manage data directly from your applications.
 
 - **Quick start**: Run `python fsdb_rest_api.py --test` to launch a temporary server.
-- **Core endpoints**: `/scans`, `/scan/<id>`, `/image/...`, `/pointcloud/...`, `/mesh/...`.
+- **Core endpoints**: `/scans`, `/scans/<id>`, `/assets/image/...`, `/assets/pointcloud/...`, `/assets/mesh/...`.
 - **Management**:
-    - Register users via `/register`
-    - Obtain JWT tokens via `/login`
-    - Create new scans via `/api/scan`
+    - Register users via `/auth/register`
+    - Obtain JWT tokens via `/auth/login`
+    - Create new scans via `/scans/<id>`
 
 ## Table of Contents
 
