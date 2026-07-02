@@ -52,6 +52,7 @@ classifiers = [
 
 [project.scripts]
 fsdb_rest_api = "plantdb.server.cli.fsdb_rest_api:main"
+fsdb_healthcheck = "plantdb.comons.cli.fsdb_healthcheck:main"
 
 [project.urls]
 homepage = "https://romi-project.eu/"
