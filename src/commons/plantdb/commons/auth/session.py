@@ -733,7 +733,7 @@ class JWTSessionManager(SessionManager):
     """
 
     def __init__(self, session_timeout: int = 900, refresh_timeout: int = 86400, max_concurrent_sessions: int = 10,
-                 secret_key: Union[str, bytes] = None, leeway: int = 2, api_token_dir=gettempdir()):
+                 secret_key: Union[str, bytes] = None, leeway: int = 2, api_token_dir=None):
         """Manage user sessions with timeout.
 
         Parameters
@@ -769,7 +769,9 @@ class JWTSessionManager(SessionManager):
         self._lock = RLock()  # to lock `self.session` dict for thread‑safe changes
 
         self.secret_key = _init_secret_key(secret_key)
-        self.api_token_file = Path(api_token_dir) / 'api_token.txt'
+        self.api_token_dir = Path(api_token_dir) if api_token_dir else Path(gettempdir()) / ".plantdb"
+        self.api_token_dir.mkdir(exist_ok=True, parents=True)
+        self.api_token_file = self.api_token_dir / 'api_token.txt'
         self._api_tokens: dict[str, str] = {}  # jti -> ISO expiry string
         self._safe_secret_init(secret_key)
 
@@ -876,29 +878,29 @@ class JWTSessionManager(SessionManager):
         - iat (issued at): Token creation timestamp
         - jti (JWT ID): Unique identifier for the token generated using `secrets.token_urlsafe`.
         """
-        if self.n_active_sessions() >= self.max_concurrent_sessions:
-            self.logger.warning(
-                f"Too many users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
-            return None
-
-        # Create an access token
-        now = datetime.now(timezone.utc)
-        access_exp = now + timedelta(seconds=self.session_timeout)
-        access_jti = secrets.token_urlsafe(16)
-
-        # Create a refresh token
-        refresh_exp = now + timedelta(seconds=self.refresh_timeout)
-        refresh_jti = secrets.token_urlsafe(16)
-
-        try:
-            # Generate JSON Web Tokens
-            access_token = self._create_token(username, access_jti, access_exp, now, token_type='access')
-            refresh_token = self._create_token(username, refresh_jti, refresh_exp, now, token_type='refresh')
-        except Exception as e:
-            self.logger.error(f"Failed to create JSON Web Tokens for {username}: {e}")
-            return None
-
         with self._lock:
+            if self.n_active_sessions() >= self.max_concurrent_sessions:
+                self.logger.warning(
+                    f"Too many users currently active, reached max concurrent sessions limit ({self.max_concurrent_sessions})")
+                return None
+
+            # Create an access token
+            now = datetime.now(timezone.utc)
+            access_exp = now + timedelta(seconds=self.session_timeout)
+            access_jti = secrets.token_urlsafe(16)
+
+            # Create a refresh token
+            refresh_exp = now + timedelta(seconds=self.refresh_timeout)
+            refresh_jti = secrets.token_urlsafe(16)
+
+            try:
+                # Generate JSON Web Tokens
+                access_token = self._create_token(username, access_jti, access_exp, now, token_type='access')
+                refresh_token = self._create_token(username, refresh_jti, refresh_exp, now, token_type='refresh')
+            except Exception as e:
+                self.logger.error(f"Failed to create JSON Web Tokens for {username}: {e}")
+                return None
+
             # Track access session for concurrent‑limit enforcement
             self.sessions[access_jti] = {
                 'username': username,
