@@ -18,9 +18,9 @@ Each function returns the endpoint string with an optional prefix and performs b
 ```python
 >>> from plantdb.commons import api_endpoints
 >>> api_endpoints.login()
-'/api/v1/login'
->>> api_endpoints.scan('plant1', )
-'/api/v1/scan/plant1'
+'/api/v1/auth/login'
+>>> api_endpoints.scan('plant1')
+'/api/v1/scans/plant1'
 ```
 
 ## Resource mapping
