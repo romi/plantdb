@@ -97,7 +97,7 @@ ENV PATH="/home/${USER_NAME}/.local/bin:${PATH}"
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 
 # URI prefix to use when behind a reverse proxy (NGINX)
-ENV PLANTDB_API_PREFIX=""
+ENV API_PREFIX=""
 # Location of the database folder to serve:
 ENV ROMI_DB="/myapp/db"
 # Force credentials usage on this database

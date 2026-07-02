@@ -2,8 +2,33 @@
 # -*- coding: utf-8 -*-
 
 """
-Robust server‑availability checker with built‑in SSRF / safety guards.
+# Server Availability Checker
+
+A robust utility for verifying the reachability of HTTP(S) endpoints while protecting against SSRF attacks.
+It validates URLs, enforces whitelist/blacklist policies, filters private networks, resolves hostnames securely,
+and performs configurable HTTP requests with retry, timeout, and SSL handling.
+
+## Key Features
+
+- Strict URL scheme validation (only ``http`` and ``https``)
+- Optional whitelist loading from a file and dynamic blacklist caching from GitHub
+- Private‑network and blacklisted‑host protection
+- DNS‑over‑HTTPS resolution with fallback to the system resolver
+- Customizable SSL context with optional custom CA bundles
+- Manual redirect handling with a configurable limit
+- Retry strategy with exponential back‑off and timeout control
+- Dataclass ``ServerCheckResult`` summarizing status, final URL, redirects, and messages
+
+## Usage Examples
+
+```python
+>>> from plantdb.client.url import is_server_available
+>>> result = is_server_available('https://example.com', validate_host=False)
+>>> print(result.ok, result.final_url)
+True https://example.com/
+```
 """
+
 import ipaddress
 import json
 import os

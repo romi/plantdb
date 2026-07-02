@@ -18,7 +18,7 @@ from plantdb.commons.log import get_logger
 from plantdb.commons.utils import yes_no_abort_choice
 
 
-@click.command()
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.argument('fsdb_path', type=click.Path(exists=True))
 @optgroup.group("Fix", cls=OptionGroup)
 @optgroup.option('--fix', is_flag=True,

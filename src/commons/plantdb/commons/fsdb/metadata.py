@@ -9,35 +9,38 @@ This module provides a robust interface for managing metadata in JSON format, of
 ## Key Features
 
 - **Metadata Loading Operations**
-  - Load metadata from JSON files for files, filesets, and scan datasets
-  - Handle JSON decode errors gracefully with appropriate error logging
-  - Support both string and Path objects for file paths
-  - Maintain backward compatibility with legacy metadata storage patterns
-
+    - Load metadata from JSON files for files, filesets, and scan datasets
+    - Handle JSON decode errors gracefully with appropriate error logging
+    - Support both string and Path objects for file paths
+    - Maintain backward compatibility with legacy metadata storage patterns
 - **Metadata Storage Operations**
-  - Save metadata to JSON files with consistent formatting
-  - Automatic creation of necessary directory structures
-  - Support for hierarchical metadata organization
-
+    - Save metadata to JSON files with consistent formatting
+    - Automatic creation of necessary directory structures
+    - Support for hierarchical metadata organization
 - **Metadata Manipulation**
-  - Deep copy functionality to prevent unintended modifications
-  - Flexible key-value pair management
-  - Support for both single value updates and bulk dictionary updates
+    - Deep copy functionality to prevent unintended modifications
+    - Flexible key-value pair management
+    - Support for both single value updates and bulk dictionary updates
 
 ## Usage Examples
 
 ```python
-# Loading metadata from a file
-metadata = _load_metadata("path/to/metadata.json")
+>>> from plantdb.commons.fsdb.metadata import _load_metadata
+>>> from plantdb.commons.fsdb.metadata import _set_metadata
+>>> from plantdb.commons.fsdb.metadata import _get_metadata
 
-# Setting metadata values
-metadata_dict = {}
-_set_metadata(metadata_dict, "key", "value")
-# Or update with a dictionary
-_set_metadata(metadata_dict, {"key1": "value1", "key2": "value2"}, None)
+>>> # Loading metadata from a file
+>>> metadata = _load_metadata("path/to/metadata.json")
 
-# Getting metadata with a default value
-value = _get_metadata(metadata_dict, "key", default={})
+>>> # Setting metadata values
+>>> metadata_dict = {}
+>>> _set_metadata(metadata_dict, "key", "value")
+>>> # Or update with a dictionary
+>>> _set_metadata(metadata_dict, {"key1": "value1", "key2": "value2"}, None)
+
+>>> # Getting metadata with a default value
+>>> value = _get_metadata(metadata_dict, "key", default={})
+```
 """
 from __future__ import annotations
 

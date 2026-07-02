@@ -26,17 +26,17 @@
 """
 # Authentication REST API Resources
 
-Provides Flask‑RESTful resources that implement a complete authentication workflow for the PlantDB server, including user registration, login, logout, JWT validation, and token refresh.
-The resources add security features such as rate‑limiting and automatic JWT extraction, making it easy to protect API endpoints while keeping the codebase tidy.
+Provides Flask-RESTful resources that implement a complete authentication workflow for the PlantDB server, including user registration, login, logout, JWT validation, and token refresh.
+The resources add security features such as rate-limiting and automatic JWT extraction, making it easy to protect API endpoints while keeping the codebase tidy.
 
 ## Key Features
 
-- **Register** - Create new user accounts with input validation, rate limiting, and JWT handling.
-- **Login** - Check username existence, authenticate credentials, and return access/refresh tokens.
-- **Logout** - Invalidate a user session and log the outcome.
-- **TokenValidation** - Verify a JWT and return the associated user's basic profile information.
-- **TokenRefresh** - Issue a fresh access token given a valid refresh token.
-- Built‑in decorators (`@rate_limit`, `@add_jwt_from_header`) ensure consistent security across all endpoints.
+- **Register**: Create new user accounts with input validation, rate limiting, and JWT handling.
+- **Login**: Check username existence, authenticate credentials, and return access/refresh tokens.
+- **Logout**: Invalidate a user session and log the outcome.
+- **TokenValidation**: Verify a JWT and return the associated user's basic profile information.
+- **TokenRefresh**: Issue a fresh access token given a valid refresh token.
+- Built-in decorators (`@rate_limit`, `@add_jwt_from_header`) ensure consistent security across all endpoints.
 
 ## Usage Examples
 
@@ -97,9 +97,6 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-import requests
-from flask import jsonify
-from flask import make_response
 from flask import request
 from flask_restful import Resource
 
@@ -187,9 +184,14 @@ class Register(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by login as admin to have permission to create new users
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> token = response.json()['access_token']
@@ -205,6 +207,8 @@ class Register(Resource):
         >>> res_dict = response.json()
         >>> res_dict["message"]
         'Login successful'
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Parse JSON data from request body
         data = request.get_json()
@@ -213,26 +217,26 @@ class Register(Resource):
         if not data or not all(field in data for field in required_fields):
             return {
                 'success': False,
-                'message': 'Missing required fields. Please provide username, fullname, and password'
+                'error': 'Missing required fields. Please provide username, fullname, and password'
             }, 400
 
         try:
             # Delegate to the service layer
             register_user(self.db, data, token=kwargs.get('token'))
-            # Return success response if the user creation succeeds
-            return {'message': 'User successfully created'}, 201
-
         except MissingFieldError as e:
-            return {'message': str(e)}, 400  # HTTP 400 Bad Request
+            response = {'error': str(e)}, 400  # HTTP 400 Bad Request
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except SessionValidationError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except UserExistsError as e:
-            return {'message': f'Failed to create user: {str(e)}'}, 409  # HTTP 409 Conflict
+            response = {'error': f'Failed to create user: {str(e)}'}, 409  # HTTP 409 Conflict
         except Exception as e:
-            return {'message': f'Failed to create user: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': f'Failed to create user: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            response = {'message': f"User {data['username']} successfully created"}, 201
 
+        return response
 
 class Login(Resource):
     """A RESTful resource to handle user login and authentication processes.
@@ -285,9 +289,14 @@ class Login(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Check if the user exists (valid username):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=admin")
         >>> print(response.json())
@@ -296,15 +305,20 @@ class Login(Resource):
         >>> response = requests.get("http://127.0.0.1:5000/login?username=superman")
         >>> print(response.json())
         {'username': 'superman', 'exists': False}
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Extract username from query parameters
         username = request.args.get('username', None)
         # Return an error if the username parameter is missing
         if not username:
-            return {'message': 'Missing username parameter'}, 400
-        # Query database to check if the user exists
-        user_exists = check_username_exists(self.db, username)
-        return {'username': username, 'exists': user_exists}, 200
+            response = {'error': 'Missing username parameter'}, 400
+        else:
+            # Query database to check if the user exists
+            user_exists = check_username_exists(self.db, username)
+            response = {'username': username, 'exists': user_exists}, 200
+
+        return response
 
     @rate_limit(max_requests=20, window_seconds=60)
     def post(self):
@@ -340,27 +354,34 @@ class Login(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Valid login request
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json())
         {'authenticated': True, 'message': 'Login successful. Welcome, Guy Fawkes!'}
-        >>> print(response.status_code)
-        200
+        >>> print(response.ok)
+        True
         >>> # Invalid request (missing credentials)
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin'})
         >>> print(response.json())
         {'authenticated': False, 'message': 'Missing username or password'}
         >>> print(response.status_code)
         400
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get JSON data from the request body
         data = request.get_json()
         # Validate that required fields are present in the request
         if not data or 'username' not in data or 'password' not in data:
-            return {'authenticated': False, 'message': 'Missing username or password'}, 400
+            return {'authenticated': False, 'error': 'Missing username or password'}, 400
 
         # Extract credentials from request data
         username = data['username']
@@ -369,22 +390,23 @@ class Login(Resource):
         try:
             access_token, refresh_token = authenticate_user(self.db, username, password)
         except InvalidCredentialsError:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
-            return {'message': f'Authentication failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': f'Authentication failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
+            # Build the successful response with user info, access token, and refresh token
+            user = self.db.get_user_data(token=access_token)
+            response = {
+                'message': 'Login successful',
+                'user': {
+                    'username': user.username,
+                    'fullname': user.fullname,
+                },
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }, 200
 
-        # Build the successful response with user info, access token, and refresh token
-        user = self.db.get_user_data(token=access_token)
-        response_data = {
-            'message': 'Login successful',
-            'user': {
-                'username': user.username,
-                'fullname': user.fullname,
-            },
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }
-        return response_data, 200
+        return response
 
 
 class Logout(Resource):
@@ -417,9 +439,14 @@ class Logout(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by log in as 'admin'
         >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
         >>> print(response.json()['message'])
@@ -429,25 +456,27 @@ class Logout(Resource):
         >>> response = requests.post("http://127.0.0.1:5000/logout", headers={'Authorization': 'Bearer ' + token})
         >>> print(response.json()['message'])
         Logout successful
+        >>> # Stop the test server
+        >>> server.stop()
         """
-        try:
-            # The decorator supplies the token via kwargs
-            token = kwargs.get('token')
-            if not token:
-                self.logger.error("Logout error: no active session!")
-                return {'message': 'Logout failed, no active session!'}, 401  # HTTP 401 Unauthorized (authentication)
+        # The decorator supplies the token via kwargs
+        token = kwargs.get('token')
+        if not token:
+            self.logger.error("Logout error: no active session!")
+            return {'error': 'Logout failed, no active session!'}, 401  # HTTP 401 Unauthorized (authentication)
 
+        try:
             # Delegate to the service layer
             username = logout_user(self.db, token, logger=self.logger)
-
-            return {'message': f'Logout successful from {username}'}, 200
-
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Logout error: {str(e)}")
-            return {'message': 'Logout failed!'}, 500  # HTTP 500 Internal Server Error
+            response = {'error': 'Logout failed!'}, 500  # HTTP 500 Internal Server Error
+        else:
+            response = {'message': f'Logout successful from {username}'}, 200
 
+        return response
 
 class TokenValidation(Resource):
     """Validate a JSON Web Token (JWT) and retrieve associated user data.
@@ -485,36 +514,42 @@ class TokenValidation(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
+        >>> from plantdb.commons import api_endpoints
         >>> # Start by login as admin
-        >>> response = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> response = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json={'username': 'admin', 'password': 'admin'})
         >>> token = response.json()['access_token']
         >>> # Now create a new user:
-        >>> response = requests.post("http://127.0.0.1:5000/token-validation", headers={'Authorization': 'Bearer ' + token})
+        >>> response = requests.post("http://127.0.0.1:5000" + api_endpoints.token_validation(), headers={'Authorization': 'Bearer ' + token})
         >>> print(response.json()['message'])
         Token validation successful
+        >>> # Stop the test server
+        >>> server.stop()
         """
-        try:
-            token = kwargs.get('token')
-            if not token:
-                raise TokenError('No token supplied')
+        # The decorator supplies the token via kwargs
+        token = kwargs.get('token')
 
+        try:
             # Delegate to the service layer
             user_info = validate_token(self.db, token)
-
+        except NoAuthUserError as e:
+            response = {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            response = {'error': f'Token validation failed: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
+        except Exception as e:
+            response = {'error': f'Unexpected error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
             response = {
                 'message': 'Token validation successful',
                 'user': user_info,
             }, 200
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except TokenError as e:
-            response = {'message': f'Token validation failed: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
-        except Exception as e:
-            response = {'message': f'Unexpected error: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         return response
 
@@ -556,28 +591,24 @@ class TokenRefresh(Resource):
         It validates the refresh token and issues a new access/refresh token pair.
         """
         data = request.get_json()
-        if not data or 'refresh_token' not in data:
-            return {'message': 'Missing refresh_token'}, 400
-
-        refresh_token_str = data['refresh_token']
-
+        refresh_token_str = data.get('refresh_token')
         try:
             # Delegate to the service layer
             access_token, new_refresh_token = refresh_token(self.db, refresh_token_str)
-
+        except NoAuthUserError as e:
+            response = {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+        except TokenError as e:
+            response = {'error': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
+        except Exception as e:
+            response = {'error': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        else:
             response = {
                 'message': 'Token refreshed successfully',
                 'access_token': access_token,
                 'refresh_token': new_refresh_token
             }, 200
-            return response
 
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except TokenError as e:
-            return {'message': f'Invalid or expired refresh token: {str(e)}'}, 401  # HTTP 401 Unauthorized (authentication)
-        except Exception as e:
-            return {'message': f'Token refresh failed: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+        return response
 
 class CreateApiToken(Resource):
     """
@@ -612,9 +643,9 @@ class CreateApiToken(Resource):
         """
         data = request.get_json()
         if "datasets" not in data:
-            return {'message': 'Missing "datasets" field'}, 400
+            return {'error': 'Missing "datasets" field'}, 400
         if "token_exp" not in data:
-            return {'message': 'Missing "token_exp" field'}, 400
+            return {'error': 'Missing "token_exp" field'}, 400
         token_exp = int(data['token_exp'])
 
         try:
@@ -623,17 +654,17 @@ class CreateApiToken(Resource):
                 datasets=data['datasets'],
                 **kwargs
             )
-
-            if token:
-                exp_date = datetime.now(timezone.utc) + timedelta(seconds=token_exp)
-                response = {
-                    'message': 'API Token generated successfully',
-                    'api_token': token,
-                    'expiration date': exp_date.isoformat(),
-                }, 200
-                return response
-            else:
-                return {'message': 'Could not create token.'}, 401
-
         except Exception as e:
-            return {'message': f'Token creation failed: {e}'}, 500
+            response = {'error': f'Token creation failed: {e}'}, 500
+        else:
+            exp_date = datetime.now(timezone.utc) + timedelta(seconds=token_exp)
+            response = (
+                {
+                    "message": "API Token generated successfully",
+                    "api_token": token,
+                    "expiration date": exp_date.isoformat(),
+                },
+                200,
+            )
+
+        return response

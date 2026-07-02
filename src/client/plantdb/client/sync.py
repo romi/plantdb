@@ -23,7 +23,8 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Synchronization Utility for PlantDB Databases
+"""
+# Synchronization Utility for PlantDB Databases
 
 This module provides a robust synchronization mechanism for File System Databases (FSDB) in the PlantDB project, enabling seamless data transfer between local and remote database instances.
 
@@ -93,7 +94,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 ```python
 >>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.server.test_rest_api import TestRestApiServer
->>> from plantdb.client.rest_api import request_scan_names_list
+>>> from plantdb.client.rest_api.requests import request_scan_names_list
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database with all 5 test dataset
 >>> db_source = test_database("all")
@@ -124,7 +125,7 @@ Test REST API server started at http://127.0.0.1:5000
 >>> else:
 ...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
->>> from plantdb.client.rest_api import request_refresh
+>>> from plantdb.client.rest_api.requests import request_refresh
 >>> success, msg = request_refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
 >>> scans_list = request_scan_names_list(**server_cfg)
@@ -156,8 +157,8 @@ import paramiko
 import requests
 import urllib3
 
-from plantdb.client.rest_api import request_archive_download
-from plantdb.client.rest_api import request_archive_upload
+from plantdb.client.rest_api.requests import request_archive_download
+from plantdb.client.rest_api.requests import request_archive_upload
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb

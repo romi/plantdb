@@ -16,17 +16,31 @@ This module simplifies the handling of file paths for scans, filesets, and indiv
 - Utility function for generating standardized filenames with specific extensions
 
 ## Usage Examples
+
 ```python
-from path_helpers import _scan_path, _file_path, _get_filename
-
-# Get the path to a scan directory
-scan_path = _scan_path(scan_object)
-
-# Get the path to a specific file within a fileset
-file_path = _file_path(file_object)
-
-# Generate a standardized filename with extension
-new_filename = _get_filename(file_object, "jpg")  # Returns: "file_id.jpg"
+>>> from plantdb.commons.fsdb.path_helpers import _scan_path, _file_path, _get_filename
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
+>>> db.connect()
+>>> # Create a new scan named "experiment‑001"
+>>> scan = db.create_scan("experiment-001")
+>>> # Get the path to a scan directory
+>>> scan_path = _scan_path(scan)
+>>> print(scan_path)
+/tmp/ROMI_DB_y1m6n8eq/experiment-001
+>>> # Add a fileset to the scan
+>>> fileset = scan.create_fileset("raw-data")
+>>> # Store a file inside the fileset
+>>> file = fileset.create_file("sensor")
+>>> # Generate a standardized filename with extension
+>>> new_filename = _get_filename(file, "csv")  # Returns: "file_id.csv"
+>>> print(new_filename)
+sensor.csv
+>>> file.write_raw(b"timestamp,value\\n0,12.3\\n1,13.7", ext="csv")
+>>> file_path = _file_path(file)
+>>> print(file_path)
+/tmp/ROMI_DB_kke0pk9s/experiment-001/raw-data/sensor.csv
 ```
 """
 import pathlib

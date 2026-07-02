@@ -4,7 +4,8 @@
 """
 # PlantDB Client Module
 
-A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data including scans, filesets, and associated metadata.
+A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data
+including scans, filesets, and associated metadata.
 
 ## Key Features
 
@@ -20,7 +21,7 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 >>> # Start a test REST API server first:
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
->>> from plantdb.client.rest_api import plantdb_url
+>>> from plantdb.client.rest_api.urls import plantdb_url
 >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
 >>> # Create a new scan
 >>> scan_id = client.create_scan(
@@ -38,13 +39,12 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 import json
 import mimetypes
 import os
-from functools import wraps
 
 import requests
 from ada_url import join_url
 from requests import RequestException
 
-from plantdb.client import api_endpoints
+from plantdb.commons import api_endpoints
 from plantdb.commons.auth.models import Permission
 from plantdb.commons.log import get_logger
 
@@ -120,7 +120,7 @@ class PlantDBClient:
     >>> server.start()
     >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
-    >>> from plantdb.client.rest_api import plantdb_url
+    >>> from plantdb.client.rest_api.urls import plantdb_url
     >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
     >>> scans = client.list_scans()
     >>> print(scans)
@@ -168,7 +168,6 @@ class PlantDBClient:
 
         self.logger = get_logger(__class__.__name__)
 
-
     def login(self, username: str, password: str) -> bool:
         """Authenticate the user with the PlantDB API.
 
@@ -196,7 +195,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -269,7 +268,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -319,7 +318,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> _ = client.login('admin', 'admin')
@@ -387,7 +386,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> from plantdb.commons.auth.models import Permission
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
@@ -447,7 +446,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> client.refresh()
         True
@@ -486,7 +485,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -521,7 +520,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -616,7 +615,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scans()
         >>> print(sorted(response))
@@ -667,7 +666,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = (client.list_scans_info())
         >>> print(len(response))
@@ -725,7 +724,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Scan creation requires authentication
         >>> response = client.create_scan('test_plant')
@@ -787,7 +786,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_scan_metadata('real_plant')
@@ -839,7 +838,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -888,7 +887,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scan_filesets('real_plant')
         >>> print(response)
@@ -938,7 +937,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -989,7 +988,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_fileset_metadata('real_plant', 'images')
@@ -1043,7 +1042,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -1095,9 +1094,9 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
-        >>> response = client.fileset_files_list('real_plant','images')
+        >>> response = client.fileset_files_list('real_plant', 'images')
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
         >>> # Finally, stop the server
@@ -1256,7 +1255,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_file_metadata('test_plant', 'images', 'image_001')
@@ -1312,7 +1311,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')

@@ -24,7 +24,25 @@
 # ------------------------------------------------------------------------------
 
 """
-This module provides a collection of utility functions for data handling in the ROMI project.
+# Utility Functions for ROMI Data Handling
+
+A small toolbox of helper functions used throughout the ROMI project.  
+These utilities simplify common tasks such as image loading, temporary file‑system handling,
+task‑fileset discovery, angle unit detection, date formatting, user prompts, and file backup.
+
+## Key Features
+
+- **Image I/O**: `read_image_from_file` loads an image with Pillow and guarantees it is fully loaded into memory.
+- **Task‑fileset mapping**: `locate_task_filesets` returns a dictionary that links task names
+  to the corresponding fileset identifiers in a scan.
+- **Angle unit guessing**: `is_radians` heuristically decides whether a list of angles is expressed in radians.
+- **Filesystem helpers**: `to_file`, `fsdb_file_from_local_file`, `tmpdir_from_fileset`,
+  `backup_filename` and `backup_file` make it easy to move data between the in‑memory FSDB
+  representation and the real file system.
+- **String matching**: `partial_match` performs deep, optional fuzzy matching of nested dictionaries, lists, or strings.
+- **ISO‑8601 timestamps**: `iso_date_now` returns the current local time in ISO‑8601 format.
+- **Interactive prompts**: `yes_no_choice` and `yes_no_abort_choice` provide robust yes/no (with optional abort) dialogs.
+- **Name sanitization**: `sanitize_name` validates and cleans identifiers for safe use.
 """
 import tempfile
 from datetime import datetime
@@ -443,3 +461,41 @@ def backup_file(file: Path) -> Path:
     bak_fname = backup_filename(file)
     copy(file, bak_fname)
     return bak_fname
+
+
+def sanitize_name(name) -> str:
+    """Sanitizes and validates the provided name.
+
+    The function ensures that the input string adheres to predefined naming rules by:
+
+    - stripping leading/trailing spaces,
+    - isolating the last segment after splitting by slashes,
+    - validating the name against an alphanumeric pattern
+      with optional underscores (`_`), dashes (`-`), or periods (`.`).
+
+    Parameters
+    ----------
+    name : str
+        The name to sanitize and validate.
+
+    Returns
+    -------
+    str
+        Sanitized name that conforms to the rules.
+
+    Raises
+    ------
+    ValueError
+        If the provided name contains invalid characters or does not meet
+        the naming rules.
+    """
+    import re
+
+    sanitized_name = name.strip()  # Remove leading/trailing spaces
+    sanitized_name = sanitized_name.split("/")[-1]  # isolate the last segment after splitting by slashes
+    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
+        raise ValueError(
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods."
+        )
+    return sanitized_name

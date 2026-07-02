@@ -24,7 +24,7 @@
 # ------------------------------------------------------------------------------
 
 """
-This module implement a database as a **file structure on a remote server using SSHFS**.
+This module implements a database as a **file structure on a remote server using SSHFS**.
 """
 
 import subprocess

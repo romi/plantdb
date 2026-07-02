@@ -14,6 +14,7 @@ import unittest
 import numpy as np
 import requests
 
+from plantdb.commons import api_endpoints
 from plantdb.commons.test_database import _mkdtemp_romidb
 from plantdb.server.test_rest_api import TestRestApiServer
 
@@ -33,7 +34,7 @@ class AssetsApiTests(unittest.TestCase):
         import time
         for _ in range(10):
             try:
-                r = requests.get(cls.base_url + "/health")
+                r = requests.get(cls.base_url + api_endpoints.health())
                 if r.status_code == 200:
                     break
             except Exception:
@@ -49,15 +50,15 @@ class AssetsApiTests(unittest.TestCase):
 
     @classmethod
     def _login_admin(cls, base_url):
-        """Login as admin user and return access token."""
-        r = requests.post(base_url + '/login',
+        """Login as the admin user and return an access token."""
+        r = requests.post(base_url + api_endpoints.login(),
                           json={'username': 'admin', 'password': 'admin'})
         return r.json()['access_token']
 
     def test_file_serve_success(self):
         """Test that serving a file succeeds."""
         # Get a scan ID first
-        r = requests.get(self.base_url + '/scans',
+        r = requests.get(self.base_url + api_endpoints.scans(),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 200)
         scans = r.json()
@@ -65,7 +66,7 @@ class AssetsApiTests(unittest.TestCase):
         scan_id = scans[0]
 
         # Get metadata to find a file
-        r = requests.get(self.base_url + f'/scan/{scan_id}',
+        r = requests.get(self.base_url + api_endpoints.scan(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 200)
         metadata = r.json()['metadata']
@@ -73,15 +74,16 @@ class AssetsApiTests(unittest.TestCase):
         self.assertGreater(len(metadata['files']), 0)
 
         # Try to download the metadata file
-        file_name = metadata['files']['metadata']
-        r = requests.get(self.base_url + f'{file_name}',
+        file_uri = metadata['files']['metadata']
+        print(file_uri)
+        r = requests.get(self.base_url + f'{file_uri}',
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 200)
         self.assertGreater(len(r.content), 0)
 
     def test_file_serve_not_found(self):
         """Test that serving a non-existent file fails."""
-        r = requests.get(self.base_url + '/file/12345678-1234-1234-1234-123456789012/nonexistent.png',
+        r = requests.get(self.base_url + api_endpoints.file('12345678', 'azerty' , 'nonexistent.png'),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 404)
 
@@ -95,7 +97,7 @@ class AssetsApiTests(unittest.TestCase):
         file_id = "00000_rgb"
 
         # Request thumbnail
-        r = requests.get(self.base_url + f'/image/{scan_id}/{fileset_id}/{file_id}',
+        r = requests.get(self.base_url + api_endpoints.image(scan_id, fileset_id, file_id),
                          stream=True, params={"size": "thumb", "as_base64": 'false'})
         self.assertEqual(r.status_code, 200)
         self.assertIn('image', r.headers.get('Content-Type', ''))
@@ -112,7 +114,7 @@ class AssetsApiTests(unittest.TestCase):
         file_id = "00000_rgb"
 
         # Request thumbnail
-        r = requests.get(self.base_url + f'/image/{scan_id}/{fileset_id}/{file_id}',
+        r = requests.get(self.base_url + api_endpoints.image(scan_id, fileset_id, file_id),
                          stream=True, params={"size": "orig", "as_base64": 'false'})
         self.assertEqual(r.status_code, 200)
         self.assertIn('image', r.headers.get('Content-Type', ''))
@@ -130,7 +132,7 @@ class AssetsApiTests(unittest.TestCase):
         file_id = "00000_rgb"
 
         # Request thumbnail
-        r = requests.get(self.base_url + f'/image/{scan_id}/{fileset_id}/{file_id}',
+        r = requests.get(self.base_url + api_endpoints.image(scan_id, fileset_id, file_id),
                          stream=True, params={"size": "thumb", "as_base64": 'true'})
         self.assertEqual(r.status_code, 200)
         self.assertIn('application/json', r.headers.get('Content-Type'))
@@ -146,7 +148,7 @@ class AssetsApiTests(unittest.TestCase):
     def test_archive_download(self):
         """Test that downloading an archive succeeds."""
         # Get a scan ID first
-        r = requests.get(self.base_url + '/scans',
+        r = requests.get(self.base_url + api_endpoints.scans(),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 200)
         scans = r.json()
@@ -154,7 +156,7 @@ class AssetsApiTests(unittest.TestCase):
         scan_id = scans[0]
 
         # Request archive
-        r = requests.get(self.base_url + f'/archive/{scan_id}',
+        r = requests.get(self.base_url + api_endpoints.archive(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 200)
         # Should get a ZIP file

@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""WSGI Application Entry Point
+"""
+# WSGI Application Entry Point
 
 This module serves as the Web Server Gateway Interface (WSGI) entry point for the application,
 allowing web servers like Gunicorn, uWSGI, or Apache with mod_wsgi to interact with the application.
 
-Key Features
-------------
+## Key Features
+
 - Provides the application instance for WSGI-compatible web servers
 - Serves as the deployment entry point in production environments
 - Separates server configuration from application logic
 - Enables standard deployment practices for Python web applications
 
-Environment Variables
----------------------
+## Environment Variables
+
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
-- ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
+- ``API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 - ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (64 bits secret).
 - ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (64 bits secret).
@@ -24,14 +25,12 @@ Environment Variables
 - ``REFRESH_TIMEOUT``: Refresh JWT validity duration in seconds. Default `86400` seconds (1 day).
 - ``MAX_SESSION``: The maximum number of concurrent sessions to allow. Default `10`.
 
-Usage Examples
---------------
+## Usage Examples
+
 When deploying with uWSGI:
-
-.. code-block:: bash
-
-   uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
-
+```shell
+uwsgi --http :5000 --module plantdb.server.cli.wsgi:application --callable application --master
+```
 Should then be accessible under: http://localhost:5000/scans
 """
 
@@ -42,11 +41,11 @@ from plantdb.server.cli.fsdb_rest_api import rest_api
 # Get the path to the FSDB to serve using `ROMI_DB` environment variable, use '/myapp/db' as default (container)
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
 # Get the PlantDB REST API URL prefix
-url_prefix = os.environ.get("PLANTDB_API_PREFIX", "")
+url_prefix = os.environ.get("API_PREFIX", "")
 enable_ssl = str(os.environ.get("PLANTDB_API_SSL", "false")).lower() == "true"
 
 # Get the Flask application with a Proxy:
-application = rest_api(romi_db, proxy=True, url_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
+application = rest_api(romi_db, proxy=True, api_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
                        empty=False, models=False)
 
 if __name__ == "__main__":

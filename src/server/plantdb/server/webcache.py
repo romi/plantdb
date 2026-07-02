@@ -24,35 +24,47 @@
 # ------------------------------------------------------------------------------
 
 """
-This module provides three utility functions that are used in combination with the
-DB interface to create downsized versions of images, point clouds, and mesh resources.
-The resources are identified using the ``Scan``, ``Fileset``, and `File` IDs.
-The downsized versions are cached in the `'webcache'` directory in the scan directory.
+# WebCache - Cached Resources for PlantDB REST API
 
-The following **size specifications** are available:
+A utility module that creates and serves cached, down-sampled versions of images, point clouds, and meshes stored in a PlantDB scan.
+It exposes convenient ``*_path`` functions that return the file system path to either the original resource or a
+resized, cached copy, generating the cache on the fly when needed.
+This reduces bandwidth and processing time when serving data through web interfaces or visualization tools.
 
-* Images: 'thumb' (max. 150x150), 'large' (max. 1500x1500), and 'orig' (original size).
-* Point clouds: 'preview' (max. 10k points), and 'orig' (original size).
-* Mesh: 'orig' (original size). TODO: add remeshing
+## Key Features
 
-Examples
---------
+- **Automatic cache directory creation**: a ``webcache`` sub-folder is created inside each scan directory on demand.
+- **Image handling**: resize images to predefined ``thumb`` (150px) or ``large`` (1500px) resolutions, cache them as JPEG files, and return their paths.
+- **Point-cloud handling**: down-sample point clouds using Open3D voxel clustering, cache the result as ``.ply`` files, and provide easy access to both original and preview versions.
+- **Mesh handling**: simplify meshes via vertex clustering, cache the reduced meshes, and return paths for original or preview versions.
+- **Transparent hash-based filenames**: cached files are uniquely named using a SHA-1 hash of the resource identifiers and size, avoiding name collisions.
+- **Convenient API**: high-level ``image_path``, ``pointcloud_path``, and ``mesh_path`` functions abstract the caching logic and return ``pathlib.Path`` objects ready for further processing.
+
+## Usage Examples
+
+```python
 >>> from plantdb.server import webcache
->>> from os import environ
->>> from plantdb.commons.fsdb.core import FSDB
->>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
 >>> db.connect()
 >>> # Get the path to the original image:
->>> webcache.image_path(db,'sango36','images','00000_rgb','orig')
+>>> webcache.image_path(db,'real_plant_analyzed','images','00000_rgb','orig')
+PosixPath('/tmp/ROMI_DB_zrkxfixa/real_plant_analyzed/images/00000_rgb.jpg')
 >>> # Get the path to the thumb image (resized and cached):
->>> webcache.image_path(db,'sango36','images','00000_rgb','thumb')
+>>> webcache.image_path(db,'real_plant_analyzed','images','00000_rgb','thumb')
+PosixPath('/tmp/ROMI_DB_zrkxfixa/real_plant_analyzed/webcache/6fbae08f195837c511af7c2864d075dd5cd153bc.jpeg')
 >>> # Get the path to the original pointcloud:
->>> webcache.pointcloud_path(db,'sango_90_300_36','PointCloud_1_0_0_0_10_0_ca07eb2790','PointCloud','orig')
+>>> webcache.pointcloud_path(db,'real_plant_analyzed','PointCloud_1_0_1_0_10_0_7ee836e5a9','PointCloud','orig')
+PosixPath('/tmp/ROMI_DB_zrkxfixa/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply')
 >>> # Get the path to the preview pointcloud (resized and cached):
->>> webcache.pointcloud_path(db,'sango_90_300_36','PointCloud_1_0_0_0_10_0_ca07eb2790','PointCloud','preview')
+>>> webcache.pointcloud_path(db,'real_plant_analyzed','PointCloud_1_0_1_0_10_0_7ee836e5a9','PointCloud','preview')
+PosixPath('/tmp/ROMI_DB_zrkxfixa/real_plant_analyzed/webcache/77e25820ddd8facd7d7a4bc5b17ad3c81046becc.ply')
 >>> # Get the path to a downsampled pointcloud (resized and cached):
->>> webcache.pointcloud_path(db,'sango_90_300_36','PointCloud_1_0_0_0_10_0_ca07eb2790','PointCloud','2.3')
+>>> webcache.pointcloud_path(db,'real_plant_analyzed','PointCloud_1_0_1_0_10_0_7ee836e5a9','PointCloud','2.3')
+PosixPath('/tmp/ROMI_DB_zrkxfixa/real_plant_analyzed/webcache/8570781d75db5816a1d8a3899df1461a649ff9c9.ply')
 >>> db.disconnect()
+```
 """
 import hashlib
 from pathlib import Path
@@ -296,7 +308,7 @@ def image_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import image_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> db.login('guest', 'guest')
     >>> # Example 1: Get the original image:
@@ -475,7 +487,7 @@ def pointcloud_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import pointcloud_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> # Example 1: Get the original pointcloud:
     >>> pointcloud_path(db, 'real_plant_analyzed', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'PointCloud', 'orig')
@@ -654,7 +666,7 @@ def mesh_path(db, scan_id, fileset_id, file_id, size='orig', **kwargs):
     --------
     >>> from plantdb.server.webcache import mesh_path
     >>> from plantdb.commons.test_database import test_database
-    >>> db = test_database('real_plant_analyzed')
+    >>> db = test_database('real_plant_analyzed', no_auth=True)
     >>> db.connect()
     >>> # Example 1: Get the original mesh:
     >>> mesh_path(db, 'real_plant_analyzed', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'TriangleMesh', 'orig')
