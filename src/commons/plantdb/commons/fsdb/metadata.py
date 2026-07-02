@@ -9,20 +9,18 @@ This module provides a robust interface for managing metadata in JSON format, of
 ## Key Features
 
 - **Metadata Loading Operations**
-  - Load metadata from JSON files for files, filesets, and scan datasets
-  - Handle JSON decode errors gracefully with appropriate error logging
-  - Support both string and Path objects for file paths
-  - Maintain backward compatibility with legacy metadata storage patterns
-
+    - Load metadata from JSON files for files, filesets, and scan datasets
+    - Handle JSON decode errors gracefully with appropriate error logging
+    - Support both string and Path objects for file paths
+    - Maintain backward compatibility with legacy metadata storage patterns
 - **Metadata Storage Operations**
-  - Save metadata to JSON files with consistent formatting
-  - Automatic creation of necessary directory structures
-  - Support for hierarchical metadata organization
-
+    - Save metadata to JSON files with consistent formatting
+    - Automatic creation of necessary directory structures
+    - Support for hierarchical metadata organization
 - **Metadata Manipulation**
-  - Deep copy functionality to prevent unintended modifications
-  - Flexible key-value pair management
-  - Support for both single value updates and bulk dictionary updates
+    - Deep copy functionality to prevent unintended modifications
+    - Flexible key-value pair management
+    - Support for both single value updates and bulk dictionary updates
 
 ## Usage Examples
 

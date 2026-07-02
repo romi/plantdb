@@ -22,18 +22,14 @@ It allows acquiring and releasing locks on resources identified by scan, fileset
 
 ```python
 >>> from plantdb.commons.fsdb.lock import LockManager, LockType
-
 >>> # Initialize the lock manager with a base path
 >>> manager = LockManager('/path/to/database')
-
 >>> # Acquire an exclusive lock for a scan
 >>> with manager.acquire_lock('scan123', LockType.EXCLUSIVE, user='user1', level='scan'):
 >>>     # Perform critical section operations...
-
 >>> # Acquire a shared lock for a fileset
 >>> with manager.acquire_lock('scan123/fileset1', LockType.SHARED, user='user1', level='fileset'):
 >>>     # Perform critical section operations...
-
 >>> # Acquire an exclusive lock for a file
 >>> with manager.acquire_lock('scan123/fileset1/file1', LockType.EXCLUSIVE, user='user1', level='file'):
 >>>     # Perform critical section operations...

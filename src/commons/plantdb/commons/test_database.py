@@ -29,8 +29,21 @@
 This module regroups tools to download test datasets, pipeline configuration files and trained CNN models from ZENODO repository.
 It aims at simplifying the creation of a test database for demonstration or CI purposes.
 
+The list of valid dataset names are:
+
+- ``'real_plant'``: 60 images of a Col-0 _Arabidopsis thaliana_ plant acquired with the _Plant Imager_;
+- ``'virtual_plant'``: 18 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;
+- ``'real_plant_analyzed'``: the ``real_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``config/geom_pipe_real.toml`` configuration file;
+- ``'virtual_plant_analyzed'``: the ``virtual_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``config/geom_pipe_virtual.toml`` configuration file;
+- ``'arabidopsis000'``: 72 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;
+
+Archive ``'configs.zip'`` contains the configuration files used with the ``romi_run_task`` CLI to reconstruct the datasets.
+
+Archive ``'models.zip'`` contains a preconfigured directory structure with the trained CNN weight file Resnet_896_896_epoch50.pt.
+
 ## Examples
 
+```python
 >>> from plantdb.commons.test_database import setup_test_database
 >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
 >>> db_path = setup_test_database('real_plant')
@@ -50,17 +63,8 @@ INFO     [test_database] Verifying 'configs.zip' MD5 hash value...
 INFO     [test_database] The test database is set up under '/tmp/ROMI_DB'.
 >>> print(db_path)
 PosixPath('/tmp/ROMI_DB')
+```
 
-The list of valid dataset names are:
-  * ``'real_plant'``: 60 images of a Col-0 _Arabidopsis thaliana_ plant acquired with the _Plant Imager_;
-  * ``'virtual_plant'``: 18 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;
-  * ``'real_plant_analyzed'``: the ``real_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``config/geom_pipe_real.toml`` configuration file;
-  * ``'virtual_plant_analyzed'``: the ``virtual_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``config/geom_pipe_virtual.toml`` configuration file;
-  * ``'arabidopsis000'``: 72 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;
-
-Archive ``'configs.zip'`` contains the configuration files used with the ``romi_run_task`` CLI to reconstruct the datasets.
-
-Archive ``'models.zip'`` contains a preconfigured directory structure with the trained CNN weight file Resnet_896_896_epoch50.pt.
 """
 import hashlib
 from pathlib import Path

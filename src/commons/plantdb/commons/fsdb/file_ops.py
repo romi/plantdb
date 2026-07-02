@@ -19,8 +19,8 @@ A comprehensive module for managing file system operations in a hierarchical dat
 ## Usage Examples
 
 ```python
->>> from plantdb.commons.test_database import test_database
 >>> from plantdb.commons.fsdb.file_ops import _load_scans,_make_scan, _store_scan, _delete_scan
+>>> from plantdb.commons.test_database import test_database
 >>> # Initialize the database (creates base directory if needed)
 >>> db = test_database(no_auth=True)
 >>> db.connect()

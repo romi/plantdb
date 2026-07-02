@@ -32,12 +32,12 @@ repeatable test environments without affecting the original data.
 
 ## Key Features
 
-- **TemporaryCloneDB** – Creates a temporary copy of an existing PlantDB on disk,
+- **TemporaryCloneDB**: Creates a temporary copy of an existing PlantDB on disk,
   ensuring tests run against an isolated sandbox that is automatically cleaned up.
-- **DummyDBTestCase** – A unittest.TestCase subclass that builds a lightweight dummy
+- **DummyDBTestCase**: A unittest.TestCase subclass that builds a lightweight dummy
   database containing a sample scan, fileset, and file, with convenience methods to
   retrieve them.
-- **FSDBTestCase** – A unittest.TestCase subclass for real‑world datasets; it handles
+- **FSDBTestCase**: A unittest.TestCase subclass for real‑world datasets; it handles
   connecting, authenticating, and cleaning up a temporary FSDB instance.
 - Helper methods (`get_test_db`, `get_test_scan`, `get_test_fileset`,
   `get_test_image_file`, `get_task_fileset`, etc.) to quickly access common test

@@ -9,19 +9,19 @@ A collection of specialized exception classes designed to handle various error s
 ## Key Features
 
 - **Database Validation**
-  - `NotAnFSDBError` for invalid database instances
+    - `NotAnFSDBError` for invalid database instances
 - **Scan Management** : exceptions for scan-related errors:
-  - `ScanExistsError` for existing scan directories
-  - `ScanNotFoundError` for missing scan directories
+    - `ScanExistsError` for existing scan directories
+    - `ScanNotFoundError` for missing scan directories
 - **Fileset Operations**: exceptions for fileset-related errors:
-  - `FilesetExistsError` for existing fileset directories
-  - `FilesetNotFoundError` for missing fileset directories
-  - `FilesetNoIDError` for missing fileset identifiers
+    - `FilesetExistsError` for existing fileset directories
+    - `FilesetNotFoundError` for missing fileset directories
+    - `FilesetNoIDError` for missing fileset identifiers
 - **File Handling**: exceptions for file-related issues:
-  - `FileExistsError` for existing file
-  - `FileNotFoundError` for missing file
-  - `FileNoIDError` for missing file identifiers
-  - `FileNoFileNameError` for missing file names
+    - `FileExistsError` for existing file
+    - `FileNotFoundError` for missing file
+    - `FileNoIDError` for missing file identifiers
+    - `FileNoFileNameError` for missing file names
 
 ## Usage Examples
 
