@@ -23,7 +23,8 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Synchronization Utility for PlantDB Databases
+"""
+# Synchronization Utility for PlantDB Databases
 
 This module provides a robust synchronization mechanism for File System Databases (FSDB) in the PlantDB project, enabling seamless data transfer between local and remote database instances.
 

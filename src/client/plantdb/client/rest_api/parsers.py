@@ -26,7 +26,8 @@
 """
 # REST API Parser Module
 
-Module containing functions for parsing responses from the PlantDB REST API. This module handles the conversion of raw API responses into Python objects, including images, point clouds, meshes, skeletons, and configuration data.
+Module containing functions for parsing responses from the PlantDB REST API.
+This module handles the conversion of raw API responses into Python objects, including images, point clouds, meshes, skeletons, and configuration data.
 
 ## Key Features
 

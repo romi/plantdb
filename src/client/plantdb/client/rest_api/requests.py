@@ -26,14 +26,12 @@
 """
 # REST API Requests Module
 
-Provides a unified interface for communicating with the PlantDB REST API, handling
-authentication, data retrieval, and file transfers. It abstracts HTTP request details,
-allowing client code to focus on business logic.
+Provides a unified interface for communicating with the PlantDB REST API, handling authentication, data retrieval, and file transfers.
+It abstracts HTTP request details, allowing client code to focus on business logic.
 
 ## Key Features
 
-- Centralized `make_api_request` supporting GET, POST, PUT, DELETE with timeout,
-  SSL verification, and custom headers.
+- Centralized `make_api_request` supporting GET, POST, PUT, DELETE with timeout, SSL verification, and custom headers.
 - Convenience helpers for authentication (login, logout, token validation/refresh).
 - Utilities for managing scans, images, archives, and dataset files.
 - Streamed download/upload support with timing for performance monitoring.

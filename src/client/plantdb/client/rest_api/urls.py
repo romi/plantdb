@@ -37,8 +37,7 @@ with PlantDB services.
 - Generate full endpoint URLs for authentication (login, logout, register, token handling).
 - Build URLs for scans, individual scan data, preview images, and task‑specific images.
 - Create URLs for archive access, configuration files, and reconstruction pipelines.
-- Support custom host, port, URL prefix, and SSL toggles via environment variables or
-  function arguments.
+- Support custom host, port, URL prefix, and SSL toggles via environment variables or function arguments.
 - Validate and sanitize dataset names before forming URLs.
 - Provide helper to list image URIs with size and base64 options.
 

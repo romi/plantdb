@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-FSDB Synchronization via REST API
+# FSDB Synchronization via REST API
 
-This module provides functionality to synchronize scan archives between two FSDB
-(Plant Database) instances using REST API. It ensures data consistency and aids in
-migrating or backing up scan data efficiently between different database instances.
+This module provides functionality to synchronize scan archives between two FSDB (Plant Database) instances using REST API.
+It ensures data consistency and aids in migrating or backing up scan data efficiently between different database instances.
 
-Key Features
-------------
+## Key Features
+
 - **Command-line Interface (CLI)**: Includes an argument parser for easy configuration of source and target databases.
 - **URL Validation**: Verifies the format and accessibility of the provided database URLs.
 - **Scan Synchronization**: Retrieves scan archives from the source database and uploads them to the target database.
@@ -18,18 +17,16 @@ Key Features
 - **Logging**: Offers informational and error logging to provide feedback during the synchronization process.
 - **Error Handling**: Handles common errors such as invalid URLs, inaccessible ports, and connectivity issues.
 
-Usage Examples
---------------
-To synchronize two FSDB databases, run the script from the command line with the
-`origin` and `target` arguments in the format `host:port`.
+## Usage Examples
+
+To synchronize two FSDB databases, run the script from the command line with the `origin` and `target` arguments in the format `host:port`.
 Temporary files are stored in the `/tmp` directory during the transfer process.
 
 ```bash
 python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000
 ```
 
-This command connects the origin database at `192.168.1.1:5000` to the target database
-at `192.168.1.2:5000` and transfers all scan archives.
+This command connects the origin database at `192.168.1.1:5000` to the target database at `192.168.1.2:5000` and transfers all scan archives.
 
 To filter the transferred scans based on a regular expression, use the `--filter` optional argument.
 For example, to transfer only scans with names starting with 'virtual_':
@@ -37,8 +34,8 @@ For example, to transfer only scans with names starting with 'virtual_':
 python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000 --filter 'virtual_*'
 ```
 
-Testing
--------
+## Testing
+
 To test this script, you can set up two test FSDB REST API instances locally, with each instance running on a different port.
 One instance should start with sample data, while the other should be empty.
 You can then use this script to transfer data from the first instance to the second.

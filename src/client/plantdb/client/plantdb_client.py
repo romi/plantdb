@@ -4,7 +4,8 @@
 """
 # PlantDB Client Module
 
-A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data including scans, filesets, and associated metadata.
+A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data
+including scans, filesets, and associated metadata.
 
 ## Key Features
 

@@ -1,7 +1,8 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Dash UI for FSDBSync - PlantDB Database Synchronization Tool
+"""
+# Dash UI for FSDBSync - PlantDB Database Synchronization Tool
 
 This module provides a web-based user interface for the FSDBSync class,
 allowing users to easily configure and manage database synchronization
