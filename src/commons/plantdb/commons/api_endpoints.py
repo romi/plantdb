@@ -16,9 +16,9 @@ Key Features
 Usage Examples
 --------------
 >>> from plantdb.commons import api_endpoints
->>> api_endpoints.login(prefix='/api/v1')
+>>> api_endpoints.login()
 '/api/v1/login'
->>> api_endpoints.scan('plant1', prefix='/api/v1')
+>>> api_endpoints.scan('plant1', )
 '/api/v1/scan/plant1'
 """
 
@@ -52,27 +52,15 @@ def sanitize_name(name) -> str:
         the naming rules.
     """
     import re
+
     sanitized_name = name.strip()  # Remove leading/trailing spaces
-    sanitized_name = sanitized_name.split('/')[-1]  # isolate the last segment after splitting by slashes
+    sanitized_name = sanitized_name.split("/")[-1]  # isolate the last segment after splitting by slashes
     # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
     if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
         raise ValueError(
-            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods.")
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods."
+        )
     return sanitized_name
-
-
-def url_prefix(endpoint_path):
-    """Wrap an endpoint path generator with an optional URL prefix."""
-
-    def wrapper(*args, **kwargs):
-        if "prefix" in kwargs and kwargs["prefix"]:
-            prefix = kwargs["prefix"]
-            prefix = '/' + prefix.lstrip('/').rstrip('/')
-            return prefix + endpoint_path(*args, **kwargs)
-        else:
-            return endpoint_path(*args, **kwargs)
-
-    return wrapper
 
 
 # ------------------------------------------------------------------------
@@ -127,7 +115,7 @@ def url_prefix(endpoint_path):
 #           ├─ sequence/{scan_id}     (GET) → retrieve scan sequence
 #           └─ skeleton/{scan_id}     (GET) → retrieve scan skeleton
 # ------------------------------------------------------------------------
-
+URL_PREFIX = "/api/v1"
 HOME = "/"
 HEALTH = "/health"
 REFRESH = "/refresh"
@@ -162,9 +150,24 @@ ARCHIVE = "/assets/archive/{scan_id}"
 FILE_PATH = "/assets/files/{file_path}"
 
 
+def url_prefix(endpoint_path):
+    """Wrap an endpoint path generator with an optional URL prefix."""
+
+    def wrapper(*args, **kwargs):
+        prefix = kwargs.get("prefix", URL_PREFIX)
+        if prefix:
+            prefix = "/" + prefix.lstrip("/").rstrip("/")
+            return prefix + endpoint_path(*args, **kwargs)
+        else:
+            return endpoint_path(*args, **kwargs)
+
+    return wrapper
+
+
 # ------------------------------------------------------------------------
 # - Base Endpoints
 # ------------------------------------------------------------------------
+
 
 @url_prefix
 def home(**kwargs) -> str:
@@ -183,8 +186,10 @@ def home(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.home(prefix='/api/v1')
+    >>> api_endpoints.home()
     '/api/v1/'
+    >>> api_endpoints.home(prefix='/plantdb')
+    '/plantdb/'
     """
     return HOME
 
@@ -206,7 +211,7 @@ def health(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.health(prefix='/api/v1')
+    >>> api_endpoints.health()
     '/api/v1/health'
     """
     return HEALTH
@@ -234,7 +239,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.refresh(prefix='/api/v1')
+    >>> api_endpoints.refresh()
     '/api/v1/refresh'
     >>> api_endpoints.refresh('scan1')
     '/refresh?scan_id=scan1'
@@ -249,6 +254,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
 # ------------------------------------------------------------------------
 # - Authentication Endpoints
 # ------------------------------------------------------------------------
+
 
 @url_prefix
 def register(**kwargs) -> str:
@@ -267,7 +273,7 @@ def register(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.register(prefix='/api/v1')
+    >>> api_endpoints.register()
     '/api/v1/auth/register'
     """
     return REGISTER
@@ -290,7 +296,7 @@ def login(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.login(prefix='/api/v1')
+    >>> api_endpoints.login()
     '/api/v1/auth/login'
     """
     return LOGIN
@@ -313,7 +319,7 @@ def logout(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.logout(prefix='/api/v1')
+    >>> api_endpoints.logout()
     '/api/v1/auth/logout'
     """
     return LOGOUT
@@ -336,7 +342,7 @@ def token_refresh(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.token_refresh(prefix='/api/v1')
+    >>> api_endpoints.token_refresh()
     '/api/v1/auth/token/refresh'
     """
     return TOKEN_REFRESH
@@ -359,7 +365,7 @@ def token_validation(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.token_validation(prefix='/api/v1')
+    >>> api_endpoints.token_validation()
     '/api/v1/auth/token/validation'
     """
     return TOKEN_VALIDATION
@@ -382,7 +388,7 @@ def create_api_token(**kwargs):
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.create_api_token(prefix='/api/v1')
+    >>> api_endpoints.create_api_token()
     '/api/v1/auth/token/create-api-token'
     """
     return CREATE_API_TOKEN
@@ -410,7 +416,7 @@ def scans(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.scans(prefix='/api/v1')
+    >>> api_endpoints.scans()
     '/api/v1/scans'
     """
     return SCANS
@@ -433,7 +439,7 @@ def scans_info(**kwargs) -> str:
     Examples
     --------
     >>> from plantdb.commons import api_endpoints
-    >>> api_endpoints.scans_info(prefix='/api/v1')
+    >>> api_endpoints.scans_info()
     '/api/v1/scans/info'
     """
     return SCANS_INFO
@@ -462,8 +468,6 @@ def scan(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scan('scan1')
-    '/scans/scan1'
-    >>> api_endpoints.scan('scan1', prefix='/api/v1')
     '/api/v1/scans/scan1'
     """
     scan_id = sanitize_name(scan_id)
@@ -495,7 +499,7 @@ def scan_metadata(scan_id: str, key: str | None = None, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scan_metadata('real_plant')
-    '/filesets/real_plant/metadata'
+    '/api/v1/scans/real_plant/metadata'
     """
     scan_id = sanitize_name(scan_id)
 
@@ -531,7 +535,7 @@ def scan_filesets_list(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.scan_filesets_list('real_plant')
-    '/filesets/real_plant/filesets'
+    '/api/v1/scans/real_plant/filesets'
     """
     scan_id = sanitize_name(scan_id)
     return SCAN_FILESETS.format(scan_id=scan_id)
@@ -562,7 +566,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.fileset('real_plant', 'images')
-    '/filesets/real_plant/images'
+    '/api/v1/filesets/real_plant/images'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -570,7 +574,9 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
 
 
 @url_prefix
-def fileset_metadata(scan_id: str, fileset_id: str, key: str | None = None, **kwargs) -> str:
+def fileset_metadata(
+    scan_id: str, fileset_id: str, key: str | None = None, **kwargs
+) -> str:
     """URL to access the fileset metadata associated with the given scan and fileset name.
 
     Parameters
@@ -596,7 +602,7 @@ def fileset_metadata(scan_id: str, fileset_id: str, key: str | None = None, **kw
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.fileset_metadata('real_plant', 'images')
-    '/filesets/real_plant/images/metadata'
+    '/api/v1/filesets/real_plant/images/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -635,7 +641,7 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.fileset_files_list('real_plant', 'images')
-    '/filesets/real_plant/images/files'
+    '/api/v1/filesets/real_plant/images/files'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -655,6 +661,11 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     file_id : str
         The name of the file.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -664,7 +675,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.file('real_plant', 'images', '00000_rgb')
-    '/files/real_plant/images/00000_rgb'
+    '/api/v1/files/real_plant/images/00000_rgb'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -673,7 +684,9 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 
 
 @url_prefix
-def file_metadata(scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs) -> str:
+def file_metadata(
+    scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs
+) -> str:
     """URL to access the file metadata associated with the given scan and fileset name.
 
     Parameters
@@ -701,7 +714,7 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, key: str | None =
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.file_metadata('real_plant', 'images', '00000_rgb')
-    '/files/real_plant/images/00000_rgb/metadata'
+    '/api/v1/files/real_plant/images/00000_rgb/metadata'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -713,16 +726,26 @@ def file_metadata(scan_id: str, fileset_id: str, file_id: str, key: str | None =
         query["key"] = str(key)
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
-    return FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id) + f"{query_str}"
+    return (
+        FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
+        + f"{query_str}"
+    )
 
 
 # ------------------------------------------------------------------------
 # - Asset Endpoints
 # ------------------------------------------------------------------------
 
+
 @url_prefix
-def image(scan_id: str, fileset_id: str, file_id: str,
-          size: int | str | None = None, as_base64: bool | None = None, **kwargs) -> str:
+def image(
+    scan_id: str,
+    fileset_id: str,
+    file_id: str,
+    size: int | str | None = None,
+    as_base64: bool | None = None,
+    **kwargs,
+) -> str:
     """Return the URL path to the image endpoint.
 
     Parameters
@@ -738,6 +761,11 @@ def image(scan_id: str, fileset_id: str, file_id: str,
     as_base64 : bool, optional
         A boolean flag indicating whether to return an image as a base64 string.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -747,9 +775,9 @@ def image(scan_id: str, fileset_id: str, file_id: str,
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.image('real_plant', 'images', '00000_rgb', 'orig', False)
-    '/assets/image/real_plant/images/00000_rgb?size=orig'
+    '/api/v1/assets/image/real_plant/images/00000_rgb?size=orig&as_base64=false'
     >>> api_endpoints.image('real_plant', 'images', '00000_rgb', 'thumb', True)
-    '/assets/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
+    '/api/v1/assets/image/real_plant/images/00000_rgb?size=thumb&as_base64=true'
     """
     scan_id = sanitize_name(scan_id)
     fileset_id = sanitize_name(fileset_id)
@@ -764,7 +792,10 @@ def image(scan_id: str, fileset_id: str, file_id: str,
         query["as_base64"] = str(as_base64).lower()
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
-    return IMAGE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id) + f"{query_str}"
+    return (
+        IMAGE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
+        + f"{query_str}"
+    )
 
 
 @url_prefix
@@ -779,6 +810,11 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
         The type of measure to request, in ``['all', 'angles', 'internodes', 'fruit_points',
          'manual_angles', 'manual_internodes']``.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -788,10 +824,17 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.sequence('real_plant','all')
-    '/assets/sequence/real_plant?type=all'
+    '/api/v1/assets/sequence/real_plant?type=all'
     """
-    valid_types = ['all', 'angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
-    seq_type = 'all' if seq_type not in valid_types else seq_type
+    valid_types = [
+        "all",
+        "angles",
+        "internodes",
+        "fruit_points",
+        "manual_angles",
+        "manual_internodes",
+    ]
+    seq_type = "all" if seq_type not in valid_types else seq_type
     scan_id = sanitize_name(scan_id)
 
     # Assemble optional query parameters
@@ -804,28 +847,38 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
 
 
 @url_prefix
-def pointcloud(scan_id: str,
-               size: int | float | str | None = None,
-               coords: bool | None = None,
-               pcd_type: str = "default",
-               **kwargs) -> str:
+def pointcloud(
+    scan_id: str,
+    size: int | float | str | None = None,
+    coords: bool | None = None,
+    pcd_type: str = "default",
+    **kwargs,
+) -> str:
     """Return the URL path to the point-cloud endpoint.
 
     Parameters
     ----------
     scan_id : str
         The name of the scan dataset containing the point-cloud.
-    size : str or int or float
+    size : str or int or float, optional
         Query parameter controlling downsampling.
         Accepted values:
             * 'orig' - serve the original point cloud.
             * 'preview' - serve a precomputed preview (default).
             * A float value - perform on-the-fly voxel downsampling using the specified voxel size.
         If an invalid string is supplied, the default 'preview' is used.
-    coords : str
+    coords : bool, optional
         Query parameter indicating whether to return the point coordinates as JSON.
-    pcd_type : str or int
-        The type of point-cloud to request, in ``['default', 'gt']``.
+        Defaults to 'false', which streams the PLY file.
+        If set, returns the data as a list under the 'coordinates' JSON dictionary entry.
+    pcd_type : str or int, optional
+        Query parameter indicating whether to return the reconstructed point cloud (default) or
+        the ground truth ('type=gt').
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
 
     Returns
     -------
@@ -836,13 +889,15 @@ def pointcloud(scan_id: str,
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.pointcloud('real_plant')
-    '/assets/pointcloud/real_plant?type=default'
-    >>> api_endpoints.pointcloud('real_plant','gt')
-    '/assets/pointcloud/real_plant?type=gt'
+    '/api/v1/assets/pointcloud/real_plant?type=default'
+    >>> api_endpoints.pointcloud('real_plant', pcd_type='gt')
+    '/api/v1/assets/pointcloud/real_plant?type=gt'
+    >>> api_endpoints.pointcloud('real_plant', coords=True)
+    '/api/v1/assets/pointcloud/real_plant?type=default&coords=True'
     """
-    VALID_SIZES = {'orig', 'preview'}
-    VALID_TYPES = ['default', 'gt']
-    seq_type = '' if pcd_type not in VALID_TYPES else pcd_type
+    VALID_SIZES = {"orig", "preview"}
+    VALID_TYPES = ["default", "gt"]
+    seq_type = "" if pcd_type not in VALID_TYPES else pcd_type
     scan_id = sanitize_name(scan_id)
 
     # Assemble optional query parameters
@@ -853,7 +908,9 @@ def pointcloud(scan_id: str,
         elif isinstance(size, str) and size in VALID_SIZES:
             query["size"] = size.lower()
         else:
-            raise ValueError(f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}")
+            raise ValueError(
+                f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}"
+            )
     if seq_type is not None:
         query["type"] = str(seq_type)
     if coords is not None:
@@ -864,15 +921,27 @@ def pointcloud(scan_id: str,
 
 
 @url_prefix
-def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs) -> str:
+def mesh(
+    scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs
+) -> str:
     """Return the URL path to the mesh endpoint.
 
     Parameters
     ----------
     scan_id : str
         The name of the scan dataset containing the mesh.
-    coords : str
+    size : str or int, optional
+        Query parameter controlling downsampling.
+        Accepted values:
+            * 'orig' - serve the original point cloud.
+    coords : bool, optional
         Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
+        Defaults to 'false', which streams the PLY file.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
 
     Returns
     -------
@@ -883,9 +952,10 @@ def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.mesh('real_plant')
-    '/assets/mesh/real_plant'
+    '/api/v1/assets/mesh/real_plant'
+    >>> api_endpoints.mesh('real_plant', coords=True)
     """
-    VALID_SIZES = {'orig'}
+    VALID_SIZES = {"orig"}
     scan_id = sanitize_name(scan_id)
 
     # Assemble optional query parameters
@@ -896,7 +966,9 @@ def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None
         elif isinstance(size, str) and size in VALID_SIZES:
             query["size"] = size.lower()
         else:
-            raise ValueError(f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}")
+            raise ValueError(
+                f"Invalid size '{size}'. Valid options: integer value or {VALID_SIZES}"
+            )
     if coords is not None:
         query["coords"] = str(coords)
 
@@ -913,6 +985,11 @@ def skeleton(scan_id: str, **kwargs) -> str:
     scan_id : str
         The name of the scan dataset containing the skeleton.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -922,7 +999,7 @@ def skeleton(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.skeleton('real_plant')
-    '/assets/skeleton/real_plant'
+    '/api/v1/assets/skeleton/real_plant'
     """
     scan_id = sanitize_name(scan_id)
     return SKELETON.format(scan_id=scan_id)
@@ -937,6 +1014,11 @@ def archive(scan_id: str, **kwargs) -> str:
     scan_id : str
         The name of the scan dataset to archive.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -946,7 +1028,7 @@ def archive(scan_id: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.archive('scan1')
-    '/assets/archive/scan1'
+    '/api/v1/assets/archive/scan1'
     """
     scan_id = sanitize_name(scan_id)
     return ARCHIVE.format(scan_id=scan_id)
@@ -963,6 +1045,11 @@ def file_path(file_path: str, **kwargs) -> str:
     file_path : str
         The path to the file in the database.
 
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
     Returns
     -------
     str
@@ -972,6 +1059,6 @@ def file_path(file_path: str, **kwargs) -> str:
     --------
     >>> from plantdb.commons import api_endpoints
     >>> api_endpoints.file_path('real_plant/images/00000_rgb.jpg')
-    '/assets/files/real_plant/images/00000_rgb.jpg'
+    '/api/v1/assets/files/real_plant/images/00000_rgb.jpg'
     """
-    return FILE_PATH.format(file_path=file_path.lstrip('/'))
+    return FILE_PATH.format(file_path=file_path.lstrip("/"))
