@@ -177,7 +177,7 @@ class Home(Resource):
             "base endpoints": {
                 f"{HOME}": "Provides general information about the PlantDB REST API.",
                 f"{HEALTH}": "Health‑check endpoint that verifies the API is operational.",
-                f"{REFRESH.format(scan_id='<scan_id>')}": "Refreshes the database or a specific scan if provided."
+                f"{REFRESH.format(scan_id='scan_id')}": "Refreshes the database or a specific scan if provided."
             },
 
             "authentication endpoints": {
@@ -192,30 +192,30 @@ class Home(Resource):
             "scans endpoints": {
                 f"{SCANS}": "Returns a list of all available scans.",
                 f"{SCANS_INFO}": "Provides a table containing scan metadata.",
-                f"{SCAN.format(scan_id='<scan_id>')}": "Retrieves an existing scan or creates a new one.",
-                f"{SCAN_MD.format(scan_id='<scan_id>')}": "Gets or updates metadata for the specified scan.",
-                f"{SCAN_FILESETS.format(scan_id='<scan_id>')}": "Lists the filesets belonging to the specified scan."
+                f"{SCAN.format(scan_id='scan_id')}": "Retrieves an existing scan or creates a new one.",
+                f"{SCAN_MD.format(scan_id='scan_id')}": "Gets or updates metadata for the specified scan.",
+                f"{SCAN_FILESETS.format(scan_id='scan_id')}": "Lists the filesets belonging to the specified scan."
             },
 
             "filesets endpoints": {
-                f"{FILESET.format(scan_id='<scan_id>', fileset_id='<fileset_id>')}": "Retrieves an existing fileset or creates a new one.",
-                f"{FILESET_MD.format(scan_id='<scan_id>', fileset_id='<fileset_id>')}": "Gets or updates metadata for the specified fileset.",
-                f"{FILESET_FILES.format(scan_id='<scan_id>', fileset_id='<fileset_id>')}": "Lists the files contained in the specified fileset."
+                f"{FILESET.format(scan_id='scan_id', fileset_id='fileset_id')}": "Retrieves an existing fileset or creates a new one.",
+                f"{FILESET_MD.format(scan_id='scan_id', fileset_id='fileset_id')}": "Gets or updates metadata for the specified fileset.",
+                f"{FILESET_FILES.format(scan_id='scan_id', fileset_id='fileset_id')}": "Lists the files contained in the specified fileset."
             },
 
             "files endpoints": {
-                f"{FILE.format(scan_id='<scan_id>', fileset_id='<fileset_id>', file_id='<file_id>')}": "Retrieves an existing file or creates a new one.",
-                f"{FILE_MD.format(scan_id='<scan_id>', fileset_id='<fileset_id>', file_id='<file_id>')}": "Gets or updates metadata for the specified file."
+                f"{FILE.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Retrieves an existing file or creates a new one.",
+                f"{FILE_MD.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Gets or updates metadata for the specified file."
             },
 
             "assets endpoints": {
-                f"{FILE_PATH.format(file_path='<file_path>')}": "Retrieves a file located at the specified path.",
-                f"{IMAGE.format(scan_id='<scan_id>', fileset_id='<fileset_id>', file_id='<file_id>')}": "Returns a specific image.",
-                f"{ARCHIVE.format(scan_id='<scan_id>')}": "Downloads or updates the archive for the given scan.",
-                f"{POINTCLOUD.format(scan_id='<scan_id>')}": "Returns a specific point‑cloud file.",
-                f"{MESH.format(scan_id='<scan_id>')}": "Returns a specific mesh file.",
-                f"{SEQUENCE.format(scan_id='<scan_id>')}": "Returns sequence data for the given scan.",
-                f"{SKELETON.format(scan_id='<scan_id>')}": "Returns curve‑skeleton data for the given scan."
+                f"{FILE_PATH.format(file_path='file_path')}": "Retrieves a file located at the specified path.",
+                f"{IMAGE.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Returns a specific image.",
+                f"{ARCHIVE.format(scan_id='scan_id')}": "Downloads or updates the archive for the given scan.",
+                f"{POINTCLOUD.format(scan_id='scan_id')}": "Returns a specific point‑cloud file.",
+                f"{MESH.format(scan_id='scan_id')}": "Returns a specific mesh file.",
+                f"{SEQUENCE.format(scan_id='scan_id')}": "Returns sequence data for the given scan.",
+                f"{SKELETON.format(scan_id='scan_id')}": "Returns curve‑skeleton data for the given scan."
             }
         }
         return api_info
