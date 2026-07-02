@@ -17,7 +17,7 @@ allowing web servers like Gunicorn, uWSGI, or Apache with mod_wsgi to interact w
 ## Environment Variables
 
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
-- ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
+- ``API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 - ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (64 bits secret).
 - ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (64 bits secret).
@@ -41,11 +41,11 @@ from plantdb.server.cli.fsdb_rest_api import rest_api
 # Get the path to the FSDB to serve using `ROMI_DB` environment variable, use '/myapp/db' as default (container)
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
 # Get the PlantDB REST API URL prefix
-url_prefix = os.environ.get("PLANTDB_API_PREFIX", "")
+url_prefix = os.environ.get("API_PREFIX", "")
 enable_ssl = str(os.environ.get("PLANTDB_API_SSL", "false")).lower() == "true"
 
 # Get the Flask application with a Proxy:
-application = rest_api(romi_db, proxy=True, url_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
+application = rest_api(romi_db, proxy=True, api_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
                        empty=False, models=False)
 
 if __name__ == "__main__":

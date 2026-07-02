@@ -20,7 +20,7 @@ blocking the main interpreter, enabling fast, isolated integration tests.
 ```python
 >>> from plantdb.server.test_rest_api import test_rest_api
 >>> # Create a temporary test database and start the API
->>> api = test_rest_api(test=True)
+>>> api = test_rest_api()
 >>> api.start()
 >>> # Interact with the API (e.g., list scans)
 >>> import requests
@@ -30,7 +30,7 @@ blocking the main interpreter, enabling fast, isolated integration tests.
 >>> api.stop()
 
 >>> # Using the server as a context manager
->>> with test_rest_api(test=True) as api:
+>>> with test_rest_api() as api:
 ...     print(f"API running at {api.get_base_url()}")
 ...     # Perform HTTP requests here
 ```
@@ -42,11 +42,11 @@ import threading
 import time
 from pathlib import Path
 
-from werkzeug.serving import make_server
-
+from plantdb.commons.api_endpoints import API_PREFIX
 from plantdb.commons.log import get_logger
 from plantdb.commons.test_database import _mkdtemp_romidb
 from plantdb.server.cli.fsdb_rest_api import rest_api
+from werkzeug.serving import make_server
 
 
 class TestRestApiServer:
@@ -109,8 +109,18 @@ class TestRestApiServer:
     >>> server.stop()
     """
 
-    def __init__(self, db_path=None, port=5000, host='127.0.0.1', prefix='', ssl=False, test=False, empty=False,
-                 models=False, logger=None):
+    def __init__(
+        self,
+        db_path=None,
+        port=5000,
+        host="127.0.0.1",
+        prefix=API_PREFIX,
+        ssl=False,
+        test=False,
+        empty=False,
+        models=False,
+        logger=None,
+    ):
         """Initialize the test REST API server.
 
         Parameters
@@ -122,7 +132,7 @@ class TestRestApiServer:
         host : str, optional
             Host address for the server (default: '127.0.0.1')
         prefix : str, optional
-            URL prefix for API endpoints (default: '')
+            URL prefix for API endpoints (default: '/api/v1')
         ssl : bool, optional
             Whether to use SSL/HTTPS (default: False)
         test : bool, optional
@@ -145,18 +155,21 @@ class TestRestApiServer:
         self.app = None
         self.server = None
         self.thread = None
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__) or get_logger(__name__)
+        self.logger: logging.Logger = (
+            logger
+            if logger
+            else get_logger(self.__class__.__name__) or get_logger(__name__)
+        )
         self._setup_flask_app()
 
     def _setup_flask_app(self):
         """Set up the Flask application with REST API endpoints."""
         rest_api_kwargs = {
-            'proxy': self.prefix != '',
-            'url_prefix': self.prefix,
-            'ssl': self.ssl,
-            'test': self.test,
-            'empty': self.empty,
-            'models': self.models
+            "api_prefix": self.prefix,
+            "ssl": self.ssl,
+            "test": self.test,
+            "empty": self.empty,
+            "models": self.models,
         }
         self.app = rest_api(self.db_path, **rest_api_kwargs)
 
@@ -183,7 +196,9 @@ class TestRestApiServer:
 
         # Check if port is available
         if not self._is_port_available():
-            raise RuntimeError(f"Port {self.port} is already in use on host {self.host}")
+            raise RuntimeError(
+                f"Port {self.port} is already in use on host {self.host}"
+            )
 
         # Create server
         self.server = make_server(self.host, self.port, self.app, threaded=True)
@@ -221,12 +236,17 @@ class TestRestApiServer:
         str
             The base URL for the API.
         """
-        protocol = 'https' if self.ssl else 'http'
-        return f"{protocol}://{self.host}:{self.port}{self.prefix}"
+        protocol = "https" if self.ssl else "http"
+        return f"{protocol}://{self.host}:{self.port}"
 
     def get_server_config(self):
         """Get the server configuration settings."""
-        return {"host": self.host, "port": self.port, "prefix": self.prefix, "ssl": self.ssl}
+        return {
+            "host": self.host,
+            "port": self.port,
+            "prefix": self.prefix,
+            "ssl": self.ssl,
+        }
 
     def __enter__(self):
         """Context manager entry."""
@@ -238,12 +258,11 @@ class TestRestApiServer:
         self.stop()
 
 
-def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
+def test_rest_api(db_path, port=5000, host="127.0.0.1", api_prefix=API_PREFIX, ssl=False):
     """Create and return a TestRestApi instance.
 
     This is a convenience function that creates a TestRestApi instance with the
-    specified parameters. The returned instance can be used to start/stop a
-    test REST API server.
+    specified parameters. The returned instance can be used to start/stop a test REST API server.
 
     Parameters
     ----------
@@ -253,14 +272,14 @@ def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
         Port number for the server (default: 5000)
     host : str, optional
         Host address for the server (default: '127.0.0.1')
-    prefix : str, optional
+    api_prefix : str, optional
         URL prefix for API endpoints (default: '/api/v1')
     ssl : bool, optional
         Whether to use SSL/HTTPS (default: False)
 
     Returns
     -------
-    TestRestApiServer
+    plantdb.server.test_rest_api.TestRestApiServer
         Configured TestRestApi instance
 
     Examples
@@ -270,17 +289,22 @@ def test_rest_api(db_path, port=5000, host='127.0.0.1', prefix='', ssl=False):
     >>> # Create a test database
     >>> db = test_database(dataset=None)
     >>> # Create and start a REST API server
-    >>> api = test_rest_api(db.path(), port=8080)
+    >>> api = test_rest_api(db.path(), port=5000)
     >>> api.start()
+    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000/api/v1
     >>> # Use the API
     >>> print(f"API running at: {api.get_base_url()}")
+    API running at: http://127.0.0.1:5000/api/v1
     >>> # Stop the server
     >>> api.stop()
     >>>
     >>> # Or use as a context manager
-    >>> with test_rest_api(db.path(), port=8080) as api:
+    >>> with test_rest_api(db.path(),port=5000) as api:
     ...     # API is running here
     ...     print(f"API URL: {api.get_base_url()}")
+    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000/api/v1
+    API URL: http://127.0.0.1:5000/api/v1
+    INFO     [TestRestApiServer] Test REST API server stopped
     >>> # API is automatically stopped here
     """
-    return TestRestApiServer(db_path, port, host, prefix, ssl)
+    return TestRestApiServer(db_path, port, host, api_prefix, ssl)

@@ -41,7 +41,7 @@ The server enables users to query and manage plant scans, images, point clouds, 
 ## Environment Variables
 
 - ``ROMI_DB``: Path to the directory containing the FSDB. Default: '/myapp/db' (container)
-- ``PLANTDB_API_PREFIX``: Prefix for the REST API URL. Default is empty.
+- ``API_PREFIX``: Prefix for the REST API URL. Default is empty.
 - ``PLANTDB_API_SSL``: Enable SSL to use an HTTPS scheme. Default is `False`.
 - ``FLASK_SECRET_KEY``: The secret key to use with flask. Default to random (64 bits secret).
 - ``JWT_SECRET_KEY``: The secret key to use with JSON Web Token generator. Default to random (64 bits secret).
@@ -54,7 +54,7 @@ The server enables users to query and manage plant scans, images, point clouds, 
 To start the REST API server for a local plant database:
 
 ```shell
-fsdb_rest_api --db_location /path/to/your/database --host 127.0.0.1 --port 8080 --debug
+fsdb_rest_api -db /path/to/your/database --host 127.0.0.1 --port 8080
 ```
 
 To run the server with a temporary test database in debug mode:
@@ -80,37 +80,40 @@ from typing import Optional
 from typing import Union
 
 import click
+from click_option_group import OptionGroup
+from click_option_group import optgroup
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from plantdb.commons.api_endpoints import API_PREFIX
 from plantdb.commons.api_endpoints import ARCHIVE
+from plantdb.commons.api_endpoints import CREATE_API_TOKEN
 from plantdb.commons.api_endpoints import FILE
 from plantdb.commons.api_endpoints import FILESET
 from plantdb.commons.api_endpoints import FILESET_FILES
 from plantdb.commons.api_endpoints import FILESET_MD
 from plantdb.commons.api_endpoints import FILE_MD
 from plantdb.commons.api_endpoints import FILE_PATH
+from plantdb.commons.api_endpoints import HEALTH
+from plantdb.commons.api_endpoints import HOME
 from plantdb.commons.api_endpoints import IMAGE
+from plantdb.commons.api_endpoints import LOGIN
+from plantdb.commons.api_endpoints import LOGOUT
 from plantdb.commons.api_endpoints import MESH
 from plantdb.commons.api_endpoints import POINTCLOUD
+from plantdb.commons.api_endpoints import REFRESH
+from plantdb.commons.api_endpoints import REGISTER
 from plantdb.commons.api_endpoints import SCAN
+from plantdb.commons.api_endpoints import SCANS
+from plantdb.commons.api_endpoints import SCANS_INFO
 from plantdb.commons.api_endpoints import SCAN_FILESETS
 from plantdb.commons.api_endpoints import SCAN_MD
 from plantdb.commons.api_endpoints import SEQUENCE
 from plantdb.commons.api_endpoints import SKELETON
-from plantdb.commons.api_endpoints import create_api_token
-from plantdb.commons.api_endpoints import health
-from plantdb.commons.api_endpoints import home
-from plantdb.commons.api_endpoints import login
-from plantdb.commons.api_endpoints import logout
-from plantdb.commons.api_endpoints import refresh
-from plantdb.commons.api_endpoints import register
-from plantdb.commons.api_endpoints import scans
-from plantdb.commons.api_endpoints import scans_info
-from plantdb.commons.api_endpoints import token_refresh
-from plantdb.commons.api_endpoints import token_validation
+from plantdb.commons.api_endpoints import TOKEN_REFRESH
+from plantdb.commons.api_endpoints import TOKEN_VALIDATION
 from plantdb.commons.auth.session import JWTSessionManager
 from plantdb.commons.auth.session import _init_secret_key
 from plantdb.commons.fsdb.core import FSDB
@@ -155,7 +158,7 @@ def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
     var_name : str
         Name of the environment variable holding the secret.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
 
     Returns
     -------
@@ -199,7 +202,7 @@ def _configure_app(secret_key: str, ssl: bool = False) -> Flask:
 
 
 def _configure_api(
-        app: Flask, proxy: bool, url_prefix: str, logger: logging.Logger
+        app: Flask, proxy: str, api_prefix: str, logger: logging.Logger
 ) -> Api:
     """Attach a `flask_restful.Api` to the `app` and configure proxy handling.
 
@@ -207,26 +210,34 @@ def _configure_api(
     ----------
     app : flask.Flask
         The Flask application to extend.
-    proxy : bool
-        Whether the server is behind a reverse proxy.
-    url_prefix : str
-        URL prefix for all endpoints when using a proxy.
+    proxy_path : str
+        Proxy path prefix to use for all API endpoints.
+    api_prefix : str
+        URL path prefix for all API endpoints.
     logger : logging.Logger
-        Logger instance for warning and debugging.
+        A logger instance for warning and debugging.
 
     Returns
     -------
     flask_restful.Api
         The configured API instance.
     """
-    if proxy:
-        logger.info("Setting up Flask application with proxy support...")
-        api = Api(app, prefix=url_prefix)
-        logger.info(f"Using prefix '{url_prefix}' for all RESTful endpoints.")
+    logger.info("Setting up Flask application...")
+
+    prefix = ""
+    if api_prefix:
+        api_prefix = "/" + api_prefix.lstrip("/").rstrip("/")
+        logger.info(f"Using API prefix '{api_prefix}' for all RESTful endpoints.")
+        prefix += api_prefix
+
+    if prefix or proxy:
+        logger.info("Enabling proxy support for all RESTful endpoints.")
+        api = Api(app, prefix=prefix)
         # App is behind one proxy that sets the X-Forwarded-* headers.
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
     else:
         api = Api(app)
+
     return api
 
 
@@ -298,33 +309,30 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
     # Mapping of (resource class, endpoint function, *resource args)
     RESOURCE_MAP = [
         # Core endpoints
-        (Home, home),
-        (HealthCheck, health),
-        (Refresh, refresh),
-
+        (Home, lambda: HOME),
+        (HealthCheck, lambda: HEALTH),
+        (Refresh, lambda: REFRESH),
         # Authentication
-        (Register, register),
-        (Login, login),
-        (Logout, logout),
-        (TokenRefresh, token_refresh),
-        (TokenValidation, token_validation),
-        (CreateApiToken, create_api_token),
-
+        (Register, lambda: REGISTER),
+        (Login, lambda: LOGIN),
+        (Logout, lambda: LOGOUT),
+        (TokenRefresh, lambda: TOKEN_REFRESH),
+        (TokenValidation, lambda: TOKEN_VALIDATION),
+        (CreateApiToken, lambda: CREATE_API_TOKEN),
         # Scan CRUD
-        (ScansList, scans),
-        (ScansTable, scans_info),
+        (ScansList, lambda: SCANS),
+        (ScansTable, lambda: SCANS_INFO),
         (Scan, lambda: SCAN.format(scan_id="<string:scan_id>")),
         (ScanMetadata, lambda: SCAN_MD.format(scan_id="<string:scan_id>")),
         (ScanFilesets, lambda: SCAN_FILESETS.format(scan_id="<string:scan_id>")),
-
         # Fileset CRUD
         (Fileset, lambda: FILESET.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
         (FilesetMetadata, lambda: FILESET_MD.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
         (FilesetFiles, lambda: FILESET_FILES.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
 
         # File CRUD
-        (File,
-         lambda: FILE.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>", file_id="<string:file_id>")),
+        (File, lambda: FILE.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>",
+                                   file_id="<string:file_id>")),
         (FileMetadata, lambda: FILE_MD.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>",
                                               file_id="<string:file_id>")),
 
@@ -347,7 +355,7 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger) -> None:
 def rest_api(
         db_path: Optional[Union[str, Path]],
         proxy: bool = False,
-        url_prefix: str = "",
+        api_prefix: str = API_PREFIX,
         ssl: bool = False,
         log_level: str = DEFAULT_LOG_LEVEL,
         test: bool = False,
@@ -370,8 +378,8 @@ def rest_api(
         If `None`, requires `test=True` and a temporary folder will be created.
     proxy : bool, optional
         Boolean flag indicating whether the application is behind a reverse proxy, ``False`` by default.
-    url_prefix : str, optional
-        Prefix for all endpoints, by default ""
+    api_prefix : str, optional
+        Path prefix for all API endpoints, `'API_PREFIX'` by default.
     log_level : str, optional
         The logging level to use for the application. Defaults to ``DEFAULT_LOG_LEVEL``.
     test : bool, optional
@@ -391,7 +399,7 @@ def rest_api(
     # 1 - Application and API configuration
     secret_key = _get_env_secret("FLASK_SECRET_KEY", logger)
     app = _configure_app(secret_key, ssl=ssl)
-    api = _configure_api(app, proxy, url_prefix, logger)
+    api = _configure_api(app, proxy, api_prefix, logger)
 
     # 2 - Handle test mode
     if test:
@@ -413,7 +421,7 @@ def rest_api(
     if not db_path:
         logger.error("No path to the local PlantDB was specified; aborting startup.")
         logger.info(
-            "Set the environment variable 'ROMI_DB' or use the '--db_location' CLI argument."
+            "Set the environment variable 'ROMI_DB' or use the '-db' CLI argument."
         )
         sleep(1)
         sys.exit("Wrong database location!")
@@ -452,25 +460,17 @@ def rest_api(
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
-    "-db",
-    "--db_location",
-    "db_location",
-    type=click.Path(),
-    default=os.getenv("ROMI_DB", None),
-    help="Location of the database to serve.",
-)
-@click.option(
     "--host",
     default="0.0.0.0",
     show_default=True,
-    help="Hostname to listen on; defaults to '0.0.0.0'.",
+    help="Hostname to listen on.",
 )
 @click.option(
     "--port",
     type=int,
     default=5000,
     show_default=True,
-    help="Port of the webserver; defaults to '5000'.",
+    help="Port of the webserver.",
 )
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option(
@@ -480,41 +480,51 @@ def rest_api(
     help="Use when the server sits behind a reverse proxy.",
 )
 @click.option(
+    "--api-prefix",
+    type=str,
+    default=API_PREFIX,
+    show_default=True,
+    help="Defines the API prefix, if any. This will prefix the URL path to use with all API endpoints.",
+)
+@optgroup.group("Database", cls=OptionGroup)
+@optgroup.option(
+    "-db",
+    "--db-path",
+    type=click.Path(),
+    default=os.getenv("ROMI_DB", None),
+    show_default=True,
+    help="Path to the local database to serve.",
+)
+@optgroup.option(
     "--test",
     is_flag=True,
     default=False,
     help="Set up a temporary test database before starting the REST API.",
 )
-@click.option(
+@optgroup.option(
     "--empty",
     is_flag=True,
     default=False,
     help="Do not populate the test database with toy datasets.",
 )
-@click.option(
+@optgroup.option(
     "--models",
     is_flag=True,
     default=False,
     help="Include trained CNN model in the test database.",
 )
-@click.option(
+@optgroup.group("Logging", cls=OptionGroup)
+@optgroup.option(
     "--log-level",
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     show_default=True,
-    help="Logging level; defaults to 'INFO'.",
+    help="Logging level.",
 )
-def main(db_location, host, port, debug, proxy, test, empty, models, log_level):
+def main(host, port, debug, proxy, api_prefix, db_path, test, empty, models, log_level):
     """Entry point for the REST API server using Click."""
-    print(f"{log_level.upper()=}")
-    app = rest_api(
-        db_path=db_location,
-        proxy=proxy,
-        log_level=log_level.upper(),
-        test=test,
-        empty=empty,
-        models=models,
-    )
+    app = rest_api(db_path=db_path, proxy=proxy, api_prefix=api_prefix, log_level=log_level.upper(), test=test,
+                   empty=empty, models=models)
     # Start the Flask development server.
     app.run(host=host, port=port, debug=debug)
 
