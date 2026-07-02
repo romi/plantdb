@@ -4,7 +4,7 @@
 """
 # Test REST API Server Module
 
-Provides a lightweight, thread‑based Flask server that serves the PlantDB REST API for use in automated tests and development.
+Provides a lightweight, thread-based Flask server that serves the PlantDB REST API for use in automated tests and development.
 By running the server in a separate daemon thread, test suites can interact with a fully functional API without
 blocking the main interpreter, enabling fast, isolated integration tests.
 
@@ -12,8 +12,8 @@ blocking the main interpreter, enabling fast, isolated integration tests.
 
 - **Threaded server**: Starts a WSGI server in a background thread that can be started and stopped programmatically.
 - **Configurable environment**: Host, port, URL prefix, SSL, and database initialization (test, empty, models) are all selectable via constructor arguments.
-- **Context‑manager support**: Use `with` statements to automatically start and stop the server, ensuring clean teardown.
-- **Convenient factory function**: `test_rest_api()` creates a ready‑to‑use `TestRestApiServer` instance with a single call.
+- **Context-manager support**: Use `with` statements to automatically start and stop the server, ensuring clean teardown.
+- **Convenient factory function**: `test_rest_api()` creates a ready-to-use `TestRestApiServer` instance with a single call.
 
 ## Usage Examples
 

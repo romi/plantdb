@@ -26,21 +26,21 @@
 """
 # Assets REST API Resources
 
-Provides a collection of Flask‑RESTful resources for exposing plant‑database assets over HTTP.
+Provides a collection of Flask-RESTful resources for exposing plant-database assets over HTTP.
 The module enables serving and managing files, images, point clouds, meshes, curve skeletons,
-sequence data, and whole‑dataset archives, making it easy to build a REST API that gives
+sequence data, and whole-dataset archives, making it easy to build a REST API that gives
 programmatic access to plant scan data.
 
 ## Key Features
 
 - **Resource classes**: `File`, `DatasetFile`, `Image`, `PointCloud`, `PointCloudGroundTruth`,
   `Mesh`, `CurveSkeleton`, `Sequence`, `Archive`.
-- **Safety**: automatic input sanitization, directory‑traversal protection, and
-  rate‑limiting decorators on every endpoint.
-- **Flexible output**: optional resizing, thumbnail generation, base‑64 encoding,
-  and on‑the‑fly down‑sampling for large assets (point clouds, meshes, images).
+- **Safety**: automatic input sanitization, directory-traversal protection, and
+  rate-limiting decorators on every endpoint.
+- **Flexible output**: optional resizing, thumbnail generation, base-64 encoding,
+  and on-the-fly down-sampling for large assets (point clouds, meshes, images).
 - **Archive handling**: creation, validation, and extraction of ZIP archives with
-  robust error handling and temporary‑file cleanup.
+  robust error handling and temporary-file cleanup.
 - **Utility helpers**: `is_within_directory` and `is_directory_in_archive` for
   safe path checks inside the filesystem and ZIP files.
 
@@ -309,7 +309,7 @@ class Image(Resource):
             If an invalid string is supplied, the default 'thumb' is used.
         as_base64 : str
             Query parameter indicating whether to return the image encoded in base64.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the image file.
             If set, returns the image in base64 under the 'image' JSON dictionary entry and mimetype under 'content-type'.
 
@@ -399,7 +399,7 @@ class Image(Resource):
             # ---------- JSON (base64) ----------
             with open(path, "rb") as f:
                 b64_str = pybase64.b64encode(f.read()).decode("ascii")
-            # ``decode('ascii')`` gives us a plain string that can be JSON‑encoded.
+            # ``decode('ascii')`` gives us a plain string that can be JSON-encoded.
             payload = {"image": b64_str, "content-type": mime_type}
             # Wrap ``jsonify`` with ``make_response`` to add custom headers
             resp = make_response(jsonify(payload))
@@ -472,11 +472,11 @@ class PointCloud(Resource):
             Accepted values:
                 * 'orig': serve the original point cloud.
                 * 'preview': serve a precomputed preview (default).
-                * A float value: perform on‑the‑fly voxel downsampling using the specified voxel size.
+                * A float value: perform on-the-fly voxel downsampling using the specified voxel size.
             If an invalid string is supplied, the default 'preview' is used.
         coords : str
             Query parameter indicating whether to return the point coordinates as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the PLY file.
             If set, returns the data as list under the 'coordinates' JSON dictionary entry.
         type : str
@@ -573,7 +573,7 @@ class PointCloud(Resource):
 
         # Get the corresponding `File` from the database
         file = resource_file(self.db, scan_id, task_name, **kwargs)
-        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
         if isinstance(file, tuple) and isinstance(file[0], dict):
             return file
 
@@ -663,7 +663,7 @@ class Mesh(Resource):
         ----------------
         coords : str
             Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the PLY file.
             If set, returns the data as list under the 'vertices' & 'triangles' JSON dictionary entry.
 
@@ -730,7 +730,7 @@ class Mesh(Resource):
         )
 
         file = resource_file(self.db, scan_id, "TriangleMesh", **kwargs)
-        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
         if isinstance(file, tuple) and isinstance(file[0], dict):
             return file
 
@@ -860,7 +860,7 @@ class CurveSkeleton(Resource):
         >>> server.stop()
         """
         file = resource_file(self.db, scan_id, "CurveSkeleton", **kwargs)
-        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
         if isinstance(file, tuple) and isinstance(file[0], dict):
             return file
 
@@ -982,7 +982,7 @@ class Sequence(Resource):
         type = request.args.get("type", default="all", type=str)
 
         file = resource_file(self.db, scan_id, "AnglesAndInternodes", **kwargs)
-        # If an error tuple was returned, forward it directly to Flask‑RESTful.
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
         if isinstance(file, tuple) and isinstance(file[0], dict):
             return file
 
@@ -1230,7 +1230,7 @@ class Archive(Resource):
         >>> # Stop the test server
         >>> server.stop()
         """
-        # 1. Basic pre‑condition checks
+        # 1. Basic pre-condition checks
         if self.db.scan_exists(scan_id):
             self.logger.error("Dataset `%s` already exists.", scan_id)
             return {"error": f"Dataset `{scan_id}` already exists!"}, 400
@@ -1281,10 +1281,10 @@ class Archive(Resource):
             }, 200
 
         except (ValidationError, ExtractionError) as exc:
-            # Validation / extraction errors are client‑side problems → 400
+            # Validation / extraction errors are client-side problems → 400
             return {"error": str(exc)}, 400
         except Exception as exc:
-            # Unexpected server‑side errors → 500
+            # Unexpected server-side errors → 500
             self.logger.exception("Unexpected error while processing archive")
             return {
                 "error": f"Internal server error: {exc}"

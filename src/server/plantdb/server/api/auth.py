@@ -26,8 +26,8 @@
 """
 # Authentication REST API Resources
 
-Provides Flask‑RESTful resources that implement a complete authentication workflow for the PlantDB server, including user registration, login, logout, JWT validation, and token refresh.
-The resources add security features such as rate‑limiting and automatic JWT extraction, making it easy to protect API endpoints while keeping the codebase tidy.
+Provides Flask-RESTful resources that implement a complete authentication workflow for the PlantDB server, including user registration, login, logout, JWT validation, and token refresh.
+The resources add security features such as rate-limiting and automatic JWT extraction, making it easy to protect API endpoints while keeping the codebase tidy.
 
 ## Key Features
 
@@ -36,7 +36,7 @@ The resources add security features such as rate‑limiting and automatic JWT ex
 - **Logout**: Invalidate a user session and log the outcome.
 - **TokenValidation**: Verify a JWT and return the associated user's basic profile information.
 - **TokenRefresh**: Issue a fresh access token given a valid refresh token.
-- Built‑in decorators (`@rate_limit`, `@add_jwt_from_header`) ensure consistent security across all endpoints.
+- Built-in decorators (`@rate_limit`, `@add_jwt_from_header`) ensure consistent security across all endpoints.
 
 ## Usage Examples
 

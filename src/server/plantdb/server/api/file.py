@@ -280,7 +280,7 @@ class File(Resource):
 
         file_data = request.files['file']
 
-        # Multipart/form‑data: fields are in ``request.form`` (`json=` is ignored when `files=` is present)
+        # Multipart/form-data: fields are in ``request.form`` (`json=` is ignored when `files=` is present)
         data = request.form.to_dict()
 
         # Get form data

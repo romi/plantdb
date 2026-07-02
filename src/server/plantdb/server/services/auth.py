@@ -26,20 +26,20 @@
 """
 # Authentication Service Layer
 
-Provides pure‑Python business‑logic functions for user registration, login, logout,
-token validation, and token refresh. The functions are independent of the Flask‑RESTful
-API layer and raise domain‑specific exceptions, making them reusable across
-different interfaces and straightforward to unit‑test.
+Provides pure-Python business-logic functions for user registration, login, logout,
+token validation, and token refresh. The functions are independent of the Flask-RESTful
+API layer and raise domain-specific exceptions, making them reusable across
+different interfaces and straightforward to unit-test.
 
 ## Key Features
 
-- Register new users with required‑field validation.
+- Register new users with required-field validation.
 - Check whether a username already exists.
 - Authenticate credentials and obtain JWT access and refresh tokens.
-- Invalidate a session (logout) and return the logged‑out username.
+- Invalidate a session (logout) and return the logged-out username.
 - Validate JWT tokens and retrieve basic user information.
 - Refresh access tokens using a refresh token.
-- Consistent, domain‑specific exception hierarchy (`MissingFieldError`, `InvalidCredentialsError`, `TokenError`, etc.).
+- Consistent, domain-specific exception hierarchy (`MissingFieldError`, `InvalidCredentialsError`, `TokenError`, etc.).
 
 ## Usage Examples
 
@@ -83,7 +83,7 @@ class InvalidCredentialsError(ValueError):
 
 
 class TokenError(ValueError):
-    """Raised for generic token‑related problems (validation / refresh)."""
+    """Raised for generic token-related problems (validation / refresh)."""
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +108,7 @@ def register_user(db: Any, payload: Dict[str, Any], **kwargs) -> None:
         The token for authentication.
     logger : logging.Logger
         Optional logger used for diagnostic messages.
-        If ``None`` (default), a module‑level logger is obtained via ``_get_logger``.
+        If ``None`` (default), a module-level logger is obtained via ``_get_logger``.
 
     Raises
     ------
@@ -116,7 +116,7 @@ def register_user(db: Any, payload: Dict[str, Any], **kwargs) -> None:
         If any of the required keys (``username``, ``fullname``, ``password``) are absent from ``payload``.
     UserAlreadyExistsError
         If the underlying ``db.create_user`` raises an exception that indicates
-        a duplicate user or any other database‑level problem.
+        a duplicate user or any other database-level problem.
     SessionValidationError
         Propagated unchanged when the database signals that the operation is
         invalid for the current session (e.g., unauthorized).

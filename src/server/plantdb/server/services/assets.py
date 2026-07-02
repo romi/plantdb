@@ -29,7 +29,7 @@ Assets handling utilities for PlantDB
 Provides a collection of helper functions and custom exceptions used by the PlantDB server to validate, create,
 and extract ZIP archives that store scan datasets.
 These utilities ensure that uploads conform to the required directory layout, manage atomic file writes,
-and protect against unsafe extractions such as path‑traversal attacks.
+and protect against unsafe extractions such as path-traversal attacks.
 
 ## Key Features
 
@@ -37,7 +37,7 @@ and protect against unsafe extractions such as path‑traversal attacks.
 - **Atomic file writing** for raw data and streamed chunks.
 - **Robust ZIP validation** that checks required directories, files, and depth.
 - **Safe archive creation** that excludes temporary caches and returns a temporary ZIP path.
-- **Secure extraction** with top‑level directory stripping, UTF‑8 filename handling, path‑traversal protection, and SHA‑256 hash verification.
+- **Secure extraction** with top-level directory stripping, UTF-8 filename handling, path-traversal protection, and SHA-256 hash verification.
 
 ## Usage Examples
 
@@ -92,7 +92,7 @@ import plantdb.commons.fsdb.core
 
 
 class ArchiveError(RuntimeError):
-    """Base class for archive‑related errors."""
+    """Base class for archive-related errors."""
 
 
 class ValidationError(ArchiveError):
@@ -177,7 +177,7 @@ def validate_upload_headers(headers: dict) -> dict:
 
 
 # --------------------------------------------------------------------------- #
-#  Scan‑related helpers
+#  Scan-related helpers
 # --------------------------------------------------------------------------- #
 
 
@@ -201,7 +201,7 @@ def get_scan_path(db: plantdb.commons.fsdb.core.FSDB, scan_id: str, **kwargs) ->
 
 
 # --------------------------------------------------------------------------- #
-#  File‑writing helpers (atomic, testable)
+#  File-writing helpers (atomic, testable)
 # --------------------------------------------------------------------------- #
 
 
@@ -221,14 +221,14 @@ def write_file(file_path: Path, data: bytes) -> int:
 def write_streamed_file(file_path: Path, content_length: int, chunk_size: int) -> int:
     """
     Persist a streamed upload.  The Flask ``request`` object is accessed
-    globally - this function only deals with the low‑level I/O.
+    globally - this function only deals with the low-level I/O.
 
     Parameters
     ----------
     file_path : pathlib.Path
         Destination file.
     content_length : int
-        Expected total size (from the ``Content‑Length`` header).
+        Expected total size (from the ``Content-Length`` header).
     chunk_size : int
         Size of each chunk read from ``request.stream``.  ``0`` means “no
         streaming”, but the caller should have already handled that case.
@@ -396,7 +396,7 @@ def is_valid_archive(archive_path):
 
 def _ensure_valid_structure(zip_path: Path) -> None:
     """
-    Perform any domain‑specific validation on the archive structure.
+    Perform any domain-specific validation on the archive structure.
     Placeholder for ``is_valid_archive`` logic.
     """
     if not is_valid_archive(zip_path):
@@ -437,7 +437,7 @@ def create_zip_for_scan(scan_path: Path, logger: logging.Logger) -> Path:
     try:
         with ZipFile(zip_path, "w") as zip_f:
             for root, _dirs, files in os.walk(scan_path):
-                # Skip any ``webcache`` sub‑directories
+                # Skip any ``webcache`` sub-directories
                 if "webcache" in Path(root).parts:
                     continue
                 for file in files:
@@ -482,7 +482,7 @@ def extract_zip_to_scan(
     """
     logger.debug(f"Preparing to extract {zip_path} into {destination}")
 
-    # Detect a single top‑level directory that should be stripped
+    # Detect a single top-level directory that should be stripped
     with ZipFile(zip_path, "r") as zip_f:
         top_level_dirs = [
             name
@@ -500,7 +500,7 @@ def extract_zip_to_scan(
                 if member.endswith("/"):
                     continue
 
-                # Ensure the filename is UTF‑8 decodable
+                # Ensure the filename is UTF-8 decodable
                 try:
                     member = member.encode("utf-8").decode("utf-8")
                 except UnicodeDecodeError as exc:
@@ -508,7 +508,7 @@ def extract_zip_to_scan(
                         f"Filename encoding error in archive entry '{member}'."
                     ) from exc
 
-                # Remove the top‑level folder if present
+                # Remove the top-level folder if present
                 target_rel = Path(member)
                 if strip_top_dir:
                     target_rel = Path(*target_rel.parts[1:])

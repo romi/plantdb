@@ -26,16 +26,16 @@
 """
 # PlantDB Utility Functions
 
-A small collection of helper utilities used throughout the PlantDB project to simplify common filesystem‑related tasks.
+A small collection of helper utilities used throughout the PlantDB project to simplify common filesystem-related tasks.
 These functions handle safe retrieval of database resources, verify path containment, and inspect the contents
- of ZIP archives, reducing boiler‑plate and ensuring consistent error handling across the code base.
+ of ZIP archives, reducing boiler-plate and ensuring consistent error handling across the code base.
 
 ## Key Features
 
 - **resource_file**: Retrieves a ``File`` object from the PlantDB database, translating common error conditions into
-  clear JSON‑style messages and HTTP status codes.
-- **is_within_directory**: Checks whether a target path lies inside a given directory, preventing directory‑traversal vulnerabilities.
-- **is_directory_in_archive**: Determines if a specific top‑level directory exists inside a ZIP archive,
+  clear JSON-style messages and HTTP status codes.
+- **is_within_directory**: Checks whether a target path lies inside a given directory, preventing directory-traversal vulnerabilities.
+- **is_directory_in_archive**: Determines if a specific top-level directory exists inside a ZIP archive,
   useful for validating package structures before extraction.
 
 ## Usage Examples
@@ -106,10 +106,10 @@ def resource_file(db, scan_id, task_name, **kwargs):
     except FileNotFoundError:
         return {"error": f"File '{fs.id}/{task_name}' not found."}, 404
     except Exception as exc:                     # Unexpected internal error
-        # Use JSON‑serializable payload; Flask will handle conversion.
+        # Use JSON-serializable payload; Flask will handle conversion.
         return {"error": f"Internal server error: {str(exc)}"}, 500
 
-    # Success: return the File object (Flask‑RESTful resources expect the
+    # Success: return the File object (Flask-RESTful resources expect the
     # object itself; the caller can decide the HTTP status if required).
     return file
 

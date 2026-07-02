@@ -26,19 +26,19 @@
 """
 # WebCache - Cached Resources for PlantDB REST API
 
-A utility module that creates and serves cached, down‑sampled versions of images, point clouds, and meshes stored in a PlantDB scan.
+A utility module that creates and serves cached, down-sampled versions of images, point clouds, and meshes stored in a PlantDB scan.
 It exposes convenient ``*_path`` functions that return the file system path to either the original resource or a
 resized, cached copy, generating the cache on the fly when needed.
 This reduces bandwidth and processing time when serving data through web interfaces or visualization tools.
 
 ## Key Features
 
-- **Automatic cache directory creation**: a ``webcache`` sub‑folder is created inside each scan directory on demand.
+- **Automatic cache directory creation**: a ``webcache`` sub-folder is created inside each scan directory on demand.
 - **Image handling**: resize images to predefined ``thumb`` (150px) or ``large`` (1500px) resolutions, cache them as JPEG files, and return their paths.
-- **Point‑cloud handling**: down‑sample point clouds using Open3D voxel clustering, cache the result as ``.ply`` files, and provide easy access to both original and preview versions.
+- **Point-cloud handling**: down-sample point clouds using Open3D voxel clustering, cache the result as ``.ply`` files, and provide easy access to both original and preview versions.
 - **Mesh handling**: simplify meshes via vertex clustering, cache the reduced meshes, and return paths for original or preview versions.
-- **Transparent hash‑based filenames**: cached files are uniquely named using a SHA‑1 hash of the resource identifiers and size, avoiding name collisions.
-- **Convenient API**: high‑level ``image_path``, ``pointcloud_path``, and ``mesh_path`` functions abstract the caching logic and return ``pathlib.Path`` objects ready for further processing.
+- **Transparent hash-based filenames**: cached files are uniquely named using a SHA-1 hash of the resource identifiers and size, avoiding name collisions.
+- **Convenient API**: high-level ``image_path``, ``pointcloud_path``, and ``mesh_path`` functions abstract the caching logic and return ``pathlib.Path`` objects ready for further processing.
 
 ## Usage Examples
 

@@ -26,15 +26,15 @@
 """
 # Scan REST API Resources
 
-Provides Flask‑RESTful resources for managing scan datasets in PlantDB.
+Provides Flask-RESTful resources for managing scan datasets in PlantDB.
 The resources expose endpoints that allow clients to list scans, retrieve detailed
 information, create new scans, and manipulate scan metadata and filesets.
 These APIs simplify integration with PlantDB by handling request parsing,
-security (rate‑limiting and JWT extraction), and data sanitization.
+security (rate-limiting and JWT extraction), and data sanitization.
 
 ## Key Features
 
-- **ScansList**: Returns a list of scan identifiers with optional JSON‑based filtering and fuzzy matching.
+- **ScansList**: Returns a list of scan identifiers with optional JSON-based filtering and fuzzy matching.
 - **ScansTable**: Supplies detailed information (metadata, tasks, files) for each scan, supporting the same filtering capabilities.
 - **Scan**: Retrieves or creates a single scan, performing ID sanitization and returning comprehensive scan data.
 - **ScanCreate**: Dedicated endpoint for creating new scans with optional metadata.
@@ -45,7 +45,7 @@ security (rate‑limiting and JWT extraction), and data sanitization.
 ## Usage Examples
 
 Below is a minimal example that demonstrates how to register the **ScansList**
-resource with a Flask‑RESTful application.
+resource with a Flask-RESTful application.
 
 ```python
 >>> import logging

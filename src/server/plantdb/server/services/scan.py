@@ -26,16 +26,16 @@
 """
 # PlantDB Scan Services
 
-Convenient utilities for extracting high‑level information and associated data from a PlantDB *scan* dataset.
+Convenient utilities for extracting high-level information and associated data from a PlantDB *scan* dataset.
 The functions aggregate metadata, file locations, camera parameters, and derived data (_e.g._, skeletons, angles)
 into plain Python structures, making it easy for downstream tools (e.g., visualizers, analysis scripts) to consume
-scan contents without dealing with low‑level filesystem details.
+scan contents without dealing with low-level filesystem details.
 
 ## Key Features
 
 - Automatic handling of legacy vs. new PlantDB API versions.
-- Friendly logging with a per‑function logger fallback.
-- Generation of URLs for web‑based resources (thumbnails, archives, individual files) via the PlantDB API endpoints.
+- Friendly logging with a per-function logger fallback.
+- Generation of URLs for web-based resources (thumbnails, archives, individual files) via the PlantDB API endpoints.
 
 ## Usage Examples
 ```python

@@ -26,10 +26,10 @@
 """
 # Base REST API Resources
 
-Provides Flask‑RESTful resources that expose the PlantDB database through a
-well‑documented HTTP API. The module bundles endpoints for health checks,
-metadata queries, file access, and on‑demand database reloading, all protected
-by configurable rate‑limiting to safeguard the service.
+Provides Flask-RESTful resources that expose the PlantDB database through a
+well-documented HTTP API. The module bundles endpoints for health checks,
+metadata queries, file access, and on-demand database reloading, all protected
+by configurable rate-limiting to safeguard the service.
 
 ## Key Features
 
@@ -37,7 +37,7 @@ by configurable rate‑limiting to safeguard the service.
   database are operational.
 - **Dynamic database refresh**: reload a single scan or the entire dataset
   without restarting the server.
-- **Self‑describing root resource**: returns API name, description,
+- **Self-describing root resource**: returns API name, description,
   version information, and a list of all available routes.
 
 ## Usage Examples
@@ -223,7 +223,7 @@ class Home(Resource):
 
 # Resource HealthCheck
 class HealthCheck(Resource):
-    """Simple health‑check resource exposing an endpoint that verifies the API and its database connectivity.
+    """Simple health-check resource exposing an endpoint that verifies the API and its database connectivity.
 
     Attributes
     ----------
