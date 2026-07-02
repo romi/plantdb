@@ -5,7 +5,7 @@ Welcome to the PlantDB REST API!
 This interface provides programmatic access to plant scan datasets, images, point clouds, meshes, and related metadata.
 Use the API to list scans, retrieve files, and manage data directly from your applications.
 
-- **Quick start**: Run `python fsdb_rest_api.py --test` to launch a temporary server.
+- **Quick start**: Run `fsdb_rest_api --test` to launch a temporary server.
 - **Core endpoints**: `/scans`, `/scans/<id>`, `/assets/image/...`, `/assets/pointcloud/...`, `/assets/mesh/...`.
 - **Management**:
     - Register users via `/auth/register`

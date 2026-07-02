@@ -5,9 +5,10 @@ This document describes the REST API endpoints for the PlantDB (Plant Database) 
 ## Overview
 
 The PlantDB REST API is implemented using Flask and Flask-RESTful, providing a comprehensive interface for managing and accessing plant-related datasets. The Python implementation is located in the
-`plantdb.server.rest_api` module, and the CLI server is started using `fsdb_rest_api.py`.
+`plantdb.server.rest_api` module, and the CLI server is started using the `fsdb_rest_api` CLI.
 
 **Base URL**: `http://127.0.0.1:5000` (default, configurable)
+**API URL prefix**: `/api/v1` (default, configurable)
 
 ## Table of Contents
 
@@ -26,7 +27,7 @@ The PlantDB REST API is implemented using Flask and Flask-RESTful, providing a c
 
 To run the server with a temporary test database:
 ```bash
-python fsdb_rest_api.py --test
+fsdb_rest_api --test
 ```
 
 For more explanations, have a look at [how to run the REST API](rest_api_usage.md).
