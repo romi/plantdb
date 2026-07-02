@@ -36,7 +36,7 @@ class RestApiServerTests(unittest.TestCase):
         cls.server.stop()
 
     def test_home(self):
-        r = requests.get(self.server.get_base_url() + "/")
+        r = requests.get(self.server.get_base_url() + api_endpoints.home())
         self.assertEqual(r.status_code, 200)
         self.assertIn("PlantDB", r.json().get("name", ""))
 
@@ -185,7 +185,7 @@ class RestApiServerTests(unittest.TestCase):
         # Clean up the temporary file
         os.unlink(temp_zip_path)
 
-        r = requests.get(self.server.get_base_url() + "/scans")
+        r = requests.get(self.server.get_base_url() + api_endpoints.scans())
         self.assertEqual(r.status_code, 200)
         scans = r.json()
         self.assertIsInstance(scans, list)

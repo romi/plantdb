@@ -50,7 +50,7 @@ class AssetsApiTests(unittest.TestCase):
 
     @classmethod
     def _login_admin(cls, base_url):
-        """Login as admin user and return access token."""
+        """Login as the admin user and return an access token."""
         r = requests.post(base_url + api_endpoints.login(),
                           json={'username': 'admin', 'password': 'admin'})
         return r.json()['access_token']
