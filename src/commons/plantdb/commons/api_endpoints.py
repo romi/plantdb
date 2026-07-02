@@ -82,7 +82,7 @@ Flask REST API in the `plantdb.server.cli.fsdb_rest_api` submodule.
 from urllib import parse
 from plantdb.commons.utils import sanitize_name
 
-URL_PREFIX = "/api/v1"
+API_PREFIX = "/api/v1"
 HOME = "/"
 HEALTH = "/health"
 REFRESH = "/refresh"
@@ -117,11 +117,11 @@ ARCHIVE = "/assets/archive/{scan_id}"
 FILE_PATH = "/assets/files/{file_path}"
 
 
-def url_prefix(endpoint_path):
+def api_prefix(endpoint_path):
     """Wrap an endpoint path generator with an optional URL prefix."""
 
     def wrapper(*args, **kwargs):
-        prefix = kwargs.get("prefix", URL_PREFIX)
+        prefix = kwargs.get("prefix", API_PREFIX)
         if prefix:
             prefix = "/" + prefix.lstrip("/").rstrip("/")
             return prefix + endpoint_path(*args, **kwargs)
@@ -136,7 +136,7 @@ def url_prefix(endpoint_path):
 # ------------------------------------------------------------------------
 
 
-@url_prefix
+@api_prefix
 def home(**kwargs) -> str:
     """Return the URL path to the home endpoint.
 
@@ -161,7 +161,7 @@ def home(**kwargs) -> str:
     return HOME
 
 
-@url_prefix
+@api_prefix
 def health(**kwargs) -> str:
     """Return the URL path to the health endpoint.
 
@@ -184,7 +184,7 @@ def health(**kwargs) -> str:
     return HEALTH
 
 
-@url_prefix
+@api_prefix
 def refresh(scan_id: str = None, **kwargs) -> str:
     """Return the URL path to the dataset archive endpoint.
 
@@ -223,7 +223,7 @@ def refresh(scan_id: str = None, **kwargs) -> str:
 # ------------------------------------------------------------------------
 
 
-@url_prefix
+@api_prefix
 def register(**kwargs) -> str:
     """Return the URL path to the register endpoint.
 
@@ -246,7 +246,7 @@ def register(**kwargs) -> str:
     return REGISTER
 
 
-@url_prefix
+@api_prefix
 def login(**kwargs) -> str:
     """Return the URL path to the login endpoint.
 
@@ -269,7 +269,7 @@ def login(**kwargs) -> str:
     return LOGIN
 
 
-@url_prefix
+@api_prefix
 def logout(**kwargs) -> str:
     """Return the URL path to the logout endpoint.
 
@@ -292,7 +292,7 @@ def logout(**kwargs) -> str:
     return LOGOUT
 
 
-@url_prefix
+@api_prefix
 def token_refresh(**kwargs) -> str:
     """Return the URL path to the token refresh endpoint.
 
@@ -315,7 +315,7 @@ def token_refresh(**kwargs) -> str:
     return TOKEN_REFRESH
 
 
-@url_prefix
+@api_prefix
 def token_validation(**kwargs) -> str:
     """Return the URL path to the token validation endpoint.
 
@@ -338,7 +338,7 @@ def token_validation(**kwargs) -> str:
     return TOKEN_VALIDATION
 
 
-@url_prefix
+@api_prefix
 def create_api_token(**kwargs):
     """Return the URL path to the API token creation endpoint.
 
@@ -366,7 +366,7 @@ def create_api_token(**kwargs):
 # ------------------------------------------------------------------------
 
 
-@url_prefix
+@api_prefix
 def scans(**kwargs) -> str:
     """Return the URL path to the scans' endpoint.
 
@@ -389,7 +389,7 @@ def scans(**kwargs) -> str:
     return SCANS
 
 
-@url_prefix
+@api_prefix
 def scans_info(**kwargs) -> str:
     """Return the URL path to the list of scan dataset information endpoint.
 
@@ -412,7 +412,7 @@ def scans_info(**kwargs) -> str:
     return SCANS_INFO
 
 
-@url_prefix
+@api_prefix
 def scan(scan_id: str, **kwargs) -> str:
     """Return the URL path to the scan endpoint.
 
@@ -441,7 +441,7 @@ def scan(scan_id: str, **kwargs) -> str:
     return SCAN.format(scan_id=scan_id)
 
 
-@url_prefix
+@api_prefix
 def scan_metadata(scan_id: str, key: str | None = None, **kwargs) -> str:
     """URL to access the metadata associated with the given scan name.
 
@@ -479,7 +479,7 @@ def scan_metadata(scan_id: str, key: str | None = None, **kwargs) -> str:
     return SCAN_MD.format(scan_id=scan_id) + f"{query_str}"
 
 
-@url_prefix
+@api_prefix
 def scan_filesets_list(scan_id: str, **kwargs) -> str:
     """URL to list the filesets associated with the given scan name.
 
@@ -508,7 +508,7 @@ def scan_filesets_list(scan_id: str, **kwargs) -> str:
     return SCAN_FILESETS.format(scan_id=scan_id)
 
 
-@url_prefix
+@api_prefix
 def fileset(scan_id, fileset_id, **kwargs) -> str:
     """URL path for a fileset belonging to a scan.
 
@@ -540,7 +540,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
     return FILESET.format(scan_id=scan_id, fileset_id=fileset_id)
 
 
-@url_prefix
+@api_prefix
 def fileset_metadata(
     scan_id: str, fileset_id: str, key: str | None = None, **kwargs
 ) -> str:
@@ -583,7 +583,7 @@ def fileset_metadata(
     return FILESET_MD.format(scan_id=scan_id, fileset_id=fileset_id) + f"{query_str}"
 
 
-@url_prefix
+@api_prefix
 def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     """URL to list the file associated with the given scan and filesets names.
 
@@ -615,7 +615,7 @@ def fileset_files_list(scan_id: str, fileset_id: str, **kwargs) -> str:
     return FILESET_FILES.format(scan_id=scan_id, fileset_id=fileset_id)
 
 
-@url_prefix
+@api_prefix
 def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     """Return the URL path to the `scan/fileset/file` endpoint.
 
@@ -650,7 +650,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
     return FILE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
 
 
-@url_prefix
+@api_prefix
 def file_metadata(
     scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs
 ) -> str:
@@ -704,7 +704,7 @@ def file_metadata(
 # ------------------------------------------------------------------------
 
 
-@url_prefix
+@api_prefix
 def image(
     scan_id: str,
     fileset_id: str,
@@ -765,7 +765,7 @@ def image(
     )
 
 
-@url_prefix
+@api_prefix
 def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
     """Return the URL path to the sequence endpoint.
 
@@ -813,7 +813,7 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
     return SEQUENCE.format(scan_id=scan_id) + f"{query_str}"
 
 
-@url_prefix
+@api_prefix
 def pointcloud(
     scan_id: str,
     size: int | float | str | None = None,
@@ -887,7 +887,7 @@ def pointcloud(
     return POINTCLOUD.format(scan_id=scan_id) + f"{query_str}"
 
 
-@url_prefix
+@api_prefix
 def mesh(
     scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs
 ) -> str:
@@ -943,7 +943,7 @@ def mesh(
     return MESH.format(scan_id=scan_id) + f"{query_str}"
 
 
-@url_prefix
+@api_prefix
 def skeleton(scan_id: str, **kwargs) -> str:
     """Return the URL path to the skeleton endpoint.
 
@@ -972,7 +972,7 @@ def skeleton(scan_id: str, **kwargs) -> str:
     return SKELETON.format(scan_id=scan_id)
 
 
-@url_prefix
+@api_prefix
 def archive(scan_id: str, **kwargs) -> str:
     """Return the URL path to the dataset archive endpoint.
 
@@ -1001,7 +1001,7 @@ def archive(scan_id: str, **kwargs) -> str:
     return ARCHIVE.format(scan_id=scan_id)
 
 
-@url_prefix
+@api_prefix
 def file_path(file_path: str, **kwargs) -> str:
     """Return the URL path to the `scan/file_path` endpoint.
 
