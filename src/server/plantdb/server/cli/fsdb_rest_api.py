@@ -54,18 +54,18 @@ The server enables users to query and manage plant scans, images, point clouds, 
 To start the REST API server for a local plant database:
 
 ```shell
-python fsdb_rest_api.py --db_location /path/to/your/database --host 127.0.0.1 --port 8080 --debug
+fsdb_rest_api --db_location /path/to/your/database --host 127.0.0.1 --port 8080 --debug
 ```
 
 To run the server with a temporary test database in debug mode:
 
 ```shell
-python fsdb_rest_api.py --test --debug
+fsdb_rest_api --test --debug
 ```
 
 For detailed command-line parameters, use the `--help` flag:
 ```shell
-python fsdb_rest_api.py --help
+fsdb_rest_api --help
 ```
 """
 
