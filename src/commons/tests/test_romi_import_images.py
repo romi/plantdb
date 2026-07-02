@@ -33,19 +33,22 @@ class TestFSDBDummy(DummyDBTestCase):
         db._is_dummy = False  # to avoid clean up by 'disconnect' method
         db.disconnect()
         copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
-        out = subprocess.run(["fsdb_import_images", str(db.path()), copy_path,
+        cmd = ["fsdb_import_images", str(db.path()), copy_path,
                               "--name", "test_import_img",
-                              "--metadata", TESTS_ROOT / "testdata" / "testscan" / "files.json"], capture_output=True)
+                              "--metadata", TESTS_ROOT / "testdata" / "testscan" / "files.json",
+                              "--no-auth"]
+        print("Calling: " + ' '.join(map(str, cmd)))
+        out = subprocess.run(cmd, capture_output=True)
         rcode = out.returncode
         if rcode != 0:
             print(f"Return code: {rcode}")
-            print(f"Captured stdout: {out.stdout}")
-            print(f"Captured stderr: {out.stderr}")
+            print(f"Captured stdout: {out.stdout.decode()}")
+            print(f"Captured stderr: {out.stderr.decode()}")
         self.assertTrue(rcode == 0, msg=f"Return code is {rcode}: {out.stderr}")
         db.connect()
         # Test database path:
         self.assertTrue(db.path().is_dir())
-        # Test scan exist and its path exists:
+        # Test that the scan exists and its path exists:
         scan = db.get_scan('test_import_img')
         self.assertIsNotNone(scan)
         self.assertTrue(scan.path().is_dir())
