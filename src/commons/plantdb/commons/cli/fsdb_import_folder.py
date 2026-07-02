@@ -76,7 +76,7 @@ logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
     show_default=True,
     help="Logging level.",
 )
-def main(scan, folder, metadata, db_user, db_password, no_auth, log_level):
+def main(scan, folder, metadata, user, password, no_auth, log_level):
     """FSDB Folder Import CLI
 
     A command‑line utility that imports a folder's contents as a ``Fileset`` in a known ``Scan`` dataset, optionally
@@ -89,7 +89,7 @@ def main(scan, folder, metadata, db_user, db_password, no_auth, log_level):
     logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
     logger.setLevel(log_level)
 
-    if not (no_auth or (db_user and db_password)):
+    if not (no_auth or (user and password)):
         raise click.UsageError("Requires using either the --no-auth flag or using both --user and --password")
 
     # Load metadata if a path is provided
@@ -106,8 +106,8 @@ def main(scan, folder, metadata, db_user, db_password, no_auth, log_level):
     db.connect()
 
     # Authenticate unless explicitly disabled
-    if not no_auth and (db_user and db_password):
-        db.login(db_user, db_password)
+    if not no_auth and (user and password):
+        db.login(user, password)
 
     folder_path = Path(folder).resolve()
     fileset_id = folder_path.name

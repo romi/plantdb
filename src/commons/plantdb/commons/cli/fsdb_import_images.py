@@ -44,19 +44,17 @@ import click
 from click_option_group import OptionGroup
 from click_option_group import optgroup
 
-from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
 
-DESC = """
-Import the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` dataset.
-"""
-IMG_EXT = [".png", ".jpg", ".jpeg"]
-
 # Create a logger and set the environment variable
 os.environ.setdefault('ROMI_APP_LOGGER', __file__.split('.')[0])
 logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
+
+from plantdb.commons.fsdb.core import FSDB
+
+IMG_EXT = [".png", ".jpg", ".jpeg"]
 
 
 def list_image_files(images_path):
@@ -108,7 +106,7 @@ def load_metadata(md_path) -> dict:
     show_default=True,
     help="Logging level.",
 )
-def main(database, folder, name, metadata, db_user, db_password, no_auth, log_level):
+def main(database, folder, name, metadata, user, password, no_auth, log_level):
     """FSDB Images Import CLI
 
     A command‑line utility that imports the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` dataset,
@@ -121,7 +119,7 @@ def main(database, folder, name, metadata, db_user, db_password, no_auth, log_le
     logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
     logger.setLevel(log_level)
 
-    if not (no_auth or (db_user and db_password)):
+    if not (no_auth or (user and password)):
         raise click.UsageError("Requires using either the --no-auth flag or using both --user and --password")
 
     # - Configure a logger from this application:
@@ -145,8 +143,8 @@ def main(database, folder, name, metadata, db_user, db_password, no_auth, log_le
     db.connect()
 
     # - Authenticate unless explicitly disabled
-    if not no_auth and (db_user and db_password):
-        db.login(db_user, db_password)
+    if not no_auth and (user and password):
+        db.login(user, password)
 
     # - Defines the scan dataset name to create
     default_scan_name = folder_path.name
@@ -159,7 +157,6 @@ def main(database, folder, name, metadata, db_user, db_password, no_auth, log_le
     scan = db.create_scan(ds_name)
 
     # - Try to load metadata:
-    metadata = None
     if metadata is None:
         md_path = folder_path / "metadata.json"
         if md_path.exists():

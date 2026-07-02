@@ -74,7 +74,7 @@ from plantdb.commons.fsdb.core import FSDB
     show_default=True,
     help="Logging level.",
 )
-def main(fileset, file, metadata, db_user, db_password, no_auth, log_level):
+def main(fileset, file, metadata, user, password, no_auth, log_level):
     """FSDB File Import CLI
 
     A command‑line utility that imports a single file into a specified PlantDB fileset, optionally attaching
@@ -87,7 +87,7 @@ def main(fileset, file, metadata, db_user, db_password, no_auth, log_level):
     logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
     logger.setLevel(log_level)
 
-    if not (no_auth or (db_user and db_password)):
+    if not (no_auth or (user and password)):
         raise click.UsageError("Requires using either the --no-auth flag or using both --user and --password")
 
     # Load metadata if a path is provided
@@ -106,8 +106,8 @@ def main(fileset, file, metadata, db_user, db_password, no_auth, log_level):
     db.connect()
 
     # Authenticate unless explicitly disabled
-    if not no_auth and (db_user and db_password):
-        db.login(db_user, db_password)
+    if not no_auth and (user and password):
+        db.login(user, password)
 
     scan = db.create_scan(scan_id)
     fileset_obj = scan.create_fileset(fileset_id)
