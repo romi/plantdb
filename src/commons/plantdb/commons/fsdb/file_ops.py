@@ -228,6 +228,8 @@ def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'S
             _store_scan(scan)  # update the scan's ``files.json``
         # Try to load the scan's metadata
         scan.metadata = _load_scan_metadata(scan)
+        # Try to list the scan's configs
+        scan.configs = _list_scan_configs(scan)
         # Try to load the scan's manual measure, if any
         scan.measures = _load_scan_measures(scan)
     else:
@@ -493,6 +495,51 @@ def _load_file(fileset: 'Fileset', file_info: dict[str, str]) -> 'File':
     file = _parse_file(fileset, file_info)
     file.metadata = _load_file_metadata(file)
     return file
+
+
+def _list_scan_configs(scan:'Scan') -> dict[str, Path]:
+    """List path to all TOML configuration files associated with a scan.
+
+    This helper iterates over every ``*.toml`` file located in the supplied *scan* directory.
+    Each file location and stored in a dictionary keyed by the file stem.
+
+    Parameters
+    ----------
+    scan : plantdb.commons.fsdb.core.Scan
+        The instance to use to list the configuration files.
+
+    Returns
+    -------
+    dict[str, pathlib.Path]
+        Mapping from the stem of each TOML file to the parsed configuration dictionary.
+        If a file could not be read, the value will be ``None``.
+
+    See Also
+    --------
+    _scan_path : Resolve a scan identifier to a filesystem path.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.core import Scan
+    >>> from plantdb.commons.fsdb.file_ops import _list_scan_configs
+    >>> db = test_database(no_auth=True)
+    >>> db.connect()
+    >>> scan = Scan(db, 'real_plant_analyzed')
+    >>> configs = _list_scan_configs(scan)
+    >>> sorted(configs.keys())
+    ['pipeline', 'scan']
+    >>> print(configs['scan'])
+    PosixPath('/tmp/ROMI_DB_hicfekb9/real_plant_analyzed/scan.toml')
+    """
+    path = _scan_path(scan)
+    toml_files = path.glob("*.toml")
+
+    configs = {}
+    for toml_file in toml_files:
+        configs[toml_file.stem] = toml_file
+
+    return configs
 
 
 def _load_measures(path: str | Path) -> dict[str, Any]:

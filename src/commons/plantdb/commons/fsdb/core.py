@@ -2052,6 +2052,7 @@ class Scan(db.Scan, MetadataManager):
         # Defines attributes:
         self.metadata = {}
         self.filesets = {}
+        self.configs = {}
         self.measures = None
 
         self.session_manager = self.db.session_manager
