@@ -329,9 +329,10 @@ def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False) -> 
     Examples
     --------
     >>> from plantdb.commons.test_database import get_test_dataset
-    >>> get_test_dataset()  # download and extract the test dataset to `plantdb/tests/testdata` directory
+    >>> # Download and extract the 'real_plant' test dataset to `plantdb/src/commons/tests/testdata` directory
+    >>> get_test_dataset('real_plant')
     """
-    ds_path = db_path / dataset
+    ds_path = Path(db_path) / dataset
     if ds_path.exists() and not force:
         db_path = ds_path
     else:
@@ -359,9 +360,10 @@ def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     Examples
     --------
     >>> from plantdb.commons.test_database import get_models_dataset
-    >>> get_models_dataset()  # download and extract the trained CNN models to `plantdb/tests/testdata` directory
+    >>> # Download and extract the trained CNN models to `plantdb/src/commons/tests/testdata` directory
+    >>> get_models_dataset()
     """
-    ds_path = db_path / "models"
+    ds_path = Path(db_path) / "models"
     if ds_path.exists() and not force:
         db_path = ds_path
     else:
@@ -389,9 +391,10 @@ def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     Examples
     --------
     >>> from plantdb.commons.test_database import get_configs
-    >>> get_configs()  # download and extract the pipeline configurations to `plantdb/tests/testdata` directory
+    >>> # Download and extract the pipeline configurations to `plantdb/src/commons/tests/testdata` directory
+    >>> get_configs()
     """
-    ds_path = db_path / "configs"
+    ds_path = Path(db_path) / "configs"
     if ds_path.exists() and not force:
         db_path = ds_path
     else:
