@@ -1970,6 +1970,9 @@ class Scan(db.Scan, MetadataManager):
         The identifier of this ``Scan`` instance in the local database `db`.
     metadata : dict
         A metadata dictionary.
+    configs : dict
+        A dictionary listing the paths to the TOML configuration files.
+        Indexed by configuration file stem, typically `'scan'` or `'pipeline'`.
     filesets : dict[str, plantdb.commons.fsdb.core.Fileset]
         A dictionary of `Fileset` instances, indexed by their identifier.
 
