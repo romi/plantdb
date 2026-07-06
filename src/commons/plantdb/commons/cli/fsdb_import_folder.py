@@ -53,7 +53,7 @@ logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
-@click.argument('scan', type=click.Path(exists=True))
+@click.argument('scan_path', type=click.Path(exists=True))
 @click.argument('folder', type=click.Path(exists=True))
 @click.option(
     '--metadata',
@@ -76,7 +76,7 @@ logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
     show_default=True,
     help="Logging level.",
 )
-def main(scan, folder, metadata, user, password, no_auth, log_level):
+def main(scan_path, folder, metadata, user, password, no_auth, log_level):
     """FSDB Folder Import CLI
 
     A command‑line utility that imports a folder's contents as a ``Fileset`` in a known ``Scan`` dataset, optionally
@@ -97,7 +97,7 @@ def main(scan, folder, metadata, user, password, no_auth, log_level):
         with open(metadata, "r", encoding="utf-8") as f:
             metadata = json.load(f)
 
-    scan_path = Path(scan)
+    scan_path = Path(scan_path)
     scan_id = scan_path.name
     db_path = scan_path.parent
 
@@ -112,14 +112,14 @@ def main(scan, folder, metadata, user, password, no_auth, log_level):
     folder_path = Path(folder).resolve()
     fileset_id = folder_path.name
 
-    fileset = scan.create_fileset(fileset_id)
+    fileset = scan_path.create_fileset(fileset_id)
     try:
         for f in os.listdir(folder_path):
             if os.path.isfile(os.path.join(folder_path, f)):
                 fi = fileset.create_file(os.path.splitext(f)[0])
                 fi.import_file(os.path.join(folder_path, f))
     except Exception as e:
-        scan.delete_fileset(fileset_id)
+        scan_path.delete_fileset(fileset_id)
         raise e
 
     if metadata is not None:

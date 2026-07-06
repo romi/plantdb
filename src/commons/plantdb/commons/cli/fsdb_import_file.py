@@ -51,8 +51,8 @@ from plantdb.commons.fsdb.core import FSDB
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
-@click.argument('fileset', type=click.Path(exists=True))
-@click.argument('file', type=click.Path(exists=True))
+@click.argument('fileset_path', type=click.Path(exists=True))
+@click.argument('file_path', type=click.Path(exists=True))
 @click.option(
     '--metadata',
     type=click.Path(exists=True),
@@ -74,7 +74,7 @@ from plantdb.commons.fsdb.core import FSDB
     show_default=True,
     help="Logging level.",
 )
-def main(fileset, file, metadata, user, password, no_auth, log_level):
+def main(fileset_path, file_path, metadata, user, password, no_auth, log_level):
     """FSDB File Import CLI
 
     A command‑line utility that imports a single file into a specified PlantDB fileset, optionally attaching
@@ -95,11 +95,11 @@ def main(fileset, file, metadata, user, password, no_auth, log_level):
         with open(metadata, "r", encoding="utf-8") as f:
             metadata = json.load(f)
 
-    fileset_dir = Path(fileset)  # Directory representing the target fileset
-    fileset_id = fileset_dir.name  # Identifier derived from fileset folder name
-    file_id = Path(file).stem  # Identifier derived from source filename (without extension)
-    scan_id = fileset_dir.parent  # Parent directory used as scan identifier
-    db_path = fileset_dir.parent.parent  # Grandparent directory points to the database location
+    fileset_path = Path(fileset_path)  # Directory representing the target fileset
+    fileset_id = fileset_path.name  # Identifier derived from fileset folder name
+    file_id = Path(file_path).stem  # Identifier derived from source filename (without extension)
+    scan_id = fileset_path.parent  # Parent directory used as scan identifier
+    db_path = fileset_path.parent.parent  # Grandparent directory points to the database location
 
     # Initialize the database
     db = FSDB(db_path, no_auth=no_auth)
@@ -112,7 +112,7 @@ def main(fileset, file, metadata, user, password, no_auth, log_level):
     scan = db.create_scan(scan_id)
     fileset_obj = scan.create_fileset(fileset_id)
     file_obj = fileset_obj.create_file(file_id)
-    file_obj.import_file(file)
+    file_obj.import_file(file_path)
 
     if metadata is not None:
         file_obj.set_metadata(metadata)

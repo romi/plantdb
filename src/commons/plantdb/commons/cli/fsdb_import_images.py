@@ -80,7 +80,7 @@ def load_metadata(md_path) -> dict:
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
-@click.argument('database', type=click.Path(exists=True))
+@click.argument('db_path', type=click.Path(exists=True))
 @click.argument('folder', type=click.Path(exists=True))
 @click.option('--name', type=str, default="",
               help="Name of the scan dataset where to import the fileset to. "
@@ -106,7 +106,7 @@ def load_metadata(md_path) -> dict:
     show_default=True,
     help="Logging level.",
 )
-def main(database, folder, name, metadata, user, password, no_auth, log_level):
+def main(db_path, folder, name, metadata, user, password, no_auth, log_level):
     """FSDB Images Import CLI
 
     A command‑line utility that imports the content of a folder as an 'images' ``Fileset`` to a new ``Scan`` dataset,
@@ -139,7 +139,7 @@ def main(database, folder, name, metadata, user, password, no_auth, log_level):
         logger.info(f"Found {len(img_files)} image files in folder '{folder}'.")
 
     # - Connect to the database:
-    db = FSDB(database, no_auth=no_auth)
+    db = FSDB(db_path, no_auth=no_auth)
     db.connect()
 
     # - Authenticate unless explicitly disabled

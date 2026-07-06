@@ -55,7 +55,7 @@ from plantdb.commons.utils import yes_no_abort_choice
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
-@click.argument('fsdb_path', type=click.Path(exists=True))
+@click.argument('db_path', type=click.Path(exists=True))
 @optgroup.group("Fix", cls=OptionGroup)
 @optgroup.option('--fix', is_flag=True,
                  help="Fix all errors by removing missing references and importing extra local files.")
@@ -66,7 +66,7 @@ from plantdb.commons.utils import yes_no_abort_choice
 @optgroup.group("Logging", cls=OptionGroup)
 @optgroup.option('--log-level', 'log_level', type=click.Choice(LOG_LEVELS), default=DEFAULT_LOG_LEVEL,
                  help="Level of message logging.", show_default=True)
-def main(fsdb_path, fix, fix_missing, fix_extra, log_level):
+def main(db_path, fix, fix_missing, fix_extra, log_level):
     """Perform a sanity check of the given local File System DataBase (FSDB).
 
     This command performs health checks on the FSDB, identifying and optionally fixing
@@ -77,22 +77,22 @@ def main(fsdb_path, fix, fix_missing, fix_extra, log_level):
     logger.setLevel(log_level)
 
     # Verify provided path is a directory
-    fsdb_path = Path(fsdb_path)
-    if not fsdb_path.is_dir():
+    db_path = Path(db_path)
+    if not db_path.is_dir():
         logger.error("The provided path is not a directory.")
         raise ValueError("The provided path is not a directory.")
 
     # Ensure FSDB marker file exists to confirm valid FSDB
-    marker_path = fsdb_path / MARKER_FILE_NAME
+    marker_path = db_path / MARKER_FILE_NAME
     if not marker_path.is_file():
         logger.error(f"The given path does not contain the required marker file '{MARKER_FILE_NAME}'.")
         raise NotAnFSDBError(f"The given path does not refer to a valid FSDB.")
 
     # Gather scan directories (ignore hidden folders)
-    scan_dirs = [f for f in fsdb_path.iterdir() if f.is_dir() and not f.name.startswith('.')]
+    scan_dirs = [f for f in db_path.iterdir() if f.is_dir() and not f.name.startswith('.')]
     # Empty FSDB handling
     if not scan_dirs:
-        logger.warning(f"The FSDB at '{fsdb_path}' is empty.")
+        logger.warning(f"The FSDB at '{db_path}' is empty.")
         exit(0)  # Still valid as an empty FSDB
 
     # If --fix flag is set, enable missing‑reference fixing (extra fixing not yet implemented)
@@ -101,7 +101,7 @@ def main(fsdb_path, fix, fix_missing, fix_extra, log_level):
         # fix_extra = True  # TODO: write the method first!
 
     # Instantiate FSDB object without authentication
-    db = FSDB(fsdb_path, no_auth=True)
+    db = FSDB(db_path, no_auth=True)
     # do NOT use the `connect()` method
 
     if fix_missing:
