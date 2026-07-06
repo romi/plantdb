@@ -19,6 +19,7 @@ dependencies = [
     "toml",
     "tqdm",
     "send2trash",
+    "click",
     "click_option_group"
 ]
 description = "Core shared library for the ROMI plant database ecosystem."
