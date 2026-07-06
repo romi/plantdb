@@ -87,6 +87,14 @@ from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from plantdb.commons.log import get_logger
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+
+# Create a logger and set the environment variable
+os.environ.setdefault('ROMI_APP_LOGGER', __file__.split('.')[0])
+logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
+
 from plantdb.commons.api_endpoints import API_PREFIX
 from plantdb.commons.api_endpoints import ARCHIVE
 from plantdb.commons.api_endpoints import CREATE_API_TOKEN
@@ -117,9 +125,6 @@ from plantdb.commons.api_endpoints import TOKEN_VALIDATION
 from plantdb.commons.auth.session import JWTSessionManager
 from plantdb.commons.auth.session import _init_secret_key
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.log import DEFAULT_LOG_LEVEL
-from plantdb.commons.log import LOG_LEVELS
-from plantdb.commons.log import get_logger
 from plantdb.commons.test_database import DATASET
 from plantdb.commons.test_database import test_database
 from plantdb.server.api.assets import Archive
@@ -394,7 +399,9 @@ def rest_api(
         Defaults to ``False``.
     """
     wlogger = logging.getLogger("werkzeug")
-    logger = get_logger("fsdb_rest_api", log_level=log_level)
+    # Get the logger and change the level if needed:
+    logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
+    logger.setLevel(log_level)
 
     # 1 - Application and API configuration
     secret_key = _get_env_secret("FLASK_SECRET_KEY", logger)
@@ -522,7 +529,7 @@ def rest_api(
     help="Logging level.",
 )
 def main(host, port, debug, proxy, api_prefix, db_path, test, empty, models, log_level):
-    """Entry point for the REST API server using Click."""
+    """FSDB REST API - Serve Plant Database through RESTful Endpoints."""
     app = rest_api(db_path=db_path, proxy=proxy, api_prefix=api_prefix, log_level=log_level.upper(), test=test,
                    empty=empty, models=models)
     # Start the Flask development server.

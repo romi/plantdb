@@ -9,12 +9,12 @@ It ensures data consistency and aids in migrating or backing up scan data effici
 
 ## Key Features
 
-- **Command-line Interface (CLI)**: Includes an argument parser for easy configuration of source and target databases.
+- **Command-line Interface (CLI)**: Uses `click` for easy configuration of source and target databases.
 - **URL Validation**: Verifies the format and accessibility of the provided database URLs.
 - **Scan Synchronization**: Retrieves scan archives from the source database and uploads them to the target database.
 - **REST API Integration**: Utilizes REST API calls for secure and efficient data transfer.
 - **Progress Tracking**: Displays a progress bar with `tqdm` to show transfer status for each scan.
-- **Logging**: Offers informational and error logging to provide feedback during the synchronization process.
+- **Configurable logging**: choose from predefined log levels to control output verbosity.
 - **Error Handling**: Handles common errors such as invalid URLs, inaccessible ports, and connectivity issues.
 
 ## Usage Examples
@@ -23,15 +23,16 @@ To synchronize two FSDB databases, run the script from the command line with the
 Temporary files are stored in the `/tmp` directory during the transfer process.
 
 ```bash
-python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000
+fsdb_rest_api_sync 192.168.1.1:5000 192.168.1.2:5000
 ```
 
 This command connects the origin database at `192.168.1.1:5000` to the target database at `192.168.1.2:5000` and transfers all scan archives.
 
 To filter the transferred scans based on a regular expression, use the `--filter` optional argument.
 For example, to transfer only scans with names starting with 'virtual_':
+
 ```shell
-python fsdb_rest_api_sync.py 192.168.1.1:5000 192.168.1.2:5000 --filter 'virtual_*'
+fsdb_rest_api_sync 192.168.1.1:5000 192.168.1.2:5000 --filter 'virtual_*'
 ```
 
 ## Testing
@@ -60,12 +61,13 @@ For example:
 
 """
 
-import argparse
+import os
 import re
 from pathlib import Path
 from urllib.parse import urlparse
 
-from requests.exceptions import HTTPError
+import click
+from requests import HTTPError
 from tqdm import tqdm
 
 from plantdb.client.rest_api.requests import request_archive_download
@@ -77,30 +79,41 @@ from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
 
+# Create a logger and set the environment variable
+os.environ.setdefault('ROMI_APP_LOGGER', __file__.split('.')[0])
+logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
-def parsing():
-    """Parses command line arguments for database synchronization.
 
-    Returns
-    -------
-    argparse.ArgumentParser
-        An argument parser configured for FSDB synchronization.
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.argument('origin', type=str)
+@click.argument('target', type=str)
+@click.option('--filter', type=str, default=None,
+              help='optional regular expression to filter scan names.')
+@click.option(
+    "--log-level",
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    default=DEFAULT_LOG_LEVEL,
+    show_default=True,
+    help="Logging level.",
+)
+def main(origin, target, filter_pattern, log_level):
+    """FSDB Synchronization via REST API
+
+    Transfer dataset from an origin FSDB database towards a target using REST API.
+
+    ORIGIN is the source database URL, as "host:port".
+    TARGET is the target database URL, as "host:port".
     """
-    parser = argparse.ArgumentParser(
-        description='Transfer dataset from an origin FSDB database towards a target using REST API.')
-    parser.add_argument('origin', type=str,
-                        help='source database URL, as "host:port".')
-    parser.add_argument('target', type=str,
-                        help='target database URL, as "host:port".')
+    # Get the logger and change the level if needed:
+    logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
+    logger.setLevel(log_level)
 
-    parser.add_argument('--filter', type=str, default=None,
-                        help='optional regular expression to filter scan names.')
+    # Validate the availability of origin and target database URLs
+    is_server_available(origin)
+    is_server_available(target)
 
-    log_opt = parser.add_argument_group("Logging options")
-    log_opt.add_argument("--log-level", dest="log_level", type=str, default=DEFAULT_LOG_LEVEL, choices=LOG_LEVELS,
-                         help="Level of message logging, defaults to 'INFO'.")
-
-    return parser
+    # Synchronize scan archives between the origin and target databases
+    sync_scan_archives(origin, target, filter_pattern, log_level)
 
 
 def filter_scan(scan_list, filter_pattern, logger):
@@ -185,42 +198,22 @@ def sync_scan_archives(origin_url, target_url, filter_pattern=None, log_level=DE
             continue
         logger.debug(f"Transferring scan '{scan_id}'...")
         # Download from origin DB via REST API
-        f_path, msg = request_archive_download(scan_id, out_dir='/tmp', host=origin_host, port=origin_port)
+        f_path, msg = request_archive_download(origin_host, scan_id, '/tmp', port=origin_port)
         logger.debug(msg)
         # Upload to target DB via REST API
-        msg = request_archive_upload(scan_id, f_path, host=target_host, port=target_port)
+        msg = request_archive_upload(target_host, scan_id, f_path, port=target_port)
         logger.debug(msg)
         # Delete the temporary file
         Path(f_path).unlink()
         # Refresh the scan in the target to load its infos:
         try:
-            success, msg = request_refresh(scan_id, host=target_host, port=target_port)
+            success, msg = request_refresh(target_host, scan_id, port=target_port)
         except HTTPError as e:
             logger.error(f"Error refreshing target database for scan '{scan_id}': {e}")
             continue
         logger.debug(msg)
 
     return
-
-
-def main():
-    """Main execution function.
-
-    This function orchestrates the parsing of command-line arguments, validation of the
-    provided database URLs, and the synchronization of scan archives between the origin
-    and target databases.
-    """
-    # Parse command-line arguments using the parsing function
-    parser = parsing()
-    # Extract the parsed arguments
-    args = parser.parse_args()
-
-    # Validate the availability of origin and target database URLs
-    is_server_available(args.origin)
-    is_server_available(args.target)
-
-    # Synchronize scan archives between the origin and target databases
-    sync_scan_archives(args.origin, args.target, args.filter, args.log_level)  # Perform synchronization
 
 
 if __name__ == '__main__':
