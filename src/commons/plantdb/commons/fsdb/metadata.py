@@ -145,13 +145,15 @@ def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
     md_path = _scan_metadata_path(scan)
     if md_path.exists():
         scan_md.update(_load_metadata(md_path))
-    # FIXME: next lines are here to solve the issue that most scans dataset have no metadata as they have been saved in the 'images' fileset metadata...
+
+    # FIXME: next lines are here to solve the issue that scans dataset prior to 2026 have no metadata as they have been saved in the 'images' fileset metadata...
     img_fs_path = md_path.parent / 'images.json'  # path to 'images' fileset metadata
     if img_fs_path.exists():
         img_fs_md = _load_metadata(img_fs_path)
-        scan_md.update({'object': img_fs_md.get('object', {})})
-        scan_md.update({'hardware': img_fs_md.get('hardware', {})})
-        scan_md.update({'acquisition_date': img_fs_md.get('acquisition_date', None)})
+        # Update the fields only if empty from the scan's metadata file
+        for md_key in ['object', 'hardware', 'acquisition_date']:
+            if scan_md[md_key] == {}:
+                scan_md.update({md_key: img_fs_md.get(md_key, {})})
     return scan_md
 
 
