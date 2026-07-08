@@ -152,7 +152,7 @@ def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
         img_fs_md = _load_metadata(img_fs_path)
         # Update the fields only if empty from the scan's metadata file
         for md_key in ['object', 'hardware', 'acquisition_date']:
-            if scan_md[md_key] == {}:
+            if scan_md.get(md_key, {}) == {}:
                 scan_md.update({md_key: img_fs_md.get(md_key, {})})
     return scan_md
 
