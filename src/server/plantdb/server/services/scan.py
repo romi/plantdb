@@ -181,8 +181,8 @@ def get_scan_info(scan, **kwargs):
             f = fs.get_file(task)
             scan_info["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
 
-    # Get the workspace metadata
-    scan_info["workspace"] = img_fs.get_metadata("workspace")
+    # Get the workspace metadata from the scan metadata, or fallback to image metadata (older implementation)
+    scan_info["workspace"] = scan_md.get('workspace', img_fs.get_metadata("workspace"))
     # Get the camera metadata
     scan_info["camera"] = {}
     if img_f.get_metadata("colmap_camera") != {}:
