@@ -180,11 +180,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
 - **Request Body**: JSON with updated metadata
 - **Response**: Metadata update confirmation
 
----
-
-## Filesets
-
-### GET `/scans/{scan_id}/filesets/`
+### GET `/scans/{scan_id}/filesets`
 
 **List filesets for scan**
 
@@ -193,7 +189,11 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
     - `scan_id`: Unique identifier of the scan
 - **Response**: JSON array of fileset identifiers
 
-### POST `/scans/{scan_id}/filesets/{fileset_id}/`
+---
+
+## Filesets
+
+### POST `/filesets/{scan_id}/{fileset_id}/`
 
 **Create a new fileset**
 
@@ -204,7 +204,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
 - **Request Body**: JSON with fileset information
 - **Response**: Fileset creation confirmation
 
-### GET `/scans/{scan_id}/filesets/{fileset_id}/metadata/`
+### GET `/filesets/{scan_id}/{fileset_id}/metadata/`
 
 **Get fileset metadata**
 
@@ -214,7 +214,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
     - `fileset_id`: Unique identifier of the fileset
 - **Response**: JSON with fileset metadata
 
-### POST `/scans/{scan_id}/filesets/{fileset_id}/metadata/`
+### POST `/filesets/{scan_id}/{fileset_id}/metadata/`
 
 **Update fileset metadata**
 
@@ -225,7 +225,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
 - **Request Body**: JSON with updated metadata
 - **Response**: Metadata update confirmation
 
-### GET `/scans/{scan_id}/filesets/{fileset_id}/files/`
+### GET `/filesets/{scan_id}/{fileset_id}/files`
 
 **List files**
 
@@ -239,7 +239,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
 
 ## Files
 
-### GET `/scans/{scan_id}/filesets/{fileset_id}/files/{file_id}/`
+### GET `/files/{scan_id}/{fileset_id}/{file_id}`
 
 **Retrieve file**
 
@@ -250,7 +250,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
     - `file_id`: Unique identifier of the file
 - **Response**: JSON with file details
 
-### POST `/scans/{scan_id}/filesets/{fileset_id}/files/{file_id}/`
+### POST `/files/{scan_id}/{fileset_id}/{file_id}`
 
 **Create a new file**
 
@@ -262,7 +262,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
 - **Request Body**: File data and metadata
 - **Response**: File creation confirmation
 
-### GET `/scans/{scan_id}/filesets/{fileset_id}/files/{file_id}/metadata/`
+### GET `/files/{scan_id}/{fileset_id}/{file_id}/metadata/`
 
 **Get file metadata**
 
@@ -273,7 +273,7 @@ Use the `/auth/register`, `/auth/login` endpoints to obtain authentication token
     - `file_id`: Unique identifier of the file
 - **Response**: JSON with file metadata
 
-### POST `/scans/{scan_id}/filesets/{fileset_id}/files/{file_id}/metadata/`
+### POST `/files/{scan_id}/{fileset_id}/{file_id}/metadata/`
 
 **Update file metadata**
 
