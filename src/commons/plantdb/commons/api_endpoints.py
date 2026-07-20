@@ -49,21 +49,24 @@ Flask REST API in the `plantdb.server.cli.fsdb_rest_api` submodule.
       │       ├─ metadata/
       │       │   ├─ (GET)   → get `scan_id` metadata
       │       │   └─ (POST)  → update `scan_id` metadata
-      │       └─ filesets/
-      │           ├─ (GET)       → list filesets for scan
-      │           └─ {fileset_id}/
-      │               ├─ (POST)      → create new fileset
-      │               ├─ metadata/
-      │               │   ├─ (GET)   → get `scan_id/fileset_id` metadata
-      │               │   └─ (POST)  → update `scan_id/fileset_id` metadata
-      │               └─ files/
-      │                   ├─ (GET)           → list files
-      │                   └─ {file_id}/
-      │                       ├─ (GET)       → retrieve file
-      │                       ├─ (POST)      → create new file
-      │                       └─ metadata/   → (GET, PATCH)
-      │                           ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
-      │                           └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
+      │       └─ filesets   (GET) → list filesets for scan
+      ├─ filesets/
+      │   └─ {scan_id}/
+      │       └─ {fileset_id}/
+      │           ├─ (POST)      → create new fileset
+      │           ├─ metadata/
+      │           │   ├─ (GET)   → get `scan_id/fileset_id` metadata
+      │           │   └─ (POST)  → update `scan_id/fileset_id` metadata
+      │           └─ files      (GET) → list files
+      ├─ files/
+      │   └─ {scan_id}/
+      │       └─ {fileset_id}/
+      │           └─ {file_id}/
+      │               ├─ (GET)       → retrieve file
+      │               ├─ (POST)      → create new file
+      │               └─ metadata/   → (GET, POST)
+      │                   ├─ (GET)   → get `scan_id/fileset_id/file_id` metadata
+      │                   └─ (POST)  → update `scan_id/fileset_id/file_id` metadata
       └─ assets/
           ├─ files/{file_path}      (GET) → retrieve a specific scan
           ├─ archive/{scan_id}
