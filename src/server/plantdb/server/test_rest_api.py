@@ -18,13 +18,17 @@ blocking the main interpreter, enabling fast, isolated integration tests.
 ## Usage Examples
 
 ```python
+>>> from plantdb.commons.test_database import test_database
 >>> from plantdb.server.test_rest_api import test_rest_api
->>> # Create a temporary test database and start the API
->>> api = test_rest_api()
+>>> from plantdb.server.test_rest_api import API_PREFIX
+>>> # Create a test database
+>>> db = test_database(dataset=None)
+>>> # Create and start a REST API server
+>>> api = test_rest_api(db.path(), port=5000)
 >>> api.start()
 >>> # Interact with the API (e.g., list scans)
 >>> import requests
->>> response = requests.get(f"{api.get_base_url()}/scans")
+>>> response = requests.get(f"{api.get_base_url()}/{API_PREFIX}/scans")
 >>> print(response.json())
 ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
 >>> api.stop()
