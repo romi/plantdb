@@ -563,10 +563,6 @@ def _delete_file(file: 'File') -> None:
         return
 
     file_path = _file_path(file)
-    if not _is_safe_to_delete(file_path):
-        logger.error(f"File {file.filename} is not in the current database.")
-        logger.debug(f"File path: '{file_path}'")
-        raise IOError("Cannot delete files or directories outside of a local DB.")
 
     # - Delete the JSON metadata file associated with the `File` instance:
     file_md_path = _file_metadata_path(file)
@@ -578,7 +574,7 @@ def _delete_file(file: 'File') -> None:
                 f"Could not delete the JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
             logger.debug(f"JSON metadata file path: '{file_md_path}'.")
         else:
-            logger.info(
+            logger.debug(
                 f"Deleted JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
 
     # - Delete the file associated with the `File` instance:
@@ -589,7 +585,7 @@ def _delete_file(file: 'File') -> None:
             logger.error(f"Could not delete file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
             logger.debug(f"File path: '{file_path}'.")
         else:
-            logger.info(f"Deleted file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+            logger.debug(f"Deleted file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
 
     return
 
@@ -622,10 +618,6 @@ def _delete_fileset(fileset: 'Fileset') -> None:
     plantdb.commons.fsdb._is_safe_to_delete
     """
     fileset_path = _fileset_path(fileset)
-    if not _is_safe_to_delete(fileset_path):
-        logger.error(f"Fileset {fileset.id} is not in the current database.")
-        logger.debug(f"Fileset path: '{fileset_path}'.")
-        raise IOError("Cannot delete files or directories outside of a local DB.")
 
     # - Delete the `Files` (and their metadata) belonging to the `Fileset` instance:
     files_list = fileset.list_files()
@@ -640,7 +632,7 @@ def _delete_fileset(fileset: 'Fileset') -> None:
         logger.warning(f"Could not find the JSON metadata file for fileset '{fileset.id}'.")
         logger.debug(f"JSON metadata file path: '{json_md}'.")
     else:
-        logger.info(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
 
     # - Delete the metadata directory associated with the `Fileset` instance:
     dir_md = _fileset_metadata_path(fileset)
@@ -650,7 +642,7 @@ def _delete_fileset(fileset: 'Fileset') -> None:
         logger.warning(f"Could not find metadata directory for fileset '{fileset.id}'.")
         logger.debug(f"Metadata directory path: '{dir_md}'.")
     else:
-        logger.info(f"Deleted metadata directory for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted metadata directory for fileset '{fileset.id}'.")
 
     # - Delete the directory associated with the `Fileset` instance:
     try:
@@ -659,7 +651,7 @@ def _delete_fileset(fileset: 'Fileset') -> None:
         logger.warning(f"Could not find directory for fileset '{fileset.id}'.")
         logger.debug(f"Fileset directory path: '{fileset_path}'.")
     else:
-        logger.info(f"Deleted directory for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted directory for fileset '{fileset.id}'.")
     return
 
 
@@ -692,7 +684,7 @@ def _delete_scan(scan: 'Scan') -> None:
         logger.warning(f"Could not find directory for scan '{scan.id}'.")
         logger.debug(f"Scan path: '{scan_path}'.")
     else:
-        logger.info(f"Deleted directory for scan '{scan.id}'.")
+        logger.debug(f"Deleted directory for scan '{scan.id}'.")
 
     return
 
