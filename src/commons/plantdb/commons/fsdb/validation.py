@@ -128,7 +128,7 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     path = Path(path)
     # Check if the path is a directory
     if not path.is_dir():
-        logger.error("The provided path is not related to a directory.")
+        logger.error("The provided path is not a directory.")
         return False
 
     # Check if the marker file exists (original check)
