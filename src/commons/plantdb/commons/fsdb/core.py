@@ -1977,6 +1977,9 @@ class Scan(db.Scan, MetadataManager):
         The identifier of this ``Scan`` instance in the local database `db`.
     metadata : dict
         A metadata dictionary.
+    configs : dict
+        A dictionary listing the paths to the TOML configuration files.
+        Indexed by configuration file stem, typically `'scan'` or `'pipeline'`.
     filesets : dict[str, plantdb.commons.fsdb.core.Fileset]
         A dictionary of `Fileset` instances, indexed by their identifier.
 
@@ -2060,6 +2063,7 @@ class Scan(db.Scan, MetadataManager):
         # Defines attributes:
         self.metadata = {}
         self.filesets = {}
+        self.configs = {}
         self.measures = None
 
         self.session_manager = self.db.session_manager
@@ -2248,7 +2252,49 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
-    def get_measures(self, key=None, current_user=None, **kwargs) -> Any:
+    def get_configuration(self, key, current_user=None, **kwargs) -> dict[str, Any]:
+        """Get the configurations associated with a scan.
+
+        Parameters
+        ----------
+        key : str
+            The scan's configuration name to recover, usually `'scan'` or `'pipeline'`.
+
+        Returns
+        -------
+        dict
+            The configuration dictionary.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('real_plant_analyzed')
+        >>> # Get the scan configuration
+        >>> scan_cfg = scan.get_configuration('scan')
+        >>> print(scan_cfg['ScanPath']['class_name'])
+        Circle
+        >>> # Get the reconstruction pipeline configuration:
+        >>> pipe_cfg = scan.get_configuration('pipeline')
+        >>> print(pipe_cfg['PointCloud'])
+        {'upstream_task': 'Voxels', 'level_set_value': 1.0}
+        >>> db.disconnect()
+        """
+        from plantdb.commons.io import read_toml
+        if key not in self.configs:
+            self.logger.warning(f"No configuration found for {key}.")
+            return {}
+
+        # Use shared lock for read operations
+        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
+            cfg_path = self.configs[key]
+            return read_toml(cfg_path)
+
+    @get_authentication
+    @use_guest_as_default
+    @requires_permission(Permission.READ, check_scan_access=True)
+    def get_measures(self, key=None, current_user=None, **kwargs):
         """Get the manual measurements associated with a scan.
 
         Parameters
@@ -2266,6 +2312,19 @@ class Scan(db.Scan, MetadataManager):
         -----
         These manual measurements should be a JSON file named `measures.json`.
         It is located at the root folder of the scan dataset.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> scan = db.get_scan('real_plant_analyzed')
+        >>> measures = scan.get_measures()
+        >>> print(list(measures.keys()))
+        ['angles', 'internodes']
+        >>> print(measures['angles'][:3])  # print the first 3 measures angles
+        [2.356194490192345, 0.9599310885968813, 2.1816615649929116]
+        >>> db.disconnect()
         """
         # Use shared lock for read operations
         with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
