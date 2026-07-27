@@ -264,13 +264,15 @@ def _fileset_files_exists(fs_info, fs_path) -> list[bool]:
     return file_exists
 
 
-def _is_safe_to_delete(path) -> bool:
+def _is_safe_to_delete(path, db_path) -> bool:
     """Tests if a given path is safe to delete.
 
     Parameters
     ----------
     path : str or pathlib.Path
         A path to test for safe deletion.
+    db_path : str or pathlib.Path
+        The path to the FSDB database to delete the path from.
 
     Returns
     -------
@@ -279,17 +281,34 @@ def _is_safe_to_delete(path) -> bool:
 
     Notes
     -----
-    A path is safe to delete only if it's a sub-folder of a db.
+    A path is safe to delete only if it's a subfolder or a file of an FSDB.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.validation import _is_safe_to_delete
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> _is_safe_to_delete(scan.path(), db.path())
+    >>> db.disconnect()
     """
     path = Path(path).resolve()
-    while True:
-        # Test if the current path is a local DB (FSDB):
-        if _is_fsdb(path):
-            return True  # exit and return `True` if it is
-        # Else, move to the parent directory & try again:
-        newpath = path.parent
-        # Check if we have indeed moved up to the parent directory
-        if newpath == path:
-            # Stop if we did not
-            return False
-        path = newpath
+    db_path = Path(db_path).resolve()
+
+    if db_path not in path.parents:
+        logger.error(f"The provided path '{path}' is not inside the FSDB '{db_path}'.")
+        return False
+
+    # Ensure the provided db_path is a valid FSDB
+    if not _is_fsdb(db_path):
+        logger.error(f"The provided path to the FSDB '{db_path}' is not valid.")
+        return False
+
+    # A path is safe to delete if it is a subdirectory (or file) within the db_path
+    # and not the db_path itself.
+    if path == db_path:
+        logger.error(f"The provided path to delete '{path}' is the root FSDB directory; deletion is not allowed.")
+        return False
+
+    return True
