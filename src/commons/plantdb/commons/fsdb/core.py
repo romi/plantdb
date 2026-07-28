@@ -793,7 +793,7 @@ class FSDB(db.DB):
         return
 
     @require_connected_db
-    def reload(self, scan_id: Optional[Union[str, Iterable[str]]] = None) -> None:
+    def reload(self, scan_id: str | list[str] | None = None) -> None:
         """Reload the database by scanning datasets.
 
         Parameters
@@ -846,7 +846,7 @@ class FSDB(db.DB):
     @require_connected_db
     @get_authentication
     @require_authentication
-    def get_scans(self, query=None, current_user=None, **kwargs) -> List:
+    def get_scans(self, query=None, current_user=None, **kwargs) -> list["Scan"]:
         """Get a list of `Scan` instances defined in the local database, possibly filtered using a `query`.
 
         Parameters
@@ -911,7 +911,7 @@ class FSDB(db.DB):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.READ, check_scan_access=True)
-    def get_scan(self, scan_id, current_user=None, **kwargs):
+    def get_scan(self, scan_id, current_user=None, **kwargs) -> "Scan":
         """Get a ` Scan ` instance in the local database.
 
         Parameters
@@ -965,7 +965,7 @@ class FSDB(db.DB):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.CREATE, check_scan_access=False)
-    def create_scan(self, scan_id, metadata=None, current_user=None, **kwargs):
+    def create_scan(self, scan_id, metadata=None, current_user=None, **kwargs) -> "Scan":
         """Create a new ``Scan`` instance in the local database.
 
         Parameters
@@ -982,7 +982,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        Optional[plantdb.commons.fsdb.core.Scan]
+        plantdb.commons.fsdb.core.Scan
             The ``Scan`` instance created in the local database.
 
         Raises
@@ -1167,7 +1167,7 @@ class FSDB(db.DB):
             return [scan.id for scan in _filter_query(list(self.scans.values()), query, fuzzy)]
 
     @require_connected_db
-    def get_scan_lock_status(self, scan_id: str) -> Dict:
+    def get_scan_lock_status(self, scan_id: str) -> dict:
         """Get the current lock status for a specific scan.
 
         Parameters
@@ -1220,7 +1220,7 @@ class FSDB(db.DB):
         self.logger.warning("All scan locks have been cleaned up")
 
     @require_connected_db
-    def list_active_locks(self) -> Dict[str, Dict]:
+    def list_active_locks(self) -> dict[str, dict]:
         """List all currently active locks across all scans.
 
         Returns
@@ -1270,7 +1270,7 @@ class FSDB(db.DB):
         return self.rbac_manager.users.validate(username, password)
 
     @require_connected_db
-    def login(self, username: str, password: str, **kwargs) -> Optional[str]:
+    def login(self, username: str, password: str, **kwargs) -> str | None:
         """Authenticate a user and create a session.
 
         Parameters
@@ -1282,7 +1282,7 @@ class FSDB(db.DB):
 
         Returns
         -------
-        Optional[str]
+        str or None
             Returns the user session ID if successful, ``None`` otherwise.
 
         Examples
@@ -1330,6 +1330,13 @@ class FSDB(db.DB):
     @require_token
     def logout(self, **kwargs) -> tuple[bool, str]:
         """Log out a user by invalidating its session.
+
+        Returns
+        -------
+        bool
+            Indicate successfull log-out.
+        str
+            The logged out username.
 
         Examples
         --------
@@ -1531,7 +1538,7 @@ class FSDB(db.DB):
         """
         return self.rbac_manager.get_guest_user()
 
-    def get_username(self, token) -> Optional[str]:
+    def get_username(self, token) -> str | None:
         """Get the username.
 
         Parameters
@@ -1608,7 +1615,7 @@ class FSDB(db.DB):
 
     @get_authentication
     @require_authentication
-    def create_group(self, name, users=None, description=None, current_user=None, **kwargs) -> Optional[Group]:
+    def create_group(self, name, users=None, description=None, current_user=None, **kwargs) -> Group | None:
         """Create a new group.
 
         Parameters
@@ -1662,7 +1669,7 @@ class FSDB(db.DB):
 
     @get_authentication
     @require_authentication
-    def add_user_to_group(self, group_name, user, current_user=None, **kwargs):
+    def add_user_to_group(self, group_name, user, current_user=None, **kwargs) -> bool:
         """Add a user to a group.
 
         Parameters
@@ -1713,7 +1720,7 @@ class FSDB(db.DB):
 
     @get_authentication
     @require_authentication
-    def remove_user_from_group(self, group_name, user, current_user=None, **kwargs):
+    def remove_user_from_group(self, group_name, user, current_user=None, **kwargs) -> bool:
         """Remove a user from a group.
 
         Parameters
@@ -1893,7 +1900,7 @@ class FSDB(db.DB):
 
     @get_authentication
     @require_authentication
-    def get_scan_access_summary(self, scan_id, current_user=None, **kwargs):
+    def get_scan_access_summary(self, scan_id, current_user=None, **kwargs) -> dict | None:
         """Get access summary for the current user on a scan.
 
         Parameters
@@ -2062,7 +2069,7 @@ class Scan(db.Scan, MetadataManager):
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
 
-    def _erase(self):
+    def _erase(self) -> None:
         """Erase the filesets and metadata associated with this scan."""
         for fs_id, fs in self.filesets.items():
             fs._erase()
@@ -2139,7 +2146,7 @@ class Scan(db.Scan, MetadataManager):
         """
         return fileset_id in self.filesets
 
-    def get_filesets(self, query=None, fuzzy=False):
+    def get_filesets(self, query=None, fuzzy=False) -> list["Fileset"]:
         """Get the list of `Fileset` instances defined in the current scan dataset, possibly filtered using a `query`.
 
         Parameters
@@ -2170,7 +2177,7 @@ class Scan(db.Scan, MetadataManager):
         """
         return [self.get_fileset(fs.id) for fs in _filter_query(list(self.filesets.values()), query, fuzzy)]
 
-    def get_fileset(self, fs_id):
+    def get_fileset(self, fs_id) -> "Fileset":
         """Get a `Fileset` instance, of given `id`, in the current scan dataset.
 
         Parameters
@@ -2180,7 +2187,7 @@ class Scan(db.Scan, MetadataManager):
 
         Returns
         -------
-        Fileset
+        plantdb.commons.fsdb.core.Fileset
             The retrieved or created fileset.
 
         Examples
@@ -2209,7 +2216,7 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=False)
-    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs) -> Any:
         """Get the metadata associated with a scan.
 
         Parameters
@@ -2326,7 +2333,7 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def set_metadata(self, data, value=None, current_user=None, **kwargs):
+    def set_metadata(self, data, value=None, current_user=None, **kwargs) -> None:
         """Add a new metadata to the scan.
 
         Parameters
@@ -2374,7 +2381,7 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
-    def change_owner(self, new_owner, current_user=None, **kwargs):
+    def change_owner(self, new_owner, current_user=None, **kwargs) -> None:
         """Change the owner of the scan.
 
         Examples
@@ -2409,7 +2416,7 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
-    def group_share(self, groups, current_user=None, **kwargs):
+    def group_share(self, groups, current_user=None, **kwargs) -> None:
         """Change the group sharing of the scan.
 
         Examples
@@ -2457,7 +2464,7 @@ class Scan(db.Scan, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def create_fileset(self, fs_id, metadata=None, current_user=None, **kwargs):
+    def create_fileset(self, fs_id, metadata=None, current_user=None, **kwargs) -> "Fileset":
         """Create a new `Fileset` instance in the local database attached to the current `Scan` instance.
 
         Parameters
@@ -2589,7 +2596,7 @@ class Scan(db.Scan, MetadataManager):
         self.logger.debug(f"Done deleting fileset.")
         return
 
-    def store(self):
+    def store(self) -> None:
         """Save changes to the scan main JSON FILE (``files.json``)."""
         _store_scan(self)
         return
@@ -2607,7 +2614,7 @@ class Scan(db.Scan, MetadataManager):
         """
         return _scan_path(self)
 
-    def list_filesets(self, query=None, fuzzy=False) -> list:
+    def list_filesets(self, query=None, fuzzy=False) -> list[str]:
         """Get the list of filesets identifiers in the scan dataset.
 
         Parameters
@@ -2620,7 +2627,7 @@ class Scan(db.Scan, MetadataManager):
 
         Returns
         -------
-        list[str]
+        list of str
             The list of filesets identifiers in the scan dataset.
 
         See Also
@@ -2686,7 +2693,7 @@ class Fileset(db.Fileset, MetadataManager):
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
 
-    def _erase(self):
+    def _erase(self) -> None:
         """Erase the files and metadata associated with this fileset."""
         for f_id, f in self.files.items():
             f._erase()
@@ -2722,7 +2729,7 @@ class Fileset(db.Fileset, MetadataManager):
         """
         return file_id in self.files
 
-    def get_files(self, query=None, fuzzy=False):
+    def get_files(self, query=None, fuzzy=False) -> list["File"]:
         """Get the list of `File` instances defined in the current fileset, possibly filtered using a `query`.
 
         Parameters
@@ -2755,7 +2762,7 @@ class Fileset(db.Fileset, MetadataManager):
         """
         return _filter_query(list(self.files.values()), query, fuzzy)
 
-    def get_file(self, f_id):
+    def get_file(self, f_id) -> "File":
         """Get a `File` instance, of given `f_id`, in the current fileset.
 
         Parameters
@@ -2788,7 +2795,7 @@ class Fileset(db.Fileset, MetadataManager):
     @get_authentication
     @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
-    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs) -> Any:
         """Get the metadata associated with a fileset.
 
         Parameters
@@ -2833,7 +2840,7 @@ class Fileset(db.Fileset, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def set_metadata(self, data, value=None, current_user=None, **kwargs):
+    def set_metadata(self, data, value=None, current_user=None, **kwargs) -> None:
         """Add a new metadata to the fileset.
 
         Parameters
@@ -2872,7 +2879,7 @@ class Fileset(db.Fileset, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def create_file(self, f_id, metadata=None, current_user=None, **kwargs):
+    def create_file(self, f_id, metadata=None, current_user=None, **kwargs) -> "File":
         """Create a new `File` instance in the local database attached to the current `Fileset` instance.
 
         Parameters
@@ -2955,7 +2962,7 @@ class Fileset(db.Fileset, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.DELETE, check_scan_access=True)
-    def delete_file(self, f_id, current_user=None, **kwargs):
+    def delete_file(self, f_id, current_user=None, **kwargs) -> None:
         """Delete a given file from the current fileset.
 
         Parameters
@@ -3009,7 +3016,7 @@ class Fileset(db.Fileset, MetadataManager):
         self.logger.debug(f"Done deleting file.")
         return
 
-    def store(self):
+    def store(self) -> None:
         """Save changes to the scan main JSON FILE (``files.json``)."""
         self.scan.store()
         return
@@ -3106,7 +3113,7 @@ class File(db.File, MetadataManager):
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
 
-    def _erase(self):
+    def _erase(self) -> None:
         self.id = None
         self.metadata = {}
         return
@@ -3114,7 +3121,7 @@ class File(db.File, MetadataManager):
     @get_authentication
     @use_guest_as_default
     @requires_permission(Permission.READ, check_scan_access=True)
-    def get_metadata(self, key=None, default={}, current_user=None, **kwargs):
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs) -> Any:
         """Get the metadata associated with a file.
 
         Parameters
@@ -3151,7 +3158,7 @@ class File(db.File, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def set_metadata(self, data, value=None, current_user=None, **kwargs):
+    def set_metadata(self, data, value=None, current_user=None, **kwargs) -> None:
         """Add a new metadata to the file.
 
         Parameters
@@ -3185,7 +3192,7 @@ class File(db.File, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def import_file(self, path, current_user=None, **kwargs):
+    def import_file(self, path, current_user=None, **kwargs) -> None:
         """Import the file from its local path to the current fileset.
 
         Parameters
@@ -3230,12 +3237,12 @@ class File(db.File, MetadataManager):
         self.logger.debug(f"Done importing file.")
         return
 
-    def store(self):
+    def store(self) -> None:
         """Save changes to the scan main JSON FILE (``files.json``)."""
         self.fileset.store()
         return
 
-    def read_raw(self):
+    def read_raw(self) -> bytes:
         """Read the file and return its contents.
 
         Returns
@@ -3268,7 +3275,7 @@ class File(db.File, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def write_raw(self, data, ext="", current_user=None, **kwargs):
+    def write_raw(self, data, ext="", current_user=None, **kwargs) -> None:
         """Write a file from raw byte data.
 
         Parameters
@@ -3309,7 +3316,7 @@ class File(db.File, MetadataManager):
         self.logger.debug(f"Done writing raw file.")
         return
 
-    def read(self):
+    def read(self) -> str:
         """Read the file and return its contents.
 
         Returns
@@ -3345,7 +3352,7 @@ class File(db.File, MetadataManager):
     @get_authentication
     @require_authentication
     @requires_permission(Permission.WRITE, check_scan_access=True)
-    def write(self, data, ext="", current_user=None, **kwargs):
+    def write(self, data, ext="", current_user=None, **kwargs) -> None:
         """Write a file from data.
 
         Parameters
