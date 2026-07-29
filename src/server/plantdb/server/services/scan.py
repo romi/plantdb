@@ -201,7 +201,7 @@ def get_scan_info(scan, **kwargs):
             z = min(scan.get_configuration("pipeline")["Voxels"]["bounding_box"]["z"])
         except:
             z = -750  # fallback value
-        scan_info["workspace"] = {"x": [x-150, x+150], "y": [y-150, y+150], "z": sorted([z-150, z+150])}
+        scan_info["workspace"] = {"x": [x-150, x+150], "y": [y-150, y+150], "z": [z-150, z+150]}
     else:
         # Get the workspace metadata from the scan metadata, or fallback to image metadata (older implementation)
         scan_info["workspace"] = scan_md.get('workspace', img_fs.get_metadata("workspace"))
