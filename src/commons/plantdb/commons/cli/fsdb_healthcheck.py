@@ -43,8 +43,8 @@ from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 
 # Create a logger and set the environment variable
-logger = get_logger("fsdb_rest_api", log_level=DEFAULT_LOG_LEVEL)
-os.environ.setdefault('ROMI_APP_LOGGER', 'fsdb_rest_api')
+os.environ.setdefault('ROMI_APP_LOGGER', __name__.split('.')[-1])
+logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME

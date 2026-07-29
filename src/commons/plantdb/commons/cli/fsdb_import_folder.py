@@ -48,7 +48,7 @@ from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
 
 # Create a logger and set the environment variable
-os.environ.setdefault('ROMI_APP_LOGGER', __name__.split('.')[0])
+os.environ.setdefault('ROMI_APP_LOGGER', __name__.split('.')[-1])
 logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 
