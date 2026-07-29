@@ -188,8 +188,24 @@ def get_scan_info(scan, **kwargs):
             f = fs.get_file(task)
             scan_info["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
 
-    # Get the workspace metadata from the scan metadata, or fallback to image metadata (older implementation)
-    scan_info["workspace"] = scan_md.get('workspace', img_fs.get_metadata("workspace"))
+    # In the P3DX, the 'workspace' is used to center the plant with:
+    # this.viewerObjects.position.x = -(workspace.x[1] - workspace.x[0])
+    # this.viewerObjects.position.y = -(workspace.y[1] - workspace.y[0])
+    # this.viewerObjects.position.z = workspace.z[1] - (workspace.z[1] - workspace.z[0])
+    # FIXME: Replace this with a XYZ 'position' parameter in future release.
+    if "ScanPath" in scan_md:
+        # Plant Imager v3 API
+        x = scan_md["ScanPath"]["kwargs"]["center_x"]
+        y = scan_md["ScanPath"]["kwargs"]["center_y"]
+        try:
+            z = min(scan.get_configuration("pipeline")["Voxels"]["bounding_box"]["z"])
+        except:
+            z = -750  # fallback value
+        scan_info["workspace"] = {"x": [x-150, x+150], "y": [y-150, y+150], "z": sorted([z-150, z+150])}
+    else:
+        # Get the workspace metadata from the scan metadata, or fallback to image metadata (older implementation)
+        scan_info["workspace"] = scan_md.get('workspace', img_fs.get_metadata("workspace"))
+
     # Get the camera metadata
     scan_info["camera"] = {}
     if img_f.get_metadata("colmap_camera") != {}:
