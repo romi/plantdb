@@ -121,10 +121,17 @@ def get_scan_info(scan, **kwargs):
     ## Get acquisition date:
     scan_info["metadata"]['date'] = get_scan_date(scan)
     ## Import 'object' related scan metadata to scan info template:
-    if 'object' in scan_md:
+    if 'object' in scan_md and scan_md["object"]:
+        # Plant Imager v2 API
         scan_obj = scan_md['object']  # get the 'object' related dictionary
         scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
         scan_info["metadata"]["environment"] = scan_obj.get('environment', 'N/A')
+        scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
+    else:
+        # Plant Imager v3 API
+        scan_obj = scan_md.get('Metadata', {'object':{}}).get('object', {})  # get the 'object' related dictionary
+        scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
+        scan_info["metadata"]["environment"] = scan_obj.get('growth_environment', 'N/A')
         scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
