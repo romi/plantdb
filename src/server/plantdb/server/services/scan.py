@@ -117,7 +117,7 @@ def get_scan_info(scan, **kwargs):
     scan_info["images"] = [img_f.filename for img_f in img_fs.get_files(query={"channel": 'rgb'})]
 
     # Gather "metadata" information from scan:
-    scan_md = scan.get_metadata()
+    scan_md: dict = scan.get_metadata()
     ## Get acquisition date:
     scan_info["metadata"]['date'] = get_scan_date(scan)
     ## Import 'object' related scan metadata to scan info template:
@@ -195,12 +195,18 @@ def get_scan_info(scan, **kwargs):
     # FIXME: Replace this with a XYZ 'position' parameter in future release.
     if "ScanPath" in scan_md:
         # Plant Imager v3 API
-        x = scan_md["ScanPath"]["kwargs"]["center_x"]
-        y = scan_md["ScanPath"]["kwargs"]["center_y"]
+        try:
+            x = scan_md["ScanPath"]["kwargs"]["center_x"]
+            y = scan_md["ScanPath"]["kwargs"]["center_y"]
+        except KeyError:
+            x, y = 375, 375
+        except Exception as e:
+            print(e, type(e))
+            raise
         try:
             z = min(scan.get_configuration("pipeline")["Voxels"]["bounding_box"]["z"])
-        except:
-            z = -750  # fallback value
+        except Exception:
+            z = -500  # fallback value
         scan_info["workspace"] = {"x": [x-150, x+150], "y": [y-150, y+150], "z": [z-150, z+150]}
     else:
         # Get the workspace metadata from the scan metadata, or fallback to image metadata (older implementation)
