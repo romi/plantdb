@@ -21,6 +21,7 @@ Each function returns the endpoint string with an optional prefix and performs b
 '/api/v1/auth/login'
 >>> api_endpoints.scan('plant1')
 '/api/v1/scans/plant1'
+
 ```
 
 ## Resource mapping
@@ -121,15 +122,31 @@ FILE_PATH = "/assets/files/{file_path}"
 
 
 def api_prefix(endpoint_path):
-    """Wrap an endpoint path generator with an optional URL prefix."""
+    """Wrap an endpoint path generator with an optional URL prefix.
+
+    The ``prefix`` keyword argument, when given, represents a **deployment prefix**
+    (_e.g._ ``/plantdb`` for a reverse-proxy at that path).  It is composed
+    **in front of** the API version prefix (``API_PREFIX = "/api/v1"``).
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.login()
+    '/api/v1/auth/login'
+    >>> api_endpoints.login(prefix='/plantdb')
+    '/plantdb/api/v1/auth/login'
+    >>> api_endpoints.login(prefix=None)
+    '/api/v1/auth/login'
+    """
 
     def wrapper(*args, **kwargs):
-        prefix = kwargs.get("prefix", API_PREFIX)
-        if prefix:
-            prefix = "/" + prefix.lstrip("/").rstrip("/")
-            return prefix + endpoint_path(*args, **kwargs)
-        else:
-            return endpoint_path(*args, **kwargs)
+        deploy_prefix = kwargs.pop("prefix", "") or ""
+        deploy_prefix = deploy_prefix.strip("/")
+        # Assemble parts, filtering out empty components
+        parts = [p for p in [deploy_prefix, API_PREFIX.strip("/")] if p]
+        composed_prefix = "/" + "/".join(parts) if parts else ""
+        raw = endpoint_path(*args, **kwargs)  # e.g. "/auth/login" or "/"
+        return composed_prefix + raw
 
     return wrapper
 
@@ -159,7 +176,7 @@ def home(**kwargs) -> str:
     >>> api_endpoints.home()
     '/api/v1/'
     >>> api_endpoints.home(prefix='/plantdb')
-    '/plantdb/'
+    '/plantdb/api/v1/'
     """
     return HOME
 
