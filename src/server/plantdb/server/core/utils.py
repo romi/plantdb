@@ -171,7 +171,7 @@ def get_scan_template(scan_id: str, error=False) -> dict:
     }
 
 
-def _get_colmap_camera_model(scan):
+def _get_colmap_camera_model(scan, **kwargs):
     """Retrieve the COLMAP camera model and camera poses from a scan object.
 
     This function extracts the COLMAP camera model from the metadata of the first image file
@@ -183,6 +183,12 @@ def _get_colmap_camera_model(scan):
     ----------
     scan : Scan object
         The scan object containing the image fileset with COLMAP metadata.
+
+    Other Parameters
+    ----------------
+    prefix : str, optional
+        Deployment (reverse-proxy) prefix prepended before ``/api/v1/...``
+        in the generated image URIs.
 
     Returns
     -------
@@ -210,9 +216,10 @@ def _get_colmap_camera_model(scan):
     >>> print(camera_model)
     {'height': 1080, 'id': 1, 'model': 'OPENCV', 'params': [1166.9518889440105, 1166.9518889440105, 720.0, 540.0, -0.0013571157486977348, -0.0013571157486977348, 0.0, 0.0], 'width': 1440}
     >>> print(poses[0])
-    {'id': '00000_rgb', 'tvec': [369.4279687732083, 120.36109311437637, -62.07043190848918], 'rotmat': [[0.06475585405884698, -0.9971710205080586, 0.038165890845442085], [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284], [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]], 'photoUri': '/image/real_plant_analyzed/images/00000_rgb.jpg?size=orig', 'thumbnailUri': '/image/real_plant_analyzed/images/00000_rgb.jpg?size=thumb'}
+    {'id': '00000_rgb', 'tvec': [369.4279687732083, 120.36109311437637, -62.07043190848918], 'rotmat': [[0.06475585405884698, -0.9971710205080586, 0.038165890845442085], [-0.3390191175518756, -0.0579549181538338, -0.9389926865509284], [0.9385481965778085, 0.04786630673761355, -0.34181295964290737]], 'photoUri': '/api/v1/assets/image/real_plant_analyzed/images/00000_rgb?size=orig', 'thumbnailUri': '/api/v1/assets/image/real_plant_analyzed/images/00000_rgb?size=thumb'}
 
     """
+    _prefix = kwargs.get("prefix", "")
     img_fs = scan.get_fileset("images")
     img_f = img_fs.get_files()[0]
 
@@ -224,7 +231,7 @@ def _get_colmap_camera_model(scan):
             "id": img_f.id,
             "tvec": camera_md['tvec'],
             "rotmat": camera_md['rotmat'],
-            "photoUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="orig"),
-            "thumbnailUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb")
+            "photoUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="orig", prefix=_prefix),
+            "thumbnailUri": api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb", prefix=_prefix)
         })
     return model, poses

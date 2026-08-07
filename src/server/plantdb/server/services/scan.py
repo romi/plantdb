@@ -135,16 +135,18 @@ def get_scan_info(scan, **kwargs):
         scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
+    # Runtime deployment prefix (reverse-proxy) — empty unless configured.
+    _prefix = kwargs.get("prefix", "")
     ## Get the URL to the archive:
-    scan_info["metadata"]["files"]["archive"] = api_endpoints.archive(scan.id)
+    scan_info["metadata"]["files"]["archive"] = api_endpoints.archive(scan.id, prefix=_prefix)
     ## Get the path to the JSON metadata file:
-    metadata_json_path = api_endpoints.file_path(os.path.join(scan.id, "metadata", "metadata.json"))
+    metadata_json_path = api_endpoints.file_path(os.path.join(scan.id, "metadata", "metadata.json"), prefix=_prefix)
     scan_info["metadata"]["files"]["metadata"] = metadata_json_path
 
     # Get the URI to first image to create thumbnail:
     # It is used by the `plant-3d-explorer`, in its landing page, as image presenting the dataset
     img_f = img_fs.get_files()[0]
-    scan_info["thumbnailUri"] = api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb")
+    scan_info["thumbnailUri"] = api_endpoints.image(scan.id, img_fs.id, img_f.id, size="thumb", prefix=_prefix)
 
     def _try_has_file(task, file):
         if task not in task_fs_map:
@@ -186,7 +188,7 @@ def get_scan_info(scan, **kwargs):
         if scan_info[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
             f = fs.get_file(task)
-            scan_info["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
+            scan_info["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}", prefix=_prefix)
 
     # In the P3DX, the 'workspace' is used to center the plant with:
     # this.viewerObjects.position.x = -(workspace.x[1] - workspace.x[0])
@@ -209,7 +211,7 @@ def get_scan_info(scan, **kwargs):
     # Get the camera metadata
     scan_info["camera"] = {}
     if img_f.get_metadata("colmap_camera") != {}:
-        model, poses = _get_colmap_camera_model(scan)
+        model, poses = _get_colmap_camera_model(scan, prefix=_prefix)
         scan_info["camera"]["model"] = model
         scan_info["camera"]["poses"] = poses
 
@@ -251,9 +253,11 @@ def get_scan_data(scan, **kwargs):
     >>> db.disconnect()
     """
     logger = kwargs.get("logger", get_logger(__name__))
+    # Runtime deployment prefix (reverse-proxy) — empty unless configured.
+    _prefix = kwargs.get("prefix", "")
 
     task_fs_map = compute_fileset_matches(scan)
-    scan_data = get_scan_info(scan, logger=logger)
+    scan_data = get_scan_info(scan, logger=logger, prefix=_prefix)
     img_fs = scan.get_fileset(task_fs_map['images'])
 
     # Get the paths to data files:
@@ -263,7 +267,7 @@ def get_scan_data(scan, **kwargs):
         if scan_data[f"has{task}"]:
             fs = scan.get_fileset(task_fs_map[task])
             f = fs.get_file(task)
-            scan_data["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}")
+            scan_data["filesUri"][uri_key] = api_endpoints.file_path(f"{scan.id}/{fs.id}/{f.id}", prefix=_prefix)
 
     # Load some of the data:
     scan_data["data"] = {}
