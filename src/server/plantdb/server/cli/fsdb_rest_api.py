@@ -83,6 +83,7 @@ import click
 from click_option_group import OptionGroup
 from click_option_group import optgroup
 from flask import Flask
+from flask import redirect
 from flask_cors import CORS
 from flask_restful import Api
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -95,6 +96,7 @@ from plantdb.commons.log import DEFAULT_LOG_LEVEL
 os.environ.setdefault('ROMI_APP_LOGGER', __name__.split('.')[-1])
 logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
+from plantdb.commons import api_endpoints
 from plantdb.commons.api_endpoints import API_PREFIX
 from plantdb.commons.api_endpoints import ARCHIVE
 from plantdb.commons.api_endpoints import CREATE_API_TOKEN
@@ -243,6 +245,31 @@ def _configure_api(
 
     api = Api(app, prefix=mount_prefix)
     return api
+
+
+def _register_root_redirect(app: Flask, deploy_prefix: str = "") -> None:
+    """Redirect the server root (``/``) to the API home endpoint.
+
+    The API home is served at the API mount prefix (``/api/v1``), so a request to
+    the bare root (``http://host:port/``, or ``http://host:port/{deploy_prefix}/``
+    behind a reverse proxy) would otherwise 404. This registers a lightweight
+    route that issues a ``302`` redirect to ``home(prefix=deploy_prefix)``.
+
+    The ``deploy_prefix`` (reverse-proxy prefix, e.g. ``/plantdb``) is prepended to
+    the generated ``Location`` so the browser stays under the proxy path; without a
+    deployment prefix the redirect simply targets ``/api/v1``.
+
+    Parameters
+    ----------
+    app : flask.Flask
+        The Flask application to register the redirect on.
+    deploy_prefix : str, optional
+        Deployment (reverse-proxy) prefix prepended before ``/api/v1/...`` in the
+        generated redirect location (e.g. ``/plantdb``).
+    """
+    @app.route("/")
+    def _home_redirect():
+        return redirect(api_endpoints.home(prefix=deploy_prefix), code=302)
 
 
 def _setup_test_database(
@@ -433,6 +460,9 @@ def rest_api(
     secret_key = _get_env_secret("FLASK_SECRET_KEY", logger)
     app = _configure_app(secret_key, ssl=ssl)
     api = _configure_api(app, proxy, _deploy_prefix, logger)
+
+    # 1b - Redirect the server root (``/``) to the API home endpoint.
+    _register_root_redirect(app, _deploy_prefix)
 
     # 2 - Handle test mode
     if test:
