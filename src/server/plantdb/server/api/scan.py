@@ -233,7 +233,7 @@ class ScansTable(Resource):
     plantdb.server.services.scan.get_scan_info : Function used to extract information for each scan
     """
 
-    def __init__(self, db, logger=None):
+    def __init__(self, db, logger=None, deploy_prefix=""):
         """Initialize the resource.
 
         Parameters
@@ -242,9 +242,13 @@ class ScansTable(Resource):
             A database instance providing the resources to serve.
         logger : logging.Logger
             A logger instance to record operations and errors.
+        deploy_prefix : str, optional
+            Deployment (reverse-proxy) prefix prepended before ``/api/v1/...``
+            when generating endpoint URLs in scan responses.
         """
         self.db: FSDB = db
         self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.deploy_prefix: str = deploy_prefix
 
     @rate_limit(max_requests=120, window_seconds=60)
     @add_jwt_from_header
@@ -323,7 +327,7 @@ class ScansTable(Resource):
         for scan_id in scans_list:
             try:
                 scan = self.db.get_scan(scan_id, **kwargs)
-                scan_info = get_scan_info(scan, logger=self.logger, **kwargs)
+                scan_info = get_scan_info(scan, logger=self.logger, prefix=self.deploy_prefix, **kwargs)
             except NoAuthUserError as e:
                 return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except ScanNotFoundError as e:
@@ -359,7 +363,7 @@ class Scan(Resource):
     plantdb.server.core.security.sanitize_name : Function used to validate and clean scan IDs
     """
 
-    def __init__(self, db, logger=None):
+    def __init__(self, db, logger=None, deploy_prefix=""):
         """Initialize the resource.
 
         Parameters
@@ -368,9 +372,13 @@ class Scan(Resource):
             A database instance providing the resources to serve.
         logger : logging.Logger
             A logger instance to record operations and errors.
+        deploy_prefix : str, optional
+            Deployment (reverse-proxy) prefix prepended before ``/api/v1/...``
+            when generating endpoint URLs in scan responses.
         """
         self.db: FSDB = db
         self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.deploy_prefix: str = deploy_prefix
 
     @sanitize_ids('scan_id')
     @rate_limit(max_requests=120, window_seconds=60)
@@ -423,7 +431,7 @@ class Scan(Resource):
         """
         try:
             scan = self.db.get_scan(scan_id, **kwargs)
-            scan_info = get_scan_info(scan, logger=self.logger)
+            scan_info = get_scan_info(scan, logger=self.logger, prefix=self.deploy_prefix)
 
         except NoAuthUserError as e:
             return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)

@@ -67,8 +67,10 @@ class TestRestApiServer:
         Port number for the server
     host : str
         Host address for the server
-    prefix : str
-        URL prefix for API endpoints
+    deploy_prefix : str
+        Deployment (reverse-proxy) prefix for external URL generation (default "").
+    mount_prefix : str
+        Internal mount prefix (always ``/api/v1``).
     ssl : bool
         Whether to use SSL/HTTPS
     test : bool
@@ -92,7 +94,7 @@ class TestRestApiServer:
     >>> server = TestRestApiServer(test=True)
     >>> server.start()
     >>> # Get a list of all datasets from the DB:
-    >>> response = requests.get("http://127.0.0.1:5000/scans")
+    >>> response = requests.get("http://127.0.0.1:5000/api/v1/scans")
     >>> scans_list = response.json()
     >>> print(scans_list)
     ['arabidopsis000', 'real_plant', 'real_plant_analyzed', 'virtual_plant', 'virtual_plant_analyzed']
@@ -106,7 +108,7 @@ class TestRestApiServer:
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
     >>> # Get a list of all datasets from the DB:
-    >>> response = requests.get("http://127.0.0.1:5000/scans")
+    >>> response = requests.get("http://127.0.0.1:5000/api/v1/scans")
     >>> scans_list = response.json()
     >>> print(scans_list)
     ['real_plant_analyzed']
@@ -118,7 +120,7 @@ class TestRestApiServer:
         db_path=None,
         port=5000,
         host="127.0.0.1",
-        prefix=API_PREFIX,
+        deploy_prefix="",
         ssl=False,
         test=False,
         empty=False,
@@ -135,8 +137,8 @@ class TestRestApiServer:
             Port number for the server (default: 5000)
         host : str, optional
             Host address for the server (default: '127.0.0.1')
-        prefix : str, optional
-            URL prefix for API endpoints (default: '/api/v1')
+        deploy_prefix : str, optional
+            Deployment (reverse-proxy) prefix for external URL generation (default '').
         ssl : bool, optional
             Whether to use SSL/HTTPS (default: False)
         test : bool, optional
@@ -151,7 +153,8 @@ class TestRestApiServer:
         self.db_path: Path = Path(db_path) if db_path else _mkdtemp_romidb()
         self.port: int = port
         self.host: str = host
-        self.prefix: str = prefix
+        self.deploy_prefix: str = deploy_prefix
+        self.mount_prefix: str = API_PREFIX  # always /api/v1
         self.ssl: bool = ssl
         self.test: bool = test
         self.empty: bool = empty
@@ -169,7 +172,7 @@ class TestRestApiServer:
     def _setup_flask_app(self):
         """Set up the Flask application with REST API endpoints."""
         rest_api_kwargs = {
-            "api_prefix": self.prefix,
+            "deploy_prefix": self.deploy_prefix,
             "ssl": self.ssl,
             "test": self.test,
             "empty": self.empty,
@@ -248,9 +251,15 @@ class TestRestApiServer:
         return {
             "host": self.host,
             "port": self.port,
-            "prefix": self.prefix,
+            "deploy_prefix": self.deploy_prefix,
+            "mount_prefix": self.mount_prefix,
             "ssl": self.ssl,
         }
+
+    @property
+    def prefix(self):
+        """Backward-compatible alias: returns the deploy prefix."""
+        return self.deploy_prefix
 
     def __enter__(self):
         """Context manager entry."""
@@ -262,7 +271,7 @@ class TestRestApiServer:
         self.stop()
 
 
-def test_rest_api(db_path, port=5000, host="127.0.0.1", api_prefix=API_PREFIX, ssl=False):
+def test_rest_api(db_path, port=5000, host="127.0.0.1", deploy_prefix="", ssl=False):
     """Create and return a TestRestApi instance.
 
     This is a convenience function that creates a TestRestApi instance with the
@@ -276,8 +285,8 @@ def test_rest_api(db_path, port=5000, host="127.0.0.1", api_prefix=API_PREFIX, s
         Port number for the server (default: 5000)
     host : str, optional
         Host address for the server (default: '127.0.0.1')
-    api_prefix : str, optional
-        URL prefix for API endpoints (default: '/api/v1')
+    deploy_prefix : str, optional
+        Deployment (reverse-proxy) prefix for external URLs (default '').
     ssl : bool, optional
         Whether to use SSL/HTTPS (default: False)
 
@@ -295,10 +304,10 @@ def test_rest_api(db_path, port=5000, host="127.0.0.1", api_prefix=API_PREFIX, s
     >>> # Create and start a REST API server
     >>> api = test_rest_api(db.path(), port=5000)
     >>> api.start()
-    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000/api/v1
+    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000
     >>> # Use the API
     >>> print(f"API running at: {api.get_base_url()}")
-    API running at: http://127.0.0.1:5000/api/v1
+    API running at: http://127.0.0.1:5000
     >>> # Stop the server
     >>> api.stop()
     >>>
@@ -306,9 +315,9 @@ def test_rest_api(db_path, port=5000, host="127.0.0.1", api_prefix=API_PREFIX, s
     >>> with test_rest_api(db.path(),port=5000) as api:
     ...     # API is running here
     ...     print(f"API URL: {api.get_base_url()}")
-    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000/api/v1
-    API URL: http://127.0.0.1:5000/api/v1
+    INFO     [TestRestApiServer] Test REST API server started at http://127.0.0.1:5000
+    API URL: http://127.0.0.1:5000
     INFO     [TestRestApiServer] Test REST API server stopped
     >>> # API is automatically stopped here
     """
-    return TestRestApiServer(db_path, port, host, api_prefix, ssl)
+    return TestRestApiServer(db_path, port, host, deploy_prefix, ssl)
