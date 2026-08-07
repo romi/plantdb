@@ -145,10 +145,26 @@ class PlantDBClient:
     """
 
     def __init__(self, base_url, prefix=None, api_token=None):
-        """Initialize the PlantDBClient with a base URL."""
+        """Initialize the PlantDBClient with a base URL.
+
+        Parameters
+        ----------
+        base_url : str
+            The **origin** (scheme + host [:port]) of the PlantDB REST API.
+            Must **not** include a path — the API version prefix ``/api/v1``
+            and any deployment prefix are handled automatically.
+        prefix : str, optional
+            Deployment (reverse-proxy) prefix, e.g. ``/plantdb``.
+            Passed to ``api_endpoints.*`` functions, which compose it as
+            ``prefix + /api/v1 + endpoint``.  Defaults to the ``PLANTDB_PREFIX``
+            environment variable (empty string if unset).
+        api_token : str, optional
+            A long-lived API token to use instead of session-based auth.
+        """
         if prefix is None:
             prefix = api_prefix()
-        self.base_url = f"{base_url}{prefix}"
+        self.base_url: str = base_url.rstrip("/")
+        self.prefix: str = prefix
 
         self._access_token = None
         self._refresh_token = None
@@ -159,7 +175,7 @@ class PlantDBClient:
         self._session = requests.Session()
         if self._api_token:
             # Validate provided API token:
-            url = join_url(self.base_url, api_endpoints.token_validation())
+            url = join_url(self.base_url, api_endpoints.token_validation(prefix=self.prefix))
             response = self._session.request("POST", url, headers={"Authorization": f"Bearer {self._api_token}"})
             if response.ok:
                 self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
@@ -203,7 +219,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.login())
+        url = join_url(self.base_url, api_endpoints.login(prefix=self.prefix))
         data = {
             'username': username,
             'password': password
@@ -277,7 +293,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.logout())
+        url = join_url(self.base_url, api_endpoints.logout(prefix=self.prefix))
         try:
             # Use _request_with_refresh for logout as it requires authentication
             response = self._request("POST", url)
@@ -327,7 +343,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.create_user())
+        url = join_url(self.base_url, api_endpoints.register(prefix=self.prefix))
         data = {
             'username': username,
             'password': password,
@@ -399,7 +415,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.create_api_token())
+        url = join_url(self.base_url, api_endpoints.create_api_token(prefix=self.prefix))
 
         # Validate dataset permissions
         datasets = {}
@@ -453,7 +469,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.refresh(scan_id))
+        url = join_url(self.base_url, api_endpoints.refresh(scan_id, prefix=self.prefix))
         try:
             response = self._request("GET", url)
             if response.ok:
@@ -494,7 +510,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.token_validation())
+        url = join_url(self.base_url, api_endpoints.token_validation(prefix=self.prefix))
         response = self._request("POST", url, headers={"Authorization": f"Bearer {token}"})
         if response.ok:
             resp_username = response.json()['user']['username']
@@ -536,7 +552,7 @@ class PlantDBClient:
             self.logger.error("No refresh token available")
             return False
 
-        url = join_url(self.base_url, api_endpoints.token_refresh())
+        url = join_url(self.base_url, api_endpoints.token_refresh(prefix=self.prefix))
         data = {'refresh_token': self._refresh_token}
         try:
             # Use _session.request directly to avoid infinite recursion with _request_with_refresh
@@ -623,7 +639,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scans())
+        url = join_url(self.base_url, api_endpoints.scans(prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
@@ -677,7 +693,7 @@ class PlantDBClient:
         >>> server.stop()
         """
         # Build the URL for the “scans info” endpoint - the server side class is ScansTable
-        url = join_url(self.base_url, api_endpoints.scans_info())
+        url = join_url(self.base_url, api_endpoints.scans_info(prefix=self.prefix))
 
         # Prepare query parameters exactly as the REST API expects
         params = {}
@@ -745,7 +761,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan(name))
+        url = join_url(self.base_url, api_endpoints.scan(name, prefix=self.prefix))
 
         data = {}
         if metadata:
@@ -799,7 +815,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -849,7 +865,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 
@@ -895,7 +911,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_filesets_list(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_filesets_list(scan_id, prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
@@ -948,7 +964,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset(scan_id, fileset_id, prefix=self.prefix))
         data = {'fileset_id': fileset_id, 'scan_id': scan_id}
         if metadata:
             data['metadata'] = metadata
@@ -1001,7 +1017,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -1054,7 +1070,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 
@@ -1102,7 +1118,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_files_list(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_files_list(scan_id, fileset_id, prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
@@ -1184,7 +1200,7 @@ class PlantDBClient:
         from io import BytesIO
         from pathlib import Path
 
-        url = join_url(self.base_url, api_endpoints.file(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file(scan_id, fileset_id, file_id, prefix=self.prefix))
 
         # Prepare data
         ext = ext.lstrip('.').lower()  # Remove the leading dot if present
@@ -1268,7 +1284,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -1323,7 +1339,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 
