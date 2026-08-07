@@ -86,7 +86,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(plantdb_url('localhost', 2020, prefix='', ssl=True),
                          'https://localhost:2020')
         self.assertEqual(plantdb_url('localhost', prefix='/plantdb'),
-                         'http://localhost')
+                         'http://localhost/plantdb')
 
     def test_login_url(self):
         """Test login_url functionality"""

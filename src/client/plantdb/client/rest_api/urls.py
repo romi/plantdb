@@ -54,7 +54,7 @@ with PlantDB services.
     >>> # Base PlantDB API URL with custom port, prefix and HTTPS
     >>> base = plantdb_url('localhost', port=5000, prefix='plantdb', ssl=True)
     >>> base
-    'https://localhost:5000/plantdb/'
+    'https://localhost:5000/plantdb'
     >>> # URL for a specific scan
     >>> scan = scan_url('localhost', 'real_plant')
     >>> scan
@@ -189,9 +189,11 @@ def origin_url(host, port=None, ssl=False, **kwargs) -> str:
 
 
 def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> str:
-    """Generates the **origin** URL for the PlantDB REST API using the specified host and port.
+    """Generates the root URL for the PlantDB REST API using the specified host and port.
 
-    This function returns a *pure origin* (scheme + host + port).
+    This function returns the server root (scheme + host [+ port] + optional
+    deployment prefix). The API version prefix ``/api/v1`` is **not** included:
+    it is only added by the ``api_endpoints.*`` builders.
 
     Parameters
     ----------
@@ -200,15 +202,16 @@ def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> st
     port : int or str, optional
         The port number of the PlantDB REST API server. Defaults to ``None``.
     prefix : str, optional
-        **Deprecated.** Kept only for backward compatibility; ignored because the
-        deployment prefix is now passed directly to ``api_endpoints.*`` calls.
+        Deployment (reverse-proxy) prefix under which the server is reachable,
+        e.g. ``/plantdb``. Composed as ``<origin><deployment-prefix>``.
     ssl : bool, optional
         Flag indicating whether to use HTTPS (``True``) or HTTP (``False``). Defaults to ``False``.
 
     Returns
     -------
     str
-        A properly formatted origin URL for the PlantDB REST API (e.g. ``http://localhost:5000``).
+        A properly formatted server-root URL for the PlantDB REST API
+        (e.g. ``http://localhost:5000`` or ``http://localhost/plantdb``).
 
     Examples
     --------
@@ -217,8 +220,13 @@ def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> st
     'http://localhost'
     >>> plantdb_url('api.example.com', port=8443, ssl=True)
     'https://api.example.com:8443'
+    >>> plantdb_url('localhost', port=5000, prefix='/plantdb')
+    'http://localhost:5000/plantdb'
     """
-    return origin_url(host, port, ssl)
+    url = origin_url(host, port, ssl)
+    if prefix:
+        url += "/" + prefix.lstrip("/").rstrip("/")
+    return url
 
 
 def login_url(host, **kwargs):
