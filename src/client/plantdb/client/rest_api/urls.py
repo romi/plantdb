@@ -51,18 +51,18 @@ with PlantDB services.
 
 ```python
 >>> from plantdb.client.rest_api.urls import plantdb_url, scan_url, scan_image_url
-    >>> # Base PlantDB API URL with custom port, prefix and HTTPS
-    >>> base = plantdb_url('localhost', port=5000, prefix='plantdb', ssl=True)
-    >>> base
-    'https://localhost:5000/plantdb'
-    >>> # URL for a specific scan
-    >>> scan = scan_url('localhost', 'real_plant')
-    >>> scan
-    'http://localhost/api/v1/scans/real_plant'
-    >>> # URL for a thumbnail image of a scan
-    >>> img = scan_image_url('localhost', 'real_plant', 'images', '00000_rgb', size='thumb')
-    >>> img
-    'http://localhost/api/v1/assets/image/real_plant/images/00000_rgb?size=thumb'
+>>> # Base PlantDB API URL with custom port, prefix and HTTPS
+>>> base = plantdb_url('localhost', port=5000, prefix='plantdb', ssl=True)
+>>> base
+'https://localhost:5000/plantdb'
+>>> # URL for a specific scan
+>>> scan = scan_url('localhost', 'real_plant')
+>>> scan
+'http://localhost/api/v1/scans/real_plant'
+>>> # URL for a thumbnail image of a scan
+>>> img = scan_image_url('localhost', 'real_plant', 'images', '00000_rgb', size='thumb')
+>>> img
+'http://localhost/api/v1/assets/image/real_plant/images/00000_rgb?size=thumb'
 ```
 """
 
