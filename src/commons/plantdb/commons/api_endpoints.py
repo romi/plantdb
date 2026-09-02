@@ -21,7 +21,6 @@ Each function returns the endpoint string with an optional prefix and performs b
 '/api/v1/auth/login'
 >>> api_endpoints.scan('plant1')
 '/api/v1/scans/plant1'
-
 ```
 
 ## Resource mapping
@@ -84,6 +83,7 @@ Flask REST API in the `plantdb.server.cli.fsdb_rest_api` submodule.
 """
 
 from urllib import parse
+
 from plantdb.commons.utils import sanitize_name
 
 API_PREFIX = "/api/v1"
@@ -205,12 +205,12 @@ def health(**kwargs) -> str:
 
 
 @api_prefix
-def refresh(scan_id: str = None, **kwargs) -> str:
+def refresh(scan_id: str | None = None, **kwargs) -> str:
     """Return the URL path to the dataset archive endpoint.
 
     Parameters
     ----------
-    scan_id : str
+    scan_id : str or None, optional
         The name of the scan dataset to archive.
 
     Other Parameters
@@ -469,7 +469,7 @@ def scan_metadata(scan_id: str, key: str | None = None, **kwargs) -> str:
     ----------
     scan_id : str
         The name of the scan to access.
-    key : str
+    key : str or None, optional
         A specific metadata key to fetch.
 
     Other Parameters
@@ -529,7 +529,7 @@ def scan_filesets_list(scan_id: str, **kwargs) -> str:
 
 
 @api_prefix
-def fileset(scan_id, fileset_id, **kwargs) -> str:
+def fileset(scan_id:str, fileset_id:str, **kwargs) -> str:
     """URL path for a fileset belonging to a scan.
 
     Parameters
@@ -562,7 +562,7 @@ def fileset(scan_id, fileset_id, **kwargs) -> str:
 
 @api_prefix
 def fileset_metadata(
-    scan_id: str, fileset_id: str, key: str | None = None, **kwargs
+        scan_id: str, fileset_id: str, key: str | None = None, **kwargs
 ) -> str:
     """URL to access the fileset metadata associated with the given scan and fileset name.
 
@@ -572,7 +572,7 @@ def fileset_metadata(
         The name of the scan to access.
     fileset_id : str
         The name of the fileset to access.
-    key : str
+    key : str or Noe, optional
         A specific metadata key to fetch.
 
     Other Parameters
@@ -671,9 +671,7 @@ def file(scan_id: str, fileset_id: str, file_id: str, **kwargs) -> str:
 
 
 @api_prefix
-def file_metadata(
-    scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs
-) -> str:
+def file_metadata(scan_id: str, fileset_id: str, file_id: str, key: str | None = None, **kwargs) -> str:
     """URL to access the file metadata associated with the given scan and fileset name.
 
     Parameters
@@ -714,8 +712,8 @@ def file_metadata(
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
     return (
-        FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
-        + f"{query_str}"
+            FILE_MD.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
+            + f"{query_str}"
     )
 
 
@@ -726,12 +724,12 @@ def file_metadata(
 
 @api_prefix
 def image(
-    scan_id: str,
-    fileset_id: str,
-    file_id: str,
-    size: int | str | None = None,
-    as_base64: bool | None = None,
-    **kwargs,
+        scan_id: str,
+        fileset_id: str,
+        file_id: str,
+        size: int | str | None = None,
+        as_base64: bool | None = None,
+        **kwargs,
 ) -> str:
     """Return the URL path to the image endpoint.
 
@@ -780,8 +778,8 @@ def image(
 
     query_str = f"?{parse.urlencode(query)}" if query else ""
     return (
-        IMAGE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
-        + f"{query_str}"
+            IMAGE.format(scan_id=scan_id, fileset_id=fileset_id, file_id=file_id)
+            + f"{query_str}"
     )
 
 
@@ -835,11 +833,11 @@ def sequence(scan_id: str, seq_type: str | None = None, **kwargs) -> str:
 
 @api_prefix
 def pointcloud(
-    scan_id: str,
-    size: int | float | str | None = None,
-    coords: bool | None = None,
-    pcd_type: str = "default",
-    **kwargs,
+        scan_id: str,
+        size: int | float | str | None = None,
+        coords: bool | None = None,
+        pcd_type: str = "default",
+        **kwargs,
 ) -> str:
     """Return the URL path to the point-cloud endpoint.
 
@@ -908,9 +906,7 @@ def pointcloud(
 
 
 @api_prefix
-def mesh(
-    scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs
-) -> str:
+def mesh(scan_id: str, size: int | str | None = None, coords: bool | None = None, **kwargs) -> str:
     """Return the URL path to the mesh endpoint.
 
     Parameters
@@ -1027,8 +1023,6 @@ def file_path(file_path: str, **kwargs) -> str:
 
     Parameters
     ----------
-    scan_id : str
-        The name of the scan dataset containing the file.
     file_path : str
         The path to the file in the database.
 
