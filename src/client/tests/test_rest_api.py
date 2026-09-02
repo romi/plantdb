@@ -86,99 +86,99 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(plantdb_url('localhost', 2020, prefix='', ssl=True),
                          'https://localhost:2020')
         self.assertEqual(plantdb_url('localhost', prefix='/plantdb'),
-                         'http://localhost/plantdb/')
+                         'http://localhost/plantdb')
 
     def test_login_url(self):
         """Test login_url functionality"""
         self.assertEqual(login_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/login')
+                         'http://localhost:2020/plantdb/api/v1/auth/login')
 
     def test_logout_url(self):
         """Test logout_url functionality"""
         self.assertEqual(logout_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/logout')
+                         'http://localhost:2020/plantdb/api/v1/auth/logout')
 
     def test_register_url(self):
         """Test register_url functionality"""
         self.assertEqual(register_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/register')
+                         'http://localhost:2020/plantdb/api/v1/auth/register')
 
     def test_token_validation_url(self):
         """Test token_validation_url functionality"""
         self.assertEqual(token_validation_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/token/validation')
+                         'http://localhost:2020/plantdb/api/v1/auth/token/validation')
 
     def test_token_refresh_url(self):
         """Test token_refresh_url functionality"""
         self.assertEqual(token_refresh_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/token/refresh')
+                         'http://localhost:2020/plantdb/api/v1/auth/token/refresh')
 
     def test_api_token_url(self):
         """Test api_token_url functionality"""
         self.assertEqual(api_token_url('localhost', **self.attr_dict),
-                         'http://localhost:2020/plantdb/auth/token/create-api-token')
+                         'http://localhost:2020/plantdb/api/v1/auth/token/create-api-token')
 
     def test_scans_url(self):
         self.assertEqual(scans_url('localhost', port=2020, prefix=''),
-                         'http://localhost:2020/scans')
+                         'http://localhost:2020/api/v1/scans')
         self.assertEqual(scans_url('localhost', prefix='/plantdb'),
-                         'http://localhost/plantdb/scans')
+                         'http://localhost/plantdb/api/v1/scans')
 
     def test_scan_url(self):
         self.assertEqual(scan_url('localhost', 'example', port=2020, prefix=''),
-                         'http://localhost:2020/scans/example')
+                         'http://localhost:2020/api/v1/scans/example')
         self.assertEqual(scan_url('localhost', 'example', prefix='/plantdb'),
-                         'http://localhost/plantdb/scans/example')
+                         'http://localhost/plantdb/api/v1/scans/example')
 
     def test_scan_image_url(self):
         self.assertEqual(
             scan_image_url('localhost', 'example', 'images', '0', size='orig', as_base64=False, port=2020, prefix=''),
-            'http://localhost:2020/assets/image/example/images/0?size=orig&as_base64=false'
+            'http://localhost:2020/api/v1/assets/image/example/images/0?size=orig&as_base64=false'
         )
         self.assertEqual(
             scan_image_url('localhost', 'example', 'images', '1', size='big', as_base64=False, port=2020, prefix=''),
-            'http://localhost:2020/assets/image/example/images/1?size=big&as_base64=false'
+            'http://localhost:2020/api/v1/assets/image/example/images/1?size=big&as_base64=false'
         )
         self.assertEqual(
             scan_image_url('localhost', 'example', 'images', '0', prefix='/plantdb'),
-            'http://localhost/plantdb/assets/image/example/images/0?size=orig&as_base64=false'
+            'http://localhost/plantdb/api/v1/assets/image/example/images/0?size=orig&as_base64=false'
         )
         self.assertEqual(
             scan_image_url('localhost', 'example', 'images', '1', size='big', prefix='/plantdb'),
-            'http://localhost/plantdb/assets/image/example/images/1?size=big&as_base64=false')
+            'http://localhost/plantdb/api/v1/assets/image/example/images/1?size=big&as_base64=false')
 
     def test_refresh_url(self):
         """Test refresh_url functionality"""
         self.assertEqual(refresh_url(host='localhost', port=2020, prefix=''),
-                         'http://localhost:2020/refresh')
+                         'http://localhost:2020/api/v1/refresh')
         self.assertEqual(refresh_url('localhost', 'example', port=2020, prefix=''),
-                         'http://localhost:2020/refresh?scan_id=example')
+                         'http://localhost:2020/api/v1/refresh?scan_id=example')
         self.assertEqual(refresh_url(host='localhost', prefix='/plantdb'),
-                         'http://localhost/plantdb/refresh')
+                         'http://localhost/plantdb/api/v1/refresh')
         self.assertEqual(refresh_url('localhost', 'example', prefix='/plantdb'),
-                         'http://localhost/plantdb/refresh?scan_id=example')
+                         'http://localhost/plantdb/api/v1/refresh?scan_id=example')
 
     def test_archive_url(self):
         """Test archive_url functionality"""
         self.assertEqual(archive_url('localhost', 'real_plant', port=2020, prefix=''),
-                         'http://localhost:2020/assets/archive/real_plant')
+                         'http://localhost:2020/api/v1/assets/archive/real_plant')
         self.assertEqual(archive_url('localhost', 'real_plant', prefix='/plantdb'),
-                         'http://localhost/plantdb/assets/archive/real_plant')
+                         'http://localhost/plantdb/api/v1/assets/archive/real_plant')
 
     def test_scan_file_url(self):
         """Test scan_file_url functionality"""
         self.assertEqual(scan_file_url('localhost', 'dataset/file.txt', port=2020, prefix=''),
-                         'http://localhost:2020/assets/files/dataset/file.txt')
+                         'http://localhost:2020/api/v1/assets/files/dataset/file.txt')
 
     def test_scan_config_url(self):
         """Test scan_config_url functionality"""
         self.assertEqual(scan_config_url('localhost', 'real_plant', port=2020, prefix=''),
-                         'http://localhost:2020/assets/files/real_plant/scan.toml')
+                         'http://localhost:2020/api/v1/assets/files/real_plant/scan.toml')
 
     def test_scan_reconstruction_url(self):
         """Test scan_reconstruction_url functionality"""
         self.assertEqual(scan_reconstruction_url('localhost', 'real_plant', port=2020, prefix=''),
-                         'http://localhost:2020/assets/files/real_plant/pipeline.toml')
+                         'http://localhost:2020/api/v1/assets/files/real_plant/pipeline.toml')
 
     @patch('plantdb.client.rest_api.requests.make_api_request')
     def test_request_login(self, mock_request):

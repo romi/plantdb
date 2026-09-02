@@ -40,12 +40,13 @@ from plantdb.server.cli.fsdb_rest_api import rest_api
 
 # Get the path to the FSDB to serve using `ROMI_DB` environment variable, use '/myapp/db' as default (container)
 romi_db = os.environ.get('ROMI_DB', '/myapp/db')
-# Get the PlantDB REST API URL prefix
-url_prefix = os.environ.get("API_PREFIX", "")
+# Get the deployment (reverse-proxy) prefix, if any (e.g. "/plantdb").
+# The API version prefix "/api/v1" is always included automatically.
+deploy_prefix = os.environ.get("API_PREFIX", "")
 enable_ssl = str(os.environ.get("PLANTDB_API_SSL", "false")).lower() == "true"
 
 # Get the Flask application with a Proxy:
-application = rest_api(romi_db, proxy=True, api_prefix=url_prefix, ssl=enable_ssl, log_level='INFO', test=False,
+application = rest_api(romi_db, proxy=True, deploy_prefix=deploy_prefix, ssl=enable_ssl, log_level='INFO', test=False,
                        empty=False, models=False)
 
 if __name__ == "__main__":

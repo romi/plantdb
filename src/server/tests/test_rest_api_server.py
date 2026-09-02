@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import tempfile
 import time
 import unittest
@@ -9,6 +10,7 @@ import requests
 
 from plantdb.client.plantdb_client import PlantDBClient
 from plantdb.commons.test_database import _mkdtemp_romidb
+from plantdb.server.cli.fsdb_rest_api import rest_api
 from plantdb.server.test_rest_api import TestRestApiServer
 from plantdb.commons import api_endpoints
 
@@ -198,6 +200,34 @@ class RestApiServerTests(unittest.TestCase):
         r = requests.get(self.server.get_base_url() + api_endpoints.refresh())
         self.assertIn(r.status_code, (200, 429))
         self.assertIn("message", r.json())
+
+
+class RootRedirectTests(unittest.TestCase):
+    """Tests for the root (``/``) redirect to the API home endpoint."""
+
+    def _make_client(self, deploy_prefix):
+        db_path = _mkdtemp_romidb()
+        self.addCleanup(lambda: shutil.rmtree(db_path, ignore_errors=True))
+        app = rest_api(db_path, test=True, deploy_prefix=deploy_prefix)
+        return app.test_client()
+
+    def test_root_redirect_no_prefix(self):
+        client = self._make_client("")
+        r = client.get("/")
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.headers["Location"], api_endpoints.home())
+
+    def test_root_redirect_with_prefix(self):
+        client = self._make_client("/plantdb")
+        r = client.get("/")
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.headers["Location"], api_endpoints.home(prefix="/plantdb"))
+
+    def test_root_redirect_follows_to_home(self):
+        client = self._make_client("")
+        r = client.get("/", follow_redirects=True)
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("PlantDB", r.get_json().get("name", ""))
 
 
 if __name__ == '__main__':

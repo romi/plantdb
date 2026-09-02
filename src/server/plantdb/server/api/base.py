@@ -136,7 +136,7 @@ task_filesUri_mapping = {
 # Home page resource
 class Home(Resource):
 
-    def __init__(self, db, logger=None):
+    def __init__(self, db, logger=None, deploy_prefix=""):
         """Initialize the resource.
 
         Parameters
@@ -145,9 +145,13 @@ class Home(Resource):
             A database instance providing the resources to serve.
         logger : logging.Logger
             A logger instance to record operations and errors.
+        deploy_prefix : str, optional
+            Deployment (reverse-proxy) prefix prepended before ``/api/v1/...``
+            when generating endpoint URLs in responses.
         """
         self.db: FSDB = db
         self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.deploy_prefix: str = deploy_prefix
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -168,6 +172,8 @@ class Home(Resource):
                 package_version = "unknown"
             return package_version
 
+        p  = self.deploy_prefix
+
         api_info = {
             "name": "PlantDB REST API",
             "description": "RESTful API for querying PlantDB",
@@ -175,47 +181,47 @@ class Home(Resource):
             "plantdb.server": _package_version("plantdb.server"),
 
             "base endpoints": {
-                f"{HOME}": "Provides general information about the PlantDB REST API.",
-                f"{HEALTH}": "Health‑check endpoint that verifies the API is operational.",
-                f"{REFRESH.format(scan_id='scan_id')}": "Refreshes the database or a specific scan if provided."
+                api_endpoints.home(prefix=p): "Provides general information about the PlantDB REST API.",
+                api_endpoints.health(prefix=p): "Health‑check endpoint that verifies the API is operational.",
+                api_endpoints.refresh(prefix=p) + f"?scan_id='scan_id'": "Refreshes the database or a specific scan if provided."
             },
 
             "authentication endpoints": {
-                f"{LOGIN}": "Logs a user in.",
-                f"{LOGOUT}": "Logs a user out.",
-                f"{REGISTER}": "Registers a new user.",
-                f"{TOKEN_VALIDATION}": "Validates a token.",
-                f"{TOKEN_REFRESH}": "Refreshes a user’s access and refresh tokens.",
-                f"{CREATE_API_TOKEN}": "Creates a new API token."
+                api_endpoints.register(prefix=p): "Registers a new user.",
+                api_endpoints.login(prefix=p): "Logs a user in.",
+                api_endpoints.logout(prefix=p): "Logs a user out.",
+                api_endpoints.token_validation(prefix=p): "Validates a token.",
+                api_endpoints.token_refresh(prefix=p): "Refreshes a user's access and refresh tokens.",
+                api_endpoints.create_api_token(prefix=p): "Creates a new API token."
             },
 
             "scans endpoints": {
-                f"{SCANS}": "Returns a list of all available scans.",
-                f"{SCANS_INFO}": "Provides a table containing scan metadata.",
-                f"{SCAN.format(scan_id='scan_id')}": "Retrieves an existing scan or creates a new one.",
-                f"{SCAN_MD.format(scan_id='scan_id')}": "Gets or updates metadata for the specified scan.",
-                f"{SCAN_FILESETS.format(scan_id='scan_id')}": "Lists the filesets belonging to the specified scan."
+                api_endpoints.scans(prefix=p): "Returns a list of all available scans.",
+                api_endpoints.scans_info(prefix=p): "Provides a table containing scan metadata.",
+                api_endpoints.scan('scan_id', prefix=p): "Retrieves an existing scan or creates a new one.",
+                api_endpoints.scan_metadata('scan_id', prefix=p): "Gets or updates metadata for the specified scan.",
+                api_endpoints.scan_filesets_list('scan_id', prefix=p): "Lists the filesets belonging to the specified scan."
             },
 
             "filesets endpoints": {
-                f"{FILESET.format(scan_id='scan_id', fileset_id='fileset_id')}": "Retrieves an existing fileset or creates a new one.",
-                f"{FILESET_MD.format(scan_id='scan_id', fileset_id='fileset_id')}": "Gets or updates metadata for the specified fileset.",
-                f"{FILESET_FILES.format(scan_id='scan_id', fileset_id='fileset_id')}": "Lists the files contained in the specified fileset."
+                api_endpoints.fileset('scan_id', 'fileset_id', prefix=p): "Retrieves an existing fileset or creates a new one.",
+                api_endpoints.fileset_metadata('scan_id', 'fileset_id', prefix=p): "Gets or updates metadata for the specified fileset.",
+                api_endpoints.fileset_files_list('scan_id', 'fileset_id', prefix=p): "Lists the files contained in the specified fileset."
             },
 
             "files endpoints": {
-                f"{FILE.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Retrieves an existing file or creates a new one.",
-                f"{FILE_MD.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Gets or updates metadata for the specified file."
+                api_endpoints.file('scan_id', 'fileset_id', 'file_id', prefix=p): "Retrieves an existing file or creates a new one.",
+                api_endpoints.file_metadata('scan_id', 'fileset_id', 'file_id', prefix=p): "Gets or updates metadata for the specified file."
             },
 
             "assets endpoints": {
-                f"{FILE_PATH.format(file_path='file_path')}": "Retrieves a file located at the specified path.",
-                f"{IMAGE.format(scan_id='scan_id', fileset_id='fileset_id', file_id='file_id')}": "Returns a specific image.",
-                f"{ARCHIVE.format(scan_id='scan_id')}": "Downloads or updates the archive for the given scan.",
-                f"{POINTCLOUD.format(scan_id='scan_id')}": "Returns a specific point‑cloud file.",
-                f"{MESH.format(scan_id='scan_id')}": "Returns a specific mesh file.",
-                f"{SEQUENCE.format(scan_id='scan_id')}": "Returns sequence data for the given scan.",
-                f"{SKELETON.format(scan_id='scan_id')}": "Returns curve‑skeleton data for the given scan."
+                api_endpoints.file_path('file_path', prefix=p): "Retrieves a file located at the specified path.",
+                api_endpoints.image('scan_id', 'fileset_id', 'file_id', prefix=p): "Returns a specific image.",
+                api_endpoints.archive('scan_id', prefix=p): "Downloads or updates the archive for the given scan.",
+                api_endpoints.pointcloud('scan_id', prefix=p): "Returns a specific point‑cloud file.",
+                api_endpoints.mesh('scan_id', prefix=p): "Returns a specific mesh file.",
+                api_endpoints.sequence('scan_id', prefix=p): "Returns sequence data for the given scan.",
+                api_endpoints.skeleton('scan_id', prefix=p): "Returns curve‑skeleton data for the given scan."
             }
         }
         return api_info
