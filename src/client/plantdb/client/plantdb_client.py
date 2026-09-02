@@ -151,7 +151,7 @@ class PlantDBClient:
         ----------
         base_url : str
             The **origin** (scheme + host [:port]) of the PlantDB REST API.
-            Must **not** include a path — the API version prefix ``/api/v1``
+            Must **not** include a path — the API version prefix ``'/api/v1'``
             and any deployment prefix are handled automatically.
         prefix : str, optional
             Deployment (reverse-proxy) prefix, e.g. ``/plantdb``.

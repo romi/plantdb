@@ -70,7 +70,7 @@ class TestRestApiServer:
     deploy_prefix : str
         Deployment (reverse-proxy) prefix for external URL generation (default "").
     mount_prefix : str
-        Internal mount prefix (always ``/api/v1``).
+        Internal mount prefix (always ``'/api/v1'``).
     ssl : bool
         Whether to use SSL/HTTPS
     test : bool

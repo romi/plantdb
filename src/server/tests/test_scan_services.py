@@ -31,7 +31,7 @@ class TestScanServicesPrefix(unittest.TestCase):
         cls.db.disconnect()
 
     def test_get_scan_info_no_prefix(self):
-        """Without a prefix, generated URLs start with ``/api/v1``."""
+        """Without a prefix, generated URLs start with ``'/api/v1'``."""
         info = get_scan_info(self.scan)
         self.assertTrue(info["thumbnailUri"].startswith("/api/v1/"))
         self.assertFalse(info["thumbnailUri"].startswith("/plantdb"))
@@ -73,7 +73,7 @@ class TestScanServicesPrefix(unittest.TestCase):
             )
 
     def test_get_scan_data_no_prefix(self):
-        """Without prefix, ``get_scan_data`` URLs start with ``/api/v1``."""
+        """Without prefix, ``get_scan_data`` URLs start with ``'/api/v1'``."""
         data = get_scan_data(self.scan)
         self.assertTrue(data["thumbnailUri"].startswith("/api/v1/"))
         self.assertFalse(data["thumbnailUri"].startswith("/plantdb"))

@@ -250,14 +250,14 @@ def _configure_api(
 def _register_root_redirect(app: Flask, deploy_prefix: str = "") -> None:
     """Redirect the server root (``/``) to the API home endpoint.
 
-    The API home is served at the API mount prefix (``/api/v1``), so a request to
+    The API home is served at the API mount prefix (``'/api/v1'``), so a request to
     the bare root (``http://host:port/``, or ``http://host:port/{deploy_prefix}/``
     behind a reverse proxy) would otherwise 404. This registers a lightweight
     route that issues a ``302`` redirect to ``home(prefix=deploy_prefix)``.
 
     The ``deploy_prefix`` (reverse-proxy prefix, e.g. ``/plantdb``) is prepended to
     the generated ``Location`` so the browser stays under the proxy path; without a
-    deployment prefix the redirect simply targets ``/api/v1``.
+    deployment prefix the redirect simply targets ``'/api/v1'``.
 
     Parameters
     ----------

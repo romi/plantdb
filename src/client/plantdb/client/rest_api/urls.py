@@ -192,7 +192,7 @@ def plantdb_url(host, port=PLANTDB_PORT, prefix=PLANTDB_PREFIX, ssl=False) -> st
     """Generates the root URL for the PlantDB REST API using the specified host and port.
 
     This function returns the server root (scheme + host [+ port] + optional
-    deployment prefix). The API version prefix ``/api/v1`` is **not** included:
+    deployment prefix). The API version prefix ``'/api/v1'`` is **not** included:
     it is only added by the ``api_endpoints.*`` builders.
 
     Parameters

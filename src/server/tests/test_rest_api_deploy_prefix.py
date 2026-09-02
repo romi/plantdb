@@ -4,7 +4,7 @@
 Integration test verifying the server injects the deployment prefix into
 generated URLs when configured with a ``deploy_prefix``.
 
-The app is mounted at ``/api/v1`` (mount prefix); when a ``deploy_prefix`` is
+The app is mounted at ``'/api/v1'`` (mount prefix); when a ``deploy_prefix`` is
 configured, links embedded in responses (the ``Home`` endpoint map, the
 ``ScansTable`` / ``Scan`` resources) must carry ``<deploy_prefix>/api/v1/<endpoint>``.
 """
