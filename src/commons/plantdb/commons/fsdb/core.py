@@ -1235,6 +1235,23 @@ class FSDB(db.DB):
         -------
         plantdb.commons.fsdb.core.TimeLapse
             The created TimeLapse object.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        ['mytl_001']
+        >>> tl.path().exists()
+        True
+        >>> tl.list_scan()
+        []
+        >>> scan = tl.create_scan('mytl_001_01')
+        >>> scan.path().exists()
+        True
+        >>> db.disconnect()
         """
         if not _is_valid_timelapse_id(tl_id):
             raise ValueError(f"Invalid timelapse identifier '{tl_id}'!")
@@ -1272,6 +1289,19 @@ class FSDB(db.DB):
         -------
         plantdb.commons.fsdb.core.TimeLapse
             The TimeLapse object.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> db.create_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        ['mytl_001']
+        >>> tl = db.get_timelapse('mytl_001')
+        >>> print(tl.id)
+        mytl_001
+        >>> db.disconnect()
         """
         tl_path = _timelapse_path(self, tl_id)
         marker_path = _timelapse_marker(tl_path)
@@ -1307,6 +1337,16 @@ class FSDB(db.DB):
         -------
         list[str]
             List of timelapse container IDs.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        ['mytl_001']
+        >>> db.disconnect()
         """
         timelapses = []
         if self.path().is_dir():
@@ -1333,6 +1373,19 @@ class FSDB(db.DB):
         -------
         bool
             True on successful deletion.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        ['mytl_001']
+        >>> db.delete_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        []
+        >>> db.disconnect()
         """
         tl_path = _timelapse_path(self, tl_id)
         if not _timelapse_marker(tl_path).is_file() and not tl_path.is_dir():
