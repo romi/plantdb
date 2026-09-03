@@ -139,6 +139,197 @@ class DB(object):
         """
         raise NotImplementedError
 
+    def get_timelapses(self):
+        """Get the list of timelapses saved in the database.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def get_timelapse(self, id):
+        """Get a timelapse container saved in the database.
+
+        Parameters
+        ----------
+        id : str
+            Id of the timelapse instance to retrieve.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def create_timelapse(self, id, metadata=None):
+        """Create a new timelapse object in the database.
+
+        Parameters
+        ----------
+        id : str
+            Id of the timelapse to create.
+        metadata : dict, optional
+            Metadata for the timelapse.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def delete_timelapse(self, id, recursive=False):
+        """Delete a timelapse container from the DB.
+
+        Parameters
+        ----------
+        id : str
+            Id of the timelapse to delete.
+        recursive : bool, optional
+            Whether to delete member scans recursively.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+
+class TimeLapse(object):
+    """Class defining the timelapse/series object ``TimeLapse`` contained in a ``DB``.
+
+    Abstract class defining the API used to represent a timelapse or series of scans in the ROMI project.
+    A timelapse container groups multiple temporal scans under a shared identifier and metadata.
+
+    Attributes
+    ----------
+    db : plantdb.commons.db.DB
+        Database instance where to find the timelapse container.
+    id : str
+        Id of the timelapse instance.
+    """
+
+    def __init__(self, db, id):
+        """Constructor.
+
+        Parameters
+        ----------
+        db : plantdb.commons.db.DB
+            Database instance where to find the timelapse.
+        id : str
+            Id of the timelapse instance.
+        """
+        self.db = db
+        self.id = id
+
+    def get_id(self):
+        """Get the timelapse instance id.
+
+        Returns
+        -------
+        str
+            Id of the timelapse instance.
+        """
+        return deepcopy(self.id)
+
+    def get_db(self):
+        """Get parent database instance.
+
+        Returns
+        -------
+        plantdb.commons.db.DB
+            Database instance where to find the timelapse.
+        """
+        return self.db
+
+    def get_scans(self, query=None, sort="timelapse.scheduled", **kwargs):
+        """Get the list of scans belonging to this timelapse.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def get_scan(self, id, **kwargs):
+        """Get a scan belonging to this timelapse with a given id.
+
+        Parameters
+        ----------
+        id : str
+            Id of the scan instance to retrieve.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def list_scans(self, query=None, fuzzy=False, sort="timelapse.scheduled", **kwargs):
+        """List scan ids belonging to this timelapse.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def list_scan(self, query=None, fuzzy=False, sort="timelapse.scheduled", **kwargs):
+        """Alias for list_scans."""
+        return self.list_scans(query=query, fuzzy=fuzzy, sort=sort, **kwargs)
+
+    def create_scan(self, id, metadata=None, **kwargs):
+        """Create a new member scan in this timelapse.
+
+        Parameters
+        ----------
+        id : str
+            Id of the scan to create.
+        metadata : dict, optional
+            Metadata for the scan.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def delete_scan(self, id, **kwargs):
+        """Delete a scan from this timelapse.
+
+        Parameters
+        ----------
+        id : str
+            Id of the scan to delete.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def get_metadata(self, key=None, default=None):
+        """Get metadata associated with the timelapse.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+    def set_metadata(self, data, value=None):
+        """Set metadata associated with the timelapse.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError
+
+
+#: Alias for TimeLapse
+Series = TimeLapse
+
 
 class Scan(object):
     """Class defining the scan object ``Scan``.
@@ -185,6 +376,20 @@ class Scan(object):
             Database instance where to find the scan.
         """
         return self.db
+
+    def get_timelapse(self):
+        """Get parent timelapse/series instance if defined, else None.
+
+        Returns
+        -------
+        plantdb.commons.db.TimeLapse | None
+            Parent timelapse instance or None.
+        """
+        return None
+
+    def get_series(self):
+        """Alias for get_timelapse."""
+        return self.get_timelapse()
 
     def get_filesets(self):
         """Get all sets of files.
