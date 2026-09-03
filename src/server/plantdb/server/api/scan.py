@@ -197,6 +197,8 @@ class ScansList(Resource):
         """
         # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
+        timelapse_id = request.args.get('timelapse_id', None)
+        sort = request.args.get('sort', None)
         # Get filter query from "filterQuery" JSON data
         query_data = request.get_json(silent=True)
         if isinstance(query_data, dict):
@@ -204,9 +206,17 @@ class ScansList(Resource):
         else:
             query = None
 
+        if timelapse_id is not None:
+            if query is None:
+                query = {"timelapse": {"id": timelapse_id}}
+            elif isinstance(query, dict):
+                tl_query = query.setdefault("timelapse", {})
+                if isinstance(tl_query, dict):
+                    tl_query["id"] = timelapse_id
+
         try:
             # Query database for matching scans, allowing access to all owners
-            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False, sort=sort)
         except Exception as e:
             # Return an error response if any exception occurs
             return {'error': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error
@@ -309,6 +319,8 @@ class ScansTable(Resource):
         """
         # Get fuzzy parameter from request URL
         fuzzy = request.args.get('fuzzy', False, type=bool)
+        timelapse_id = request.args.get('timelapse_id', None)
+        sort = request.args.get('sort', None)
         # Get filter query from "filterQuery" JSON data
         query_data = request.get_json(silent=True)
         if isinstance(query_data, dict):
@@ -316,9 +328,17 @@ class ScansTable(Resource):
         else:
             query = None
 
+        if timelapse_id is not None:
+            if query is None:
+                query = {"timelapse": {"id": timelapse_id}}
+            elif isinstance(query, dict):
+                tl_query = query.setdefault("timelapse", {})
+                if isinstance(tl_query, dict):
+                    tl_query["id"] = timelapse_id
+
         try:
             # Query database for matching scans, allowing access to all owners
-            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False)
+            scans_list = self.db.list_scans(query=query, fuzzy=fuzzy, owner_only=False, sort=sort)
         except Exception as e:
             # Return an error response if any exception occurs
             return {'error': f'Error retrieving scan list: {str(e)}'}, 500  # HTTP 500 Internal Server Error

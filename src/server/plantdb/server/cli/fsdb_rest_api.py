@@ -124,6 +124,9 @@ from plantdb.commons.api_endpoints import SEQUENCE
 from plantdb.commons.api_endpoints import SKELETON
 from plantdb.commons.api_endpoints import TOKEN_REFRESH
 from plantdb.commons.api_endpoints import TOKEN_VALIDATION
+from plantdb.commons.api_endpoints import TIMELAPSES
+from plantdb.commons.api_endpoints import TIMELAPSE
+from plantdb.commons.api_endpoints import TIMELAPSE_SCANS
 from plantdb.commons.auth.session import JWTSessionManager
 from plantdb.commons.auth.session import _init_secret_key
 from plantdb.commons.fsdb.core import FSDB
@@ -155,6 +158,9 @@ from plantdb.server.api.scan import ScanFilesets
 from plantdb.server.api.scan import ScanMetadata
 from plantdb.server.api.scan import ScansList
 from plantdb.server.api.scan import ScansTable
+from plantdb.server.api.timelapse import Timelapses
+from plantdb.server.api.timelapse import Timelapse
+from plantdb.server.api.timelapse import TimelapseScans
 
 
 def _get_env_secret(var_name: str, logger: logging.Logger) -> str:
@@ -368,6 +374,10 @@ def _register_resources(api: Api, db: FSDB, logger: logging.Logger, deploy_prefi
         (Scan, lambda: SCAN.format(scan_id="<string:scan_id>")),
         (ScanMetadata, lambda: SCAN_MD.format(scan_id="<string:scan_id>")),
         (ScanFilesets, lambda: SCAN_FILESETS.format(scan_id="<string:scan_id>")),
+        # Timelapse CRUD
+        (Timelapses, lambda: TIMELAPSES),
+        (Timelapse, lambda: TIMELAPSE.format(timelapse_id="<string:timelapse_id>")),
+        (TimelapseScans, lambda: TIMELAPSE_SCANS.format(timelapse_id="<string:timelapse_id>")),
         # Fileset CRUD
         (Fileset, lambda: FILESET.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
         (FilesetMetadata, lambda: FILESET_MD.format(scan_id="<string:scan_id>", fileset_id="<string:fileset_id>")),
