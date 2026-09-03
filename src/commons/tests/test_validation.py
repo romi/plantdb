@@ -7,11 +7,17 @@ import pytest
 
 from plantdb.commons.fsdb.validation import (
     _is_valid_id,
+    _is_valid_timelapse_id,
     _is_fsdb,
     _is_scan_dataset,
     _is_valid_fileset,
     _fileset_files_exists,
     _is_safe_to_delete,
+)
+from plantdb.commons.fsdb.path_helpers import (
+    _scan_path,
+    _timelapse_path,
+    _timelapse_marker,
 )
 from plantdb.commons.test_database import (
     setup_empty_database,
@@ -275,3 +281,68 @@ def test_is_safe_to_delete_root_path(db_with_scan, caplog):
 def test_is_safe_to_delete_valid_subpath(db_with_scan):
     scan = db_with_scan.get_scan("myscan_001")
     assert _is_safe_to_delete(scan.path(), db_with_scan.path()) is True
+
+
+# ---------------------------------------------------------------------------
+# Timelapse validation & path helper tests
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "input_id, expected",
+    [
+        (123, False),
+        (None, False),
+        ("", False),
+        ("-invalid_start", False),
+        ("_invalid_start", False),
+        ("a" * 129, False),
+        ("valid_tl_01", True),
+        ("TL-experiment-2026", True),
+        ("001_scan_tl", True),
+    ],
+)
+def test_is_valid_timelapse_id(input_id, expected, caplog):
+    result = _is_valid_timelapse_id(input_id)
+    assert result is expected
+    if not expected:
+        assert any(record.levelname == "ERROR" for record in caplog.records)
+
+
+def test_is_fsdb_with_timelapses(empty_db_path):
+    # Create a timelapse directory with timelapse.json
+    tl_dir = empty_db_path / "tl_001"
+    tl_dir.mkdir()
+    (tl_dir / "timelapse.json").write_text(json.dumps({"id": "tl_001", "created_at": "2026-09-03T12:00:00Z"}))
+
+    # Empty timelapse container is valid in FSDB
+    assert _is_fsdb(empty_db_path) is True
+
+    # Add a valid child scan in timelapse
+    child_scan = tl_dir / "tl_001_0"
+    child_scan.mkdir()
+    (child_scan / "metadata").mkdir()
+    (child_scan / "files.json").write_text(json.dumps({"filesets": []}))
+
+    assert _is_fsdb(empty_db_path) is True
+
+    # Add an invalid child scan in timelapse
+    bad_child_scan = tl_dir / "tl_001_1"
+    bad_child_scan.mkdir()
+    # Missing metadata dir and files.json
+    assert _is_fsdb(empty_db_path) is False
+
+
+def test_path_helpers_timelapse(db_with_scan, tmp_path):
+    # Test _timelapse_path and _timelapse_marker
+    tl_path = _timelapse_path(tmp_path, "tl_test")
+    assert tl_path == (tmp_path / "tl_test").resolve()
+    marker = _timelapse_marker(tl_path)
+    assert marker == (tmp_path / "tl_test" / "timelapse.json").resolve()
+
+    # Test _scan_path without timelapse
+    scan = db_with_scan.get_scan("myscan_001")
+    assert _scan_path(scan) == (db_with_scan.basedir / "myscan_001").resolve()
+
+    # Test _scan_path with timelapse metadata
+    scan.metadata = {"timelapse": {"id": "tl_test", "index": 0}}
+    assert _scan_path(scan) == (db_with_scan.basedir / "tl_test" / "myscan_001").resolve()

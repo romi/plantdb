@@ -4,6 +4,7 @@ import tempfile
 import time
 import unittest
 
+from plantdb.client.plantdb_client import PlantDBClient
 from plantdb.client.rest_api import parsers
 from plantdb.client.rest_api import requests
 from plantdb.client.rest_api import urls
@@ -250,6 +251,36 @@ class ClientRestApiIntegrationTests(unittest.TestCase):
         # If data is returned, it should be a dictionary
         if data is not None:
             self.assertIsInstance(data, dict)
+
+    def test_plantdb_client_timelapse(self):
+        """Test PlantDBClient timelapse SDK methods against running server."""
+        client = PlantDBClient(plantdb_url(self.server.host, port=self.server.port, prefix=self.server.prefix))
+        client.login("admin", "admin")
+
+        # Create timelapse
+        created = client.create_timelapse("tl_client_test", metadata={"exp": "sdk"})
+        self.assertEqual(created["id"], "tl_client_test")
+
+        # List timelapses
+        timelapses = client.list_timelapses()
+        self.assertIn("tl_client_test", timelapses)
+
+        # Get timelapse info
+        info = client.get_timelapse("tl_client_test")
+        self.assertEqual(info["id"], "tl_client_test")
+        self.assertEqual(info["counts"]["scans"], 0)
+
+        # Create member scans
+        client.create_scan("tl_client_s0", metadata={"timelapse": {"id": "tl_client_test", "scheduled": "2026-09-03T09:00:00Z", "index": 0}})
+        client.create_scan("tl_client_s1", metadata={"timelapse": {"id": "tl_client_test", "scheduled": "2026-09-03T11:00:00Z", "index": 1}})
+
+        # List scans filtered and sorted
+        scans = client.list_scans(timelapse_id="tl_client_test", sort="timelapse.scheduled")
+        self.assertEqual(scans, ["tl_client_s0", "tl_client_s1"])
+
+        # Delete timelapse
+        self.assertTrue(client.delete_timelapse("tl_client_test", recursive=True))
+        self.assertNotIn("tl_client_test", client.list_timelapses())
 
 
 if __name__ == '__main__':
