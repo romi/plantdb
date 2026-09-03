@@ -44,6 +44,32 @@ from ..log import get_logger
 logger = get_logger(__name__)
 
 
+TIMELAPSE_ID_RE = r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$'
+
+
+def _is_valid_timelapse_id(name: str) -> bool:
+    """Checks the validity of a given timelapse identifier name.
+
+    Parameters
+    ----------
+    name : str
+        The timelapse identifier name to be validated.
+
+    Returns
+    -------
+    bool
+        ``True`` if the name is valid, otherwise ``False``.
+    """
+    import re
+    if not isinstance(name, str):
+        logger.error(f"Given timelapse name is not a string: '{name}'")
+        return False
+    if not re.match(TIMELAPSE_ID_RE, name):
+        logger.error(f"Given timelapse name contains invalid characters or length: '{name}'.")
+        return False
+    return True
+
+
 def _is_valid_id(name):
     """Checks the validity of a given identifier name based on specified conditions.
 
@@ -149,8 +175,17 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     for scan_dir in scan_dirs:
         if scan_dir.name in extra_dirs:
             continue  # skip the verification for any folder declared as "extra"
-        if not _is_scan_dataset(scan_dir, validate_json_fileset):
-            bad_dir.append(str(scan_dir))
+        if (scan_dir / "timelapse.json").is_file():
+            # It is a timelapse container: validate child scan directories
+            child_dirs = [c for c in scan_dir.iterdir() if c.is_dir() and not c.name.startswith('.')]
+            for child_dir in child_dirs:
+                if child_dir.name in extra_dirs:
+                    continue
+                if not _is_scan_dataset(child_dir, validate_json_fileset):
+                    bad_dir.append(str(child_dir))
+        else:
+            if not _is_scan_dataset(scan_dir, validate_json_fileset):
+                bad_dir.append(str(scan_dir))
 
     if len(bad_dir) > 0:
         logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")

@@ -167,6 +167,7 @@ from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.fsdb.file_ops import _delete_file
 from plantdb.commons.fsdb.file_ops import _delete_fileset
 from plantdb.commons.fsdb.file_ops import _delete_scan
+from plantdb.commons.fsdb.file_ops import _delete_timelapse
 from plantdb.commons.fsdb.file_ops import _load_scan
 from plantdb.commons.fsdb.file_ops import _load_scans
 from plantdb.commons.fsdb.file_ops import _make_fileset
@@ -181,12 +182,17 @@ from plantdb.commons.fsdb.metadata import _set_metadata
 from plantdb.commons.fsdb.metadata import _store_file_metadata
 from plantdb.commons.fsdb.metadata import _store_fileset_metadata
 from plantdb.commons.fsdb.metadata import _store_scan_metadata
+from plantdb.commons.fsdb.metadata import _store_timelapse_metadata
 from plantdb.commons.fsdb.path_helpers import _file_path
 from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
+from plantdb.commons.fsdb.path_helpers import _timelapse_marker
+from plantdb.commons.fsdb.path_helpers import _timelapse_path
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
+from plantdb.commons.fsdb.validation import _is_valid_timelapse_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import iso_date_now
@@ -352,7 +358,7 @@ def get_authentication(method: Callable) -> Callable:
         token: Optional[str] = kwargs.get('token', None)
 
         # Retrieve username based on the type of `self`
-        if isinstance(self, (Scan, Fileset, File)):
+        if isinstance(self, (TimeLapse, Scan, Fileset, File)):
             user = get_logged_username(self.db, default_user=default_user, token=token)
         else:
             user = get_logged_username(self, default_user=default_user, token=token)
@@ -390,7 +396,7 @@ def use_guest_as_default(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         if not kwargs.get('current_user'):
-            if isinstance(self, (Scan, Fileset, File)):
+            if isinstance(self, (TimeLapse, Scan, Fileset, File)):
                 kwargs["current_user"] = self.db.get_guest_user()
             else:
                 kwargs["current_user"] = self.get_guest_user()
@@ -404,7 +410,7 @@ def _get_fsdb(obj) -> "FSDB":
 
     Parameters
     ----------
-    obj : FSDB | Scan | Fileset | File
+    obj : FSDB | TimeLapse | Scan | Fileset | File
         Object from which to get the ``FSDB``.
 
     Returns
@@ -415,15 +421,11 @@ def _get_fsdb(obj) -> "FSDB":
     Raises
     ------
     TypeError
-        If ``obj`` is not an instance of ``FSDB``, ``Scan``, ``Fileset``, or ``File``.
+        If ``obj`` is not an instance of ``FSDB``, ``TimeLapse``, ``Scan``, ``Fileset``, or ``File``.
     """
     if isinstance(obj, FSDB):
         return obj
-    elif isinstance(obj, Scan):
-        return obj.db
-    elif isinstance(obj, Fileset):
-        return obj.db
-    elif isinstance(obj, File):
+    elif isinstance(obj, (TimeLapse, Scan, Fileset, File)):
         return obj.db
     else:
         raise TypeError(f"Unsupported object type: {type(obj)}")
@@ -434,10 +436,10 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
 
     Parameters
     ----------
-    obj : FSDB | Scan | Fileset | File
+    obj : FSDB | TimeLapse | Scan | Fileset | File
         Object from which to get the ``FSDB`` and ``Scan`` instances.
     *args : tuple
-        Additional positional arguments. When ``obj`` is an ``FSDB``, the first
+        Additional positional arguments. When ``obj`` is an ``FSDB`` or ``TimeLapse``, the first
         element should be the index or key identifying the desired scan.
 
     Returns
@@ -450,12 +452,17 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
     Raises
     ------
     TypeError
-        If ``obj`` is not an instance of ``Scan``, ``FSDB``, ``Fileset``, or ``File``.
+        If ``obj`` is not an instance of ``Scan``, ``TimeLapse``, ``FSDB``, ``Fileset``, or ``File``.
     plantdb.commons.fsdb.exceptions.ScanNotFoundError
-        If ``obj`` is an instance of ``FSDB`` and ``args[0]`` is not an existing ``Scan``.
+        If ``obj`` is an instance of ``FSDB`` or ``TimeLapse`` and ``args[0]`` is not an existing ``Scan``.
     """
     if isinstance(obj, Scan):
         return obj.db, obj
+    elif isinstance(obj, TimeLapse):
+        try:
+            return obj.db, obj.db.scans[args[0]]
+        except KeyError:
+            raise ScanNotFoundError(obj.db, args[0])
     elif isinstance(obj, FSDB):
         try:
             return obj, obj.scans[args[0]]
@@ -565,6 +572,26 @@ def requires_permission(required_permissions: Union[Permission, Tuple[Permission
         return wrapper
 
     return decorator
+
+
+def _sort_scans(scans: list["Scan"], sort: str | None) -> list["Scan"]:
+    """Sort a list of scans according to the specified sort criteria."""
+    if not sort:
+        return scans
+    if sort == "timelapse.scheduled":
+        def sort_key(s):
+            tl = s.metadata.get("timelapse") if isinstance(s.metadata, dict) else None
+            if not isinstance(tl, dict):
+                return ("", 0)
+            scheduled = tl.get("scheduled") or ""
+            idx = tl.get("index")
+            try:
+                idx = int(idx) if idx is not None else 0
+            except (ValueError, TypeError):
+                idx = 0
+            return (str(scheduled), idx)
+        return sorted(scans, key=sort_key)
+    return scans
 
 
 class FSDB(db.DB):
@@ -905,6 +932,9 @@ class FSDB(db.DB):
         else:
             accessible_scans = list(accessible_scans.values())
 
+        sort = kwargs.get('sort', None)
+        accessible_scans = _sort_scans(accessible_scans, sort)
+
         return accessible_scans
 
     @require_connected_db
@@ -956,9 +986,9 @@ class FSDB(db.DB):
         real_plant_analyzed
         >>> db.disconnect()
         """
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username, LockLevel.SCAN):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username if current_user else "guest", LockLevel.SCAN):
             if not self.scan_exists(scan_id):
-                ScanNotFoundError(self, scan_id)
+                raise ScanNotFoundError(self, scan_id)
             return self.scans[scan_id]
 
     @require_connected_db
@@ -1022,6 +1052,24 @@ class FSDB(db.DB):
         if self.scan_exists(scan_id):
             raise ScanExistsError(self, scan_id)
 
+        tl_id = None
+        if metadata and isinstance(metadata, dict):
+            tl_meta = metadata.get("timelapse")
+            if isinstance(tl_meta, dict):
+                tl_id = tl_meta.get("id")
+
+        if tl_id:
+            if not _is_valid_timelapse_id(tl_id):
+                raise ValueError(f"Invalid timelapse identifier '{tl_id}'!")
+            tl_path = _timelapse_path(self, tl_id)
+            tl_marker = _timelapse_marker(tl_path)
+            if not tl_marker.is_file():
+                raise ScanNotFoundError(self, tl_id)
+        else:
+            # Standalone scan: reject collision with timelapse container of same name
+            if (self.path() / scan_id / TIMELAPSE_MARKER_FILE_NAME).is_file():
+                raise ScanExistsError(self, scan_id)
+
         # Prepare metadata with ownership
         if metadata is None:
             metadata = {}
@@ -1048,9 +1096,9 @@ class FSDB(db.DB):
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Initialize scan object
             scan = Scan(self, scan_id)  # Initialize a new Scan instance
+            # Set metadata dictionary before making scan so _scan_path resolves nested path if tl_id is present
+            _set_metadata(scan.metadata, metadata, None)
             scan_path = _make_scan(scan)  # Create directory structure
-            # Cannot use scan.set_metadata(initial_metadata) here as ownership is not granted yet!
-            _set_metadata(scan.metadata, metadata, None)  # add metadata dictionary to the new scan
             _store_scan_metadata(scan)
             scan.store()  # store the new scan in the local database
             self.scans[scan_id] = scan  # Update scans dictionary with the new one
@@ -1161,10 +1209,164 @@ class FSDB(db.DB):
             else:
                 query.update({'owner': current_user.username})
 
-        if query is None:
+        sort = kwargs.get('sort', None)
+        if query is None and not sort:
             return list(self.scans.keys())
         else:
-            return [scan.id for scan in _filter_query(list(self.scans.values()), query, fuzzy)]
+            scans_list = _filter_query(list(self.scans.values()), query, fuzzy) if query else list(self.scans.values())
+            scans_list = _sort_scans(scans_list, sort)
+            return [scan.id for scan in scans_list]
+
+    @require_connected_db
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.CREATE, check_scan_access=False)
+    def create_timelapse(self, tl_id: str, metadata: dict = None, current_user=None, **kwargs) -> "TimeLapse":
+        """Create a new timelapse container in the local database.
+
+        Parameters
+        ----------
+        tl_id : str
+            The identifier of the timelapse to create.
+        metadata : dict, optional
+            A dictionary of metadata for the timelapse container.
+
+        Returns
+        -------
+        plantdb.commons.fsdb.core.TimeLapse
+            The created TimeLapse object.
+        """
+        if not _is_valid_timelapse_id(tl_id):
+            raise ValueError(f"Invalid timelapse identifier '{tl_id}'!")
+        if self.scan_exists(tl_id) or (self.path() / tl_id).exists():
+            raise ScanExistsError(self, tl_id)
+
+        tl_path = _timelapse_path(self, tl_id)
+        marker_path = _timelapse_marker(tl_path)
+        now = iso_date_now()
+
+        with self.lock_manager.acquire_lock(tl_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
+            tl_path.mkdir(parents=True, exist_ok=True)
+            tl_data = {
+                "id": tl_id,
+                "created_at": now,
+                "metadata": metadata or {},
+            }
+            with marker_path.open("w") as f:
+                json.dump(tl_data, f, indent=4)
+
+        return TimeLapse(self, tl_id, metadata=metadata or {}, created_at=now)
+
+    @require_connected_db
+    @get_authentication
+    @require_authentication
+    def get_timelapse(self, tl_id: str, current_user=None, **kwargs) -> "TimeLapse":
+        """Get a timelapse container by its identifier.
+
+        Parameters
+        ----------
+        tl_id : str
+            The identifier of the timelapse.
+
+        Returns
+        -------
+        plantdb.commons.fsdb.core.TimeLapse
+            The TimeLapse object.
+        """
+        tl_path = _timelapse_path(self, tl_id)
+        marker_path = _timelapse_marker(tl_path)
+        if not marker_path.is_file():
+            raise ScanNotFoundError(self, tl_id)
+
+        username = current_user.username if current_user else "guest"
+        with self.lock_manager.acquire_lock(tl_id, LockType.SHARED, username, LockLevel.SCAN):
+            with marker_path.open("r") as f:
+                tl_data = json.load(f)
+
+        return TimeLapse(self, tl_id, metadata=tl_data.get("metadata", {}), created_at=tl_data.get("created_at"))
+
+    @require_connected_db
+    @get_authentication
+    @require_authentication
+    def get_timelapses(self, current_user=None, **kwargs) -> list["TimeLapse"]:
+        """Get the list of all TimeLapse objects in the local database.
+
+        Returns
+        -------
+        list[plantdb.commons.fsdb.core.TimeLapse]
+            List of TimeLapse instances.
+        """
+        return [self.get_timelapse(tl_id, current_user=current_user, **kwargs) for tl_id in self.list_timelapses()]
+
+    @require_connected_db
+    @get_authentication
+    def list_timelapses(self, current_user=None, **kwargs) -> list[str]:
+        """Get the list of timelapse identifiers from the local database.
+
+        Returns
+        -------
+        list[str]
+            List of timelapse container IDs.
+        """
+        timelapses = []
+        if self.path().is_dir():
+            for d in self.path().iterdir():
+                if d.is_dir() and not d.name.startswith('.') and _timelapse_marker(d).is_file():
+                    timelapses.append(d.name)
+        return sorted(timelapses)
+
+    @require_connected_db
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.DELETE, check_scan_access=False)
+    def delete_timelapse(self, tl_id: str, recursive: bool = False, current_user=None, **kwargs) -> bool:
+        """Delete a timelapse container from the local database.
+
+        Parameters
+        ----------
+        tl_id : str
+            Identifier of the timelapse to delete.
+        recursive : bool
+            Whether to recursively delete member scans. Defaults to False.
+
+        Returns
+        -------
+        bool
+            True on successful deletion.
+        """
+        tl_path = _timelapse_path(self, tl_id)
+        if not _timelapse_marker(tl_path).is_file() and not tl_path.is_dir():
+            raise ScanNotFoundError(self, tl_id)
+
+        with self.lock_manager.acquire_lock(tl_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
+            _delete_timelapse(self, tl_id, recursive=recursive)
+
+        return True
+
+    create_series = create_timelapse
+    get_series = get_timelapse
+    list_series = list_timelapses
+    delete_series = delete_timelapse
+    get_series_list = get_timelapses
+
+    @require_connected_db
+    def timelapse_exists(self, tl_id: str) -> bool:
+        """Check if a timelapse exists in the database.
+
+        Parameters
+        ----------
+        tl_id : str
+            The ID of the timelapse to check.
+
+        Returns
+        -------
+        bool
+            True if the timelapse exists, False otherwise.
+        """
+        tl_path = _timelapse_path(self, tl_id)
+        return _timelapse_marker(tl_path).is_file()
+
+    series_exists = timelapse_exists
 
     @require_connected_db
     def get_scan_lock_status(self, scan_id: str) -> dict:
@@ -1961,6 +2163,290 @@ class FSDB(db.DB):
             return None
 
 
+class TimeLapse(db.TimeLapse, MetadataManager):
+    """Implement ``TimeLapse`` (or ``Series``) for the local *File System DataBase*.
+
+    Implementation of a timelapse container as a file structure with:
+      * directory ``${TimeLapse.db.basedir}/${TimeLapse.id}`` as timelapse root directory;
+      * JSON marker file ``timelapse.json`` containing timelapse metadata;
+      * member scans located under ``${TimeLapse.db.basedir}/${TimeLapse.id}/${Scan.id}``.
+
+    Attributes
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        A local database instance hosting this ``TimeLapse`` instance.
+    id : str
+        The identifier of this ``TimeLapse`` instance in the local database `db`.
+    metadata : dict
+        A metadata dictionary.
+    created_at : str
+        ISO-formatted creation timestamp.
+
+    See Also
+    --------
+    plantdb.commons.db.TimeLapse
+    plantdb.commons.fsdb.core.Scan
+    """
+
+    def __init__(self, db, tl_id, metadata=None, created_at=None):
+        super().__init__(db, tl_id)
+        self.metadata = metadata if metadata is not None else {}
+        self.created_at = created_at or iso_date_now()
+        self.session_manager = self.db.session_manager
+        self.logger = self.db.logger
+
+    def path(self) -> pathlib.Path:
+        """Get the path to the local timelapse directory."""
+        return _timelapse_path(self.db, self.id)
+
+    def _erase(self) -> None:
+        """Erase the metadata associated with this timelapse in memory."""
+        self.metadata = {}
+
+    def scan_exists(self, scan_id: str) -> bool:
+        """Check if a scan exists in this timelapse.
+
+        Parameters
+        ----------
+        scan_id : str
+            The identifier of the scan to check.
+
+        Returns
+        -------
+        bool
+            True if the scan exists and belongs to this timelapse, False otherwise.
+        """
+        if not self.db.scan_exists(scan_id):
+            return False
+        scan = self.db.scans[scan_id]
+        if isinstance(scan.metadata, dict):
+            tl = scan.metadata.get("timelapse")
+            if isinstance(tl, dict) and tl.get("id") == self.id:
+                return True
+        return False
+
+    @get_authentication
+    @require_authentication
+    def get_scans(self, query=None, current_user=None, **kwargs) -> list["Scan"]:
+        """Get the list of member `Scan` instances in this timelapse.
+
+        Parameters
+        ----------
+        query : dict, optional
+            A query dictionary to filter member scans.
+
+        Returns
+        -------
+        list of plantdb.commons.fsdb.core.Scan
+            Sorted list of member `Scan` instances.
+        """
+        tl_query = {"timelapse": {"id": self.id}}
+        if query:
+            tl_query.update(query)
+        kwargs_copy = dict(kwargs)
+        kwargs_copy.setdefault("sort", "timelapse.scheduled")
+        return self.db.get_scans(query=tl_query, current_user=current_user, **kwargs_copy)
+
+    @get_authentication
+    @require_authentication
+    def get_scan(self, scan_id: str, current_user=None, **kwargs) -> "Scan":
+        """Get a member `Scan` instance by id in this timelapse.
+
+        Parameters
+        ----------
+        scan_id : str
+            The identifier of the member scan.
+
+        Returns
+        -------
+        plantdb.commons.fsdb.core.Scan
+            The retrieved `Scan` instance.
+        """
+        scan = self.db.get_scan(scan_id, current_user=current_user, **kwargs)
+        if isinstance(scan.metadata, dict):
+            tl = scan.metadata.get("timelapse")
+            if isinstance(tl, dict) and tl.get("id") == self.id:
+                return scan
+        raise ScanNotFoundError(self.db, scan_id)
+
+    @get_authentication
+    def list_scans(self, query=None, fuzzy=False, current_user=None, **kwargs) -> list[str]:
+        """Get the list of member scan identifiers in this timelapse.
+
+        Parameters
+        ----------
+        query : dict, optional
+            A query dictionary to filter member scans.
+        fuzzy : bool, optional
+            Whether to use fuzzy regex matching.
+
+        Returns
+        -------
+        list[str]
+            List of member scan IDs sorted chronologically.
+        """
+        tl_query = {"timelapse": {"id": self.id}}
+        if query:
+            tl_query.update(query)
+        kwargs_copy = dict(kwargs)
+        kwargs_copy.setdefault("sort", "timelapse.scheduled")
+        kwargs_copy.setdefault("owner_only", False)
+        return self.db.list_scans(query=tl_query, fuzzy=fuzzy, current_user=current_user, **kwargs_copy)
+
+    def list_scan(self, query=None, fuzzy=False, current_user=None, **kwargs) -> list[str]:
+        """Alias for list_scans."""
+        return self.list_scans(query=query, fuzzy=fuzzy, current_user=current_user, **kwargs)
+
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.CREATE, check_scan_access=False)
+    def create_scan(self, scan_id: str, metadata: dict = None, current_user=None, **kwargs) -> "Scan":
+        """Create a new member scan in this timelapse.
+
+        Parameters
+        ----------
+        scan_id : str
+            The identifier of the scan to create.
+        metadata : dict, optional
+            Additional metadata for the scan. The `timelapse.id` will automatically be set.
+
+        Returns
+        -------
+        plantdb.commons.fsdb.core.Scan
+            The created `Scan` instance.
+        """
+        meta = copy.deepcopy(metadata) if metadata else {}
+        tl_meta = meta.setdefault("timelapse", {})
+        if isinstance(tl_meta, dict):
+            tl_meta["id"] = self.id
+        return self.db.create_scan(scan_id, metadata=meta, current_user=current_user, **kwargs)
+
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.DELETE, check_scan_access=False)
+    def delete_scan(self, scan_id: str, current_user=None, **kwargs) -> bool:
+        """Delete a member scan from this timelapse.
+
+        Parameters
+        ----------
+        scan_id : str
+            The identifier of the scan to delete.
+
+        Returns
+        -------
+        bool
+            True on successful deletion.
+        """
+        if not self.scan_exists(scan_id):
+            raise ScanNotFoundError(self.db, scan_id)
+        return self.db.delete_scan(scan_id, current_user=current_user, **kwargs)
+
+    @get_authentication
+    @use_guest_as_default
+    @requires_permission(Permission.READ, check_scan_access=False)
+    def get_metadata(self, key=None, default={}, current_user=None, **kwargs) -> Any:
+        """Get metadata associated with this timelapse.
+
+        Parameters
+        ----------
+        key : str, optional
+            Specific key to retrieve.
+        default : Any, optional
+            Default value if key is not found.
+
+        Returns
+        -------
+        Any
+            Metadata dictionary or specific value.
+        """
+        with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
+            return _get_metadata(self.metadata, key, default)
+
+    @get_authentication
+    @require_authentication
+    @requires_permission(Permission.WRITE, check_scan_access=False)
+    def set_metadata(self, data, value=None, current_user=None, **kwargs) -> None:
+        """Set metadata for this timelapse.
+
+        Parameters
+        ----------
+        data : str or dict
+            Key or metadata dictionary.
+        value : Any, optional
+            Value if data is a key string.
+        """
+        self._update_metadata(data, value, current_user, _store_timelapse_metadata, cls_name="TimeLapse")
+
+    def store(self) -> None:
+        """Save changes to the timelapse JSON file (timelapse.json)."""
+        _store_timelapse_metadata(self)
+
+    def delete(self, recursive: bool = False, current_user=None, **kwargs) -> bool:
+        """Delete this timelapse container from the database.
+
+        Parameters
+        ----------
+        recursive : bool, optional
+            Whether to delete member scans recursively. Defaults to False.
+
+        Returns
+        -------
+        bool
+            True on successful deletion.
+        """
+        return self.db.delete_timelapse(self.id, recursive=recursive, current_user=current_user, **kwargs)
+
+    def to_dict(self) -> dict:
+        """Serialize timelapse descriptor to dictionary.
+
+        Returns
+        -------
+        dict
+            Dictionary containing timelapse id, created_at, metadata, and scan counts.
+        """
+        member_scans = [
+            s for s in self.db.scans.values()
+            if isinstance(s.metadata, dict) and s.metadata.get("timelapse", {}).get("id") == self.id
+        ]
+        return {
+            "id": self.id,
+            "created_at": self.created_at,
+            "metadata": self.metadata,
+            "counts": {"scans": len(member_scans)},
+        }
+
+    def __getitem__(self, item):
+        """Dict-like access for backward compatibility with dictionary return values."""
+        if item == "id":
+            return self.id
+        elif item == "created_at":
+            return self.created_at
+        elif item == "metadata":
+            return self.metadata
+        elif item == "counts":
+            member_scans = [
+                s for s in self.db.scans.values()
+                if isinstance(s.metadata, dict) and s.metadata.get("timelapse", {}).get("id") == self.id
+            ]
+            return {"scans": len(member_scans)}
+        elif item in self.metadata:
+            return self.metadata[item]
+        raise KeyError(item)
+
+    def __contains__(self, item):
+        return item in ("id", "created_at", "metadata", "counts") or item in self.metadata
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+#: Alias for TimeLapse
+Series = TimeLapse
+
+
 class Scan(db.Scan, MetadataManager):
     """Implement ``Scan`` for the local *File System DataBase* from the abstract class ``db.Scan``.
 
@@ -2104,6 +2590,34 @@ class Scan(db.Scan, MetadataManager):
             _store_scan_metadata(self)
             self.db.reload(self.id)
         return self.metadata.get('owner')
+
+    def get_timelapse(self) -> Optional["TimeLapse"]:
+        """Get the parent `TimeLapse` instance if this scan belongs to one, else `None`.
+
+        Returns
+        -------
+        plantdb.commons.fsdb.core.TimeLapse | None
+            The parent `TimeLapse` instance, or `None` if standalone.
+        """
+        if isinstance(self.metadata, dict):
+            tl_meta = self.metadata.get("timelapse")
+            if isinstance(tl_meta, dict) and tl_meta.get("id"):
+                return self.db.get_timelapse(tl_meta["id"])
+        return None
+
+    @property
+    def timelapse(self) -> Optional["TimeLapse"]:
+        """Property to get parent `TimeLapse` instance if defined, else `None`."""
+        return self.get_timelapse()
+
+    def get_series(self) -> Optional["TimeLapse"]:
+        """Alias for get_timelapse."""
+        return self.get_timelapse()
+
+    @property
+    def series(self) -> Optional["TimeLapse"]:
+        """Alias for timelapse property."""
+        return self.get_timelapse()
 
     def is_locked(self) -> bool:
         """Check if a scan is locked in the system.
