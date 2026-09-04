@@ -164,6 +164,8 @@ from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import TimeLapseExistsError
+from plantdb.commons.fsdb.exceptions import TimeLapseNotFoundError
 from plantdb.commons.fsdb.file_ops import _delete_file
 from plantdb.commons.fsdb.file_ops import _delete_fileset
 from plantdb.commons.fsdb.file_ops import _delete_scan
@@ -192,7 +194,6 @@ from plantdb.commons.fsdb.path_helpers import _timelapse_path
 from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
-from plantdb.commons.fsdb.validation import _is_valid_timelapse_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import iso_date_now
@@ -1050,6 +1051,7 @@ class FSDB(db.DB):
         if self.scan_exists(scan_id):
             raise ScanExistsError(self, scan_id)
 
+        # Try to determine the timelaps ID from the metadata, if any
         tl_id = None
         if metadata and isinstance(metadata, dict):
             tl_meta = metadata.get("timelapse")
@@ -1057,12 +1059,13 @@ class FSDB(db.DB):
                 tl_id = tl_meta.get("id")
 
         if tl_id:
-            if not _is_valid_timelapse_id(tl_id):
+            # Validate the timelapse (ID and JSON file):
+            if not _is_valid_id(tl_id):
                 raise ValueError(f"Invalid timelapse identifier '{tl_id}'!")
             tl_path = _timelapse_path(self, tl_id)
             tl_marker = _timelapse_marker(tl_path)
             if not tl_marker.is_file():
-                raise ScanNotFoundError(self, tl_id)
+                raise TimeLapseNotFoundError(self, tl_id)
         else:
             # Standalone scan: reject collision with timelapse container of same name
             if (self.path() / scan_id / TIMELAPSE_MARKER_FILE_NAME).is_file():
@@ -1101,8 +1104,68 @@ class FSDB(db.DB):
             scan.store()  # store the new scan in the local database
             self.scans[scan_id] = scan  # Update scans dictionary with the new one
 
+            if tl_id:
+                self._register_scan_in_timelapse(tl_id, scan_id, current_user.username)
+
         self.logger.debug(f"Done creating scan.")
         return scan
+
+    def _register_scan_in_timelapse(self, tl_id: str, scan_id: str, owner: str) -> None:
+        """Append ``scan_id`` to the timelapse marker and set/check its owner.
+
+        The marker is a soft redundancy with each scan's ``metadata.timelapse.id``;
+        it is maintained append/remove only, never rebuilt on load.
+        """
+        # Resolve the directory and marker file paths for the timelapse
+        tl_path = _timelapse_path(self, tl_id)
+        marker_path = _timelapse_marker(tl_path)
+        # Abort registration if the timelapse marker file does not exist
+        if not marker_path.is_file():
+            self.logger.warning(f"Timelapse '{tl_id}' marker missing; cannot register scan '{scan_id}'.")
+            return
+        # Read and parse existing timelapse data from JSON marker
+        with marker_path.open("r") as f:
+            tl_data = json.load(f)
+        # Append the scan ID if not already present in the list
+        scans = tl_data.get("scans") or []
+        if scan_id not in scans:
+            scans.append(scan_id)
+        tl_data["scans"] = scans
+        # Update last modified timestamp in the nested metadata dictionary
+        tl_data.setdefault("metadata", {})["last_modified"] = iso_date_now()
+        # Set the timelapse owner on first registration, or warn on ownership mismatch
+        cur_owner = tl_data.get("owner")
+        if cur_owner is None:
+            tl_data["owner"] = owner
+        elif cur_owner != owner:
+            self.logger.warning(
+                f"Timelapse '{tl_id}' is owned by '{cur_owner}' but scan '{scan_id}' was created by '{owner}'; keeping first owner."
+            )
+        # Save updated timelapse metadata back to the marker file
+        with marker_path.open("w") as f:
+            json.dump(tl_data, f, indent=4)
+
+    def _unregister_scan_from_timelapse(self, tl_id: str, scan_id: str) -> None:
+        """Remove ``scan_id`` from the owning timelapse marker's ``scans`` index."""
+        tl_path = _timelapse_path(self, tl_id)  # locate timelapse directory
+        marker_path = _timelapse_marker(tl_path)  # resolve marker file path
+        # Abort if the marker file does not exist
+        if not marker_path.is_file():
+            return
+
+        # Load the existing marker JSON data
+        with marker_path.open("r") as f:
+            tl_data = json.load(f)
+
+        scans = tl_data.get("scans") or []  # fetch scans list, defaulting to empty
+        if scan_id in scans:
+            scans.remove(scan_id)  # remove the specified scan ID
+        tl_data["scans"] = scans  # update the scans list in the data
+        tl_data.setdefault("metadata", {})["last_modified"] = iso_date_now()  # refresh modification timestamp
+
+        # Persist the updated marker JSON back to disk
+        with marker_path.open("w") as f:
+            json.dump(tl_data, f, indent=4)
 
     @require_connected_db
     @get_authentication
@@ -1156,8 +1219,15 @@ class FSDB(db.DB):
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Get the Scan instance from the database
             scan = self.scans[scan_id]
+            tl_id = None
+            if isinstance(scan.metadata, dict):
+                tl_meta = scan.metadata.get("timelapse")
+                if isinstance(tl_meta, dict):
+                    tl_id = tl_meta.get("id")
             _delete_scan(scan)  # delete the scan directory
             self.scans.pop(scan_id)  # remove the scan from the scan list
+            if tl_id:
+                self._unregister_scan_from_timelapse(tl_id, scan_id)
 
         self.logger.debug(f"Done deleting scan.")
         return True
@@ -1251,26 +1321,31 @@ class FSDB(db.DB):
         True
         >>> db.disconnect()
         """
-        if not _is_valid_timelapse_id(tl_id):
+        if not _is_valid_id(tl_id):
             raise ValueError(f"Invalid timelapse identifier '{tl_id}'!")
         if self.scan_exists(tl_id) or (self.path() / tl_id).exists():
-            raise ScanExistsError(self, tl_id)
+            raise TimeLapseExistsError(self, tl_id)
 
         tl_path = _timelapse_path(self, tl_id)
         marker_path = _timelapse_marker(tl_path)
         now = iso_date_now()
+        owner = current_user.username if current_user else "guest"
+        meta = dict(metadata) if metadata else {}
+        meta["last_modified"] = now
 
-        with self.lock_manager.acquire_lock(tl_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
+        with self.lock_manager.acquire_lock(tl_id, LockType.EXCLUSIVE, owner, LockLevel.SCAN):
             tl_path.mkdir(parents=True, exist_ok=True)
             tl_data = {
                 "id": tl_id,
                 "created_at": now,
-                "metadata": metadata or {},
+                "owner": owner,
+                "scans": [],
+                "metadata": meta,
             }
             with marker_path.open("w") as f:
                 json.dump(tl_data, f, indent=4)
 
-        return TimeLapse(self, tl_id, metadata=metadata or {}, created_at=now)
+        return TimeLapse(self, tl_id, metadata=meta, created_at=now, owner=owner, scans=[])
 
     @require_connected_db
     @get_authentication
@@ -1304,14 +1379,15 @@ class FSDB(db.DB):
         tl_path = _timelapse_path(self, tl_id)
         marker_path = _timelapse_marker(tl_path)
         if not marker_path.is_file():
-            raise ScanNotFoundError(self, tl_id)
+            raise TimeLapseNotFoundError(self, tl_id)
 
         username = current_user.username if current_user else "guest"
         with self.lock_manager.acquire_lock(tl_id, LockType.SHARED, username, LockLevel.SCAN):
             with marker_path.open("r") as f:
                 tl_data = json.load(f)
 
-        return TimeLapse(self, tl_id, metadata=tl_data.get("metadata", {}), created_at=tl_data.get("created_at"))
+        return TimeLapse(self, tl_id, metadata=tl_data.get("metadata", {}), created_at=tl_data.get("created_at"),
+                         owner=tl_data.get("owner"), scans=tl_data.get("scans"))
 
     @require_connected_db
     @get_authentication
@@ -1398,7 +1474,7 @@ class FSDB(db.DB):
         """
         tl_path = _timelapse_path(self, tl_id)
         if not _timelapse_marker(tl_path).is_file() and not tl_path.is_dir():
-            raise ScanNotFoundError(self, tl_id)
+            raise TimeLapseNotFoundError(self, tl_id)
 
         with self.lock_manager.acquire_lock(tl_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             _delete_timelapse(self, tl_id, recursive=recursive)
@@ -2271,10 +2347,12 @@ class TimeLapse(db.TimeLapse, MetadataManager):
     >>> db.disconnect()
     """
 
-    def __init__(self, db, tl_id, metadata=None, created_at=None):
+    def __init__(self, db, tl_id, metadata=None, created_at=None, owner=None, scans=None):
         super().__init__(db, tl_id)
         self.metadata = metadata if metadata is not None else {}
         self.created_at = created_at or iso_date_now()
+        self.owner = owner
+        self.scans = list(scans) if scans else []
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
 
@@ -2629,6 +2707,8 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         return {
             "id": self.id,
             "created_at": self.created_at,
+            "owner": self.owner,
+            "scans": list(self.scans),
             "metadata": self.metadata,
             "counts": {"scans": len(member_scans)},
         }
@@ -2641,6 +2721,10 @@ class TimeLapse(db.TimeLapse, MetadataManager):
             return self.created_at
         elif item == "metadata":
             return self.metadata
+        elif item == "owner":
+            return self.owner
+        elif item == "scans":
+            return list(self.scans)
         elif item == "counts":
             member_scans = [
                 s for s in self.db.scans.values()
@@ -2652,7 +2736,7 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         raise KeyError(item)
 
     def __contains__(self, item):
-        return item in ("id", "created_at", "metadata", "counts") or item in self.metadata
+        return item in ("id", "created_at", "owner", "scans", "metadata", "counts") or item in self.metadata
 
     def get(self, key, default=None):
         try:

@@ -236,6 +236,8 @@ def _store_timelapse_metadata(timelapse: TimeLapse) -> None:
     data = {
         "id": timelapse.id,
         "created_at": getattr(timelapse, "created_at", None) or iso_date_now(),
+        "owner": getattr(timelapse, "owner", None),
+        "scans": list(getattr(timelapse, "scans", None) or []),
         "metadata": timelapse.metadata,
     }
     with marker_path.open("w") as f:
