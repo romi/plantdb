@@ -70,6 +70,7 @@ import hashlib
 from pathlib import Path
 from tempfile import gettempdir
 from tempfile import mkdtemp
+from typing import TYPE_CHECKING
 from zipfile import ZipFile
 
 import requests
@@ -78,6 +79,9 @@ from tqdm import tqdm
 from plantdb.commons.auth.session import NoAuthSessionManager
 from plantdb.commons.auth.session import SessionManager
 from plantdb.commons.log import get_logger
+
+if TYPE_CHECKING:
+    from plantdb.commons.fsdb.core import FSDB
 
 DATASET = ["real_plant", "real_plant_analyzed",
            "virtual_plant", "virtual_plant_analyzed",
@@ -108,7 +112,7 @@ TEST_DIR = ROOT / "tests" / "testdata"
 logger = get_logger(__name__)
 
 
-def _tmp_fpath_from_url(url) -> Path:
+def _tmp_fpath_from_url(url: str) -> Path:
     """Generate a temporary file path for a file from a given URL.
 
     Parameters
@@ -145,7 +149,7 @@ def _mkdtemp_romidb() -> Path:
     return Path(mkdtemp(prefix='ROMI_DB_'))
 
 
-def _save_file_from_url(url) -> Path:
+def _save_file_from_url(url: str) -> Path:
     """Save URL to a temporary file.
 
     Parameters
@@ -201,7 +205,7 @@ def _save_file_from_url(url) -> Path:
     return tmp_fname
 
 
-def _test_hash(tmp_fname, hash_value, hash_method="md5"):
+def _test_hash(tmp_fname: Path, hash_value: str, hash_method: str = "md5") -> None:
     """Test the hash value of a downloaded file against a known hash from ZENODO.
 
     Parameters
@@ -239,7 +243,7 @@ def _test_hash(tmp_fname, hash_value, hash_method="md5"):
     return
 
 
-def _get_archive(archive, force=False) -> Path:
+def _get_archive(archive: str, force: bool = False) -> Path:
     """Download and verify an archive file from a given URL.
 
     This function retrieves an archive file from a specified URL.
@@ -270,7 +274,8 @@ def _get_archive(archive, force=False) -> Path:
     return tmp_fname
 
 
-def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
+def _get_extract_archive(archive: str, out_path: str | Path = TEST_DIR,
+                         keep_tmp: bool = False, force: bool = False) -> Path:
     """Download and extract an archive from ZENODO.
 
     Parameters
@@ -307,7 +312,8 @@ def _get_extract_archive(archive, out_path=TEST_DIR, keep_tmp=False, force=False
     return out_path / archive
 
 
-def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
+def get_test_dataset(dataset: str, db_path: str | Path = TEST_DIR,
+                     keep_tmp: bool = False, force: bool = False) -> Path:
     """Download and extract a test dataset from ZENODO.
 
     Parameters
@@ -340,7 +346,8 @@ def get_test_dataset(dataset, db_path=TEST_DIR, keep_tmp=False, force=False) -> 
     return db_path
 
 
-def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
+def get_models_dataset(db_path: str | Path = TEST_DIR,
+                       keep_tmp: bool = False, force: bool = False) -> Path:
     """Download and extract the trained CNN model from ZENODO.
 
     Parameters
@@ -371,7 +378,8 @@ def get_models_dataset(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     return db_path
 
 
-def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
+def get_configs(db_path: str | Path = TEST_DIR,
+                keep_tmp: bool = False, force: bool = False) -> Path:
     """Download and extract the pipeline configurations from ZENODO.
 
     Parameters
@@ -402,7 +410,7 @@ def get_configs(db_path=TEST_DIR, keep_tmp=False, force=False) -> Path:
     return db_path
 
 
-def setup_empty_database(db_path=None) -> Path:
+def setup_empty_database(db_path: str | Path | None = None) -> Path:
     """Sets up an empty ROMI database.
 
     Sets up necessary marker file and ensures the absence of a lock file.
@@ -451,8 +459,9 @@ def setup_empty_database(db_path=None) -> Path:
     return db_path
 
 
-def setup_test_database(dataset, db_path=TEST_DIR,
-                        keep_tmp=True, with_configs=False, with_models=False, force=False) -> Path:
+def setup_test_database(dataset: str | list[str], db_path: str | Path | None = TEST_DIR,
+                        keep_tmp: bool = True, with_configs: bool = False,
+                        with_models: bool = False, force: bool = False) -> Path:
     """Download and extract the test database from ZENODO.
 
     Parameters
@@ -532,12 +541,13 @@ def setup_test_database(dataset, db_path=TEST_DIR,
     return db_path
 
 
-def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
+def test_database(dataset: str | list[str] | None = 'real_plant_analyzed',
+                  db_path: str | Path | None = None, **kwargs) -> "FSDB":
     """Create and return an FSDB test database.
 
     Parameters
     ----------
-    dataset : str or list[str] or None, optional
+    dataset : str or list of str or None, optional
         The (list of) test dataset to use, by default 'real_plant_analyzed'.
         Using "all" allows downloading all defined datasets.
         If ``None``, only set up an empty database.
@@ -597,7 +607,7 @@ def test_database(dataset='real_plant_analyzed', db_path=None, **kwargs):
                     session_manager=session_manager, no_auth=no_auth)
 
 
-def dummy_db(with_scan=False, with_fileset=False, with_file=False):
+def dummy_db(with_scan: bool = False, with_fileset: bool = False, with_file: bool = False) -> "FSDB":
     """Create a dummy temporary database.
 
     Parameters
