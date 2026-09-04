@@ -196,9 +196,9 @@ class DB(object):
 
 
 class TimeLapse(object):
-    """Class defining the timelapse/series object ``TimeLapse`` contained in a ``DB``.
+    """Class defining the timelapse object ``TimeLapse`` contained in a ``DB``.
 
-    Abstract class defining the API used to represent a timelapse or series of scans in the ROMI project.
+    Abstract class defining the API used to represent a timelapse of scans in the ROMI project.
     A timelapse container groups multiple temporal scans under a shared identifier and metadata.
 
     Attributes
@@ -327,10 +327,6 @@ class TimeLapse(object):
         raise NotImplementedError
 
 
-#: Alias for TimeLapse
-Series = TimeLapse
-
-
 class Scan(object):
     """Class defining the scan object ``Scan``.
 
@@ -378,7 +374,7 @@ class Scan(object):
         return self.db
 
     def get_timelapse(self):
-        """Get parent timelapse/series instance if defined, else None.
+        """Get parent timelapse instance if defined, else None.
 
         Returns
         -------
@@ -386,10 +382,6 @@ class Scan(object):
             Parent timelapse instance or None.
         """
         return None
-
-    def get_series(self):
-        """Alias for get_timelapse."""
-        return self.get_timelapse()
 
     def get_filesets(self):
         """Get all sets of files.
