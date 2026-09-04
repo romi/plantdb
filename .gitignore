@@ -118,6 +118,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Local dev plans (private, not committed)
+dev_plan/
+
 # CMake:
 *.cmake
 *.tcl

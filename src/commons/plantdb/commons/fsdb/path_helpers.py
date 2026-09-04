@@ -44,6 +44,8 @@ sensor.csv
 ```
 """
 import pathlib
+from collections.abc import Iterator
+from collections.abc import Sequence
 
 TIMELAPSE_MARKER_FILE_NAME = "timelapse.json"
 
@@ -106,6 +108,77 @@ def _timelapse_marker(tl_path) -> pathlib.Path:
         The path to the timelapse marker JSON file.
     """
     return pathlib.Path(tl_path) / TIMELAPSE_MARKER_FILE_NAME
+
+
+def is_timelapse_container(path: pathlib.Path | str) -> bool:
+    """Return True if *path* is a timelapse container (contains ``timelapse.json``)."""
+    return (pathlib.Path(path) / TIMELAPSE_MARKER_FILE_NAME).is_file()
+
+
+def iter_scan_paths(
+    basedir: pathlib.Path | str,
+    *,
+    extra_dirs: Sequence[str] = (),
+    yield_ids: bool = False,
+) -> Iterator[pathlib.Path] | Iterator[tuple[pathlib.Path, str, str | None]]:
+    """Iterate over scan directories, expanding timelapse containers.
+
+    Walks one level below *basedir*: standalone scans are yielded directly;
+    timelapse containers (directories containing ``timelapse.json``) are
+    expanded and their child scan directories are yielded instead. Hidden
+    directories (names starting with ``.``) and any name in *extra_dirs*
+    are skipped at both levels.
+
+    A directory is a timelapse container iff it contains ``timelapse.json``
+    (see :func:`is_timelapse_container`). The iterator yields candidate scan
+    paths regardless of validity so callers can validate via
+    :func:`plantdb.commons.fsdb.validation._is_scan_dataset` and report
+    ``bad_dir``.
+
+    Parameters
+    ----------
+    basedir : pathlib.Path | str
+        Root of the FSDB (directory containing scan and timelapse dirs).
+    extra_dirs : Sequence[str], optional
+        Directory names to ignore (e.g. ``["configs"]`` for :func:`_is_fsdb`).
+    yield_ids : bool, optional
+        When False (default) yield each scan :class:`pathlib.Path`. When
+        True yield ``(scan_path, scan_id, tl_id)`` where *tl_id* is the
+        parent timelapse id or ``None`` for standalone scans.
+
+    Yields
+    ------
+    pathlib.Path | tuple[pathlib.Path, str, str | None]
+        Scan paths, or triples when *yield_ids* is True.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.path_helpers import iter_scan_paths
+    >>> list(iter_scan_paths("/tmp/ROMI_DB_x"))  # doctest: +SKIP
+    [PosixPath('/tmp/ROMI_DB_x/scan_01'), PosixPath('/tmp/ROMI_DB_x/tl_01/scan_02')]
+    >>> list(iter_scan_paths("/tmp/ROMI_DB_x", yield_ids=True))  # doctest: +SKIP
+    [(PosixPath('/tmp/ROMI_DB_x/scan_01'), 'scan_01', None),
+     (PosixPath('/tmp/ROMI_DB_x/tl_01/scan_02'), 'scan_02', 'tl_01')]
+    """
+    basedir = pathlib.Path(basedir)
+    if not basedir.is_dir():
+        return
+    for entry in basedir.iterdir():
+        if not entry.is_dir() or entry.name.startswith(".") or entry.name in extra_dirs:
+            continue
+        if is_timelapse_container(entry):
+            for child in entry.iterdir():
+                if not child.is_dir() or child.name.startswith(".") or child.name in extra_dirs:
+                    continue
+                if yield_ids:
+                    yield (child, child.name, entry.name)
+                else:
+                    yield child
+        else:
+            if yield_ids:
+                yield (entry, entry.name, None)
+            else:
+                yield entry
 
 
 def _scan_json_file(scan) -> pathlib.Path:

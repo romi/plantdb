@@ -41,6 +41,7 @@ from pathlib import Path
 
 from .path_helpers import _fileset_path
 from .path_helpers import _scan_json_file
+from .path_helpers import iter_scan_paths
 from ..log import get_logger
 
 logger = get_logger(__name__)
@@ -160,21 +161,9 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
         return True  # Still valid as an empty FSDB
 
     bad_dir = []
-    # Check if the scan directories have the required structure
-    for scan_dir in scan_dirs:
-        if scan_dir.name in extra_dirs:
-            continue  # skip the verification for any folder declared as "extra"
-        if (scan_dir / "timelapse.json").is_file():
-            # It is a timelapse container: validate child scan directories
-            child_dirs = [c for c in scan_dir.iterdir() if c.is_dir() and not c.name.startswith('.')]
-            for child_dir in child_dirs:
-                if child_dir.name in extra_dirs:
-                    continue
-                if not _is_scan_dataset(child_dir, validate_json_fileset):
-                    bad_dir.append(str(child_dir))
-        else:
-            if not _is_scan_dataset(scan_dir, validate_json_fileset):
-                bad_dir.append(str(scan_dir))
+    for scan_path in iter_scan_paths(path, extra_dirs=extra_dirs):
+        if not _is_scan_dataset(scan_path, validate_json_fileset):
+            bad_dir.append(str(scan_path))
 
     if len(bad_dir) > 0:
         logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")
