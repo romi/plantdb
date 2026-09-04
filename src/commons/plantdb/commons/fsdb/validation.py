@@ -22,7 +22,7 @@ This module ensures data integrity and safe operations when working with file sy
 >>> from pathlib import Path
 
 >>> # Validate an identifier
->>> result = _is_valid_id("valid-name.123")  # Returns True
+>>> result = _is_valid_id("valid_name-123")  # Returns True
 >>> result = _is_valid_id("invalid/name")    # Returns False
 
 >>> # Check if a path is an FSDB database
@@ -35,6 +35,8 @@ This module ensures data integrity and safe operations when working with file sy
 ```
 """
 
+import re
+
 from pathlib import Path
 
 from .path_helpers import _fileset_path
@@ -44,12 +46,21 @@ from ..log import get_logger
 logger = get_logger(__name__)
 
 
-def _is_valid_id(name):
-    """Checks the validity of a given identifier name based on specified conditions.
+# Identifier naming rules shared by scans, filesets, files and timelapses.
+# Constraints: ASCII only, no dots, first character must be alphanumeric, and a hard length cap.
+MAX_ID_LENGTH = 128
+VALID_ID_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$') # Compiled once at import time
 
-    This function validates whether the provided name is a valid identifier by ensuring it
-    is a string, non-empty, not longer than 255 characters, and contains only allowable
-    characters. It logs errors for invalid input.
+
+def _is_valid_id(name: str) -> bool:
+    """Checks the validity of a given identifier name.
+
+    This function validates whether the provided ``name`` is a valid identifier
+    by ensuring it is a non-empty string of at most ``MAX_ID_LENGTH`` (128)
+    characters, made only of ASCII alphanumeric characters, underscores and
+    dashes, and that it starts with an alphanumeric character. Disallowing a
+    leading separator avoids hidden (dot-prefixed) filesystem entries and keeps
+    the identifier safe to use as a path component.
 
     Parameters
     ----------
@@ -61,22 +72,26 @@ def _is_valid_id(name):
     bool
         ``True`` if the name is valid, otherwise ``False``.
     """
-    import re
     # Check if the name is a string
     if not isinstance(name, str):
         logger.error(f"Given name is not a string: '{name}'")
         return False
 
-    # Check if the string is empty or too long (e.g., limit to 255 characters)
-    if not name or len(name) > 255:
-        logger.error(f"Given name is empty or too long: '{name}'")
+    # Check if the string is empty
+    if not name:
+        logger.error(f"Given name is empty!")
+        return False
+    # Check if the string is too long (hard cap keeps paths short)
+    if len(name) > MAX_ID_LENGTH:
+        logger.error(f"Given name is too long (current={len(name)}; max={MAX_ID_LENGTH}): '{name}'")
         return False
 
-    # Check for invalid characters (disallow slashes, backslashes, etc.)
-    # Here we use a regex to allow alphanumeric, underscores, dashes and dots only
-    if not re.match(r'^[\w\-\.]+$', name):
+    # Single precompiled regex validates, in one pass, both the first character
+    # (must be alphanumeric) and the remaining character set / total length.
+    if not VALID_ID_RE.match(name):
         logger.error(f"Given name contains invalid characters: '{name}'.")
-        logger.info("Only alphanumeric characters, underscores, dashes and dots are allowed.")
+        logger.info("Only ASCII alphanumeric characters, underscores and dashes are allowed, "
+                    "and the name must start with an alphanumeric character.")
         return False
 
     return True
@@ -149,8 +164,17 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     for scan_dir in scan_dirs:
         if scan_dir.name in extra_dirs:
             continue  # skip the verification for any folder declared as "extra"
-        if not _is_scan_dataset(scan_dir, validate_json_fileset):
-            bad_dir.append(str(scan_dir))
+        if (scan_dir / "timelapse.json").is_file():
+            # It is a timelapse container: validate child scan directories
+            child_dirs = [c for c in scan_dir.iterdir() if c.is_dir() and not c.name.startswith('.')]
+            for child_dir in child_dirs:
+                if child_dir.name in extra_dirs:
+                    continue
+                if not _is_scan_dataset(child_dir, validate_json_fileset):
+                    bad_dir.append(str(child_dir))
+        else:
+            if not _is_scan_dataset(scan_dir, validate_json_fileset):
+                bad_dir.append(str(scan_dir))
 
     if len(bad_dir) > 0:
         logger.warning(f"Found {len(bad_dir)} bad scan directories in FSDB database at: {path}")

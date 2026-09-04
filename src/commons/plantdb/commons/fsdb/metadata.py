@@ -65,12 +65,15 @@ if TYPE_CHECKING:
     from .core import File
     from .core import Fileset
     from .core import Scan
+    from .core import TimeLapse
 # ----------------------------------------------------------------------
 
 from .lock import LockType
 from .path_helpers import _file_metadata_path
 from .path_helpers import _fileset_metadata_json_path
 from .path_helpers import _scan_metadata_path
+from .path_helpers import _timelapse_marker
+from .path_helpers import _timelapse_path
 from ..log import get_logger
 from ..utils import iso_date_now
 
@@ -220,6 +223,28 @@ def _store_scan_metadata(scan: Scan) -> None:
     return
 
 
+def _store_timelapse_metadata(timelapse: TimeLapse) -> None:
+    """Save the metadata for a timelapse dataset.
+
+    Parameters
+    ----------
+    timelapse : plantdb.commons.fsdb.core.TimeLapse
+        The timelapse to save the metadata for.
+    """
+    tl_path = _timelapse_path(timelapse.db, timelapse.id)
+    marker_path = _timelapse_marker(tl_path)
+    data = {
+        "id": timelapse.id,
+        "created_at": getattr(timelapse, "created_at", None) or iso_date_now(),
+        "owner": getattr(timelapse, "owner", None),
+        "scans": list(getattr(timelapse, "scans", None) or []),
+        "metadata": timelapse.metadata,
+    }
+    with marker_path.open("w") as f:
+        json.dump(data, f, indent=4)
+    return
+
+
 def _store_fileset_metadata(fileset: Fileset) -> None:
     """Save the metadata for a dataset.
 
@@ -343,6 +368,20 @@ class MetadataManager(object):
             if key in new_metadata:
                 new_metadata.pop(key)
                 self.logger.warning(msg.format(cls=cls_name))
+
+        # For Scan, prevent mutation of timelapse.id once set
+        if cls_name == "Scan" and hasattr(self, "metadata") and isinstance(self.metadata, dict):
+            existing_tl = self.metadata.get("timelapse")
+            if isinstance(existing_tl, dict) and existing_tl.get("id"):
+                existing_tl_id = existing_tl.get("id")
+                if "timelapse" in new_metadata:
+                    if isinstance(new_metadata["timelapse"], dict):
+                        if new_metadata["timelapse"].get("id") != existing_tl_id:
+                            self.logger.warning("Excluding 'timelapse.id' key from Scan metadata update (immutable)!")
+                        new_metadata["timelapse"]["id"] = existing_tl_id
+                    else:
+                        self.logger.warning("Excluding 'timelapse' mutation from Scan metadata update!")
+                        new_metadata.pop("timelapse", None)
         return
 
     def _store_and_timestamp(self, store_func):
@@ -353,6 +392,7 @@ class MetadataManager(object):
 
     def _update_metadata(self, data, value, current_user, store_func, cls_name):
         """High‑level driver used by the concrete classes."""
+        from plantdb.commons.fsdb.core import TimeLapse
         from plantdb.commons.fsdb.core import Scan
         from plantdb.commons.fsdb.core import Fileset
         from plantdb.commons.fsdb.core import File
@@ -362,7 +402,10 @@ class MetadataManager(object):
         if len(new_metadata) == 0:
             return
 
-        if isinstance(self, Scan):
+        if isinstance(self, TimeLapse):
+            obj_id = f"{self.id}"
+            lock_level = LockLevel.SCAN
+        elif isinstance(self, Scan):
             obj_id = f"{self.id}"
             lock_level = LockLevel.SCAN
         elif isinstance(self, Fileset):

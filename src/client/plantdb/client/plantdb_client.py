@@ -603,19 +603,23 @@ class PlantDBClient:
         # Re‑raise a generic RequestException with the extracted message
         raise RequestException(response_data)
 
-    def list_scans(self, query=None, fuzzy=False):
+    def list_scans(self, query=None, fuzzy=False, timelapse_id=None, sort=None):
         """List all scans in the database.
 
         Parameters
         ----------
-        query : str, optional
-            Query string to filter scans
+        query : str or dict, optional
+            Query string or dict to filter scans
         fuzzy : bool, optional
             Whether to use fuzzy matching for the query (default: False)
+        timelapse_id : str, optional
+            Filter scans belonging to this timelapse ID
+        sort : str, optional
+            Sort parameter (e.g. 'timelapse.scheduled')
 
         Returns
         -------
-        dict
+        list
             Server response containing the list of scan IDs
 
         Raises
@@ -645,13 +649,17 @@ class PlantDBClient:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
+        if timelapse_id is not None:
+            params['timelapse_id'] = timelapse_id
+        if sort is not None:
+            params['sort'] = sort
         response = self._request('GET', url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
         return response.json()
 
-    def list_scans_info(self, query=None, fuzzy=False):
+    def list_scans_info(self, query=None, fuzzy=False, timelapse_id=None, sort=None):
         """Retrieve detailed scan information dictionaries from the ScansTable resource.
 
         Parameters
@@ -662,6 +670,10 @@ class PlantDBClient:
             ``{"object": {"species": "Arabidopsis.*"}}``.
         fuzzy : bool, optional
             When ``True`` the server performs fuzzy matching (default ``False``).
+        timelapse_id : str, optional
+            Filter scans belonging to this timelapse ID
+        sort : str, optional
+            Sort parameter (e.g. 'timelapse.scheduled')
 
         Returns
         -------
@@ -699,9 +711,13 @@ class PlantDBClient:
         params = {}
         if query is not None:
             # The API expects a JSON string in the ``filterQuery`` parameter
-            params["filterQuery"] = json.dumps(query)
+            params["filterQuery"] = json.dumps(query) if isinstance(query, dict) else query
         if fuzzy:
             params["fuzzy"] = fuzzy
+        if timelapse_id is not None:
+            params["timelapse_id"] = timelapse_id
+        if sort is not None:
+            params["sort"] = sort
 
         # Perform the request; token refresh is handled automatically
         response = self._request("GET", url, params=params)
@@ -711,6 +727,101 @@ class PlantDBClient:
 
         # Return the parsed JSON payload (list of dicts)
         return response.json()
+
+    def create_timelapse(self, name: str, metadata: dict | None = None) -> dict:
+        """Create a new timelapse container in the database.
+
+        Parameters
+        ----------
+        name : str
+            The identifier of the timelapse to create.
+        metadata : dict, optional
+            A dictionary of metadata to append to the new timelapse.
+
+        Returns
+        -------
+        dict
+            The created timelapse descriptor dictionary.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapses(prefix=self.prefix))
+        payload = {"id": name}
+        if metadata is not None:
+            payload["metadata"] = metadata
+        response = self._request("POST", url, json=payload)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def get_timelapse(self, timelapse_id: str) -> dict:
+        """Retrieve information about a specific timelapse.
+
+        Parameters
+        ----------
+        timelapse_id : str
+            The identifier of the timelapse.
+
+        Returns
+        -------
+        dict
+            The timelapse descriptor dictionary.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapse(timelapse_id, prefix=self.prefix))
+        response = self._request("GET", url)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def list_timelapses(self) -> list[str]:
+        """List all timelapse IDs in the database.
+
+        Returns
+        -------
+        list[str]
+            List of timelapse identifiers.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapses(prefix=self.prefix))
+        response = self._request("GET", url)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def delete_timelapse(self, timelapse_id: str, recursive: bool = False) -> bool:
+        """Delete a timelapse container from the database.
+
+        Parameters
+        ----------
+        timelapse_id : str
+            The identifier of the timelapse to delete.
+        recursive : bool, optional
+            Whether to delete member scans recursively (default: False).
+
+        Returns
+        -------
+        bool
+            True if deletion was successful.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapse(timelapse_id, prefix=self.prefix))
+        params = {"recursive": "true"} if recursive else {"recursive": "false"}
+        response = self._request("DELETE", url, params=params)
+        self._handle_http_errors(response)
+        return True
 
     def create_scan(self, name, metadata=None):
         """Create a new scan in the database.

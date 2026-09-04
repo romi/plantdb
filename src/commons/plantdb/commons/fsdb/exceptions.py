@@ -70,6 +70,20 @@ class ScanExistsError(Exception):
         super().__init__(f"Scan id '{scan_id}' already exists in database '{db.path()}'!")
 
 
+class TimeLapseNotFoundError(Exception):
+    """Could not find the timelapse directory."""
+
+    def __init__(self, db: 'FSDB', tl_id: str) -> None:
+        super().__init__(f"Unknown timelapse id '{tl_id}' in database '{db.path()}'!")
+
+
+class TimeLapseExistsError(Exception):
+    """The timelapse directory already exists."""
+
+    def __init__(self, db: 'FSDB', tl_id: str) -> None:
+        super().__init__(f"Timelapse id '{tl_id}' already exists in database '{db.path()}'!")
+
+
 class FilesetNotFoundError(Exception):
     """Could not find the fileset directory."""
 

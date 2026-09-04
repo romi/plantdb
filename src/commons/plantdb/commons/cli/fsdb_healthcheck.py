@@ -146,12 +146,24 @@ def fix_missing_scans_reference(db: FSDB, scan_dirs: list[Path], logger: Logger)
     """
     # Track scans with structural problems
     bad_dir = []
-    for scan_path in scan_dirs:
-        # Validate scan folder structure (skip JSON fileset validation for now)
-        if not _is_scan_dataset(scan_path, validate_json_fileset=False):
-            bad_dir.append(scan_path)  # mark for possible removal
-        scan_id = scan_path.name
-        _ = _load_scan(db, scan_id, updates_files_json=True)  # load scan; updates files.json if needed
+    total_scans = 0
+    for entry_path in scan_dirs:
+        if (entry_path / "timelapse.json").is_file():
+            # Timelapse container
+            child_dirs = [c for c in entry_path.iterdir() if c.is_dir() and not c.name.startswith('.')]
+            for child_path in child_dirs:
+                total_scans += 1
+                if not _is_scan_dataset(child_path, validate_json_fileset=False):
+                    bad_dir.append(child_path)
+                scan_id = child_path.name
+                _ = _load_scan(db, scan_id, updates_files_json=True)
+        else:
+            total_scans += 1
+            # Validate scan folder structure (skip JSON fileset validation for now)
+            if not _is_scan_dataset(entry_path, validate_json_fileset=False):
+                bad_dir.append(entry_path)  # mark for possible removal
+            scan_id = entry_path.name
+            _ = _load_scan(db, scan_id, updates_files_json=True)  # load scan; updates files.json if needed
 
     if bad_dir:
         n_bad = len(bad_dir)
@@ -193,7 +205,7 @@ def fix_missing_scans_reference(db: FSDB, scan_dirs: list[Path], logger: Logger)
                 send2trash(scan_name)  # move to OS trash
             logger.info("Done.")
     else:
-        logger.info(f"All {len(scan_dirs)} scans are healthy!")
+        logger.info(f"All {total_scans} scans are healthy!")
 
 
 if __name__ == '__main__':

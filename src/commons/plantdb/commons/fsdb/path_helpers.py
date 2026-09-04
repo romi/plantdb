@@ -45,6 +45,8 @@ sensor.csv
 """
 import pathlib
 
+TIMELAPSE_MARKER_FILE_NAME = "timelapse.json"
+
 
 def _scan_path(scan) -> pathlib.Path:
     """Get the path to given scan.
@@ -59,7 +61,51 @@ def _scan_path(scan) -> pathlib.Path:
     pathlib.Path
         The path to the scan directory.
     """
-    return (scan.db.basedir / scan.id).resolve()
+    tl_id = None
+    if hasattr(scan, "metadata") and isinstance(scan.metadata, dict):
+        tl_meta = scan.metadata.get("timelapse")
+        if isinstance(tl_meta, dict):
+            tl_id = tl_meta.get("id")
+
+    basedir = getattr(scan.db, "basedir", scan.db)
+    if tl_id:
+        return (pathlib.Path(basedir) / tl_id / scan.id).resolve()
+    return (pathlib.Path(basedir) / scan.id).resolve()
+
+
+def _timelapse_path(db, tl_id: str) -> pathlib.Path:
+    """Get the path to given timelapse directory.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB or pathlib.Path or str
+        The database instance or basedir path.
+    tl_id : str
+        The identifier of the timelapse.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the timelapse directory.
+    """
+    basedir = getattr(db, "basedir", db)
+    return (pathlib.Path(basedir) / tl_id).resolve()
+
+
+def _timelapse_marker(tl_path) -> pathlib.Path:
+    """Get the path to given timelapse marker file ('timelapse.json').
+
+    Parameters
+    ----------
+    tl_path : str or pathlib.Path
+        The path to the timelapse directory.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the timelapse marker JSON file.
+    """
+    return pathlib.Path(tl_path) / TIMELAPSE_MARKER_FILE_NAME
 
 
 def _scan_json_file(scan) -> pathlib.Path:

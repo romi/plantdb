@@ -50,6 +50,10 @@ classifiers = [
     "Natural Language :: English",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
+
 [project.scripts]
 fsdb_rest_api = "plantdb.server.cli.fsdb_rest_api:main"
 

@@ -10,11 +10,13 @@ import json
 import pytest
 
 from plantdb.commons.fsdb.file_ops import _delete_file
+from plantdb.commons.fsdb.file_ops import _delete_timelapse
 from plantdb.commons.fsdb.file_ops import _load_file
 from plantdb.commons.fsdb.file_ops import _load_fileset
 from plantdb.commons.fsdb.file_ops import _load_fileset_files
 from plantdb.commons.fsdb.file_ops import _load_measures
 from plantdb.commons.fsdb.file_ops import _load_scan
+from plantdb.commons.fsdb.file_ops import _load_scan_at
 from plantdb.commons.fsdb.file_ops import _load_scan_filesets
 from plantdb.commons.fsdb.file_ops import _load_scan_measures
 from plantdb.commons.fsdb.file_ops import _load_scans
@@ -297,4 +299,77 @@ def test_make_scan():
     path = _make_scan(scan)
     assert path.exists()
     assert path.is_dir()
+    db.disconnect()
+
+
+def test_make_scan_nested():
+    """Test making a member scan directory under a timelapse container."""
+    from plantdb.commons.fsdb.core import Scan
+    db = dummy_db()
+    db.connect()
+    scan = Scan(db, "tl_scan_0")
+    scan.metadata = {"timelapse": {"id": "tl_001", "index": 0}}
+
+    path = _make_scan(scan)
+    assert path.exists()
+    assert path.is_dir()
+    assert path == (db.path() / "tl_001" / "tl_scan_0").resolve()
+    assert (db.path() / "tl_001" / "timelapse.json").is_file()
+    db.disconnect()
+
+
+def test_dual_read_scans():
+    """Test loading scans from a DB containing both flat and timelapse scans."""
+    from plantdb.commons.fsdb.core import Scan
+    db = dummy_db()
+    db.connect()
+
+    # Create a flat scan
+    flat_scan = db.create_scan("flat_scan_01")
+    _ = flat_scan.create_fileset("fs1")
+
+    # Create a nested member scan in a timelapse
+    tl_scan = Scan(db, "tl_member_01")
+    tl_scan.metadata = {"timelapse": {"id": "tl_exp", "index": 0}}
+    _make_scan(tl_scan)
+    tl_fs = tl_scan.create_fileset("fs_tl")
+    (tl_scan.path() / "metadata").mkdir(exist_ok=True)
+    (tl_scan.path() / "metadata" / "metadata.json").write_text(json.dumps(tl_scan.metadata))
+
+    loaded_scans = _load_scans(db)
+    assert "flat_scan_01" in loaded_scans
+    assert "tl_member_01" in loaded_scans
+    assert loaded_scans["tl_member_01"].metadata["timelapse"]["id"] == "tl_exp"
+
+    # Test _load_scan single lookup
+    single_scan = _load_scan(db, "tl_member_01")
+    assert single_scan is not None
+    assert single_scan.id == "tl_member_01"
+    assert single_scan.metadata["timelapse"]["id"] == "tl_exp"
+
+    db.disconnect()
+
+
+def test_delete_timelapse():
+    """Test deleting a timelapse container (non-recursive guard and recursive deletion)."""
+    from plantdb.commons.fsdb.core import Scan
+    db = dummy_db()
+    db.connect()
+
+    # Create timelapse and member scan
+    tl_scan = Scan(db, "tl_scan_to_del")
+    tl_scan.metadata = {"timelapse": {"id": "tl_del_test", "index": 0}}
+    _make_scan(tl_scan)
+    (tl_scan.path() / "metadata").mkdir(exist_ok=True)
+    (tl_scan.path() / "metadata" / "metadata.json").write_text(json.dumps(tl_scan.metadata))
+    tl_fs = tl_scan.create_fileset("fs")
+
+    # Deleting non-empty timelapse with recursive=False should raise ValueError
+    with pytest.raises(ValueError):
+        _delete_timelapse(db, "tl_del_test", recursive=False)
+
+    # Deleting with recursive=True should succeed
+    _delete_timelapse(db, "tl_del_test", recursive=True)
+    assert not (db.path() / "tl_del_test").exists()
+
     db.disconnect()

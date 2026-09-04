@@ -13,6 +13,11 @@ from plantdb.commons.fsdb.validation import (
     _fileset_files_exists,
     _is_safe_to_delete,
 )
+from plantdb.commons.fsdb.path_helpers import (
+    _scan_path,
+    _timelapse_path,
+    _timelapse_marker,
+)
 from plantdb.commons.test_database import (
     setup_empty_database,
     dummy_db,
@@ -59,21 +64,19 @@ def db_with_file():
         (123, False),  # non‑string
         (None, False),
         ("", False),  # empty
-        ("a" * 256, False),  # too long
-        ("valid_name-01.test", True),
+        ("a" * 129, False),  # too long (>128)
+        ("valid_name-01", True),
+        ("valid_name-01.test", False),  # dots not allowed
+        ("-invalid_start", False),  # leading separator
+        ("_invalid_start", False),  # leading separator
         ("invalid/name", False),
         ("bad space", False),
-        ("unicodeñ", False),
+        ("unicodeñ", False),  # non‑ASCII rejected
     ],
 )
 def test_is_valid_id_various(input_id, expected, caplog):
-    """Validate identifier strings and ensure logging on failure.
-    Note: Unicode characters are accepted by the current regex implementation,
-    so the expectation for such inputs is adjusted accordingly."""
+    """Validate identifier strings and ensure logging on failure."""
     result = _is_valid_id(input_id)
-    # Adjust expectation for Unicode characters based on implementation behavior
-    if isinstance(input_id, str) and any(ord(ch) > 127 for ch in input_id):
-        expected = True
     assert result is expected
     if not expected:
         # At least one error log should have been emitted
@@ -275,3 +278,47 @@ def test_is_safe_to_delete_root_path(db_with_scan, caplog):
 def test_is_safe_to_delete_valid_subpath(db_with_scan):
     scan = db_with_scan.get_scan("myscan_001")
     assert _is_safe_to_delete(scan.path(), db_with_scan.path()) is True
+
+
+# ---------------------------------------------------------------------------
+# Timelapse validation & path helper tests
+# ---------------------------------------------------------------------------
+
+def test_is_fsdb_with_timelapses(empty_db_path):
+    # Create a timelapse directory with timelapse.json
+    tl_dir = empty_db_path / "tl_001"
+    tl_dir.mkdir()
+    (tl_dir / "timelapse.json").write_text(json.dumps({"id": "tl_001", "created_at": "2026-09-03T12:00:00Z"}))
+
+    # Empty timelapse container is valid in FSDB
+    assert _is_fsdb(empty_db_path) is True
+
+    # Add a valid child scan in timelapse
+    child_scan = tl_dir / "tl_001_0"
+    child_scan.mkdir()
+    (child_scan / "metadata").mkdir()
+    (child_scan / "files.json").write_text(json.dumps({"filesets": []}))
+
+    assert _is_fsdb(empty_db_path) is True
+
+    # Add an invalid child scan in timelapse
+    bad_child_scan = tl_dir / "tl_001_1"
+    bad_child_scan.mkdir()
+    # Missing metadata dir and files.json
+    assert _is_fsdb(empty_db_path) is False
+
+
+def test_path_helpers_timelapse(db_with_scan, tmp_path):
+    # Test _timelapse_path and _timelapse_marker
+    tl_path = _timelapse_path(tmp_path, "tl_test")
+    assert tl_path == (tmp_path / "tl_test").resolve()
+    marker = _timelapse_marker(tl_path)
+    assert marker == (tmp_path / "tl_test" / "timelapse.json").resolve()
+
+    # Test _scan_path without timelapse
+    scan = db_with_scan.get_scan("myscan_001")
+    assert _scan_path(scan) == (db_with_scan.basedir / "myscan_001").resolve()
+
+    # Test _scan_path with timelapse metadata
+    scan.metadata = {"timelapse": {"id": "tl_test", "index": 0}}
+    assert _scan_path(scan) == (db_with_scan.basedir / "tl_test" / "myscan_001").resolve()

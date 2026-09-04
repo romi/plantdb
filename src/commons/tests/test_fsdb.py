@@ -14,6 +14,8 @@ from plantdb.commons.fsdb.exceptions import FilesetExistsError
 from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import TimeLapseExistsError
+from plantdb.commons.fsdb.exceptions import TimeLapseNotFoundError
 from plantdb.commons.testing import DummyDBTestCase
 
 
@@ -552,6 +554,191 @@ class TestFilterQuery(DummyDBTestCase):
         result = _filter_query(scans, query={"biome": "tropic.*"}, fuzzy=True)
         self.assertGreater(len(result), 0)
         self.assertEqual(result[0].id, "myscan_001")
+
+
+class TestFSDBTimelapse(DummyDBTestCase):
+
+    def test_timelapse_crud(self):
+        """Test full timelapse lifecycle: create, get, list, delete."""
+        db = self.get_test_db()
+        tl = db.create_timelapse("tl_crud_01", metadata={"experiment": "growth"})
+        self.assertEqual(tl["id"], "tl_crud_01")
+        self.assertEqual(tl["metadata"]["experiment"], "growth")
+
+        # Get timelapse
+        tl_info = db.get_timelapse("tl_crud_01")
+        self.assertEqual(tl_info["id"], "tl_crud_01")
+        self.assertEqual(tl_info["counts"]["scans"], 0)
+
+        # List timelapses
+        self.assertIn("tl_crud_01", db.list_timelapses())
+
+        # Delete timelapse
+        self.assertTrue(db.delete_timelapse("tl_crud_01"))
+        self.assertNotIn("tl_crud_01", db.list_timelapses())
+        with self.assertRaises(TimeLapseNotFoundError):
+            db.get_timelapse("tl_crud_01")
+
+    def test_create_scan_requires_timelapse(self):
+        """Creating a member scan when the parent timelapse does not exist raises TimeLapseNotFoundError."""
+        db = self.get_test_db()
+        with self.assertRaises(TimeLapseNotFoundError):
+            db.create_scan("scan_missing_tl", metadata={"timelapse": {"id": "nonexistent_tl"}})
+
+    def test_create_timelapse_rejects_scan_collision(self):
+        """Collisions between scan IDs and timelapse IDs are rejected."""
+        db = self.get_test_db()
+        # Create scan first
+        db.create_scan("collision_id")
+        with self.assertRaises(TimeLapseExistsError):
+            db.create_timelapse("collision_id")
+
+        # Create timelapse first
+        db.create_timelapse("tl_unique")
+        with self.assertRaises(ScanExistsError):
+            db.create_scan("tl_unique")
+
+    def test_timelapse_scan_sorting(self):
+        """list_scans with sort='timelapse.scheduled' sorts chronologically and tie-breaks by index."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_sort_exp")
+
+        db.create_scan("scan_mid", metadata={"timelapse": {"id": "tl_sort_exp", "scheduled": "2026-09-03T12:00:00Z", "index": 1}})
+        db.create_scan("scan_early", metadata={"timelapse": {"id": "tl_sort_exp", "scheduled": "2026-09-03T08:00:00Z", "index": 0}})
+        db.create_scan("scan_mid_tie", metadata={"timelapse": {"id": "tl_sort_exp", "scheduled": "2026-09-03T12:00:00Z", "index": 0}})
+
+        sorted_scans = db.list_scans(query={"timelapse": {"id": "tl_sort_exp"}}, sort="timelapse.scheduled", owner_only=False)
+        self.assertEqual(sorted_scans, ["scan_early", "scan_mid_tie", "scan_mid"])
+
+    def test_timelapse_id_immutability(self):
+        """Attempting to mutate timelapse.id after scan creation is ignored."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_immutable")
+        scan = db.create_scan("scan_immut", metadata={"timelapse": {"id": "tl_immutable", "index": 0}})
+
+        scan.set_metadata({"timelapse": {"id": "tl_mutated", "index": 5}})
+        self.assertEqual(scan.get_metadata("timelapse")["id"], "tl_immutable")
+        self.assertEqual(scan.get_metadata("timelapse")["index"], 5)
+
+    def test_timelapse_marker_population(self):
+        """Creating/deleting member scans maintains owner + scans index in the timelapse marker."""
+        db = self.get_test_db()
+        tl = db.create_timelapse("tl_marker")
+        self.assertEqual(tl.owner, "admin")
+        self.assertEqual(tl.scans, [])
+        self.assertEqual(db.get_timelapse("tl_marker").owner, "admin")
+
+        db.create_scan("scan_a", metadata={"timelapse": {"id": "tl_marker", "index": 0}})
+        db.create_scan("scan_b", metadata={"timelapse": {"id": "tl_marker", "index": 1}})
+        tl_info = db.get_timelapse("tl_marker")
+        self.assertEqual(tl_info.scans, ["scan_a", "scan_b"])
+        self.assertEqual(tl_info.to_dict()["scans"], ["scan_a", "scan_b"])
+        self.assertEqual(tl_info.to_dict()["owner"], "admin")
+
+        db.delete_scan("scan_a")
+        self.assertEqual(db.get_timelapse("tl_marker").scans, ["scan_b"])
+
+    def test_standalone_scan_leaves_timelapse_scans_empty(self):
+        """A standalone (non-member) scan does not touch any timelapse marker."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_standalone")
+        db.create_scan("standalone_scan")
+        self.assertEqual(db.get_timelapse("tl_standalone").scans, [])
+
+    def test_timelapse_owner_conflict_keeps_first(self):
+        """Registering a scan by a different owner logs a warning and keeps the first owner."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_owner")
+        with self.assertLogs(db.logger.name, level="WARNING") as cm:
+            db._register_scan_in_timelapse("tl_owner", "scan_other", "otheruser")
+        self.assertTrue(any("keeping first owner" in m for m in cm.output))
+        self.assertEqual(db.get_timelapse("tl_owner").owner, "admin")
+
+    def test_timelapse_class_methods(self):
+        """Test TimeLapse class methods for scan management and metadata."""
+        from plantdb.commons.fsdb.core import TimeLapse
+
+        db = self.get_test_db()
+        tl = db.create_timelapse("tl_class_test", metadata={"author": "alice"})
+        self.assertIsInstance(tl, TimeLapse)
+        self.assertEqual(tl.id, "tl_class_test")
+        self.assertEqual(tl.get_id(), "tl_class_test")
+        self.assertEqual(tl.get_db(), db)
+        self.assertTrue(tl.path().is_dir())
+
+        # Metadata methods
+        self.assertEqual(tl.get_metadata("author"), "alice")
+        tl.set_metadata({"stage": "flowering", "author": "alice"})
+        self.assertEqual(tl.get_metadata("stage"), "flowering")
+
+        # Create member scans via TimeLapse.create_scan
+        scan1 = tl.create_scan("scan_tl_01", metadata={"timelapse": {"scheduled": "2026-09-03T10:00:00Z", "index": 0}})
+        scan2 = tl.create_scan("scan_tl_02", metadata={"timelapse": {"scheduled": "2026-09-03T14:00:00Z", "index": 1}})
+        self.assertEqual(scan1.metadata["timelapse"]["id"], "tl_class_test")
+        self.assertEqual(scan2.metadata["timelapse"]["id"], "tl_class_test")
+
+        # Scan exists
+        self.assertTrue(tl.scan_exists("scan_tl_01"))
+        self.assertTrue(tl.scan_exists("scan_tl_02"))
+        self.assertFalse(tl.scan_exists("nonexistent"))
+
+        # list_scans & list_scan
+        self.assertEqual(tl.list_scans(), ["scan_tl_01", "scan_tl_02"])
+        self.assertEqual(tl.list_scan(), ["scan_tl_01", "scan_tl_02"])
+
+        # get_scans & get_scan
+        scans = tl.get_scans()
+        self.assertEqual(len(scans), 2)
+        self.assertEqual(scans[0].id, "scan_tl_01")
+        self.assertEqual(scans[1].id, "scan_tl_02")
+
+        fetched_scan = tl.get_scan("scan_tl_01")
+        self.assertEqual(fetched_scan.id, "scan_tl_01")
+
+        # Navigation from Scan to TimeLapse
+        self.assertEqual(fetched_scan.get_timelapse().id, "tl_class_test")
+        self.assertEqual(fetched_scan.timelapse.id, "tl_class_test")
+
+        # Standalone scan navigation
+        standalone = db.create_scan("scan_solo")
+        self.assertIsNone(standalone.get_timelapse())
+        self.assertIsNone(standalone.timelapse)
+
+        # get_timelapses on db
+        all_tls = db.get_timelapses()
+        self.assertIn("tl_class_test", [t.id for t in all_tls])
+
+        # Delete member scan via TimeLapse.delete_scan
+        self.assertTrue(tl.delete_scan("scan_tl_02"))
+        self.assertFalse(tl.scan_exists("scan_tl_02"))
+        self.assertEqual(tl.list_scans(), ["scan_tl_01"])
+
+        # Delete timelapse container via TimeLapse.delete
+        self.assertTrue(tl.delete(recursive=True))
+        self.assertFalse(db.timelapse_exists("tl_class_test"))
+
+    def test_timelapse_last_modified(self):
+        """last_modified is set on timelapse creation and updated on member scan create/delete."""
+        db = self.get_test_db()
+        tl = db.create_timelapse("tl_lastmod")
+        created = tl.metadata.get("last_modified")
+        self.assertIsNotNone(created)
+        self.assertEqual(db.get_timelapse("tl_lastmod").metadata.get("last_modified"), created)
+
+        db.create_scan("scan_lm_01", metadata={"timelapse": {"id": "tl_lastmod", "index": 0}})
+        after_create = db.get_timelapse("tl_lastmod").metadata.get("last_modified")
+        self.assertIsNotNone(after_create)
+        self.assertNotEqual(after_create, created)
+
+        db.create_scan("scan_lm_02", metadata={"timelapse": {"id": "tl_lastmod", "index": 1}})
+        after_create2 = db.get_timelapse("tl_lastmod").metadata.get("last_modified")
+        self.assertNotEqual(after_create2, after_create)
+
+        db.delete_scan("scan_lm_01")
+        after_delete = db.get_timelapse("tl_lastmod").metadata.get("last_modified")
+        self.assertIsNotNone(after_delete)
+        self.assertNotEqual(after_delete, after_create2)
+        self.assertEqual(db.get_timelapse("tl_lastmod").scans, ["scan_lm_02"])
 
 
 if __name__ == "__main__":

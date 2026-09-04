@@ -104,6 +104,10 @@ SCANS_INFO = SCANS + "/info"
 SCAN = SCANS + "/{scan_id}"
 SCAN_MD = SCAN + "/metadata"
 SCAN_FILESETS = SCAN + "/filesets"
+# --- Timelapses ---
+TIMELAPSES = "/timelapses"
+TIMELAPSE = TIMELAPSES + "/{timelapse_id}"
+TIMELAPSE_SCANS = TIMELAPSE + "/scans"
 # --- Fileset object ---
 FILESET = "/filesets/{scan_id}/{fileset_id}"
 FILESET_MD = FILESET + "/metadata"
@@ -407,6 +411,92 @@ def scans(**kwargs) -> str:
     '/api/v1/scans'
     """
     return SCANS
+
+
+@api_prefix
+def timelapses(**kwargs) -> str:
+    """Return the URL path to the timelapses' endpoint.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the timelapses' endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.timelapses()
+    '/api/v1/timelapses'
+    """
+    return TIMELAPSES
+
+
+@api_prefix
+def timelapse(timelapse_id: str, **kwargs) -> str:
+    """Return the URL path to the timelapse endpoint.
+
+    Parameters
+    ----------
+    timelapse_id : str
+        The identifier of the timelapse to access.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the timelapse endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.timelapse('tl1')
+    '/api/v1/timelapses/tl1'
+    """
+    timelapse_id = sanitize_name(timelapse_id)
+    return TIMELAPSE.format(timelapse_id=timelapse_id)
+
+
+@api_prefix
+def timelapse_scans(timelapse_id: str, sort: str | None = None, **kwargs) -> str:
+    """Return the URL path to the timelapse member scans endpoint.
+
+    Parameters
+    ----------
+    timelapse_id : str
+        The identifier of the timelapse to access.
+    sort : str, optional
+        Sort parameter, e.g. 'timelapse.scheduled'.
+
+    Other Parameters
+    ----------------
+    prefix : str
+        An optional prefix to prepend to the URL path.
+
+    Returns
+    -------
+    str
+        The URL path to the timelapse member scans endpoint.
+
+    Examples
+    --------
+    >>> from plantdb.commons import api_endpoints
+    >>> api_endpoints.timelapse_scans('tl1')
+    '/api/v1/timelapses/tl1/scans'
+    """
+    timelapse_id = sanitize_name(timelapse_id)
+    raw = TIMELAPSE_SCANS.format(timelapse_id=timelapse_id)
+    if sort:
+        raw = f"{raw}?{parse.urlencode({'sort': sort})}"
+    return raw
 
 
 @api_prefix

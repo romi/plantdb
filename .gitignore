@@ -126,3 +126,10 @@ CMakeFiles/
 
 # JetBrain IDE
 .idea/
+
+# Junie agent working artifacts
+.junie/
+
+# Downloadable test fixtures (large datasets fetched via test_database.py)
+src/commons/tests/testdata/
+!src/commons/tests/testdata/romidb
