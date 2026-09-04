@@ -1239,7 +1239,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import test_database
         >>> db = test_database(no_auth=True)
         >>> db.connect()
-        >>> tl = db.create_timelapse('mytl_001')
+         >>> tl = db.create_timelapse('mytl_001')
         >>> db.list_timelapses()
         ['mytl_001']
         >>> tl.path().exists()
@@ -1293,7 +1293,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import test_database
         >>> db = test_database(no_auth=True)
         >>> db.connect()
-        >>> db.create_timelapse('mytl_001')
+        >>> tl = db.create_timelapse('mytl_001')
         >>> db.list_timelapses()
         ['mytl_001']
         >>> tl = db.get_timelapse('mytl_001')
@@ -1321,8 +1321,19 @@ class FSDB(db.DB):
 
         Returns
         -------
-        list[plantdb.commons.fsdb.core.TimeLapse]
+        list of plantdb.commons.fsdb.core.TimeLapse
             List of TimeLapse instances.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl = db.create_timelapse('mytl_002')
+        >>> [tl.id for tl in db.get_timelapses()]
+        ['mytl_001', 'mytl_002']
+        >>> db.disconnect()
         """
         return [self.get_timelapse(tl_id, current_user=current_user, **kwargs) for tl_id in self.list_timelapses()]
 
@@ -1394,12 +1405,6 @@ class FSDB(db.DB):
 
         return True
 
-    create_series = create_timelapse
-    get_series = get_timelapse
-    list_series = list_timelapses
-    delete_series = delete_timelapse
-    get_series_list = get_timelapses
-
     @require_connected_db
     def timelapse_exists(self, tl_id: str) -> bool:
         """Check if a timelapse exists in the database.
@@ -1413,11 +1418,21 @@ class FSDB(db.DB):
         -------
         bool
             True if the timelapse exists, False otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+         >>> tl = db.create_timelapse('mytl_001')
+        >>> db.timelapse_exists('mytl_001')
+        True
+        >>> db.timelapse_exists('mytl_002')
+        False
+        >>> db.disconnect()
         """
         tl_path = _timelapse_path(self, tl_id)
         return _timelapse_marker(tl_path).is_file()
-
-    series_exists = timelapse_exists
 
     @require_connected_db
     def get_scan_lock_status(self, scan_id: str) -> dict:
@@ -2215,7 +2230,7 @@ class FSDB(db.DB):
 
 
 class TimeLapse(db.TimeLapse, MetadataManager):
-    """Implement ``TimeLapse`` (or ``Series``) for the local *File System DataBase*.
+    """Implement ``TimeLapse`` for the local *File System DataBase*.
 
     Implementation of a timelapse container as a file structure with:
       * directory ``${TimeLapse.db.basedir}/${TimeLapse.id}`` as timelapse root directory;
@@ -2237,6 +2252,23 @@ class TimeLapse(db.TimeLapse, MetadataManager):
     --------
     plantdb.commons.db.TimeLapse
     plantdb.commons.fsdb.core.Scan
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> db = test_database(no_auth=True)
+    >>> db.connect()
+    >>> tl = db.create_timelapse('mytl_001')
+    >>> tl.list_scans()
+    []
+    >>> scan = tl.create_scan('mytl_001_01')
+    >>> tl.list_scans()
+    ['mytl_001_01']
+    >>> scan.timelapse.id
+    'mytl_001'
+    >>> tl.to_dict()['counts']
+    {'scans': 1}
+    >>> db.disconnect()
     """
 
     def __init__(self, db, tl_id, metadata=None, created_at=None):
@@ -2247,7 +2279,18 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         self.logger = self.db.logger
 
     def path(self) -> pathlib.Path:
-        """Get the path to the local timelapse directory."""
+        """Get the path to the local timelapse directory.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.path().name
+        'mytl_001'
+        >>> db.disconnect()
+        """
         return _timelapse_path(self.db, self.id)
 
     def _erase(self) -> None:
@@ -2266,6 +2309,19 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         bool
             True if the scan exists and belongs to this timelapse, False otherwise.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> scan = tl.create_scan('mytl_001_01')
+        >>> tl.scan_exists('mytl_001_01')
+        True
+        >>> tl.scan_exists('unrelated_scan')
+        False
+        >>> db.disconnect()
         """
         if not self.db.scan_exists(scan_id):
             return False
@@ -2290,6 +2346,18 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         list of plantdb.commons.fsdb.core.Scan
             Sorted list of member `Scan` instances.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.create_scan('mytl_001_01')
+        >>> tl.create_scan('mytl_001_02')
+        >>> [scan.id for scan in tl.get_scans()]
+        ['mytl_001_01', 'mytl_001_02']
+        >>> db.disconnect()
         """
         tl_query = {"timelapse": {"id": self.id}}
         if query:
@@ -2312,6 +2380,17 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         plantdb.commons.fsdb.core.Scan
             The retrieved `Scan` instance.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.create_scan('mytl_001_01')
+        >>> tl.get_scan('mytl_001_01').id
+        'mytl_001_01'
+        >>> db.disconnect()
         """
         scan = self.db.get_scan(scan_id, current_user=current_user, **kwargs)
         if isinstance(scan.metadata, dict):
@@ -2335,6 +2414,18 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         list[str]
             List of member scan IDs sorted chronologically.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.create_scan('mytl_001_01')
+        >>> tl.create_scan('mytl_001_02')
+        >>> tl.list_scans()
+        ['mytl_001_01', 'mytl_001_02']
+        >>> db.disconnect()
         """
         tl_query = {"timelapse": {"id": self.id}}
         if query:
@@ -2365,8 +2456,22 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         plantdb.commons.fsdb.core.Scan
             The created `Scan` instance.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> scan = tl.create_scan('mytl_001_01')
+        >>> scan.path().exists()
+        True
+        >>> scan.timelapse.id
+        'mytl_001'
+        >>> db.disconnect()
         """
         meta = copy.deepcopy(metadata) if metadata else {}
+        # Add timelapse ID to the scan metadata
         tl_meta = meta.setdefault("timelapse", {})
         if isinstance(tl_meta, dict):
             tl_meta["id"] = self.id
@@ -2387,6 +2492,19 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         bool
             True on successful deletion.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.create_scan('mytl_001_01')
+        >>> tl.delete_scan('mytl_001_01')
+        True
+        >>> tl.list_scans()
+        []
+        >>> db.disconnect()
         """
         if not self.scan_exists(scan_id):
             raise ScanNotFoundError(self.db, scan_id)
@@ -2409,6 +2527,17 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         Any
             Metadata dictionary or specific value.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.set_metadata('experiment', 'romi')
+        >>> tl.get_metadata('experiment')
+        'romi'
+        >>> db.disconnect()
         """
         with self.db.lock_manager.acquire_lock(self.id, LockType.SHARED, current_user.username, LockLevel.SCAN):
             return _get_metadata(self.metadata, key, default)
@@ -2425,6 +2554,17 @@ class TimeLapse(db.TimeLapse, MetadataManager):
             Key or metadata dictionary.
         value : Any, optional
             Value if data is a key string.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.set_metadata('experiment', 'romi')
+        >>> tl.get_metadata('experiment')
+        'romi'
+        >>> db.disconnect()
         """
         self._update_metadata(data, value, current_user, _store_timelapse_metadata, cls_name="TimeLapse")
 
@@ -2444,6 +2584,20 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         bool
             True on successful deletion.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> db.list_timelapses()
+        ['mytl_001']
+        >>> tl.delete()
+        True
+        >>> db.list_timelapses()
+        []
+        >>> db.disconnect()
         """
         return self.db.delete_timelapse(self.id, recursive=recursive, current_user=current_user, **kwargs)
 
@@ -2454,6 +2608,19 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         -------
         dict
             Dictionary containing timelapse id, created_at, metadata, and scan counts.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> tl.create_scan('mytl_001_01')
+        >>> tl.to_dict()['id']
+        'mytl_001'
+        >>> tl.to_dict()['counts']
+        {'scans': 1}
+        >>> db.disconnect()
         """
         member_scans = [
             s for s in self.db.scans.values()
@@ -2492,10 +2659,6 @@ class TimeLapse(db.TimeLapse, MetadataManager):
             return self[key]
         except KeyError:
             return default
-
-
-#: Alias for TimeLapse
-Series = TimeLapse
 
 
 class Scan(db.Scan, MetadataManager):
@@ -2649,6 +2812,17 @@ class Scan(db.Scan, MetadataManager):
         -------
         plantdb.commons.fsdb.core.TimeLapse | None
             The parent `TimeLapse` instance, or `None` if standalone.
+
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> scan = tl.create_scan('mytl_001_01')
+        >>> scan.get_timelapse().id
+        'mytl_001'
+        >>> db.disconnect()
         """
         if isinstance(self.metadata, dict):
             tl_meta = self.metadata.get("timelapse")
@@ -2658,16 +2832,19 @@ class Scan(db.Scan, MetadataManager):
 
     @property
     def timelapse(self) -> Optional["TimeLapse"]:
-        """Property to get parent `TimeLapse` instance if defined, else `None`."""
-        return self.get_timelapse()
+        """Property to get parent `TimeLapse` instance if defined, else `None`.
 
-    def get_series(self) -> Optional["TimeLapse"]:
-        """Alias for get_timelapse."""
-        return self.get_timelapse()
-
-    @property
-    def series(self) -> Optional["TimeLapse"]:
-        """Alias for timelapse property."""
+        Examples
+        --------
+        >>> from plantdb.commons.test_database import test_database
+        >>> db = test_database(no_auth=True)
+        >>> db.connect()
+        >>> tl = db.create_timelapse('mytl_001')
+        >>> scan = tl.create_scan('mytl_001_01')
+        >>> scan.timelapse.id
+        'mytl_001'
+        >>> db.disconnect()
+        """
         return self.get_timelapse()
 
     def is_locked(self) -> bool:
