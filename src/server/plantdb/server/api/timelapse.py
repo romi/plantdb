@@ -13,8 +13,8 @@ from flask_restful import Resource
 
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
-from plantdb.commons.fsdb.exceptions import ScanExistsError
-from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import TimeLapseExistsError
+from plantdb.commons.fsdb.exceptions import TimeLapseNotFoundError
 from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
@@ -56,7 +56,7 @@ class Timelapses(Resource):
             tl = self.db.create_timelapse(tl_id, metadata=metadata, **kwargs)
             res = tl.to_dict() if hasattr(tl, "to_dict") else tl
             return res, 201
-        except ScanExistsError as e:
+        except TimeLapseExistsError as e:
             return {'error': str(e)}, 409
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -85,7 +85,7 @@ class Timelapse(Resource):
             tl_data = self.db.get_timelapse(timelapse_id, **kwargs)
             res = tl_data.to_dict() if hasattr(tl_data, "to_dict") else tl_data
             return res, 200
-        except ScanNotFoundError as e:
+        except TimeLapseNotFoundError as e:
             return {'error': str(e)}, 404
         except Exception as e:
             return {'error': f'Error getting timelapse: {str(e)}'}, 500
@@ -101,7 +101,7 @@ class Timelapse(Resource):
         try:
             self.db.delete_timelapse(timelapse_id, recursive=recursive, **kwargs)
             return "", 204
-        except ScanNotFoundError as e:
+        except TimeLapseNotFoundError as e:
             return {'error': str(e)}, 404
         except ValueError as e:
             return {'error': str(e)}, 409

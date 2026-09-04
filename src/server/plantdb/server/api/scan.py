@@ -101,6 +101,7 @@ from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
+from plantdb.commons.fsdb.exceptions import TimeLapseNotFoundError
 from plantdb.commons.log import get_logger
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
@@ -551,6 +552,8 @@ class Scan(Resource):
             return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanExistsError as e:
             return {'error': str(e)}, 409  # HTTP 409 Conflict
+        except TimeLapseNotFoundError as e:
+            return {'error': str(e)}, 404  # HTTP 404 Not Found (missing timelapse)
         except Exception as e:
             # Handle all other exceptions including duplicate scans
             self.logger.error(f"Error creating scan {scan_id}: {str(e)}")

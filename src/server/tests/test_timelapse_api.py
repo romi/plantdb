@@ -84,10 +84,13 @@ class TimelapseApiTests(unittest.TestCase):
                            headers=headers)
         self.assertEqual(r0.status_code, 201)
 
-        # Check counts updated
+        # Check counts updated and marker metadata (owner + scans index)
         r = requests.get(self.base_url + api_endpoints.timelapse("tl_api_01"), headers=headers)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()["counts"]["scans"], 2)
+        body = r.json()
+        self.assertEqual(body["counts"]["scans"], 2)
+        self.assertEqual(body["owner"], "admin")
+        self.assertEqual(body["scans"], ["tl_api_01_1", "tl_api_01_0"])
 
         # 5. GET /timelapses/tl_api_01/scans
         r = requests.get(self.base_url + api_endpoints.timelapse_scans("tl_api_01"), headers=headers)
