@@ -3,12 +3,10 @@
 
 import json
 import subprocess
+import tempfile
 import unittest
-from pathlib import Path
 
 from plantdb.commons.testing import DummyDBTestCase
-
-TESTS_ROOT = Path(__file__).parent  # path to the 'plantdb/tests/' directory
 
 
 class TestFSDBDummy(DummyDBTestCase):
@@ -29,13 +27,22 @@ class TestFSDBDummy(DummyDBTestCase):
         - Ensuring that the fileset and a test file exist after import
         - Confirming that metadata associated with the imported files matches the original data
         """
+        # Use the shared dummy dataset (from `plantdb.commons.test_database`) as the import source
+        src_fs = self.get_test_fileset()
+        copy_path = src_fs.path()
+        # Reuse the source fileset metadata as the metadata to import
+        md = {k: v for k, v in src_fs.metadata.items()
+              if k not in ('owner', 'created', 'created_by', 'last_modified')}
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as f:
+            json.dump(md, f)
+            md_path = f.name
+
         db = self.get_test_db()
         db._is_dummy = False  # to avoid clean up by 'disconnect' method
         db.disconnect()
-        copy_path = TESTS_ROOT / "testdata" / "testscan" / "testfileset"
-        cmd = ["fsdb_import_images", str(db.path()), copy_path,
+        cmd = ["fsdb_import_images", str(db.path()), str(copy_path),
                               "--name", "test_import_img",
-                              "--metadata", TESTS_ROOT / "testdata" / "testscan" / "files.json",
+                              "--metadata", md_path,
                               "--no-auth"]
         print("Calling: " + ' '.join(map(str, cmd)))
         out = subprocess.run(cmd, capture_output=True)
@@ -56,16 +63,14 @@ class TestFSDBDummy(DummyDBTestCase):
         fs = scan.get_fileset('images')
         self.assertIsNotNone(fs)
         self.assertTrue(fs.path().is_dir())
-        # Test 'image.png' file exist and its path exists:
-        f = fs.get_file('image')
+        # Test 'test_image.png' file exist and its path exists:
+        f = fs.get_file('test_image')
         self.assertIsNotNone(f)
         self.assertTrue(f.path().is_file())
         # Test metadata exists
         self.assertIsNotNone(fs.metadata)
-        # Compare to original JSON
-        with open(scan.path() / "metadata" / "images.json") as json_f:
-            md_json = json.load(json_f)
-        self.assertDictEqual(fs.metadata, md_json)
+        # Compare to the imported metadata
+        self.assertTrue(md.items() <= fs.metadata.items())
 
         db._is_dummy = True
         db.disconnect()
