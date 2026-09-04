@@ -50,6 +50,7 @@ from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 from plantdb.commons.fsdb.file_ops import _load_scan
+from plantdb.commons.fsdb.path_helpers import iter_scan_paths
 from plantdb.commons.fsdb.validation import _is_scan_dataset
 from plantdb.commons.utils import yes_no_abort_choice
 
@@ -88,47 +89,46 @@ def main(db_path, fix, fix_missing, fix_extra, log_level):
         logger.error(f"The given path does not contain the required marker file '{MARKER_FILE_NAME}'.")
         raise NotAnFSDBError(f"The given path does not refer to a valid FSDB.")
 
-    # Gather scan directories (ignore hidden folders)
-    scan_dirs = [f for f in db_path.iterdir() if f.is_dir() and not f.name.startswith('.')]
+    # Instantiate FSDB object without authentication
+    db = FSDB(db_path, no_auth=True)
+    # do NOT use the `connect()` method
+
     # Empty FSDB handling
-    if not scan_dirs:
-        logger.warning(f"The FSDB at '{db_path}' is empty.")
-        exit(0)  # Still valid as an empty FSDB
+    if not any(iter_scan_paths(db_path)):
+        # also consider hidden/extra check via iter helper; empty if no scans
+        if not [f for f in db_path.iterdir() if f.is_dir() and not f.name.startswith('.')]:
+            logger.warning(f"The FSDB at '{db_path}' is empty.")
+            exit(0)  # Still valid as an empty FSDB
 
     # If --fix flag is set, enable missing‑reference fixing (extra fixing not yet implemented)
     if fix:
         fix_missing = True
         # fix_extra = True  # TODO: write the method first!
 
-    # Instantiate FSDB object without authentication
-    db = FSDB(db_path, no_auth=True)
-    # do NOT use the `connect()` method
-
     if fix_missing:
         logger.info("Removing missing reference from each scan's 'files.json'...")
-        fix_missing_scans_reference(db, scan_dirs, logger)
+        fix_missing_scans_reference(db, logger)
 
     if fix_extra:
         # logger.info("Importing new fileset references to 'files.json'...")
         raise NotImplementedError
 
 
-def fix_missing_scans_reference(db: FSDB, scan_dirs: list[Path], logger: Logger):
+def fix_missing_scans_reference(db: FSDB, logger: Logger):
     """Identify and optionally remove scans with structural problems.
 
-    The function walks through each directory in ``scan_dirs`` and validates the expected FSDB scan layout.
-    Scans that fail the structural check are collected and presented to the user for confirmation before
-    being moved to the operating system’s trash bin.
+    The function walks through each scan in the DB (expanding timelapse
+    containers) and validates the expected FSDB scan layout. Scans that
+    fail the structural check are collected and presented to the user for
+    confirmation before being moved to the operating system’s trash bin.
 
     Parameters
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        An already‑initialized ``FSDB`` object representing the target file‑system database.
-        Authentication is not required for this operation.
-    scan_dirs : list[Path]
-        A list path, each pointing to a scan directory inside the FSDB.
+        An already‑initialized ``FSDB`` object representing the target
+        file‑system database. Authentication is not required.
     logger : Logger
-        A ``Logger`` instance used for informational and warning messages throughout the process.
+        A ``Logger`` instance used for informational and warning messages.
 
     Notes
     -----
@@ -144,26 +144,13 @@ def fix_missing_scans_reference(db: FSDB, scan_dirs: list[Path], logger: Logger)
     plantdb.commons.fsdb.file_ops._load_scan
     send2trash.send2trash
     """
-    # Track scans with structural problems
     bad_dir = []
     total_scans = 0
-    for entry_path in scan_dirs:
-        if (entry_path / "timelapse.json").is_file():
-            # Timelapse container
-            child_dirs = [c for c in entry_path.iterdir() if c.is_dir() and not c.name.startswith('.')]
-            for child_path in child_dirs:
-                total_scans += 1
-                if not _is_scan_dataset(child_path, validate_json_fileset=False):
-                    bad_dir.append(child_path)
-                scan_id = child_path.name
-                _ = _load_scan(db, scan_id, updates_files_json=True)
-        else:
-            total_scans += 1
-            # Validate scan folder structure (skip JSON fileset validation for now)
-            if not _is_scan_dataset(entry_path, validate_json_fileset=False):
-                bad_dir.append(entry_path)  # mark for possible removal
-            scan_id = entry_path.name
-            _ = _load_scan(db, scan_id, updates_files_json=True)  # load scan; updates files.json if needed
+    for scan_path in iter_scan_paths(db.path()):
+        total_scans += 1
+        if not _is_scan_dataset(scan_path, validate_json_fileset=False):
+            bad_dir.append(scan_path)
+        _ = _load_scan(db, scan_path.name, updates_files_json=True)
 
     if bad_dir:
         n_bad = len(bad_dir)

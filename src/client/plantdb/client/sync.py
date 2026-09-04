@@ -162,6 +162,8 @@ from plantdb.client.rest_api.requests import request_archive_download
 from plantdb.client.rest_api.requests import request_archive_upload
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import is_timelapse_container
+from plantdb.commons.fsdb.path_helpers import iter_scan_paths
 from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.utils import iso_date_now
 
@@ -174,7 +176,7 @@ def _resolve_local_scan_path(base_path: Path, scan_id: str) -> Path:
         return flat
     if base_path.is_dir():
         for d in base_path.iterdir():
-            if d.is_dir() and not d.name.startswith('.') and (d / "timelapse.json").is_file():
+            if d.is_dir() and not d.name.startswith('.') and is_timelapse_container(d):
                 nested = d / scan_id
                 if nested.is_dir():
                     return nested
@@ -186,7 +188,7 @@ def _resolve_dest_scan_path(dst_path: Path, src_scan_path: Path, scan_id: str) -
     dst_path = Path(dst_path)
     src_scan_path = Path(src_scan_path)
     parent = src_scan_path.parent
-    if (parent / "timelapse.json").is_file():
+    if is_timelapse_container(parent):
         tl_id = parent.name
         dst_tl_path = dst_path / tl_id
         dst_tl_path.mkdir(parents=True, exist_ok=True)
@@ -892,17 +894,7 @@ class FSDBSync():
         db_path = Path(db_path)
         if not db_path.exists():
             return []
-        scans = []
-        for d in db_path.iterdir():
-            if not d.is_dir() or d.name.startswith('.'):
-                continue
-            if (d / "timelapse.json").is_file():
-                for c in d.iterdir():
-                    if c.is_dir() and not c.name.startswith('.'):
-                        scans.append(c.name)
-            else:
-                scans.append(d.name)
-        return scans
+        return [p.name for p in iter_scan_paths(db_path)]
 
     def _list_http_scans(self, base_url):
         """List scans available via HTTP REST API."""

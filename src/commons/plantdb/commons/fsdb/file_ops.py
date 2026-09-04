@@ -59,6 +59,8 @@ from .path_helpers import _scan_measures_path
 from .path_helpers import _scan_path
 from .path_helpers import _timelapse_marker
 from .path_helpers import _timelapse_path
+from .path_helpers import is_timelapse_container
+from .path_helpers import iter_scan_paths
 from .serialization import _parse_file
 from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
@@ -137,33 +139,16 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     [('007', '007'), ('111', '111')]
     >>> db.disconnect()
     """
-    # List all subdirectories of the database path:
-    dir_names = [dir_name for dir_name in db.path().iterdir() if dir_name.is_dir() and not dir_name.name.startswith('.')]
-    # Return empty list if no directory found:
-    if len(dir_names) == 0:
-        return {}
-
-    # Loop through the directories and load them as scan if they meet the criteria
     scans = {}
     bad_scans = set()
-    for dir_name in tqdm(dir_names, unit="scan"):
-        if (dir_name / "timelapse.json").is_file():
-            # Timelapse container directory: discover member scans
-            child_dirs = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
-            for child in child_dirs:
-                scan_name = child.name
-                scan = _load_scan_at(db, child, scan_name, updates_files_json)
-                if scan is not None:
-                    scans[scan_name] = scan
-                else:
-                    bad_scans.add(f"{dir_name.name}/{scan_name}")
+    for scan_path, scan_name, tl_id in tqdm(
+        list(iter_scan_paths(db.path(), yield_ids=True)), unit="scan"
+    ):
+        scan = _load_scan_at(db, scan_path, scan_name, updates_files_json)
+        if scan is not None:
+            scans[scan_name] = scan
         else:
-            scan_name = dir_name.name
-            scan = _load_scan_at(db, dir_name, scan_name, updates_files_json)
-            if scan is not None:
-                scans[scan_name] = scan
-            else:
-                bad_scans.add(scan_name)
+            bad_scans.add(f"{tl_id}/{scan_name}" if tl_id else scan_name)
 
     if bad_scans:
         n_bad = len(bad_scans)
@@ -279,7 +264,7 @@ def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'S
     # Search in timelapse containers
     if hasattr(db, "path") and db.path().is_dir():
         for d in db.path().iterdir():
-            if d.is_dir() and not d.name.startswith('.') and (d / "timelapse.json").is_file():
+            if d.is_dir() and not d.name.startswith('.') and is_timelapse_container(d):
                 nested_path = d / scan_id
                 if nested_path.is_dir():
                     return _load_scan_at(db, nested_path, scan_id, updates_files_json)
