@@ -768,7 +768,7 @@ class FSDB(db.DB):
         """
         return copy.deepcopy(self.basedir)
 
-    def connect(self) -> bool:
+    def connect(self) -> None:
         """Connect the database by loading the scans' dataset."""
         if not _is_fsdb(self.basedir, extra_dirs=self.extra_dirs):
             raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
@@ -780,8 +780,6 @@ class FSDB(db.DB):
         except Exception as e:
             self.logger.error(f"Failed to connect to database: {e}")
             raise
-
-        return True
 
     @require_connected_db
     def disconnect(self) -> None:
