@@ -7,7 +7,6 @@ import pytest
 
 from plantdb.commons.fsdb.validation import (
     _is_valid_id,
-    _is_valid_timelapse_id,
     _is_fsdb,
     _is_scan_dataset,
     _is_valid_fileset,
@@ -65,21 +64,19 @@ def db_with_file():
         (123, False),  # non‑string
         (None, False),
         ("", False),  # empty
-        ("a" * 256, False),  # too long
-        ("valid_name-01.test", True),
+        ("a" * 129, False),  # too long (>128)
+        ("valid_name-01", True),
+        ("valid_name-01.test", False),  # dots not allowed
+        ("-invalid_start", False),  # leading separator
+        ("_invalid_start", False),  # leading separator
         ("invalid/name", False),
         ("bad space", False),
-        ("unicodeñ", False),
+        ("unicodeñ", False),  # non‑ASCII rejected
     ],
 )
 def test_is_valid_id_various(input_id, expected, caplog):
-    """Validate identifier strings and ensure logging on failure.
-    Note: Unicode characters are accepted by the current regex implementation,
-    so the expectation for such inputs is adjusted accordingly."""
+    """Validate identifier strings and ensure logging on failure."""
     result = _is_valid_id(input_id)
-    # Adjust expectation for Unicode characters based on implementation behavior
-    if isinstance(input_id, str) and any(ord(ch) > 127 for ch in input_id):
-        expected = True
     assert result is expected
     if not expected:
         # At least one error log should have been emitted
@@ -286,27 +283,6 @@ def test_is_safe_to_delete_valid_subpath(db_with_scan):
 # ---------------------------------------------------------------------------
 # Timelapse validation & path helper tests
 # ---------------------------------------------------------------------------
-
-@pytest.mark.parametrize(
-    "input_id, expected",
-    [
-        (123, False),
-        (None, False),
-        ("", False),
-        ("-invalid_start", False),
-        ("_invalid_start", False),
-        ("a" * 129, False),
-        ("valid_tl_01", True),
-        ("TL-experiment-2026", True),
-        ("001_scan_tl", True),
-    ],
-)
-def test_is_valid_timelapse_id(input_id, expected, caplog):
-    result = _is_valid_timelapse_id(input_id)
-    assert result is expected
-    if not expected:
-        assert any(record.levelname == "ERROR" for record in caplog.records)
-
 
 def test_is_fsdb_with_timelapses(empty_db_path):
     # Create a timelapse directory with timelapse.json
