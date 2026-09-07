@@ -21,6 +21,8 @@ from typing import Any
 
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+from plantdb.commons.cli.fsdb_migrate_metadata import migrate_metadata
+from plantdb.commons.cli.fsdb_migrate_metadata import migrate_scan_metadata
 
 from plantdb.client.metadata_app.field_spec import flatten
 
@@ -149,7 +151,27 @@ def apply_bulk(db_path: Path, scan_ids: list[str], path: str, value: Any,
     return modified
 
 
+def scan_needs_migration(scan_dir: Path) -> bool:
+    """Return True if a scan's metadata still holds a legacy ``object`` block."""
+    return migrate_metadata(read_scan_metadata(scan_dir))[1]
+
+
+def migratable_scans(db_path: Path) -> list[str]:
+    """Return the ids of scans that still use the legacy (pre-MIAPPE) schema."""
+    return [sid for sid in _scan_ids(db_path)
+            if scan_needs_migration(get_scan_dir(db_path, sid))]
+
+
+def migrate_scans(db_path: Path, scan_ids: list[str]) -> int:
+    """Migrate the given scans to the MIAPPE-aligned schema.
+
+    Returns the number of scans that were actually migrated.
+    """
+    return sum(migrate_scan_metadata(get_scan_dir(db_path, sid)) for sid in scan_ids)
+
+
 __all__ = [
     "get_scan_dir", "load_db", "read_scan_metadata", "write_scan_metadata",
     "update_biological", "get_field", "set_field", "apply_bulk",
+    "scan_needs_migration", "migratable_scans", "migrate_scans",
 ]

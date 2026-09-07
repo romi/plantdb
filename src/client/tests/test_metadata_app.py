@@ -139,6 +139,27 @@ class TestDbOps(unittest.TestCase):
         with self.assertRaises(NotAnFSDBError):
             db_ops.load_db(tmp)
 
+    def test_detect_and_run_migration(self):
+        """Legacy (object-block) scans are flagged and migrated to the MIAPPE tree."""
+        tmp = _mk_db({
+            "legacy_a": {"Metadata": {"object": {"species": "Arabidopsis thaliana",
+                                                 "experiment_id": "exp1"}}},
+            "legacy_b": {"object": {"species": "Solanum lycopersicum"}},
+            "new_c": {"biologicalMaterial": {"organism": {"species": "Zea mays"}}},
+        })
+
+        self.assertEqual(db_ops.migratable_scans(tmp), ["legacy_a", "legacy_b"])
+
+        done = db_ops.migrate_scans(tmp, ["legacy_a", "legacy_b"])
+        self.assertEqual(done, 2)
+        self.assertEqual(db_ops.migratable_scans(tmp), [])
+
+        saved = db_ops.read_scan_metadata(db_ops.get_scan_dir(tmp, "legacy_a"))
+        self.assertEqual(saved["biologicalMaterial"]["organism"]["species"], "Arabidopsis thaliana")
+        self.assertEqual(saved["study"]["identifier"], "exp1")
+        self.assertNotIn("object", saved)
+        self.assertNotIn("Metadata", saved)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -45,6 +45,8 @@ os.environ.setdefault('ROMI_APP_LOGGER', 'metadata_gui')
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 
+from plantdb.commons.fsdb.exceptions import NotAnFSDBError
+
 from plantdb.client.metadata_app import db_ops
 from plantdb.client.metadata_app.field_spec import FIELD_SPECS
 from plantdb.client.metadata_app.field_spec import FIELD_BY_PATH
@@ -86,6 +88,9 @@ def scan_checklist(scan_ids):
 FIELD_OPTIONS = [{"label": spec["path"], "value": spec["path"]} for spec in FIELD_SPECS]
 FIELD_STATES = [State(_field_input_id(spec["path"]), "value") for spec in FIELD_SPECS]
 
+#: DB path store.
+#: ``main()`` pre-fills the store from ``--db-path`` so the database is loaded automatically on startup.
+DB_PATH_STORE = dcc.Store(id="db-path-store", data=None)
 
 def _filtered_scans(scan_ids, scans, regexp, fpath, fvalue):
     """Return scan ids matching the regexp AND the metadata filter."""
@@ -133,7 +138,8 @@ app.layout = dbc.Container([
                     ])
                 ], width=12)
             ]),
-            html.Div(id="db-status", className="mt-2")
+            html.Div(id="db-status", className="mt-2"),
+            html.Div(id="migration-status", className="mt-2"),
         ])
     ], className="mb-4"),
 
@@ -193,6 +199,8 @@ app.layout = dbc.Container([
     ]),
 
     dcc.Store(id="scans-store", data={}, storage_type="session"),
+    DB_PATH_STORE,
+
 ], id="metadata-app", fluid=True)
 
 
@@ -200,35 +208,101 @@ app.layout = dbc.Container([
 # Callbacks
 # ----------------------------------------------------------------------
 @callback(
+    Output("db-path-store", "data"),
+    Input("load-btn", "n_clicks"),
+    State("db-path", "value"),
+    prevent_initial_call=True
+)
+def set_db_path_from_button(n_clicks, db_path):
+    """Write the entered path into the store, which triggers loading."""
+    if n_clicks and db_path:
+        return db_path
+    return None
+
+@callback(
+    Output("db-path", "value"),
+    Input("db-path-store", "data"),
+    prevent_initial_call=False
+)
+def set_db_path_value(db_path):
+    """Update the text input value from the store."""
+    return db_path or ""
+
+@callback(
     [Output("scans-store", "data"),
      Output("scan-checklist", "options"),
      Output("scan-checklist", "value"),
      Output("scan-select", "options"),
      Output("meta-filter-path", "options"),
-     Output("db-status", "children")],
-    Input("load-btn", "n_clicks"),
-    State("db-path", "value"),
-    prevent_initial_call=True
+     Output("db-status", "children"),
+     Output("migration-status", "children")],
+    Input("db-path-store", "data"),
+    prevent_initial_call=False
 )
-def load_database(n_clicks, db_path):
-    if not n_clicks or not db_path:
-        return {}, [], [], [], [], ""
+def load_database(db_path):
+    if not db_path:
+        return {}, [], [], [], [], "", ""
     db_path = Path(db_path).expanduser().resolve()
     if not db_path.is_dir():
-        return {}, [], [], [], [], dbc.Alert(f"Path does not exist: {db_path}", color="danger")
+        return {}, [], [], [], [], dbc.Alert(f"Path does not exist: `{db_path}`", color="danger"), ""
     try:
         scan_ids, scans = db_ops.load_db(db_path)
         data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
         opts = scan_checklist(scan_ids)
         n = len(scan_ids)
+        ok_alert = dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
+                              f"Loaded {n} scan(s) from `{db_path}`"], color="success")
+        migratable = db_ops.migratable_scans(db_path)
+        if migratable:
+            mig_alert = dbc.Alert([
+                html.I(className="bi bi-exclamation-triangle-fill me-2"),
+                html.Strong(f"{len(migratable)} scan(s) use the legacy (pre-MIAPPE) schema and need migration:"),
+                html.Ul([html.Li(s) for s in migratable[:20]] +
+                        ([html.Li(f"... and {len(migratable) - 20} more")] if len(migratable) > 20 else [])),
+                html.Small("Edit is disabled for legacy scans until migrated."),
+                html.Div(dbc.Button([html.I(className="bi bi-arrow-repeat me-1"), "Migrate now"],
+                                    id="migrate-btn", color="warning", n_clicks=0), className="mt-2"),
+            ], color="warning")
+        else:
+            mig_alert = ""
         return (data, opts, scan_ids,
                 [{"label": s, "value": s} for s in scan_ids],
-                FIELD_OPTIONS,
-                dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
-                           f"Loaded {n} scan(s) from {db_path}"], color="success"))
-    except Exception as e:
+                FIELD_OPTIONS, ok_alert, mig_alert)
+    except NotAnFSDBError as e:
         return ({}, [], [], [], [],
-                dbc.Alert([html.I(className="bi bi-x-octagon-fill me-2"), f"Load failed: {e}"], color="danger"))
+                dbc.Alert([html.I(className="bi bi-exclamation-triangle-fill me-2"), str(e)],
+                          color="danger"), "")
+    except Exception as e:
+        return ({}, [], [], [], [], "",
+                dbc.Alert([html.I(className="bi bi-x-octagon-fill me-2"), f"Load failed: {e}"],
+                          color="danger"))
+
+
+@callback(
+    [Output("migration-status", "children", allow_duplicate=True),
+     Output("scans-store", "data", allow_duplicate=True),
+     Output("scan-checklist", "options", allow_duplicate=True),
+     Output("scan-checklist", "value", allow_duplicate=True),
+     Output("scan-select", "options", allow_duplicate=True)],
+    Input("migrate-btn", "n_clicks"),
+    State("scans-store", "data"),
+    prevent_initial_call=True
+)
+def do_migrate(n_clicks, data):
+    if not n_clicks or not data:
+        return "", data, [], [], []
+    db_path = Path(data["db_path"])
+    try:
+        migratable = db_ops.migratable_scans(db_path)
+        done = db_ops.migrate_scans(db_path, migratable)
+        scan_ids, scans = db_ops.load_db(db_path)
+        new_data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
+        msg = dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
+                         f"Migrated {done} scan(s) to the MIAPPE schema."], color="success")
+        return msg, new_data, scan_checklist(scan_ids), scan_ids, [{"label": s, "value": s} for s in scan_ids]
+    except Exception as e:
+        return (dbc.Alert([html.I(className="bi bi-x-octagon-fill me-2"), f"Migration failed: {e}"],
+                          color="danger"), data, [], [], [])
 
 
 @callback(
@@ -389,6 +463,10 @@ def main(db_path, port, debug):
     """MIAPPE metadata editor - Dash UI for editing scan metadata of a local PlantDB."""
     logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
     logger.setLevel(DEFAULT_LOG_LEVEL)
+
+    if db_path:
+        DB_PATH_STORE.data = db_path
+
     app.run(host="0.0.0.0", port=port, debug=debug)
 
 
