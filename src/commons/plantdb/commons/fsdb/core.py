@@ -773,7 +773,7 @@ class FSDB(db.DB):
     def connect(self) -> None:
         """Connect the database by loading the scans' dataset."""
         if not _is_fsdb(self.basedir, extra_dirs=self.extra_dirs):
-            raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
+            raise NotAnFSDBError(f"Directory `{self.basedir}` is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery
             self.scans = _load_scans(self)

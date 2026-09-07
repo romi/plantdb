@@ -8,10 +8,9 @@ Small FSDB helpers used by the metadata editor: load the flattened MIAPPE
 metadata of every scan, and write updated metadata back to ``metadata.json``
 with a ``.bak`` backup and schema validation.
 
-A database root may be either a formal PlantDB (FSDB, i.e. a directory
-containing a ``romidb`` marker file) or a loose directory whose sub-directories
-are scan directories (each containing ``metadata/metadata.json``). Both are
-handled here.
+A database root must be a formal PlantDB (FSDB, i.e. a directory containing a
+``romidb`` marker file). A loose directory that is not a proper ROMI DB is
+rejected.
 """
 from __future__ import annotations
 
@@ -22,7 +21,6 @@ from typing import Any
 
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
-from plantdb.commons.fsdb.validation import _is_fsdb
 
 from plantdb.client.metadata_app.field_spec import flatten
 
@@ -33,38 +31,27 @@ _BIOLOGICAL_SECTIONS = ("investigation", "study", "biologicalMaterial", "observe
 _SCAN_METADATA_REL = Path("metadata") / "metadata.json"
 
 
-def _is_scan_dir(path: Path) -> bool:
-    """Return True if ``path`` looks like a scan directory (has metadata)."""
-    return (path / _SCAN_METADATA_REL).is_file()
-
-
 def _scan_ids(db_path: Path) -> list[str]:
-    """Return the scan ids of the database at ``db_path``.
+    """Return the scan ids of the FSDB at ``db_path``.
 
-    Uses the formal FSDB when possible, otherwise falls back to enumerating the
-    sub-directories that look like scans.
+    Raises ``NotAnFSDBError`` if ``db_path`` is not a proper ROMI DB.
     """
-    if _is_fsdb(db_path):
-        db = FSDB(db_path, no_auth=True)
-        db.connect()
-        try:
-            return db.list_scans(owner_only=False)
-        finally:
-            db.disconnect()
-    return sorted(p.name for p in db_path.iterdir()
-                  if p.is_dir() and not p.name.startswith('.') and _is_scan_dir(p))
+    db = FSDB(db_path, no_auth=True)
+    db.connect()
+    try:
+        return db.list_scans(owner_only=False)
+    finally:
+        db.disconnect()
 
 
 def get_scan_dir(db_path: Path, scan_id: str) -> Path:
-    """Return the on-disk directory of ``scan_id`` in the database at ``db_path``."""
-    if _is_fsdb(db_path):
-        db = FSDB(db_path, no_auth=True)
-        db.connect()
-        try:
-            return db.get_scan(scan_id, owner_only=False).path()
-        finally:
-            db.disconnect()
-    return db_path / scan_id
+    """Return the on-disk directory of ``scan_id`` in the FSDB at ``db_path``."""
+    db = FSDB(db_path, no_auth=True)
+    db.connect()
+    try:
+        return db.get_scan(scan_id, owner_only=False).path()
+    finally:
+        db.disconnect()
 
 
 def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:

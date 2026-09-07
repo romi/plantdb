@@ -128,23 +128,16 @@ class TestDbOps(unittest.TestCase):
         with self.assertRaises(ValueError):
             db_ops.write_scan_metadata(scan_dir, {"biologicalMaterial": {"ageDays": "not-a-number"}})
 
-    def test_loose_directory_without_marker(self):
-        """A directory of scan dirs (no romidb marker) is also editable."""
+    def test_loose_directory_without_marker_rejected(self):
+        """A directory without the romidb marker is not a proper ROMI DB."""
         tmp = Path(tempfile.mkdtemp())
-        # scan dirs are plain folders with metadata/metadata.json, no marker file
-        for sid in ("scan_1", "scan_2"):
-            md_dir = tmp / sid / "metadata"
-            md_dir.mkdir(parents=True)
-            (md_dir / "metadata.json").write_text(json.dumps(
-                {"biologicalMaterial": {"organism": {"species": "Arabidopsis thaliana"}}}))
-        ids, flat = db_ops.load_db(tmp)
-        self.assertEqual(ids, ["scan_1", "scan_2"])
-        modified = db_ops.apply_bulk(tmp, ids, "biologicalMaterial.organism.species",
-                                     "Solanum lycopersicum")
-        self.assertEqual(modified, ids)
-        self.assertEqual(
-            db_ops.read_scan_metadata(db_ops.get_scan_dir(tmp, "scan_1"))
-            ["biologicalMaterial"]["organism"]["species"], "Solanum lycopersicum")
+        md_dir = tmp / "scan_1" / "metadata"
+        md_dir.mkdir(parents=True)
+        (md_dir / "metadata.json").write_text(json.dumps(
+            {"biologicalMaterial": {"organism": {"species": "Arabidopsis thaliana"}}}))
+        from plantdb.commons.fsdb.exceptions import NotAnFSDBError
+        with self.assertRaises(NotAnFSDBError):
+            db_ops.load_db(tmp)
 
 
 if __name__ == "__main__":
