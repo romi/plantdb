@@ -21,6 +21,7 @@ import shutil
 import threading
 from pathlib import Path
 from typing import Any
+from typing import Callable
 
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
@@ -42,7 +43,21 @@ _DB_LOCK = threading.Lock()
 
 
 def _connect(db_path: Path) -> FSDB:
-    """Return a connected FSDB for ``db_path``, connecting (and caching) on first use."""
+    """Return a connected, cached FSDB for ``db_path``.
+
+    The first call connects the database and stores it in ``_DB_CACHE``;
+    subsequent calls reuse the cached instance for the same resolved path.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB to connect.
+
+    Returns
+    -------
+    FSDB
+        A connected database instance.
+    """
     db_path = Path(db_path).resolve()
     db = _DB_CACHE.get(db_path)
     if db is None:
@@ -60,6 +75,11 @@ def close_db(db_path: Path) -> None:
 
     Used when the app switches to a different database so only one live
     connection stays in memory.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path of the database whose cached connection to close.
     """
     db_path = Path(db_path).resolve()
     with _DB_LOCK:
@@ -73,28 +93,61 @@ def _close_all() -> None:
     for db in _DB_CACHE.values():
         db.disconnect()
 
-
 atexit.register(_close_all)
 
 
 def _scan_ids(db_path: Path) -> list[str]:
     """Return the scan ids of the FSDB at ``db_path``.
 
-    Raises ``NotAnFSDBError`` if ``db_path`` is not a proper ROMI DB.
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB to inspect.
+
+    Returns
+    -------
+    list of str
+        The scan ids found in the database.
+
+    Raises
+    ------
+    NotAnFSDBError
+        If ``db_path`` is not a proper ROMI DB.
     """
     return _connect(db_path).list_scans(owner_only=False)
 
 
 def get_scan_dir(db_path: Path, scan_id: str) -> Path:
-    """Return the on-disk directory of ``scan_id`` in the FSDB at ``db_path``."""
+    """Return the on-disk directory of ``scan_id`` in the FSDB at ``db_path``.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB containing the scan.
+    scan_id : str
+        Identifier of the scan.
+
+    Returns
+    -------
+    Path
+        Directory of the scan.
+    """
     return _connect(db_path).get_scan(scan_id, owner_only=False).path()
 
 
 def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:
     """Return ``(scan_ids, flattened)`` for every scan in the database.
 
-    ``flattened`` maps each scan id to its flattened MIAPPE metadata (see
-    :func:`plantdb.client.metadata_app.field_spec.flatten`).
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB to load.
+
+    Returns
+    -------
+    tuple of (list of str, dict of dict)
+        A pair of the scan ids and a mapping of each scan id to its flattened
+        MIAPPE metadata (see :func:`plantdb.client.metadata_app.field_spec.flatten`).
     """
     scan_ids = _scan_ids(db_path)
     flattened: dict[str, dict[str, Any]] = {}
@@ -105,7 +158,18 @@ def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:
 
 
 def read_scan_metadata(scan_dir: Path) -> dict[str, Any]:
-    """Read the full ``metadata.json`` of a scan directory."""
+    """Read the full ``metadata.json`` of a scan directory.
+
+    Parameters
+    ----------
+    scan_dir : Path
+        Directory of the scan.
+
+    Returns
+    -------
+    dict of str to Any
+        The parsed metadata, or an empty dict if no metadata file exists.
+    """
     md_path = scan_dir / _SCAN_METADATA_REL
     if not md_path.is_file():
         return {}
@@ -118,7 +182,21 @@ def write_scan_metadata(scan_dir: Path, metadata: dict[str, Any],
     """Validate and write ``metadata`` to ``scan_dir/metadata/metadata.json``.
 
     A ``.bak`` copy of the previous file is written first when ``backup`` is
-    ``True``. Raises ``ValueError`` if the MIAPPE biological block is invalid.
+    ``True``.
+
+    Parameters
+    ----------
+    scan_dir : Path
+        Directory of the scan.
+    metadata : dict of str to Any
+        The metadata to persist.
+    backup : bool, default True
+        Write a ``.bak`` copy of the previous file before overwriting.
+
+    Raises
+    ------
+    ValueError
+        If the MIAPPE biological block of ``metadata`` is invalid.
     """
     validate_biological_metadata(metadata)
     md_path = scan_dir / _SCAN_METADATA_REL
@@ -133,6 +211,18 @@ def update_biological(metadata: dict[str, Any], tree: dict[str, Any]) -> dict[st
     """Return ``metadata`` with the biological sections replaced by ``tree``.
 
     Non-biological keys (owner, created, ...) are preserved.
+
+    Parameters
+    ----------
+    metadata : dict of str to Any
+        The full scan metadata to update.
+    tree : dict of str to Any
+        New MIAPPE biological tree to install.
+
+    Returns
+    -------
+    dict of str to Any
+        A copy of ``metadata`` with the biological sections replaced.
     """
     updated = dict(metadata)
     for section in _BIOLOGICAL_SECTIONS:
@@ -142,7 +232,20 @@ def update_biological(metadata: dict[str, Any], tree: dict[str, Any]) -> dict[st
 
 
 def get_field(metadata: dict[str, Any], path: str) -> Any:
-    """Return the value of the field at dot-``path`` in a nested dict."""
+    """Return the value of the field at dot-``path`` in a nested dict.
+
+    Parameters
+    ----------
+    metadata : dict of str to Any
+        The nested metadata dict to read.
+    path : str
+        Dot-separated path to the field, e.g. ``study.title``.
+
+    Returns
+    -------
+    Any
+        The field value, or ``None`` if the path does not exist.
+    """
     node = metadata
     for part in path.split("."):
         if not isinstance(node, dict) or part not in node:
@@ -155,6 +258,20 @@ def set_field(metadata: dict[str, Any], path: str, value: Any) -> dict[str, Any]
     """Return ``metadata`` with the field at dot-``path`` set to ``value``.
 
     Intermediate sections are created as needed.
+
+    Parameters
+    ----------
+    metadata : dict of str to Any
+        The nested metadata dict to modify (in place).
+    path : str
+        Dot-separated path to the field, e.g. ``study.title``.
+    value : Any
+        Value to set at the field.
+
+    Returns
+    -------
+    dict of str to Any
+        The same ``metadata`` dict, modified in place.
     """
     parts = path.split(".")
     node = metadata
@@ -170,8 +287,24 @@ def apply_bulk(db_path: Path, scan_ids: list[str], path: str, value: Any,
                backup: bool = True) -> list[str]:
     """Set the field at ``path`` to ``value`` on every scan in ``scan_ids``.
 
-    Returns the list of scan ids that were actually modified (i.e. whose value
-    changed). Writes are validated and backed up.
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB containing the scans.
+    scan_ids : list of str
+        Scan ids to update.
+    path : str
+        Dot-separated field path to set.
+    value : Any
+        Value to set at the field.
+    backup : bool, default True
+        Back up each scan's metadata before overwriting.
+
+    Returns
+    -------
+    list of str
+        The scan ids that were actually modified (i.e. whose value changed).
+        Writes are validated and backed up.
     """
     modified: list[str] = []
     for scan_id in scan_ids:
@@ -186,12 +319,34 @@ def apply_bulk(db_path: Path, scan_ids: list[str], path: str, value: Any,
 
 
 def scan_needs_migration(scan_dir: Path) -> bool:
-    """Return True if a scan's metadata still holds a legacy ``object`` block."""
+    """Return True if a scan's metadata still holds a legacy ``object`` block.
+
+    Parameters
+    ----------
+    scan_dir : Path
+        Directory of the scan to inspect.
+
+    Returns
+    -------
+    bool
+        True if the scan requires migration to the MIAPPE schema.
+    """
     return migrate_metadata(read_scan_metadata(scan_dir))[1]
 
 
 def migratable_scans(db_path: Path) -> list[str]:
-    """Return the ids of scans that still use the legacy (pre-MIAPPE) schema."""
+    """Return the ids of scans that still use the legacy (pre-MIAPPE) schema.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB to inspect.
+
+    Returns
+    -------
+    list of str
+        Scan ids that require migration.
+    """
     return [sid for sid in _scan_ids(db_path)
             if scan_needs_migration(get_scan_dir(db_path, sid))]
 
@@ -199,16 +354,43 @@ def migratable_scans(db_path: Path) -> list[str]:
 def migrate_scans(db_path: Path, scan_ids: list[str]) -> int:
     """Migrate the given scans to the MIAPPE-aligned schema.
 
-    Returns the number of scans that were actually migrated.
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB containing the scans.
+    scan_ids : list of str
+        Scan ids to migrate.
+
+    Returns
+    -------
+    int
+        The number of scans that were actually migrated.
     """
     return migrate_scans_progress(db_path, scan_ids)
 
 
-def migrate_scans_progress(db_path: Path, scan_ids: list[str], logger:logging.Logger, on_progress=None) -> int:
+def migrate_scans_progress(db_path: Path, scan_ids: list[str], logger: logging.Logger,
+                           on_progress: Callable[[int, int], None] | None = None) -> int:
     """Migrate ``scan_ids`` scan by scan, reporting progress.
 
     ``on_progress(done, total)`` is called after each scan is processed, so a
-    caller can surface a live progress bar. Returns the number of migrated scans.
+    caller can surface a live progress bar.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path to the FSDB containing the scans.
+    scan_ids : list of str
+        Scan ids to migrate.
+    logger : logging.Logger
+        Logger used to report each migrated scan.
+    on_progress : Callable[[int, int], None], optional
+        Callback invoked with ``(done, total)`` after each scan.
+
+    Returns
+    -------
+    int
+        The number of scans that were actually migrated.
     """
     total = len(scan_ids)
     done = 0
