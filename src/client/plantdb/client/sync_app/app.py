@@ -582,7 +582,10 @@ def get_scans_for_db(config):
             path = Path(config["spec"])
             db = FSDB(path)
             db.connect()
-            return db.list_scans(owner_only=False)
+            try:
+                return db.list_scans(owner_only=False)
+            finally:
+                db.disconnect()
         elif config["type"] == "http":
             from plantdb.client.rest_api import refresh_url
             from plantdb.client.rest_api.requests import make_api_request
