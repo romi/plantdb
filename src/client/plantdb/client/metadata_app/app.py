@@ -61,6 +61,8 @@ from plantdb.client.metadata_app.field_spec import unflatten
 logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
 logger.setLevel(DEFAULT_LOG_LEVEL)
 
+# Long-running work (migration) runs as a Dash background callback in a subprocess,
+# so its progress can stream back to the UI; diskcache persists the callback state.
 #: Background-callback backend; migration runs in a subprocess so its progress can stream.
 _CACHE = diskcache.Cache(str(Path(__file__).parent / ".dashcache"))
 background_callback_manager = DiskcacheManager(_CACHE)
@@ -137,7 +139,9 @@ app.layout = dbc.Container([
         ], className="w-100"),
     ], color="#00a960", class_name="mb-3"),
 
+    # Top row: database path input + static About card
     dbc.Row([
+        # FSDB location: path input, Load button, and status areas
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
@@ -156,6 +160,7 @@ app.layout = dbc.Container([
             ]),
         ]),
 
+        # About: static usage/help text
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
@@ -174,14 +179,18 @@ app.layout = dbc.Container([
         ])
     ], className="mb-4"),
 
+    # Main row: scan selection (left) + field edit form (right)
     dbc.Row([
+        # Scan selection: filter + checklist for bulk, or a single scan picker
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
                     html.H4([html.I(className="bi bi-search me-2"), "Scan selection"], className="mb-0")
                 ),
                 dbc.CardBody([
+                    # Accordion switching between the two edit scopes
                     dbc.Accordion([
+                        # Bulk edit: filter scans by ID regexp and/or metadata value
                         dbc.AccordionItem([
                             dbc.InputGroup([
                                 dbc.InputGroupText(html.I(className="bi bi-funnel")),
@@ -196,6 +205,7 @@ app.layout = dbc.Container([
                             html.Div(id="scope-info", className="mb-2 text-muted small"),
                             dbc.Checklist(id="scan-checklist", options=[], value=[], switch=True),
                         ], title=[html.I(className="bi bi-pencil-square me-2"), "Bulk edit"], item_id="bulk"),
+                        # Single scan edit: pick one scan to inspect
                         dbc.AccordionItem([
                             dbc.Label("Scan:"),
                             dbc.Select(id="scan-select", options=[], placeholder="Select a scan..."),
@@ -205,6 +215,7 @@ app.layout = dbc.Container([
             ]),
         ], width=6),
 
+        # Field edit: the shared per-scan/bulk form plus Apply button and status
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
@@ -220,11 +231,13 @@ app.layout = dbc.Container([
         ], width=6),
     ], className="mb-4"),
 
+    # Session stores: loaded scans, migratable scans, and migration-done flag
     dcc.Store(id="scans-store", data={}, storage_type="session"),
     dcc.Store(id="migratable-store", data={}, storage_type="session"),
     dcc.Store(id="migration-done", data=False, storage_type="session"),
     DB_PATH_STORE,
 
+    # Blocking modal shown when the loaded database still has legacy (pre-MIAPPE) scans.
     dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("MIAPPE migration required")),
         dbc.ModalBody(id="migration-modal-body"),
@@ -301,6 +314,8 @@ def load_database(db_path, prev_data):
         return {}, {}, [], [], [], [], dbc.Alert(f"Path does not exist: `{db_path}`", color="danger"), "", False, ""
     try:
         scan_ids, scans = db_ops.load_db(db_path)
+        # Switching databases: drop the cached connection for the previous one to
+        # avoid holding several live FSDB instances at once.
         if prev_data and prev_data.get("db_path") and Path(prev_data["db_path"]).resolve() != db_path:
             db_ops.close_db(Path(prev_data["db_path"]))
         data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
@@ -308,6 +323,7 @@ def load_database(db_path, prev_data):
         n = len(scan_ids)
         ok_alert = dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
                               f"Loaded {n} scan(s) from `{db_path}`"], color="success")
+        # Pre-compute which scans still need migration; this drives the warning modal.
         migratable = db_ops.migratable_scans(db_path)
         return (data, migratable, opts, scan_ids,
                 [{"label": s, "value": s} for s in scan_ids],
@@ -378,6 +394,8 @@ def do_migration(set_progress, n_clicks, migratable, db_path, modal_open):
         return msg, True, False
 
 
+# On success, close the modal a few seconds after it is shown so the user can see
+# the confirmation; otherwise leave it untouched.
 clientside_callback(
     """
     function(done) {
@@ -440,6 +458,8 @@ def render_edit_form(mode, scan_id, data):
     flat = {}
     if mode == "single" and scan_id and data and data.get("scans"):
         flat = data["scans"].get(scan_id, {})
+    # One shared form is used for both edit modes: in "single" mode it is prefilled
+    # with the scan's values, in "bulk" mode the fields stay empty as templates.
     section_accordion = dbc.Accordion([], id="field-accordion", flush=True)
     for section in sections():
         specs = specs_for_section(section)
@@ -462,6 +482,7 @@ def render_edit_form(mode, scan_id, data):
     return section_accordion
 
 
+#: Dictionary of icons associated with the metadata sections
 _SECTION_ICONS = {
     "investigation": "bi-clipboard-data",
     "study": "bi-calendar3",
@@ -493,6 +514,7 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
         if mode == "single":
             if not scan_id:
                 return dbc.Alert("Select a single scan first.", color="warning"), data, [], []
+            # Rebuild the nested MIAPPE tree and merge it into the scan's metadata.
             tree = unflatten(dict(flat))
             scan_dir = db_ops.get_scan_dir(db_path, scan_id)
             metadata = db_ops.read_scan_metadata(scan_dir)
@@ -503,6 +525,7 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
             selected = selected or []
             if not selected:
                 return dbc.Alert("Select at least one scan for bulk edit.", color="warning"), data, [], []
+            # Only non-empty fields are applied, each to every selected scan.
             edited = {p: v for p, v in flat.items() if v not in (None, "")}
             if not edited:
                 return dbc.Alert("Enter at least one value to apply.", color="warning"), data, [], []
@@ -510,6 +533,7 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
             for path, value in edited.items():
                 modified.update(db_ops.apply_bulk(db_path, selected, path, coerce(path, value)))
             msg = f"Applied to {len(modified)} scan(s)."
+        # Reload so the refreshed scan list/checklist reflect the edits.
         scan_ids, scans = db_ops.load_db(db_path)
         new_data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
         return (dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"), msg], color="success"),
