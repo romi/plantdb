@@ -141,7 +141,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
-                    html.H4(["FSDB location"], className="mb-0")
+                    html.H4([html.I(className="bi bi-database me-2"), "FSDB location"], className="mb-0")
                 ),
                 dbc.CardBody([
                     dbc.InputGroup([
@@ -178,7 +178,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
-                    html.H4([html.I(className="bi bi-pencil-square me-2"), "Scan selection"], className="mb-0")
+                    html.H4([html.I(className="bi bi-search me-2"), "Scan selection"], className="mb-0")
                 ),
                 dbc.CardBody([
                     dbc.Accordion([
@@ -195,11 +195,11 @@ app.layout = dbc.Container([
                             ], className="mb-2"),
                             html.Div(id="scope-info", className="mb-2 text-muted small"),
                             dbc.Checklist(id="scan-checklist", options=[], value=[], switch=True),
-                        ], title="Bulk edit", item_id="bulk"),
+                        ], title=[html.I(className="bi bi-pencil-square me-2"), "Bulk edit"], item_id="bulk"),
                         dbc.AccordionItem([
                             dbc.Label("Scan:"),
                             dbc.Select(id="scan-select", options=[], placeholder="Select a scan..."),
-                        ], title="Single scan edit", item_id="single", ),
+                        ], title=[html.I(className="bi bi-folder me-2"), "Single scan edit"], item_id="single", ),
                     ], id="edit-accordion", start_collapsed=False, flush=True),
                 ])
             ]),
@@ -451,12 +451,23 @@ def render_edit_form(mode, scan_id, data):
             value = flat.get(path)
             kind = {"type": "number"} if spec["type"] in ("int", "float") else {"type": "text"}
             rows.append(dbc.InputGroup([
-                dbc.InputGroupText(html.Label(spec["label"], title=_tooltip(spec)), className="align-self-center"),
-                dbc.Input(id=_field_input_id(path), value="" if value is None else str(value), **kind)
-            ], className="mb-1"))
-        section_accordion.children.append(dbc.AccordionItem(rows, title=section, className="mb-2"))
+                dbc.InputGroupText(html.Label(spec["label"]), className="align-self-center"),
+                dbc.Input(id=_field_input_id(path), value="" if value is None else str(value), **kind),
+                dbc.InputGroupText(html.I(className="bi bi-question-circle", title=_tooltip(spec)),
+                                   className="align-self-center"),
+            ], className="mb-1 field-group"))
+        section_accordion.children.append(dbc.AccordionItem(rows,
+                                                             title=[html.I(className=f"{_SECTION_ICONS.get(section, 'bi-folder')} me-2"), section],
+                                                             className="mb-2"))
     return section_accordion
 
+
+_SECTION_ICONS = {
+    "investigation": "bi-clipboard-data",
+    "study": "bi-calendar3",
+    "biologicalMaterial": "bi-flower1",
+    "observedVariable": "bi-rulers",
+}
 
 @callback(
     [Output("field-status", "children"),
