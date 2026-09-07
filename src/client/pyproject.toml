@@ -60,6 +60,7 @@ metadata_app = "plantdb.client.metadata_app.app:main"
 sync = [
     "dash",
     "dash-bootstrap-components",
+    "diskcache",
     "paramiko"
 ]
 test = [
