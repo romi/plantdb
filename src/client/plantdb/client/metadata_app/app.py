@@ -31,6 +31,7 @@ import os
 import re
 import time
 from pathlib import Path
+from typing import Any
 
 import click
 import dash_bootstrap_components as dbc
@@ -53,6 +54,7 @@ from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 
 from plantdb.client.metadata_app import db_ops
 from plantdb.client.metadata_app.field_spec import FIELD_SPECS
+from plantdb.client.metadata_app.field_spec import FieldSpec
 from plantdb.client.metadata_app.field_spec import coerce
 from plantdb.client.metadata_app.field_spec import sections
 from plantdb.client.metadata_app.field_spec import specs_for_section
@@ -75,12 +77,24 @@ app = Dash(name="plantdb-metadata",
 
 
 def _field_input_id(path: str) -> str:
-    """Dash-safe component id for a field path."""
+    """Return a Dash-safe component id for a field path."""
     return "per-" + path.replace(".", "__")
 
 
-def _tooltip(spec) -> str:
-    """Build a compact tooltip string for a field spec."""
+def _tooltip(spec: FieldSpec) -> str:
+    """Build a compact tooltip string for a field spec.
+
+    Parameters
+    ----------
+    spec : FieldSpec
+        A MIAPPE field definition.
+
+    Returns
+    -------
+    str
+        The definition, plus any format, example and MIAPPE codename,
+        joined by ``|``.
+    """
     tt = spec["tooltip"]
     lines = [tt["definition"]]
     if tt.get("format"):
@@ -92,21 +106,54 @@ def _tooltip(spec) -> str:
     return " | ".join(lines)
 
 
-def scan_checklist(scan_ids):
-    """Build the scope checklist options for the given scan ids."""
+def scan_checklist(scan_ids: list[str]) -> list[dict[str, str]]:
+    """Build the scope checklist options for the given scan ids.
+
+    Parameters
+    ----------
+    scan_ids : list[str]
+        The scan ids to turn into checklist entries.
+
+    Returns
+    -------
+    list[dict[str, str]]
+        ``{"label": id, "value": id}`` entries for a Dash checklist.
+    """
     return [{"label": s, "value": s} for s in scan_ids]
 
 
 FIELD_OPTIONS = [{"label": spec["path"], "value": spec["path"]} for spec in FIELD_SPECS]
 FIELD_STATES = [State(_field_input_id(spec["path"]), "value") for spec in FIELD_SPECS]
 
-#: DB path store.
-#: ``main()`` pre-fills the store from ``--db-path`` so the database is loaded automatically on startup.
+# Indirection store: main() pre-fills it from --db-path so the database loads on
+# startup, while the Load button writes to it to trigger the same loading flow.
+#: Save the location of the current database.
 DB_PATH_STORE = dcc.Store(id="db-path-store", data=None)
 
 
-def _filtered_scans(scan_ids, scans, regexp, fpath, fvalue):
-    """Return scan ids matching the regexp AND the metadata filter."""
+def _filtered_scans(scan_ids: list[str], scans: dict[str, dict[str, Any]],
+                    regexp: str | None, fpath: str | None, fvalue: str | None) -> list[str]:
+    """Return scan ids matching the ID regexp AND the metadata value filter.
+
+    Parameters
+    ----------
+    scan_ids : list[str]
+        All scan ids of the loaded database.
+    scans : dict[str, dict[str, Any]]
+        Flattened ``{scan_id: {dot.path: value}}`` metadata per scan.
+    regexp : str | None
+        Optional regexp matched against the scan id; ``None`` keeps all.
+    fpath : str | None
+        Optional metadata field path to filter on; ignored unless both
+        ``fpath`` and ``fvalue`` are provided.
+    fvalue : str | None
+        Case-insensitive substring the field value must contain.
+
+    Returns
+    -------
+    list[str]
+        Scan ids passing both filters.
+    """
     rx = None
     if regexp:
         try:
@@ -127,6 +174,7 @@ def _filtered_scans(scan_ids, scans, regexp, fpath, fvalue):
 # Layout
 # ----------------------------------------------------------------------
 app.layout = dbc.Container([
+    # App header bar
     dbc.Navbar([
         dbc.Row([
             dbc.Col(
@@ -246,8 +294,20 @@ app.layout = dbc.Container([
 ], id="metadata-app", fluid=True)
 
 
-def _migration_modal_body(migratable):
-    """Build the migration-warning modal body for the given scan ids."""
+def _migration_modal_body(migratable: list[str]) -> dbc.ModalBody:
+    """Build the migration-warning modal body for the given scan ids.
+
+    Parameters
+    ----------
+    migratable : list[str]
+        Scan ids that still use the legacy (pre-MIAPPE) schema.
+
+    Returns
+    -------
+    dbc.ModalBody
+        The modal content: warning, Migrate/Abort buttons, a progress bar
+        and the list of scans requiring migration.
+    """
     return dbc.ModalBody([
         dbc.Alert([html.I(className="bi bi-exclamation-triangle-fill me-2"),
                    f"{len(migratable)} scan(s) use the legacy (pre-MIAPPE) schema and require migration "
@@ -380,9 +440,10 @@ def do_migration(set_progress, n_clicks, migratable, db_path, modal_open):
         return dbc.Alert("No scans to migrate.", color="warning"), False, False
     total = len(migratable)
 
-    def _report(done, total):
+    def _report(done: int, total: int) -> None:
         set_progress((done, total, f"{done} / {total}"))
 
+    # Runs in a background subprocess; set_progress streams counts to the progress bar.
     try:
         db_ops.migrate_scans_progress(Path(db_path), list(migratable), logger, _report)
         msg = dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
@@ -548,9 +609,9 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
               help="Path to the local PlantDB (FSDB) to edit.")
 @click.option("--port", type=int, default=8050, help="Port to run the web application on.")
 @click.option("--debug", is_flag=True, help="Enable debug mode.")
-def main(db_path, port, debug):
-    """MIAPPE metadata editor - Dash UI for editing scan metadata of a local PlantDB."""
-
+def main(db_path: str | None, port: int, debug: bool) -> None:
+    """Launch the MIAPPE metadata editor web UI."""
+    # Pre-seed the store so the DB loads automatically without clicking Load.
     if db_path:
         DB_PATH_STORE.data = db_path
 
