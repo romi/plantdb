@@ -179,6 +179,7 @@ from plantdb.commons.fsdb.lock import LockLevel
 from plantdb.commons.fsdb.lock import LockManager
 from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.metadata import MetadataManager
+from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
 from plantdb.commons.fsdb.metadata import _get_metadata
 from plantdb.commons.fsdb.metadata import _set_metadata
 from plantdb.commons.fsdb.metadata import _store_file_metadata
@@ -1091,6 +1092,9 @@ class FSDB(db.DB):
                 raise ValueError("Sharing field must be a list of group names")
             if not self.rbac_manager.validate_sharing_groups(sharing_groups):
                 raise ValueError("One or more sharing groups do not exist")
+
+        # Validate the MIAPPE biological block if provided (optional on scans)
+        validate_biological_metadata(metadata)
 
         # Use exclusive lock for scan creation
         self.logger.debug(f"Creating a scan '{scan_id}' as user '{current_user.username}'...")

@@ -402,6 +402,11 @@ class MetadataManager(object):
         if len(new_metadata) == 0:
             return
 
+        if isinstance(self, Scan):
+            # Validate the MIAPPE biological block (if present) at the write boundary
+            from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+            validate_biological_metadata(new_metadata)
+
         if isinstance(self, TimeLapse):
             obj_id = f"{self.id}"
             lock_level = LockLevel.SCAN
