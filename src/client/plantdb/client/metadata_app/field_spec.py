@@ -97,7 +97,29 @@ _MIAPPE_TOOLTIPS: dict[str, dict[str, str]] = {
 
 def _spec(path: str, label: str, ftype: str = "str", codename: str | None = None,
           suggest: bool = False, note: str | None = None) -> FieldSpec:
-    """Build a ``FieldSpec`` with a tooltip from the MIAPPE table or a note."""
+    """Build a ``FieldSpec`` with a tooltip from the MIAPPE table or a note.
+
+    Parameters
+    ----------
+    path : str
+        Dot-separated field path in the MIAPPE tree.
+    label : str
+        Human-readable label shown in the UI.
+    ftype : str, default 'str'
+        Field value type, one of ``'str'``, ``'int'``, ``'float'``.
+    codename : str or None, optional
+        MIAPPE checklist codename used to look up the tooltip.
+    suggest : bool, default False
+        Whether the UI offers a dropdown of existing values.
+    note : str or None, optional
+        Extra text appended to the definition, or used as the definition
+        when no MIAPPE tooltip exists.
+
+    Returns
+    -------
+    FieldSpec
+        The field specification dict.
+    """
     if codename and codename in _MIAPPE_TOOLTIPS:
         tooltip = dict(_MIAPPE_TOOLTIPS[codename])
         if note:
@@ -149,6 +171,18 @@ def flatten(metadata: dict[str, Any], prefix: str = "") -> dict[str, Any]:
     """Flatten a nested metadata dict into a flat ``{dot.path: value}`` mapping.
 
     Only leaf fields declared in ``FIELD_SPECS`` are kept.
+
+    Parameters
+    ----------
+    metadata : dict of str to Any
+        The nested metadata dict to flatten.
+    prefix : str, default ''
+        Dot-separated path prefix to prepend (used in recursion).
+
+    Returns
+    -------
+    dict of str to Any
+        The flattened mapping.
     """
     flat: dict[str, Any] = {}
     for key, value in metadata.items():
@@ -165,6 +199,16 @@ def unflatten(flat: dict[str, Any]) -> dict[str, Any]:
 
     Intermediate sections are created as needed. Values are coerced to the
     declared field type.
+
+    Parameters
+    ----------
+    flat : dict of str to Any
+        The flattened mapping to rebuild.
+
+    Returns
+    -------
+    dict of str to Any
+        The nested metadata tree.
     """
     tree: dict[str, Any] = {}
     for path, value in flat.items():
@@ -177,7 +221,21 @@ def unflatten(flat: dict[str, Any]) -> dict[str, Any]:
 
 
 def coerce(path: str, value: Any) -> Any:
-    """Coerce ``value`` to the declared type of the field at ``path``."""
+    """Coerce ``value`` to the declared type of the field at ``path``.
+
+    Parameters
+    ----------
+    path : str
+        Dot-separated field path whose declared type is applied.
+    value : Any
+        Value to coerce.
+
+    Returns
+    -------
+    Any
+        The coerced value, the original value if it cannot be coerced, or
+        ``None`` for empty values.
+    """
     if value is None or value == "":
         return None
     spec = FIELD_BY_PATH[path]
@@ -195,7 +253,17 @@ def coerce(path: str, value: Any) -> Any:
 def collect_suggestions(scans: list[dict[str, Any]], path: str) -> list[str]:
     """Return the sorted unique non-empty values of ``path`` across ``scans``.
 
-    ``scans`` is a list of flattened scan dicts (see :func:`flatten`).
+    Parameters
+    ----------
+    scans : list of dict of str to Any
+        A list of flattened scan dicts (see :func:`flatten`).
+    path : str
+        Dot-separated field path to collect values for.
+
+    Returns
+    -------
+    list of str
+        Sorted unique values.
     """
     values: set[str] = set()
     for flat in scans:
@@ -206,12 +274,29 @@ def collect_suggestions(scans: list[dict[str, Any]], path: str) -> list[str]:
 
 
 def sections() -> list[str]:
-    """Return the ordered top-level MIAPPE section names."""
+    """Return the ordered top-level MIAPPE section names.
+
+    Returns
+    -------
+    list of str
+        The top-level keys of the biological schema.
+    """
     return list(SCAN_BIOLOGICAL_SCHEMA.keys())
 
 
 def specs_for_section(section: str) -> list[FieldSpec]:
-    """Return the field specs whose dot-path starts with ``section``."""
+    """Return the field specs whose dot-path starts with ``section``.
+
+    Parameters
+    ----------
+    section : str
+        Top-level MIAPPE section name, e.g. ``study``.
+
+    Returns
+    -------
+    list of FieldSpec
+        The field specs belonging to the section.
+    """
     return [s for s in FIELD_SPECS if s["path"].startswith(section + ".")]
 
 
