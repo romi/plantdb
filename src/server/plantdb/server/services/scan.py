@@ -120,19 +120,14 @@ def get_scan_info(scan, **kwargs):
     scan_md: dict = scan.get_metadata()
     ## Get acquisition date:
     scan_info["metadata"]['date'] = get_scan_date(scan)
-    ## Import 'object' related scan metadata to scan info template:
-    if 'object' in scan_md and scan_md["object"]:
-        # Plant Imager v2 API
-        scan_obj = scan_md['object']  # get the 'object' related dictionary
-        scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
-        scan_info["metadata"]["environment"] = scan_obj.get('environment', 'N/A')
-        scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
-    else:
-        # Plant Imager v3 API
-        scan_obj = scan_md.get('Metadata', {'object':{}}).get('object', {})  # get the 'object' related dictionary
-        scan_info["metadata"]["species"] = scan_obj.get('species', 'N/A')
-        scan_info["metadata"]["environment"] = scan_obj.get('growth_environment', 'N/A')
-        scan_info["metadata"]["plant"] = scan_obj.get('plant_id', 'N/A')
+    ## Import MIAPPE-aligned biological metadata to scan info template:
+    bio = scan_md.get('biologicalMaterial', {}) or {}
+    organism = bio.get('organism', {}) or {}
+    scan_info["metadata"]["species"] = organism.get('species', 'N/A')
+    scan_info["metadata"]["plant"] = bio.get('biologicalMaterialId', 'N/A')
+    study = scan_md.get('study', {}) or {}
+    growth_facility = study.get('growthFacility', {}) or {}
+    scan_info["metadata"]["environment"] = growth_facility.get('name', 'N/A')
     ## Get the number of 'images' in the dataset:
     scan_info["metadata"]['nbPhotos'] = len(scan_info["images"])
     # Runtime deployment prefix (reverse-proxy) — empty unless configured.

@@ -73,7 +73,7 @@ class ScanApiTests(unittest.TestCase):
     def test_scans_list_with_filter(self):
         """Test that filtering scans succeeds."""
         # Use a filter query that should match at least one scan
-        filter_query = {"object": {"species": "Arabidopsis.*"}}
+        filter_query = {"biologicalMaterial": {"organism": {"species": "Arabidopsis.*"}}}
         params = {"filterQuery": json.dumps(filter_query), "fuzzy": "true"}
         r = requests.get(self.base_url + api_endpoints.scans(), params=params,
                          headers={'Authorization': 'Bearer ' + self.admin_token})
@@ -121,8 +121,8 @@ class ScanApiTests(unittest.TestCase):
         scan_id = "test_scan_md"
         metadata = {
             "metadata": {
-                "object": {
-                    "species": "TestPlant"
+                "biologicalMaterial": {
+                    "organism": {"species": "TestPlant"}
                 }
             }
         }
@@ -137,8 +137,19 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_metadata_get(self):
         """Test that getting scan metadata succeeds."""
-        # Get a scan ID to test
-        scan_id = "real_plant"
+        # Create a scan with MIAPPE-aligned biological metadata to read back
+        scan_id = "test_scan_md_get"
+        metadata = {
+            "metadata": {
+                "biologicalMaterial": {
+                    "organism": {"species": "Arabidopsis thaliana"}
+                }
+            }
+        }
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
+                          json=metadata,
+                          headers={'Authorization': 'Bearer ' + self.admin_token})
+        self.assertEqual(r.status_code, 201)
 
         r = requests.get(self.base_url + api_endpoints.scan_metadata(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
@@ -147,15 +158,28 @@ class ScanApiTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         metadata = r.json()['metadata']
         self.assertIn('owner', metadata)
-        self.assertIn('acquisition_date', metadata)
-        self.assertIn('object', metadata)
+        self.assertIn('biologicalMaterial', metadata)
+        self.assertEqual(
+            metadata['biologicalMaterial']['organism']['species'],
+            'Arabidopsis thaliana',
+        )
 
     def test_scan_metadata_post(self):
         """Test that updating scan metadata succeeds."""
-        # Get a scan ID to test
-        scan_id = "real_plant"
+        # Create a scan with MIAPPE-aligned biological metadata to update
+        scan_id = "test_scan_md_post"
+        metadata = {
+            "metadata": {
+                "biologicalMaterial": {
+                    "organism": {"species": "Arabidopsis thaliana"}
+                }
+            }
+        }
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
+                          json=metadata,
+                          headers={'Authorization': 'Bearer ' + self.admin_token})
+        self.assertEqual(r.status_code, 201)
 
-        # Get current metadata
         r = requests.get(self.base_url + api_endpoints.scan_metadata(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
@@ -164,7 +188,7 @@ class ScanApiTests(unittest.TestCase):
         metadata = r.json()['metadata']
 
         # Update metadata
-        metadata["object"].update({"description": "Updated test scan description"})
+        metadata["biologicalMaterial"].update({"sample": "Updated test scan sample"})
         r = requests.post(self.base_url + api_endpoints.scan_metadata(scan_id),
                           json={'metadata': metadata},
                           headers={'Authorization': 'Bearer ' + self.admin_token})
@@ -172,8 +196,8 @@ class ScanApiTests(unittest.TestCase):
             print(r.json())
         self.assertEqual(r.status_code, 200)
         metadata = r.json()['metadata']
-        self.assertIn('object', metadata)
-        self.assertIn('description', metadata['object'])
+        self.assertIn('biologicalMaterial', metadata)
+        self.assertIn('sample', metadata['biologicalMaterial'])
 
     def test_scan_filesets_list(self):
         """Test that listing scan filesets succeeds."""
