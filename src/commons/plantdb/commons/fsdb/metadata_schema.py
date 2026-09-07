@@ -13,7 +13,7 @@ and ``observedVariable``. The validator only inspects these keys **when present*
 a scan without biological metadata is valid (the block is optional), but if a
 section is provided its known fields are type-checked.
 
-See ``docs/developers/metadata_miappe_plan.md`` for the full mapping and design.
+See ``docs/developers/miappe_metadata.md`` for the full mapping and design.
 """
 from __future__ import annotations
 

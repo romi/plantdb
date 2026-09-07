@@ -13,7 +13,7 @@ This CLI reads every scan's ``metadata/metadata.json``, converts the old
 canonical MIAPPE tree and rewrites the file. It is idempotent: scans already
 migrated (no legacy ``object`` block) are left untouched.
 
-See ``docs/developers/metadata_miappe_plan.md`` for the mapping and design.
+See ``docs/developers/miappe_metadata.md`` for the mapping and design.
 
 ## Usage Examples
 
