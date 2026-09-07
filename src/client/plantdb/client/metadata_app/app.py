@@ -169,6 +169,52 @@ def _filtered_scans(scan_ids: list[str], scans: dict[str, dict[str, Any]],
         out.append(sid)
     return out
 
+UI_HELP = """
+## How to use this UI
+
+### 1. Load a database.
+Enter the path to your PlantDB (FSDB) in the "FSDB location" box and click Load.
+The number of loaded scans is shown below it.
+
+### 2. Migrate legacy scans.
+If some scans still use the old pre-MIAPPE schema, a migration dialog appears.
+Click Migrate to convert them before editing (required).
+
+### 3. Choose what to edit.
+Under "Scan selection", pick either "Bulk edit" to edit several scans at once, or "Single scan edit" to inspect and edit one scan.
+In bulk mode, narrow the list with the scan-ID regex and/or metadata-value filters, then tick the scans to target.
+
+### 4. Fill in the fields.
+The fields are grouped by MIAPPE section (investigation, study, biological material, observed variable).
+Hover the help icon next to a field to see its MIAPPE codename and definition.
+
+### 5. Apply your changes.
+Click Apply.
+In single mode the whole scan is saved.
+In bulk mode only the fields you filled in are written to each selected scan.
+"""
+
+UI_ABOUT = """
+This tool allows you to edit the metadata of a PlantDB database.
+
+### ISA & MIAPPE
+
+The biological metadata follows the **ISA** (Investigation / Study / Assay)
+framework and its plant-phenotyping specialization **MIAPPE** (Minimum
+Information about a Plant Phenotyping Experiment). Each top-level metadata
+block corresponds to a MIAPPE section:
+
+- **Investigation** — the overall project/dataset.
+- **Study** — the experiment (facility, environment, experimental design/factors).
+- **Biological material** — the scanned plant, MIAPPE's *observation unit*.
+- **Observed variable** — the trait measured and the method used.
+
+For the detailed mapping from legacy fields to the MIAPPE tree, see the
+[developer documentation](docs/developers/miappe_metadata.md).
+
+Scans created before this schema can also be edited here; they are flagged and
+migrated to the MIAPPE structure on load.
+"""
 
 # ----------------------------------------------------------------------
 # Layout
@@ -185,12 +231,26 @@ app.layout = dbc.Container([
                 width=12, className="text-center"
             )
         ], className="w-100"),
+        # Help and About nav entries opening their respective modals
+        dbc.Nav(
+            [
+                dbc.NavItem(
+                    dbc.NavLink([html.H4("Help")],
+                                id="help-btn", href="#", active=False)
+                ),
+                dbc.NavItem(
+                    dbc.NavLink([html.H4("About")],
+                                id="about-btn", href="#", active=False)
+                ),
+            ],
+            className="ms-auto",
+        ),
     ], color="#00a960", class_name="mb-3"),
 
-    # Top row: database path input + static About card
+    # Main row: scan selection (left) + field edit form (right)
     dbc.Row([
-        # FSDB location: path input, Load button, and status areas
         dbc.Col([
+            # FSDB location: path input, Load button, and status areas
             dbc.Card([
                 dbc.CardHeader(
                     html.H4([html.I(className="bi bi-database me-2"), "FSDB location"], className="mb-0")
@@ -206,31 +266,7 @@ app.layout = dbc.Container([
                     html.Div(id="migration-status", className="mt-2"),
                 ])
             ]),
-        ]),
-
-        # About: static usage/help text
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader(
-                    html.H4([html.I(className="bi bi-info-circle-fill me-2"), "About"], className="mb-0")
-                ),
-                dbc.CardBody([
-                    html.P([
-                        "This tool allows you to edit the metadata of a PlantDB database. "
-                        "It is based on the MIAPPE schema, a standardized way to store metadata in PlantDB, but can also edit legacy scans."
-                    ]),
-                    html.P([
-                        "Hover over the field labels to see the MIAPPE codenames and definitions. "
-                    ])
-                ])
-            ]),
-        ])
-    ], className="mb-4"),
-
-    # Main row: scan selection (left) + field edit form (right)
-    dbc.Row([
-        # Scan selection: filter + checklist for bulk, or a single scan picker
-        dbc.Col([
+            # Scan selection: filter + checklist for bulk, or a single scan picker
             dbc.Card([
                 dbc.CardHeader(
                     html.H4([html.I(className="bi bi-search me-2"), "Scan selection"], className="mb-0")
@@ -267,7 +303,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader(
-                    html.H4([html.I(className="bi bi-pencil-square me-2"), "Field edit"], className="mb-0")
+                    html.H4([html.I(className="bi bi-pencil-square me-2"), "Metadata field edition"], className="mb-0")
                 ),
                 dbc.CardBody([
                     html.Div(id="per-scan-form"),
@@ -290,6 +326,22 @@ app.layout = dbc.Container([
         dbc.ModalHeader(dbc.ModalTitle("MIAPPE migration required")),
         dbc.ModalBody(id="migration-modal-body"),
     ], id="migration-modal", is_open=False, centered=True),
+
+    # Help modal opened from the "Help" nav entry
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle([html.I(className="bi bi-question-circle me-2"), "Help"])),
+        dbc.ModalBody([
+            dcc.Markdown(UI_HELP)
+        ]),
+    ], id="help-modal", is_open=False, centered=True),
+
+    # About modal opened from the "About" nav entry
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle([html.I(className="bi bi-info-circle me-2"), "About"])),
+        dbc.ModalBody([
+            dcc.Markdown(UI_ABOUT)
+        ]),
+    ], id="about-modal", is_open=False, centered=True),
 
 ], id="metadata-app", fluid=True)
 
@@ -396,6 +448,28 @@ def load_database(db_path, prev_data):
         return ({}, {}, [], [], [], [],
                 dbc.Alert([html.I(className="bi bi-x-octagon-fill me-2"), f"Load failed: {e}"],
                           color="danger"))
+
+
+# Toggle the About modal when its nav entry is clicked.
+@callback(
+    Output("about-modal", "is_open"),
+    Input("about-btn", "n_clicks"),
+    State("about-modal", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_about(n_clicks, is_open):
+    return not is_open
+
+
+# Toggle the Help modal when its nav entry is clicked.
+@callback(
+    Output("help-modal", "is_open"),
+    Input("help-btn", "n_clicks"),
+    State("help-modal", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_help(n_clicks, is_open):
+    return not is_open
 
 
 @callback(
@@ -521,7 +595,7 @@ def render_edit_form(mode, scan_id, data):
         flat = data["scans"].get(scan_id, {})
     # One shared form is used for both edit modes: in "single" mode it is prefilled
     # with the scan's values, in "bulk" mode the fields stay empty as templates.
-    section_accordion = dbc.Accordion([], id="field-accordion", flush=True)
+    section_accordion = dbc.Accordion([], id="field-accordion", always_open=True)
     for section in sections():
         specs = specs_for_section(section)
         if not specs:
@@ -537,9 +611,12 @@ def render_edit_form(mode, scan_id, data):
                 dbc.InputGroupText(html.I(className="bi bi-question-circle", title=_tooltip(spec)),
                                    className="align-self-center"),
             ], className="mb-1 field-group"))
-        section_accordion.children.append(dbc.AccordionItem(rows,
-                                                             title=[html.I(className=f"{_SECTION_ICONS.get(section, 'bi-folder')} me-2"), section],
-                                                             className="mb-2"))
+
+        sec_acc = dbc.AccordionItem(rows,
+                                    title=[html.I(className=f"{_SECTION_ICONS.get(section, 'bi-folder')} me-2"),
+                                           section],
+                                    className="mb-2")
+        section_accordion.children.append(sec_acc)
     return section_accordion
 
 
@@ -550,6 +627,7 @@ _SECTION_ICONS = {
     "biologicalMaterial": "bi-flower1",
     "observedVariable": "bi-rulers",
 }
+
 
 @callback(
     [Output("field-status", "children"),
