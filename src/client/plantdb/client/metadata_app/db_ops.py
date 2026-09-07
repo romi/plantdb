@@ -14,8 +14,11 @@ rejected.
 """
 from __future__ import annotations
 
+import atexit
 import json
+import logging
 import shutil
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -32,28 +35,59 @@ _BIOLOGICAL_SECTIONS = ("investigation", "study", "biologicalMaterial", "observe
 #: Name of a scan's metadata file, relative to the scan directory.
 _SCAN_METADATA_REL = Path("metadata") / "metadata.json"
 
+#: Cache of live connected FSDB instances, keyed by resolved db path.
+#: Connect is expensive (browses the DB tree and parses JSON), so each distinct database is connected once and reused until switched.
+_DB_CACHE: dict[Path, FSDB] = {}
+_DB_LOCK = threading.Lock()
+
+
+def _connect(db_path: Path) -> FSDB:
+    """Return a connected FSDB for ``db_path``, connecting (and caching) on first use."""
+    db_path = Path(db_path).resolve()
+    db = _DB_CACHE.get(db_path)
+    if db is None:
+        with _DB_LOCK:
+            db = _DB_CACHE.get(db_path)
+            if db is None:
+                db = FSDB(db_path, no_auth=True)
+                db.connect()
+                _DB_CACHE[db_path] = db
+    return db
+
+
+def close_db(db_path: Path) -> None:
+    """Disconnect and drop the cached FSDB for ``db_path``, if any.
+
+    Used when the app switches to a different database so only one live
+    connection stays in memory.
+    """
+    db_path = Path(db_path).resolve()
+    with _DB_LOCK:
+        db = _DB_CACHE.pop(db_path, None)
+    if db is not None:
+        db.disconnect()
+
+
+def _close_all() -> None:
+    """Disconnect every still-cached FSDB at process exit."""
+    for db in _DB_CACHE.values():
+        db.disconnect()
+
+
+atexit.register(_close_all)
+
 
 def _scan_ids(db_path: Path) -> list[str]:
     """Return the scan ids of the FSDB at ``db_path``.
 
     Raises ``NotAnFSDBError`` if ``db_path`` is not a proper ROMI DB.
     """
-    db = FSDB(db_path, no_auth=True)
-    db.connect()
-    try:
-        return db.list_scans(owner_only=False)
-    finally:
-        db.disconnect()
+    return _connect(db_path).list_scans(owner_only=False)
 
 
 def get_scan_dir(db_path: Path, scan_id: str) -> Path:
     """Return the on-disk directory of ``scan_id`` in the FSDB at ``db_path``."""
-    db = FSDB(db_path, no_auth=True)
-    db.connect()
-    try:
-        return db.get_scan(scan_id, owner_only=False).path()
-    finally:
-        db.disconnect()
+    return _connect(db_path).get_scan(scan_id, owner_only=False).path()
 
 
 def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:
@@ -167,11 +201,28 @@ def migrate_scans(db_path: Path, scan_ids: list[str]) -> int:
 
     Returns the number of scans that were actually migrated.
     """
-    return sum(migrate_scan_metadata(get_scan_dir(db_path, sid)) for sid in scan_ids)
+    return migrate_scans_progress(db_path, scan_ids)
+
+
+def migrate_scans_progress(db_path: Path, scan_ids: list[str], logger:logging.Logger, on_progress=None) -> int:
+    """Migrate ``scan_ids`` scan by scan, reporting progress.
+
+    ``on_progress(done, total)`` is called after each scan is processed, so a
+    caller can surface a live progress bar. Returns the number of migrated scans.
+    """
+    total = len(scan_ids)
+    done = 0
+    for sid in scan_ids:
+        logger.info(f"Migrating {sid} ({done+1}/{total}): {get_scan_dir(db_path, sid)}")
+        if migrate_scan_metadata(get_scan_dir(db_path, sid)):
+            done += 1
+        if on_progress is not None:
+            on_progress(done, total)
+    return done
 
 
 __all__ = [
-    "get_scan_dir", "load_db", "read_scan_metadata", "write_scan_metadata",
+    "get_scan_dir", "close_db", "load_db", "read_scan_metadata", "write_scan_metadata",
     "update_biological", "get_field", "set_field", "apply_bulk",
-    "scan_needs_migration", "migratable_scans", "migrate_scans",
+    "scan_needs_migration", "migratable_scans", "migrate_scans", "migrate_scans_progress",
 ]
