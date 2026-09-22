@@ -423,7 +423,7 @@ def load_database(db_path, prev_data):
         return {}, {}, [], [], [], [], ""
     db_path = Path(db_path).expanduser().resolve()
     if not db_path.is_dir():
-        return {}, {}, [], [], [], [], dbc.Alert(f"Path does not exist: `{db_path}`", color="danger"), "", False, ""
+        return {}, {}, [], [], [], [], dbc.Alert(f"Path does not exist: `{db_path}`", color="danger")
     try:
         scan_ids, scans = db_ops.load_db(db_path)
         # Switching databases: drop the cached connection for the previous one to
