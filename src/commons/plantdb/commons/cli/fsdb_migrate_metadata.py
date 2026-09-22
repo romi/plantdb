@@ -19,12 +19,16 @@ See ``docs/developers/miappe_metadata.md`` for the mapping and design.
 
 ```shell
 fsdb_migrate_metadata /romi_db
+
+# Migrate without keeping a '.bak' copy of each changed file:
+fsdb_migrate_metadata /romi_db --no-backup
 ```
 """
 from __future__ import annotations
 
 import json
 import os
+import shutil
 from pathlib import Path
 
 import click
@@ -122,8 +126,15 @@ def migrate_metadata(metadata: dict) -> tuple[dict, bool]:
     return metadata, True
 
 
-def migrate_scan_metadata(scan_path: Path) -> bool:
+def migrate_scan_metadata(scan_path: Path, backup: bool = True) -> bool:
     """Migrate a single scan's ``metadata/metadata.json`` in place.
+
+    Parameters
+    ----------
+    scan_path : pathlib.Path
+        Path to the scan directory.
+    backup : bool, optional
+        If ``True``, write a ``.bak`` copy of the file before overwriting it.
 
     Returns
     -------
@@ -138,6 +149,8 @@ def migrate_scan_metadata(scan_path: Path) -> bool:
     migrated, did_migrate = migrate_metadata(metadata)
     if not did_migrate:
         return False
+    if backup:
+        shutil.copy2(md_path, md_path.with_suffix(md_path.suffix + ".bak"))
     with md_path.open("w") as f:
         json.dump(migrated, f, sort_keys=True, indent=4, separators=(',', ': '))
     return True
@@ -146,13 +159,18 @@ def migrate_scan_metadata(scan_path: Path) -> bool:
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.argument('db_path', type=click.Path(exists=True))
 @click.option(
+    "--no-backup",
+    is_flag=True,
+    help="Do not write a '.bak' copy of changed files.",
+)
+@click.option(
     "--log-level",
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
     default=DEFAULT_LOG_LEVEL,
     show_default=True,
     help="Logging level.",
 )
-def main(db_path, log_level):
+def main(db_path, no_backup, log_level):
     """Migrate all scans of a database to the MIAPPE-aligned biological metadata."""
     logger.setLevel(log_level)
     db_path = Path(db_path).resolve()
@@ -160,7 +178,7 @@ def main(db_path, log_level):
     for scan_path in db_path.iterdir():
         if not scan_path.is_dir():
             continue
-        if migrate_scan_metadata(scan_path):
+        if migrate_scan_metadata(scan_path, backup=not no_backup):
             migrated += 1
             logger.info(f"Migrated scan '{scan_path.name}'.")
         else:
