@@ -53,6 +53,7 @@ from plantdb.commons.log import get_logger
 from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 
 from plantdb.client.metadata_app import db_ops
+from plantdb.client.metadata_app.db_ops import _connect
 from plantdb.client.metadata_app.field_spec import FIELD_SPECS
 from plantdb.client.metadata_app.field_spec import FieldSpec
 from plantdb.client.metadata_app.field_spec import coerce
@@ -425,12 +426,13 @@ def load_database(db_path, prev_data):
     if not db_path.is_dir():
         return {}, {}, [], [], [], [], dbc.Alert(f"Path does not exist: `{db_path}`", color="danger")
     try:
-        scan_ids, scans = db_ops.load_db(db_path)
+        scans_md = db_ops.all_scan_metadata(db_path)
+        scan_ids = list(scans_md.keys())
         # Switching databases: drop the cached connection for the previous one to
         # avoid holding several live FSDB instances at once.
         if prev_data and prev_data.get("db_path") and Path(prev_data["db_path"]).resolve() != db_path:
             db_ops.close_db(Path(prev_data["db_path"]))
-        data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
+        data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans_md}
         opts = scan_checklist(scan_ids)
         n = len(scan_ids)
         ok_alert = dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"),
@@ -655,10 +657,10 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
                 return dbc.Alert("Select a single scan first.", color="warning"), data, [], []
             # Rebuild the nested MIAPPE tree and merge it into the scan's metadata.
             tree = unflatten(dict(flat))
-            scan_dir = db_ops.get_scan_dir(db_path, scan_id)
-            metadata = db_ops.read_scan_metadata(scan_dir)
+            scan = _connect(db_path).get_scan(scan_id)
+            metadata = scan.get_metadata()
             metadata = db_ops.update_biological(metadata, tree)
-            db_ops.write_scan_metadata(scan_dir, metadata)
+            db_ops.write_scan_metadata(scan, metadata)
             msg = f"Saved scan '{scan_id}'."
         else:
             selected = selected or []
@@ -673,8 +675,9 @@ def apply_edit(n_clicks, mode, data, scan_id, selected, *field_values):
                 modified.update(db_ops.apply_bulk(db_path, selected, path, coerce(path, value)))
             msg = f"Applied to {len(modified)} scan(s)."
         # Reload so the refreshed scan list/checklist reflect the edits.
-        scan_ids, scans = db_ops.load_db(db_path)
-        new_data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans}
+        scans_md = db_ops.all_scan_metadata(db_path)
+        scan_ids = list(scans_md.keys())
+        new_data = {"db_path": str(db_path), "scan_ids": scan_ids, "scans": scans_md}
         return (dbc.Alert([html.I(className="bi bi-check-circle-fill me-2"), msg], color="success"),
                 new_data, scan_checklist(scan_ids), scan_ids)
     except Exception as e:

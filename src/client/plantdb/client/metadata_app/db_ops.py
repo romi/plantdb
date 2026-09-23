@@ -15,7 +15,6 @@ rejected.
 from __future__ import annotations
 
 import atexit
-import json
 import logging
 import shutil
 import threading
@@ -27,14 +26,13 @@ from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
 from plantdb.commons.cli.fsdb_migrate_metadata import migrate_metadata
 from plantdb.commons.cli.fsdb_migrate_metadata import migrate_scan_metadata
+from plantdb.commons.fsdb.path_helpers import _scan_metadata_path
+from plantdb.commons.fsdb.metadata import _load_scan_metadata
 
 from plantdb.client.metadata_app.field_spec import flatten
 
 #: Top-level MIAPPE sections managed by the editor.
 _BIOLOGICAL_SECTIONS = ("investigation", "study", "biologicalMaterial", "observedVariable")
-
-#: Name of a scan's metadata file, relative to the scan directory.
-_SCAN_METADATA_REL = Path("metadata") / "metadata.json"
 
 #: Cache of live connected FSDB instances, keyed by resolved db path.
 #: Connect is expensive (browses the DB tree and parses JSON), so each distinct database is connected once and reused until switched.
@@ -135,8 +133,8 @@ def get_scan_dir(db_path: Path, scan_id: str) -> Path:
     return _connect(db_path).get_scan(scan_id, owner_only=False).path()
 
 
-def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:
-    """Return ``(scan_ids, flattened)`` for every scan in the database.
+def all_scan_metadata(db_path: Path) -> dict[str, dict[str, Any]]:
+    """Return flattened scan metadata for every scan in the database.
 
     Parameters
     ----------
@@ -145,49 +143,25 @@ def load_db(db_path: Path) -> tuple[list[str], dict[str, dict[str, Any]]]:
 
     Returns
     -------
-    tuple of (list of str, dict of dict)
-        A pair of the scan ids and a mapping of each scan id to its flattened
-        MIAPPE metadata (see :func:`plantdb.client.metadata_app.field_spec.flatten`).
+    dict of dict
+        A mapping of each scan id to its flattened MIAPPE metadata
+        (see :func:`plantdb.client.metadata_app.field_spec.flatten`).
     """
-    scan_ids = _scan_ids(db_path)
     flattened: dict[str, dict[str, Any]] = {}
-    for scan_id in scan_ids:
-        scan_dir = get_scan_dir(db_path, scan_id)
-        flattened[scan_id] = flatten(read_scan_metadata(scan_dir))
-    return scan_ids, flattened
+    for scan in _connect(db_path).get_scans():
+        flattened[scan.id] = flatten(scan.get_metadata())
+    return flattened
 
 
-def read_scan_metadata(scan_dir: Path) -> dict[str, Any]:
-    """Read the full ``metadata.json`` of a scan directory.
-
-    Parameters
-    ----------
-    scan_dir : Path
-        Directory of the scan.
-
-    Returns
-    -------
-    dict of str to Any
-        The parsed metadata, or an empty dict if no metadata file exists.
-    """
-    md_path = scan_dir / _SCAN_METADATA_REL
-    if not md_path.is_file():
-        return {}
-    with md_path.open() as f:
-        return json.load(f)
-
-
-def write_scan_metadata(scan_dir: Path, metadata: dict[str, Any],
-                        backup: bool = True) -> None:
+def write_scan_metadata(scan: "Scan", metadata: dict[str, Any], backup: bool = True) -> None:
     """Validate and write ``metadata`` to ``scan_dir/metadata/metadata.json``.
 
-    A ``.bak`` copy of the previous file is written first when ``backup`` is
-    ``True``.
+    A ``.bak`` copy of the previous file is written first when ``backup`` is ``True``.
 
     Parameters
     ----------
-    scan_dir : Path
-        Directory of the scan.
+    scan : plantdb.commons.fsdb.core.Scan
+        Scan instance to use for metadata modification.
     metadata : dict of str to Any
         The metadata to persist.
     backup : bool, default True
@@ -199,12 +173,10 @@ def write_scan_metadata(scan_dir: Path, metadata: dict[str, Any],
         If the MIAPPE biological block of ``metadata`` is invalid.
     """
     validate_biological_metadata(metadata)
-    md_path = scan_dir / _SCAN_METADATA_REL
+    md_path = _scan_metadata_path(scan)
     if backup and md_path.is_file():
         shutil.copy2(md_path, md_path.with_suffix(md_path.suffix + ".bak"))
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-    with md_path.open("w") as f:
-        json.dump(metadata, f, sort_keys=True, indent=4, separators=(',', ': '))
+    scan.set_metadata(metadata)
 
 
 def update_biological(metadata: dict[str, Any], tree: dict[str, Any]) -> dict[str, Any]:
@@ -307,31 +279,32 @@ def apply_bulk(db_path: Path, scan_ids: list[str], path: str, value: Any,
         Writes are validated and backed up.
     """
     modified: list[str] = []
+    db = _connect(db_path)
     for scan_id in scan_ids:
-        scan_dir = get_scan_dir(db_path, scan_id)
-        metadata = read_scan_metadata(scan_dir)
+        scan = db.get_scan(scan_id)
+        metadata = scan.get_metadata()
         if get_field(metadata, path) == value:
             continue
         set_field(metadata, path, value)
-        write_scan_metadata(scan_dir, metadata, backup=backup)
+        write_scan_metadata(scan, metadata, backup=backup)
         modified.append(scan_id)
     return modified
 
 
-def scan_needs_migration(scan_dir: Path) -> bool:
-    """Return True if a scan's metadata still holds a legacy ``object`` block.
+def scan_needs_migration(scan: "Scan") -> bool:
+    """Return ``True`` if a scan's metadata still holds a legacy ``object`` block.
 
     Parameters
     ----------
-    scan_dir : Path
-        Directory of the scan to inspect.
+    scan : plantdb.commons.fsdb.core.Scan
+        Scan to inspect.
 
     Returns
     -------
     bool
-        True if the scan requires migration to the MIAPPE schema.
+        ``True`` if the scan requires migration to the MIAPPE schema.
     """
-    return migrate_metadata(read_scan_metadata(scan_dir))[1]
+    return migrate_metadata(_load_scan_metadata(scan))[1]
 
 
 def migratable_scans(db_path: Path) -> list[str]:
@@ -347,26 +320,7 @@ def migratable_scans(db_path: Path) -> list[str]:
     list of str
         Scan ids that require migration.
     """
-    return [sid for sid in _scan_ids(db_path)
-            if scan_needs_migration(get_scan_dir(db_path, sid))]
-
-
-def migrate_scans(db_path: Path, scan_ids: list[str]) -> int:
-    """Migrate the given scans to the MIAPPE-aligned schema.
-
-    Parameters
-    ----------
-    db_path : Path
-        Path to the FSDB containing the scans.
-    scan_ids : list of str
-        Scan ids to migrate.
-
-    Returns
-    -------
-    int
-        The number of scans that were actually migrated.
-    """
-    return migrate_scans_progress(db_path, scan_ids)
+    return [sid for sid in _scan_ids(db_path) if scan_needs_migration(get_scan_dir(db_path, sid))]
 
 
 def migrate_scans_progress(db_path: Path, scan_ids: list[str], logger: logging.Logger,
@@ -404,7 +358,7 @@ def migrate_scans_progress(db_path: Path, scan_ids: list[str], logger: logging.L
 
 
 __all__ = [
-    "get_scan_dir", "close_db", "load_db", "read_scan_metadata", "write_scan_metadata",
+    "get_scan_dir", "close_db", "all_scan_metadata", "write_scan_metadata",
     "update_biological", "get_field", "set_field", "apply_bulk",
-    "scan_needs_migration", "migratable_scans", "migrate_scans", "migrate_scans_progress",
+    "scan_needs_migration", "migratable_scans", "migrate_scans_progress",
 ]

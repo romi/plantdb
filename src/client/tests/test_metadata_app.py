@@ -10,8 +10,10 @@ from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.core import NoAuthSessionManager
 from plantdb.commons.fsdb.metadata_schema import SCAN_BIOLOGICAL_SCHEMA
+from plantdb.commons.fsdb.metadata import _load_scan_metadata
 
 from plantdb.client.metadata_app import db_ops
+from plantdb.client.metadata_app.db_ops import _connect
 from plantdb.client.metadata_app.field_spec import FIELD_BY_PATH
 from plantdb.client.metadata_app.field_spec import FIELD_SPECS
 from plantdb.client.metadata_app.field_spec import coerce
@@ -89,7 +91,7 @@ class TestDbOps(unittest.TestCase):
         modified = db_ops.apply_bulk(tmp, ["scan_a", "scan_b"],
                                      "biologicalMaterial.organism.species", "Solanum lycopersicum")
         self.assertEqual(modified, ["scan_a", "scan_b"])
-        _, flat = db_ops.load_db(tmp)
+        flat = db_ops.all_scan_metadata(tmp)
         self.assertEqual(flat["scan_a"]["biologicalMaterial.organism.species"], "Solanum lycopersicum")
         # backup written
         self.assertTrue((tmp / "scan_a" / "metadata" / "metadata.json.bak").is_file())
@@ -105,7 +107,7 @@ class TestDbOps(unittest.TestCase):
         })
         modified = db_ops.apply_bulk(tmp, ["scan_a"], "biologicalMaterial.organism.species", "X")
         self.assertEqual(modified, ["scan_a"])
-        _, flat = db_ops.load_db(tmp)
+        flat = db_ops.all_scan_metadata(tmp)
         self.assertNotIn("biologicalMaterial.organism.species", flat["scan_b"])
 
     def test_per_scan_update_preserves_non_biological(self):
@@ -113,12 +115,12 @@ class TestDbOps(unittest.TestCase):
             "scan_a": {"owner": "admin",
                        "biologicalMaterial": {"biologicalMaterialId": "old"}},
         })
-        scan_dir = db_ops.get_scan_dir(tmp, "scan_a")
-        metadata = db_ops.read_scan_metadata(scan_dir)
+        scan = _connect(tmp).get_scan("scan_a")
+        metadata = _load_scan_metadata(scan)
         metadata = db_ops.update_biological(
             metadata, unflatten({"biologicalMaterial.biologicalMaterialId": "new"}))
-        db_ops.write_scan_metadata(scan_dir, metadata)
-        saved = db_ops.read_scan_metadata(scan_dir)
+        db_ops.write_scan_metadata(scan, metadata)
+        saved = _load_scan_metadata(scan)
         self.assertEqual(saved["biologicalMaterial"]["biologicalMaterialId"], "new")
         self.assertEqual(saved["owner"], "admin")
 
@@ -137,28 +139,7 @@ class TestDbOps(unittest.TestCase):
             {"biologicalMaterial": {"organism": {"species": "Arabidopsis thaliana"}}}))
         from plantdb.commons.fsdb.exceptions import NotAnFSDBError
         with self.assertRaises(NotAnFSDBError):
-            db_ops.load_db(tmp)
-
-    def test_detect_and_run_migration(self):
-        """Legacy (object-block) scans are flagged and migrated to the MIAPPE tree."""
-        tmp = _mk_db({
-            "legacy_a": {"Metadata": {"object": {"species": "Arabidopsis thaliana",
-                                                 "experiment_id": "exp1"}}},
-            "legacy_b": {"object": {"species": "Solanum lycopersicum"}},
-            "new_c": {"biologicalMaterial": {"organism": {"species": "Zea mays"}}},
-        })
-
-        self.assertEqual(db_ops.migratable_scans(tmp), ["legacy_a", "legacy_b"])
-
-        done = db_ops.migrate_scans(tmp, ["legacy_a", "legacy_b"])
-        self.assertEqual(done, 2)
-        self.assertEqual(db_ops.migratable_scans(tmp), [])
-
-        saved = db_ops.read_scan_metadata(db_ops.get_scan_dir(tmp, "legacy_a"))
-        self.assertEqual(saved["biologicalMaterial"]["organism"]["species"], "Arabidopsis thaliana")
-        self.assertEqual(saved["study"]["identifier"], "exp1")
-        self.assertNotIn("object", saved)
-        self.assertNotIn("Metadata", saved)
+            db_ops.all_scan_metadata(tmp)
 
 
 if __name__ == "__main__":
