@@ -1313,7 +1313,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import test_database
         >>> db = test_database(no_auth=True)
         >>> db.connect()
-         >>> tl = db.create_timelapse('mytl_001')
+        >>> tl = db.create_timelapse('mytl_001')
         >>> db.list_timelapses()
         ['mytl_001']
         >>> tl.path().exists()
