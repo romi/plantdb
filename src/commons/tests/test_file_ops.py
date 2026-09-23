@@ -320,7 +320,6 @@ def test_make_scan_nested():
 
 def test_dual_read_scans():
     """Test loading scans from a DB containing both flat and timelapse scans."""
-    from plantdb.commons.fsdb.core import Scan
     db = dummy_db()
     db.connect()
 
@@ -329,23 +328,15 @@ def test_dual_read_scans():
     _ = flat_scan.create_fileset("fs1")
 
     # Create a nested member scan in a timelapse
-    tl_scan = Scan(db, "tl_member_01")
-    tl_scan.metadata = {"timelapse": {"id": "tl_exp", "index": 0}}
-    _make_scan(tl_scan)
-    tl_fs = tl_scan.create_fileset("fs_tl")
-    (tl_scan.path() / "metadata").mkdir(exist_ok=True)
-    (tl_scan.path() / "metadata" / "metadata.json").write_text(json.dumps(tl_scan.metadata))
+    tl = db.create_timelapse("tl_exp")
+    tl_scan = tl.create_scan("tl_member_01")
+    tl_scan.set_metadata({"timelapse": {"id": "tl_exp", "index": 0}})
+    _ = tl_scan.create_fileset("fs_tl")
 
-    loaded_scans = _load_scans(db)
-    assert "flat_scan_01" in loaded_scans
-    assert "tl_member_01" in loaded_scans
-    assert loaded_scans["tl_member_01"].metadata["timelapse"]["id"] == "tl_exp"
-
-    # Test _load_scan single lookup
-    single_scan = _load_scan(db, "tl_member_01")
-    assert single_scan is not None
-    assert single_scan.id == "tl_member_01"
-    assert single_scan.metadata["timelapse"]["id"] == "tl_exp"
+    assert "flat_scan_01" in db.scans
+    assert "tl_member_01" in db.scans
+    md = db.get_scan("tl_member_01").get_metadata("timelapse")
+    assert md["id"] == "tl_exp"
 
     db.disconnect()
 

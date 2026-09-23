@@ -192,6 +192,7 @@ def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files
         The loaded ``Scan`` object if the scan directory is a valid scan dataset; otherwise ``None``.
     """
     from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
 
     scan_path = Path(scan_path)
     if not _is_scan_dataset(scan_path, validate_json_fileset=False):
