@@ -50,10 +50,11 @@ from pathlib import Path
 from typing import Any
 from typing import Mapping
 from typing import MutableMapping
-from typing import Union
 from typing import TYPE_CHECKING
+from typing import Union
 
 from .lock import LockLevel
+from .path_helpers import _fileset_metadata_path
 
 # ----------------------------------------------------------------------
 # NOTE: The following imports are only needed for type‑checking / IDE hints.
@@ -78,22 +79,6 @@ from ..log import get_logger
 from ..utils import iso_date_now
 
 logger = get_logger(__name__)
-
-
-def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
-    """Load the metadata for a fileset.
-
-    Parameters
-    ----------
-    fileset : plantdb.commons.fsdb.core.Fileset
-        The fileset to load the metadata for.
-
-    Returns
-    -------
-    dict[str, Any]
-        The metadata dictionary.
-    """
-    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_metadata(path: Union[str, Path]) -> dict[str, Any]:
@@ -144,11 +129,23 @@ def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
     dict[str, Any]
         The metadata dictionary.
     """
-    scan_md = {}
-    md_path = _scan_metadata_path(scan)
-    if md_path.exists():
-        scan_md.update(_load_metadata(md_path))
-    return scan_md
+    return _load_metadata(_scan_metadata_path(scan))
+
+
+def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
+    """Load the metadata for a fileset.
+
+    Parameters
+    ----------
+    fileset : plantdb.commons.fsdb.core.Fileset
+        The fileset to load the metadata for.
+
+    Returns
+    -------
+    dict[str, Any]
+        The metadata dictionary.
+    """
+    return _load_metadata(_fileset_metadata_path(fileset))
 
 
 def _load_file_metadata(file: File) -> dict[str, Any]:
@@ -418,7 +415,7 @@ class MetadataManager(object):
         # Acquire exclusive lock on the object
         self.logger.debug(
             f"Updating '{obj_id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
-        )        
+        )
         with self.db.lock_manager.acquire_lock(obj_id, LockType.EXCLUSIVE, current_user.username, lock_level):
             _set_metadata(self.metadata, new_metadata, None)
             self._store_and_timestamp(store_func)

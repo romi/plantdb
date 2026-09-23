@@ -198,14 +198,11 @@ def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files
         return None
 
     scan = Scan(db, scan_id)
-
     # Load scan metadata first so that _scan_path(scan) can resolve nested paths if timelapse metadata is present
-    md_path = scan_path / "metadata" / "metadata.json"
-    if md_path.exists():
-        scan.metadata = _load_metadata(md_path)
+    scan.metadata = _load_scan_metadata(scan)
 
     # Backward compatibility with pre-2026 legacy metadata in images.json
-    img_fs_path = scan_path / "metadata" / "images.json"
+    img_fs_path = _fileset_metadata_path(Fileset(scan, 'images'))
     if img_fs_path.exists():
         img_fs_md = _load_metadata(img_fs_path)
         for md_key in ['object', 'hardware', 'acquisition_date']:
