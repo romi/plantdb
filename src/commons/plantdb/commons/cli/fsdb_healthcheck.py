@@ -38,16 +38,17 @@ from click_option_group import OptionGroup
 from click_option_group import optgroup
 from send2trash import send2trash
 
-from plantdb.commons.log import get_logger
-from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import LOG_LEVELS
+from plantdb.commons.log import get_logger
 
 # Create a logger and set the environment variable
 os.environ.setdefault('ROMI_APP_LOGGER', __name__.split('.')[-1])
 logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.exceptions import NotAnFSDBError
 from plantdb.commons.fsdb.file_ops import _load_scan
 from plantdb.commons.fsdb.validation import _is_scan_dataset
@@ -148,7 +149,7 @@ def fix_missing_scans_reference(db: FSDB, scan_dirs: list[Path], logger: Logger)
     bad_dir = []
     total_scans = 0
     for entry_path in scan_dirs:
-        if (entry_path / "timelapse.json").is_file():
+        if (entry_path / TIMELAPSE_MARKER_FILE_NAME).is_file():
             # Timelapse container
             child_dirs = [c for c in entry_path.iterdir() if c.is_dir() and not c.name.startswith('.')]
             for child_path in child_dirs:

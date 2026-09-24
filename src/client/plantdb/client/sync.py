@@ -157,13 +157,14 @@ from urllib.parse import urlparse
 import paramiko
 import requests
 import urllib3
+from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
+from plantdb.commons.fsdb.validation import _is_fsdb
+from plantdb.commons.utils import iso_date_now
 
 from plantdb.client.rest_api.requests import request_archive_download
 from plantdb.client.rest_api.requests import request_archive_upload
-from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.fsdb.core import MARKER_FILE_NAME
-from plantdb.commons.fsdb.validation import _is_fsdb
-from plantdb.commons.utils import iso_date_now
 
 
 def _resolve_local_scan_path(base_path: Path, scan_id: str) -> Path:
@@ -174,7 +175,7 @@ def _resolve_local_scan_path(base_path: Path, scan_id: str) -> Path:
         return flat
     if base_path.is_dir():
         for d in base_path.iterdir():
-            if d.is_dir() and not d.name.startswith('.') and (d / "timelapse.json").is_file():
+            if d.is_dir() and not d.name.startswith('.') and (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
                 nested = d / scan_id
                 if nested.is_dir():
                     return nested
@@ -186,12 +187,12 @@ def _resolve_dest_scan_path(dst_path: Path, src_scan_path: Path, scan_id: str) -
     dst_path = Path(dst_path)
     src_scan_path = Path(src_scan_path)
     parent = src_scan_path.parent
-    if (parent / "timelapse.json").is_file():
+    if (parent / TIMELAPSE_MARKER_FILE_NAME).is_file():
         tl_id = parent.name
         dst_tl_path = dst_path / tl_id
         dst_tl_path.mkdir(parents=True, exist_ok=True)
-        dst_marker = dst_tl_path / "timelapse.json"
-        src_marker = parent / "timelapse.json"
+        dst_marker = dst_tl_path / TIMELAPSE_MARKER_FILE_NAME
+        src_marker = parent / TIMELAPSE_MARKER_FILE_NAME
         if not dst_marker.is_file() and src_marker.is_file():
             shutil.copy2(src_marker, dst_marker)
         return dst_tl_path / scan_id
@@ -595,7 +596,7 @@ class FSDBSync():
                     if tl_id:
                         final_dst_tl = dst_path / tl_id
                         final_dst_tl.mkdir(parents=True, exist_ok=True)
-                        dst_marker = final_dst_tl / "timelapse.json"
+                        dst_marker = final_dst_tl / TIMELAPSE_MARKER_FILE_NAME
                         if not dst_marker.is_file():
                             with dst_marker.open("w") as f:
                                 json.dump({"id": tl_id, "created_at": iso_date_now()}, f, indent=4)
@@ -691,7 +692,7 @@ class FSDBSync():
                     if tl_id:
                         dst_tl = dst_path / tl_id
                         dst_tl.mkdir(parents=True, exist_ok=True)
-                        dst_marker = dst_tl / "timelapse.json"
+                        dst_marker = dst_tl / TIMELAPSE_MARKER_FILE_NAME
                         if not dst_marker.is_file():
                             with dst_marker.open("w") as f:
                                 json.dump({"id": tl_id, "created_at": iso_date_now()}, f, indent=4)
@@ -896,7 +897,7 @@ class FSDBSync():
         for d in db_path.iterdir():
             if not d.is_dir() or d.name.startswith('.'):
                 continue
-            if (d / "timelapse.json").is_file():
+            if (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
                 for c in d.iterdir():
                     if c.is_dir() and not c.name.startswith('.'):
                         scans.append(c.name)
@@ -1086,7 +1087,7 @@ def config_from_url(url):
     return config
 
 
-def _parse_database_spec(spec) :
+def _parse_database_spec(spec):
     """Parse and validate a database specification, determining the appropriate synchronization strategy.
 
     This function analyzes database specifications and returns a structured representation

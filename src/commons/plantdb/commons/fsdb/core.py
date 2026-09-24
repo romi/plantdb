@@ -140,8 +140,6 @@ from pathlib import Path
 from shutil import copyfile
 from typing import Any
 from typing import Callable
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -179,28 +177,25 @@ from plantdb.commons.fsdb.lock import LockLevel
 from plantdb.commons.fsdb.lock import LockManager
 from plantdb.commons.fsdb.lock import LockType
 from plantdb.commons.fsdb.metadata import MetadataManager
-from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
 from plantdb.commons.fsdb.metadata import _get_metadata
 from plantdb.commons.fsdb.metadata import _set_metadata
 from plantdb.commons.fsdb.metadata import _store_file_metadata
 from plantdb.commons.fsdb.metadata import _store_fileset_metadata
 from plantdb.commons.fsdb.metadata import _store_scan_metadata
 from plantdb.commons.fsdb.metadata import _store_timelapse_metadata
+from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.path_helpers import _file_path
 from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
 from plantdb.commons.fsdb.path_helpers import _timelapse_marker
 from plantdb.commons.fsdb.path_helpers import _timelapse_path
-from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import iso_date_now
-
-#: This file must exist in the root of a folder for it to be considered a valid FSDB
-MARKER_FILE_NAME = "romidb"
 
 
 def require_connected_db(method: Callable) -> Callable:
@@ -592,6 +587,7 @@ def _sort_scans(scans: list["Scan"], sort: str | None) -> list["Scan"]:
             except (ValueError, TypeError):
                 idx = 0
             return (str(scheduled), idx)
+
         return sorted(scans, key=sort_key)
     return scans
 
@@ -658,7 +654,7 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
-                 extra_dirs:list[str]=['configs'],
+                 extra_dirs: list[str] = ['configs'],
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -986,7 +982,8 @@ class FSDB(db.DB):
         real_plant_analyzed
         >>> db.disconnect()
         """
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username if current_user else "guest", LockLevel.SCAN):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED,
+                                            current_user.username if current_user else "guest", LockLevel.SCAN):
             if not self.scan_exists(scan_id):
                 raise ScanNotFoundError(self, scan_id)
             return self.scans[scan_id]

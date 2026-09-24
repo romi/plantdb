@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import tempfile
 import unittest
-import json
 from pathlib import Path
 
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.fsdb.core import MARKER_FILE_NAME
 from plantdb.commons.fsdb.core import NoAuthSessionManager
-from plantdb.commons.fsdb.metadata_schema import SCAN_BIOLOGICAL_SCHEMA
 from plantdb.commons.fsdb.metadata import _load_scan_metadata
+from plantdb.commons.fsdb.metadata_schema import SCAN_BIOLOGICAL_SCHEMA
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
 
 from plantdb.client.metadata_app import db_ops
 from plantdb.client.metadata_app.db_ops import _connect
@@ -37,6 +37,7 @@ def _mk_db(scans=None):
 class TestFieldSpec(unittest.TestCase):
     def test_specs_cover_schema(self):
         """Every leaf of the validator schema must have a field spec (no drift)."""
+
         def leaves(schema, prefix=""):
             for key, rule in schema.items():
                 path = f"{prefix}.{key}" if prefix else key
@@ -44,6 +45,7 @@ class TestFieldSpec(unittest.TestCase):
                     yield from leaves(rule, path)
                 else:
                     yield path
+
         schema_leaves = set(leaves(SCAN_BIOLOGICAL_SCHEMA))
         spec_paths = set(FIELD_BY_PATH)
         self.assertEqual(schema_leaves, spec_paths)

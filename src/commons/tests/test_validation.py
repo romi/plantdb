@@ -1,28 +1,21 @@
 import json
-import os
 from pathlib import Path
-from unittest import mock
 
 import pytest
 
-from plantdb.commons.fsdb.validation import (
-    _is_valid_id,
-    _is_fsdb,
-    _is_scan_dataset,
-    _is_valid_fileset,
-    _fileset_files_exists,
-    _is_safe_to_delete,
-)
-from plantdb.commons.fsdb.path_helpers import (
-    _scan_path,
-    _timelapse_path,
-    _timelapse_marker,
-)
-from plantdb.commons.test_database import (
-    setup_empty_database,
-    dummy_db,
-    setup_test_database,
-)
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import _scan_path
+from plantdb.commons.fsdb.path_helpers import _timelapse_marker
+from plantdb.commons.fsdb.path_helpers import _timelapse_path
+from plantdb.commons.fsdb.validation import _fileset_files_exists
+from plantdb.commons.fsdb.validation import _is_fsdb
+from plantdb.commons.fsdb.validation import _is_safe_to_delete
+from plantdb.commons.fsdb.validation import _is_scan_dataset
+from plantdb.commons.fsdb.validation import _is_valid_fileset
+from plantdb.commons.fsdb.validation import _is_valid_id
+from plantdb.commons.test_database import dummy_db
+from plantdb.commons.test_database import setup_empty_database
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -33,12 +26,14 @@ def empty_db_path(tmp_path):
     """Create an empty FSDB (only marker file)."""
     return setup_empty_database(db_path=tmp_path)
 
+
 @pytest.fixture
 def db_with_scan():
     """Create a dummy DB with a single scan (myscan_001)."""
     db = dummy_db(with_scan=True)
     yield db
     db.disconnect()
+
 
 @pytest.fixture
 def db_with_fileset():
@@ -47,12 +42,14 @@ def db_with_fileset():
     yield db
     db.disconnect()
 
+
 @pytest.fixture
 def db_with_file():
     """Create a dummy DB with a scan, fileset and three files."""
     db = dummy_db(with_file=True)
     yield db
     db.disconnect()
+
 
 # ---------------------------------------------------------------------------
 # _is_valid_id tests
@@ -82,6 +79,7 @@ def test_is_valid_id_various(input_id, expected, caplog):
         # At least one error log should have been emitted
         assert any(record.levelname == "ERROR" for record in caplog.records)
 
+
 # ---------------------------------------------------------------------------
 # _is_fsdb tests
 # ---------------------------------------------------------------------------
@@ -92,6 +90,7 @@ def test_is_fsdb_empty(empty_db_path, caplog):
     # No warning about bad scans
     assert not any("bad scan" in rec.message for rec in caplog.records)
 
+
 def test_is_fsdb_non_directory(tmp_path, caplog):
     """Path that is not a directory returns False and logs an error."""
     file_path = tmp_path / "somefile"
@@ -99,15 +98,18 @@ def test_is_fsdb_non_directory(tmp_path, caplog):
     assert _is_fsdb(file_path) is False
     assert any("not a directory" in rec.message for rec in caplog.records)
 
+
 def test_is_fsdb_missing_marker(tmp_path, caplog):
     """Directory without marker file is not a FSDB."""
     (tmp_path / "scan1").mkdir()
     assert _is_fsdb(tmp_path) is False
     assert any("marker file" in rec.message for rec in caplog.records)
 
+
 def test_is_fsdb_with_valid_scan(db_with_scan):
     """FSDB containing a correctly structured scan is valid."""
     assert _is_fsdb(db_with_scan.path()) is True
+
 
 def test_is_fsdb_with_extra_dir(tmp_path, caplog):
     """Extra directory listed in `extra_dirs` should be ignored."""
@@ -123,6 +125,7 @@ def test_is_fsdb_with_extra_dir(tmp_path, caplog):
     # Now validation should succeed despite the extra folder
     assert _is_fsdb(db_path) is True
 
+
 def test_is_fsdb_invalid_scan_structure(db_with_scan, caplog):
     """A scan missing required files should cause `_is_fsdb` to return False."""
     # Remove the metadata directory of the existing scan
@@ -134,6 +137,7 @@ def test_is_fsdb_invalid_scan_structure(db_with_scan, caplog):
     metadata_dir.rmdir()
     assert _is_fsdb(db_with_scan.path()) is False
     assert any("bad scan directories" in rec.message for rec in caplog.records)
+
 
 # ---------------------------------------------------------------------------
 # _is_scan_dataset tests
@@ -148,11 +152,13 @@ def test_is_scan_dataset_missing_metadata(db_with_scan):
     metadata.rmdir()
     assert _is_scan_dataset(scan.path()) is False
 
+
 def test_is_scan_dataset_missing_files_json(db_with_scan):
     scan = db_with_scan.get_scan("myscan_001")
     files_json = scan.path() / "files.json"
     files_json.unlink()
     assert _is_scan_dataset(scan.path()) is False
+
 
 def test_is_scan_dataset_invalid_json(db_with_scan, caplog):
     scan = db_with_scan.get_scan("myscan_001")
@@ -161,6 +167,7 @@ def test_is_scan_dataset_invalid_json(db_with_scan, caplog):
     assert _is_scan_dataset(scan.path()) is False
     assert any("Could not load required `files.json`" in rec.message for rec in caplog.records)
 
+
 def test_is_scan_dataset_missing_filesets_key(db_with_scan, caplog):
     scan = db_with_scan.get_scan("myscan_001")
     files_json = scan.path() / "files.json"
@@ -168,9 +175,11 @@ def test_is_scan_dataset_missing_filesets_key(db_with_scan, caplog):
     assert _is_scan_dataset(scan.path()) is False
     assert any("Missing required 'filesets' entry" in rec.message for rec in caplog.records)
 
+
 def test_is_scan_dataset_valid_without_validation(db_with_scan):
     scan = db_with_scan.get_scan("myscan_001")
     assert _is_scan_dataset(scan.path(), validate_json_fileset=False) is True
+
 
 def test_is_scan_dataset_valid_with_validation(db_with_fileset, caplog):
     # The dummy DB already has a valid fileset and files.json
@@ -178,6 +187,7 @@ def test_is_scan_dataset_valid_with_validation(db_with_fileset, caplog):
     assert _is_scan_dataset(scan.path(), validate_json_fileset=True) is True
     # No errors should be logged
     assert not any(rec.levelname == "ERROR" for rec in caplog.records)
+
 
 def test_is_scan_dataset_invalid_fileset_json(db_with_fileset, caplog):
     # Corrupt the fileset entry so that validation fails (missing directory)
@@ -192,6 +202,7 @@ def test_is_scan_dataset_invalid_fileset_json(db_with_fileset, caplog):
     assert _is_scan_dataset(scan.path(), validate_json_fileset=True) is True
     assert any("Missing fileset" in rec.message for rec in caplog.records)
 
+
 # ---------------------------------------------------------------------------
 # _is_valid_fileset tests
 # ---------------------------------------------------------------------------
@@ -201,6 +212,7 @@ def test_is_valid_fileset_missing_directory(db_with_fileset, caplog):
     # Use a non‑existent fileset id
     assert _is_valid_fileset(scan.path(), "no_such_fs", []) is False
     assert any("Missing fileset" in rec.message for rec in caplog.records)
+
 
 def test_is_valid_fileset_missing_files(db_with_fileset, caplog):
     scan = db_with_fileset.get_scan("myscan_001")
@@ -212,6 +224,7 @@ def test_is_valid_fileset_missing_files(db_with_fileset, caplog):
     assert _is_valid_fileset(scan.path(), "empty_fs", fs_info) is False
     assert any("Missing" in rec.message for rec in caplog.records)
 
+
 def test_is_valid_fileset_all_present(db_with_fileset):
     scan = db_with_fileset.get_scan("myscan_001")
     # Use the existing fileset which already has its files
@@ -222,12 +235,14 @@ def test_is_valid_fileset_all_present(db_with_fileset):
     fs_info = data["filesets"][0]["files"]
     assert _is_valid_fileset(scan.path(), fileset.id, fs_info) is True
 
+
 # ---------------------------------------------------------------------------
 # _fileset_files_exists tests
 # ---------------------------------------------------------------------------
 
 def test_fileset_files_exists_empty_list():
     assert _fileset_files_exists([], Path("/tmp")) == []
+
 
 def test_fileset_files_exists_ignore_invalid_entries(tmp_path):
     # Create a dummy file for a valid entry
@@ -242,6 +257,7 @@ def test_fileset_files_exists_ignore_invalid_entries(tmp_path):
     # Only the first entry should be considered
     assert result == [True]
 
+
 def test_fileset_files_exists_mixed(tmp_path):
     (tmp_path / "present.txt").write_text("x")
     fs_info = [
@@ -249,6 +265,7 @@ def test_fileset_files_exists_mixed(tmp_path):
         {"id": "b", "file": "missing.txt"},
     ]
     assert _fileset_files_exists(fs_info, tmp_path) == [True, False]
+
 
 # ---------------------------------------------------------------------------
 # _is_safe_to_delete tests
@@ -261,6 +278,7 @@ def test_is_safe_to_delete_outside_path(db_with_scan, caplog):
     assert _is_safe_to_delete(outside, db_with_scan.path()) is False
     assert any("not inside the FSDB" in rec.message for rec in caplog.records)
 
+
 def test_is_safe_to_delete_invalid_db(tmp_path, caplog):
     # Provide a db_path that lacks marker file
     invalid_db = tmp_path / "invalid"
@@ -270,10 +288,12 @@ def test_is_safe_to_delete_invalid_db(tmp_path, caplog):
     assert _is_safe_to_delete(inside, invalid_db) is False
     assert any("path to the FSDB" in rec.message for rec in caplog.records)
 
+
 def test_is_safe_to_delete_root_path(db_with_scan, caplog):
     # Trying to delete the root DB folder is disallowed; function returns False and logs error about path not inside FSDB.
     assert _is_safe_to_delete(db_with_scan.path(), db_with_scan.path()) is False
     assert any("not inside the FSDB" in rec.message for rec in caplog.records)
+
 
 def test_is_safe_to_delete_valid_subpath(db_with_scan):
     scan = db_with_scan.get_scan("myscan_001")
@@ -288,7 +308,7 @@ def test_is_fsdb_with_timelapses(empty_db_path):
     # Create a timelapse directory with timelapse.json
     tl_dir = empty_db_path / "tl_001"
     tl_dir.mkdir()
-    (tl_dir / "timelapse.json").write_text(json.dumps({"id": "tl_001", "created_at": "2026-09-03T12:00:00Z"}))
+    (tl_dir / TIMELAPSE_MARKER_FILE_NAME).write_text(json.dumps({"id": "tl_001", "created_at": "2026-09-03T12:00:00Z"}))
 
     # Empty timelapse container is valid in FSDB
     assert _is_fsdb(empty_db_path) is True
@@ -313,7 +333,7 @@ def test_path_helpers_timelapse(db_with_scan, tmp_path):
     tl_path = _timelapse_path(tmp_path, "tl_test")
     assert tl_path == (tmp_path / "tl_test").resolve()
     marker = _timelapse_marker(tl_path)
-    assert marker == (tmp_path / "tl_test" / "timelapse.json").resolve()
+    assert marker == (tmp_path / "tl_test" / TIMELAPSE_MARKER_FILE_NAME).resolve()
 
     # Test _scan_path without timelapse
     scan = db_with_scan.get_scan("myscan_001")

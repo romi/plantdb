@@ -435,7 +435,7 @@ def setup_empty_database(db_path: str | Path | None = None) -> Path:
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     """
-    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+    from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
 
     if isinstance(db_path, str):
         db_path = Path(db_path)
@@ -661,7 +661,7 @@ def dummy_db(with_scan: bool = False, with_fileset: bool = False, with_file: boo
     """
     from plantdb.commons import io
     from plantdb.commons.fsdb.core import FSDB
-    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+    from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
 
     # Create a temporary folder to host the dummy database
     db_path = _mkdtemp_romidb()

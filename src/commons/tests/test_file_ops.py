@@ -22,6 +22,7 @@ from plantdb.commons.fsdb.file_ops import _load_scan_measures
 from plantdb.commons.fsdb.file_ops import _load_scans
 from plantdb.commons.fsdb.file_ops import _make_fileset
 from plantdb.commons.fsdb.file_ops import _make_scan
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.test_database import dummy_db
 
 
@@ -334,7 +335,7 @@ def test_make_scan_nested():
     assert path.exists()
     assert path.is_dir()
     assert path == (db.path() / "tl_001" / "tl_scan_0").resolve()
-    assert (db.path() / "tl_001" / "timelapse.json").is_file()
+    assert (db.path() / "tl_001" / TIMELAPSE_MARKER_FILE_NAME).is_file()
     db.disconnect()
 
 
