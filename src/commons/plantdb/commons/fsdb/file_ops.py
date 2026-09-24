@@ -197,8 +197,13 @@ def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files
     scan_path = Path(scan_path)
     if not _is_scan_dataset(scan_path, validate_json_fileset=False):
         return None
+    try:
+        tl_id, _scan_id = scan_path.parts[-2:]
+    except ValueError:
+        tl_id = None
+        _scan_id = scan_path.name
 
-    scan = Scan(db, scan_id)
+    scan = Scan(db, scan_id, timelapse_id=tl_id)
     # Load scan metadata first so that _scan_path(scan) can resolve nested paths if timelapse metadata is present
     scan.metadata = _load_scan_metadata(scan)
 

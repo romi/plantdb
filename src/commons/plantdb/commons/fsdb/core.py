@@ -2808,7 +2808,17 @@ class Scan(db.Scan, MetadataManager):
     >>> print(os.listdir(os.path.join(db.path(), scan.id, "metadata")))  # Same goes for the metadata
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
-    >>> # Example #2: Get it from an `FSDB` object:
+    >>> # Example #2: Initialize a `Scan` object that belongs to a `Timelapse` object
+    >>> db = dummy_db()
+    >>> db.timelapse_exists("Star_Wars")
+    False
+    >>> scan = Scan(db, 'A_New_Hope', timelapse_id='Star_Wars')
+    >>> db.timelapse_exists("Star_Wars")
+    True
+    >>> scan.path()
+    PosixPath('/tmp/ROMI_DB_********/Star_Wars/A_New_Hope')
+
+    >>> # Example #3: Get it from an `FSDB` object:
     >>> db = dummy_db()
     >>> scan = db.create_scan('007')
     >>> print(type(scan))
@@ -2828,7 +2838,7 @@ class Scan(db.Scan, MetadataManager):
     >>> db._is_dummy = True  # to clean up the temporary dummy database
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
-    >>> # Example #3: Use an existing database:
+    >>> # Example #4: Use an existing database:
     >>> from os import environ
     >>> from plantdb.commons.fsdb.core import FSDB
     >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
@@ -2837,7 +2847,7 @@ class Scan(db.Scan, MetadataManager):
     >>> scan.get_metadata()
     """
 
-    def __init__(self, db, scan_id):
+    def __init__(self, db, scan_id, timelapse_id=None):
         """Scan dataset constructor.
 
         Parameters
@@ -2856,6 +2866,11 @@ class Scan(db.Scan, MetadataManager):
 
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
+
+        if timelapse_id is not None:
+            if not self.db.timelapse_exists(timelapse_id):
+                self.db.create_timelapse(timelapse_id)
+            self.set_metadata("timelapse", {"id": timelapse_id})
 
     def _erase(self) -> None:
         """Erase the filesets and metadata associated with this scan."""
