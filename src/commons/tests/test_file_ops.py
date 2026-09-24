@@ -94,6 +94,26 @@ def test_load_scan_nonexistent():
     db.disconnect()
 
 
+def test_load_scan_at_success():
+    """Test loading a scan from an explicit directory path."""
+    db = dummy_db()
+    db.connect()
+    scan = db.create_scan("test_scan")
+    scan_obj = _load_scan_at(db, scan.path())
+    assert scan_obj is not None
+    assert scan_obj.id == "test_scan"
+    db.disconnect()
+
+
+def test_load_scan_at_invalid_path():
+    """Test loading a scan from a path that is not a valid scan dataset returns None."""
+    db = dummy_db()
+    db.connect()
+    scan_obj = _load_scan_at(db, db.path() / "nonexistent")
+    assert scan_obj is None
+    db.disconnect()
+
+
 def test_load_scan_filesets_success():
     """Test loading scan filesets from a valid files.json."""
     db = dummy_db(with_file=True)
