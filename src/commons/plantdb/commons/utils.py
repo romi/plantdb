@@ -50,6 +50,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
+
 
 def read_image_from_file(filename):
     """Read an image from a file and return it.
@@ -186,7 +188,6 @@ def fsdb_file_from_local_file(path):
     from plantdb.commons.fsdb.core import Scan
     from plantdb.commons.fsdb.core import Fileset
     from plantdb.commons.fsdb.core import File
-    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem
@@ -343,10 +344,10 @@ def yes_no_choice(question: str, default: bool = True) -> bool:
 
 
 def yes_no_abort_choice(
-    question: str,
-    default: bool = True,
-    abort_allowed: bool = True,
-    default_abort: bool = False,
+        question: str,
+        default: bool = True,
+        abort_allowed: bool = True,
+        default_abort: bool = False,
 ) -> bool | None:
     """Prompt the user with a Yes/No question that also supports aborting.
 
@@ -413,6 +414,7 @@ def yes_no_abort_choice(
         if kbd in opt:
             return opt[kbd]
         print("Please answer with 'yes', 'no', or 'a' (abort).")
+
 
 def backup_filename(file: Path) -> Path:
     """Create a backup a filename by adding a timestamp.

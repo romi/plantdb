@@ -49,7 +49,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install -yq --no-install-recommends \
         # Install Open3D system dependencies
-        libegl1 libgl1 libgomp1
+        libegl1 libgl1 libgomp1 libusb-1.0-0
 
 COPY src/client client/
 
@@ -116,7 +116,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         # Install python3.10 & pip
         python3 python3-distutils python3-dev \
         # Install Open3D system dependencies
-        libegl1 libgl1 libgomp1 && \
+        libegl1 libgl1 libgomp1 libusb-1.0-0 && \
     # Clean package manager:
     apt-get clean -y && \
     apt-get autoremove -y && \

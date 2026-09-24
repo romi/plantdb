@@ -130,6 +130,9 @@ CMakeFiles/
 # Junie agent working artifacts
 .junie/
 
+# Dash/Diskcache runtime cache (metadata editor)
+.dashcache/
+
 # Downloadable test fixtures (large datasets fetched via test_database.py)
 src/commons/tests/testdata/
 !src/commons/tests/testdata/romidb

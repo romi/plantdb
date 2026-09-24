@@ -140,8 +140,6 @@ from pathlib import Path
 from shutil import copyfile
 from typing import Any
 from typing import Callable
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -185,21 +183,19 @@ from plantdb.commons.fsdb.metadata import _store_file_metadata
 from plantdb.commons.fsdb.metadata import _store_fileset_metadata
 from plantdb.commons.fsdb.metadata import _store_scan_metadata
 from plantdb.commons.fsdb.metadata import _store_timelapse_metadata
+from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.path_helpers import _file_path
 from plantdb.commons.fsdb.path_helpers import _fileset_path
 from plantdb.commons.fsdb.path_helpers import _get_filename
 from plantdb.commons.fsdb.path_helpers import _scan_path
 from plantdb.commons.fsdb.path_helpers import _timelapse_marker
 from plantdb.commons.fsdb.path_helpers import _timelapse_path
-from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
 from plantdb.commons.fsdb.validation import _is_valid_id
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import get_logger
 from plantdb.commons.utils import iso_date_now
-
-#: This file must exist in the root of a folder for it to be considered a valid FSDB
-MARKER_FILE_NAME = "romidb"
 
 
 def require_connected_db(method: Callable) -> Callable:
@@ -591,6 +587,7 @@ def _sort_scans(scans: list["Scan"], sort: str | None) -> list["Scan"]:
             except (ValueError, TypeError):
                 idx = 0
             return (str(scheduled), idx)
+
         return sorted(scans, key=sort_key)
     return scans
 
@@ -657,7 +654,7 @@ class FSDB(db.DB):
     """
 
     def __init__(self, basedir: Union[str, Path],
-                 extra_dirs:list[str]=['configs'],
+                 extra_dirs: list[str] = ['configs'],
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
@@ -772,7 +769,7 @@ class FSDB(db.DB):
     def connect(self) -> None:
         """Connect the database by loading the scans' dataset."""
         if not _is_fsdb(self.basedir, extra_dirs=self.extra_dirs):
-            raise NotAnFSDBError(f"Directory {self.basedir} is not a valid path to an FSDB!")
+            raise NotAnFSDBError(f"Directory `{self.basedir}` is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery
             self.scans = _load_scans(self)
@@ -985,7 +982,8 @@ class FSDB(db.DB):
         real_plant_analyzed
         >>> db.disconnect()
         """
-        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED, current_user.username if current_user else "guest", LockLevel.SCAN):
+        with self.lock_manager.acquire_lock(scan_id, LockType.SHARED,
+                                            current_user.username if current_user else "guest", LockLevel.SCAN):
             if not self.scan_exists(scan_id):
                 raise ScanNotFoundError(self, scan_id)
             return self.scans[scan_id]
@@ -1091,6 +1089,9 @@ class FSDB(db.DB):
                 raise ValueError("Sharing field must be a list of group names")
             if not self.rbac_manager.validate_sharing_groups(sharing_groups):
                 raise ValueError("One or more sharing groups do not exist")
+
+        # Validate the MIAPPE biological block if provided (optional on scans)
+        validate_biological_metadata(metadata)
 
         # Use exclusive lock for scan creation
         self.logger.debug(f"Creating a scan '{scan_id}' as user '{current_user.username}'...")
@@ -1309,7 +1310,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import test_database
         >>> db = test_database(no_auth=True)
         >>> db.connect()
-         >>> tl = db.create_timelapse('mytl_001')
+        >>> tl = db.create_timelapse('mytl_001')
         >>> db.list_timelapses()
         ['mytl_001']
         >>> tl.path().exists()
@@ -2804,7 +2805,17 @@ class Scan(db.Scan, MetadataManager):
     >>> print(os.listdir(os.path.join(db.path(), scan.id, "metadata")))  # Same goes for the metadata
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
-    >>> # Example #2: Get it from an `FSDB` object:
+    >>> # Example #2: Initialize a `Scan` object that belongs to a `Timelapse` object
+    >>> db = dummy_db()
+    >>> db.timelapse_exists("Star_Wars")
+    False
+    >>> scan = Scan(db, 'A_New_Hope', timelapse_id='Star_Wars')
+    >>> db.timelapse_exists("Star_Wars")
+    True
+    >>> scan.path()
+    PosixPath('/tmp/ROMI_DB_********/Star_Wars/A_New_Hope')
+
+    >>> # Example #3: Get it from an `FSDB` object:
     >>> db = dummy_db()
     >>> scan = db.create_scan('007')
     >>> print(type(scan))
@@ -2824,7 +2835,7 @@ class Scan(db.Scan, MetadataManager):
     >>> db._is_dummy = True  # to clean up the temporary dummy database
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
 
-    >>> # Example #3: Use an existing database:
+    >>> # Example #4: Use an existing database:
     >>> from os import environ
     >>> from plantdb.commons.fsdb.core import FSDB
     >>> db = FSDB(environ.get('ROMI_DB', "/data/ROMI/DB/"))
@@ -2833,7 +2844,7 @@ class Scan(db.Scan, MetadataManager):
     >>> scan.get_metadata()
     """
 
-    def __init__(self, db, scan_id):
+    def __init__(self, db, scan_id, timelapse_id=None):
         """Scan dataset constructor.
 
         Parameters
@@ -2852,6 +2863,11 @@ class Scan(db.Scan, MetadataManager):
 
         self.session_manager = self.db.session_manager
         self.logger = self.db.logger
+
+        if timelapse_id is not None:
+            if not self.db.timelapse_exists(timelapse_id):
+                self.db.create_timelapse(timelapse_id)
+            self.metadata["timelapse"] = {"id": timelapse_id}
 
     def _erase(self) -> None:
         """Erase the filesets and metadata associated with this scan."""

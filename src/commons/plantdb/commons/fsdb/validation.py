@@ -36,20 +36,18 @@ This module ensures data integrity and safe operations when working with file sy
 """
 
 import re
-
 from pathlib import Path
 
-from .path_helpers import _fileset_path
-from .path_helpers import _scan_json_file
+from .path_helpers import MARKER_FILE_NAME
+from .path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from ..log import get_logger
 
 logger = get_logger(__name__)
 
-
 # Identifier naming rules shared by scans, filesets, files and timelapses.
 # Constraints: ASCII only, no dots, first character must be alphanumeric, and a hard length cap.
 MAX_ID_LENGTH = 128
-VALID_ID_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$') # Compiled once at import time
+VALID_ID_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$')  # Compiled once at import time
 
 
 def _is_valid_id(name: str) -> bool:
@@ -138,8 +136,6 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     >>> _is_fsdb(path)
     True
     """
-    from .core import MARKER_FILE_NAME
-
     path = Path(path)
     # Check if the path is a directory
     if not path.is_dir():
@@ -164,7 +160,7 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     for scan_dir in scan_dirs:
         if scan_dir.name in extra_dirs:
             continue  # skip the verification for any folder declared as "extra"
-        if (scan_dir / "timelapse.json").is_file():
+        if (scan_dir / TIMELAPSE_MARKER_FILE_NAME).is_file():
             # It is a timelapse container: validate child scan directories
             child_dirs = [c for c in scan_dir.iterdir() if c.is_dir() and not c.name.startswith('.')]
             for child_dir in child_dirs:

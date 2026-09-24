@@ -49,6 +49,7 @@ from .metadata import _load_file_metadata
 from .metadata import _load_fileset_metadata
 from .metadata import _load_metadata
 from .metadata import _load_scan_metadata
+from .path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from .path_helpers import _file_metadata_path
 from .path_helpers import _file_path
 from .path_helpers import _fileset_metadata_json_path
@@ -138,7 +139,8 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     >>> db.disconnect()
     """
     # List all subdirectories of the database path:
-    dir_names = [dir_name for dir_name in db.path().iterdir() if dir_name.is_dir() and not dir_name.name.startswith('.')]
+    dir_names = [dir_name for dir_name in db.path().iterdir() if
+                 dir_name.is_dir() and not dir_name.name.startswith('.')]
     # Return empty list if no directory found:
     if len(dir_names) == 0:
         return {}
@@ -147,23 +149,21 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     scans = {}
     bad_scans = set()
     for dir_name in tqdm(dir_names, unit="scan"):
-        if (dir_name / "timelapse.json").is_file():
+        if (dir_name / TIMELAPSE_MARKER_FILE_NAME).is_file():
             # Timelapse container directory: discover member scans
             child_dirs = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
             for child in child_dirs:
-                scan_name = child.name
-                scan = _load_scan_at(db, child, scan_name, updates_files_json)
+                scan = _load_scan_at(db, child, updates_files_json)
                 if scan is not None:
-                    scans[scan_name] = scan
+                    scans[scan.id] = scan
                 else:
-                    bad_scans.add(f"{dir_name.name}/{scan_name}")
+                    bad_scans.add(f"{dir_name.name}/{child.name}")
         else:
-            scan_name = dir_name.name
-            scan = _load_scan_at(db, dir_name, scan_name, updates_files_json)
+            scan = _load_scan_at(db, dir_name, updates_files_json)
             if scan is not None:
-                scans[scan_name] = scan
+                scans[scan.id] = scan
             else:
-                bad_scans.add(scan_name)
+                bad_scans.add(dir_name.name)
 
     if bad_scans:
         n_bad = len(bad_scans)
@@ -172,7 +172,7 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     return scans
 
 
-def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files_json: bool = False) -> 'Scan | None':
+def _load_scan_at(db: 'FSDB', scan_path: Path | str, updates_files_json: bool = False) -> 'Scan | None':
     """Load a single scan from an explicit filesystem directory path.
 
     Parameters
@@ -181,8 +181,6 @@ def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files
         The filesystem database instance from which the scan should be loaded.
     scan_path : str or pathlib.Path
         The explicit directory path of the scan.
-    scan_id : str
-        Identifier of the scan to load.
     updates_files_json : bool
         A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
 
@@ -192,20 +190,21 @@ def _load_scan_at(db: 'FSDB', scan_path: Path | str, scan_id: str, updates_files
         The loaded ``Scan`` object if the scan directory is a valid scan dataset; otherwise ``None``.
     """
     from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
 
-    scan_path = Path(scan_path)
+    scan_path = Path(scan_path).resolve()
     if not _is_scan_dataset(scan_path, validate_json_fileset=False):
         return None
+    parts = scan_path.relative_to(db.path()).parts
+    tl_id = parts[-2] if len(parts) > 1 else None
+    scan_id = parts[-1]
 
-    scan = Scan(db, scan_id)
-
+    scan = Scan(db, scan_id, timelapse_id=tl_id)
     # Load scan metadata first so that _scan_path(scan) can resolve nested paths if timelapse metadata is present
-    md_path = scan_path / "metadata" / "metadata.json"
-    if md_path.exists():
-        scan.metadata = _load_metadata(md_path)
+    scan.metadata = _load_scan_metadata(scan)
 
     # Backward compatibility with pre-2026 legacy metadata in images.json
-    img_fs_path = scan_path / "metadata" / "images.json"
+    img_fs_path = _fileset_metadata_path(Fileset(scan, 'images'))
     if img_fs_path.exists():
         img_fs_md = _load_metadata(img_fs_path)
         for md_key in ['object', 'hardware', 'acquisition_date']:
@@ -274,15 +273,15 @@ def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'S
     """
     flat_path = Path(db.basedir) / scan_id
     if flat_path.is_dir():
-        return _load_scan_at(db, flat_path, scan_id, updates_files_json)
+        return _load_scan_at(db, flat_path, updates_files_json)
 
     # Search in timelapse containers
     if hasattr(db, "path") and db.path().is_dir():
         for d in db.path().iterdir():
-            if d.is_dir() and not d.name.startswith('.') and (d / "timelapse.json").is_file():
+            if d.is_dir() and not d.name.startswith('.') and (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
                 nested_path = d / scan_id
                 if nested_path.is_dir():
-                    return _load_scan_at(db, nested_path, scan_id, updates_files_json)
+                    return _load_scan_at(db, nested_path, updates_files_json)
 
     return None
 
@@ -571,7 +570,7 @@ def _load_file(fileset: 'Fileset', file_info: dict[str, str]) -> 'File':
     return file
 
 
-def _list_scan_configs(scan:'Scan') -> dict[str, Path]:
+def _list_scan_configs(scan: 'Scan') -> dict[str, Path]:
     """List path to all TOML configuration files associated with a scan.
 
     This helper iterates over every ``*.toml`` file located in the supplied *scan* directory.

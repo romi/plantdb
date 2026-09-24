@@ -45,6 +45,10 @@ sensor.csv
 """
 import pathlib
 
+#: This file must exist in the root of a folder for it to be considered a valid FSDB
+MARKER_FILE_NAME = "romidb"
+
+#: This file must exist in the root of a folder for it to be considered a valid Timelapse
 TIMELAPSE_MARKER_FILE_NAME = "timelapse.json"
 
 

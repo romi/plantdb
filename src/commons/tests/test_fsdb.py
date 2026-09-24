@@ -275,6 +275,17 @@ class TestFSDBDummy(DummyDBTestCase):
         scan = db.get_scan("myscan_001")
         self.assertIsInstance(scan, Scan)
 
+    def test_fsdb_reload_timelapse_scan(self):
+        """FSDB.reload() finds a scan nested inside a timelapse container."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_001", metadata={"project": "chrono"})
+        db.create_scan("tl_001_1", metadata={"timelapse": {"id": "tl_001", "index": 1}})
+        # Should complete without raising an exception (regression: FileNotFoundError on files.json)
+        db.reload("tl_001_1")
+        scan = db.get_scan("tl_001_1")
+        self.assertIsInstance(scan, Scan)
+        self.assertEqual(scan.get_metadata("timelapse")["id"], "tl_001")
+
 
 # ---------------------------------------------------------------------------
 # Scan tests
@@ -353,6 +364,19 @@ class TestScan(DummyDBTestCase):
         scan = self.get_test_scan()
         db = scan.get_db()
         self.assertIsInstance(db, FSDB)
+
+    def test_scan_timelapse_id_parameter(self):
+        """Scan(timelapse_id=...) creates the timelapse and records it in metadata."""
+        db = self.get_test_db()
+        scan = Scan(db, "scan_tl_param", timelapse_id="tl_param")
+        self.assertTrue(db.timelapse_exists("tl_param"))
+        self.assertEqual(scan.get_metadata("timelapse")["id"], "tl_param")
+
+    def test_scan_timelapse_id_none(self):
+        """Scan without timelapse_id leaves no timelapse metadata."""
+        db = self.get_test_db()
+        scan = Scan(db, "scan_no_tl")
+        self.assertEqual(scan.get_metadata("timelapse"), {})
 
 
 # ---------------------------------------------------------------------------

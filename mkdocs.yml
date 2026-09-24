@@ -17,6 +17,7 @@ nav:
     - 'Release Guide': developers/releases.md
     - 'Authentication': developers/authentication.md
     - 'Locking': developers/locking.md
+    - 'MIAPPE Metadata': developers/miappe_metadata.md
 
 
 theme:

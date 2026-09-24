@@ -50,10 +50,11 @@ from pathlib import Path
 from typing import Any
 from typing import Mapping
 from typing import MutableMapping
-from typing import Union
 from typing import TYPE_CHECKING
+from typing import Union
 
 from .lock import LockLevel
+from .path_helpers import _fileset_metadata_path
 
 # ----------------------------------------------------------------------
 # NOTE: The following imports are only needed for type‑checking / IDE hints.
@@ -78,22 +79,6 @@ from ..log import get_logger
 from ..utils import iso_date_now
 
 logger = get_logger(__name__)
-
-
-def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
-    """Load the metadata for a fileset.
-
-    Parameters
-    ----------
-    fileset : plantdb.commons.fsdb.core.Fileset
-        The fileset to load the metadata for.
-
-    Returns
-    -------
-    dict[str, Any]
-        The metadata dictionary.
-    """
-    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_metadata(path: Union[str, Path]) -> dict[str, Any]:
@@ -144,20 +129,23 @@ def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
     dict[str, Any]
         The metadata dictionary.
     """
-    scan_md = {}
-    md_path = _scan_metadata_path(scan)
-    if md_path.exists():
-        scan_md.update(_load_metadata(md_path))
+    return _load_metadata(_scan_metadata_path(scan))
 
-    # FIXME: next lines are here to solve the issue that scans dataset prior to 2026 have no metadata as they have been saved in the 'images' fileset metadata...
-    img_fs_path = md_path.parent / 'images.json'  # path to 'images' fileset metadata
-    if img_fs_path.exists():
-        img_fs_md = _load_metadata(img_fs_path)
-        # Update the fields only if empty from the scan's metadata file
-        for md_key in ['object', 'hardware', 'acquisition_date']:
-            if scan_md.get(md_key, {}) == {}:
-                scan_md.update({md_key: img_fs_md.get(md_key, {})})
-    return scan_md
+
+def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
+    """Load the metadata for a fileset.
+
+    Parameters
+    ----------
+    fileset : plantdb.commons.fsdb.core.Fileset
+        The fileset to load the metadata for.
+
+    Returns
+    -------
+    dict[str, Any]
+        The metadata dictionary.
+    """
+    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_file_metadata(file: File) -> dict[str, Any]:
@@ -402,6 +390,11 @@ class MetadataManager(object):
         if len(new_metadata) == 0:
             return
 
+        if isinstance(self, Scan):
+            # Validate the MIAPPE biological block (if present) at the write boundary
+            from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+            validate_biological_metadata(new_metadata)
+
         if isinstance(self, TimeLapse):
             obj_id = f"{self.id}"
             lock_level = LockLevel.SCAN
@@ -422,7 +415,7 @@ class MetadataManager(object):
         # Acquire exclusive lock on the object
         self.logger.debug(
             f"Updating '{obj_id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
-        )        
+        )
         with self.db.lock_manager.acquire_lock(obj_id, LockType.EXCLUSIVE, current_user.username, lock_level):
             _set_metadata(self.metadata, new_metadata, None)
             self._store_and_timestamp(store_func)
