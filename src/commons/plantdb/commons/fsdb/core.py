@@ -2867,7 +2867,7 @@ class Scan(db.Scan, MetadataManager):
         if timelapse_id is not None:
             if not self.db.timelapse_exists(timelapse_id):
                 self.db.create_timelapse(timelapse_id)
-            self.set_metadata("timelapse", {"id": timelapse_id})
+            self.metadata["timelapse"] = {"id": timelapse_id}
 
     def _erase(self) -> None:
         """Erase the filesets and metadata associated with this scan."""
