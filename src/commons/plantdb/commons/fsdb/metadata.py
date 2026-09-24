@@ -145,7 +145,7 @@ def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
     dict[str, Any]
         The metadata dictionary.
     """
-    return _load_metadata(_fileset_metadata_path(fileset))
+    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_file_metadata(file: File) -> dict[str, Any]:
