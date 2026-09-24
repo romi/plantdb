@@ -49,6 +49,7 @@ from .metadata import _load_file_metadata
 from .metadata import _load_fileset_metadata
 from .metadata import _load_metadata
 from .metadata import _load_scan_metadata
+from .path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from .path_helpers import _file_metadata_path
 from .path_helpers import _file_path
 from .path_helpers import _fileset_metadata_json_path
@@ -148,7 +149,7 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     scans = {}
     bad_scans = set()
     for dir_name in tqdm(dir_names, unit="scan"):
-        if (dir_name / "timelapse.json").is_file():
+        if (dir_name / TIMELAPSE_MARKER_FILE_NAME).is_file():
             # Timelapse container directory: discover member scans
             child_dirs = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
             for child in child_dirs:
@@ -272,15 +273,15 @@ def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'S
     """
     flat_path = Path(db.basedir) / scan_id
     if flat_path.is_dir():
-        return _load_scan_at(db, flat_path, scan_id, updates_files_json)
+        return _load_scan_at(db, flat_path, updates_files_json)
 
     # Search in timelapse containers
     if hasattr(db, "path") and db.path().is_dir():
         for d in db.path().iterdir():
-            if d.is_dir() and not d.name.startswith('.') and (d / "timelapse.json").is_file():
+            if d.is_dir() and not d.name.startswith('.') and (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
                 nested_path = d / scan_id
                 if nested_path.is_dir():
-                    return _load_scan_at(db, nested_path, scan_id, updates_files_json)
+                    return _load_scan_at(db, nested_path, updates_files_json)
 
     return None
 
@@ -569,7 +570,7 @@ def _load_file(fileset: 'Fileset', file_info: dict[str, str]) -> 'File':
     return file
 
 
-def _list_scan_configs(scan:'Scan') -> dict[str, Path]:
+def _list_scan_configs(scan: 'Scan') -> dict[str, Path]:
     """List path to all TOML configuration files associated with a scan.
 
     This helper iterates over every ``*.toml`` file located in the supplied *scan* directory.
