@@ -17,14 +17,14 @@ This module provides functionality for serializing and deserializing filesystem 
 ## Usage Examples
 
 ```python
-# Example of converting a scan to a dictionary representation
-from plantdb.commons.fsdb.core import Scan
+>>> # Example of converting a scan to a dictionary representation
+>>> from plantdb.commons.fsdb.core import Scan
 
-# Assuming we have a scan object
-scan = Scan(...)
+>>> # Assuming we have a scan object
+>>> scan = Scan(...)
 
-# Convert scan structure to dictionary
-scan_dict = _scan_to_dict(scan)
+>>> # Convert scan structure to dictionary
+>>> scan_dict = _scan_to_dict(scan)
 # Result format:
 # {
 #     "filesets": [
@@ -40,13 +40,13 @@ scan_dict = _scan_to_dict(scan)
 #     ]
 # }
 
-# Parse a fileset from dictionary
-fileset_info = {"id": "fileset_id"}
-fileset = _parse_fileset(scan, fileset_info)
+>>> # Parse a fileset from dictionary
+>>> fileset_info = {"id": "fileset_id"}
+>>> fileset = _parse_fileset(scan, fileset_info)
 
-# Parse a file from dictionary
-file_info = {"id": "file_id", "file": "example.txt"}
-file = _parse_file(fileset, file_info)
+>>> # Parse a file from dictionary
+>>> file_info = {"id": "file_id", "file": "example.txt"}
+>>> file = _parse_file(fileset, file_info)
 ```
 """
 

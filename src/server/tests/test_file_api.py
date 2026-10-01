@@ -12,6 +12,7 @@ from pathlib import Path
 
 import requests
 
+from plantdb.commons import api_endpoints
 from plantdb.commons.test_database import _mkdtemp_romidb
 from plantdb.server.test_rest_api import TestRestApiServer
 
@@ -31,7 +32,7 @@ class FileApiTests(unittest.TestCase):
         import time
         for _ in range(10):
             try:
-                r = requests.get(cls.base_url + "/health")
+                r = requests.get(cls.base_url + api_endpoints.health())
                 if r.status_code == 200:
                     break
             except Exception:
@@ -48,7 +49,7 @@ class FileApiTests(unittest.TestCase):
     @classmethod
     def _login_admin(cls, base_url):
         """Login as admin user and return access token."""
-        r = requests.post(base_url + '/login', json={'username': 'admin', 'password': 'admin'})
+        r = requests.post(base_url + api_endpoints.login(), json={'username': 'admin', 'password': 'admin'})
         return r.json()['access_token']
 
     def test_download_existing_file(self):
@@ -56,7 +57,7 @@ class FileApiTests(unittest.TestCase):
         scan_id = 'real_plant_analyzed'
         fileset_id = "images"
         file_id = "00000_rgb"
-        r = requests.get(self.base_url + f'/file/{scan_id}/{fileset_id}/{file_id}',
+        r = requests.get(self.base_url + api_endpoints.file(scan_id, fileset_id, file_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
 
         self.assertEqual(r.status_code, 200)
@@ -65,7 +66,7 @@ class FileApiTests(unittest.TestCase):
 
     def test_download_nonexistent_file(self):
         """Test that downloading a non-existent file returns 404."""
-        r = requests.get(self.base_url + '/file/12345678-1234-1234-1234-123456789012/nonexistent.png',
+        r = requests.get(self.base_url + api_endpoints.file("12345678", 'azerty', "nonexistent.png"),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 404)
 
@@ -85,7 +86,7 @@ class FileApiTests(unittest.TestCase):
 
         with open(file_path, 'rb') as file_handle:
             files = {'file': (Path(file_path).name, file_handle, 'application/octet-stream')}
-            r = requests.post(self.base_url + f'/file/{scan_id}/{fileset_id}/{file_id}',
+            r = requests.post(self.base_url + api_endpoints.file(scan_id, fileset_id, file_id),
                               files=files,
                               data={'ext': '.yaml', 'metadata': json.dumps(metadata)},
                               headers={'Authorization': 'Bearer ' + self.admin_token})

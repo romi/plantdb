@@ -31,10 +31,10 @@ This module allows users to upload files to specific filesets and manipulate ass
 
 ## Key Features
 
-- **File Creation** - Upload files with automatic extension validation, name sanitization, and support for both binary and text modes.
-- **Metadata Retrieval** - Access complete metadata dictionaries or specific keys for any file stored in the database.
-- **Metadata Management** - Update or set metadata for existing files with support for partial updates.
-- **Security Integration** - Leverages JWT-based authentication via the `@add_jwt_from_header` decorator to ensure secure access to file operations.
+- **File Creation**: Upload files with automatic extension validation, name sanitization, and support for both binary and text modes.
+- **Metadata Retrieval**: Access complete metadata dictionaries or specific keys for any file stored in the database.
+- **Metadata Management**: Update or set metadata for existing files with support for partial updates.
+- **Security Integration**: Leverages JWT-based authentication via the `@add_jwt_from_header` decorator to ensure secure access to file operations.
 
 ## Usage Examples
 
@@ -83,7 +83,7 @@ It may be used as follows (in another Python REPL):
 >>> data = {"metadata": {"description": "Updated via API", "author": "bot"}}
 >>> response = requests.post(url, json=data)
 >>> print(response.json())
-{'message': 'Error processing request: User guest does not have required permissions to use set_metadata'}
+{'error': 'Error processing request: User guest does not have required permissions to use set_metadata'}
 ```
 """
 # ... existing code ...
@@ -102,6 +102,7 @@ from plantdb.commons.fsdb.exceptions import FilesetNotFoundError
 from plantdb.commons.fsdb.exceptions import NoAuthUserError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.log import get_logger
+from plantdb.server.api.utils import resource_file
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
@@ -156,20 +157,23 @@ class File(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get a file from the database:
         >>> scan_id = 'real_plant'
         >>> fileset_id = 'images'
         >>> file_id = '00000_rgb'
-        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
-        >>> response = requests.get(url)
-        >>> print(response.status_code)
-        201
-        >>> print(response.json())
-        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
-        >>> file_path.unlink()  # Delete the YAML test file
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.file(scan_id, fileset_id, file_id))
+        >>> print(response.ok)
+        True
+        >>> # Stop the test server
+        >>> server.stop()
         """
 
         try:
@@ -177,31 +181,29 @@ class File(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {
-                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Create the file
             file = fileset.get_file(file_id)
-
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
-            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             rel_file_path = file.path().relative_to(self.db.path())
             return send_from_directory(self.db.path(), rel_file_path)
@@ -235,54 +237,63 @@ class File(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
         >>> import json
         >>> from pathlib import Path
         >>> from tempfile import NamedTemporaryFile
+        >>> from plantdb.commons import api_endpoints
         >>> # Create a YAML temporary file:
         >>> with NamedTemporaryFile(suffix='.yaml', mode="w", delete=False) as f: f.write('name: my_file')
         >>> file_path = f.name
-        >>> login_res = requests.post(f"http://127.0.0.1:5000/login", json={'username': 'admin', 'password': 'admin'})
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
         >>> token = login_res.json()['access_token']
         >>> # Create a new file with metadata in the database:
         >>> scan_id = "real_plant"
         >>> fileset_id = "images"
         >>> file_id = Path(file_path).stem
-        >>> url = f"http://127.0.0.1:5000/file/{scan_id}/{fileset_id}/{file_id}"
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file(scan_id, fileset_id, file_id)
         >>> metadata = {'description': 'Test file description'}
         >>> data = {'ext': '.yaml', 'metadata': json.dumps(metadata)}
         >>> file_handle = open(file_path, 'rb')
         >>> files = {'file': (Path(file_path).name, file_handle, 'application/octet-stream')}
         >>> response = requests.post(url, files=files, data=data, headers={'Authorization': 'Bearer ' + token})
-        >>> print(response.status_code)
-        201
+        >>> print(response.ok)
+        True
         >>> print(response.json())
-        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'."}
+        {'message': "File 'test_file.yaml' created and written successfully in fileset 'images'.", 'id': 'tmpescmpwuq'}
         >>> file_handle.close()
         >>> Path(file_path).unlink()  # Delete the YAML test file
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Check if the request has the file part
         if 'file' not in request.files:
-            return {'message': 'No file provided'}, 400
+            return {'error': 'No file provided'}, 400
 
         file_data = request.files['file']
 
-        # Multipart/form‑data: fields are in ``request.form`` (`json=` is ignored when `files=` is present)
+        # Multipart/form-data: fields are in ``request.form`` (`json=` is ignored when `files=` is present)
         data = request.form.to_dict()
 
         # Get form data
         ext = data.get('ext', None)
         # Validate required fields
         if not ext:
-            return {'message': "'ext' field is required"}, 400
+            return {'error': "'ext' field is required"}, 400
         # Validate file extension
         if not ext.startswith('.'):
             ext = f'.{ext}'
         if ext not in VALID_FILE_EXT:
             return {
-                'message': f'Invalid file extension. Must be one of: {", ".join(VALID_FILE_EXT)}'
+                'error': f'Invalid file extension. Must be one of: {", ".join(VALID_FILE_EXT)}'
             }, 400
 
         # Get metadata if provided
@@ -295,7 +306,7 @@ class File(Resource):
                 try:
                     metadata = ast.literal_eval(metadata_raw)
                 except (ValueError, SyntaxError):
-                    return {'message': "Invalid metadata format – must be JSON or a Python dict string"}, 400
+                    return {'error': "Invalid metadata format: must be JSON or a Python dict string"}, 400
         else:
             metadata = None
 
@@ -304,21 +315,21 @@ class File(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             return {
-                'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Create the file
@@ -332,13 +343,13 @@ class File(Resource):
             except Exception as e:
                 fileset.delete_file(file_id, **kwargs)
                 self.logger.error(f'Error writing file: {str(e)}')
-                return {'message': f'Error writing file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                return {'error': f'Error writing file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f"Error creating file: {str(e)}")
-            return {'message': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error creating file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {
                 'message': f"File created and written successfully in fileset '{fileset.id}'.",
@@ -406,18 +417,29 @@ class FileMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Get all metadata:
-        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id)
         >>> response = requests.get(url)
-        >>> print(response.json())
-        {'metadata': {'description': 'Test file'}}
+        >>> f_md = response.json()['metadata']
+        >>> print(f_md['channel'])
+        rgb
         >>> # Get a specific metadata key:
-        >>> response = requests.get(url+"?key=description")
-        >>> print(response.json())
-        {'metadata': 'Test file'}
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id, key="channel")
+        >>> response = requests.get(url)
+        >>> md = response.json()['metadata']
+        >>> print(md)
+        rgb
         """
         key = request.args.get('key', default=None, type=str)
         if key:
@@ -428,31 +450,30 @@ class FileMetadata(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             file = fileset.get_file(file_id)
             # Get the metadata
             metadata = file.get_metadata(key)
-
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
             self.logger.error(f'Error retrieving metadata: {str(e)}')
-            return {'message': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error retrieving metadata: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': metadata}, 200
 
@@ -477,7 +498,7 @@ class FileMetadata(Resource):
         dict
             Response dictionary with either:
                 * 'metadata': containing updated metadata for successful requests
-                * 'message': for error cases
+                * 'error': for error cases
         int
             HTTP status code (200, 400, 404, or 500).
 
@@ -489,44 +510,62 @@ class FileMetadata(Resource):
 
         Examples
         --------
-        >>> # Start a test REST API server first:
-        >>> # $ fsdb_rest_api --test
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> url = f"http://127.0.0.1:5000/file/test_plant/images/image_001/metadata"
+        >>> from plantdb.commons import api_endpoints
+        >>> # Start by log in as 'admin'
+        >>> user_data = {'username': 'admin', 'password': 'admin'}
+        >>> login_res = requests.post("http://127.0.0.1:5000" + api_endpoints.login(), json=user_data)
+        >>> token = login_res.json()['access_token']
+        >>> # Now update the metadata:
+        >>> scan_id = 'real_plant'
+        >>> fileset_id = 'images'
+        >>> file_id = '00000_rgb'
+        >>> url = "http://127.0.0.1:5000" + api_endpoints.file_metadata(scan_id, fileset_id, file_id)
         >>> data = {"metadata": {"description": "Updated description"}}
-        >>> response = requests.post(url, json=data)
-        >>> print(response.json())
-        {'metadata': {'description': 'Updated description'}}
+        >>> response = requests.post(url, json=data, headers={'Authorization': 'Bearer ' + token})
+        >>> # Inspect returned metadata:
+        >>> f_md = response.json()['metadata']
+        >>> print(f_md['description'])
+        Updated description
+        >>> _ = requests.post("http://127.0.0.1:5000" + api_endpoints.logout())  # logout
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Get request data
         data = request.get_json()
         if not data or 'metadata' not in data:
-            return {'message': 'Missing metadata in request body'}, 400
+            return {'error': 'Missing metadata in request body'}, 400
 
         metadata = data['metadata']
 
         if not isinstance(metadata, dict):
-            return {'message': 'Metadata must be a dictionary'}, 400
+            return {'error': 'Metadata must be a dictionary'}, 400
 
         try:
             # Get the scan
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the fileset
             fileset = scan.get_fileset(fileset_id)
 
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error accessing the fileset {fileset_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
 
         try:
             # Get the file
@@ -537,11 +576,11 @@ class FileMetadata(Resource):
             updated_metadata = file.get_metadata()
 
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {'error': str(e)}, 404  # HTTP 404 Not Found
         except SessionValidationError as e:
-            return {'message': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
+            return {'error': 'Invalid credentials'}, 401  # HTTP 401 Unauthorized (authentication)
         except Exception as e:
             self.logger.error(f'Error processing request: {str(e)}')
-            return {'message': f'Error processing request: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {'error': f'Error processing request: {str(e)}'}, 500  # HTTP 500 Internal Server Error
         else:
             return {'metadata': updated_metadata}, 200

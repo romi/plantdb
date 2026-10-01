@@ -1,0 +1,3 @@
+.field-group .input-group-text:first-child {
+    min-width: 12rem;
+}

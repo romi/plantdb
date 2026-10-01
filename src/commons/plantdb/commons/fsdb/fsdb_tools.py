@@ -20,19 +20,19 @@ A utility module for managing metadata in a plant database system, providing fun
 ## Usage Examples
 
 ```python
-from plantdb.commons.test_database import dummy_db
-from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
+>>> from plantdb.commons.test_database import dummy_db
+>>> from plantdb.commons.fsdb.fsdb_tools import add_metadata_to_scan
 
-# Create a dummy database with a scan
-db = dummy_db(with_scan=True)
+>>> # Create a dummy database with a scan
+>>> db = dummy_db(with_scan=True)
 
-# Add metadata to an existing scan
-scan_id = "myscan_001"
-new_metadata = {"Name": "Example Scan", "Date": "2025-09-06"}
-updated_scan = add_metadata_to_scan(db, scan_id, new_metadata)
+>>> # Add metadata to an existing scan
+>>> scan_id = "myscan_001"
+>>> new_metadata = {"Name": "Example Scan", "Date": "2025-09-06"}
+>>> updated_scan = add_metadata_to_scan(db, scan_id, new_metadata)
 
-# Clean up
-db.disconnect()
+>>> # Clean up
+>>> db.disconnect()
 ```
 """
 

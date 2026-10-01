@@ -63,7 +63,7 @@ conda activate plantdb  # activate your environment
 
 ## Installation
 
-### User – Pre Built Packages
+### User - Pre Built Packages
 
 Activate your environment and install the packages using `pip`:
 
@@ -71,7 +71,7 @@ Activate your environment and install the packages using `pip`:
 pip install plantdb.commons plantdb.server plantdb.client
 ```
 
-### Developers – From Sources
+### Developers - From Sources
 
 To contribute to the development, you will need to install the sources:
 
@@ -93,7 +93,7 @@ pip install -e src/client/
 To run the server with a temporary test database in debug mode:
 
 ```shell
-python fsdb_rest_api.py --test --debug
+fsdb_rest_api --test --debug
 ```
 
 ### Development
@@ -101,7 +101,7 @@ python fsdb_rest_api.py --test --debug
 To start the REST API server for a local plant database:
 
 ```shell
-python fsdb_rest_api.py --db_location /path/to/your/database --host 127.0.0.1 --port 8080
+fsdb_rest_api -db /path/to/your/database --host 127.0.0.1 --port 8080
 ```
 
 ### Production

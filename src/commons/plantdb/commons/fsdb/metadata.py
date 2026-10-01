@@ -9,35 +9,38 @@ This module provides a robust interface for managing metadata in JSON format, of
 ## Key Features
 
 - **Metadata Loading Operations**
-  - Load metadata from JSON files for files, filesets, and scan datasets
-  - Handle JSON decode errors gracefully with appropriate error logging
-  - Support both string and Path objects for file paths
-  - Maintain backward compatibility with legacy metadata storage patterns
-
+    - Load metadata from JSON files for files, filesets, and scan datasets
+    - Handle JSON decode errors gracefully with appropriate error logging
+    - Support both string and Path objects for file paths
+    - Maintain backward compatibility with legacy metadata storage patterns
 - **Metadata Storage Operations**
-  - Save metadata to JSON files with consistent formatting
-  - Automatic creation of necessary directory structures
-  - Support for hierarchical metadata organization
-
+    - Save metadata to JSON files with consistent formatting
+    - Automatic creation of necessary directory structures
+    - Support for hierarchical metadata organization
 - **Metadata Manipulation**
-  - Deep copy functionality to prevent unintended modifications
-  - Flexible key-value pair management
-  - Support for both single value updates and bulk dictionary updates
+    - Deep copy functionality to prevent unintended modifications
+    - Flexible key-value pair management
+    - Support for both single value updates and bulk dictionary updates
 
 ## Usage Examples
 
 ```python
-# Loading metadata from a file
-metadata = _load_metadata("path/to/metadata.json")
+>>> from plantdb.commons.fsdb.metadata import _load_metadata
+>>> from plantdb.commons.fsdb.metadata import _set_metadata
+>>> from plantdb.commons.fsdb.metadata import _get_metadata
 
-# Setting metadata values
-metadata_dict = {}
-_set_metadata(metadata_dict, "key", "value")
-# Or update with a dictionary
-_set_metadata(metadata_dict, {"key1": "value1", "key2": "value2"}, None)
+>>> # Loading metadata from a file
+>>> metadata = _load_metadata("path/to/metadata.json")
 
-# Getting metadata with a default value
-value = _get_metadata(metadata_dict, "key", default={})
+>>> # Setting metadata values
+>>> metadata_dict = {}
+>>> _set_metadata(metadata_dict, "key", "value")
+>>> # Or update with a dictionary
+>>> _set_metadata(metadata_dict, {"key1": "value1", "key2": "value2"}, None)
+
+>>> # Getting metadata with a default value
+>>> value = _get_metadata(metadata_dict, "key", default={})
+```
 """
 from __future__ import annotations
 
@@ -47,10 +50,11 @@ from pathlib import Path
 from typing import Any
 from typing import Mapping
 from typing import MutableMapping
-from typing import Union
 from typing import TYPE_CHECKING
+from typing import Union
 
 from .lock import LockLevel
+from .path_helpers import _fileset_metadata_path
 
 # ----------------------------------------------------------------------
 # NOTE: The following imports are only needed for type‑checking / IDE hints.
@@ -62,32 +66,19 @@ if TYPE_CHECKING:
     from .core import File
     from .core import Fileset
     from .core import Scan
+    from .core import TimeLapse
 # ----------------------------------------------------------------------
 
 from .lock import LockType
 from .path_helpers import _file_metadata_path
 from .path_helpers import _fileset_metadata_json_path
 from .path_helpers import _scan_metadata_path
+from .path_helpers import _timelapse_marker
+from .path_helpers import _timelapse_path
 from ..log import get_logger
 from ..utils import iso_date_now
 
 logger = get_logger(__name__)
-
-
-def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
-    """Load the metadata for a fileset.
-
-    Parameters
-    ----------
-    fileset : plantdb.commons.fsdb.core.Fileset
-        The fileset to load the metadata for.
-
-    Returns
-    -------
-    dict[str, Any]
-        The metadata dictionary.
-    """
-    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_metadata(path: Union[str, Path]) -> dict[str, Any]:
@@ -138,18 +129,23 @@ def _load_scan_metadata(scan: Scan) -> dict[str, Any]:
     dict[str, Any]
         The metadata dictionary.
     """
-    scan_md = {}
-    md_path = _scan_metadata_path(scan)
-    if md_path.exists():
-        scan_md.update(_load_metadata(md_path))
-    # FIXME: next lines are here to solve the issue that most scans dataset have no metadata as they have been saved in the 'images' fileset metadata...
-    img_fs_path = md_path.parent / 'images.json'  # path to 'images' fileset metadata
-    if img_fs_path.exists():
-        img_fs_md = _load_metadata(img_fs_path)
-        scan_md.update({'object': img_fs_md.get('object', {})})
-        scan_md.update({'hardware': img_fs_md.get('hardware', {})})
-        scan_md.update({'acquisition_date': img_fs_md.get('acquisition_date', None)})
-    return scan_md
+    return _load_metadata(_scan_metadata_path(scan))
+
+
+def _load_fileset_metadata(fileset: Fileset) -> dict[str, Any]:
+    """Load the metadata for a fileset.
+
+    Parameters
+    ----------
+    fileset : plantdb.commons.fsdb.core.Fileset
+        The fileset to load the metadata for.
+
+    Returns
+    -------
+    dict[str, Any]
+        The metadata dictionary.
+    """
+    return _load_metadata(_fileset_metadata_json_path(fileset))
 
 
 def _load_file_metadata(file: File) -> dict[str, Any]:
@@ -212,6 +208,28 @@ def _store_scan_metadata(scan: Scan) -> None:
         The dataset to save the metadata for.
     """
     _store_metadata(_scan_metadata_path(scan), scan.metadata)
+    return
+
+
+def _store_timelapse_metadata(timelapse: TimeLapse) -> None:
+    """Save the metadata for a timelapse dataset.
+
+    Parameters
+    ----------
+    timelapse : plantdb.commons.fsdb.core.TimeLapse
+        The timelapse to save the metadata for.
+    """
+    tl_path = _timelapse_path(timelapse.db, timelapse.id)
+    marker_path = _timelapse_marker(tl_path)
+    data = {
+        "id": timelapse.id,
+        "created_at": getattr(timelapse, "created_at", None) or iso_date_now(),
+        "owner": getattr(timelapse, "owner", None),
+        "scans": list(getattr(timelapse, "scans", None) or []),
+        "metadata": timelapse.metadata,
+    }
+    with marker_path.open("w") as f:
+        json.dump(data, f, indent=4)
     return
 
 
@@ -338,6 +356,20 @@ class MetadataManager(object):
             if key in new_metadata:
                 new_metadata.pop(key)
                 self.logger.warning(msg.format(cls=cls_name))
+
+        # For Scan, prevent mutation of timelapse.id once set
+        if cls_name == "Scan" and hasattr(self, "metadata") and isinstance(self.metadata, dict):
+            existing_tl = self.metadata.get("timelapse")
+            if isinstance(existing_tl, dict) and existing_tl.get("id"):
+                existing_tl_id = existing_tl.get("id")
+                if "timelapse" in new_metadata:
+                    if isinstance(new_metadata["timelapse"], dict):
+                        if new_metadata["timelapse"].get("id") != existing_tl_id:
+                            self.logger.warning("Excluding 'timelapse.id' key from Scan metadata update (immutable)!")
+                        new_metadata["timelapse"]["id"] = existing_tl_id
+                    else:
+                        self.logger.warning("Excluding 'timelapse' mutation from Scan metadata update!")
+                        new_metadata.pop("timelapse", None)
         return
 
     def _store_and_timestamp(self, store_func):
@@ -348,6 +380,7 @@ class MetadataManager(object):
 
     def _update_metadata(self, data, value, current_user, store_func, cls_name):
         """High‑level driver used by the concrete classes."""
+        from plantdb.commons.fsdb.core import TimeLapse
         from plantdb.commons.fsdb.core import Scan
         from plantdb.commons.fsdb.core import Fileset
         from plantdb.commons.fsdb.core import File
@@ -358,6 +391,14 @@ class MetadataManager(object):
             return
 
         if isinstance(self, Scan):
+            # Validate the MIAPPE biological block (if present) at the write boundary
+            from plantdb.commons.fsdb.metadata_schema import validate_biological_metadata
+            validate_biological_metadata(new_metadata)
+
+        if isinstance(self, TimeLapse):
+            obj_id = f"{self.id}"
+            lock_level = LockLevel.SCAN
+        elif isinstance(self, Scan):
             obj_id = f"{self.id}"
             lock_level = LockLevel.SCAN
         elif isinstance(self, Fileset):
@@ -374,7 +415,7 @@ class MetadataManager(object):
         # Acquire exclusive lock on the object
         self.logger.debug(
             f"Updating '{obj_id}' {cls_name.lower()} metadata as '{current_user.username}' user..."
-        )        
+        )
         with self.db.lock_manager.acquire_lock(obj_id, LockType.EXCLUSIVE, current_user.username, lock_level):
             _set_metadata(self.metadata, new_metadata, None)
             self._store_and_timestamp(store_func)

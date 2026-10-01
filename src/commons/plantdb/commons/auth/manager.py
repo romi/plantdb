@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-User and Group Management Module
+# User and Group Management Module
 
 This module provides two primary classes - `UserManager` and `GroupManager` - to handle
 authentication, authorization, and role‑based access control in a lightweight
@@ -13,8 +13,8 @@ projects or prototyping, offering straightforward APIs for creating users,
 managing passwords, locking out accounts, and organizing users into
 groups with associated permissions.
 
-Key Features
-------------
+## Key Features
+
 - **Password hashing** with Argon2 and secure verification.
 - **Account lock‑out** after configurable failed login attempts.
 - **User activation/deactivation** and role assignment.
@@ -22,8 +22,9 @@ Key Features
 - **Atomic JSON persistence** to avoid data corruption.
 - **Minimal dependencies** - relies only on the standard library plus `argon2`.
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from pathlib import Path
 >>> from plantdb.commons.auth.manager import UserManager, GroupManager, Role
 >>> # Initialize managers (will create JSON files if absent)
@@ -37,6 +38,7 @@ Usage Examples
 >>> group = gm.create_group('admins', creator='alice', users={'alice'}, description='Admin group')
 >>> # Check membership
 >>> assert 'admins' in [g.name for g in gm.get_user_groups('alice')]
+```
 """
 
 import json

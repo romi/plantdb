@@ -24,13 +24,33 @@
 # ------------------------------------------------------------------------------
 
 """
-This module provides a collection of utility functions for data handling in the ROMI project.
+# Utility Functions for ROMI Data Handling
+
+A small toolbox of helper functions used throughout the ROMI project.  
+These utilities simplify common tasks such as image loading, temporary file‑system handling,
+task‑fileset discovery, angle unit detection, date formatting, user prompts, and file backup.
+
+## Key Features
+
+- **Image I/O**: `read_image_from_file` loads an image with Pillow and guarantees it is fully loaded into memory.
+- **Task‑fileset mapping**: `locate_task_filesets` returns a dictionary that links task names
+  to the corresponding fileset identifiers in a scan.
+- **Angle unit guessing**: `is_radians` heuristically decides whether a list of angles is expressed in radians.
+- **Filesystem helpers**: `to_file`, `fsdb_file_from_local_file`, `tmpdir_from_fileset`,
+  `backup_filename` and `backup_file` make it easy to move data between the in‑memory FSDB
+  representation and the real file system.
+- **String matching**: `partial_match` performs deep, optional fuzzy matching of nested dictionaries, lists, or strings.
+- **ISO‑8601 timestamps**: `iso_date_now` returns the current local time in ISO‑8601 format.
+- **Interactive prompts**: `yes_no_choice` and `yes_no_abort_choice` provide robust yes/no (with optional abort) dialogs.
+- **Name sanitization**: `sanitize_name` validates and cleans identifiers for safe use.
 """
 import tempfile
 from datetime import datetime
 from pathlib import Path
 
 from PIL import Image
+
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
 
 
 def read_image_from_file(filename):
@@ -168,7 +188,6 @@ def fsdb_file_from_local_file(path):
     from plantdb.commons.fsdb.core import Scan
     from plantdb.commons.fsdb.core import Fileset
     from plantdb.commons.fsdb.core import File
-    from plantdb.commons.fsdb.core import MARKER_FILE_NAME
     path = Path(path)
     dirname, fname = path.parent, path.name
     id = Path(fname).stem
@@ -290,7 +309,8 @@ def iso_date_now():
     """
     return datetime.isoformat(datetime.now())
 
-def yes_no_choice(question: str, default: bool=True) -> bool:
+
+def yes_no_choice(question: str, default: bool = True) -> bool:
     """Raise a yes/no question with a default reply and wait for a valid reply from user.
 
     Parameters
@@ -321,3 +341,163 @@ def yes_no_choice(question: str, default: bool=True) -> bool:
         if kbd in opt:
             return opt[kbd]
         print("Please answer with 'yes' or 'no'.")
+
+
+def yes_no_abort_choice(
+        question: str,
+        default: bool = True,
+        abort_allowed: bool = True,
+        default_abort: bool = False,
+) -> bool | None:
+    """Prompt the user with a Yes/No question that also supports aborting.
+
+    Parameters
+    ----------
+    question : str
+        The question to ask.
+    default : bool, optional
+        The default answer when the user just presses *Enter* (default is ``True``).
+    abort_allowed : bool, optional
+        If ``True`` the user can abort the operation (default is ``True``).
+    default_abort : bool, optional
+        If ``True`` an empty input is interpreted as *abort* instead of the normal
+        ``default``; useful when abort is the most common action.
+
+    Returns
+    -------
+    bool | None
+        ``True`` for a positive answer, ``False`` for a negative answer, or
+        ``None`` if the user aborted.
+
+    Examples
+    --------
+    >>> from plantdb.commons.utils import yes_no_abort_choice
+    >>> yes_no_abort_choice("Delete all data?")
+    Delete all data? [Y/n/a]>
+    True
+    >>> yes_no_abort_choice("Delete all data?", default=False)
+    Delete all data? [y/N/a]>
+    False
+    >>> yes_no_abort_choice("Delete all data?", default=False, default_abort=True)
+    Delete all data? [y/N/a]>
+    None
+    """
+    # Map of valid inputs
+    opt = {
+        "": default,
+        "yes": True,
+        "y": True,
+        "ye": True,
+        "no": False,
+        "n": False,
+        "a": None,
+        "abort": None,
+    }
+
+    # Build the prompt suffix
+    choices = "[Y/n]" if default else "[y/N]"
+    if abort_allowed:
+        choices = choices.replace("]", "/a]")  # add abort option
+        if default_abort:
+            choices = choices.replace('/N', '/n')
+            choices = choices.replace('/a', '/A')
+    prompt = f"{question} {choices}> "
+
+    while True:
+        kbd = input(prompt).strip().lower()
+        # Empty input handling
+        if kbd == "":
+            if default_abort and abort_allowed:
+                return None
+            return default
+        # Direct match
+        if kbd in opt:
+            return opt[kbd]
+        print("Please answer with 'yes', 'no', or 'a' (abort).")
+
+
+def backup_filename(file: Path) -> Path:
+    """Create a backup a filename by adding a timestamp.
+
+    Parameters
+    ----------
+    file : str or pathlib.Path
+        The path to the file to back up.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the backup.
+
+    Examples
+    --------
+    >>> from plantdb.commons.utils import backup_filename
+    >>> backup_filename("test/file.json")
+    PosixPath('test/file_230601_105815.json')
+    """
+    file = Path(file)
+    now = datetime.now()
+    timestamp = now.strftime("%y%m%d_%H%M%S")
+    fname = file.stem
+    return file.with_stem(f"{fname}_{timestamp}")
+
+
+def backup_file(file: Path) -> Path:
+    """Back up a file by creating a timestamped copy.
+
+    Parameters
+    ----------
+    file : str or pathlib.Path
+        The path to the file to back up.
+
+    Returns
+    -------
+    pathlib.Path
+        The path to the backup.
+
+    See Also
+    --------
+    backup_filename
+    """
+    from shutil import copy
+    bak_fname = backup_filename(file)
+    copy(file, bak_fname)
+    return bak_fname
+
+
+def sanitize_name(name) -> str:
+    """Sanitizes and validates the provided name.
+
+    The function ensures that the input string adheres to predefined naming rules by:
+
+    - stripping leading/trailing spaces,
+    - isolating the last segment after splitting by slashes,
+    - validating the name against an alphanumeric pattern
+      with optional underscores (`_`), dashes (`-`), or periods (`.`).
+
+    Parameters
+    ----------
+    name : str
+        The name to sanitize and validate.
+
+    Returns
+    -------
+    str
+        Sanitized name that conforms to the rules.
+
+    Raises
+    ------
+    ValueError
+        If the provided name contains invalid characters or does not meet
+        the naming rules.
+    """
+    import re
+
+    sanitized_name = name.strip()  # Remove leading/trailing spaces
+    sanitized_name = sanitized_name.split("/")[-1]  # isolate the last segment after splitting by slashes
+    # Validate against an alphanumeric pattern with optional underscores, dashes, or periods
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", sanitized_name):
+        raise ValueError(
+            f"Invalid name: '{name}'. Names must be alphanumeric and can include underscores, dashes, or periods."
+        )
+    return sanitized_name

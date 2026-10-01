@@ -26,21 +26,21 @@
 """
 # Assets REST API Resources
 
-Provides a collection of Flask‑RESTful resources for exposing plant‑database assets over HTTP.
+Provides a collection of Flask-RESTful resources for exposing plant-database assets over HTTP.
 The module enables serving and managing files, images, point clouds, meshes, curve skeletons,
-sequence data, and whole‑dataset archives, making it easy to build a REST API that gives
+sequence data, and whole-dataset archives, making it easy to build a REST API that gives
 programmatic access to plant scan data.
 
 ## Key Features
 
 - **Resource classes**: `File`, `DatasetFile`, `Image`, `PointCloud`, `PointCloudGroundTruth`,
   `Mesh`, `CurveSkeleton`, `Sequence`, `Archive`.
-- **Safety**: automatic input sanitization, directory‑traversal protection, and
-  rate‑limiting decorators on every endpoint.
-- **Flexible output**: optional resizing, thumbnail generation, base‑64 encoding,
-  and on‑the‑fly down‑sampling for large assets (point clouds, meshes, images).
+- **Safety**: automatic input sanitization, directory-traversal protection, and
+  rate-limiting decorators on every endpoint.
+- **Flexible output**: optional resizing, thumbnail generation, base-64 encoding,
+  and on-the-fly down-sampling for large assets (point clouds, meshes, images).
 - **Archive handling**: creation, validation, and extraction of ZIP archives with
-  robust error handling and temporary‑file cleanup.
+  robust error handling and temporary-file cleanup.
 - **Utility helpers**: `is_within_directory` and `is_directory_in_archive` for
   safe path checks inside the filesystem and ZIP files.
 
@@ -93,17 +93,11 @@ Circle
 import json
 import logging
 import mimetypes
-import os
-import pathlib
 import warnings
 from http.client import HTTPException
-from io import BytesIO
 from pathlib import Path
-from zipfile import ZipFile
 
-import numpy as np
 import pybase64
-import requests
 from flask import after_this_request
 from flask import jsonify
 from flask import make_response
@@ -120,11 +114,11 @@ from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.io import read_json
 from plantdb.commons.log import get_logger
 from plantdb.server import webcache
+from plantdb.server.api.utils import resource_file
 from plantdb.server.core.security import add_jwt_from_header
 from plantdb.server.core.security import rate_limit
 from plantdb.server.core.security import sanitize_ids
 from plantdb.server.core.security import use_guest_as_default
-from plantdb.server.core.utils import compute_fileset_matches
 from plantdb.server.services.assets import ArchiveError
 from plantdb.server.services.assets import ExtractionError
 from plantdb.server.services.assets import FileUploadError
@@ -172,7 +166,9 @@ class FilePath(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self, path):
@@ -211,159 +207,30 @@ class FilePath(Resource):
         Examples
         --------
         >>> # Start the REST API server (in test mode)
-        >>> # fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
         >>> import toml
+        >>> from plantdb.commons import api_endpoints
         >>> # Request a TOML configuration file
-        >>> response = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/pipeline.toml")
+        >>> file_uri = api_endpoints.file_path('real_plant_analyzed/pipeline.toml')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> cfg = toml.loads(response.content.decode())
         >>> print(cfg['Undistorted'])
         {'upstream_task': 'ImagesFilesetExists'}
         >>> # Request a JSON file
-        >>> response = requests.get("http://127.0.0.1:5000/files/real_plant_analyzed/files.json")
+        >>> file_uri = api_endpoints.file_path('real_plant_analyzed/files.json')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> scan_files = response.json()
         >>> print([fs['id'] for fs in scan_files['filesets']])
         ['images', 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595', 'TreeGraph__False_CurveSkeleton_c304a2cc71', 'CurveSkeleton__TriangleMesh_0393cb5708', 'TriangleMesh_9_most_connected_t_open3d_00e095c359', 'PointCloud_1_0_1_0_10_0_7ee836e5a9', 'Voxels___x____300__450__colmap_camera_False_2a093f0ccc', 'Masks_1__0__1__0____channel____rgb_5619aa428d', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7']
+        >>> # Stop the test server
+        >>> server.stop()
         """
         return send_from_directory(self.db.path(), path)
-
-
-class DatasetFile(Resource):
-    """A RESTful resource handler for file upload operations in a plant database system.
-
-    Attributes
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        The database providing the resources to serve.
-        Used for validating scan IDs and determining file storage paths.
-    logger : logging.Logger
-        The logger used to record operations and errors.
-
-    Notes
-    -----
-    File operations are performed with proper error handling and cleanup
-    of partial uploads in case of failures.
-
-    See Also
-    --------
-    plantdb.server.api.scan.ScansList : Resource for managing scan listings
-    plantdb.server.api.scan.File : Resource for file retrieval operations
-    """
-
-    def __init__(self, db, logger=None):
-        """Initialize the resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.core.FSDB
-            A database instance providing the resources to serve.
-        logger : logging.Logger
-            A logger instance to record operations and errors.
-        """
-        # Emit a deprecation warning the first time this class is instantiated
-        warnings.warn(
-            "DatasetFile is pending deprecation and will be replaced by the Archive resource in an upcoming release.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
-
-    @sanitize_ids('scan_id')
-    @add_jwt_from_header
-    @rate_limit(max_requests=30, window_seconds=60)
-    def post(self, scan_id, **kwargs):
-        """Handle POST request to upload and save a file to the server.
-
-        This endpoint processes file uploads and saves them to the specified location. It supports
-        both full file uploads and chunked uploads based on the provided headers. The method
-        ensures data integrity by validating the received file size against the Content-Length.
-
-        Parameters
-        ----------
-        scan_id : str
-            Unique identifier for the scan associated with the file upload. Used to determine
-            the base storage path for the file.
-
-        Returns
-        -------
-        flask.Response
-            JSON response with status code and message:
-
-            - 201: Successful upload with a message confirming file save
-            - 400: Bad request (missing headers or invalid parameters)
-            - 500: Server error during file processing
-
-        Notes
-        -----
-        Required HTTP headers:
-
-        - 'Content-Disposition': Contains file information
-        - 'Content-Length': Size of the file in bytes
-        - 'X-File-Path': Relative path where the file should be saved
-        - 'X-Chunk-Size' (optional): Size of chunks for streamed upload
-
-        The method will automatically create any necessary directories in the path.
-        Partial uploads are automatically cleaned up if they fail.
-
-        Raises
-        ------
-        Exception
-            When database access fails or file operations encounter errors.
-            All exceptions are caught and returned as HTTP 400 or 500 responses.
-        http.client.HTTPException
-             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
-
-        See Also
-        --------
-        plantdb.commons.io.write_stream
-        plantdb.commons.io.write_data
-        """
-        try:
-            # 1The database providing the resources to serveValidate request headers and extract useful values
-            headers = validate_upload_headers(request.headers)
-
-            # 2️. Resolve the target location on the filesystem
-            scan_root: Path = get_scan_path(self.db, scan_id, **kwargs)
-            file_path: Path = scan_root / headers["rel_filename"]
-            parent_path = file_path.parent
-            parent_path.mkdir(parents=True, exist_ok=True)
-
-            # 3. Persist the payload
-            if headers["chunk_size"] == 0:
-                bytes_written = write_file(file_path, request.data)
-            else:
-                bytes_written = write_streamed_file(
-                    file_path,
-                    headers["content_length"],
-                    headers["chunk_size"],
-                )
-
-            # 4. Verify the received size matches the declared size
-            if bytes_written != headers["content_length"]:
-                file_path.unlink(missing_ok=True)
-                raise FileUploadError(
-                    f"Received {bytes_written} bytes, expected "
-                    f"{headers['content_length']} bytes"
-                )
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except FileUploadError as exc:
-            self.logger.error("File upload failed: %s", exc)
-            return {"error": str(exc)}, 500  # HTTP 500 Internal Server Error)
-        except HTTPException:
-            # Let Flask‑RESTful propagate rate‑limit (429) or other HTTP errors.
-            raise
-        except Exception as exc:  # pragma: no cover - defensive fallback
-            self.logger.exception("Unexpected error while handling file upload")
-            return {"error": str(exc)}, 400
-
-        message = f"File {headers['rel_filename']} received and saved"
-        self.logger.info(message)
-        return {"message": message}, 201
 
 
 class Image(Resource):
@@ -397,19 +264,21 @@ class Image(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
     @staticmethod
     def wants_base64(request) -> bool:
         """
         Return ``True`` when the query string contains ``as_base64`` with a truthy value.
         """
-        flag = request.args.get('as_base64', default='false', type=str).lower()
-        return flag in ('true', '1', 'yes')
+        flag = request.args.get("as_base64", default="false", type=str).lower()
+        return flag in ("true", "1", "yes")
 
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
+    @sanitize_ids("scan_id")
+    @sanitize_ids("fileset_id")
+    @sanitize_ids("file_id")
     @rate_limit(max_requests=3000, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -440,7 +309,7 @@ class Image(Resource):
             If an invalid string is supplied, the default 'thumb' is used.
         as_base64 : str
             Query parameter indicating whether to return the image encoded in base64.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the image file.
             If set, returns the image in base64 under the 'image' JSON dictionary entry and mimetype under 'content-type'.
 
@@ -462,26 +331,35 @@ class Image(Resource):
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import numpy as np
+        >>> from plantdb.commons import api_endpoints
         >>> import requests
         >>> import pybase64
         >>> from io import BytesIO
         >>> from PIL import Image
         >>> # Example #1 - Get the first image as a thumbnail (default):
-        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True)
+        >>> file_uri = api_endpoints.image('real_plant_analyzed', 'images', '00000_rgb')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri, stream=True)
         >>> img = Image.open(BytesIO(response.content))
-        >>> image.show()
+        >>> img.show()
         >>> np.asarray(img).shape
         (113, 150, 3)
         >>> # Example #2 - Get the first image in original size:
-        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig"})
+        >>> file_uri = api_endpoints.image('real_plant_analyzed', 'images', '00000_rgb', size="orig")
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri, stream=True)
         >>> img = Image.open(BytesIO(response.content))
-        >>> image.show()
+        >>> img.show()
         >>> np.asarray(img).shape
         (1080, 1440, 3)
         >>> # Example #3 - Get a base64 encoded image:
-        >>> response = requests.get("http://127.0.0.1:5000/image/real_plant_analyzed/images/00000_rgb", stream=True, params={"size": "orig", "as_base64": 'true'})
+        >>> file_uri = api_endpoints.image('real_plant_analyzed', 'images', '00000_rgb', size="orig", as_base64=True)
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri, stream=True)
         >>> print(response.json()['content-type'])
         'image/jpeg'
         >>> b64_string = response.json()['image']
@@ -489,37 +367,40 @@ class Image(Resource):
         '/9j/4AAQSkZJRgABAQAAAQABAAD/2w'
         >>> image_data = pybase64.b64decode(b64_string)
         >>> image = Image.open(BytesIO(image_data))
-        >>> image.show()
+        >>> img.show()
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='thumb', type=str)
+        size = request.args.get("size", default="thumb", type=str)
         # Get the path to the image resource:
         try:
-            path = webcache.image_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.image_path(
+                self.db, scan_id, fileset_id, file_id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving image file: {str(e)}')
-            return {'message': f'Error retrieving image file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving image file: {str(e)}")
+            return {
+                "error": f"Error retrieving image file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         mime_type, _ = mimetypes.guess_type(path)
 
         if self.wants_base64(request):
             # ---------- JSON (base64) ----------
-            with open(path, 'rb') as f:
-                b64_str = pybase64.b64encode(f.read()).decode('ascii')
-            # ``decode('ascii')`` gives us a plain string that can be JSON‑encoded.
-            payload = {
-                "image": b64_str,
-                "content-type": mime_type
-            }
+            with open(path, "rb") as f:
+                b64_str = pybase64.b64encode(f.read()).decode("ascii")
+            # ``decode('ascii')`` gives us a plain string that can be JSON-encoded.
+            payload = {"image": b64_str, "content-type": mime_type}
             # Wrap ``jsonify`` with ``make_response`` to add custom headers
             resp = make_response(jsonify(payload))
             resp.headers["Content-Type"] = "application/json"
@@ -564,15 +445,15 @@ class PointCloud(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
+    def get(self, scan_id, **kwargs):
         """Retrieve and serve a point cloud from the database.
 
         Handles point cloud retrieval requests with optional downsampling based on
@@ -583,25 +464,24 @@ class PointCloud(Resource):
         ----------
         scan_id : str
             Identifier for the scan containing the point cloud.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific point cloud file.
 
         Other Parameters
         ----------------
         size : str or float
             Query parameter controlling downsampling.
             Accepted values:
-                * 'orig' - serve the original point cloud.
-                * 'preview' - serve a precomputed preview (default).
-                * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
+                * 'orig': serve the original point cloud.
+                * 'preview': serve a precomputed preview (default).
+                * A float value: perform on-the-fly voxel downsampling using the specified voxel size.
             If an invalid string is supplied, the default 'preview' is used.
         coords : str
             Query parameter indicating whether to return the point coordinates as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the PLY file.
             If set, returns the data as list under the 'coordinates' JSON dictionary entry.
+        type : str
+            Query parameter indicating whether to return the reconstructed point cloud (default) or
+            the ground truth ('type=gt').
 
         Returns
         -------
@@ -626,25 +506,49 @@ class PointCloud(Resource):
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> from plyfile import PlyData
         >>> from io import BytesIO
         >>> # Get original point cloud:
-        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud")
+        >>> file_uri = api_endpoints.pointcloud('real_plant_analyzed', size='orig')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> pcd_data = PlyData.read(BytesIO(response.content))
-        >>> # Access point X-coordinates:
-        >>> list(pcd_data['vertex']['x'])
+        >>> # Get the number of points in the point-cloud from X-coordinates:
+        >>> len(list(pcd_data['vertex']['x']))
+        57890
         >>> # Get preview (downsampled) version
-        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview"})
+        >>> file_uri = api_endpoints.pointcloud('real_plant_analyzed', size='preview')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
+        >>> pcd_data = PlyData.read(BytesIO(response.content))
+        >>> # Get the number of points in the point-cloud from X-coordinates:
+        >>> len(list(pcd_data['vertex']['x']))
+        2907
         >>> # Get custom downsampled version (voxel size 0.01)
-        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "0.01"})
+        >>> file_uri = api_endpoints.pointcloud('real_plant_analyzed', size=0.01)
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
+        >>> pcd_data = PlyData.read(BytesIO(response.content))
+        >>> # Get the number of points in the point-cloud from X-coordinates:
+        >>> len(list(pcd_data['vertex']['x']))
+        57856
         >>> # Send the coordinates (read the file on the server-side)
-        >>> response = requests.get("http://127.0.0.1:5000/pointcloud/real_plant_analyzed/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud", params={"size": "preview", 'coords': 'true'})
+        >>> file_uri = api_endpoints.pointcloud('real_plant_analyzed', size='preview', coords=True)
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> coordinates = np.array(response.json()['coordinates'])
+        >>> # Get the shape of the `coordinates` array:
+        >>> coordinates.shape
+        (2907, 3)
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='preview', type=str)
+        size = request.args.get("size", default="preview", type=str)
         # Try to convert the 'size' argument as a float:
         try:
             vxs = float(size)
@@ -653,165 +557,56 @@ class PointCloud(Resource):
         else:
             size = vxs
         # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
-        if isinstance(size, str) and size not in ['orig', 'preview']:
-            size = 'preview'
+        if isinstance(size, str) and size not in ["orig", "preview"]:
+            size = "preview"
 
-        # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+        # Parse the `coords` flag
+        true_coords_opt = {"true", "1", "yes"}  # valid options to match the `True` flag
+        coords_flag = request.args.get("coords", default="false", type=str).lower() in true_coords_opt
 
-        try:
-            # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            self.logger.error(f'Error retrieving point cloud file: {str(e)}')
-            return {'message': f'Error retrieving point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
-
-        # If coords_flag is set, read the file and return JSON
-        if coords_flag:
-            import numpy as np
-            from open3d import io
-            pcd = io.read_point_cloud(path, print_progress=False)
-            # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'coordinates': np.array(pcd.points).tolist()})
-        # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
-
-
-class PointCloudGroundTruth(Resource):
-    """A RESTful resource for serving ground-truth point-cloud data.
-
-    This class handles HTTP GET requests for point-cloud data, with optional
-    downsampling capabilities based on the requested size parameter.
-
-    Attributes
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        The database providing the resources to serve.
-    logger : Logger
-        The logger instance for this resource.
-    """
-
-    def __init__(self, db, logger=None):
-        """Initialize the resource.
-
-        Parameters
-        ----------
-        db : plantdb.commons.fsdb.core.FSDB
-            A database instance providing the resources to serve.
-        logger : logging.Logger
-            A logger instance to record operations and errors.
-        """
-        self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
-
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
-    @rate_limit(max_requests=5, window_seconds=60)
-    @add_jwt_from_header
-    @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
-        """Retrieve and serve a ground-truth point-cloud file.
-
-        Fetches the requested point-cloud data from the cache, potentially
-        downsampling it based on the size parameter provided in the query string.
-
-        Parameters
-        ----------
-        scan_id : str
-            Identifier for the scan to retrieve.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific point-cloud file.
-
-        Other Parameters
-        ----------------
-        size : str or float
-            Query parameter controlling downsampling.
-            Accepted values:
-                * 'orig' - serve the original point cloud.
-                * 'preview' - serve a precomputed preview (default).
-                * A float value - perform on‑the‑fly voxel downsampling using the specified voxel size.
-            If an invalid string is supplied, the default 'preview' is used.
-        coords : str
-            Query parameter indicating whether to return the point coordinates as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
-            Defaults to 'false', which streams the PLY file.
-            If set, returns the data as list under the 'coordinates' JSON dictionary entry.
-
-        Returns
-        -------
-        flask.Response
-            HTTP response containing the point-cloud data as an octet-stream.
-
-        Raises
-        ------
-        werkzeug.exceptions.NotFound
-            If the requested point-cloud file doesn't exist.
-        http.client.HTTPException
-             If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
-
-        Notes
-        -----
-        - In the URL, you can use the 'size' parameter to specify the size of the point-cloud:
-            * 'orig': Original size
-            * 'preview': Preview size (default)
-            * A float value: Custom voxel size for downsampling
-        - All identifiers are sanitized before use
-        - Invalid size parameters default to 'preview'
-        - Response mimetype is 'application/octet-stream'
-        """
-        # Parse the `size` flag
-        size = request.args.get('size', default='preview', type=str)
-        # Try to convert the 'size' argument as a float:
-        try:
-            vxs = float(size)
-        except ValueError:
-            pass
+        # Parse the `type` flag
+        pcd_type = request.args.get("type", default="default", type=str)
+        if pcd_type == "gt":
+            task_name = "PointCloudGroundTruth"
         else:
-            size = vxs
-        # If a string, make sure that the 'size' argument we got is a valid option, else default to 'preview':
-        if isinstance(size, str) and size not in ['orig', 'preview']:
-            size = 'preview'
+            task_name = "PointCloud"  # default to 'default'
 
-        # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+        # Get the corresponding `File` from the database
+        file = resource_file(self.db, scan_id, task_name, **kwargs)
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         try:
             # Get the path to the pointcloud resource:
-            path = webcache.pointcloud_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.pointcloud_path(
+                self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving ground truth point cloud file: {str(e)}')
-            return {'message': f'Error retrieving ground truth point cloud file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving point cloud file: {str(e)}")
+            return {
+                "error": f"Error retrieving point cloud file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
             import numpy as np
             from open3d import io
+
             pcd = io.read_point_cloud(path, print_progress=False)
             # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'coordinates': np.array(pcd.points).tolist()})
+            return jsonify({"coordinates": np.array(pcd.points).tolist()})
         # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype="application/octet-stream")
 
 
 class Mesh(Resource):
@@ -844,15 +639,15 @@ class Mesh(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
-    @sanitize_ids('fileset_id')
-    @sanitize_ids('file_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
-    def get(self, scan_id, fileset_id, file_id, **kwargs):
+    def get(self, scan_id, **kwargs):
         """Retrieve and serve a triangular mesh file.
 
         This method handles GET requests for mesh data, supporting optional size
@@ -863,16 +658,12 @@ class Mesh(Resource):
         ----------
         scan_id : str
             Identifier for the scan containing the mesh.
-        fileset_id : str
-            Identifier for the fileset within the scan.
-        file_id : str
-            Identifier for the specific mesh file.
 
         Other Parameters
         ----------------
         coords : str
             Query parameter indicating whether to return the vertices coordinates and triangle IDs as JSON.
-            Accepts 'true', '1', 'yes' (case‑insensitive) to enable.
+            Accepts 'true', '1', 'yes' (case-insensitive) to enable.
             Defaults to 'false', which streams the PLY file.
             If set, returns the data as list under the 'vertices' & 'triangles' JSON dictionary entry.
 
@@ -902,53 +693,82 @@ class Mesh(Resource):
 
         Examples
         --------
-        >>> # In a terminal, start a (test) REST API with `fsdb_rest_api --test`, then:
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> from plyfile import PlyData
         >>> from io import BytesIO
         >>> # Request a mesh file
-        >>> url = "http://127.0.0.1:5000/mesh/real_plant_analyzed/TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh"
-        >>> response = requests.get(url)
+        >>> file_uri = api_endpoints.mesh('real_plant_analyzed', size='orig')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> # Parse the PLY data
         >>> mesh_data = PlyData.read(BytesIO(response.content))
         >>> # Access vertex coordinates
         >>> vertices = mesh_data['vertex']
         >>> x_coords = list(vertices['x'])
+        >>> len(x_coords)
+        28360
+        >>> # Stop the test server
+        >>> server.stop()
         """
         # Parse the `size` flag
-        size = request.args.get('size', default='orig', type=str)
+        size = request.args.get("size", default="orig", type=str)
         # Make sure that the 'size' argument we got is a valid option, else default to 'orig':
-        if not size in ['orig']:
-            size = 'orig'
+        if not size in ["orig"]:
+            size = "orig"
 
         # Parse the coords flag (accepting true/1/yes in any case)
-        coords_flag = request.args.get('coords', default='false', type=str).lower() in ('true', '1', 'yes')
+        coords_flag = request.args.get("coords", default="false", type=str).lower() in (
+            "true",
+            "1",
+            "yes",
+        )
+
+        file = resource_file(self.db, scan_id, "TriangleMesh", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         try:
             # Get the path to the mesh resource:
-            path = webcache.mesh_path(self.db, scan_id, fileset_id, file_id, size, **kwargs)
+            path = webcache.mesh_path(
+                self.db, file.scan.id, file.fileset.id, file.id, size, **kwargs
+            )
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FilesetNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except FileNotFoundError as e:
-            return {'message': str(e)}, 404  # HTTP 404 Not Found
+            return {"error": str(e)}, 404  # HTTP 404 Not Found
         except Exception as e:
-            self.logger.error(f'Error retrieving mesh file: {str(e)}')
-            return {'message': f'Error retrieving mesh file: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            self.logger.error(f"Error retrieving mesh file: {str(e)}")
+            return {
+                "error": f"Error retrieving mesh file: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         # If coords_flag is set, read the file and return JSON
         if coords_flag:
             import numpy as np
             from open3d import io
+
             pcd = io.read_triangle_mesh(path, print_progress=False)
             # Convert the Open3D Vector3dVector to a plain Python list so JSON can serialize it.
-            return jsonify({'vertices': np.array(pcd.vertices).tolist(), 'triangles': np.array(pcd.triangles).tolist()})
+            return jsonify(
+                {
+                    "vertices": np.array(pcd.vertices).tolist(),
+                    "triangles": np.array(pcd.triangles).tolist(),
+                }
+            )
         # Otherwise, return the file directly
-        return send_file(path, mimetype='application/octet-stream')
+        return send_file(path, mimetype="application/octet-stream")
 
 
 class CurveSkeleton(Resource):
@@ -976,9 +796,11 @@ class CurveSkeleton(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -1020,52 +842,33 @@ class CurveSkeleton(Resource):
 
         Examples
         --------
-        >>> # Start the REST API server
-        >>> # Then in a Python console:
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
+        >>> from plantdb.commons import api_endpoints
         >>> # Fetch skeleton data for a valid scan
-        >>> response = requests.get("http://127.0.0.1:5000/skeleton/Col-0_E1_1")
+        >>> file_uri = api_endpoints.skeleton('real_plant_analyzed')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> skeleton_data = response.json()
         >>> print(list(skeleton_data.keys()))
-        ['angles', 'internodes', 'metadata']
-        >>> # Example with invalid scan ID
-        >>> response = requests.get("http://127.0.0.1:5000/skeleton/invalid_id")
-        >>> print(response.status_code)
-        400
-        >>> print(response.json())
-        {'message': "Scan 'invalid_id' not found!"}
+        ['points', 'lines']
+        >>> # Stop the test server
+        >>> server.stop()
         """
-        # Get the corresponding `Scan` instance
-        try:
-            scan = self.db.get_scan(scan_id, **kwargs)
-
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError:
-            return {"error": f"Scan '{scan_id}' not found!"}, 400
-
-        task_fs_map = compute_fileset_matches(scan)
-        # Get the corresponding `Fileset` instance
-        try:
-            fs = scan.get_fileset(task_fs_map['CurveSkeleton'])
-        except KeyError:
-            return {'message': "No 'CurveSkeleton' fileset mapped!"}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError:
-            return {'message': "No 'CurveSkeleton' fileset found!"}, 404  # HTTP 404 Not Found
-
-        # Get the `File` corresponding to the CurveSkeleton resource
-        try:
-            file = fs.get_file('CurveSkeleton')
-        except FileNotFoundError:
-            return {'message': "No 'CurveSkeleton' file found!"}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+        file = resource_file(self.db, scan_id, "CurveSkeleton", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         # Load the JSON file:
         try:
             skeleton = read_json(file.path())
         except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({"error": str(e)}), 500  # HTTP 500 Internal Server Error
         else:
             return skeleton
 
@@ -1096,9 +899,11 @@ class Sequence(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=60, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -1151,117 +956,69 @@ class Sequence(Resource):
 
         Examples
         --------
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> # Get all sequence data
         >>> import requests
-        >>> response = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed")
+        >>> from plantdb.commons import api_endpoints
+        >>> file_uri = api_endpoints.sequence('real_plant_analyzed')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> data = response.json()  # Expected output: {'angles': [...], 'internodes': [...], 'fruit_points': [...]}
         >>> print(list(data))
         ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']
         >>> # Get only angles data
-        >>> response = requests.get("http://127.0.0.1:5000/sequence/real_plant_analyzed", params={'type': 'angles'})
+        >>> file_uri = api_endpoints.sequence('real_plant_analyzed', seq_type='angles')
+        >>> response = requests.get("http://127.0.0.1:5000" + file_uri)
         >>> angles = response.json()
         >>> print(angles[:5])
         [47.13015345294241, 239.43543078022594, 311.8816488465762, 251.0289289739646, 249.56560354730826]
+        >>> # Stop the test server
+        >>> server.stop()
         """
-        type = request.args.get('type', default='all', type=str)
-        # Get the corresponding `Scan` instance
-        try:
-            scan = self.db.get_scan(scan_id, **kwargs)
+        type = request.args.get("type", default="all", type=str)
 
-        except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
-        except ScanNotFoundError:
-            return {"error": f"Scan '{scan_id}' not found!"}, 404  # HTTP 404 Not Found
-
-        task_fs_map = compute_fileset_matches(scan)
-        # Get the corresponding `Fileset` instance
-        try:
-            fs = scan.get_fileset(task_fs_map['AnglesAndInternodes'])
-        except KeyError:
-            return {'message': "No 'AnglesAndInternodes' fileset mapped!"}, 404  # HTTP 404 Not Found
-        except FilesetNotFoundError:
-            return {'message': "No 'AnglesAndInternodes' fileset found!"}, 404  # HTTP 404 Not Found
-
-        # Get the `File` corresponding to the AnglesAndInternodes resource
-        try:
-            file = fs.get_file('AnglesAndInternodes')
-        except FileNotFoundError:
-            return {'message': "No 'AnglesAndInternodes' file found!"}, 404  # HTTP 404 Not Found
-        except Exception as e:
-            return json.dumps({'message': str(e)}), 404  # HTTP 404 Not Found
+        file = resource_file(self.db, scan_id, "AnglesAndInternodes", **kwargs)
+        # If an error tuple was returned, forward it directly to Flask-RESTful.
+        if isinstance(file, tuple) and isinstance(file[0], dict):
+            return file
 
         # Load the JSON file:
         try:
             measures = read_json(file.path())
         except Exception as e:
-            return json.dumps({'message': str(e)}), 500  # HTTP 500 Internal Server Error
+            return json.dumps({"error": str(e)}), 500  # HTTP 500 Internal Server Error
 
         # Load the manual 'measures.json' JSON file:
-        manual_measures_file = scan.path() / 'measures.json'
+        scan = file.scan
+        manual_measures_file = scan.path() / "measures.json"
         try:
             manual_measures = read_json(manual_measures_file)
         except Exception as e:
             if manual_measures_file.exists():
-                self.logger.warning(f"Failed to load manual measures file: {manual_measures_file}")
+                self.logger.warning(
+                    f"Failed to load manual measures file: {manual_measures_file}"
+                )
                 self.logger.warning(e)
             pass
         else:
-            measures['manual_angles'] = manual_measures['angles']
-            measures['manual_internodes'] = manual_measures['internodes']
+            measures["manual_angles"] = manual_measures["angles"]
+            measures["manual_internodes"] = manual_measures["internodes"]
 
         # Make sure that the 'type' argument we got is a valid option, else default to 'all':
-        if type in ['angles', 'internodes', 'fruit_points', 'manual_angles', 'manual_internodes']:
+        if type in [
+            "angles",
+            "internodes",
+            "fruit_points",
+            "manual_angles",
+            "manual_internodes",
+        ]:
             return measures[type]
         else:
             return measures
-
-
-def is_within_directory(directory, target):
-    """Check if a target path is within a directory.
-
-    This function determines if the absolute path of the target is located
-    within the absolute path of the directory. It uses `os.path.commonpath`
-    to perform the comparison.
-
-    Parameters
-    ----------
-    directory : str or pathlib.Path
-        The path to the directory to check against.
-    target : str or pathlib.Path
-        The path to the target to check if it resides within the directory.
-
-    Returns
-    -------
-    bool
-        ``True`` if the target path is within the directory, ``False`` otherwise.
-    """
-    abs_directory = os.path.abspath(directory)
-    abs_target = os.path.abspath(target)
-    return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
-
-
-def is_directory_in_archive(archive_path, target_dir):
-    """Check if a specific directory exists within an archive file.
-
-    This function checks whether a given directory is present at the top level of a ZIP archive.
-
-    Parameters
-    ----------
-    archive_path : str or pathlib.Path
-        The path to the ZIP archive file.
-    target_dir : str
-        The name of the target directory to check for within the archive.
-
-    Returns
-    -------
-    bool
-        True if the target directory exists at the top level of the archive, False otherwise.
-    """
-    with ZipFile(archive_path, 'r') as zip_ref:
-        # List all members in the zip file
-        top_level_members = [name for name in zip_ref.namelist() if '/' not in name]
-        # Check if the target directory is among them
-        return f"{target_dir}/" in top_level_members or target_dir in top_level_members
 
 
 class Archive(Resource):
@@ -1290,9 +1047,11 @@ class Archive(Resource):
             A logger instance to record operations and errors.
         """
         self.db: FSDB = db
-        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.logger: logging.Logger = (
+            logger if logger else get_logger(self.__class__.__name__)
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     @use_guest_as_default  # FIXME: Remove this if we want strict token identification
@@ -1323,6 +1082,12 @@ class Archive(Resource):
 
         Examples
         --------
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import os
         >>> import requests
         >>> import shutil
@@ -1330,12 +1095,10 @@ class Archive(Resource):
         >>> from io import BytesIO
         >>> from pathlib import Path
         >>> from zipfile import ZipFile
-        >>> from plantdb.server.test_rest_api import TestRestApiServer
-        >>> # Create a test database and start the Flask App serving a REST API
-        >>> server = TestRestApiServer(test=True)
-        >>> server.start()
+        >>> from plantdb.commons import api_endpoints
+        >>> file_uri = api_endpoints.archive('real_plant_analyzed')
         >>> # Get the archive for the 'real_plant' dataset with
-        >>> zip_file = requests.get("http://127.0.0.1:5000/archive/real_plant", stream=True)
+        >>> zip_file = requests.get("http://127.0.0.1:5000" + file_uri, stream=True)
         >>> # EXAMPLE 1 - Write the archive to disk:
         >>> # Create a unique temporary file name with .zip extension
         >>> temp_zip_handle, temp_zip_path = tempfile.mkstemp(suffix='.zip')
@@ -1343,6 +1106,7 @@ class Archive(Resource):
         >>> # Write to disk
         >>> with open(temp_zip_path, 'wb') as zip_f: zip_f.write(zip_file.content)
         >>> print(f"Successfully wrote to {temp_zip_path}")
+        Successfully wrote to /tmp/tmpmogtl78q.zip
         >>> # EXAMPLE 2 - Extract the archive:
         >>> # Create a temporary path to extract the archived data
         >>> tmp_dir = Path(tempfile.mkdtemp())
@@ -1356,6 +1120,7 @@ class Archive(Resource):
         ...
         >>> # Print the list of extracted files
         >>> print(extracted_files)
+        ['measures.json', 'pipeline.toml', 'files.json', 'scan.toml', 'TriangleMesh_9_most_connected_t_open3d_00e095c359/TriangleMesh.ply', 'PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.ply', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00030_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00016_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00018_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00057_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00048_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00027_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00051_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00006_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00022_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00003_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00017_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00004_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00059_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00035_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00005_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00046_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00001_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00026_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00054_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00031_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00025_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00007_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00028_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00010_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00008_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00042_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00000_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00036_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00041_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00015_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00024_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00052_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00053_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00009_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00002_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00039_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00034_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00019_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00020_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00044_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00047_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00056_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00029_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00049_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00045_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00021_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00037_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00032_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00011_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00058_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00012_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00038_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00050_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00055_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00040_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00043_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00014_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00023_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00033_rgb.png', 'Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00013_rgb.png', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d.json', 'metadata/metadata.json', 'metadata/CurveSkeleton__TriangleMesh_0393cb5708.json', 'metadata/PointCloud_1_0_1_0_10_0_7ee836e5a9.json', 'metadata/Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc.json', 'metadata/TreeGraph__False_CurveSkeleton_c304a2cc71.json', 'metadata/AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595.json', 'metadata/images.json', 'metadata/Voxels___x____300__450__colmap_camera_False_2a093f0ccc.json', 'metadata/TriangleMesh_9_most_connected_t_open3d_00e095c359.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7.json', 'metadata/PointCloud_1_0_1_0_10_0_7ee836e5a9/PointCloud.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00034_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00040_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00021_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00056_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00029_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00050_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00018_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00039_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00017_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00043_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00025_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00016_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00047_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00033_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00051_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00053_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00005_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00048_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00031_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00042_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00008_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00002_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00013_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00000_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00014_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00035_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00023_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00027_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00044_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00041_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00010_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00001_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00045_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00007_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00052_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00020_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00049_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00015_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00028_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00004_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00054_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00037_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00038_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00003_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00059_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00032_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00022_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00057_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00012_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00026_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00030_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00055_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00024_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00058_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00011_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00046_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00009_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00036_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00006_rgb.json', 'metadata/Undistorted_SIMPLE_RADIAL_Colmap__a333f181b7/00019_rgb.json', 'metadata/images/00034_rgb.json', 'metadata/images/00040_rgb.json', 'metadata/images/00021_rgb.json', 'metadata/images/00056_rgb.json', 'metadata/images/00029_rgb.json', 'metadata/images/00050_rgb.json', 'metadata/images/00018_rgb.json', 'metadata/images/00039_rgb.json', 'metadata/images/00017_rgb.json', 'metadata/images/00043_rgb.json', 'metadata/images/00025_rgb.json', 'metadata/images/00016_rgb.json', 'metadata/images/00047_rgb.json', 'metadata/images/00033_rgb.json', 'metadata/images/00051_rgb.json', 'metadata/images/00053_rgb.json', 'metadata/images/00005_rgb.json', 'metadata/images/00048_rgb.json', 'metadata/images/00031_rgb.json', 'metadata/images/00042_rgb.json', 'metadata/images/00008_rgb.json', 'metadata/images/00002_rgb.json', 'metadata/images/00013_rgb.json', 'metadata/images/00000_rgb.json', 'metadata/images/00014_rgb.json', 'metadata/images/00035_rgb.json', 'metadata/images/00023_rgb.json', 'metadata/images/00027_rgb.json', 'metadata/images/00044_rgb.json', 'metadata/images/00041_rgb.json', 'metadata/images/00010_rgb.json', 'metadata/images/00001_rgb.json', 'metadata/images/00045_rgb.json', 'metadata/images/00007_rgb.json', 'metadata/images/00052_rgb.json', 'metadata/images/00020_rgb.json', 'metadata/images/00049_rgb.json', 'metadata/images/00015_rgb.json', 'metadata/images/00028_rgb.json', 'metadata/images/00004_rgb.json', 'metadata/images/00054_rgb.json', 'metadata/images/00037_rgb.json', 'metadata/images/00038_rgb.json', 'metadata/images/00003_rgb.json', 'metadata/images/00059_rgb.json', 'metadata/images/00032_rgb.json', 'metadata/images/00022_rgb.json', 'metadata/images/00057_rgb.json', 'metadata/images/00012_rgb.json', 'metadata/images/00026_rgb.json', 'metadata/images/00030_rgb.json', 'metadata/images/00055_rgb.json', 'metadata/images/00024_rgb.json', 'metadata/images/00058_rgb.json', 'metadata/images/00011_rgb.json', 'metadata/images/00046_rgb.json', 'metadata/images/00009_rgb.json', 'metadata/images/00036_rgb.json', 'metadata/images/00006_rgb.json', 'metadata/images/00019_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00034_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00040_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00021_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00056_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00029_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00050_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00018_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00039_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00017_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00043_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00025_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00016_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00047_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00033_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00051_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00053_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00005_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00048_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00031_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00042_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00008_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00002_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00013_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00014_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00035_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00023_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00027_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00044_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00041_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00010_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00001_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00045_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00007_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00052_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00020_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00049_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00015_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00028_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00004_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00054_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00037_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00038_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00003_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00059_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00032_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00022_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00057_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00012_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00026_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00030_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00055_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00024_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00058_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00011_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00046_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00009_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00036_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00006_rgb.json', 'metadata/Masks_1__0__1__0____channel____rgb_5619aa428d/00019_rgb.json', 'metadata/Voxels___x____300__450__colmap_camera_False_2a093f0ccc/Voxels.json', 'TreeGraph__False_CurveSkeleton_c304a2cc71/TreeGraph.p', 'images/00013_rgb.jpg', 'images/00010_rgb.jpg', 'images/00020_rgb.jpg', 'images/00028_rgb.jpg', 'images/00035_rgb.jpg', 'images/00054_rgb.jpg', 'images/00030_rgb.jpg', 'images/00018_rgb.jpg', 'images/00029_rgb.jpg', 'images/00005_rgb.jpg', 'images/00004_rgb.jpg', 'images/00038_rgb.jpg', 'images/00047_rgb.jpg', 'images/00053_rgb.jpg', 'images/00014_rgb.jpg', 'images/00021_rgb.jpg', 'images/00037_rgb.jpg', 'images/00057_rgb.jpg', 'images/00007_rgb.jpg', 'images/00016_rgb.jpg', 'images/00050_rgb.jpg', 'images/00036_rgb.jpg', 'images/00017_rgb.jpg', 'images/00052_rgb.jpg', 'images/00009_rgb.jpg', 'images/00031_rgb.jpg', 'images/00002_rgb.jpg', 'images/00059_rgb.jpg', 'images/00027_rgb.jpg', 'images/00015_rgb.jpg', 'images/00032_rgb.jpg', 'images/00023_rgb.jpg', 'images/00000_rgb.jpg', 'images/00056_rgb.jpg', 'images/00033_rgb.jpg', 'images/00048_rgb.jpg', 'images/00019_rgb.jpg', 'images/00039_rgb.jpg', 'images/00044_rgb.jpg', 'images/00040_rgb.jpg', 'images/00022_rgb.jpg', 'images/00003_rgb.jpg', 'images/00055_rgb.jpg', 'images/00034_rgb.jpg', 'images/00049_rgb.jpg', 'images/00045_rgb.jpg', 'images/00043_rgb.jpg', 'images/00051_rgb.jpg', 'images/00011_rgb.jpg', 'images/00012_rgb.jpg', 'images/00024_rgb.jpg', 'images/00025_rgb.jpg', 'images/00046_rgb.jpg', 'images/00001_rgb.jpg', 'images/00042_rgb.jpg', 'images/00006_rgb.jpg', 'images/00041_rgb.jpg', 'images/00008_rgb.jpg', 'images/00026_rgb.jpg', 'images/00058_rgb.jpg', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/colmap.log', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/cnc_vs_colmap_poses_estimated.png', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/points3d.json', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/images.json', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/model_analyzer.log', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/sparse.ply', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/cameras.json', 'Colmap_True_null_SIMPLE_RADIAL_ffcef49fdc/euclidean_distances.json', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00030_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00016_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00018_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00057_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00048_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00027_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00051_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00006_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00022_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00003_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00017_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00004_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00059_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00035_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00005_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00046_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00001_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00026_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00054_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00031_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00025_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00007_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00028_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00010_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00008_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00042_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00000_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00036_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00041_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00015_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00024_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00052_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00053_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00009_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00002_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00039_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00034_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00019_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00020_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00044_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00047_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00056_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00029_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00049_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00045_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00021_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00037_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00032_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00011_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00058_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00012_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00038_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00050_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00055_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00040_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00043_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00014_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00023_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00033_rgb.png', 'Masks_1__0__1__0____channel____rgb_5619aa428d/00013_rgb.png', 'Voxels___x____300__450__colmap_camera_False_2a093f0ccc/Voxels.tiff', 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595/AnglesAndInternodes.json', 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595/fruit_direction.json', 'AnglesAndInternodes_1_0_2_0_6_0_6dd64fc595/stem_direction.json', 'CurveSkeleton__TriangleMesh_0393cb5708/CurveSkeleton.json']
         >>> shutil.rmtree(tmp_dir)  # Remove the temporary directory (and its contents)
         >>> # Stop the test server
         >>> server.stop()
@@ -1364,11 +1129,15 @@ class Archive(Resource):
             scan = self.db.get_scan(scan_id, **kwargs)
 
         except NoAuthUserError as e:
-            return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+            return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
         except ScanNotFoundError:
-            return {'message': f'Could not find a scan named `{scan_id}`!'}, 404  # HTTP 404 Not Found
+            return {
+                "error": f"Could not find a scan named `{scan_id}`!"
+            }, 404  # HTTP 404 Not Found
         except Exception as e:
-            return {'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+            return {
+                "error": f"Error accessing the scan {scan_id}: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
 
         try:
             zip_path = create_zip_for_scan(Path(scan.path()), self.logger)
@@ -1386,9 +1155,11 @@ class Archive(Resource):
                 self.logger.error(f"Failed to delete temporary file `{zip_path}`: {e}")
             return response
 
-        return send_file(zip_path, download_name=f'{scan_id}.zip', mimetype='application/zip')
+        return send_file(
+            zip_path, download_name=f"{scan_id}.zip", mimetype="application/zip"
+        )
 
-    @sanitize_ids('scan_id')
+    @sanitize_ids("scan_id")
     @rate_limit(max_requests=5, window_seconds=60)
     @add_jwt_from_header
     def post(self, scan_id, **kwargs):
@@ -1408,7 +1179,7 @@ class Archive(Resource):
         tuple
             A tuple containing (dict, int) where the dict contains either:
             - On success: {'success': message, 'files': list_of_extracted_files}
-            - On failure: {'message': error_message}
+            - On failure: {'error': error_message}
             The integer represents the HTTP status code (``200`` for success, ``400`` or ``500`` for errors)
 
         Notes
@@ -1425,33 +1196,41 @@ class Archive(Resource):
 
         Examples
         --------
-        >>> import requests
-        >>> from pathlib import Path
-        >>> from tempfile import gettempdir
+        >>> # Start the REST API server (in test mode)
         >>> from plantdb.server.test_rest_api import TestRestApiServer
         >>> # Create a test database and start the Flask App serving a REST API
         >>> server = TestRestApiServer(test=True)
         >>> server.start()
+
+        >>> import requests
+        >>> from pathlib import Path
+        >>> from tempfile import gettempdir
+        >>> from plantdb.commons import api_endpoints
         >>> zip_file = Path(gettempdir()) / 'real_plant.zip'  # should be in the temporary directory from the TestRestApiServer setup
         >>> print(zip_file.exists())
         True
         >>> # You need to be logged to be able to POST archives
-        >>> r = requests.post('http://127.0.0.1:5000/login', json={'username': 'admin', 'password': 'admin'})
+        >>> r = requests.post('http://127.0.0.1:5000/'+api_endpoints.login(), json={'username': 'admin', 'password': 'admin'})
         >>> jwt_token = r.json()['access_token']  # get the JSON Web Token
         >>> # Upload it as a new dataset named 'real_plant_test'
         >>> new_dataset = 'real_plant_test'
+        >>> file_uri = api_endpoints.archive(new_dataset)
         >>> with open(zip_file, 'rb') as zip_f:
         ...    files = {'zip_file': (str(zip_file), zip_f, 'application/zip')}
-        ...    response = requests.post(f'http://127.0.0.1:5000/archive/{new_dataset}', files=files, headers={'Authorization': 'Bearer ' + jwt_token})
-        >>> print(response.json())
-        >>> _ = requests.get(f"http://127.0.0.1:5000/refresh?scan_id={new_dataset}")
-        >>> r = requests.get("http://127.0.0.1:5000/scans")
+        ...    response = requests.post("http://127.0.0.1:5000"+file_uri, files=files, headers={'Authorization': 'Bearer ' + jwt_token})
+        >>> print(response.ok)
+        True
+        >>> # Call for a refresh of the database for this specific dataset to 'register' it:
+        >>> _ = requests.get("http://127.0.0.1:5000" + api_endpoints.refresh(new_dataset))
+        >>> # Look if it is now part of the list of scans:
+        >>> r = requests.get("http://127.0.0.1:5000" + api_endpoints.scans())
         >>> scans_list = r.json()
         >>> print(new_dataset in scans_list)
         True
+        >>> # Stop the test server
         >>> server.stop()
         """
-        # 1. Basic pre‑condition checks
+        # 1. Basic pre-condition checks
         if self.db.scan_exists(scan_id):
             self.logger.error("Dataset `%s` already exists.", scan_id)
             return {"error": f"Dataset `{scan_id}` already exists!"}, 400
@@ -1486,23 +1265,29 @@ class Archive(Resource):
                 scan_path = Path(self.db.create_scan(scan_id, **kwargs).path())
 
             except NoAuthUserError as e:
-                return {'message': str(e)}, 401  # HTTP 401 Unauthorized (authentication)
+                return {"error": str(e)}, 401  # HTTP 401 Unauthorized (authentication)
             except Exception as e:
                 return {
-                    'message': f'Error accessing the scan {scan_id}: {str(e)}'}, 500  # HTTP 500 Internal Server Error
+                    "error": f"Error accessing the scan {scan_id}: {str(e)}"
+                }, 500  # HTTP 500 Internal Server Error
 
             extracted_files = extract_zip_to_scan(temp_zip, scan_path, self.logger)
 
             # 5. Refresh DB state and respond
             self.db.reload(scan_id)
-            return {"message": "ZIP file processed successfully", "files": extracted_files}, 200
+            return {
+                "message": "ZIP file processed successfully",
+                "files": extracted_files,
+            }, 200
 
         except (ValidationError, ExtractionError) as exc:
-            # Validation / extraction errors are client‑side problems → 400
+            # Validation / extraction errors are client-side problems → 400
             return {"error": str(exc)}, 400
         except Exception as exc:
-            # Unexpected server‑side errors → 500
+            # Unexpected server-side errors → 500
             self.logger.exception("Unexpected error while processing archive")
-            return {"error": f"Internal server error: {exc}"}, 500  # HTTP 500 Internal Server Error
+            return {
+                "error": f"Internal server error: {exc}"
+            }, 500  # HTTP 500 Internal Server Error
         finally:
             temp_zip.unlink(missing_ok=True)

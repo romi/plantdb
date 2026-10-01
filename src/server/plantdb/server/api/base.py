@@ -26,18 +26,18 @@
 """
 # Base REST API Resources
 
-Provides Flask‑RESTful resources that expose the PlantDB database through a
-well‑documented HTTP API. The module bundles endpoints for health checks,
-metadata queries, file access, and on‑demand database reloading, all protected
-by configurable rate‑limiting to safeguard the service.
+Provides Flask-RESTful resources that expose the PlantDB database through a
+well-documented HTTP API. The module bundles endpoints for health checks,
+metadata queries, file access, and on-demand database reloading, all protected
+by configurable rate-limiting to safeguard the service.
 
 ## Key Features
 
-- **Health check endpoint** - quickly verify that the service and underlying
+- **Health check endpoint**: quickly verify that the service and underlying
   database are operational.
-- **Dynamic database refresh** - reload a single scan or the entire dataset
+- **Dynamic database refresh**: reload a single scan or the entire dataset
   without restarting the server.
-- **Self‑describing root resource** - returns API name, description,
+- **Self-describing root resource**: returns API name, description,
   version information, and a list of all available routes.
 
 ## Usage Examples
@@ -78,6 +78,7 @@ Hereafter is a minimal working example that:
 It may be used as follows (in another Python REPL):
 ```python
 >>> import requests
+>>> from plantdb.commons import api_endpoints
 >>> # Check if the user exists (valid username):
 >>> response = requests.get("http://127.0.0.1:5000/")
 >>> print(response.json()['name'])
@@ -91,6 +92,34 @@ import logging
 
 from flask import request
 from flask_restful import Resource
+
+from plantdb.commons import api_endpoints
+from plantdb.commons.api_endpoints import ARCHIVE
+from plantdb.commons.api_endpoints import CREATE_API_TOKEN
+from plantdb.commons.api_endpoints import FILE
+from plantdb.commons.api_endpoints import FILESET
+from plantdb.commons.api_endpoints import FILESET_FILES
+from plantdb.commons.api_endpoints import FILESET_MD
+from plantdb.commons.api_endpoints import FILE_MD
+from plantdb.commons.api_endpoints import FILE_PATH
+from plantdb.commons.api_endpoints import HEALTH
+from plantdb.commons.api_endpoints import HOME
+from plantdb.commons.api_endpoints import IMAGE
+from plantdb.commons.api_endpoints import LOGIN
+from plantdb.commons.api_endpoints import LOGOUT
+from plantdb.commons.api_endpoints import MESH
+from plantdb.commons.api_endpoints import POINTCLOUD
+from plantdb.commons.api_endpoints import REFRESH
+from plantdb.commons.api_endpoints import REGISTER
+from plantdb.commons.api_endpoints import SCAN
+from plantdb.commons.api_endpoints import SCANS
+from plantdb.commons.api_endpoints import SCANS_INFO
+from plantdb.commons.api_endpoints import SCAN_FILESETS
+from plantdb.commons.api_endpoints import SCAN_MD
+from plantdb.commons.api_endpoints import SEQUENCE
+from plantdb.commons.api_endpoints import SKELETON
+from plantdb.commons.api_endpoints import TOKEN_REFRESH
+from plantdb.commons.api_endpoints import TOKEN_VALIDATION
 from plantdb.commons.fsdb.core import FSDB
 from plantdb.commons.log import get_logger
 from plantdb.server.core.security import rate_limit
@@ -106,6 +135,23 @@ task_filesUri_mapping = {
 
 # Home page resource
 class Home(Resource):
+
+    def __init__(self, db, logger=None, deploy_prefix=""):
+        """Initialize the resource.
+
+        Parameters
+        ----------
+        db : plantdb.commons.fsdb.core.FSDB
+            A database instance providing the resources to serve.
+        logger : logging.Logger
+            A logger instance to record operations and errors.
+        deploy_prefix : str, optional
+            Deployment (reverse-proxy) prefix prepended before ``/api/v1/...``
+            when generating endpoint URLs in responses.
+        """
+        self.db: FSDB = db
+        self.logger: logging.Logger = logger if logger else get_logger(self.__class__.__name__)
+        self.deploy_prefix: str = deploy_prefix
 
     @rate_limit(max_requests=120, window_seconds=60)
     def get(self):
@@ -126,6 +172,8 @@ class Home(Resource):
                 package_version = "unknown"
             return package_version
 
+        p  = self.deploy_prefix
+
         api_info = {
             "name": "PlantDB REST API",
             "description": "RESTful API for querying PlantDB",
@@ -133,48 +181,47 @@ class Home(Resource):
             "plantdb.server": _package_version("plantdb.server"),
 
             "base endpoints": {
-                "/": "Provides general information about the PlantDB REST API.",
-                "/health": "Health‑check endpoint that verifies the API is operational.",
-                "/refresh/<scan_id>": "Refreshes the database or a specific scan if provided."
+                api_endpoints.home(prefix=p): "Provides general information about the PlantDB REST API.",
+                api_endpoints.health(prefix=p): "Health‑check endpoint that verifies the API is operational.",
+                api_endpoints.refresh(prefix=p) + f"?scan_id='scan_id'": "Refreshes the database or a specific scan if provided."
             },
 
             "authentication endpoints": {
-                "/login": "Logs a user in.",
-                "/logout": "Logs a user out.",
-                "/register": "Registers a new user.",
-                "/token-validation": "Validates a token.",
-                "/token-refresh": "Refreshes a user’s access and refresh tokens.",
-                "/create-api-token": "Creates a new API token."
+                api_endpoints.register(prefix=p): "Registers a new user.",
+                api_endpoints.login(prefix=p): "Logs a user in.",
+                api_endpoints.logout(prefix=p): "Logs a user out.",
+                api_endpoints.token_validation(prefix=p): "Validates a token.",
+                api_endpoints.token_refresh(prefix=p): "Refreshes a user's access and refresh tokens.",
+                api_endpoints.create_api_token(prefix=p): "Creates a new API token."
             },
 
             "scans endpoints": {
-                "/scans": "Returns a list of all available scans.",
-                "/scans_info": "Provides a table containing scan metadata.",
-                "/scan/<scan_id>": "Retrieves an existing scan or creates a new one.",
-                "/scan/<scan_id>/metadata": "Gets or updates metadata for the specified scan.",
-                "/scan/<scan_id>/filesets": "Lists the filesets belonging to the specified scan."
+                api_endpoints.scans(prefix=p): "Returns a list of all available scans.",
+                api_endpoints.scans_info(prefix=p): "Provides a table containing scan metadata.",
+                api_endpoints.scan('scan_id', prefix=p): "Retrieves an existing scan or creates a new one.",
+                api_endpoints.scan_metadata('scan_id', prefix=p): "Gets or updates metadata for the specified scan.",
+                api_endpoints.scan_filesets_list('scan_id', prefix=p): "Lists the filesets belonging to the specified scan."
             },
 
             "filesets endpoints": {
-                "/fileset/<scan_id>/<fileset_id>": "Retrieves an existing fileset or creates a new one.",
-                "/fileset/<scan_id>/<fileset_id>/metadata": "Gets or updates metadata for the specified fileset.",
-                "/fileset/<scan_id>/<fileset_id>/files": "Lists the files contained in the specified fileset."
+                api_endpoints.fileset('scan_id', 'fileset_id', prefix=p): "Retrieves an existing fileset or creates a new one.",
+                api_endpoints.fileset_metadata('scan_id', 'fileset_id', prefix=p): "Gets or updates metadata for the specified fileset.",
+                api_endpoints.fileset_files_list('scan_id', 'fileset_id', prefix=p): "Lists the files contained in the specified fileset."
             },
 
             "files endpoints": {
-                "/file/<scan_id>/<fileset_id>/<file_id>": "Retrieves an existing file or creates a new one.",
-                "/file/<scan_id>/<fileset_id>/<file_id>/metadata": "Gets or updates metadata for the specified file."
+                api_endpoints.file('scan_id', 'fileset_id', 'file_id', prefix=p): "Retrieves an existing file or creates a new one.",
+                api_endpoints.file_metadata('scan_id', 'fileset_id', 'file_id', prefix=p): "Gets or updates metadata for the specified file."
             },
 
             "assets endpoints": {
-                "/archive/<scan_id>": "Downloads or updates the archive for the given scan.",
-                "/files/<path>": "Retrieves a file located at the specified path.",
-                "/image/<scan_id>/<fileset_id>/<file_id>": "Returns a specific image.",
-                "/pointcloud/<scan_id>/<fileset_id>/<file_id>": "Returns a specific point‑cloud file.",
-                "/pcGroundTruth/<scan_id>/<fileset_id>/<file_id>": "Returns a ground‑truth point‑cloud file.",
-                "/mesh/<scan_id>/<fileset_id>/<file_id>": "Returns a specific mesh file.",
-                "/sequence/<scan_id>": "Returns sequence data for the given scan.",
-                "/skeleton/<scan_id>": "Returns curve‑skeleton data for the given scan."
+                api_endpoints.file_path('file_path', prefix=p): "Retrieves a file located at the specified path.",
+                api_endpoints.image('scan_id', 'fileset_id', 'file_id', prefix=p): "Returns a specific image.",
+                api_endpoints.archive('scan_id', prefix=p): "Downloads or updates the archive for the given scan.",
+                api_endpoints.pointcloud('scan_id', prefix=p): "Returns a specific point‑cloud file.",
+                api_endpoints.mesh('scan_id', prefix=p): "Returns a specific mesh file.",
+                api_endpoints.sequence('scan_id', prefix=p): "Returns sequence data for the given scan.",
+                api_endpoints.skeleton('scan_id', prefix=p): "Returns curve‑skeleton data for the given scan."
             }
         }
         return api_info
@@ -182,7 +229,7 @@ class Home(Resource):
 
 # Resource HealthCheck
 class HealthCheck(Resource):
-    """Simple health‑check resource exposing an endpoint that verifies the API and its database connectivity.
+    """Simple health-check resource exposing an endpoint that verifies the API and its database connectivity.
 
     Attributes
     ----------
@@ -213,10 +260,32 @@ class HealthCheck(Resource):
         ------
         http.client.HTTPException
              If the rate limit is exceeded, it returns an HTTP 429 ("Too Many Requests") response to the client.
+
+        Examples
+        --------
+        >>> # Start the REST API server (in test mode)
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
+        >>> import requests
+        >>> from plantdb.commons import api_endpoints
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.health())
+        >>> response.ok
+        True
+        >>> # Stop the test server
+        >>> server.stop()
         """
         try:
             # Try to check database connection
             scan_count = len(self.db.list_scans(owner_only=False))
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": f"API encountered an issue: {str(e)}"
+            }, 500  # HTTP 500 Internal Server Error
+        else:
             return {
                 "status": "healthy",
                 "message": "API is running correctly",
@@ -225,11 +294,6 @@ class HealthCheck(Resource):
                     "scan_count": scan_count
                 }
             }, 200
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"API encountered an issue: {str(e)}"
-            }, 500  # HTTP 500 Internal Server Error
 
 
 class Refresh(Resource):
@@ -283,9 +347,10 @@ class Refresh(Resource):
         """
         try:
             self.db.reload(scan_id)
-            return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
         except Exception as e:
-            return {'message': f"Error during scan reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+            return {'error': f"Error during scan reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'message': f"Successfully reloaded scan '{scan_id}'."}, 200
 
     @rate_limit(max_requests=12, window_seconds=60)
     def get_full_database(self):
@@ -304,9 +369,10 @@ class Refresh(Resource):
         """
         try:
             self.db.reload(None)
-            return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
         except Exception as e:
-            return {'message': f"Error during full database reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+            return {'error': f"Error during full database reload: {str(e)}"}, 500  # HTTP 500 Internal Server Error
+        else:
+            return {'message': f"Successfully reloaded entire database with {len(self.db.list_scans())} scans."}, 200
 
     def get(self):
         """Force the plant database to reload.
@@ -345,17 +411,21 @@ class Refresh(Resource):
         Examples
         --------
         >>> # Start the REST API server (in test mode)
-        >>> # fsdb_rest_api --test
+        >>> from plantdb.server.test_rest_api import TestRestApiServer
+        >>> # Create a test database and start the Flask App serving a REST API
+        >>> server = TestRestApiServer(test=True)
+        >>> server.start()
+
         >>> import requests
-        >>> # Refresh the entire database
-        >>> response = requests.get("http://127.0.0.1:5000/refresh")
-        >>> response.status_code
-        200
-        >>>
-        >>> # Refresh a specific scan
-        >>> response = requests.get("http://127.0.0.1:5000/refresh?scan_id=real_plant")
-        >>> response.status_code
-        200
+        >>> from plantdb.commons import api_endpoints
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.refresh())
+        >>> response.ok
+        True
+        >>> response = requests.get("http://127.0.0.1:5000" + api_endpoints.refresh('real_plant'))
+        >>> response.ok
+        True
+        >>> # Stop the test server
+        >>> server.stop()
         """
         scan_id = request.args.get('scan_id', default=None, type=str)
 

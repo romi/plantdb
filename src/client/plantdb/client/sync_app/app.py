@@ -1,7 +1,8 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Dash UI for FSDBSync - PlantDB Database Synchronization Tool
+"""
+# Dash UI for FSDBSync - PlantDB Database Synchronization Tool
 
 This module provides a web-based user interface for the FSDBSync class,
 allowing users to easily configure and manage database synchronization
@@ -41,11 +42,12 @@ between different database types (local, SSH, HTTP).
 ```
 
 """
-import argparse
+import os
 import time
 import traceback
 from pathlib import Path
 
+import click
 import dash_bootstrap_components as dbc
 import paramiko
 import requests
@@ -58,10 +60,17 @@ from dash import ctx
 from dash import dcc
 from dash import html
 
-from plantdb.client.rest_api import request_scan_names_list
-from plantdb.commons.fsdb.core import FSDB
+from plantdb.commons.log import DEFAULT_LOG_LEVEL
+from plantdb.commons.log import get_logger
+
+# Create a logger and set the environment variable
+os.environ.setdefault('ROMI_APP_LOGGER', 'fsdb_sync_gui')
+logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
+
+from plantdb.client.rest_api.requests import request_scan_names_list
 from plantdb.client.sync import FSDBSync
 from plantdb.client.sync import config_from_url
+from plantdb.commons.fsdb.core import FSDB
 
 #: URL for the ROMI project logo used in the navigation bar
 ROMI_LOGO: str = "https://romi-project.eu/assets/logo.svg"
@@ -573,10 +582,13 @@ def get_scans_for_db(config):
             path = Path(config["spec"])
             db = FSDB(path)
             db.connect()
-            return db.list_scans(owner_only=False)
+            try:
+                return db.list_scans(owner_only=False)
+            finally:
+                db.disconnect()
         elif config["type"] == "http":
             from plantdb.client.rest_api import refresh_url
-            from plantdb.client.rest_api import make_api_request
+            from plantdb.client.rest_api.requests import make_api_request
             url = refresh_url(**config)
             refreshed = _try_refresh(url)
             n_attempts = 0
@@ -859,18 +871,19 @@ def start_synchronization(sync_clicks, n_intervals, selected_scans):
     return 0., "", True
 
 
-def parsing():
-    parser = argparse.ArgumentParser()
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option("--port", type=int, default=8050, help="Port to run the web application on")
+@click.option("--debug", is_flag=True, help="Enable debug mode")
+def main(port, debug):
+    """Dash UI for FSDBSync - PlantDB Database Synchronization Tool
+    
+    A web-based user interface for synchronizing databases between different types (local, SSH, HTTP).
+    """
+    # Get the logger and change the level if needed:
+    logger = get_logger(os.environ.get('ROMI_APP_LOGGER', __name__))
+    logger.setLevel(DEFAULT_LOG_LEVEL)  # Using default log level for web app
 
-    parser.add_argument("--port", type=int, default=8050)
-    parser.add_argument("--debug", action="store_true")
-    return parser
-
-
-def main():
-    parser = parsing()
-    args = parser.parse_args()
-    app.run(host="0.0.0.0", port=args.port, debug=args.debug)
+    app.run(host="0.0.0.0", port=port, debug=debug)
 
 
 if __name__ == "__main__":

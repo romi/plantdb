@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.commons"
-version = "0.15.1"
+version = "0.16.0"
 dependencies = [
     "appdirs",
     "argon2-cffi",
@@ -18,6 +18,9 @@ dependencies = [
     "plyfile",
     "toml",
     "tqdm",
+    "send2trash",
+    "click",
+    "click_option_group"
 ]
 description = "Core shared library for the ROMI plant database ecosystem."
 readme = "README.md"
@@ -57,11 +60,17 @@ source = "https://github.com/romi/plantdb"
 issues = "https://github.com/romi/plantdb/issues"
 
 [project.scripts]
-fsdb_check = "plantdb.commons.cli.fsdb_check:main"
+fsdb_healthcheck = "plantdb.commons.cli.fsdb_healthcheck:main"
 fsdb_import_file = "plantdb.commons.cli.fsdb_import_file:main"
 fsdb_import_folder = "plantdb.commons.cli.fsdb_import_folder:main"
 fsdb_import_images = "plantdb.commons.cli.fsdb_import_images:main"
+fsdb_clean_images_metadata = "plantdb.commons.cli.fsdb_clean_images_metadata:main"
+fsdb_migrate_metadata = "plantdb.commons.cli.fsdb_migrate_metadata:main"
 shared_fsdb = "plantdb.commons.cli.shared_fsdb:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
 
 [project.optional-dependencies]
 doc = [
@@ -81,5 +90,6 @@ io = [
 test = [
     "nose2[coverage]",
     "coverage[toml]",
+    "pytest",
     "ruff"
 ]

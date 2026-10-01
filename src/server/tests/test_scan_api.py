@@ -13,6 +13,7 @@ import unittest
 
 import requests
 
+from plantdb.commons import api_endpoints
 from plantdb.commons.test_database import _mkdtemp_romidb
 from plantdb.server.test_rest_api import TestRestApiServer
 
@@ -32,7 +33,7 @@ class ScanApiTests(unittest.TestCase):
         import time
         for _ in range(10):
             try:
-                r = requests.get(cls.base_url + "/health")
+                r = requests.get(cls.base_url + api_endpoints.health())
                 if r.status_code == 200:
                     break
             except Exception:
@@ -49,13 +50,13 @@ class ScanApiTests(unittest.TestCase):
     @classmethod
     def _login_admin(cls, base_url):
         """Login as an admin user and return an access token."""
-        r = requests.post(base_url + '/login',
+        r = requests.post(base_url + api_endpoints.login(),
                           json={'username': 'admin', 'password': 'admin'})
         return r.json()['access_token']
 
     def test_scans_list_success(self):
         """Test that listing scans succeeds."""
-        r = requests.get(self.base_url + '/scans',
+        r = requests.get(self.base_url + api_endpoints.scans(),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -66,15 +67,15 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_without_auth_success(self):
         """Test that accessing scans without auth fails."""
-        r = requests.get(self.base_url + '/scans')
+        r = requests.get(self.base_url + api_endpoints.scans())
         self.assertEqual(r.status_code, 200)
 
     def test_scans_list_with_filter(self):
         """Test that filtering scans succeeds."""
         # Use a filter query that should match at least one scan
-        filter_query = {"object": {"species": "Arabidopsis.*"}}
+        filter_query = {"biologicalMaterial": {"organism": {"species": "Arabidopsis.*"}}}
         params = {"filterQuery": json.dumps(filter_query), "fuzzy": "true"}
-        r = requests.get(self.base_url + '/scans', params=params,
+        r = requests.get(self.base_url + api_endpoints.scans(), params=params,
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -87,7 +88,7 @@ class ScanApiTests(unittest.TestCase):
         # Get a scan ID to test
         scan_id = "real_plant"
 
-        r = requests.get(self.base_url + f'/scan/{scan_id}',
+        r = requests.get(self.base_url + api_endpoints.scan(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -100,14 +101,14 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_get_not_found(self):
         """Test that retrieving a non-existent scan fails."""
-        r = requests.get(self.base_url + '/scan/nonexistent',
+        r = requests.get(self.base_url + api_endpoints.scan("nonexistent"),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         self.assertEqual(r.status_code, 404)
 
     def test_scan_create_success(self):
         """Test that creating a scan succeeds."""
         scan_id = "test_scan_001"
-        r = requests.post(self.base_url + f'/scan/{scan_id}',
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
                           headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -120,12 +121,12 @@ class ScanApiTests(unittest.TestCase):
         scan_id = "test_scan_md"
         metadata = {
             "metadata": {
-                "object": {
-                    "species": "TestPlant"
+                "biologicalMaterial": {
+                    "organism": {"species": "TestPlant"}
                 }
             }
         }
-        r = requests.post(self.base_url + f'/scan/{scan_id}',
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
                           json=metadata,
                           headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
@@ -136,26 +137,50 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_metadata_get(self):
         """Test that getting scan metadata succeeds."""
-        # Get a scan ID to test
-        scan_id = "real_plant"
+        # Create a scan with MIAPPE-aligned biological metadata to read back
+        scan_id = "test_scan_md_get"
+        metadata = {
+            "metadata": {
+                "biologicalMaterial": {
+                    "organism": {"species": "Arabidopsis thaliana"}
+                }
+            }
+        }
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
+                          json=metadata,
+                          headers={'Authorization': 'Bearer ' + self.admin_token})
+        self.assertEqual(r.status_code, 201)
 
-        r = requests.get(self.base_url + f'/scan/{scan_id}/metadata',
+        r = requests.get(self.base_url + api_endpoints.scan_metadata(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
         self.assertEqual(r.status_code, 200)
         metadata = r.json()['metadata']
         self.assertIn('owner', metadata)
-        self.assertIn('acquisition_date', metadata)
-        self.assertIn('object', metadata)
+        self.assertIn('biologicalMaterial', metadata)
+        self.assertEqual(
+            metadata['biologicalMaterial']['organism']['species'],
+            'Arabidopsis thaliana',
+        )
 
     def test_scan_metadata_post(self):
         """Test that updating scan metadata succeeds."""
-        # Get a scan ID to test
-        scan_id = "real_plant"
+        # Create a scan with MIAPPE-aligned biological metadata to update
+        scan_id = "test_scan_md_post"
+        metadata = {
+            "metadata": {
+                "biologicalMaterial": {
+                    "organism": {"species": "Arabidopsis thaliana"}
+                }
+            }
+        }
+        r = requests.post(self.base_url + api_endpoints.scan(scan_id),
+                          json=metadata,
+                          headers={'Authorization': 'Bearer ' + self.admin_token})
+        self.assertEqual(r.status_code, 201)
 
-        # Get current metadata
-        r = requests.get(self.base_url + f'/scan/{scan_id}/metadata',
+        r = requests.get(self.base_url + api_endpoints.scan_metadata(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -163,23 +188,23 @@ class ScanApiTests(unittest.TestCase):
         metadata = r.json()['metadata']
 
         # Update metadata
-        metadata["object"].update({"description": "Updated test scan description"})
-        r = requests.post(self.base_url + f'/scan/{scan_id}/metadata',
+        metadata["biologicalMaterial"].update({"sample": "Updated test scan sample"})
+        r = requests.post(self.base_url + api_endpoints.scan_metadata(scan_id),
                           json={'metadata': metadata},
                           headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
         self.assertEqual(r.status_code, 200)
         metadata = r.json()['metadata']
-        self.assertIn('object', metadata)
-        self.assertIn('description', metadata['object'])
+        self.assertIn('biologicalMaterial', metadata)
+        self.assertIn('sample', metadata['biologicalMaterial'])
 
     def test_scan_filesets_list(self):
         """Test that listing scan filesets succeeds."""
         # Get a scan ID to test
         scan_id = "real_plant"
 
-        r = requests.get(self.base_url + f'/scan/{scan_id}/filesets',
+        r = requests.get(self.base_url + api_endpoints.scan_filesets_list(scan_id),
                          headers={'Authorization': 'Bearer ' + self.admin_token})
         if not r.ok:
             print(r.json())
@@ -189,7 +214,7 @@ class ScanApiTests(unittest.TestCase):
 
     def test_scan_create_without_auth(self):
         """Test that creating scan without auth fails."""
-        r = requests.post(self.base_url + '/scans', json={"id": "test_scan"})
+        r = requests.post(self.base_url + api_endpoints.scans(), json={"id": "test_scan"})
         self.assertEqual(r.status_code, 405)
 
 

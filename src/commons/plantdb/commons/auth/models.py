@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""PlantDB Commons Authentication Models
+"""
+# PlantDB Commons Authentication Models
+
 This module defines core authentication primitives: Permission, Role, User, and Group classes for a plant database system.
 It provides fine‑grained permission management, role‑based access control, user serialization, and group membership utilities.
 
-Key Features
-------------
+## Key Features
+
 - Enumerations for granular permissions and role‑based access control.
 - `User` dataclass with serialization (`to_dict`, `to_json`, etc.), authentication helpers and lockout logic.
 - `Group` dataclass for collaborative access to scan datasets with user membership management.
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from plantdb.commons.auth.models import Permission, Role, User, Group
 >>> from datetime import datetime, timezone
 >>> user = User(username="alice", fullname="Alice Smith", password_hash="hashed_pw", roles={Role.CONTRIBUTOR}, created_at=datetime.now(timezone.utc))
@@ -21,6 +24,7 @@ Usage Examples
 >>> group = Group(name="researchers", users={"alice"}, created_at=datetime.now(timezone.utc), created_by="alice")
 >>> group.add_user("bob")
 True
+```
 """
 
 import datetime

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.client"
-version = "0.15.1"
+version = "0.16.0"
 dependencies = [
     "plantdb.commons",
     "requests",
@@ -54,16 +54,22 @@ issues = "https://github.com/romi/plantdb/issues"
 fsdb_rest_api_sync = "plantdb.client.cli.fsdb_rest_api_sync:main"
 fsdb_sync = "plantdb.client.cli.fsdb_sync:main"
 sync_app = "plantdb.client.sync_app.app:main"
+metadata_app = "plantdb.client.metadata_app.app:main"
 
 [project.optional-dependencies]
 sync = [
     "dash",
     "dash-bootstrap-components",
+    "diskcache",
     "paramiko"
 ]
 test = [
     'plantdb.server',
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
 
 [tool.setuptools.package-data]
 "plantdb.client.sync_app" = ["assets/custom.css"]

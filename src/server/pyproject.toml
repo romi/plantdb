@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantdb.server"
-version = "0.15.1"
+version = "0.16.0"
 dependencies = [
     "plantdb.commons",
     "bcrypt",
@@ -49,6 +49,10 @@ classifiers = [
     "Operating System :: OS Independent",
     "Natural Language :: English",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
 
 [project.scripts]
 fsdb_rest_api = "plantdb.server.cli.fsdb_rest_api:main"

@@ -4,7 +4,8 @@
 """
 # PlantDB Client Module
 
-A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data including scans, filesets, and associated metadata.
+A client library for interacting with the PlantDB API, providing a streamlined interface for managing plant-related data
+including scans, filesets, and associated metadata.
 
 ## Key Features
 
@@ -20,7 +21,7 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 >>> # Start a test REST API server first:
 >>> # $ fsdb_rest_api --test
 >>> from plantdb.client.plantdb_client import PlantDBClient
->>> from plantdb.client.rest_api import plantdb_url
+>>> from plantdb.client.rest_api.urls import plantdb_url
 >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
 >>> # Create a new scan
 >>> scan_id = client.create_scan(
@@ -38,13 +39,12 @@ A client library for interacting with the PlantDB API, providing a streamlined i
 import json
 import mimetypes
 import os
-from functools import wraps
 
 import requests
 from ada_url import join_url
 from requests import RequestException
 
-from plantdb.client import api_endpoints
+from plantdb.commons import api_endpoints
 from plantdb.commons.auth.models import Permission
 from plantdb.commons.log import get_logger
 
@@ -120,7 +120,7 @@ class PlantDBClient:
     >>> server.start()
     >>> # Use the client against the server
     >>> from plantdb.client.plantdb_client import PlantDBClient
-    >>> from plantdb.client.rest_api import plantdb_url
+    >>> from plantdb.client.rest_api.urls import plantdb_url
     >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
     >>> scans = client.list_scans()
     >>> print(scans)
@@ -145,10 +145,26 @@ class PlantDBClient:
     """
 
     def __init__(self, base_url, prefix=None, api_token=None):
-        """Initialize the PlantDBClient with a base URL."""
+        """Initialize the PlantDBClient with a base URL.
+
+        Parameters
+        ----------
+        base_url : str
+            The **origin** (scheme + host [:port]) of the PlantDB REST API.
+            Must **not** include a path — the API version prefix ``'/api/v1'``
+            and any deployment prefix are handled automatically.
+        prefix : str, optional
+            Deployment (reverse-proxy) prefix, e.g. ``/plantdb``.
+            Passed to ``api_endpoints.*`` functions, which compose it as
+            ``prefix + /api/v1 + endpoint``.  Defaults to the ``PLANTDB_PREFIX``
+            environment variable (empty string if unset).
+        api_token : str, optional
+            A long-lived API token to use instead of session-based auth.
+        """
         if prefix is None:
             prefix = api_prefix()
-        self.base_url = f"{base_url}{prefix}"
+        self.base_url: str = base_url.rstrip("/")
+        self.prefix: str = prefix
 
         self._access_token = None
         self._refresh_token = None
@@ -159,7 +175,7 @@ class PlantDBClient:
         self._session = requests.Session()
         if self._api_token:
             # Validate provided API token:
-            url = join_url(self.base_url, api_endpoints.token_validation())
+            url = join_url(self.base_url, api_endpoints.token_validation(prefix=self.prefix))
             response = self._session.request("POST", url, headers={"Authorization": f"Bearer {self._api_token}"})
             if response.ok:
                 self._session.headers.update({"Authorization": f"Bearer {self._api_token}"})
@@ -167,7 +183,6 @@ class PlantDBClient:
                 raise ValueError(f"Invalid API token: {self._api_token}")
 
         self.logger = get_logger(__class__.__name__)
-
 
     def login(self, username: str, password: str) -> bool:
         """Authenticate the user with the PlantDB API.
@@ -196,7 +211,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -204,7 +219,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.login())
+        url = join_url(self.base_url, api_endpoints.login(prefix=self.prefix))
         data = {
             'username': username,
             'password': password
@@ -269,7 +284,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -278,7 +293,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.logout())
+        url = join_url(self.base_url, api_endpoints.logout(prefix=self.prefix))
         try:
             # Use _request_with_refresh for logout as it requires authentication
             response = self._request("POST", url)
@@ -319,7 +334,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> _ = client.login('admin', 'admin')
@@ -328,7 +343,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.create_user())
+        url = join_url(self.base_url, api_endpoints.register(prefix=self.prefix))
         data = {
             'username': username,
             'password': password,
@@ -387,7 +402,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> from plantdb.commons.auth.models import Permission
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
@@ -400,7 +415,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.create_api_token())
+        url = join_url(self.base_url, api_endpoints.create_api_token(prefix=self.prefix))
 
         # Validate dataset permissions
         datasets = {}
@@ -447,14 +462,14 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> client.refresh()
         True
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.refresh(scan_id))
+        url = join_url(self.base_url, api_endpoints.refresh(scan_id, prefix=self.prefix))
         try:
             response = self._request("GET", url)
             if response.ok:
@@ -486,7 +501,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -495,7 +510,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.token_validation())
+        url = join_url(self.base_url, api_endpoints.token_validation(prefix=self.prefix))
         response = self._request("POST", url, headers={"Authorization": f"Bearer {token}"})
         if response.ok:
             resp_username = response.json()['user']['username']
@@ -521,7 +536,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Use it to log in as 'admin'
         >>> client.login('admin', 'admin')
@@ -537,7 +552,7 @@ class PlantDBClient:
             self.logger.error("No refresh token available")
             return False
 
-        url = join_url(self.base_url, api_endpoints.token_refresh())
+        url = join_url(self.base_url, api_endpoints.token_refresh(prefix=self.prefix))
         data = {'refresh_token': self._refresh_token}
         try:
             # Use _session.request directly to avoid infinite recursion with _request_with_refresh
@@ -588,19 +603,23 @@ class PlantDBClient:
         # Re‑raise a generic RequestException with the extracted message
         raise RequestException(response_data)
 
-    def list_scans(self, query=None, fuzzy=False):
+    def list_scans(self, query=None, fuzzy=False, timelapse_id=None, sort=None):
         """List all scans in the database.
 
         Parameters
         ----------
-        query : str, optional
-            Query string to filter scans
+        query : str or dict, optional
+            Query string or dict to filter scans
         fuzzy : bool, optional
             Whether to use fuzzy matching for the query (default: False)
+        timelapse_id : str, optional
+            Filter scans belonging to this timelapse ID
+        sort : str, optional
+            Sort parameter (e.g. 'timelapse.scheduled')
 
         Returns
         -------
-        dict
+        list
             Server response containing the list of scan IDs
 
         Raises
@@ -616,7 +635,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scans()
         >>> print(sorted(response))
@@ -624,19 +643,23 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scans())
+        url = join_url(self.base_url, api_endpoints.scans(prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
         if fuzzy:
             params['fuzzy'] = fuzzy
+        if timelapse_id is not None:
+            params['timelapse_id'] = timelapse_id
+        if sort is not None:
+            params['sort'] = sort
         response = self._request('GET', url, params=params)
 
         # Handle HTTP errors with explicit messages
         self._handle_http_errors(response)
         return response.json()
 
-    def list_scans_info(self, query=None, fuzzy=False):
+    def list_scans_info(self, query=None, fuzzy=False, timelapse_id=None, sort=None):
         """Retrieve detailed scan information dictionaries from the ScansTable resource.
 
         Parameters
@@ -647,6 +670,10 @@ class PlantDBClient:
             ``{"object": {"species": "Arabidopsis.*"}}``.
         fuzzy : bool, optional
             When ``True`` the server performs fuzzy matching (default ``False``).
+        timelapse_id : str, optional
+            Filter scans belonging to this timelapse ID
+        sort : str, optional
+            Sort parameter (e.g. 'timelapse.scheduled')
 
         Returns
         -------
@@ -667,7 +694,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = (client.list_scans_info())
         >>> print(len(response))
@@ -678,15 +705,19 @@ class PlantDBClient:
         >>> server.stop()
         """
         # Build the URL for the “scans info” endpoint - the server side class is ScansTable
-        url = join_url(self.base_url, api_endpoints.scans_info())
+        url = join_url(self.base_url, api_endpoints.scans_info(prefix=self.prefix))
 
         # Prepare query parameters exactly as the REST API expects
         params = {}
         if query is not None:
             # The API expects a JSON string in the ``filterQuery`` parameter
-            params["filterQuery"] = json.dumps(query)
+            params["filterQuery"] = json.dumps(query) if isinstance(query, dict) else query
         if fuzzy:
             params["fuzzy"] = fuzzy
+        if timelapse_id is not None:
+            params["timelapse_id"] = timelapse_id
+        if sort is not None:
+            params["sort"] = sort
 
         # Perform the request; token refresh is handled automatically
         response = self._request("GET", url, params=params)
@@ -696,6 +727,101 @@ class PlantDBClient:
 
         # Return the parsed JSON payload (list of dicts)
         return response.json()
+
+    def create_timelapse(self, name: str, metadata: dict | None = None) -> dict:
+        """Create a new timelapse container in the database.
+
+        Parameters
+        ----------
+        name : str
+            The identifier of the timelapse to create.
+        metadata : dict, optional
+            A dictionary of metadata to append to the new timelapse.
+
+        Returns
+        -------
+        dict
+            The created timelapse descriptor dictionary.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapses(prefix=self.prefix))
+        payload = {"id": name}
+        if metadata is not None:
+            payload["metadata"] = metadata
+        response = self._request("POST", url, json=payload)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def get_timelapse(self, timelapse_id: str) -> dict:
+        """Retrieve information about a specific timelapse.
+
+        Parameters
+        ----------
+        timelapse_id : str
+            The identifier of the timelapse.
+
+        Returns
+        -------
+        dict
+            The timelapse descriptor dictionary.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapse(timelapse_id, prefix=self.prefix))
+        response = self._request("GET", url)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def list_timelapses(self) -> list[str]:
+        """List all timelapse IDs in the database.
+
+        Returns
+        -------
+        list[str]
+            List of timelapse identifiers.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapses(prefix=self.prefix))
+        response = self._request("GET", url)
+        self._handle_http_errors(response)
+        return response.json()
+
+    def delete_timelapse(self, timelapse_id: str, recursive: bool = False) -> bool:
+        """Delete a timelapse container from the database.
+
+        Parameters
+        ----------
+        timelapse_id : str
+            The identifier of the timelapse to delete.
+        recursive : bool, optional
+            Whether to delete member scans recursively (default: False).
+
+        Returns
+        -------
+        bool
+            True if deletion was successful.
+
+        Raises
+        ------
+        requests.exceptions.RequestException
+            If the request fails
+        """
+        url = join_url(self.base_url, api_endpoints.timelapse(timelapse_id, prefix=self.prefix))
+        params = {"recursive": "true"} if recursive else {"recursive": "false"}
+        response = self._request("DELETE", url, params=params)
+        self._handle_http_errors(response)
+        return True
 
     def create_scan(self, name, metadata=None):
         """Create a new scan in the database.
@@ -725,7 +851,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Scan creation requires authentication
         >>> response = client.create_scan('test_plant')
@@ -746,7 +872,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan(name))
+        url = join_url(self.base_url, api_endpoints.scan(name, prefix=self.prefix))
 
         data = {}
         if metadata:
@@ -787,7 +913,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_scan_metadata('real_plant')
@@ -800,7 +926,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -839,7 +965,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -850,7 +976,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_metadata(scan_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 
@@ -888,7 +1014,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> response = client.list_scan_filesets('real_plant')
         >>> print(response)
@@ -896,7 +1022,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.scan_filesets_list(scan_id))
+        url = join_url(self.base_url, api_endpoints.scan_filesets_list(scan_id, prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
@@ -938,7 +1064,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -949,7 +1075,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset(scan_id, fileset_id, prefix=self.prefix))
         data = {'fileset_id': fileset_id, 'scan_id': scan_id}
         if metadata:
             data['metadata'] = metadata
@@ -989,7 +1115,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_fileset_metadata('real_plant', 'images')
@@ -1002,7 +1128,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -1043,7 +1169,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -1055,7 +1181,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_metadata(scan_id, fileset_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 
@@ -1095,15 +1221,15 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
-        >>> response = client.fileset_files_list('real_plant','images')
+        >>> response = client.fileset_files_list('real_plant', 'images')
         >>> print(response)
         {'files': ['00000_rgb', '00001_rgb', '00002_rgb', ...]}
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.fileset_files_list(scan_id, fileset_id))
+        url = join_url(self.base_url, api_endpoints.fileset_files_list(scan_id, fileset_id, prefix=self.prefix))
         params = {}
         if query is not None:
             params['query'] = query
@@ -1185,7 +1311,7 @@ class PlantDBClient:
         from io import BytesIO
         from pathlib import Path
 
-        url = join_url(self.base_url, api_endpoints.file(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file(scan_id, fileset_id, file_id, prefix=self.prefix))
 
         # Prepare data
         ext = ext.lstrip('.').lower()  # Remove the leading dot if present
@@ -1256,7 +1382,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Get all metadata
         >>> metadata = client.get_file_metadata('test_plant', 'images', 'image_001')
@@ -1269,7 +1395,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id, prefix=self.prefix))
         params = {'key': key} if key else None
         response = self._request("GET", url, params=params)
 
@@ -1312,7 +1438,7 @@ class PlantDBClient:
         >>> server.start()
         >>> # Create a client
         >>> from plantdb.client.plantdb_client import PlantDBClient
-        >>> from plantdb.client.rest_api import plantdb_url
+        >>> from plantdb.client.rest_api.urls import plantdb_url
         >>> client = PlantDBClient(plantdb_url('localhost', port=5000))
         >>> # Log in as admin to get sufficient rights
         >>> client.login('admin', 'admin')
@@ -1324,7 +1450,7 @@ class PlantDBClient:
         >>> # Finally, stop the server
         >>> server.stop()
         """
-        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id))
+        url = join_url(self.base_url, api_endpoints.file_metadata(scan_id, fileset_id, file_id, prefix=self.prefix))
         data = {'metadata': metadata, 'replace': replace}
         response = self._request("POST", url, json=data)
 

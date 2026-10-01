@@ -19,31 +19,29 @@ A comprehensive module for managing file system operations in a hierarchical dat
 ## Usage Examples
 
 ```python
->>> # Load all scans from a database
->>> from plantdb.commons.fsdb.core import FSDB
->>> from plantdb.commons.fsdb.file_ops import _load_scans
-
->>> # Initialize and connect to database
->>> db = FSDB('/path/to/database')
+>>> from plantdb.commons.fsdb.file_ops import _load_scans,_make_scan, _store_scan, _delete_scan
+>>> from plantdb.commons.test_database import test_database
+>>> # Initialize the database (creates base directory if needed)
+>>> db = test_database(no_auth=True)
 >>> db.connect()
-
 >>> # Load all scans
 >>> scans = _load_scans(db)
-
 >>> # Create and store a new scan
 >>> scan = db.create_scan("scan_001")
 >>> _make_scan(scan)
+PosixPath('/tmp/ROMI_DB_sgqmij8t/scan_001')
 >>> _store_scan(scan)
-
 >>> # Delete a scan
 >>> _delete_scan(scan)
 ```
 """
 
 import json
-import pathlib
-from shutil import rmtree
+from pathlib import Path
+from typing import Any
+from typing import TYPE_CHECKING
 
+from send2trash import send2trash
 from tqdm import tqdm
 
 from .exceptions import FileNotFoundError
@@ -51,6 +49,7 @@ from .metadata import _load_file_metadata
 from .metadata import _load_fileset_metadata
 from .metadata import _load_metadata
 from .metadata import _load_scan_metadata
+from .path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from .path_helpers import _file_metadata_path
 from .path_helpers import _file_path
 from .path_helpers import _fileset_metadata_json_path
@@ -59,108 +58,72 @@ from .path_helpers import _fileset_path
 from .path_helpers import _scan_json_file
 from .path_helpers import _scan_measures_path
 from .path_helpers import _scan_path
+from .path_helpers import _timelapse_marker
+from .path_helpers import _timelapse_path
 from .serialization import _parse_file
 from .serialization import _parse_fileset
 from .serialization import _scan_to_dict
 from .validation import _is_safe_to_delete
+from .validation import _is_scan_dataset
+from .validation import _is_valid_fileset
 from ..log import get_logger
-from ..utils import yes_no_choice
+from ..utils import backup_file
+from ..utils import iso_date_now
+
+# ----------------------------------------------------------------------
+# NOTE: The following imports are only needed for type‑checking / IDE hints.
+# Importing them at runtime creates a circular dependency with `core.py`.
+# By guarding them with `TYPE_CHECKING` we keep static‑type information
+# without executing the import when the module is loaded.
+# ----------------------------------------------------------------------
+if TYPE_CHECKING:
+    from .core import FSDB
+    from .core import Scan
+    from .core import Fileset
+    from .core import File
+# ----------------------------------------------------------------------
 
 logger = get_logger(__name__)
 
 
-def _load_scan(db, scan_id):
-    """Load ``Scan`` from given database.
+def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan']:
+    """Load all scans from a PlantDB filesystem database.
 
-    List subdirectories of ``db.basedir`` as ``Scan`` instances.
-    May be restrited to the presense of subdirectories in .
-
-    Parameters
-    ----------
-    db : plantdb.commons.fsdb.core.FSDB
-        The database instance to use to list the ``Scan``.
-    scan_id : str
-        The name of the scan to load.
-
-    Returns
-    -------
-    list of plantdb.commons.fsdb.core.Scan
-         The list of ``fsdb.Scan`` found in the database.
-
-    See Also
-    --------
-    plantdb.commons.fsdb._scan_path
-    plantdb.commons.fsdb._scan_files_json
-    plantdb.commons.fsdb._load_scan_filesets
-    plantdb.commons.fsdb._load_scan_metadata
-
-    Examples
-    --------
-    >>> from plantdb.commons.fsdb.core import FSDB
-    >>> from plantdb.commons.test_database import dummy_db
-    >>> from plantdb.commons.fsdb.file_ops import _load_scans
-    >>> db = dummy_db()
-    >>> db.connect()
-    >>> db.create_scan("007")
-    >>> db.create_scan("111")
-    >>> scans = _load_scans(db)
-    >>> print(scans)
-    []
-    >>> db = dummy_db(with_fileset=True)
-    >>> db.connect()
-    >>> scans = _load_scans(db)
-    >>> print(scans)
-    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
-    """
-    from plantdb.commons.fsdb.core import Scan
-    required_fs = db.required_filesets
-
-    scan = Scan(db, scan_id)
-    scan_path = _scan_path(scan)
-
-    # If specific filesets are required, test if they exist as subdirectories:
-    if required_fs is not None:
-        req_subdir = all([scan_path.joinpath(subdir).is_dir() for subdir in required_fs])
-    else:
-        req_subdir = True
-
-    if scan_path.is_dir() and req_subdir:
-        # Parse the fileset, metadata and measure if:
-        #  - path to scan directory exists
-        #  - required subdirectories exists, if any
-        #  - required files exists, if any
-        scan.filesets, needs_update = _load_scan_filesets(scan)
-        if needs_update:
-            _store_scan(scan)
-        scan.metadata = _load_scan_metadata(scan)
-        scan.measures = _load_scan_measures(scan)
-    else:
-        scan = None
-    return scan
-
-
-def _load_scans(db):
-    """Load list of ``Scan`` from given database.
-
-    List subdirectories of ``db.basedir`` as ``Scan`` instances.
-    May be restrited to the presense of subdirectories in .
+    This internal helper iterates over the sub‑directories of the database path and attempts to instantiate
+    a `Scan` for each directory that follows the expected naming convention.
+    If a subdirectory is a timelapse container (contains `timelapse.json`), its child scan directories
+    are loaded as member scans in the flat scan mapping.
+    Directories that cannot be loaded are skipped and reported via the logger.
 
     Parameters
     ----------
     db : plantdb.commons.fsdb.core.FSDB
-        The database instance to use to list the ``Scan``.
+        The PlantDB filesystem database instance from which scans should be loaded.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
 
     Returns
     -------
-    dict of plantdb.commons.fsdb.core.Scan
-         The scan-id indexex dictionary of ``fsdb.Scan`` found in the database.
+    dict[str, plantdb.commons.fsdb.core.Scan]
+        Dictionary mapping each successfully loaded scan name to its corresponding `Scan` instance.
+        If no scan directories are present, an empty dictionary is returned.
+
+    Raises
+    ------
+    OSError
+        If the database path cannot be accessed (_e.g._, due to permission issues or the path not existing).
+
+    Notes
+    -----
+    * Hidden directories (names starting with ``'.'``) are ignored.
+    * Scans that fail to load are collected in ``bad_scans`` and reported at *INFO* level via the logger.
+    * The function returns an empty dictionary rather than ``None`` when no
+      scans are found, which simplifies downstream handling.
 
     See Also
     --------
-    plantdb.commons.fsdb._scan_path
-    plantdb.commons.fsdb._scan_files_json
-    plantdb.commons.fsdb._load_scan_filesets
-    plantdb.commons.fsdb._load_scan_metadata
+    _load_scan : Loads a single scan directory into a ``Scan`` object.
+    _load_scan_at : Loads a scan from a specific directory path into a ``Scan`` object.
 
     Examples
     --------
@@ -171,20 +134,13 @@ def _load_scans(db):
     >>> db.create_scan("007")
     >>> db.create_scan("111")
     >>> scans = _load_scans(db)
-    >>> print(scans)
-    []
-    >>> db = dummy_db(with_fileset=True)
-    >>> db.connect()
-    >>> scans = _load_scans(db)
-    >>> print(scans)
-    [<plantdb.commons.fsdb.core.Scan object at 0x7fa01220bd50>]
+    >>> print([(scan_id, scan.id) for scan_id, scan in scans.items()])
+    [('007', '007'), ('111', '111')]
+    >>> db.disconnect()
     """
-    from plantdb.commons.fsdb.core import Scan
-
     # List all subdirectories of the database path:
-    dir_names = db.path().iterdir()
-    # Filter out non-directories:
-    dir_names = [dir_name for dir_name in dir_names if dir_name.is_dir()]
+    dir_names = [dir_name for dir_name in db.path().iterdir() if
+                 dir_name.is_dir() and not dir_name.name.startswith('.')]
     # Return empty list if no directory found:
     if len(dir_names) == 0:
         return {}
@@ -193,38 +149,144 @@ def _load_scans(db):
     scans = {}
     bad_scans = set()
     for dir_name in tqdm(dir_names, unit="scan"):
-        scan_name = dir_name.name  # get the scan name from the directory
-        if scan_name.startswith('.'):
-            continue  # ignore dot-folders (hidden)
-        # Try to load each scan directory as a `Scan` instance with:
-        scan = _load_scan(db, scan_name)
-        # If the scan could be loaded, add it to the dictionary of scans
-        if scan is not None:
-            scans[scan_name] = scan
+        if (dir_name / TIMELAPSE_MARKER_FILE_NAME).is_file():
+            # Timelapse container directory: discover member scans
+            child_dirs = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
+            for child in child_dirs:
+                scan = _load_scan_at(db, child, updates_files_json)
+                if scan is not None:
+                    scans[scan.id] = scan
+                else:
+                    bad_scans.add(f"{dir_name.name}/{child.name}")
         else:
-            bad_scans.add(scan_name)
+            scan = _load_scan_at(db, dir_name, updates_files_json)
+            if scan is not None:
+                scans[scan.id] = scan
+            else:
+                bad_scans.add(dir_name.name)
 
     if bad_scans:
         n_bad = len(bad_scans)
         logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
-        try:
-            # Prompt the user only when stdin is available.
-            answer = yes_no_choice(
-                f"Do you want to remove th{'is' if n_bad == 1 else 'ese'} {n_bad} scan{'' if n_bad == 1 else 's'}?"
-            )
-        except EOFError:
-            # No interactive input –> default to **no** (do not delete)
-            logger.debug("EOFError while reading user input, defaulting to “no”.")
-            answer = False
-
-        if answer:
-            for scan_name in bad_scans:
-                _delete_scan(Scan(db, scan_name))
 
     return scans
 
 
-def _load_dummy_fileset(scan):
+def _load_scan_at(db: 'FSDB', scan_path: Path | str, updates_files_json: bool = False) -> 'Scan | None':
+    """Load a single scan from an explicit filesystem directory path.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The filesystem database instance from which the scan should be loaded.
+    scan_path : str or pathlib.Path
+        The explicit directory path of the scan.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
+
+    Returns
+    -------
+    plantdb.commons.fsdb.core.Scan | None
+        The loaded ``Scan`` object if the scan directory is a valid scan dataset; otherwise ``None``.
+    """
+    from plantdb.commons.fsdb.core import Scan
+    from plantdb.commons.fsdb.core import Fileset
+
+    scan_path = Path(scan_path).resolve()
+    if not _is_scan_dataset(scan_path, validate_json_fileset=False):
+        return None
+    parts = scan_path.relative_to(db.path()).parts
+    tl_id = parts[-2] if len(parts) > 1 else None
+    scan_id = parts[-1]
+
+    scan = Scan(db, scan_id, timelapse_id=tl_id)
+    # Load scan metadata first so that _scan_path(scan) can resolve nested paths if timelapse metadata is present
+    scan.metadata = _load_scan_metadata(scan)
+
+    # Backward compatibility with pre-2026 legacy metadata in images.json
+    img_fs_path = _fileset_metadata_path(Fileset(scan, 'images'))
+    if img_fs_path.exists():
+        img_fs_md = _load_metadata(img_fs_path)
+        for md_key in ['object', 'hardware', 'acquisition_date']:
+            if scan.metadata.get(md_key, {}) == {}:
+                scan.metadata.update({md_key: img_fs_md.get(md_key, {})})
+
+    # Try to load the filesets and their files
+    scan.filesets, needs_update = _load_scan_filesets(scan)
+    if needs_update and updates_files_json:
+        files_json = _scan_json_file(scan)
+        backup_file(files_json)
+        _store_scan(scan)
+
+    # Try to list the scan's configs
+    scan.configs = _list_scan_configs(scan)
+    # Try to load the scan's manual measure, if any
+    scan.measures = _load_scan_measures(scan)
+
+    return scan
+
+
+def _load_scan(db: 'FSDB', scan_id: str, updates_files_json: bool = False) -> 'Scan | None':
+    """Load a single scan from the filesystem database.
+
+    This internal helper retrieves the scan identified by ``scan_id`` from the
+    ``db`` instance, attempts to populate its filesets, metadata and manual
+    measures, and returns the fully populated ``Scan`` object.
+    If the scan directory does not exist, ``None`` is returned.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The filesystem database instance from which the scan should be loaded.
+    scan_id : str
+        Identifier of the scan to load.
+        Must correspond to a directory name inside the database's scan root or inside a timelapse container.
+    updates_files_json : bool
+        A boolean flag indicating whether to update the ``files.json`` when entries are not found on drive.
+
+    Returns
+    -------
+    plantdb.commons.fsdb.core.Scan | None
+        The loaded ``Scan`` object if the scan directory exists; otherwise ``None``.
+
+    See Also
+    --------
+    _load_scans : Load all scans from a database.
+    _load_scan_at : Load a scan from an explicit directory path.
+    _scan_path : Compute the filesystem path of a given scan.
+    _load_scan_filesets : Load filesets belonging to a scan.
+    _load_scan_metadata : Load metadata associated with a scan.
+    _load_scan_measures : Load manual measures for a scan.
+
+    Examples
+    --------
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> from plantdb.commons.fsdb.file_ops import _load_scan
+    >>> db = dummy_db()
+    >>> db.connect()
+    >>> _ = db.create_scan("007")
+    >>> scan = _load_scan(db, scan.id)
+    >>> print(scan.id)
+    007
+    >>> db.disconnect()
+    """
+    flat_path = Path(db.basedir) / scan_id
+    if flat_path.is_dir():
+        return _load_scan_at(db, flat_path, updates_files_json)
+
+    # Search in timelapse containers
+    if hasattr(db, "path") and db.path().is_dir():
+        for d in db.path().iterdir():
+            if d.is_dir() and not d.name.startswith('.') and (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
+                nested_path = d / scan_id
+                if nested_path.is_dir():
+                    return _load_scan_at(db, nested_path, updates_files_json)
+
+    return None
+
+
+def _load_dummy_fileset(scan: 'Scan') -> dict[str, 'Fileset']:
     """Create lightweight "dummy" filesets from a scan by populating only file paths.
 
     This function creates a more efficient representation of filesets by avoiding
@@ -264,6 +326,7 @@ def _load_dummy_fileset(scan):
     ...     print(f"Fileset {fs_id} contains {len(fileset.files)} files")
     ...     for file_path in fileset.files:
     ...         print(f"  - {file_path.name}")
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     from plantdb.commons.fsdb.core import Fileset
     filesets = {}  # Dictionary to store filesets indexed by their IDs
@@ -283,8 +346,8 @@ def _load_dummy_fileset(scan):
     return filesets
 
 
-def _load_scan_filesets(scan):
-    """Load the list of ``Fileset`` from given `scan` dataset and return them as a dict.
+def _load_scan_filesets(scan: 'Scan') -> tuple[dict[str, 'Fileset'] | None, bool]:
+    """Load the ``Fileset`` mapping from given `scan` dataset and return them as a dict.
 
     Load the list of filesets using "filesets" top-level entry from ``files.json``.
 
@@ -295,9 +358,11 @@ def _load_scan_filesets(scan):
 
     Returns
     -------
-    dict
-        A dictionary where keys are `fsid` (id of the filesets) and values are
-        the `Fileset` instances.
+    dict or None
+        A dictionary where keys are `fsid` (id of the filesets) and values are the `Fileset` instances.
+        May be ``None` if the filesets could not be loaded.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     See Also
     --------
@@ -319,6 +384,7 @@ def _load_scan_filesets(scan):
     >>> filesets = _load_scan_filesets(scan)
     >>> print(filesets)
     {'fsid_001': <plantdb.commons.fsdb.core.Fileset object at 0x7fa0122232d0>}
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     filesets = {}
     # Get the path to the `files.json` associated with the `scan`:
@@ -349,7 +415,7 @@ def _load_scan_filesets(scan):
     return filesets, needs_update
 
 
-def _load_fileset(scan, fileset_info):
+def _load_fileset(scan: 'Scan', fileset_info: dict[str, str | list]) -> tuple['Fileset | None', bool]:
     """Load a fileset and set its attributes.
 
     Parameters
@@ -363,6 +429,8 @@ def _load_fileset(scan, fileset_info):
     -------
     plantdb.commons.fsdb.core.Fileset | None
         A fileset with its ``files`` & ``metadata`` attributes restored.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     Examples
     --------
@@ -373,7 +441,6 @@ def _load_fileset(scan, fileset_info):
     >>> db = dummy_db(with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     >>> json_path = _scan_json_file(scan)
     >>> with json_path.open(mode="r") as f: structure = json.load(f)
     >>> filesets_info = structure["filesets"]
@@ -382,14 +449,16 @@ def _load_fileset(scan, fileset_info):
     fileset_001
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
+    _is_valid_fileset(scan.path(), fileset_info['id'], fileset_info['files'])
     fileset = _parse_fileset(scan, fileset_info)
     fileset.files, needs_update = _load_fileset_files(fileset, fileset_info)
     fileset.metadata = _load_fileset_metadata(fileset)
     return fileset, needs_update
 
 
-def _load_fileset_files(fileset, fileset_info):
+def _load_fileset_files(fileset: 'Fileset', fileset_info: dict[str, str | list]) -> tuple[dict[str, 'File'], bool]:
     """Load the list of ``File`` from given `fileset`.
 
     Parameters
@@ -401,8 +470,10 @@ def _load_fileset_files(fileset, fileset_info):
 
     Returns
     -------
-    list of plantdb.commons.fsdb.core.File
-         The list of ``File`` found in the `fileset`.
+    dict
+        The file ID indexed dictionary of ``File`` found in the `fileset`.
+    bool
+        A boolean indicating whether to update the scan's ``files.json``.
 
     See Also
     --------
@@ -422,7 +493,6 @@ def _load_fileset_files(fileset, fileset_info):
     >>> db = dummy_db(with_fileset=True, with_file=True)
     >>> db.connect()
     >>> scan = db.get_scan("myscan_001")
-    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     >>> json_path = _scan_json_file(scan)
     >>> with json_path.open(mode="r") as f: structure = json.load(f)
     >>> filesets_info = structure["filesets"]
@@ -430,8 +500,9 @@ def _load_fileset_files(fileset, fileset_info):
     >>> files = _load_fileset_files(fileset, filesets_info[0])
     >>> print([f.id for f in files])
     ['dummy_image', 'test_image', 'test_json']
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
-    files = {}
+    files: dict[str, File] = {}
     files_info = fileset_info.get("files", None)
 
     # Inform `_load_fileset` to update the `files.json` associated with the `scan`
@@ -452,8 +523,8 @@ def _load_fileset_files(fileset, fileset_info):
     return files, needs_update
 
 
-def _load_file(fileset, file_info):
-    """Get a `File` instance for given `fileset` using provided `file_info`.
+def _load_file(fileset: 'Fileset', file_info: dict[str, str]) -> 'File':
+    """Get a ``File`` instance for given `fileset` using provided `file_info`.
 
     Parameters
     ----------
@@ -471,13 +542,80 @@ def _load_file(fileset, file_info):
     --------
     plantdb.commons.fsdb._parse_file
     plantdb.commons.fsdb._load_file_metadata
+
+    Examples
+    --------
+    >>> import json
+    >>> from plantdb.commons.fsdb.serialization import _parse_fileset
+    >>> from plantdb.commons.fsdb.core import FSDB
+    >>> from plantdb.commons.test_database import dummy_db
+    >>> from plantdb.commons.fsdb.file_ops import _scan_json_file, _load_file
+    >>> db = dummy_db(with_fileset=True, with_file=True)
+    >>> db.connect()
+    >>> scan = db.get_scan("myscan_001")
+    >>> fileset = scan.get_fileset("fileset_001")
+    >>> json_path = _scan_json_file(scan)
+    >>> with json_path.open(mode="r") as f: structure = json.load(f)
+    >>> filesets_info = structure["filesets"]
+    >>> files_info = filesets_info[0]["files"]
+    >>> file = _load_file(fileset, files_info[0])
+    >>> print(type(file))
+    <class 'plantdb.commons.fsdb.core.File'>
+    >>> print(file.id)
+    dummy_image
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     file = _parse_file(fileset, file_info)
     file.metadata = _load_file_metadata(file)
     return file
 
 
-def _load_measures(path):
+def _list_scan_configs(scan: 'Scan') -> dict[str, Path]:
+    """List path to all TOML configuration files associated with a scan.
+
+    This helper iterates over every ``*.toml`` file located in the supplied *scan* directory.
+    Each file location and stored in a dictionary keyed by the file stem.
+
+    Parameters
+    ----------
+    scan : plantdb.commons.fsdb.core.Scan
+        The instance to use to list the configuration files.
+
+    Returns
+    -------
+    dict[str, pathlib.Path]
+        Mapping from the stem of each TOML file to the parsed configuration dictionary.
+        If a file could not be read, the value will be ``None``.
+
+    See Also
+    --------
+    _scan_path : Resolve a scan identifier to a filesystem path.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.core import Scan
+    >>> from plantdb.commons.fsdb.file_ops import _list_scan_configs
+    >>> db = test_database(no_auth=True)
+    >>> db.connect()
+    >>> scan = Scan(db, 'real_plant_analyzed')
+    >>> configs = _list_scan_configs(scan)
+    >>> sorted(configs.keys())
+    ['pipeline', 'scan']
+    >>> print(configs['scan'])
+    PosixPath('/tmp/ROMI_DB_hicfekb9/real_plant_analyzed/scan.toml')
+    """
+    path = _scan_path(scan)
+    toml_files = path.glob("*.toml")
+
+    configs = {}
+    for toml_file in toml_files:
+        configs[toml_file.stem] = toml_file
+
+    return configs
+
+
+def _load_measures(path: str | Path) -> dict[str, Any]:
     """Load a measure dictionary from a JSON file.
 
     Parameters
@@ -494,11 +632,21 @@ def _load_measures(path):
     ------
     IOError
         If the data returned by ``json.load`` is not a dictionary.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.file_ops import _load_scan_measures
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> _load_measures(scan.path()/"measures.json")
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     return _load_metadata(path)
 
 
-def _load_scan_measures(scan):
+def _load_scan_measures(scan: 'Scan') -> dict[str, Any]:
     """Load the measures for a dataset.
 
     Parameters
@@ -510,11 +658,21 @@ def _load_scan_measures(scan):
     -------
     dict
         The measures' dictionary.
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.file_ops import _load_scan_measures
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> _load_scan_measures(scan)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     return _load_measures(_scan_measures_path(scan))
 
 
-def _delete_file(file):
+def _delete_file(file: 'File') -> None:
     """Delete the given file.
 
     Parameters
@@ -537,6 +695,18 @@ def _delete_file(file):
     --------
     plantdb.commons.fsdb._file_path
     plantdb.commons.fsdb._is_safe_to_delete
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.file_ops import _delete_file
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> fs = scan.get_fileset('images')
+    >>> file = fs.get_file('00000_rgb')
+    >>> _delete_file(f)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     if file.filename is None:
         # The filename attribute is defined when the file is written!
@@ -545,7 +715,7 @@ def _delete_file(file):
         return
 
     file_path = _file_path(file)
-    if not _is_safe_to_delete(file_path):
+    if not _is_safe_to_delete(file_path, file.db.path()):
         logger.error(f"File {file.filename} is not in the current database.")
         logger.debug(f"File path: '{file_path}'")
         raise IOError("Cannot delete files or directories outside of a local DB.")
@@ -560,7 +730,7 @@ def _delete_file(file):
                 f"Could not delete the JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
             logger.debug(f"JSON metadata file path: '{file_md_path}'.")
         else:
-            logger.info(
+            logger.debug(
                 f"Deleted JSON metadata file for file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
 
     # - Delete the file associated with the `File` instance:
@@ -571,12 +741,12 @@ def _delete_file(file):
             logger.error(f"Could not delete file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
             logger.debug(f"File path: '{file_path}'.")
         else:
-            logger.info(f"Deleted file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
+            logger.debug(f"Deleted file '{file.id}' from '{file.fileset.scan.id}/{file.fileset.id}'.")
 
     return
 
 
-def _delete_fileset(fileset):
+def _delete_fileset(fileset: 'Fileset') -> None:
     """Delete the given fileset.
 
     Parameters
@@ -602,9 +772,20 @@ def _delete_fileset(fileset):
     plantdb.commons.fsdb._scan_path
     plantdb.commons.fsdb._fileset_path
     plantdb.commons.fsdb._is_safe_to_delete
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.file_ops import _delete_fileset
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> fs = scan.get_fileset('images')
+    >>> _delete_fileset(fs)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     fileset_path = _fileset_path(fileset)
-    if not _is_safe_to_delete(fileset_path):
+    if not _is_safe_to_delete(fileset_path, fileset.db.path()):
         logger.error(f"Fileset {fileset.id} is not in the current database.")
         logger.debug(f"Fileset path: '{fileset_path}'.")
         raise IOError("Cannot delete files or directories outside of a local DB.")
@@ -622,30 +803,30 @@ def _delete_fileset(fileset):
         logger.warning(f"Could not find the JSON metadata file for fileset '{fileset.id}'.")
         logger.debug(f"JSON metadata file path: '{json_md}'.")
     else:
-        logger.info(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted the JSON metadata file for fileset '{fileset.id}'.")
 
     # - Delete the metadata directory associated with the `Fileset` instance:
     dir_md = _fileset_metadata_path(fileset)
     try:
-        rmtree(dir_md, ignore_errors=True)
+        send2trash(dir_md)
     except:
         logger.warning(f"Could not find metadata directory for fileset '{fileset.id}'.")
         logger.debug(f"Metadata directory path: '{dir_md}'.")
     else:
-        logger.info(f"Deleted metadata directory for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted metadata directory for fileset '{fileset.id}'.")
 
     # - Delete the directory associated with the `Fileset` instance:
     try:
-        rmtree(fileset_path, ignore_errors=True)
+        send2trash(fileset_path)
     except:
         logger.warning(f"Could not find directory for fileset '{fileset.id}'.")
         logger.debug(f"Fileset directory path: '{fileset_path}'.")
     else:
-        logger.info(f"Deleted directory for fileset '{fileset.id}'.")
+        logger.debug(f"Deleted directory for fileset '{fileset.id}'.")
     return
 
 
-def _delete_scan(scan):
+def _delete_scan(scan: 'Scan') -> None:
     """Delete the given scan, starting by its `Fileset`s.
 
     Parameters
@@ -662,24 +843,75 @@ def _delete_scan(scan):
     --------
     plantdb.commons.fsdb._scan_path
     plantdb.commons.fsdb._is_safe_to_delete
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.file_ops import _delete_scan
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = db.get_scan('real_plant')
+    >>> _delete_scan(scan)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     scan_path = _scan_path(scan)
-    if not _is_safe_to_delete(scan_path):
-        raise IOError("Cannot delete files outside of a DB.")
+    if not _is_safe_to_delete(scan_path, scan.db.path()):
+        raise IOError("Cannot delete files or directories outside of a local DB.")
 
     # - Delete the whole directory will get rid of everything (metadata, filesets, files):
     try:
-        rmtree(scan_path, ignore_errors=True)
+        send2trash(scan_path)
     except:
         logger.warning(f"Could not find directory for scan '{scan.id}'.")
         logger.debug(f"Scan path: '{scan_path}'.")
     else:
-        logger.info(f"Deleted directory for scan '{scan.id}'.")
+        logger.debug(f"Deleted directory for scan '{scan.id}'.")
 
     return
 
 
-def _make_fileset(fileset) -> pathlib.Path:
+def _delete_timelapse(db: 'FSDB', tl_id: str, recursive: bool = False) -> None:
+    """Delete a timelapse container from the database.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The filesystem database instance.
+    tl_id : str
+        Identifier of the timelapse to delete.
+    recursive : bool
+        If False and member scans exist, raises an error.
+        If True, deletes the container and all member scans.
+
+    Raises
+    ------
+    IOError
+        If path is outside the DB.
+    ValueError
+        If non-empty and recursive=False.
+    FileNotFoundError
+        If the timelapse container directory does not exist.
+    """
+    tl_path = _timelapse_path(db, tl_id)
+    if not _is_safe_to_delete(tl_path, db.path()):
+        raise IOError("Cannot delete files or directories outside of a local DB.")
+    if not tl_path.is_dir():
+        raise FileNotFoundError(f"Timelapse '{tl_id}' not found at '{tl_path}'.")
+
+    child_scans = [c for c in tl_path.iterdir() if c.is_dir() and not c.name.startswith('.')]
+    if child_scans and not recursive:
+        raise ValueError(f"Timelapse '{tl_id}' is not empty. Use recursive=True to delete it and its scans.")
+
+    if hasattr(db, "scans") and isinstance(db.scans, dict):
+        for child in child_scans:
+            if child.name in db.scans:
+                del db.scans[child.name]
+
+    send2trash(tl_path)
+    logger.debug(f"Deleted timelapse container directory for '{tl_id}'.")
+
+
+def _make_fileset(fileset: 'Fileset') -> Path:
     """Create the fileset directory.
 
     Parameters
@@ -695,6 +927,21 @@ def _make_fileset(fileset) -> pathlib.Path:
     See Also
     --------
     plantdb.commons.fsdb._fileset_path
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.core import Scan
+    >>> from plantdb.commons.fsdb.core import Fileset
+    >>> from plantdb.commons.fsdb.file_ops import _make_fileset
+    >>> from plantdb.commons.fsdb.file_ops import _make_scan
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = Scan(db, 'new_scan')
+    >>> _make_scan(scan)
+    >>> fs = Fileset(scan, 'new_fs')
+    >>> _make_fileset(fs)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     path = _fileset_path(fileset)
     # Create the fileset directory if it does not exist:
@@ -703,7 +950,7 @@ def _make_fileset(fileset) -> pathlib.Path:
     return path
 
 
-def _make_scan(scan) -> pathlib.Path:
+def _make_scan(scan: 'Scan') -> Path:
     """Create the scan directory.
 
     Parameters
@@ -719,15 +966,39 @@ def _make_scan(scan) -> pathlib.Path:
     See Also
     --------
     plantdb.commons.fsdb._scan_path
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.core import Scan
+    >>> from plantdb.commons.fsdb.file_ops import _make_scan
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = Scan(db, 'new_scan')
+    >>> _make_scan(scan)
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     path = _scan_path(scan)
     # Create the scan directory if it does not exist:
     if not path.is_dir():
+        tl_id = None
+        if hasattr(scan, "metadata") and isinstance(scan.metadata, dict):
+            tl_meta = scan.metadata.get("timelapse")
+            if isinstance(tl_meta, dict):
+                tl_id = tl_meta.get("id")
+        if tl_id:
+            tl_path = _timelapse_path(scan.db, tl_id)
+            if not tl_path.is_dir():
+                tl_path.mkdir(parents=True, exist_ok=True)
+            marker = _timelapse_marker(tl_path)
+            if not marker.is_file():
+                with marker.open("w") as f:
+                    json.dump({"id": tl_id, "created_at": iso_date_now()}, f, indent=4)
         path.mkdir(parents=True)
     return path
 
 
-def _store_scan(scan):
+def _store_scan(scan: 'Scan') -> None:
     """Dump the fileset and files structure associated with a `scan` on drive.
 
     Parameters
@@ -739,6 +1010,24 @@ def _store_scan(scan):
     --------
     plantdb.commons.fsdb._scan_to_dict
     plantdb.commons.fsdb._scan_files_json
+
+    Examples
+    --------
+    >>> from plantdb.commons.test_database import test_database
+    >>> from plantdb.commons.fsdb.core import Scan
+    >>> from plantdb.commons.fsdb.core import Fileset
+    >>> from plantdb.commons.fsdb.file_ops import _store_scan
+    >>> from plantdb.commons.fsdb.file_ops import _make_scan
+    >>> db = test_database('all', no_auth=True)
+    >>> db.connect()
+    >>> scan = Scan(db, 'new_scan')
+    >>> scan.set_metadata({'test': 'metadata'})
+    >>> _make_scan(scan)
+    >>> fs = Fileset(scan, 'new_fs')
+    >>> _store_scan(scan)
+    >>> db.reload(scan.id)
+    >>> scan.id in db.scans
+    >>> db.disconnect()  # clean up (delete) the temporary dummy database
     """
     structure = _scan_to_dict(scan)
     files_json = _scan_json_file(scan)

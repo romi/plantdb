@@ -23,7 +23,8 @@
 # <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-"""Synchronization Utility for PlantDB Databases
+"""
+# Synchronization Utility for PlantDB Databases
 
 This module provides a robust synchronization mechanism for File System Databases (FSDB) in the PlantDB project, enabling seamless data transfer between local and remote database instances.
 
@@ -93,7 +94,7 @@ Create two test databases, a source with a dataset and a target without dataset,
 ```python
 >>> from plantdb.client.sync import FSDBSync
 >>> from plantdb.server.test_rest_api import TestRestApiServer
->>> from plantdb.client.rest_api import request_scan_names_list
+>>> from plantdb.client.rest_api.requests import request_scan_names_list
 >>> from plantdb.commons.test_database import test_database
 >>> # Create a test source database with all 5 test dataset
 >>> db_source = test_database("all")
@@ -124,7 +125,7 @@ Test REST API server started at http://127.0.0.1:5000
 >>> else:
 ...     print("Sync completed successfully")
 >>> # Use REST API endpoint to refresh scans
->>> from plantdb.client.rest_api import request_refresh
+>>> from plantdb.client.rest_api.requests import request_refresh
 >>> success, msg = request_refresh(**server_cfg)
 >>> # Use REST API to list scans and verify target DB contains the new scans
 >>> scans_list = request_scan_names_list(**server_cfg)
@@ -143,6 +144,7 @@ Test REST API server started at http://127.0.0.1:5000
 """
 
 import getpass
+import json
 import os
 import shutil
 import stat
@@ -155,12 +157,46 @@ from urllib.parse import urlparse
 import paramiko
 import requests
 import urllib3
-
-from plantdb.client.rest_api import request_archive_download
-from plantdb.client.rest_api import request_archive_upload
 from plantdb.commons.fsdb.core import FSDB
-from plantdb.commons.fsdb.core import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import MARKER_FILE_NAME
+from plantdb.commons.fsdb.path_helpers import TIMELAPSE_MARKER_FILE_NAME
 from plantdb.commons.fsdb.validation import _is_fsdb
+from plantdb.commons.utils import iso_date_now
+
+from plantdb.client.rest_api.requests import request_archive_download
+from plantdb.client.rest_api.requests import request_archive_upload
+
+
+def _resolve_local_scan_path(base_path: Path, scan_id: str) -> Path:
+    """Resolve a scan directory inside a base path, checking flat and timelapse directories."""
+    base_path = Path(base_path)
+    flat = base_path / scan_id
+    if flat.is_dir():
+        return flat
+    if base_path.is_dir():
+        for d in base_path.iterdir():
+            if d.is_dir() and not d.name.startswith('.') and (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
+                nested = d / scan_id
+                if nested.is_dir():
+                    return nested
+    return flat
+
+
+def _resolve_dest_scan_path(dst_path: Path, src_scan_path: Path, scan_id: str) -> Path:
+    """Resolve the destination path for a scan based on source layout."""
+    dst_path = Path(dst_path)
+    src_scan_path = Path(src_scan_path)
+    parent = src_scan_path.parent
+    if (parent / TIMELAPSE_MARKER_FILE_NAME).is_file():
+        tl_id = parent.name
+        dst_tl_path = dst_path / tl_id
+        dst_tl_path.mkdir(parents=True, exist_ok=True)
+        dst_marker = dst_tl_path / TIMELAPSE_MARKER_FILE_NAME
+        src_marker = parent / TIMELAPSE_MARKER_FILE_NAME
+        if not dst_marker.is_file() and src_marker.is_file():
+            shutil.copy2(src_marker, dst_marker)
+        return dst_tl_path / scan_id
+    return dst_path / scan_id
 
 
 class FSDBSync():
@@ -470,8 +506,8 @@ class FSDBSync():
         self.sync_progress = 0.
         for n, scan_id in enumerate(scans_to_sync):
             self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
-            src_scan_path = src_path / scan_id
-            dst_scan_path = dst_path / scan_id
+            src_scan_path = _resolve_local_scan_path(src_path, scan_id)
+            dst_scan_path = _resolve_dest_scan_path(dst_path, src_scan_path, scan_id)
 
             # Sync scan directory
             self._sync_directory_local(src_scan_path, dst_scan_path)
@@ -499,7 +535,7 @@ class FSDBSync():
         self.sync_progress = 0.
         for n, scan_id in enumerate(scans_to_sync):
             self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
-            src_scan_path = src_path / scan_id
+            src_scan_path = _resolve_local_scan_path(src_path, scan_id)
 
             # Create an archive of scan
             with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as tmp_file:
@@ -543,8 +579,33 @@ class FSDBSync():
             try:
                 # Download archive
                 response = request_archive_download(scan_id, dst_path, **config_from_url(src_url))
-                # Extract the downloaded archive
-                self._extract_scan_archive(str(archive_path), dst_path / scan_id)
+                # Extract the downloaded archive to a temp directory to inspect metadata
+                temp_extract = Path(tempfile.mkdtemp())
+                try:
+                    self._extract_scan_archive(str(archive_path), temp_extract / scan_id)
+                    extracted_scan = temp_extract / scan_id
+                    tl_id = None
+                    md_file = extracted_scan / "metadata" / "metadata.json"
+                    if md_file.is_file():
+                        try:
+                            with md_file.open("r") as f:
+                                md = json.load(f)
+                            tl_id = (md.get("timelapse") or {}).get("id")
+                        except Exception:
+                            pass
+                    if tl_id:
+                        final_dst_tl = dst_path / tl_id
+                        final_dst_tl.mkdir(parents=True, exist_ok=True)
+                        dst_marker = final_dst_tl / TIMELAPSE_MARKER_FILE_NAME
+                        if not dst_marker.is_file():
+                            with dst_marker.open("w") as f:
+                                json.dump({"id": tl_id, "created_at": iso_date_now()}, f, indent=4)
+                        dst_scan_dir = final_dst_tl / scan_id
+                    else:
+                        dst_scan_dir = dst_path / scan_id
+                    self._sync_directory_local(extracted_scan, dst_scan_dir)
+                finally:
+                    shutil.rmtree(temp_extract, ignore_errors=True)
             finally:
                 Path(archive_path).unlink(missing_ok=True)
 
@@ -577,7 +638,7 @@ class FSDBSync():
             self.sync_progress = 0.
             for n, scan_id in enumerate(scans_to_sync):
                 self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
-                src_scan_path = src_path / scan_id
+                src_scan_path = _resolve_local_scan_path(src_path, scan_id)
                 remote_scan_path = f"{remote_path}/{scan_id}"
 
                 # Upload scan directory
@@ -615,10 +676,32 @@ class FSDBSync():
             for n, scan_id in enumerate(scans_to_sync):
                 self.sync_progress = (n + 1) / float(n_scans_to_sync) * 100
                 remote_scan_path = f"{remote_path}/{scan_id}"
-                dst_scan_path = dst_path / scan_id
-
-                # Download scan directory
-                self._download_recursive(sftp, remote_scan_path, dst_scan_path)
+                temp_download = Path(tempfile.mkdtemp())
+                try:
+                    temp_scan_dir = temp_download / scan_id
+                    self._download_recursive(sftp, remote_scan_path, temp_scan_dir)
+                    tl_id = None
+                    md_file = temp_scan_dir / "metadata" / "metadata.json"
+                    if md_file.is_file():
+                        try:
+                            with md_file.open("r") as f:
+                                md = json.load(f)
+                            tl_id = (md.get("timelapse") or {}).get("id")
+                        except Exception:
+                            pass
+                    if tl_id:
+                        dst_tl = dst_path / tl_id
+                        dst_tl.mkdir(parents=True, exist_ok=True)
+                        dst_marker = dst_tl / TIMELAPSE_MARKER_FILE_NAME
+                        if not dst_marker.is_file():
+                            with dst_marker.open("w") as f:
+                                json.dump({"id": tl_id, "created_at": iso_date_now()}, f, indent=4)
+                        final_dst_path = dst_tl / scan_id
+                    else:
+                        final_dst_path = dst_path / scan_id
+                    self._sync_directory_local(temp_scan_dir, final_dst_path)
+                finally:
+                    shutil.rmtree(temp_download, ignore_errors=True)
         finally:
             sftp.close()
 
@@ -807,10 +890,20 @@ class FSDBSync():
 
     def _list_local_scans(self, db_path):
         """List scan directories in a local database."""
-        if db_path.exists():
-            return [d.name for d in db_path.iterdir()
-                    if d.is_dir() and not d.name.startswith('.')]
-        return []
+        db_path = Path(db_path)
+        if not db_path.exists():
+            return []
+        scans = []
+        for d in db_path.iterdir():
+            if not d.is_dir() or d.name.startswith('.'):
+                continue
+            if (d / TIMELAPSE_MARKER_FILE_NAME).is_file():
+                for c in d.iterdir():
+                    if c.is_dir() and not c.name.startswith('.'):
+                        scans.append(c.name)
+            else:
+                scans.append(d.name)
+        return scans
 
     def _list_http_scans(self, base_url):
         """List scans available via HTTP REST API."""
@@ -994,7 +1087,7 @@ def config_from_url(url):
     return config
 
 
-def _parse_database_spec(spec) :
+def _parse_database_spec(spec):
     """Parse and validate a database specification, determining the appropriate synchronization strategy.
 
     This function analyzes database specifications and returns a structured representation

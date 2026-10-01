@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Role-Based Access Control (RBAC) Manager
+# Role-Based Access Control (RBAC) Manager
 
 Provides a comprehensive framework for handling user permissions, roles, and group
 management within the PlantDB ecosystem. It supports fine‑grained access
 control for scans and user accounts, allowing administrators to create, modify,
 and revoke permissions with ease.
 
-Key Features
-------------
+## Key Features
+
 - Role and permission hierarchy with ADMIN, CONTRIBUTOR, and READER roles.
 - Group‑based sharing of scans and dynamic membership handling.
 - Decorator‑based permission checks (`requires_permission`) for method
@@ -19,8 +19,9 @@ Key Features
 - Full scan access control: ownership, group sharing, and global role
   fallback.
 
-Usage Examples
---------------
+## Usage Examples
+
+```python
 >>> from plantdb.commons.auth.rbac import RBACManager, Permission, User
 >>> rbac = RBACManager()
 >>> # Create a new user and assign a role
@@ -33,6 +34,7 @@ Usage Examples
 >>> can_read = rbac.can_access_scan(user, scan_meta, Permission.READ)
 >>> print(can_read)
 True
+```
 """
 
 from functools import wraps
