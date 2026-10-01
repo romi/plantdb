@@ -24,6 +24,7 @@ source:
 build:
   noarch: python  # Build as a platform-independent Python package
   script: |
+    export PIP_NO_INDEX=False  # conda-build sets PIP_NO_INDEX=True (blocks PyPI); allow pip-only deps
     python -m pip install .
     {% for dep in deps %}
     {% if dep.startswith('open3d') or dep.startswith('ada-url') %}  # Install pip-only deps (not on conda channels)
