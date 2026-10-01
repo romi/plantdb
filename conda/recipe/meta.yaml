@@ -23,7 +23,13 @@ source:
 
 build:
   noarch: python  # Build as a platform-independent Python package
-  script: python -m pip install .
+  script: |
+    python -m pip install .
+    {% for dep in deps %}
+    {% if dep.startswith('open3d') or dep.startswith('ada-url') %}  # Install pip-only deps (not on conda channels)
+    python -m pip install {{ dep }}
+    {% endif %}
+    {% endfor %}
 
 requirements:
   host:
@@ -35,7 +41,7 @@ requirements:
   run:
     - python  {{ project.get('requires-python') }}  # Runtime Python dependency (using minimum version)
     {% for dep in deps %}
-    {% if not dep.startswith('open3d') %}  # Skip 'open3d' dependency (not available on anaconda.org)
+    {% if not dep.startswith('open3d') and not dep.startswith('ada-url') %}  # Skip 'open3d' and 'ada-url' (not available on anaconda.org)
     - {{ dep.replace('_', '-') }}  # Conda package names use hyphens, not underscores (e.g. click-option-group)
     {% endif %}
     {% endfor %}
