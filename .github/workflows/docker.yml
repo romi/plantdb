@@ -38,7 +38,10 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: roboticsmicrofarms/plantdb  # Target Docker image name
-          tags: type=sha,format=short,prefix=  # Create tags from git SHA (short format)
+          tags: |
+            type=semver,pattern={{version}}  # Tag with the release version (e.g. 0.16.0)
+            type=raw,value=latest            # Also tag as latest
+            type=sha,format=short,prefix=    # Fallback to git SHA for manual dispatch
 
       # Step 4: Build the Docker image and save to local tar file
       - name: Build and Cache docker image
@@ -73,13 +76,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}  # Use stored credentials
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 8: Push the image to Docker Hub with both SHA tag and "latest" tag
+      # Step 8: Push the image to Docker Hub with the version and "latest" tags
       - name: Push as latest
         uses: docker/build-push-action@v7
         with:
           context: .
           push: true  # Actually push to registry
           file: docker/Dockerfile
-          tags: |
-            ${{ steps.meta.outputs.tags }}  # Push with SHA tag
-            roboticsmicrofarms/plantdb:latest  # Also tag as latest
+          tags: ${{ steps.meta.outputs.tags }}

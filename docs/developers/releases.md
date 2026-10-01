@@ -181,6 +181,34 @@ git push --follow-tags origin dev main
 
 > Note: This command pushes both `dev` and `main` branches, as well as the version tag.
 
+---
+
+# Create a GitHub Release
+
+Publishing a GitHub release triggers the publishing workflows (`conda.yml`, `pip_build_*.yml`, `docker.yml`,
+`gh‑pages.yml`). This can be done either from the command line with the GitHub CLI (`gh`) or from the web page.
+
+## Using the GitHub CLI
+
+Create a release from the tag, using the `CHANGELOG.md` content as the release notes:
+
+```shell
+gh release create X.Y.Z --title "Version X.Y.Z" --notes "$(cat CHANGELOG.md)"
+```
+
+> Note: The tag must already exist locally and be pushed to the remote (see the *Publish the Release* step above).
+
+## Using the Web Page
+
+1. Go to the repository's **Releases** page: `https://github.com/<owner>/<repo>/releases`.
+2. Click **Draft a new release**.
+3. In the **Choose a tag** dropdown, select the existing `X.Y.Z` tag (or create a new tag on the target branch).
+4. Set the **Release title** to `Version X.Y.Z`.
+5. Paste the corresponding section of `CHANGELOG.md` into the **Describe this release** box.
+6. Click **Publish release**.
+
+---
+
 # Post‑Release Verification
 
 Verify that:
