@@ -39,9 +39,9 @@ jobs:
         with:
           images: roboticsmicrofarms/plantdb  # Target Docker image name
           tags: |
-            type=semver,pattern={{version}}  # Tag with the release version (e.g. 0.16.0)
-            type=raw,value=latest            # Also tag as latest
-            type=sha,format=short,prefix=    # Fallback to git SHA for manual dispatch
+            type=semver,pattern={{version}}
+            type=raw,value=latest
+            type=sha,format=short,prefix=
 
       # Step 4: Build the Docker image and save to local tar file
       - name: Build and Cache docker image
