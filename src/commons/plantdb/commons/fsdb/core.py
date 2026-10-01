@@ -3776,11 +3776,11 @@ class Fileset(db.Fileset, MetadataManager):
         if self.file_exists(f_id):
             raise FileExistsError(self, f_id)
 
-        # Use file-level exclusive lock for file creation
+        # Use fileset-level exclusive lock for file creation, as `store()` serializes the whole fileset.
         self.logger.debug(
             f"Creating a file '{f_id}' in '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE,
-                                               current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILESET):
             # Create the new File
             file = File(self, f_id)  # Initialize a new File instance
 
@@ -3845,11 +3845,11 @@ class Fileset(db.Fileset, MetadataManager):
         if not self.file_exists(f_id):
             raise ValueError(f"File '{f_id}' does not exist in '{self.scan.id}/{self.id}'")
 
-        # Use exclusive lock for fileset creation
+        # Use fileset-level exclusive lock for file deletion, as `store()` serializes the whole fileset.
         self.logger.debug(
             f"Deleting file '{f_id}' from '{self.scan.id}/{self.id}' as '{current_user.username}' user...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}/{f_id}", LockType.EXCLUSIVE,
-                                               current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILESET):
             f = self.files[f_id]
             _delete_file(f)  # delete the file
             self.files.pop(f_id)  # remove the File instance from the fileset
@@ -4062,11 +4062,11 @@ class File(db.File, MetadataManager):
         if not os.path.isfile(path):
             raise ValueError(f"The provided path is not a file: {path}.")
 
-        # Use exclusive lock for this operation
+        # Use fileset-level exclusive lock, as `store()` serializes the whole fileset.
         self.logger.debug(
             f"Importing file '{self.id}' in '{self.scan.id}/{self.fileset.id}' as user '{current_user.username}'...")
-        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}/{self.id}", LockType.EXCLUSIVE,
-                                               current_user.username, LockLevel.FILE):
+        with self.db.lock_manager.acquire_lock(f"{self.scan.id}/{self.fileset.id}", LockType.EXCLUSIVE,
+                                               current_user.username, LockLevel.FILESET):
             # Get the file name and extension
             ext = path.suffix[1:]
             self.filename = _get_filename(self, ext)
