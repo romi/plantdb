@@ -67,6 +67,7 @@ PosixPath('/tmp/ROMI_DB')
 
 """
 import hashlib
+import time
 from pathlib import Path
 from tempfile import gettempdir
 from tempfile import mkdtemp
@@ -181,7 +182,42 @@ def _save_file_from_url(url: str) -> Path:
         url = url + "?download=1"
     headers = {"User-Agent": "Mozilla/5.0 (compatible; MyDownloader/1.0)"}
 
-    with requests.get(url, stream=True, headers=headers, timeout=5) as r:
+    # Retry transient network failures (slow/stalled reads, dropped connections).
+    # A short read timeout is the usual culprit for large ZENODO downloads.
+    max_attempts = 3
+    for attempt in range(1, max_attempts + 1):
+        try:
+            _download_file(url, tmp_fname, headers)
+            break
+        except (requests.exceptions.RequestException, IOError) as e:
+            if attempt == max_attempts:
+                raise
+            logger.warning(f"Download attempt {attempt}/{max_attempts} failed ({e}); retrying...")
+            time.sleep(2 * attempt)
+
+    return tmp_fname
+
+
+def _download_file(url: str, tmp_fname: Path, headers: dict) -> None:
+    """Stream the file at ``url`` to ``tmp_fname``, showing a progress bar.
+
+    Parameters
+    ----------
+    url : str
+        A valid URL pointing toward a file.
+    tmp_fname : pathlib.Path
+        The path to the temporary file to write the downloaded content to.
+    headers : dict
+        The HTTP headers to send with the request.
+
+    Raises
+    ------
+    requests.exceptions.RequestException
+        If the request fails or returns an error status.
+    IOError
+        If the downloaded size does not match the advertised ``content-length``.
+    """
+    with requests.get(url, stream=True, headers=headers, timeout=(10, 60)) as r:
         r.raise_for_status()  # raise an exception for bad status
         total_size = int(r.headers.get("content-length", 0))
         block_size = 32 * 1024
@@ -201,8 +237,6 @@ def _save_file_from_url(url: str) -> Path:
 
         if total_size and progress != total_size:
             raise IOError(f"Error downloading file {tmp_fname.name}!")
-
-    return tmp_fname
 
 
 def _test_hash(tmp_fname: Path, hash_value: str, hash_method: str = "md5") -> None:
