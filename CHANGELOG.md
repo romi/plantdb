@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## Version 0.16.2 - 2026-10-01
+
+### Fixed
+- Fix Docker image build by removing inline comments from the metadata-action tags block, which were being merged into the tag value and producing an invalid reference format.
+- Fix conda package build by normalizing dependency names from PyPI underscores to conda hyphens (e.g. `click_option_group` → `click-option-group`), which were unresolvable on conda-forge.
+
 ## Version 0.16.1 - 2026-10-01
 
 ### Fixed
