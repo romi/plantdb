@@ -123,14 +123,14 @@ def _is_fsdb(path, validate_json_fileset=False, extra_dirs: list[str] = ['config
     >>> from plantdb.commons.test_database import setup_test_database
     >>> path = setup_empty_database()  # initialize an empty FSDB in the temporary directory
     >>> print(path)
-    /tmp/ROMI_DB_********
+    /tmp/ROMI_DB_...
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     >>> _is_fsdb(path)
     True
     >>> path = setup_test_database('real_plant', None)  # initialize an FSDB in the temporary directory with a test dataset
     >>> print(path)
-    /tmp/ROMI_DB_********
+    /tmp/ROMI_DB_...
     >>> print([path.name for path in path.iterdir()])  # database with a single dataset
     ['romidb', 'real_plant', 'groups.json', 'users.json', '.locks']
     >>> _is_fsdb(path)

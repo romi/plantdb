@@ -633,7 +633,7 @@ class FSDB(db.DB):
     >>> print(type(db))
     <class 'plantdb.commons.fsdb.core.FSDB'>
     >>> print(db.path())
-    /tmp/romidb_********
+    /tmp/romidb_...
     >>> # Create a new `Scan`:
     >>> new_scan = db.create_scan("007")
     >>> print(type(new_scan))
@@ -761,7 +761,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db()
         >>> print(db.path())
-        /tmp/romidb_********
+        /tmp/romidb_...
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return copy.deepcopy(self.basedir)
@@ -900,7 +900,7 @@ class FSDB(db.DB):
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> db.get_scans()
-        [<plantdb.commons.fsdb.core.Scan at *x************>]
+        [<plantdb.commons.fsdb.core.Scan at ...>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         # Get all scans and filter by access permissions
@@ -963,7 +963,7 @@ class FSDB(db.DB):
         >>> db = dummy_db(with_scan=True)
         >>> scan = db.get_scan('myscan_001')
         >>> print(scan)
-        <plantdb.commons.fsdb.core.Scan object at **************>
+        <plantdb.commons.fsdb.core.Scan object at ...>
         >>> db.list_scans()
         ['007']
         >>> unknown_scan = db.get_scan('unknown')
@@ -2813,7 +2813,7 @@ class Scan(db.Scan, MetadataManager):
     >>> db.timelapse_exists("Star_Wars")
     True
     >>> scan.path()
-    PosixPath('/tmp/ROMI_DB_********/Star_Wars/A_New_Hope')
+    PosixPath('/tmp/ROMI_DB_.../Star_Wars/A_New_Hope')
 
     >>> # Example #3: Get it from an `FSDB` object:
     >>> db = dummy_db()
@@ -3014,7 +3014,7 @@ class Scan(db.Scan, MetadataManager):
         >>> db = dummy_db(with_fileset=True)
         >>> scan = db.get_scan('myscan_001')
         >>> scan.get_filesets()
-        [<plantdb.commons.fsdb.core.Fileset at *x************>]
+        [<plantdb.commons.fsdb.core.Fileset at ...>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return [self.get_fileset(fs.id) for fs in _filter_query(list(self.filesets.values()), query, fuzzy)]
@@ -3041,7 +3041,7 @@ class Scan(db.Scan, MetadataManager):
         ['fileset_001']
         >>> new_fileset = scan.create_fileset('007')
         >>> print(new_fileset)
-        <plantdb.commons.fsdb.core.Fileset object at **************>
+        <plantdb.commons.fsdb.core.Fileset object at ...>
         >>> scan.list_filesets()
         ['fileset_001', '007']
         >>> unknown_fs = scan.get_fileset('unknown')
@@ -3451,7 +3451,7 @@ class Scan(db.Scan, MetadataManager):
         >>> from plantdb.commons.test_database import dummy_db
         >>> db = dummy_db(with_file=True)
         >>> scan = db.get_scan("myscan_001")
-        >>> scan.path()  # should be '/tmp/romidb_********/myscan_001'
+        >>> scan.path()  # should be '/tmp/romidb_.../myscan_001'
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _scan_path(self)
@@ -3597,9 +3597,9 @@ class Fileset(db.Fileset, MetadataManager):
         >>> scan = db.get_scan('myscan_001')
         >>> fs = scan.get_fileset('fileset_001')
         >>> fs.get_files()
-        [<plantdb.commons.fsdb.core.File at *x************>,
-         <plantdb.commons.fsdb.core.File at *x************>,
-         <plantdb.commons.fsdb.core.File at *x************>]
+        [<plantdb.commons.fsdb.core.File at ...>,
+         <plantdb.commons.fsdb.core.File at ...>,
+         <plantdb.commons.fsdb.core.File at ...>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _filter_query(list(self.files.values()), query, fuzzy)
@@ -3874,12 +3874,12 @@ class Fileset(db.Fileset, MetadataManager):
         ['myscan_001']
         >>> scan = db.get_scan("myscan_001")
         >>> print(scan.path())
-        /tmp/romidb_********/myscan_001
+        /tmp/romidb_.../myscan_001
         >>> [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan
         ['fileset_001']
         >>> fs = scan.get_fileset("fileset_001")
         >>> print(fs.path())
-        /tmp/romidb_********/myscan_001/fileset_001
+        /tmp/romidb_.../myscan_001/fileset_001
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _fileset_path(self)
@@ -4250,7 +4250,7 @@ class File(db.File, MetadataManager):
         ['dummy_image', 'test_image', 'test_json']
         >>> f = fs.get_file('dummy_image')
         >>> f.path()
-        /tmp/romidb_********/myscan_001/fileset_001/dummy_image.png
+        /tmp/romidb_.../myscan_001/fileset_001/dummy_image.png
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
         return _file_path(self)
