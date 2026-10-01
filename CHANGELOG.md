@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
+## Version 0.16.1 - 2026-10-01
+
+### Fixed
+- Fix conda package build by invoking `conda-build` directly, as conda 26+ no longer exposes the `conda build` subcommand.
+- Fix Docker image tagging to use the release version and `latest` instead of the git SHA, and remove the inline comment that broke the tag reference format.
+- Add the missing `__init__.py` to the `plantdb.client.metadata_app` package so the documentation build can import it.
+
+### Changed
+- Document how to create a GitHub release (CLI and web page) to trigger the publishing workflows.
+
 ## Version 0.16.0 - 2026-10-01
 
 ### Added
