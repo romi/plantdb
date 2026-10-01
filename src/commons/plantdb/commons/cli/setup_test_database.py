@@ -11,7 +11,7 @@ configuration files and trained CNN models.
 
 ## Usage Examples
 
-### Download the default 'real_plant' dataset to the module test directory
+### Download the default 'real_plant' dataset to the per-user cache directory
 
 ```shell
 setup_test_database
@@ -46,7 +46,6 @@ from click_option_group import optgroup
 from plantdb.commons.log import DEFAULT_LOG_LEVEL
 from plantdb.commons.log import LOG_LEVELS
 from plantdb.commons.log import get_logger
-from plantdb.commons.test_database import DATASET
 from plantdb.commons.test_database import setup_test_database
 
 # Create a logger and set the environment variable
@@ -56,44 +55,25 @@ logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.argument('dataset', nargs=-1, required=False)
-@click.option(
-    '--db-path',
-    type=click.Path(),
-    default=None,
-    help="Path to the directory where to set up the database. Defaults to the module 'tests/testdata' directory."
-)
-@click.option(
-    '--with-configs',
-    is_flag=True,
-    default=False,
-    help="Also download the pipeline configuration files."
-)
-@click.option(
-    '--with-models',
-    is_flag=True,
-    default=False,
-    help="Also download the trained CNN model files."
-)
-@click.option(
-    '--force',
-    is_flag=True,
-    default=False,
-    help="Force re-download of the archive(s), even if they already exist locally."
-)
-@click.option(
-    '--keep-tmp',
-    is_flag=True,
-    default=False,
-    help="Keep the temporary downloaded archive files."
-)
+@click.option('--db-path', type=click.Path(), default=None,
+              help="Path to the directory where to set up the database. Defaults to the per-user cache directory '~/.cache/plantdb'."
+              )
+@click.option('--with-configs', is_flag=True, default=False,
+              help="Also download the pipeline configuration files."
+              )
+@click.option('--with-models', is_flag=True, default=False,
+              help="Also download the trained CNN model files."
+              )
+@click.option('--force', is_flag=True, default=False,
+              help="Force re-download of the archive(s), even if they already exist locally."
+              )
+@click.option('--keep-tmp', is_flag=True, default=False,
+              help="Keep the temporary downloaded archive files."
+              )
 @optgroup.group("Logging", cls=OptionGroup)
-@optgroup.option(
-    "--log-level",
-    type=click.Choice(LOG_LEVELS, case_sensitive=False),
-    default=DEFAULT_LOG_LEVEL,
-    show_default=True,
-    help="Logging level.",
-)
+@optgroup.option("--log-level", type=click.Choice(LOG_LEVELS, case_sensitive=False), default=DEFAULT_LOG_LEVEL,
+                 show_default=True, help="Logging level.",
+                 )
 def main(dataset, db_path, with_configs, with_models, force, keep_tmp, log_level):
     """Test Database Setup CLI
 
