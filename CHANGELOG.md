@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## Version 0.17.0 - 2026-10-02
+
+### Added
+- Add `setup_test_database` CLI to download and set up a ROMI test database from ZENODO.
+
+### Changed
+- Default the test database location to the per-user cache directory `~/.cache/plantdb` instead of the module `tests/testdata` directory.
+- Normalize doctest output ellipsis markers in docstrings to `...` so examples render consistently.
+
+### Fixed
+- Fix conda package build by overriding `PIP_NO_INDEX` and pip-installing the `open3d` and `ada-url` dependencies that are unavailable on conda channels.
+- Fix the Docker CI test to run the validation command against a single image tag.
+
 ## Version 0.16.2 - 2026-10-01
 
 ### Fixed

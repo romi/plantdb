@@ -66,7 +66,7 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar  # Load image from tar file
           docker image ls -a  # List all images for debugging
-          docker run --rm ${{ steps.meta.outputs.tags }} \
+          docker run --rm roboticsmicrofarms/plantdb:${{ steps.meta.outputs.version }} \
             /bin/bash -c 'shared_fsdb $ROMI_DB -d all'  # Run test command
 
       # Step 7: Authenticate with Docker Hub
