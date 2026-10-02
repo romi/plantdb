@@ -1124,6 +1124,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../cli/setup_test_database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    setup_test_database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cli/shared_fsdb/" class="md-nav__link">
         
   
@@ -4375,13 +4403,13 @@ It aims at simplifying the creation of a test database for demonstration or CI p
 <p>Archive <code>'models.zip'</code> contains a preconfigured directory structure with the trained CNN weight file Resnet_896_896_epoch50.pt.</p>
 <h3 id="plantdb.commons.test_database--examples">Examples<a class="headerlink" href="#plantdb.commons.test_database--examples" title="Permanent link">Link</a></h3>
 <div class="language-python highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> setup_test_database
-<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:</span>
+<span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Download and extract the 'real_plant' test database to the per-user cache directory:</span>
 <span style="color: #666">&gt;&gt;&gt;</span> db_path <span style="color: #666">=</span> setup_test_database(<span style="color: #BA2121">'real_plant'</span>)
 INFO     [test_database] File <span style="color: #BA2121">'real_plant.zip'</span> exists locally<span style="color: #666">.</span> Skipping download<span style="color: #666">.</span>
 INFO     [test_database] Verifying <span style="color: #BA2121">'real_plant.zip'</span> MD5 <span style="color: #008000">hash</span> value<span style="color: #666">...</span>
-INFO     [test_database] The test database <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000">set</span> up under <span style="color: #BA2121">'/home/jonathan/Projects/plantdb/tests/testdata'</span><span style="color: #666">.</span>
+INFO     [test_database] The test database <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000">set</span> up under <span style="color: #BA2121">'../.cache/plantdb'</span><span style="color: #666">.</span>
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #008000">print</span>(db_path)
-PosixPath(<span style="color: #BA2121">'/home/jonathan/Projects/plantdb/tests/testdata'</span>)
+PosixPath(<span style="color: #BA2121">'../.cache/plantdb'</span>)
 <span style="color: #666">&gt;&gt;&gt;</span> <span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':</span>
 <span style="color: #666">&gt;&gt;&gt;</span> db_path <span style="color: #666">=</span> setup_test_database([<span style="color: #BA2121">'real_plant'</span>, <span style="color: #BA2121">'virtual_plant'</span>], <span style="color: #BA2121">'/tmp/ROMI_DB'</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 INFO     [test_database] File <span style="color: #BA2121">'real_plant.zip'</span> exists locally<span style="color: #666">.</span> Skipping download<span style="color: #666">.</span>
@@ -4540,7 +4568,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_logged_username(db)<span style="color: #666">.</span>username  <span style="color: #3D7B7B; font-style: italic"># 'admin' is logged by default</span>
 <span style="color: #717171">'admin'</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666">.</span>path())  <span style="color: #3D7B7B; font-style: italic"># the database directory</span>
-<span style="color: #717171">/tmp/romidb_********</span>
+<span style="color: #717171">/tmp/romidb_...</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666">.</span>list_scans())
 <span style="color: #717171">['myscan_001']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">"myscan_001"</span>)  <span style="color: #3D7B7B; font-style: italic"># get the existing scan</span>
@@ -4551,7 +4579,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #717171">['dummy_image', 'test_image', 'test_json']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>f <span style="color: #666">=</span> fs<span style="color: #666">.</span>get_file(<span style="color: #BA2121">"test_image"</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(f<span style="color: #666">.</span>path())
-<span style="color: #717171">/tmp/romidb_********/myscan_001/fileset_001/test_image.png</span>
+<span style="color: #717171">/tmp/romidb_.../myscan_001/fileset_001/test_image.png</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666">.</span>path()<span style="color: #666">.</span>exists())
 <span style="color: #717171">False</span>
@@ -4561,11 +4589,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">644</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">645</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">646</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">647</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">648</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">649</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">650</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">651</span>
@@ -4665,7 +4689,11 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">745</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">746</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">747</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">748</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">dummy_db</span>(with_scan: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, with_fileset: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, with_file: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> <span style="color: #BA2121">"FSDB"</span>:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">748</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">749</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">750</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">751</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">752</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">dummy_db</span>(with_scan: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, with_fileset: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, with_file: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> <span style="color: #BA2121">"FSDB"</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Create a dummy temporary database.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
@@ -4701,7 +4729,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; get_logged_username(db).username  # 'admin' is logged by default</span>
 <span style="color: #BA2121; font-style: italic">    'admin'</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(db.path())  # the database directory</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_...</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(db.list_scans())</span>
 <span style="color: #BA2121; font-style: italic">    ['myscan_001']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")  # get the existing scan</span>
@@ -4712,7 +4740,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    ['dummy_image', 'test_image', 'test_json']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; f = fs.get_file("test_image")</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(f.path())</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********/myscan_001/fileset_001/test_image.png</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_.../myscan_001/fileset_001/test_image.png</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(db.path().exists())</span>
 <span style="color: #BA2121; font-style: italic">    False</span>
@@ -4812,7 +4840,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path where to download the pipeline configurations. Defaults to <code>TEST_DIR</code>.</p>
+                <p>The path where to download the pipeline configurations.
+Defaults to the per-user cache directory <code>~/.cache/plantdb</code>.</p>
               </div>
             </td>
             <td>
@@ -4880,7 +4909,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> get_configs
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the pipeline configurations to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the pipeline configurations to `~/.cache/plantdb` directory</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_configs()
 </code></pre></div>
 
@@ -4917,14 +4946,16 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">441</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">442</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">443</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">=</span> TEST_DIR,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">444</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">445</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_configs</span>(db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">=</span> TEST_DIR,
                 keep_tmp: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, force: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> Path:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Download and extract the pipeline configurations from ZENODO.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    db_path : str or pathlib.Path, optional</span>
-<span style="color: #BA2121; font-style: italic">        The path where to download the pipeline configurations. Defaults to ``TEST_DIR``.</span>
+<span style="color: #BA2121; font-style: italic">        The path where to download the pipeline configurations.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to the per-user cache directory ``~/.cache/plantdb``.</span>
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
@@ -4938,7 +4969,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import get_configs</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the pipeline configurations to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the pipeline configurations to `~/.cache/plantdb` directory</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; get_configs()</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     ds_path <span style="color: #666">=</span> Path(db_path) <span style="color: #666">/</span> <span style="color: #BA2121">"configs"</span>
@@ -4989,7 +5020,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path where to download the trained CNN model. Defaults to <code>TEST_DIR</code>.</p>
+                <p>The path where to download the trained CNN model.
+Defaults to the per-user cache directory <code>~/.cache/plantdb</code>.</p>
               </div>
             </td>
             <td>
@@ -5057,7 +5089,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> get_models_dataset
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the trained CNN models to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the trained CNN models to `~/.cache/plantdb` directory</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_models_dataset()
 </code></pre></div>
 
@@ -5065,7 +5097,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">382</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">383</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">384</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">385</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">386</span>
@@ -5101,7 +5134,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
 <span style="color: #BA2121; font-style: italic">    db_path : str or pathlib.Path, optional</span>
-<span style="color: #BA2121; font-style: italic">        The path where to download the trained CNN model. Defaults to ``TEST_DIR``.</span>
+<span style="color: #BA2121; font-style: italic">        The path where to download the trained CNN model.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to the per-user cache directory ``~/.cache/plantdb``.</span>
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
@@ -5115,7 +5149,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import get_models_dataset</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the trained CNN models to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the trained CNN models to `~/.cache/plantdb` directory</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; get_models_dataset()</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     ds_path <span style="color: #666">=</span> Path(db_path) <span style="color: #666">/</span> <span style="color: #BA2121">"models"</span>
@@ -5182,7 +5216,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path where to extract the test dataset archive. Defaults to <code>TEST_DIR</code>.</p>
+                <p>The path where to extract the test dataset archive.
+Defaults to the per-user cache directory <code>~/.cache/plantdb</code>.</p>
               </div>
             </td>
             <td>
@@ -5250,7 +5285,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> get_test_dataset
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the 'real_plant' test dataset to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Download and extract the 'real_plant' test dataset to `~/.cache/plantdb`</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>get_test_dataset(<span style="color: #BA2121">'real_plant'</span>)
 </code></pre></div>
 
@@ -5258,7 +5293,9 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">347</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">348</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">349</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">350</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">351</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">352</span>
@@ -5288,8 +5325,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">376</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">377</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">378</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">380</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset: <span style="color: #008000">str</span>, db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">=</span> TEST_DIR,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">379</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">get_test_dataset</span>(dataset: <span style="color: #008000">str</span>, db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">=</span> TEST_DIR,
                      keep_tmp: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, force: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> Path:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Download and extract a test dataset from ZENODO.</span>
 
@@ -5298,7 +5334,8 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    dataset : {'real_plant', 'virtual_plant', 'real_plant_analyzed', 'virtual_plant_analyzed', 'arabidopsis000'}</span>
 <span style="color: #BA2121; font-style: italic">        The name of the dataset to download.</span>
 <span style="color: #BA2121; font-style: italic">    db_path : str or pathlib.Path, optional</span>
-<span style="color: #BA2121; font-style: italic">        The path where to extract the test dataset archive. Defaults to ``TEST_DIR``.</span>
+<span style="color: #BA2121; font-style: italic">        The path where to extract the test dataset archive.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to the per-user cache directory ``~/.cache/plantdb``.</span>
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    force : bool, optional</span>
@@ -5312,7 +5349,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import get_test_dataset</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the 'real_plant' test dataset to `plantdb/src/commons/tests/testdata` directory</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # Download and extract the 'real_plant' test dataset to `~/.cache/plantdb`</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; get_test_dataset('real_plant')</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     ds_path <span style="color: #666">=</span> Path(db_path) <span style="color: #666">/</span> dataset
@@ -5341,7 +5378,7 @@ PosixPath(<span style="color: #BA2121">'/tmp/ROMI_DB'</span>)
     <div class="doc doc-contents ">
 
         <p>Sets up an empty ROMI database.</p>
-<p>Sets up necessary marker file and ensures the absence of a lock file.</p>
+<p>Sets up the necessary marker file and ensures the absence of a lock file.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5403,7 +5440,7 @@ Defaults to <code>None</code>.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> setup_empty_database
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>path <span style="color: #666">=</span> setup_empty_database()  <span style="color: #3D7B7B; font-style: italic"># initialize an empty FSDB in the temporary directory</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(path)
-<span style="color: #717171">/tmp/ROMI_DB_********</span>
+<span style="color: #717171">/tmp/ROMI_DB_...</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>([path<span style="color: #666">.</span>name <span style="color: #008000; font-weight: bold">for</span> path <span style="color: #A2F; font-weight: bold">in</span> path<span style="color: #666">.</span>iterdir()])  <span style="color: #3D7B7B; font-style: italic"># only the 'marker' file is created</span>
 <span style="color: #717171">['romidb']</span>
 </code></pre></div>
@@ -5412,8 +5449,7 @@ Defaults to <code>None</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">447</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">448</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">449</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">450</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">451</span>
@@ -5458,10 +5494,11 @@ Defaults to <code>None</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">490</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">491</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">492</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666">-&gt;</span> Path:
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">493</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">494</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_empty_database</span>(db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>) <span style="color: #666">-&gt;</span> Path:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Sets up an empty ROMI database.</span>
 
-<span style="color: #BA2121; font-style: italic">    Sets up necessary marker file and ensures the absence of a lock file.</span>
+<span style="color: #BA2121; font-style: italic">    Sets up the necessary marker file and ensures the absence of a lock file.</span>
 
 <span style="color: #BA2121; font-style: italic">    Parameters</span>
 <span style="color: #BA2121; font-style: italic">    ----------</span>
@@ -5479,7 +5516,7 @@ Defaults to <code>None</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import setup_empty_database</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; path = setup_empty_database()  # initialize an empty FSDB in the temporary directory</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(path)</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/ROMI_DB_********</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/ROMI_DB_...</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print([path.name for path in path.iterdir()])  # only the 'marker' file is created</span>
 <span style="color: #BA2121; font-style: italic">    ['romidb']</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
@@ -5519,7 +5556,7 @@ Defaults to <code>None</code>.</p>
 
 
 <a href="#plantdb.commons.test_database.setup_test_database" class="headerlink" title="Permanent link">Link</a></h2>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>setup_test_database(<a class="autorefs autorefs-internal" title="dataset (plantdb.commons.test_database.setup_test_database(dataset))" href="#plantdb.commons.test_database.setup_test_database(dataset)">dataset</a>, <a class="autorefs autorefs-internal" title="db_path (plantdb.commons.test_database.setup_test_database(db_path))" href="#plantdb.commons.test_database.setup_test_database(db_path)">db_path</a><span style="color: #666">=</span><span title="plantdb.commons.test_database.TEST_DIR">TEST_DIR</span>, <a class="autorefs autorefs-internal" title="keep_tmp (plantdb.commons.test_database.setup_test_database(keep_tmp))" href="#plantdb.commons.test_database.setup_test_database(keep_tmp)">keep_tmp</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, <a class="autorefs autorefs-internal" title="with_configs (plantdb.commons.test_database.setup_test_database(with_configs))" href="#plantdb.commons.test_database.setup_test_database(with_configs)">with_configs</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="with_models (plantdb.commons.test_database.setup_test_database(with_models))" href="#plantdb.commons.test_database.setup_test_database(with_models)">with_models</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="force (plantdb.commons.test_database.setup_test_database(force))" href="#plantdb.commons.test_database.setup_test_database(force)">force</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>setup_test_database(<a class="autorefs autorefs-internal" title="dataset (plantdb.commons.test_database.setup_test_database(dataset))" href="#plantdb.commons.test_database.setup_test_database(dataset)">dataset</a>, <a class="autorefs autorefs-internal" title="db_path (plantdb.commons.test_database.setup_test_database(db_path))" href="#plantdb.commons.test_database.setup_test_database(db_path)">db_path</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">None</span>, <a class="autorefs autorefs-internal" title="keep_tmp (plantdb.commons.test_database.setup_test_database(keep_tmp))" href="#plantdb.commons.test_database.setup_test_database(keep_tmp)">keep_tmp</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>, <a class="autorefs autorefs-internal" title="with_configs (plantdb.commons.test_database.setup_test_database(with_configs))" href="#plantdb.commons.test_database.setup_test_database(with_configs)">with_configs</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="with_models (plantdb.commons.test_database.setup_test_database(with_models))" href="#plantdb.commons.test_database.setup_test_database(with_models)">with_models</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="force (plantdb.commons.test_database.setup_test_database(force))" href="#plantdb.commons.test_database.setup_test_database(force)">force</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5565,11 +5602,11 @@ See the notes below for a list of dataset names and their meanings.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path where to set up the database. Defaults to <code>TEST_DIR</code>.</p>
+                <p>The path where to set up the database. Defaults to the per-user cache directory <code>~/.cache/plantdb</code>.</p>
               </div>
             </td>
             <td>
-                  <code><span title="plantdb.commons.test_database.TEST_DIR">TEST_DIR</span></code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -5665,7 +5702,7 @@ See the notes below for a list of dataset names and their meanings.</p>
 
 <details class="note" open>
   <summary>Notes</summary>
-  <p>The list of valid dataset names are:
+  <p>The list of valid dataset names is:
   * <code>'real_plant'</code>: 60 images of a Col-0 <em>Arabidopsis thaliana</em> plant acquired with the <em>Plant Imager</em>;
   * <code>'virtual_plant'</code>: 18 snapshots of a virtual <em>Arabidopsis thaliana</em> plant generated with the <em>Virtual Plant Imager</em>;
   * <code>'real_plant_analyzed'</code>: the <code>real_plant</code> dataset reconstructed using the <code>AnglesAndInternodes</code> task with the <code>testcfg/geom_pipe_real.toml</code> configuration file;
@@ -5675,20 +5712,19 @@ See the notes below for a list of dataset names and their meanings.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> setup_test_database
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 1 - Download and extract the 'real_plant' test database to the per-user cache directory:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>setup_test_database(<span style="color: #BA2121">'real_plant'</span>)
-<span style="color: #717171">PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')</span>
+<span style="color: #717171">PosixPath('.../.cache/plantdb')</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>setup_test_database([<span style="color: #BA2121">'real_plant'</span>, <span style="color: #BA2121">'virtual_plant'</span>], <span style="color: #008000; font-weight: bold">None</span>, with_configs<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
-<span style="color: #717171">PosixPath('/tmp/ROMI_DB_********')</span>
+<span style="color: #717171">PosixPath('/tmp/ROMI_DB_...')</span>
 </code></pre></div>
 
           
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">496</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">497</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">498</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">499</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">500</span>
@@ -5766,7 +5802,11 @@ See the notes below for a list of dataset names and their meanings.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">572</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">573</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">574</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset: <span style="color: #008000">str</span> <span style="color: #666">|</span> <span style="color: #008000">list</span>[<span style="color: #008000">str</span>], db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> TEST_DIR,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">575</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">576</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">577</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">579</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">setup_test_database</span>(dataset: <span style="color: #008000">str</span> <span style="color: #666">|</span> <span style="color: #008000">list</span>[<span style="color: #008000">str</span>], db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>,
                         keep_tmp: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">True</span>, with_configs: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
                         with_models: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>, force: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>) <span style="color: #666">-&gt;</span> Path:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Download and extract the test database from ZENODO.</span>
@@ -5778,7 +5818,7 @@ See the notes below for a list of dataset names and their meanings.</p>
 <span style="color: #BA2121; font-style: italic">        Using "all" allows downloading all defined datasets.</span>
 <span style="color: #BA2121; font-style: italic">        See the notes below for a list of dataset names and their meanings.</span>
 <span style="color: #BA2121; font-style: italic">    db_path : str or pathlib.Path, optional</span>
-<span style="color: #BA2121; font-style: italic">        The path where to set up the database. Defaults to ``TEST_DIR``.</span>
+<span style="color: #BA2121; font-style: italic">        The path where to set up the database. Defaults to the per-user cache directory ``~/.cache/plantdb``.</span>
 <span style="color: #BA2121; font-style: italic">    keep_tmp : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        Whether to keep the temporary files. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    with_configs : bool, optional</span>
@@ -5795,7 +5835,7 @@ See the notes below for a list of dataset names and their meanings.</p>
 
 <span style="color: #BA2121; font-style: italic">    Notes</span>
 <span style="color: #BA2121; font-style: italic">    -----</span>
-<span style="color: #BA2121; font-style: italic">    The list of valid dataset names are:</span>
+<span style="color: #BA2121; font-style: italic">    The list of valid dataset names is:</span>
 <span style="color: #BA2121; font-style: italic">      * ``'real_plant'``: 60 images of a Col-0 _Arabidopsis thaliana_ plant acquired with the _Plant Imager_;</span>
 <span style="color: #BA2121; font-style: italic">      * ``'virtual_plant'``: 18 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;</span>
 <span style="color: #BA2121; font-style: italic">      * ``'real_plant_analyzed'``: the ``real_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``testcfg/geom_pipe_real.toml`` configuration file;</span>
@@ -5805,13 +5845,16 @@ See the notes below for a list of dataset names and their meanings.</p>
 <span style="color: #BA2121; font-style: italic">    Examples</span>
 <span style="color: #BA2121; font-style: italic">    --------</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import setup_test_database</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 1 - Download and extract the 'real_plant' test database to the per-user cache directory:</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; setup_test_database('real_plant')</span>
-<span style="color: #BA2121; font-style: italic">    PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath('.../.cache/plantdb')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; setup_test_database(['real_plant', 'virtual_plant'], None, with_configs=True)</span>
-<span style="color: #BA2121; font-style: italic">    PosixPath('/tmp/ROMI_DB_********')</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath('/tmp/ROMI_DB_...')</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
+    <span style="color: #3D7B7B; font-style: italic"># Use the per-user cache directory by default</span>
+    <span style="color: #008000; font-weight: bold">if</span> db_path <span style="color: #A2F; font-weight: bold">is</span> <span style="color: #008000; font-weight: bold">None</span>:
+        db_path <span style="color: #666">=</span> TEST_DIR
     <span style="color: #3D7B7B; font-style: italic"># Initialize an empty ROMI database</span>
     db_path <span style="color: #666">=</span> setup_empty_database(db_path)
 
@@ -6030,7 +6073,7 @@ Override the <code>no_auth</code> parameter.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>list_scans(owner_only<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
 <span style="color: #717171">['real_plant_analyzed']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>path()
-<span style="color: #717171">PosixPath('/tmp/ROMI_DB_********')</span>
+<span style="color: #717171">PosixPath('/tmp/ROMI_DB_...')</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()
 </code></pre></div>
 
@@ -6038,11 +6081,7 @@ Override the <code>no_auth</code> parameter.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/commons/test_database.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">578</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">579</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">580</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">581</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">582</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">583</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">584</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">585</span>
@@ -6101,7 +6140,11 @@ Override the <code>no_auth</code> parameter.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">638</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">639</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">640</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">641</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset: <span style="color: #008000">str</span> <span style="color: #666">|</span> <span style="color: #008000">list</span>[<span style="color: #008000">str</span>] <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #BA2121">'real_plant_analyzed'</span>,
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">641</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">642</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">643</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">644</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">645</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">test_database</span>(dataset: <span style="color: #008000">str</span> <span style="color: #666">|</span> <span style="color: #008000">list</span>[<span style="color: #008000">str</span>] <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #BA2121">'real_plant_analyzed'</span>,
                   db_path: <span style="color: #008000">str</span> <span style="color: #666">|</span> Path <span style="color: #666">|</span> <span style="color: #008000; font-weight: bold">None</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">None</span>, <span style="color: #666">**</span>kwargs) <span style="color: #666">-&gt;</span> <span style="color: #BA2121">"FSDB"</span>:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Create and return an FSDB test database.</span>
 
@@ -6145,7 +6188,7 @@ Override the <code>no_auth</code> parameter.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.list_scans(owner_only=False)</span>
 <span style="color: #BA2121; font-style: italic">    ['real_plant_analyzed']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.path()</span>
-<span style="color: #BA2121; font-style: italic">    PosixPath('/tmp/ROMI_DB_********')</span>
+<span style="color: #BA2121; font-style: italic">    PosixPath('/tmp/ROMI_DB_...')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.fsdb.core</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> FSDB

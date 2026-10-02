@@ -1124,6 +1124,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../cli/setup_test_database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    setup_test_database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../cli/shared_fsdb/" class="md-nav__link">
         
   
@@ -9571,7 +9599,7 @@ plantdb.commons.fsdb.core.MARKER_FILE_NAME</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(<span style="color: #008000">type</span>(db))
 <span style="color: #717171">&lt;class 'plantdb.commons.fsdb.core.FSDB'&gt;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666">.</span>path())
-<span style="color: #717171">/tmp/romidb_********</span>
+<span style="color: #717171">/tmp/romidb_...</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Create a new `Scan`:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_scan <span style="color: #666">=</span> db<span style="color: #666">.</span>create_scan(<span style="color: #BA2121">"007"</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(<span style="color: #008000">type</span>(new_scan))
@@ -13426,7 +13454,7 @@ It should exist if <code>create</code> is <code>False</code>.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_scan<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">'myscan_001'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scan)
-<span style="color: #717171">&lt;plantdb.commons.fsdb.core.Scan object at **************&gt;</span>
+<span style="color: #717171">&lt;plantdb.commons.fsdb.core.Scan object at ...&gt;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>list_scans()
 <span style="color: #717171">['007']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>unknown_scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">'unknown'</span>)
@@ -13533,7 +13561,7 @@ It should exist if <code>create</code> is <code>False</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_scan=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan('myscan_001')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(scan)</span>
-<span style="color: #BA2121; font-style: italic">    &lt;plantdb.commons.fsdb.core.Scan object at **************&gt;</span>
+<span style="color: #BA2121; font-style: italic">    &lt;plantdb.commons.fsdb.core.Scan object at ...&gt;</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.list_scans()</span>
 <span style="color: #BA2121; font-style: italic">    ['007']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; unknown_scan = db.get_scan('unknown')</span>
@@ -14072,7 +14100,7 @@ Default is <code>True</code>.</p>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>get_scans()
-<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.Scan at *x************&gt;]</span>
+<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.Scan at ...&gt;]</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -14179,7 +14207,7 @@ Default is <code>True</code>.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.get_scans()</span>
-<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.Scan at *x************&gt;]</span>
+<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.Scan at ...&gt;]</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #3D7B7B; font-style: italic"># Get all scans and filter by access permissions</span>
@@ -16174,7 +16202,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db()
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(db<span style="color: #666">.</span>path())
-<span style="color: #717171">/tmp/romidb_********</span>
+<span style="color: #717171">/tmp/romidb_...</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -16201,7 +16229,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db()</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(db.path())</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_...</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> copy<span style="color: #666">.</span>deepcopy(<span style="color: #008000">self</span><span style="color: #666">.</span>basedir)
@@ -18164,7 +18192,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: #717171">['dummy_image', 'test_image', 'test_json']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>f <span style="color: #666">=</span> fs<span style="color: #666">.</span>get_file(<span style="color: #BA2121">'dummy_image'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>f<span style="color: #666">.</span>path()
-<span style="color: #717171">/tmp/romidb_********/myscan_001/fileset_001/dummy_image.png</span>
+<span style="color: #717171">/tmp/romidb_.../myscan_001/fileset_001/dummy_image.png</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -18201,7 +18229,7 @@ Else, returns the value attached to this key.</p>
 <span style="color: #BA2121; font-style: italic">    ['dummy_image', 'test_image', 'test_json']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; f = fs.get_file('dummy_image')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; f.path()</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********/myscan_001/fileset_001/dummy_image.png</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_.../myscan_001/fileset_001/dummy_image.png</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> _file_path(<span style="color: #008000">self</span>)
@@ -20311,9 +20339,9 @@ If the user does not have permission to delete this file.</p>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">'myscan_001'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>fs <span style="color: #666">=</span> scan<span style="color: #666">.</span>get_fileset(<span style="color: #BA2121">'fileset_001'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>fs<span style="color: #666">.</span>get_files()
-<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.File at *x************&gt;,</span>
-<span style="color: #717171"> &lt;plantdb.commons.fsdb.core.File at *x************&gt;,</span>
-<span style="color: #717171"> &lt;plantdb.commons.fsdb.core.File at *x************&gt;]</span>
+<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.File at ...&gt;,</span>
+<span style="color: #717171"> &lt;plantdb.commons.fsdb.core.File at ...&gt;,</span>
+<span style="color: #717171"> &lt;plantdb.commons.fsdb.core.File at ...&gt;]</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -20378,9 +20406,9 @@ If the user does not have permission to delete this file.</p>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan('myscan_001')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; fs = scan.get_fileset('fileset_001')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; fs.get_files()</span>
-<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.File at *x************&gt;,</span>
-<span style="color: #BA2121; font-style: italic">     &lt;plantdb.commons.fsdb.core.File at *x************&gt;,</span>
-<span style="color: #BA2121; font-style: italic">     &lt;plantdb.commons.fsdb.core.File at *x************&gt;]</span>
+<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.File at ...&gt;,</span>
+<span style="color: #BA2121; font-style: italic">     &lt;plantdb.commons.fsdb.core.File at ...&gt;,</span>
+<span style="color: #BA2121; font-style: italic">     &lt;plantdb.commons.fsdb.core.File at ...&gt;]</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> _filter_query(<span style="color: #008000">list</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>files<span style="color: #666">.</span>values()), query, fuzzy)
@@ -20927,12 +20955,12 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #717171">['myscan_001']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">"myscan_001"</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(scan<span style="color: #666">.</span>path())
-<span style="color: #717171">/tmp/romidb_********/myscan_001</span>
+<span style="color: #717171">/tmp/romidb_.../myscan_001</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>[fs<span style="color: #666">.</span>id <span style="color: #008000; font-weight: bold">for</span> fs <span style="color: #A2F; font-weight: bold">in</span> scan<span style="color: #666">.</span>get_filesets()]  <span style="color: #3D7B7B; font-style: italic"># list fileset ids found in scan</span>
 <span style="color: #717171">['fileset_001']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>fs <span style="color: #666">=</span> scan<span style="color: #666">.</span>get_fileset(<span style="color: #BA2121">"fileset_001"</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(fs<span style="color: #666">.</span>path())
-<span style="color: #717171">/tmp/romidb_********/myscan_001/fileset_001</span>
+<span style="color: #717171">/tmp/romidb_.../myscan_001/fileset_001</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -20970,12 +20998,12 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #BA2121; font-style: italic">    ['myscan_001']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(scan.path())</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********/myscan_001</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_.../myscan_001</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; [fs.id for fs in scan.get_filesets()]  # list fileset ids found in scan</span>
 <span style="color: #BA2121; font-style: italic">    ['fileset_001']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; fs = scan.get_fileset("fileset_001")</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(fs.path())</span>
-<span style="color: #BA2121; font-style: italic">    /tmp/romidb_********/myscan_001/fileset_001</span>
+<span style="color: #BA2121; font-style: italic">    /tmp/romidb_.../myscan_001/fileset_001</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> _fileset_path(<span style="color: #008000">self</span>)
@@ -21355,7 +21383,7 @@ Indexed by configuration file stem, typically <code>'scan'</code> or <code>'pipe
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>timelapse_exists(<span style="color: #BA2121">"Star_Wars"</span>)
 <span style="color: #717171">True</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>path()
-<span style="color: #717171">PosixPath('/tmp/ROMI_DB_********/Star_Wars/A_New_Hope')</span>
+<span style="color: #717171">PosixPath('/tmp/ROMI_DB_.../Star_Wars/A_New_Hope')</span>
 </code></pre></div>
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #3D7B7B; font-style: italic"># Example #3: Get it from an `FSDB` object:</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db()
@@ -22961,7 +22989,7 @@ If the user does not have permission to delete this fileset.</p>
 <span style="color: #717171">['fileset_001']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>new_fileset <span style="color: #666">=</span> scan<span style="color: #666">.</span>create_fileset(<span style="color: #BA2121">'007'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000">print</span>(new_fileset)
-<span style="color: #717171">&lt;plantdb.commons.fsdb.core.Fileset object at **************&gt;</span>
+<span style="color: #717171">&lt;plantdb.commons.fsdb.core.Fileset object at ...&gt;</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>list_filesets()
 <span style="color: #717171">['fileset_001', '007']</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>unknown_fs <span style="color: #666">=</span> scan<span style="color: #666">.</span>get_fileset(<span style="color: #BA2121">'unknown'</span>)
@@ -23031,7 +23059,7 @@ If the user does not have permission to delete this fileset.</p>
 <span style="color: #BA2121; font-style: italic">    ['fileset_001']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; new_fileset = scan.create_fileset('007')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; print(new_fileset)</span>
-<span style="color: #BA2121; font-style: italic">    &lt;plantdb.commons.fsdb.core.Fileset object at **************&gt;</span>
+<span style="color: #BA2121; font-style: italic">    &lt;plantdb.commons.fsdb.core.Fileset object at ...&gt;</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan.list_filesets()</span>
 <span style="color: #BA2121; font-style: italic">    ['fileset_001', '007']</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; unknown_fs = scan.get_fileset('unknown')</span>
@@ -23147,7 +23175,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_fileset<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">'myscan_001'</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>get_filesets()
-<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.Fileset at *x************&gt;]</span>
+<span style="color: #717171">[&lt;plantdb.commons.fsdb.core.Fileset at ...&gt;]</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -23210,7 +23238,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_fileset=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan('myscan_001')</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan.get_filesets()</span>
-<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.Fileset at *x************&gt;]</span>
+<span style="color: #BA2121; font-style: italic">    [&lt;plantdb.commons.fsdb.core.Fileset at ...&gt;]</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> [<span style="color: #008000">self</span><span style="color: #666">.</span>get_fileset(fs<span style="color: #666">.</span>id) <span style="color: #008000; font-weight: bold">for</span> fs <span style="color: #A2F; font-weight: bold">in</span> _filter_query(<span style="color: #008000">list</span>(<span style="color: #008000">self</span><span style="color: #666">.</span>filesets<span style="color: #666">.</span>values()), query, fuzzy)]
@@ -24153,7 +24181,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
     <div class="language-pycon highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span><span style="color: #008000; font-weight: bold">from</span><span style="color: #BBB"> </span><span style="color: #00F; font-weight: bold">plantdb.commons.test_database</span><span style="color: #BBB"> </span><span style="color: #008000; font-weight: bold">import</span> dummy_db
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db <span style="color: #666">=</span> dummy_db(with_file<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>)
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan <span style="color: #666">=</span> db<span style="color: #666">.</span>get_scan(<span style="color: #BA2121">"myscan_001"</span>)
-<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>path()  <span style="color: #3D7B7B; font-style: italic"># should be '/tmp/romidb_********/myscan_001'</span>
+<span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>scan<span style="color: #666">.</span>path()  <span style="color: #3D7B7B; font-style: italic"># should be '/tmp/romidb_.../myscan_001'</span>
 <span style="color: #000080; font-weight: bold">&gt;&gt;&gt; </span>db<span style="color: #666">.</span>disconnect()  <span style="color: #3D7B7B; font-style: italic"># clean up (delete) the temporary dummy database</span>
 </code></pre></div>
 
@@ -24180,7 +24208,7 @@ The metadata must match given <code>key</code> and <code>value</code> from the <
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; from plantdb.commons.test_database import dummy_db</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db = dummy_db(with_file=True)</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan = db.get_scan("myscan_001")</span>
-<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan.path()  # should be '/tmp/romidb_********/myscan_001'</span>
+<span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; scan.path()  # should be '/tmp/romidb_.../myscan_001'</span>
 <span style="color: #BA2121; font-style: italic">    &gt;&gt;&gt; db.disconnect()  # clean up (delete) the temporary dummy database</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     <span style="color: #008000; font-weight: bold">return</span> _scan_path(<span style="color: #008000">self</span>)
