@@ -45,13 +45,13 @@ Archive ``'models.zip'`` contains a preconfigured directory structure with the t
 
 ```python
 >>> from plantdb.commons.test_database import setup_test_database
->>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
+>>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to the per-user cache directory:
 >>> db_path = setup_test_database('real_plant')
 INFO     [test_database] File 'real_plant.zip' exists locally. Skipping download.
 INFO     [test_database] Verifying 'real_plant.zip' MD5 hash value...
-INFO     [test_database] The test database is set up under '/home/jonathan/Projects/plantdb/tests/testdata'.
+INFO     [test_database] The test database is set up under '../.cache/plantdb'.
 >>> print(db_path)
-PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
+PosixPath('../.cache/plantdb')
 >>> # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':
 >>> db_path = setup_test_database(['real_plant', 'virtual_plant'], '/tmp/ROMI_DB', with_configs=True)
 INFO     [test_database] File 'real_plant.zip' exists locally. Skipping download.
@@ -105,10 +105,8 @@ ZIP_MD5S = {
     "arabidopsis000": "10e0c1fefcc8cf3b629db5b42fd64e36",
 }
 
-#: Path to `plantdb` module root directory:
-ROOT = Path(__file__).absolute().parent.parent.parent
-#: Path to `plantdb` module "tests/testdata" directory:
-TEST_DIR = ROOT / "tests" / "testdata"
+#: Path to the default per-user cache directory for the test database:
+TEST_DIR = Path.home() / ".cache" / "plantdb"
 
 logger = get_logger(__name__)
 
@@ -145,7 +143,7 @@ def _mkdtemp_romidb() -> Path:
     --------
     >>> from plantdb.commons.test_database import _mkdtemp_romidb
     >>> _mkdtemp_romidb()
-    PosixPath('/tmp/ROMI_DB_********')
+    PosixPath('/tmp/ROMI_DB_...')
     """
     return Path(mkdtemp(prefix='ROMI_DB_'))
 
@@ -317,7 +315,7 @@ def _get_extract_archive(archive: str, out_path: str | Path = TEST_DIR,
     archive : {'configs', 'models', 'real_plant', 'virtual_plant', 'real_plant_analyzed', 'virtual_plant_analyzed', 'arabidopsis000'}
         The base name (without zip extension) of the archive to download.
     out_path : str or pathlib.Path, optional
-        The path where to extract the downloaded archive. Defaults to ``TEST_DIR``.
+        The path where to extract the downloaded archive. Defaults to the per-user cache directory ``~/.cache/plantdb``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
@@ -355,7 +353,8 @@ def get_test_dataset(dataset: str, db_path: str | Path = TEST_DIR,
     dataset : {'real_plant', 'virtual_plant', 'real_plant_analyzed', 'virtual_plant_analyzed', 'arabidopsis000'}
         The name of the dataset to download.
     db_path : str or pathlib.Path, optional
-        The path where to extract the test dataset archive. Defaults to ``TEST_DIR``.
+        The path where to extract the test dataset archive.
+        Defaults to the per-user cache directory ``~/.cache/plantdb``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
@@ -369,7 +368,7 @@ def get_test_dataset(dataset: str, db_path: str | Path = TEST_DIR,
     Examples
     --------
     >>> from plantdb.commons.test_database import get_test_dataset
-    >>> # Download and extract the 'real_plant' test dataset to `plantdb/src/commons/tests/testdata` directory
+    >>> # Download and extract the 'real_plant' test dataset to `~/.cache/plantdb`
     >>> get_test_dataset('real_plant')
     """
     ds_path = Path(db_path) / dataset
@@ -387,7 +386,8 @@ def get_models_dataset(db_path: str | Path = TEST_DIR,
     Parameters
     ----------
     db_path : str or pathlib.Path, optional
-        The path where to download the trained CNN model. Defaults to ``TEST_DIR``.
+        The path where to download the trained CNN model.
+        Defaults to the per-user cache directory ``~/.cache/plantdb``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
@@ -401,7 +401,7 @@ def get_models_dataset(db_path: str | Path = TEST_DIR,
     Examples
     --------
     >>> from plantdb.commons.test_database import get_models_dataset
-    >>> # Download and extract the trained CNN models to `plantdb/src/commons/tests/testdata` directory
+    >>> # Download and extract the trained CNN models to `~/.cache/plantdb` directory
     >>> get_models_dataset()
     """
     ds_path = Path(db_path) / "models"
@@ -419,7 +419,8 @@ def get_configs(db_path: str | Path = TEST_DIR,
     Parameters
     ----------
     db_path : str or pathlib.Path, optional
-        The path where to download the pipeline configurations. Defaults to ``TEST_DIR``.
+        The path where to download the pipeline configurations.
+        Defaults to the per-user cache directory ``~/.cache/plantdb``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     force : bool, optional
@@ -433,7 +434,7 @@ def get_configs(db_path: str | Path = TEST_DIR,
     Examples
     --------
     >>> from plantdb.commons.test_database import get_configs
-    >>> # Download and extract the pipeline configurations to `plantdb/src/commons/tests/testdata` directory
+    >>> # Download and extract the pipeline configurations to `~/.cache/plantdb` directory
     >>> get_configs()
     """
     ds_path = Path(db_path) / "configs"
@@ -447,7 +448,7 @@ def get_configs(db_path: str | Path = TEST_DIR,
 def setup_empty_database(db_path: str | Path | None = None) -> Path:
     """Sets up an empty ROMI database.
 
-    Sets up necessary marker file and ensures the absence of a lock file.
+    Sets up the necessary marker file and ensures the absence of a lock file.
 
     Parameters
     ----------
@@ -465,7 +466,7 @@ def setup_empty_database(db_path: str | Path | None = None) -> Path:
     >>> from plantdb.commons.test_database import setup_empty_database
     >>> path = setup_empty_database()  # initialize an empty FSDB in the temporary directory
     >>> print(path)
-    /tmp/ROMI_DB_********
+    /tmp/ROMI_DB_...
     >>> print([path.name for path in path.iterdir()])  # only the 'marker' file is created
     ['romidb']
     """
@@ -493,7 +494,7 @@ def setup_empty_database(db_path: str | Path | None = None) -> Path:
     return db_path
 
 
-def setup_test_database(dataset: str | list[str], db_path: str | Path | None = TEST_DIR,
+def setup_test_database(dataset: str | list[str], db_path: str | Path | None = None,
                         keep_tmp: bool = True, with_configs: bool = False,
                         with_models: bool = False, force: bool = False) -> Path:
     """Download and extract the test database from ZENODO.
@@ -505,7 +506,7 @@ def setup_test_database(dataset: str | list[str], db_path: str | Path | None = T
         Using "all" allows downloading all defined datasets.
         See the notes below for a list of dataset names and their meanings.
     db_path : str or pathlib.Path, optional
-        The path where to set up the database. Defaults to ``TEST_DIR``.
+        The path where to set up the database. Defaults to the per-user cache directory ``~/.cache/plantdb``.
     keep_tmp : bool, optional
         Whether to keep the temporary files. Defaults to ``False``.
     with_configs : bool, optional
@@ -522,7 +523,7 @@ def setup_test_database(dataset: str | list[str], db_path: str | Path | None = T
 
     Notes
     -----
-    The list of valid dataset names are:
+    The list of valid dataset names is:
       * ``'real_plant'``: 60 images of a Col-0 _Arabidopsis thaliana_ plant acquired with the _Plant Imager_;
       * ``'virtual_plant'``: 18 snapshots of a virtual _Arabidopsis thaliana_ plant generated with the _Virtual Plant Imager_;
       * ``'real_plant_analyzed'``: the ``real_plant`` dataset reconstructed using the ``AnglesAndInternodes`` task with the ``testcfg/geom_pipe_real.toml`` configuration file;
@@ -532,13 +533,16 @@ def setup_test_database(dataset: str | list[str], db_path: str | Path | None = T
     Examples
     --------
     >>> from plantdb.commons.test_database import setup_test_database
-    >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to `plantdb/tests/testdata` module directory:
+    >>> # EXAMPLE 1 - Download and extract the 'real_plant' test database to the per-user cache directory:
     >>> setup_test_database('real_plant')
-    PosixPath('/home/jonathan/Projects/plantdb/tests/testdata')
+    PosixPath('.../.cache/plantdb')
     >>> # EXAMPLE 2 - Download and extract the 'real_plant' and 'virtual_plant' test dataset and configuration pipelines to a temporary folder called 'ROMI_DB':
     >>> setup_test_database(['real_plant', 'virtual_plant'], None, with_configs=True)
-    PosixPath('/tmp/ROMI_DB_********')
+    PosixPath('/tmp/ROMI_DB_...')
     """
+    # Use the per-user cache directory by default
+    if db_path is None:
+        db_path = TEST_DIR
     # Initialize an empty ROMI database
     db_path = setup_empty_database(db_path)
 
@@ -619,7 +623,7 @@ def test_database(dataset: str | list[str] | None = 'real_plant_analyzed',
     >>> db.list_scans(owner_only=False)
     ['real_plant_analyzed']
     >>> db.path()
-    PosixPath('/tmp/ROMI_DB_********')
+    PosixPath('/tmp/ROMI_DB_...')
     >>> db.disconnect()
     """
     from plantdb.commons.fsdb.core import FSDB
@@ -677,7 +681,7 @@ def dummy_db(with_scan: bool = False, with_fileset: bool = False, with_file: boo
     >>> get_logged_username(db).username  # 'admin' is logged by default
     'admin'
     >>> print(db.path())  # the database directory
-    /tmp/romidb_********
+    /tmp/romidb_...
     >>> print(db.list_scans())
     ['myscan_001']
     >>> scan = db.get_scan("myscan_001")  # get the existing scan
@@ -688,7 +692,7 @@ def dummy_db(with_scan: bool = False, with_fileset: bool = False, with_file: boo
     ['dummy_image', 'test_image', 'test_json']
     >>> f = fs.get_file("test_image")
     >>> print(f.path())
-    /tmp/romidb_********/myscan_001/fileset_001/test_image.png
+    /tmp/romidb_.../myscan_001/fileset_001/test_image.png
     >>> db.disconnect()  # clean up (delete) the temporary dummy database
     >>> print(db.path().exists())
     False

@@ -104,7 +104,7 @@ class TestRestApiServer:
     >>> from plantdb.commons.test_database import test_database
     >>> test_db = test_database()  # set up a temporary test database
     >>> print(test_db.path())
-    /tmp/ROMI_DB_********
+    /tmp/ROMI_DB_...
     >>> server = TestRestApiServer(db_path=test_db.path())
     >>> server.start()
     >>> # Get a list of all datasets from the DB:
