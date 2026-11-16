@@ -16,6 +16,7 @@ from plantdb.commons.fsdb.exceptions import ScanExistsError
 from plantdb.commons.fsdb.exceptions import ScanNotFoundError
 from plantdb.commons.fsdb.exceptions import TimeLapseExistsError
 from plantdb.commons.fsdb.exceptions import TimeLapseNotFoundError
+from plantdb.commons.test_database import dummy_db
 from plantdb.commons.testing import DummyDBTestCase
 
 
@@ -763,6 +764,105 @@ class TestFSDBTimelapse(DummyDBTestCase):
         self.assertIsNotNone(after_delete)
         self.assertNotEqual(after_delete, after_create2)
         self.assertEqual(db.get_timelapse("tl_lastmod").scans, ["scan_lm_02"])
+
+
+class TestFSDBLazy(unittest.TestCase):
+    """Tests for the opt-in lazy scan loading mode."""
+
+    def setUp(self):
+        self.source = dummy_db(with_scan=True, with_fileset=True, with_file=True)
+        self.db_path = self.source.path()
+        self.db = FSDB(self.db_path, no_auth=True, lazy=True)
+        self.db.connect()
+
+    def tearDown(self):
+        self.db.disconnect()
+        self.source.disconnect()  # dummy database: removes the temporary directory
+
+    def test_connect_discovers_without_loading(self):
+        self.assertTrue(self.db.is_connected)
+        self.assertEqual(self.db.scans, {})
+        self.assertEqual(list(self.db._scan_paths), ["myscan_001"])
+        self.assertEqual(self.db._scan_paths["myscan_001"], (self.db_path / "myscan_001").resolve())
+
+    def test_scan_exists_does_not_load(self):
+        self.assertTrue(self.db.scan_exists("myscan_001"))
+        self.assertFalse(self.db.scan_exists("nope"))
+        self.assertEqual(self.db.scans, {})
+
+    def test_get_scan_loads_only_requested(self):
+        scan = self.db.get_scan("myscan_001")
+        self.assertIsInstance(scan, Scan)
+        self.assertEqual(list(self.db.scans), ["myscan_001"])
+        self.assertIs(self.db.get_scan("myscan_001"), scan)
+
+    def test_get_scan_unknown_raises(self):
+        with self.assertRaises(ScanNotFoundError):
+            self.db.get_scan("nope")
+
+    def test_get_scans_materialises_all(self):
+        scans = self.db.get_scans()
+        self.assertEqual([s.id for s in scans], ["myscan_001"])
+        self.assertEqual(list(self.db.scans), ["myscan_001"])
+
+    def test_unfiltered_list_scans_does_not_load(self):
+        self.assertEqual(self.db.list_scans(owner_only=False), ["myscan_001"])
+        self.assertEqual(self.db.scans, {})
+
+    def test_filtered_list_scans_materialises(self):
+        self.assertEqual(self.db.list_scans(query={"test": 1}, owner_only=False), ["myscan_001"])
+        self.assertEqual(list(self.db.scans), ["myscan_001"])
+
+    def test_sorted_list_scans_materialises(self):
+        self.assertEqual(self.db.list_scans(sort="id", owner_only=False), ["myscan_001"])
+        self.assertEqual(list(self.db.scans), ["myscan_001"])
+
+    def test_create_and_delete_scan_bookkeeping(self):
+        self.db.create_scan("lazy_002")
+        self.assertIn("lazy_002", self.db._scan_paths)
+        self.assertTrue(self.db.scan_exists("lazy_002"))
+        self.db.delete_scan("lazy_002")
+        self.assertNotIn("lazy_002", self.db._scan_paths)
+        self.assertNotIn("lazy_002", self.db.scans)
+        self.assertFalse(self.db.scan_exists("lazy_002"))
+
+    def test_delete_unloaded_scan(self):
+        self.assertEqual(self.db.scans, {})
+        self.db.delete_scan("myscan_001")
+        self.assertNotIn("myscan_001", self.db._scan_paths)
+        self.assertFalse(self.db.scan_exists("myscan_001"))
+
+    def test_reload_clears_loaded_scans(self):
+        self.db.get_scan("myscan_001")
+        self.db.reload()
+        self.assertEqual(self.db.scans, {})
+        self.assertIn("myscan_001", self.db._scan_paths)
+
+    def test_timelapse_member_scan_discovery(self):
+        tl = self.db.create_timelapse("tl_001")
+        tl.create_scan("tl_001_01")
+        self.db.reload()
+        self.assertEqual(self.db.scans, {})
+        self.assertEqual(self.db._scan_paths["tl_001_01"].parent, (self.db_path / "tl_001").resolve())
+
+        tl = self.db.get_timelapse("tl_001")
+        self.assertTrue(tl.scan_exists("tl_001_01"))
+        self.assertEqual(tl.to_dict()["counts"], {"scans": 1})
+
+    def test_eager_parity(self):
+        self.assertEqual(
+            sorted(self.db.list_scans(owner_only=False)),
+            ["myscan_001"],
+        )
+        lazy_metadata = self.db.get_scan("myscan_001").get_metadata("test")
+
+        eager = FSDB(self.db_path, no_auth=True)
+        eager.connect()
+        try:
+            self.assertEqual(sorted(eager.list_scans(owner_only=False)), ["myscan_001"])
+            self.assertEqual(eager.get_scan("myscan_001").get_metadata("test"), lazy_metadata)
+        finally:
+            eager.disconnect()
 
 
 if __name__ == "__main__":

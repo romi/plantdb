@@ -168,7 +168,9 @@ from plantdb.commons.fsdb.file_ops import _delete_file
 from plantdb.commons.fsdb.file_ops import _delete_fileset
 from plantdb.commons.fsdb.file_ops import _delete_scan
 from plantdb.commons.fsdb.file_ops import _delete_timelapse
+from plantdb.commons.fsdb.file_ops import _discover_scan_paths
 from plantdb.commons.fsdb.file_ops import _load_scan
+from plantdb.commons.fsdb.file_ops import _load_scan_at
 from plantdb.commons.fsdb.file_ops import _load_scans
 from plantdb.commons.fsdb.file_ops import _make_fileset
 from plantdb.commons.fsdb.file_ops import _make_scan
@@ -456,15 +458,9 @@ def _get_fsdb_and_scan(obj, *args) -> tuple["FSDB", "Scan"]:
     if isinstance(obj, Scan):
         return obj.db, obj
     elif isinstance(obj, TimeLapse):
-        try:
-            return obj.db, obj.db.scans[args[0]]
-        except KeyError:
-            raise ScanNotFoundError(obj.db, args[0])
+        return obj.db, obj._get_scan(args[0])
     elif isinstance(obj, FSDB):
-        try:
-            return obj, obj.scans[args[0]]
-        except KeyError:
-            raise ScanNotFoundError(obj, args[0])
+        return obj, obj._get_scan(args[0])
     elif isinstance(obj, Fileset):
         return obj.db, obj.scan
     elif isinstance(obj, File):
@@ -658,7 +654,8 @@ class FSDB(db.DB):
                  logger: Optional[logging.Logger] = None,
                  session_manager: SessionManager = None,
                  session_timeout: int = 3600, max_login_attempts: int = 3,
-                 lockout_duration: int = 900, max_concurrent_sessions: int = 10, **kwargs):
+                 lockout_duration: int = 900, max_concurrent_sessions: int = 10,
+                 lazy: bool = False, **kwargs):
         """Database constructor.
 
         Check the given `` basedir `` directory exists and load accessible ``Scan`` objects.
@@ -687,6 +684,9 @@ class FSDB(db.DB):
         max_concurrent_sessions : int, optional
             The maximum number of concurrent sessions to login before locking up.
             Defaults to 10.
+        lazy : bool, optional
+            If ``True``, only discover and validate scan directories on connection and load each
+            ``Scan`` on first access. Defaults to ``False`` (eager loading).
 
         Other Parameters
         ----------------
@@ -720,6 +720,8 @@ class FSDB(db.DB):
         self.extra_dirs = extra_dirs
         self.scans = {}
         self.is_connected: bool = False
+        self._lazy = lazy
+        self._scan_paths: dict[str, Path] = {}
 
         # Initialize lock manager
         self.lock_manager = LockManager(basedir)
@@ -772,12 +774,44 @@ class FSDB(db.DB):
             raise NotAnFSDBError(f"Directory `{self.basedir}` is not a valid path to an FSDB!")
         try:
             # Initialize scan discovery
-            self.scans = _load_scans(self)
+            if self._lazy:
+                self.scans = {}
+                self._scan_paths = _discover_scan_paths(self)
+            else:
+                self.scans = _load_scans(self)
             self.is_connected = True
             self.logger.info("Successfully connected to the database")
         except Exception as e:
             self.logger.error(f"Failed to connect to database: {e}")
             raise
+
+    def _get_scan(self, scan_id: str) -> "Scan":
+        """Return a fully loaded ``Scan``, loading it on first access in lazy mode.
+
+        Raises
+        ------
+        plantdb.commons.fsdb.exceptions.ScanNotFoundError
+            If ``scan_id`` is not a registered scan or its dataset cannot be loaded.
+        """
+        scan = self.scans.get(scan_id)
+        if scan is not None:
+            return scan
+        scan_path = self._scan_paths.get(scan_id)
+        if scan_path is None:
+            raise ScanNotFoundError(self, scan_id)
+        scan = _load_scan_at(self, scan_path)
+        if scan is None:
+            self._scan_paths.pop(scan_id, None)
+            raise ScanNotFoundError(self, scan_id)
+        self.scans[scan_id] = scan
+        return scan
+
+    def _ensure_all_scans(self) -> None:
+        """Materialize every registered scan (no-op outside lazy mode)."""
+        if not self._lazy:
+            return
+        for scan_id in list(self._scan_paths):
+            self._get_scan(scan_id)
 
     @require_connected_db
     def disconnect(self) -> None:
@@ -803,6 +837,7 @@ class FSDB(db.DB):
         for s_id, scan in self.scans.items():
             scan._erase()
         self.scans = {}
+        self._scan_paths = {}
         self.is_connected = False
 
         # If this FSDB instance was created by dummy_db, clean up the temp directory
@@ -826,13 +861,21 @@ class FSDB(db.DB):
         """
         if scan_id is None:
             self.logger.info("Reloading the database...")
-            self.scans = _load_scans(self)
+            if self._lazy:
+                self.scans = {}
+                self._scan_paths = _discover_scan_paths(self)
+            else:
+                self.scans = _load_scans(self)
         elif isinstance(scan_id, str):
             self.logger.info(f"Reloading scan '{scan_id}'...")
             scan = _load_scan(self, scan_id)
             if not scan:
                 self.logger.error(f"Failed to reload scan '{scan_id}'!")
-            self.scans[scan_id] = scan
+                self.scans.pop(scan_id, None)
+                self._scan_paths.pop(scan_id, None)
+            else:
+                self.scans[scan_id] = scan
+                self._scan_paths[scan_id] = scan.path()
         elif isinstance(scan_id, Iterable):
             [self.reload(scan_i) for scan_i in scan_id]
         else:
@@ -864,7 +907,7 @@ class FSDB(db.DB):
         False
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
-        return scan_id in self.scans
+        return scan_id in self.scans or scan_id in self._scan_paths
 
     @require_connected_db
     @get_authentication
@@ -903,6 +946,7 @@ class FSDB(db.DB):
         [<plantdb.commons.fsdb.core.Scan at ...>]
         >>> db.disconnect()  # clean up (delete) the temporary dummy database
         """
+        self._ensure_all_scans()
         # Get all scans and filter by access permissions
         accessible_scans = {}
 
@@ -986,7 +1030,7 @@ class FSDB(db.DB):
                                             current_user.username if current_user else "guest", LockLevel.SCAN):
             if not self.scan_exists(scan_id):
                 raise ScanNotFoundError(self, scan_id)
-            return self.scans[scan_id]
+            return self._get_scan(scan_id)
 
     @require_connected_db
     @get_authentication
@@ -1104,6 +1148,7 @@ class FSDB(db.DB):
             _store_scan_metadata(scan)
             scan.store()  # store the new scan in the local database
             self.scans[scan_id] = scan  # Update scans dictionary with the new one
+            self._scan_paths[scan_id] = scan_path
 
             if tl_id:
                 self._register_scan_in_timelapse(tl_id, scan_id, current_user.username)
@@ -1219,14 +1264,15 @@ class FSDB(db.DB):
         self.logger.debug(f"Deleting scan '{scan_id}' as '{current_user.username}' user...")
         with self.lock_manager.acquire_lock(scan_id, LockType.EXCLUSIVE, current_user.username, LockLevel.SCAN):
             # Get the Scan instance from the database
-            scan = self.scans[scan_id]
+            scan = self._get_scan(scan_id)
             tl_id = None
             if isinstance(scan.metadata, dict):
                 tl_meta = scan.metadata.get("timelapse")
                 if isinstance(tl_meta, dict):
                     tl_id = tl_meta.get("id")
             _delete_scan(scan)  # delete the scan directory
-            self.scans.pop(scan_id)  # remove the scan from the scan list
+            self.scans.pop(scan_id, None)  # remove the scan from the scan list
+            self._scan_paths.pop(scan_id, None)
             if tl_id:
                 self._unregister_scan_from_timelapse(tl_id, scan_id)
 
@@ -1280,11 +1326,11 @@ class FSDB(db.DB):
 
         sort = kwargs.get('sort', None)
         if query is None and not sort:
-            return list(self.scans.keys())
-        else:
-            scans_list = _filter_query(list(self.scans.values()), query, fuzzy) if query else list(self.scans.values())
-            scans_list = _sort_scans(scans_list, sort)
-            return [scan.id for scan in scans_list]
+            return list(self._scan_paths) if self._lazy else list(self.scans.keys())
+        self._ensure_all_scans()
+        scans_list = _filter_query(list(self.scans.values()), query, fuzzy) if query else list(self.scans.values())
+        scans_list = _sort_scans(scans_list, sort)
+        return [scan.id for scan in scans_list]
 
     @require_connected_db
     @get_authentication
@@ -1574,7 +1620,7 @@ class FSDB(db.DB):
             Dictionary mapping scan IDs to their lock status
         """
         active_locks = {}
-        for scan_id in self.scans.keys():
+        for scan_id in (self._scan_paths if self._lazy else self.scans.keys()):
             lock_status = self.get_scan_lock_status(scan_id)
             if lock_status['exclusive'] or lock_status['shared']:
                 active_locks[scan_id] = lock_status
@@ -2294,10 +2340,10 @@ class FSDB(db.DB):
         ['admin_role']
         >>> db.disconnect()
         """
-        if scan_id not in self.scans:
+        if not self.scan_exists(scan_id):
             return None
 
-        scan = self.scans[scan_id]
+        scan = self._get_scan(scan_id)
         try:
             metadata = scan.get_metadata()
             return self.rbac_manager.get_user_scan_role_summary(current_user, metadata)
@@ -2404,7 +2450,7 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         """
         if not self.db.scan_exists(scan_id):
             return False
-        scan = self.db.scans[scan_id]
+        scan = self.db._get_scan(scan_id)
         if isinstance(scan.metadata, dict):
             tl = scan.metadata.get("timelapse")
             if isinstance(tl, dict) and tl.get("id") == self.id:
@@ -2701,6 +2747,7 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         {'scans': 1}
         >>> db.disconnect()
         """
+        self.db._ensure_all_scans()
         member_scans = [
             s for s in self.db.scans.values()
             if isinstance(s.metadata, dict) and s.metadata.get("timelapse", {}).get("id") == self.id
@@ -2727,6 +2774,7 @@ class TimeLapse(db.TimeLapse, MetadataManager):
         elif item == "scans":
             return list(self.scans)
         elif item == "counts":
+            self.db._ensure_all_scans()
             member_scans = [
                 s for s in self.db.scans.values()
                 if isinstance(s.metadata, dict) and s.metadata.get("timelapse", {}).get("id") == self.id

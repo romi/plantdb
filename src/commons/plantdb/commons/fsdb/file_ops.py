@@ -86,6 +86,45 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
+def _discover_scan_paths(db: 'FSDB') -> dict[str, Path]:
+    """Discover valid scan directories without loading their content.
+
+    Walks the database root, descends timelapse containers, and keeps only the
+    candidate directories that pass ``_is_scan_dataset`` (metadata directory and
+    ``files.json`` structure). Per-file metadata is never read, which makes this
+    the cheap half of :func:`_load_scans`.
+
+    Parameters
+    ----------
+    db : plantdb.commons.fsdb.core.FSDB
+        The PlantDB filesystem database instance to scan.
+
+    Returns
+    -------
+    dict[str, pathlib.Path]
+        Dictionary mapping each valid scan identifier to its resolved directory path.
+    """
+    scans: dict[str, Path] = {}
+    bad_scans = set()
+    dir_names = [d for d in db.path().iterdir() if d.is_dir() and not d.name.startswith('.')]
+    for dir_name in dir_names:
+        if (dir_name / TIMELAPSE_MARKER_FILE_NAME).is_file():
+            # Timelapse container directory: discover member scans
+            candidates = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
+        else:
+            candidates = [dir_name]
+        for candidate in candidates:
+            if _is_scan_dataset(candidate, validate_json_fileset=False):
+                scans[candidate.name] = candidate.resolve()
+            else:
+                label = f"{dir_name.name}/{candidate.name}" if candidate != dir_name else dir_name.name
+                bad_scans.add(label)
+
+    if bad_scans:
+        logger.info(f"Found {len(bad_scans)} bad scans: {', '.join(sorted(bad_scans))}")
+    return scans
+
+
 def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan']:
     """Load all scans from a PlantDB filesystem database.
 
@@ -138,36 +177,17 @@ def _load_scans(db: 'FSDB', updates_files_json: bool = False) -> dict[str, 'Scan
     [('007', '007'), ('111', '111')]
     >>> db.disconnect()
     """
-    # List all subdirectories of the database path:
-    dir_names = [dir_name for dir_name in db.path().iterdir() if
-                 dir_name.is_dir() and not dir_name.name.startswith('.')]
-    # Return empty list if no directory found:
-    if len(dir_names) == 0:
-        return {}
+    # Discover valid scan directories without reading their content:
+    scan_paths = _discover_scan_paths(db)
 
-    # Loop through the directories and load them as scan if they meet the criteria
+    # Load each discovered scan:
     scans = {}
-    bad_scans = set()
-    for dir_name in tqdm(dir_names, unit="scan"):
-        if (dir_name / TIMELAPSE_MARKER_FILE_NAME).is_file():
-            # Timelapse container directory: discover member scans
-            child_dirs = [c for c in dir_name.iterdir() if c.is_dir() and not c.name.startswith('.')]
-            for child in child_dirs:
-                scan = _load_scan_at(db, child, updates_files_json)
-                if scan is not None:
-                    scans[scan.id] = scan
-                else:
-                    bad_scans.add(f"{dir_name.name}/{child.name}")
+    for scan_id, scan_path in tqdm(scan_paths.items(), unit="scan"):
+        scan = _load_scan_at(db, scan_path, updates_files_json)
+        if scan is not None:
+            scans[scan.id] = scan
         else:
-            scan = _load_scan_at(db, dir_name, updates_files_json)
-            if scan is not None:
-                scans[scan.id] = scan
-            else:
-                bad_scans.add(dir_name.name)
-
-    if bad_scans:
-        n_bad = len(bad_scans)
-        logger.info(f"Found {n_bad} bad scans: {', '.join(bad_scans)}")
+            logger.info(f"Failed to load scan '{scan_id}' from '{scan_path}'")
 
     return scans
 
@@ -902,10 +922,11 @@ def _delete_timelapse(db: 'FSDB', tl_id: str, recursive: bool = False) -> None:
     if child_scans and not recursive:
         raise ValueError(f"Timelapse '{tl_id}' is not empty. Use recursive=True to delete it and its scans.")
 
+    scan_paths = getattr(db, "_scan_paths", {})
     if hasattr(db, "scans") and isinstance(db.scans, dict):
         for child in child_scans:
-            if child.name in db.scans:
-                del db.scans[child.name]
+            db.scans.pop(child.name, None)
+            scan_paths.pop(child.name, None)
 
     send2trash(tl_path)
     logger.debug(f"Deleted timelapse container directory for '{tl_id}'.")

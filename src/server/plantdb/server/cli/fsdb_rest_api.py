@@ -423,6 +423,7 @@ def rest_api(
         test: bool = False,
         empty: bool = False,
         models: bool = False,
+        lazy: bool = False,
 ) -> Flask:
     """Initialize and configure a RESTful API server for Plant Database querying.
 
@@ -457,6 +458,9 @@ def rest_api(
         datasets or configurations. Defaults to ``False``.
     models : bool, optional
         A boolean flag to specify whether the test database should be populated with trained CNN models.
+        Defaults to ``False``.
+    lazy : bool, optional
+        A boolean flag to load scans on first access instead of at startup.
         Defaults to ``False``.
     """
     wlogger = logging.getLogger("werkzeug")
@@ -513,6 +517,7 @@ def rest_api(
             max_concurrent_sessions=max_sessions,
         ),
         log_level=log_level,
+        lazy=lazy,
     )
     logger.info(f"Connecting to local plant database at '{db.path()}'.")
     db.connect()
@@ -588,6 +593,12 @@ def rest_api(
     default=False,
     help="Include trained CNN model in the test database.",
 )
+@optgroup.option(
+    "--lazy",
+    is_flag=True,
+    default=False,
+    help="Load each scan on first access instead of at startup.",
+)
 @optgroup.group("Logging", cls=OptionGroup)
 @optgroup.option(
     "--log-level",
@@ -596,10 +607,10 @@ def rest_api(
     show_default=True,
     help="Logging level.",
 )
-def main(host, port, debug, proxy, api_prefix, db_path, test, empty, models, log_level):
+def main(host, port, debug, proxy, api_prefix, db_path, test, empty, models, lazy, log_level):
     """FSDB REST API - Serve Plant Database through RESTful Endpoints."""
     app = rest_api(db_path=db_path, proxy=proxy, deploy_prefix=api_prefix, log_level=log_level.upper(), test=test,
-                   empty=empty, models=models)
+                   empty=empty, models=models, lazy=lazy)
     # Start the Flask development server.
     app.run(host=host, port=port, debug=debug)
 
