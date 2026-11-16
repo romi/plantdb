@@ -318,6 +318,10 @@ class TestRestApi(unittest.TestCase):
 
     def test_centralized_variables(self):
         """Test that centralized variables are properly initialized"""
+        # Isolate from environment pollution left by other tests that construct
+        # a PlantDBClient (whose api_prefix() writes PLANTDB_PREFIX to os.environ).
+        for var in ('PLANTDB_HOST', 'PLANTDB_PORT', 'PLANTDB_PREFIX'):
+            os.environ.pop(var, None)
         # Test default values
         self.assertEqual(os.getenv('PLANTDB_HOST', "localhost"), "localhost")
         self.assertEqual(os.getenv('PLANTDB_PORT', ''), '')
