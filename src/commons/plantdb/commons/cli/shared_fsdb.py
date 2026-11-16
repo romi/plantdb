@@ -50,7 +50,7 @@ logger = get_logger(os.getenv('ROMI_APP_LOGGER'), log_level=DEFAULT_LOG_LEVEL)
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.argument('path', type=click.Path())
-@click.option('-d', '--dataset', type=str, nargs="+",
+@click.option('-d', '--dataset', type=str, multiple=True,
               default=['real_plant'],
               help="Test dataset to clone, use 'all' to get all of them. " +
                    "You can list several dataset names to clone. " +
