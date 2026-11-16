@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## Version 0.17.1 - 2026-11-16
+
+### Added
+- Add opt-in lazy scan loading so filesets are only loaded when accessed.
+
+### Fixed
+- Fix Docker entrypoint to forward all arguments to the command.
+
 ## Version 0.17.0 - 2026-10-02
 
 ### Added
