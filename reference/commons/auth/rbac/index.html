@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.57a0d79d.min.css">
       
       
 
@@ -6113,7 +6113,7 @@ and revoke permissions with ease.</p>
 </code></pre></div>
 
 <p>v    &gt;&gt;&gt; rbac.get_user_permissions(guest)
-    {<Permission.READ: 'read'>}
+    {&lt;Permission.READ: 'read'&gt;}
     &gt;&gt;&gt; rbac.can_create_group(guest)
     False
     &gt;&gt;&gt; # Get the 'admin' user and create a new user
@@ -6193,7 +6193,7 @@ and revoke permissions with ease.</p>
 <h3 id="plantdb.commons.auth.rbac.RBACManager(lockout_duration)" class="doc doc-heading doc-heading-parameter">                  <code>lockout_duration</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager(lockout_duration)" class="headerlink" title="Permanent link">Link</a></h3>            </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a> or <span title="timedelta">timedelta</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a> or timedelta</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6356,12 +6356,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.add_user_to_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.add_user_to_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6527,17 +6522,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_access_scan(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_access_scan(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | <a class="autorefs autorefs-internal" title="            TokenUser
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.TokenUser)" href="../models/#plantdb.commons.auth.models.TokenUser">TokenUser</a></code>
+                  <code>User | TokenUser</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6569,7 +6554,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_access_scan(operation)" class="doc doc-heading doc-heading-parameter">                  <code>operation</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_access_scan(operation)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Permission (plantdb.commons.auth.models.Permission)" href="../models/#plantdb.commons.auth.models.Permission">Permission</a></code>
+                  <code>Permission</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6702,12 +6687,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_add_to_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_add_to_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6854,12 +6834,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_create_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_create_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6969,12 +6944,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_create_user(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_create_user(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7081,12 +7051,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_delete_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_delete_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7205,12 +7170,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_manage_groups(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_manage_groups(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7321,12 +7281,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_modify_scan_owner(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_modify_scan_owner(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7458,12 +7413,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.can_modify_scan_sharing(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.can_modify_scan_sharing(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7595,12 +7545,7 @@ and revoke permissions with ease.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.create_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.create_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7818,12 +7763,7 @@ if the operation is not permitted.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.create_user(requesting_user)" class="doc doc-heading doc-heading-parameter">                  <code>requesting_user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.create_user(requesting_user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8101,12 +8041,7 @@ If <code>None</code> (default), use the <code>Role.READER</code> role.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.delete_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.delete_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8364,12 +8299,7 @@ the owner field is always present.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.get_accessible_scans_for_user(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.get_accessible_scans_for_user(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8523,17 +8453,7 @@ the owner field is always present.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.get_effective_role_for_scan(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.get_effective_role_for_scan(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | <a class="autorefs autorefs-internal" title="            TokenUser
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.TokenUser)" href="../models/#plantdb.commons.auth.models.TokenUser">TokenUser</a></code>
+                  <code>User | TokenUser</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8575,7 +8495,7 @@ the owner field is always present.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="plantdb.commons.models.Role">Role</span></code>
+                  <code>Role</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8817,17 +8737,7 @@ taking into account ownership and group sharing.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.get_scan_permissions(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.get_scan_permissions(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | <a class="autorefs autorefs-internal" title="            TokenUser
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.TokenUser)" href="../models/#plantdb.commons.auth.models.TokenUser">TokenUser</a></code>
+                  <code>User | TokenUser</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9075,17 +8985,7 @@ resulting set is a union of both direct and indirect permissions.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.get_user_permissions(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.get_user_permissions(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | <a class="autorefs autorefs-internal" title="            TokenUser
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.TokenUser)" href="../models/#plantdb.commons.auth.models.TokenUser">TokenUser</a></code>
+                  <code>User | TokenUser</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9283,12 +9183,7 @@ plantdb.commons.auth.models.Role : Represents a role with specific permissions.<
 <h4 id="plantdb.commons.auth.rbac.RBACManager.get_user_scan_role_summary(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.get_user_scan_role_summary(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9498,17 +9393,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.has_permission(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.has_permission(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | <a class="autorefs autorefs-internal" title="            TokenUser
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.TokenUser)" href="../models/#plantdb.commons.auth.models.TokenUser">TokenUser</a></code>
+                  <code>User | TokenUser</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9524,7 +9409,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.has_permission(permission)" class="doc doc-heading doc-heading-parameter">                  <code>permission</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.has_permission(permission)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Permission (plantdb.commons.auth.models.Permission)" href="../models/#plantdb.commons.auth.models.Permission">Permission</a></code>
+                  <code>Permission</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9668,12 +9553,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.has_role(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.has_role(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9689,7 +9569,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.has_role(role)" class="doc doc-heading doc-heading-parameter">                  <code>role</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.has_role(role)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Role (plantdb.commons.auth.models.Role)" href="../models/#plantdb.commons.auth.models.Role">Role</a></code>
+                  <code>Role</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9799,12 +9679,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.is_guest_user(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.is_guest_user(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9910,12 +9785,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.list_groups(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.list_groups(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10030,12 +9900,7 @@ including administrative privileges.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.remove_user_from_group(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.remove_user_from_group(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10368,12 +10233,7 @@ like 'owner' and 'sharing' based on the RBAC rules.</p>
 <h4 id="plantdb.commons.auth.rbac.RBACManager.validate_scan_metadata_access(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.rbac.RBACManager.validate_scan_metadata_access(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10880,10 +10740,10 @@ like 'owner' and 'sharing' based on the RBAC rules.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       

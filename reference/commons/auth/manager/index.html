@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.57a0d79d.min.css">
       
       
 
@@ -5429,12 +5429,7 @@ Groups are stored in a JSON file and loaded/saved as needed.</p>
           <tr class="doc-section-item">
             <td><code><span title="plantdb.commons.auth.manager.GroupManager.groups">groups</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-internal" title="            Group
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.Group)" href="../models/#plantdb.commons.auth.models.Group">Group</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, Group]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6662,12 +6657,7 @@ user account lockout management, and handling of guest accounts.</p>
           <tr class="doc-section-item">
             <td><code><span title="plantdb.commons.auth.manager.UserManager.users">users</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.Dict" href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, User]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6737,7 +6727,7 @@ user account lockout management, and handling of guest accounts.</p>
 <h3 id="plantdb.commons.auth.manager.UserManager(users_file)" class="doc doc-heading doc-heading-parameter">                  <code>users_file</code>
 <a href="#plantdb.commons.auth.manager.UserManager(users_file)" class="headerlink" title="Permanent link">Link</a></h3>            </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> or Path</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6890,7 +6880,7 @@ user account lockout management, and handling of guest accounts.</p>
 <h4 id="plantdb.commons.auth.manager.UserManager.activate(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.manager.UserManager.activate(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><span title="plantdb.commons.auth.User">User</span></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7030,7 +7020,7 @@ This will be converted to lowercase.</p>
 <h4 id="plantdb.commons.auth.manager.UserManager.create(roles)" class="doc doc-heading doc-heading-parameter">                  <code>roles</code>
 <a href="#plantdb.commons.auth.manager.UserManager.create(roles)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Role (plantdb.commons.auth.models.Role)" href="../models/#plantdb.commons.auth.models.Role">Role</a> or <a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-internal" title="            Role (plantdb.commons.auth.models.Role)" href="../models/#plantdb.commons.auth.models.Role">Role</a>]</code>
+                  <code>Role or <a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[Role]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7201,7 +7191,7 @@ If <code>None</code> (default), use the <code>Role.READER</code> role.</p>
 <h4 id="plantdb.commons.auth.manager.UserManager.deactivate(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.manager.UserManager.deactivate(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><span title="plantdb.commons.auth.User">User</span></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7612,12 +7602,7 @@ If it does not exist, <code>None</code> is returned.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            User
-
-
-  
-      dataclass
-   (plantdb.commons.auth.models.User)" href="../models/#plantdb.commons.auth.models.User">User</a> | None</code>
+                  <code>User | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8073,7 +8058,7 @@ for <code>"access"</code> or <code>"refresh"</code> tokens, a <code>"username"</
 <h4 id="plantdb.commons.auth.manager.UserManager.unlock_user(user)" class="doc doc-heading doc-heading-parameter">                  <code>user</code>
 <a href="#plantdb.commons.auth.manager.UserManager.unlock_user(user)" class="headerlink" title="Permanent link">Link</a></h4>            </td>
             <td>
-                  <code><span title="plantdb.commons.auth.User">User</span></code>
+                  <code>User</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8694,10 +8679,10 @@ for <code>"access"</code> or <code>"refresh"</code> tokens, a <code>"username"</
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       

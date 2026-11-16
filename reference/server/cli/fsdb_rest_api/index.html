@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/ROMI_ICON_green.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.57a0d79d.min.css">
       
       
 
@@ -2427,6 +2427,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#plantdb.server.cli.fsdb_rest_api.rest_api(lazy)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;lazy
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3910,6 +3921,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#plantdb.server.cli.fsdb_rest_api.rest_api(lazy)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;lazy
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4007,7 +4029,7 @@ The server enables users to query and manage plant scans, images, point clouds, 
 
 
 <a href="#plantdb.server.cli.fsdb_rest_api.main" class="headerlink" title="Permanent link">Link</a></h2>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>main(<span title="plantdb.server.cli.fsdb_rest_api.main(host)">host</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(port)">port</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(debug)">debug</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(proxy)">proxy</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(api_prefix)">api_prefix</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(db_path)">db_path</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(test)">test</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(empty)">empty</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(models)">models</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(log_level)">log_level</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>main(<span title="plantdb.server.cli.fsdb_rest_api.main(host)">host</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(port)">port</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(debug)">debug</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(proxy)">proxy</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(api_prefix)">api_prefix</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(db_path)">db_path</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(test)">test</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(empty)">empty</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(models)">models</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(lazy)">lazy</span>, <span title="plantdb.server.cli.fsdb_rest_api.main(log_level)">log_level</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4018,12 +4040,7 @@ The server enables users to query and manage plant scans, images, point clouds, 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>plantdb/server/cli/fsdb_rest_api.py</code></summary>
-              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">534</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">535</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">536</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">537</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">538</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">539</span>
+              <div class="language-python highlight" style="background: #f8f8f8"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">539</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">540</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">541</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">542</span>
@@ -4088,7 +4105,18 @@ The server enables users to query and manage plant scans, images, point clouds, 
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">601</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">602</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">603</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@click</span><span style="color: #666">.</span>command(context_settings<span style="color: #666">=</span><span style="color: #008000">dict</span>(help_option_names<span style="color: #666">=</span>[<span style="color: #BA2121">"-h"</span>, <span style="color: #BA2121">"--help"</span>]))
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">604</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">605</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">606</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">607</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">608</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">609</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">610</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">611</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">612</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">613</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">614</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">615</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #A2F">@click</span><span style="color: #666">.</span>command(context_settings<span style="color: #666">=</span><span style="color: #008000">dict</span>(help_option_names<span style="color: #666">=</span>[<span style="color: #BA2121">"-h"</span>, <span style="color: #BA2121">"--help"</span>]))
 <span style="color: #A2F">@click</span><span style="color: #666">.</span>option(
     <span style="color: #BA2121">"--host"</span>,
     default<span style="color: #666">=</span><span style="color: #BA2121">"0.0.0.0"</span>,
@@ -4145,6 +4173,12 @@ The server enables users to query and manage plant scans, images, point clouds, 
     default<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
     help<span style="color: #666">=</span><span style="color: #BA2121">"Include trained CNN model in the test database."</span>,
 )
+<span style="color: #A2F">@optgroup</span><span style="color: #666">.</span>option(
+    <span style="color: #BA2121">"--lazy"</span>,
+    is_flag<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,
+    default<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>,
+    help<span style="color: #666">=</span><span style="color: #BA2121">"Load each scan on first access instead of at startup."</span>,
+)
 <span style="color: #A2F">@optgroup</span><span style="color: #666">.</span>group(<span style="color: #BA2121">"Logging"</span>, <span style="color: #008000">cls</span><span style="color: #666">=</span>OptionGroup)
 <span style="color: #A2F">@optgroup</span><span style="color: #666">.</span>option(
     <span style="color: #BA2121">"--log-level"</span>,
@@ -4153,10 +4187,10 @@ The server enables users to query and manage plant scans, images, point clouds, 
     show_default<span style="color: #666">=</span><span style="color: #008000; font-weight: bold">True</span>,
     help<span style="color: #666">=</span><span style="color: #BA2121">"Logging level."</span>,
 )
-<span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>(host, port, debug, proxy, api_prefix, db_path, test, empty, models, log_level):
+<span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">main</span>(host, port, debug, proxy, api_prefix, db_path, test, empty, models, lazy, log_level):
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""FSDB REST API - Serve Plant Database through RESTful Endpoints."""</span>
     app <span style="color: #666">=</span> rest_api(db_path<span style="color: #666">=</span>db_path, proxy<span style="color: #666">=</span>proxy, deploy_prefix<span style="color: #666">=</span>api_prefix, log_level<span style="color: #666">=</span>log_level<span style="color: #666">.</span>upper(), test<span style="color: #666">=</span>test,
-                   empty<span style="color: #666">=</span>empty, models<span style="color: #666">=</span>models)
+                   empty<span style="color: #666">=</span>empty, models<span style="color: #666">=</span>models, lazy<span style="color: #666">=</span>lazy)
     <span style="color: #3D7B7B; font-style: italic"># Start the Flask development server.</span>
     app<span style="color: #666">.</span>run(host<span style="color: #666">=</span>host, port<span style="color: #666">=</span>port, debug<span style="color: #666">=</span>debug)
 </code></pre></div></td></tr></table></div>
@@ -4173,7 +4207,7 @@ The server enables users to query and manage plant scans, images, point clouds, 
 
 
 <a href="#plantdb.server.cli.fsdb_rest_api.rest_api" class="headerlink" title="Permanent link">Link</a></h2>
-<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>rest_api(<a class="autorefs autorefs-internal" title="db_path (plantdb.server.cli.fsdb_rest_api.rest_api(db_path))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(db_path)">db_path</a>, <a class="autorefs autorefs-internal" title="proxy (plantdb.server.cli.fsdb_rest_api.rest_api(proxy))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(proxy)">proxy</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="api_prefix (plantdb.server.cli.fsdb_rest_api.rest_api(api_prefix))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(api_prefix)">api_prefix</a><span style="color: #666">=</span><span style="color: #BA2121">''</span>, <a class="autorefs autorefs-internal" title="deploy_prefix (plantdb.server.cli.fsdb_rest_api.rest_api(deploy_prefix))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(deploy_prefix)">deploy_prefix</a><span style="color: #666">=</span><span style="color: #BA2121">''</span>, <span title="plantdb.server.cli.fsdb_rest_api.rest_api(ssl)">ssl</span><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="log_level (plantdb.server.cli.fsdb_rest_api.rest_api(log_level))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(log_level)">log_level</a><span style="color: #666">=</span><span title="plantdb.commons.log.DEFAULT_LOG_LEVEL">DEFAULT_LOG_LEVEL</span>, <a class="autorefs autorefs-internal" title="test (plantdb.server.cli.fsdb_rest_api.rest_api(test))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(test)">test</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="empty (plantdb.server.cli.fsdb_rest_api.rest_api(empty))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(empty)">empty</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="models (plantdb.server.cli.fsdb_rest_api.rest_api(models))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(models)">models</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<div class="language-python doc-signature highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>rest_api(<a class="autorefs autorefs-internal" title="db_path (plantdb.server.cli.fsdb_rest_api.rest_api(db_path))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(db_path)">db_path</a>, <a class="autorefs autorefs-internal" title="proxy (plantdb.server.cli.fsdb_rest_api.rest_api(proxy))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(proxy)">proxy</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="api_prefix (plantdb.server.cli.fsdb_rest_api.rest_api(api_prefix))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(api_prefix)">api_prefix</a><span style="color: #666">=</span><span style="color: #BA2121">''</span>, <a class="autorefs autorefs-internal" title="deploy_prefix (plantdb.server.cli.fsdb_rest_api.rest_api(deploy_prefix))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(deploy_prefix)">deploy_prefix</a><span style="color: #666">=</span><span style="color: #BA2121">''</span>, <span title="plantdb.server.cli.fsdb_rest_api.rest_api(ssl)">ssl</span><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="log_level (plantdb.server.cli.fsdb_rest_api.rest_api(log_level))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(log_level)">log_level</a><span style="color: #666">=</span><span title="plantdb.commons.log.DEFAULT_LOG_LEVEL">DEFAULT_LOG_LEVEL</span>, <a class="autorefs autorefs-internal" title="test (plantdb.server.cli.fsdb_rest_api.rest_api(test))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(test)">test</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="empty (plantdb.server.cli.fsdb_rest_api.rest_api(empty))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(empty)">empty</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="models (plantdb.server.cli.fsdb_rest_api.rest_api(models))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(models)">models</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>, <a class="autorefs autorefs-internal" title="lazy (plantdb.server.cli.fsdb_rest_api.rest_api(lazy))" href="#plantdb.server.cli.fsdb_rest_api.rest_api(lazy)">lazy</a><span style="color: #666">=</span><span style="color: #008000; font-weight: bold">False</span>)
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4202,7 +4236,7 @@ mode with optional configurations for using sample datasets.</p>
 <h3 id="plantdb.server.cli.fsdb_rest_api.rest_api(db_path)" class="doc doc-heading doc-heading-parameter">                  <code>db_path</code>
 <a href="#plantdb.server.cli.fsdb_rest_api.rest_api(db_path)" class="headerlink" title="Permanent link">Link</a></h3>            </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> or <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> or None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> or Path or None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4333,6 +4367,23 @@ Defaults to <code>False</code>.</p>
                   <code>False</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+<h3 id="plantdb.server.cli.fsdb_rest_api.rest_api(lazy)" class="doc doc-heading doc-heading-parameter">                  <code>lazy</code>
+<a href="#plantdb.server.cli.fsdb_rest_api.rest_api(lazy)" class="headerlink" title="Permanent link">Link</a></h3>            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A boolean flag to load scans on first access instead of at startup.
+Defaults to <code>False</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4450,7 +4501,12 @@ Defaults to <code>False</code>.</p>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">523</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">524</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">525</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">526</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">527</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">528</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">529</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">530</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">531</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #00F">rest_api</span>(
         db_path: Optional[Union[<span style="color: #008000">str</span>, Path]],
         proxy: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
         api_prefix: <span style="color: #008000">str</span> <span style="color: #666">=</span> <span style="color: #BA2121">""</span>,
@@ -4460,6 +4516,7 @@ Defaults to <code>False</code>.</p>
         test: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
         empty: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
         models: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
+        lazy: <span style="color: #008000">bool</span> <span style="color: #666">=</span> <span style="color: #008000; font-weight: bold">False</span>,
 ) <span style="color: #666">-&gt;</span> Flask:
 <span style="color: #BBB">    </span><span style="color: #BA2121; font-style: italic">"""Initialize and configure a RESTful API server for Plant Database querying.</span>
 
@@ -4494,6 +4551,9 @@ Defaults to <code>False</code>.</p>
 <span style="color: #BA2121; font-style: italic">        datasets or configurations. Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    models : bool, optional</span>
 <span style="color: #BA2121; font-style: italic">        A boolean flag to specify whether the test database should be populated with trained CNN models.</span>
+<span style="color: #BA2121; font-style: italic">        Defaults to ``False``.</span>
+<span style="color: #BA2121; font-style: italic">    lazy : bool, optional</span>
+<span style="color: #BA2121; font-style: italic">        A boolean flag to load scans on first access instead of at startup.</span>
 <span style="color: #BA2121; font-style: italic">        Defaults to ``False``.</span>
 <span style="color: #BA2121; font-style: italic">    """</span>
     wlogger <span style="color: #666">=</span> logging<span style="color: #666">.</span>getLogger(<span style="color: #BA2121">"werkzeug"</span>)
@@ -4550,6 +4610,7 @@ Defaults to <code>False</code>.</p>
             max_concurrent_sessions<span style="color: #666">=</span>max_sessions,
         ),
         log_level<span style="color: #666">=</span>log_level,
+        lazy<span style="color: #666">=</span>lazy,
     )
     logger<span style="color: #666">.</span>info(<span style="color: #BA2121">f"Connecting to local plant database at '</span><span style="color: #A45A77; font-weight: bold">{</span>db<span style="color: #666">.</span>path()<span style="color: #A45A77; font-weight: bold">}</span><span style="color: #BA2121">'."</span>)
     db<span style="color: #666">.</span>connect()
@@ -4676,10 +4737,10 @@ Defaults to <code>False</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       
