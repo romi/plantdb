@@ -286,6 +286,16 @@ class TestFSDBDummy(DummyDBTestCase):
         self.assertIsInstance(scan, Scan)
         self.assertEqual(scan.get_metadata("timelapse")["id"], "tl_001")
 
+    def test_fsdb_reconnect_with_timelapse_scan(self):
+        """connect() loads timelapse member scans (regression: timelapse_exists guarded by require_connected_db)."""
+        db = self.get_test_db()
+        db.create_timelapse("tl_001")
+        db.create_scan("tl_001_1", metadata={"timelapse": {"id": "tl_001", "index": 1}})
+        db._is_dummy = False  # keep the temp directory across disconnect
+        db.disconnect()
+        db.connect()
+        self.assertIn("tl_001_1", db.scans)
+
 
 # ---------------------------------------------------------------------------
 # Scan tests
