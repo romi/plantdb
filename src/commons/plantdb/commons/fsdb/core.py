@@ -1528,7 +1528,6 @@ class FSDB(db.DB):
 
         return True
 
-    @require_connected_db
     def timelapse_exists(self, tl_id: str) -> bool:
         """Check if a timelapse exists in the database.
 
@@ -1542,17 +1541,20 @@ class FSDB(db.DB):
         bool
             True if the timelapse exists, False otherwise.
 
+        Notes
+        -----
+        Not guarded by ``require_connected_db``: this is a pure filesystem check
+        on ``basedir`` and is called by ``Scan.__init__`` during ``connect()``.
+
         Examples
         --------
         >>> from plantdb.commons.test_database import test_database
         >>> db = test_database(no_auth=True)
-        >>> db.connect()
          >>> tl = db.create_timelapse('mytl_001')
         >>> db.timelapse_exists('mytl_001')
         True
         >>> db.timelapse_exists('mytl_002')
         False
-        >>> db.disconnect()
         """
         tl_path = _timelapse_path(self, tl_id)
         return _timelapse_marker(tl_path).is_file()
